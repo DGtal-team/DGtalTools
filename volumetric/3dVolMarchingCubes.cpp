@@ -18,17 +18,17 @@
 #include <boost/program_options/options_description.hpp>
 #include <boost/program_options/parsers.hpp>
 #include <boost/program_options/variables_map.hpp>
-#include "DGtal/kernel/sets/SetPredicate.h"
-#include "DGtal/io/readers/VolReader.h"
-#include "DGtal/images/ImageSelector.h"
-#include "DGtal/images/imagesSetsUtils/SetFromImage.h"
-#include "DGtal/images/ImageLinearCellEmbedder.h"
-#include "DGtal/shapes/Shapes.h"
-#include "DGtal/shapes/CanonicEmbedder.h"
-#include "DGtal/helpers/StdDefs.h"
-#include "DGtal/topology/helpers/Surfaces.h"
-#include "DGtal/topology/DigitalSurface.h"
-#include "DGtal/topology/SetOfSurfels.h"
+#include <DGtal/kernel/sets/SetPredicate.h>
+#include <DGtal/io/readers/VolReader.h>
+#include <DGtal/images/ImageSelector.h>
+#include <DGtal/images/imagesSetsUtils/SetFromImage.h>
+#include <DGtal/images/ImageLinearCellEmbedder.h>
+#include <DGtal/shapes/Shapes.h>
+#include <DGtal/shapes/CanonicEmbedder.h>
+#include <DGtal/helpers/StdDefs.h>
+#include <DGtal/topology/helpers/Surfaces.h>
+#include <DGtal/topology/DigitalSurface.h>
+#include <DGtal/topology/SetOfSurfels.h>
 //! [3dVolMarchingCubes-basicIncludes]
 
 ///////////////////////////////////////////////////////////////////////////////
