@@ -1,21 +1,26 @@
-#CMakeLists associated to the tests subdir
 #David Coeurjolly <david.coeurjolly@liris.cnrs.fr>
+# -----------------------------------------------------------------------------
+# Project definition
+# -----------------------------------------------------------------------------
+PROJECT(DGtalTools)
 
-# Make sure the compiler can find include files.
-if ( CPP0X_INITIALIZER_LIST )
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
-endif ( CPP0X_INITIALIZER_LIST )
-
-# Make sure the compiler can find include files.
-include_directories (${PROJECT_SOURCE_DIR}/src/)
-include_directories (${PROJECT_BINARY_DIR}/src/)
-# Make sure the compiler can find include files.
-include_directories (${PROJECT_SOURCE_DIR}/tools/)
-include_directories (${PROJECT_BINARY_DIR}/tools/)
+cmake_minimum_required (VERSION 2.6) 
 
 
-# Make sure the linker can find the library.
-link_directories (${PROJECT_BINARY_DIR})
+FIND_PACKAGE(DGtal 0.5 REQUIRED)
+INCLUDE_DIRECTORIES(${DGTAL_INCLUDE_DIRS})
+LINK_DIRECTORIES(${DGTAL_LIBRARY_DIRS})
+
+# -----------------------------------------------------------------------------
+# Define variables and cmake parameters, and display some information
+# -----------------------------------------------------------------------------
+SET(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
+SET(DGtalTools_VERSION_MAJOR 0)
+SET(DGtalTools_VERSION_MINOR 1)
+SET(DGtalTools_VERSION_PATCH 0)
+SET(DGTALTOOLS_VERSION "${DGtalTools_VERSION_MAJOR}.${DGtalTools_VERSION_MINOR}.${DGtalTools_VERSION_PATCH}")
+SET(PROJECT_VERSION "${DGtalTools_VERSION_MAJOR}.${DGtalTools_VERSION_MINOR}.${DGtalTools_VERSION_PATCH}")
+SET(VERSION ${DGtalTools_VERSION_MAJOR}.${DGtalTools_VERSION_MINOR}.${DGtalTools_VERSION_PATCH})
 
 
 #------Tools subdirectories ------
@@ -25,19 +30,3 @@ add_subdirectory(shapeGenerator)
 add_subdirectory(estimators)
 add_subdirectory(2dContourTools)
 add_subdirectory(imageTools)
-
-
-#------ Basic tools ------
-
-##-- Cmake configuration for dgtal-config tool
-CONFIGURE_FILE( ${PROJECT_SOURCE_DIR}/tools/dgtal-config.cpp.in
-  ${PROJECT_BINARY_DIR}/tools/dgtal-config.cpp)
-
-add_executable(dgtal-config ${PROJECT_BINARY_DIR}/tools/dgtal-config.cpp)
-target_link_libraries (dgtal-config ${LIBDGTAL_NAME}  ${DGtalLibDependencies} )
-install(TARGETS dgtal-config 
-  RUNTIME DESTINATION bin
-  LIBRARY DESTINATION lib
-  ARCHIVE DESTINATION lib)
-
-

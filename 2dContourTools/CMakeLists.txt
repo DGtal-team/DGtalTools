@@ -1,8 +1,5 @@
 
 
-
-
-
 SET(DGTAL_TOOLS_SRC
   pgm2freeman
   displayContours
@@ -13,7 +10,7 @@ SET(DGTAL_TOOLS_SRC
 
 FOREACH(FILE ${DGTAL_TOOLS_SRC})
   add_executable(${FILE} ${FILE})
-  target_link_libraries (${FILE} DGtal DGtalIO  ${DGtalLibDependencies} )
+  target_link_libraries (${FILE} ${DGtal_libraries} )
   install(TARGETS ${FILE} 
         RUNTIME DESTINATION bin
         LIBRARY DESTINATION lib
