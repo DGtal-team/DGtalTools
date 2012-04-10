@@ -6,7 +6,7 @@ SET(DGTAL_TOOLS_SRC
 
 FOREACH(FILE ${DGTAL_TOOLS_SRC})
   add_executable(${FILE} ${FILE})
-  target_link_libraries (${FILE} ${DGtal_libraries})
+  target_link_libraries (${FILE} ${DGTAL_LIBRARIES})
   install(TARGETS ${FILE} 
         RUNTIME DESTINATION bin
         LIBRARY DESTINATION lib
@@ -20,7 +20,7 @@ if (  WITH_VISU3D_QGLVIEWER )
     3dVolViewer)
   FOREACH(FILE ${DGTAL_EXAMPLES_QGL_SRC}) 
     add_executable(${FILE} ${FILE})
-    target_link_libraries ( ${FILE} ${DGtal_libraries})   
+    target_link_libraries ( ${FILE} ${DGTAL_LIBRARIES})   
   ENDFOREACH(FILE)
   
 endif ( WITH_VISU3D_QGLVIEWER   )
