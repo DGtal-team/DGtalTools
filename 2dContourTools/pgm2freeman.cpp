@@ -1,12 +1,13 @@
 #include "DGtal/io/colormaps/GrayscaleColorMap.h"
-#include "DGtal/images/imagesSetsUtils/ImageFromSet.h"
-#include "DGtal/images/imagesSetsUtils/SetFromImage.h"
+#include "DGtal/io/readers/PNMReader.h"
+
+
 #include "DGtal/images/ImageContainerBySTLVector.h"
 #include "DGtal/images/ImageSelector.h"
-#include "DGtal/io/readers/PNMReader.h"
+
 #include "DGtal/geometry/curves/representation/FreemanChain.h"
 #include "DGtal/geometry/helpers/ContourHelper.h"
-#include "DGtal/io/boards/Board2D.h"
+
 #include "DGtal/topology/helpers/Surfaces.h"
 
 #include <boost/program_options/options_description.hpp>
@@ -106,15 +107,14 @@ int main( int argc, char** argv )
     max = vectRange.at(2);
   }
 
+ 
+
+  
   typedef ImageSelector < Z2i::Domain, unsigned char>::Type Image;
   typedef IntervalThresholder<Image::Value> Binarizer; 
-
-
-
-
-
   string imageFileName = vm["image"].as<std::string>();
   Image image = PNMReader<Image>::importPGM( imageFileName ); 
+  
   Z2i::KSpace ks;
   if(! ks.init( image.domain().lowerBound(), 
 		image.domain().upperBound(), true )){
@@ -149,10 +149,7 @@ int main( int argc, char** argv )
 	  cout << fc.x0 << " " << fc.y0   << " " << fc.chain << endl; 
 	}
       }
-      
-    }
-  
-    
+    }    
 
   }
 
