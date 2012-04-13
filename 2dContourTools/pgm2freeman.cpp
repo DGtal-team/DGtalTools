@@ -1,45 +1,3 @@
-/**
- *  This program is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU Lesser General Public License as
- *  published by the Free Software Foundation, either version 3 of the
- *  License, or  (at your option) any later version.
- *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
- *
- **/
-/**
- * @file image2freeman.cpp
- * @ingroup Tools
- * @author Bertrand Kerautret (\c kerautre@loria.fr)
- * LORIA (CNRS, UMR 7503), University of Nancy, France
- *
- * @date 2011/27/04
- *
- * DGtal convert grey scales image to fremann contour. 
- *
- * This file is part of the DGtal library.
- */
-
-///////////////////////////////////////////////////////////////////////////////
-#include <iostream>
-
-#include "DGtal/base/Common.h"
-
-#include "DGtal/topology/KhalimskySpaceND.h"
-
-
-#include "DGtal/shapes/ShapeFactory.h"
-#include "DGtal/shapes/Shapes.h"
-#include "DGtal/helpers/StdDefs.h"
-#include "DGtal/geometry/helpers/ContourHelper.h"
-
-
 #include "DGtal/io/colormaps/GrayscaleColorMap.h"
 #include "DGtal/images/imagesSetsUtils/ImageFromSet.h"
 #include "DGtal/images/imagesSetsUtils/SetFromImage.h"
@@ -47,7 +5,7 @@
 #include "DGtal/images/ImageSelector.h"
 #include "DGtal/io/readers/PNMReader.h"
 #include "DGtal/geometry/curves/representation/FreemanChain.h"
-
+#include "DGtal/geometry/helpers/ContourHelper.h"
 #include "DGtal/io/boards/Board2D.h"
 #include "DGtal/topology/helpers/Surfaces.h"
 
@@ -148,47 +106,50 @@ int main( int argc, char** argv )
     max = vectRange.at(2);
   }
 
-
-
   typedef ImageSelector < Z2i::Domain, unsigned char>::Type Image;
+  typedef IntervalThresholder<Image::Value> Binarizer; 
+
+
+
+
+
   string imageFileName = vm["image"].as<std::string>();
   Image image = PNMReader<Image>::importPGM( imageFileName ); 
-  Z2i::DigitalSet set2d (image.domain());
-  SetPredicate<Z2i::DigitalSet> set2dPredicate( set2d );
+  Z2i::KSpace ks;
+  if(! ks.init( image.domain().lowerBound(), 
+		image.domain().upperBound(), true )){
+    trace.error() << "Problem in KSpace initialisation"<< endl;
+  }
 
   for(int i=0; minThreshold+i*increment< maxThreshold; i++){
     min = (int)(minThreshold+i*increment);
     max = (int)(minThreshold+(i+1)*increment);
+    Binarizer b(min, max); 
+    PointFunctorPredicate<Image,Binarizer> predicate(image, b); 
     
+    trace.info() << "DGtal contour extraction from thresholds ["<<  min << "," << max << "]" ;
     
-    SetFromImage<Z2i::DigitalSet>::append<Image>(set2d, image, min, max);
-    trace.info() << "DGtal set imported from thresholds ["<<  min << "," << max << "]" << endl;
-    Z2i::KSpace ks;
-    if(! ks.init( image.domain().lowerBound(), 
-      image.domain().upperBound(), true )){
-      trace.error() << "Problem in KSpace initialisation"<< endl;
-    }
     SurfelAdjacency<2> sAdj( true );
-  
     std::vector< std::vector< Z2i::Point >  >  vectContoursBdryPointels;
     Surfaces<Z2i::KSpace>::extractAllPointContours4C( vectContoursBdryPointels,
-                  ks, set2dPredicate, sAdj );  
+						      ks, predicate, sAdj );  
+    trace.info() << " [done]" << endl;
     for(unsigned int k=0; k<vectContoursBdryPointels.size(); k++){
       if(vectContoursBdryPointels.at(k).size()>minSize){
-  if(select){
-    Z2i::Point ptMean = ContourHelper::getMeanPoint(vectContoursBdryPointels.at(k));
-    unsigned int distance = (unsigned int)ceil(sqrt((double)(ptMean[0]-selectCenter[0])*(ptMean[0]-selectCenter[0])+
-            (ptMean[1]-selectCenter[1])*(ptMean[1]-selectCenter[1])));
-    if(distance<=selectDistanceMax){
-      FreemanChain<Z2i::Integer> fc (vectContoursBdryPointels.at(k));    
-      cout << fc.x0 << " " << fc.y0   << " " << fc.chain << endl; 
-    }
-  }else{
-    FreemanChain<Z2i::Integer> fc (vectContoursBdryPointels.at(k));    
-    cout << fc.x0 << " " << fc.y0   << " " << fc.chain << endl; 
-  }
+	if(select){
+	  Z2i::Point ptMean = ContourHelper::getMeanPoint(vectContoursBdryPointels.at(k));
+	  unsigned int distance = (unsigned int)ceil(sqrt((double)(ptMean[0]-selectCenter[0])*(ptMean[0]-selectCenter[0])+
+							  (ptMean[1]-selectCenter[1])*(ptMean[1]-selectCenter[1])));
+	  if(distance<=selectDistanceMax){
+	    FreemanChain<Z2i::Integer> fc (vectContoursBdryPointels.at(k));    
+	    cout << fc.x0 << " " << fc.y0   << " " << fc.chain << endl; 
+	  }
+	}else{
+	  FreemanChain<Z2i::Integer> fc (vectContoursBdryPointels.at(k));    
+	  cout << fc.x0 << " " << fc.y0   << " " << fc.chain << endl; 
+	}
       }
-
+      
     }
   
     
