@@ -112,7 +112,7 @@ int main( int argc, char** argv )
            !(vm.count("backgroundImage")) ) )
     {
       trace.info()<< "Display discrete contours. " <<std::endl << "Basic usage: "<<std::endl
-      << "\t displayContours [options] --FreemanChain  <fileName>  --imageName image.png "<<std::endl
+      << "\t displayContours [options] --FreemanChain  <fileName>  "<<std::endl
       << general_opt << "\n";
       return 0;
     }

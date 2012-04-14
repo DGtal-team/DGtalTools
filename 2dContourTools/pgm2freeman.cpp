@@ -1,54 +1,13 @@
-/**
- *  This program is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU Lesser General Public License as
- *  published by the Free Software Foundation, either version 3 of the
- *  License, or  (at your option) any later version.
- *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
- *
- **/
-/**
- * @file image2freeman.cpp
- * @ingroup Tools
- * @author Bertrand Kerautret (\c kerautre@loria.fr)
- * LORIA (CNRS, UMR 7503), University of Nancy, France
- *
- * @date 2011/27/04
- *
- * DGtal convert grey scales image to fremann contour. 
- *
- * This file is part of the DGtal library.
- */
-
-///////////////////////////////////////////////////////////////////////////////
-#include <iostream>
-
-#include "DGtal/base/Common.h"
-
-#include "DGtal/topology/KhalimskySpaceND.h"
-
-
-#include "DGtal/shapes/ShapeFactory.h"
-#include "DGtal/shapes/Shapes.h"
-#include "DGtal/helpers/StdDefs.h"
-#include "DGtal/geometry/helpers/ContourHelper.h"
-
-
 #include "DGtal/io/colormaps/GrayscaleColorMap.h"
-#include "DGtal/images/imagesSetsUtils/ImageFromSet.h"
-#include "DGtal/images/imagesSetsUtils/SetFromImage.h"
+#include "DGtal/io/readers/PNMReader.h"
+
+
 #include "DGtal/images/ImageContainerBySTLVector.h"
 #include "DGtal/images/ImageSelector.h"
-#include "DGtal/io/readers/PNMReader.h"
-#include "DGtal/geometry/curves/representation/FreemanChain.h"
 
-#include "DGtal/io/boards/Board2D.h"
+#include "DGtal/geometry/curves/representation/FreemanChain.h"
+#include "DGtal/geometry/helpers/ContourHelper.h"
+
 #include "DGtal/topology/helpers/Surfaces.h"
 
 #include <boost/program_options/options_description.hpp>
@@ -66,6 +25,38 @@ using namespace DGtal;
 ///////////////////////////////////////////////////////////////////////////////
 namespace po = boost::program_options;
 
+
+
+void saveAllContoursAsFc(std::vector< std::vector< Z2i::Point >  >  vectContoursBdryPointels, unsigned int minSize){
+  for(unsigned int k=0; k<vectContoursBdryPointels.size(); k++){
+    if(vectContoursBdryPointels.at(k).size()>minSize){
+      	  FreemanChain<Z2i::Integer> fc (vectContoursBdryPointels.at(k));    
+	  cout << fc.x0 << " " << fc.y0   << " " << fc.chain << endl; 
+	  
+    }
+  }
+}
+
+
+void saveSelContoursAsFC(std::vector< std::vector< Z2i::Point >  >  vectContoursBdryPointels, 
+			 unsigned int minSize, Z2i::Point refPoint, double selectDistanceMax){
+
+  for(unsigned int k=0; k<vectContoursBdryPointels.size(); k++){
+    if(vectContoursBdryPointels.at(k).size()>minSize){
+      Z2i::Point ptMean = ContourHelper::getMeanPoint(vectContoursBdryPointels.at(k));
+      unsigned int distance = (unsigned int)ceil(sqrt((double)(ptMean[0]-refPoint[0])*(ptMean[0]-refPoint[0])+
+						      (ptMean[1]-refPoint[1])*(ptMean[1]-refPoint[1])));
+      if(distance<=selectDistanceMax){
+	FreemanChain<Z2i::Integer> fc (vectContoursBdryPointels.at(k));    
+	cout << fc.x0 << " " << fc.y0   << " " << fc.chain << endl; 
+      }      
+    }    
+  }
+}
+
+
+
+
 int main( int argc, char** argv )
 {
   // parse command line ----------------------------------------------
@@ -79,8 +70,10 @@ int main( int argc, char** argv )
     ("minSize,s", po::value<int>(), "minSize of the extracted freeman chain (default 0)")
     ("contourSelect,s", po::value<vector <int> >()->multitoken(), 
      "Select contour according reference point and maximal distance:  ex. --contourSelect X Y distanceMax")
-    ("thresholdRange,R", po::value<vector <int> >()->multitoken(), 
-     "use a range interval as threshold : --thresholdRange min increment max : for each possible i, it define a digital sets [min+(i*increment),min+((i+1)*increment)] and extract their boundary. ");
+    ("thresholdRangeMin,r", po::value<vector <int> >()->multitoken(), 
+     "use a range interval as threshold (from min) : --thresholdRangeMin min increment max : for each possible i, it define a digital sets [min, min+((i+1)*increment)] such that min+((i+1)*increment)< max  and extract their boundary. ")
+    ("thresholdRangeMax,R", po::value<vector <int> >()->multitoken(), 
+     "use a range interval as threshold (from max) : --thresholdRangeMax min increment max : for each possible i, it define a digital sets [ max-((i)*increment), max] such that max-((i)*increment)>min  and extract their boundary. ");
   
   
   
@@ -100,11 +93,11 @@ int main( int argc, char** argv )
   double maxThreshold = 255;
   unsigned int minSize =0;
   bool select=false;
-  bool thresholdRange=vm.count("thresholdRange");
+  bool thresholdRange=vm.count("thresholdRangeMin")||vm.count("thresholdRangeMax");
   Z2i::Point selectCenter;
   unsigned int selectDistanceMax = 0; 
   
-  
+
   //Parse options
   if (!(vm.count("image"))){
     trace.info() << "Image file name needed"<< endl;
@@ -131,14 +124,19 @@ int main( int argc, char** argv )
     selectCenter[1]= cntConstraints.at(1);
     selectDistanceMax= (unsigned int) cntConstraints.at(2);
   }
-  
+
   int min, max, increment;
   if(! thresholdRange){
     min=(int)minThreshold;
     max= (int)maxThreshold;
     increment =  (int)(maxThreshold- minThreshold);
   }else{
-    vector<int> vectRange= vm["thresholdRange"].as<vector <int> >();
+    vector<int> vectRange;
+    if ( vm.count("thresholdRangeMax")){
+      vectRange= vm["thresholdRangeMax"].as<vector <int> >();
+    }else{
+      vectRange= vm["thresholdRangeMin"].as<vector <int> >();
+    }
     if(vectRange.size()!=3){
       trace.info() << "Incomplete option \"--thresholdRange\""<< endl;
       return 0;
@@ -146,53 +144,61 @@ int main( int argc, char** argv )
     min=vectRange.at(0);
     increment=vectRange.at(1);
     max = vectRange.at(2);
+    minThreshold=min;
+    maxThreshold=max;
   }
 
+ 
 
-
+  
   typedef ImageSelector < Z2i::Domain, unsigned char>::Type Image;
+  typedef IntervalThresholder<Image::Value> Binarizer; 
   string imageFileName = vm["image"].as<std::string>();
   Image image = PNMReader<Image>::importPGM( imageFileName ); 
-  Z2i::DigitalSet set2d (image.domain());
-  SetPredicate<Z2i::DigitalSet> set2dPredicate( set2d );
-
-  for(int i=0; minThreshold+i*increment< maxThreshold; i++){
-    min = (int)(minThreshold+i*increment);
-    max = (int)(minThreshold+(i+1)*increment);
-    
-    
-    SetFromImage<Z2i::DigitalSet>::append<Image>(set2d, image, min, max);
-    trace.info() << "DGtal set imported from thresholds ["<<  min << "," << max << "]" << endl;
-    Z2i::KSpace ks;
-    if(! ks.init( image.domain().lowerBound(), 
-      image.domain().upperBound(), true )){
-      trace.error() << "Problem in KSpace initialisation"<< endl;
-    }
-    SurfelAdjacency<2> sAdj( true );
   
+  Z2i::KSpace ks;
+  if(! ks.init( image.domain().lowerBound(), 
+		image.domain().upperBound(), true )){
+    trace.error() << "Problem in KSpace initialisation"<< endl;
+  }
+  
+  
+  if (!thresholdRange){
+    Binarizer b(min, max); 
+    PointFunctorPredicate<Image,Binarizer> predicate(image, b); 
+    trace.info() << "DGtal contour extraction from thresholds ["<<  min << "," << max << "]" ;
+    SurfelAdjacency<2> sAdj( true );
     std::vector< std::vector< Z2i::Point >  >  vectContoursBdryPointels;
     Surfaces<Z2i::KSpace>::extractAllPointContours4C( vectContoursBdryPointels,
-                  ks, set2dPredicate, sAdj );  
-    for(unsigned int k=0; k<vectContoursBdryPointels.size(); k++){
-      if(vectContoursBdryPointels.at(k).size()>minSize){
-  if(select){
-    Z2i::Point ptMean = ContourHelper::getMeanPoint(vectContoursBdryPointels.at(k));
-    unsigned int distance = (unsigned int)ceil(sqrt((double)(ptMean[0]-selectCenter[0])*(ptMean[0]-selectCenter[0])+
-            (ptMean[1]-selectCenter[1])*(ptMean[1]-selectCenter[1])));
-    if(distance<=selectDistanceMax){
-      FreemanChain<Z2i::Integer> fc (vectContoursBdryPointels.at(k));    
-      cout << fc.x0 << " " << fc.y0   << " " << fc.chain << endl; 
+						      ks, predicate, sAdj );  
+    if(select){
+      saveSelContoursAsFC(vectContoursBdryPointels,  minSize, selectCenter,  selectDistanceMax);
+    }else{
+      saveAllContoursAsFc(vectContoursBdryPointels,  minSize); 
     }
   }else{
-    FreemanChain<Z2i::Integer> fc (vectContoursBdryPointels.at(k));    
-    cout << fc.x0 << " " << fc.y0   << " " << fc.chain << endl; 
-  }
+    for(int i=0; minThreshold+i*increment< maxThreshold; i++){
+      if(vm.count("thresholdRangeMin")){
+	min = (int)(minThreshold+(i)*increment);
       }
-
+      if(vm.count("thresholdRangeMax")){
+	max = (int)(maxThreshold-(i)*increment);
+      }
+      Binarizer b(min, max); 
+      PointFunctorPredicate<Image,Binarizer> predicate(image, b); 
+      
+      trace.info() << "DGtal contour extraction from thresholds ["<<  min << "," << max << "]" ;
+      SurfelAdjacency<2> sAdj( true );
+      std::vector< std::vector< Z2i::Point >  >  vectContoursBdryPointels;
+      Surfaces<Z2i::KSpace>::extractAllPointContours4C( vectContoursBdryPointels,
+							ks, predicate, sAdj );  
+      if(select){
+	saveSelContoursAsFC(vectContoursBdryPointels,  minSize, selectCenter,  selectDistanceMax);
+      }else{
+	saveAllContoursAsFc(vectContoursBdryPointels,  minSize); 
+      }
+      trace.info() << " [done]" << endl;
     }
-  
-    
-
   }
 
     
