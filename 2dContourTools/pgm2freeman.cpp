@@ -27,7 +27,7 @@ namespace po = boost::program_options;
 
 
 
-void saveAllContoursAsFc(std::vector< std::vector< Z2i::Point >  >  vectContoursBdryPointels, uint minSize){
+void saveAllContoursAsFc(std::vector< std::vector< Z2i::Point >  >  vectContoursBdryPointels, unsigned int minSize){
   for(unsigned int k=0; k<vectContoursBdryPointels.size(); k++){
     if(vectContoursBdryPointels.at(k).size()>minSize){
       	  FreemanChain<Z2i::Integer> fc (vectContoursBdryPointels.at(k));    
@@ -39,7 +39,7 @@ void saveAllContoursAsFc(std::vector< std::vector< Z2i::Point >  >  vectContours
 
 
 void saveSelContoursAsFC(std::vector< std::vector< Z2i::Point >  >  vectContoursBdryPointels, 
-			 uint minSize, Z2i::Point refPoint, double selectDistanceMax){
+			 unsigned int minSize, Z2i::Point refPoint, double selectDistanceMax){
 
   for(unsigned int k=0; k<vectContoursBdryPointels.size(); k++){
     if(vectContoursBdryPointels.at(k).size()>minSize){
