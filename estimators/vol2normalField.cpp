@@ -95,7 +95,7 @@ int main ( int argc, char**argv )
     ( "help,h", "display this message." )
     ( "input,i", po::value<std::string>(), "Input vol file." )
     ( "output,o", po::value<string>(),"Output filename." )
-    ( "level,", po::value<unsigned char>()->default_value ( 1 ),"Iso-level for the surface construction." )
+    ( "level,", po::value<unsigned char>()->default_value ( 0 ),"Iso-level for the surface construction." )
     ( "sigma,s", po::value<double>()->default_value ( 5.0 ),"Sigma parameter of the Gaussian kernel." )
     ( "neighborhood,n", po::value<unsigned int>()->default_value ( 10 ),"Size of the neighborhood for the convolution (distance on surfel graph)." );
 
@@ -128,7 +128,7 @@ int main ( int argc, char**argv )
 
     trace.info() <<image<<std::endl;
 
-    SimpleThresholdForegroundPredicate<Image> simplePredicate ( image,level );
+    SimpleThresholdForegroundPredicate<Image> simplePredicate ( image, level );
 
     KSpace ks;
     bool space_ok = ks.init ( image.domain().lowerBound(),
@@ -172,11 +172,6 @@ int main ( int argc, char**argv )
     // Compute normal vector field and displays it.
     myNormalEstimatorG.init ( 1.0, neighborhood );
 
-    std::vector<MyGaussianEstimator::Quantity> allNormals;
-    myNormalEstimatorG.evalAll ( std::back_inserter ( allNormals ) );
-    trace.info() << "Normal vector field of size "<< allNormals.size() << std::endl;
-
-
     trace.info() << "Generating the NOFF surface "<< std::endl;
     ofstream out2 ( ( outputFileName + ".off" ).c_str() );
     if ( out2.good() )
@@ -187,12 +182,13 @@ int main ( int argc, char**argv )
     ofstream out3 ( ( outputFileName + ".txt" ).c_str() );
     if ( out3.good() )
     {
-        out3 << allNormals.size() <<std::endl;
-        for ( std::vector<MyGaussianEstimator::Quantity>::const_iterator it = allNormals.begin(),
-                itend=allNormals.end(); it != itend; ++it )
+        MyGaussianEstimator::Quantity res;
+        for ( MyDigitalSurface::ConstIterator it =digSurf.begin(),
+                itend = digSurf.end(); it != itend; ++it )
         {
+            res = myNormalEstimatorG.eval ( it );
             //We output Theta - Phi
-            out3<< acos ( ( *it ) [2] ) *180.0/M_PI <<"  " << ( atan2 ( ( *it ) [1], ( *it ) [0] ) + M_PI ) *180.0/M_PI <<std::endl;
+            out3<< acos ( res [2] ) *180.0/M_PI <<"  " << ( atan2 ( res [1], res [0] ) + M_PI ) *180.0/M_PI <<std::endl;
         }
     }
     out3.close();
@@ -203,3 +199,4 @@ int main ( int argc, char**argv )
 
 //                                                                           //
 ///////////////////////////////////////////////////////////////////////////////
+
