@@ -24,7 +24,7 @@
 #include <DGtal/images/imagesSetsUtils/SetFromImage.h>
 #include <DGtal/images/ImageLinearCellEmbedder.h>
 #include <DGtal/shapes/Shapes.h>
-#include <DGtal/shapes/CanonicEmbedder.h>
+#include <DGtal/kernel/CanonicEmbedder.h>
 #include <DGtal/helpers/StdDefs.h>
 #include <DGtal/topology/helpers/Surfaces.h>
 #include <DGtal/topology/DigitalSurface.h>
@@ -47,15 +47,15 @@ int main( int argc, char** argv )
   general_opt.add_options()
     ("help,h", "display this message")
     ("input-file,i", po::value<std::string>(), "the volume file (.vol)" )
-    ("threshold,t",  po::value<unsigned int>()->default_value(1), "the value that defines the isosurface in the image (an integer between 0 and 255)." ) 
+    ("threshold,t",  po::value<unsigned int>()->default_value(1), "the value that defines the isosurface in the image (an integer between 0 and 255)." )
     ("adjacency,a",  po::value<unsigned int>()->default_value(0), "0: interior adjacency, 1: exterior adjacency")
-    ("output-file,o",  po::value<std::string>()->default_value( "marching-cubes.off" ), "the output OFF file that represents the geometry of the isosurface") ; 
+    ("output-file,o",  po::value<std::string>()->default_value( "marching-cubes.off" ), "the output OFF file that represents the geometry of the isosurface") ;
   po::variables_map vm;
-  po::store(po::parse_command_line(argc, argv, general_opt), vm);  
-  po::notify(vm);    
+  po::store(po::parse_command_line(argc, argv, general_opt), vm);
+  po::notify(vm);
   if ( vm.count("help") || ( argc <= 1 ) )
     {
-      std::cout << "Usage: " << argv[0] 
+      std::cout << "Usage: " << argv[0]
                 << " [-i <fileName.vol>] [-t <threshold>] [-a <adjacency>] [-o <output.off>]" << std::endl
                 << "Outputs the isosurface of value <threshold> of the volume <fileName.vol>  as an OFF file <output.off>. The <adjacency> (0/1) allows to choose between interior (6,18) and exterior (18,6) adjacency." << std::endl
                 << general_opt << std::endl;
@@ -63,7 +63,7 @@ int main( int argc, char** argv )
     }
   if ( ! vm.count("input-file") )
     {
-      trace.error() << "The input file name was defined." << std::endl;      
+      trace.error() << "The input file name was defined." << std::endl;
       return 1;
     }
   string inputFilename = vm["input-file"].as<std::string>();
@@ -78,15 +78,15 @@ int main( int argc, char** argv )
   Image image = VolReader<Image>::importVol(inputFilename);
   DigitalSet set3d (image.domain());
   SetPredicate<DigitalSet> set3dPredicate( set3d );
-  SetFromImage<DigitalSet>::append<Image>(set3d, image, 
+  SetFromImage<DigitalSet>::append<Image>(set3d, image,
                                           threshold, 255 );
   trace.endBlock();
   //! [3dVolMarchingCubes-readVol]
-  
+
   //! [3dVolMarchingCubes-KSpace]
   trace.beginBlock( "Construct the Khalimsky space from the image domain." );
   KSpace ks;
-  bool space_ok = ks.init( image.domain().lowerBound(), 
+  bool space_ok = ks.init( image.domain().lowerBound(),
                            image.domain().upperBound(), true );
   if (!space_ok)
     {
@@ -109,7 +109,7 @@ int main( int argc, char** argv )
   MySetOfSurfels theSetOfSurfels( ks, surfAdj );
   Surfaces<KSpace>::sMakeBoundary( theSetOfSurfels.surfelSet(),
                                    ks, set3dPredicate,
-                                   image.domain().lowerBound(), 
+                                   image.domain().lowerBound(),
                                    image.domain().upperBound() );
   MyDigitalSurface digSurf( theSetOfSurfels );
   trace.info() << "Digital surface has " << digSurf.size() << " surfels."
@@ -120,7 +120,7 @@ int main( int argc, char** argv )
   //! [3dVolMarchingCubes-makingOFF]
   trace.beginBlock( "Making OFF surface. " );
   typedef CanonicEmbedder< Space > MyEmbedder;
-  typedef 
+  typedef
     ImageLinearCellEmbedder< KSpace, Image, MyEmbedder > CellEmbedder;
   CellEmbedder cellEmbedder;
   MyEmbedder trivialEmbedder;
