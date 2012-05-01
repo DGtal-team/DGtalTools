@@ -25,5 +25,9 @@ Detailled Description
       shapeGenerator: generate multigrid shape
       contourGenerator: generate multigrid shape contours
 
-   
+ * estimators/:
+      lengthEstimator: program to generate multigrid analysis of length estimators
+      estimatorComparator: program to perform comparison of local quantity estimators 
+      vol2normalField: compute the normal vector field of a given vol file  
                        
+ * 2dContourTools/: various tools on 2D contours
