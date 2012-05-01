@@ -1,6 +1,7 @@
 
 SET(DGTAL_TOOLS_SRC
   volAddBorder
+  volCComponentCounter
 )
 
 FOREACH(FILE ${DGTAL_TOOLS_SRC})
