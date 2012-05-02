@@ -11,6 +11,23 @@ How to build the tools
   - use cmake tool to generate a build script (MakeFile, VS project,..) from the CMakeLists.txt
   - DGtal must be installed in your system. Concerning DGtal dependencies (boost, Qt,...), all the dependencies used to compile your DGtal library must be present to build the DGtalTools  .
    
+Detailled Description
+=====================
 
---
-DGtal Editorial Board
+ * voltools/: utilities to manage Vol files
+      volAddBorder: add a 1 voxel boundary with value 0 to a vol file
+
+ * volumetric/:
+      3dVolViewer: Vol viewer with QGLViewer
+      3dVolMarchingCubes: marching cubes form a Vol file
+
+ * shapeGenerator/:    
+      shapeGenerator: generate multigrid shape
+      contourGenerator: generate multigrid shape contours
+
+ * estimators/:
+      lengthEstimator: program to generate multigrid analysis of length estimators
+      estimatorComparator: program to perform comparison of local quantity estimators 
+      vol2normalField: compute the normal vector field of a given vol file  
+                       
+ * 2dContourTools/: various tools on 2D contours
