@@ -14,7 +14,7 @@
  *
  **/
 /**
- * @file CComponentCounter3D.cpp
+ * @file volCComponentCounter.cpp
  * @ingroup tools
  * @author David Coeurjolly (\c david.coeurjolly@liris.cnrs.fr)
  * LIRIS (CNRS, UMR 5205), University de Lyon, France.
