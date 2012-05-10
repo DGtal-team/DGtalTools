@@ -19,7 +19,8 @@ Detailled Description
 
  * volumetric/:
       3dVolViewer: Vol viewer with QGLViewer
-      3dVolMarchingCubes: marching cubes form a Vol file
+      3dVolMarchingCubes: marching cubes form a Vol file	
+      homotopicThinning3D: ultimate skeleton from vol file
 
  * shapeGenerator/:    
       shapeGenerator: generate multigrid shape
