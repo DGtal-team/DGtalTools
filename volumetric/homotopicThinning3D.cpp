@@ -47,6 +47,10 @@
 #include <boost/program_options/parsers.hpp>
 #include <boost/program_options/variables_map.hpp>
 
+
+#include "DGtal/geometry/volumes/distance/SeparableMetricHelper.h"
+#include "DGtal/geometry/volumes/distance/DistanceTransformation.h"
+
 ///////////////////////////////////////////////////////////////////////////////
 
 using namespace std;
@@ -68,6 +72,7 @@ void missingParam ( std::string param )
     trace.info() <<std::endl;
     exit ( 1 );
 }
+
 
 
 int main( int argc, char** argv )
@@ -98,8 +103,12 @@ int main( int argc, char** argv )
   typedef ImageSelector < Z3i::Domain, unsigned char>::Type Image;
   Image image = VolReader<Image>::importVol ( filename );
 
+  trace.beginBlock("DT Computation");
+  typedef  DistanceTransformation<Image, 0> DTL2;
+  DTL2 dtL2;
   
-
+  DTL2::OutputImage resultL2 = dtL2.compute ( image );
+  trace.endBlock();
   trace.info() <<image<<std::endl;
 
   // Domain cretation from two bounding points.
@@ -112,16 +121,14 @@ int main( int argc, char** argv )
   DigitalSet shape_set( domain );
   SetPredicate<DigitalSet> set3dPredicate( shape_set );
   SetFromImage<DigitalSet>::append<Image>(shape_set, image,
-                                          1, 255);
+                                          0, 255);
   trace.info() << shape_set<<std::endl;
   trace.endBlock();
-
-
 
   trace.beginBlock("Computing skeleton");
   Object26_6 shape( dt26_6, shape_set );
   int nb_simple=0; 
-  int layer = 0;
+  int layer = 1;
   std::queue<DigitalSet::Iterator> Q;
   do 
     {
@@ -131,13 +138,15 @@ int main( int argc, char** argv )
  
       for ( DigitalSet::Iterator it = S.begin(); it != S.end(); ++it )
         {
-          trace.progressBar((double)nb, (double)S.size());
-          trace.info() << nb<<" "; nb++;
-          if ( shape.isSimple( *it ) )
-            Q.push( it );
-        }
+	  trace.progressBar((double)nb, (double)S.size()); 
+	  trace.info() << nb<<" "; nb++;
+	  if (resultL2( *it ) <= layer*layer)
+	    {
+	      if ( shape.isSimple( *it ) )
+		Q.push( it );
+	    }
+	}
       nb_simple = 0;
-      trace.info() << "Nb simple points : "<<nb_simple<<std::endl;
       while ( ! Q.empty() )
         {
           DigitalSet::Iterator it = Q.front();
@@ -148,6 +157,7 @@ int main( int argc, char** argv )
               ++nb_simple;
             }
         }
+      trace.info() << "Nb simple points : "<<nb_simple<<std::endl;
       ++layer;
      }
   while ( nb_simple != 0 );
