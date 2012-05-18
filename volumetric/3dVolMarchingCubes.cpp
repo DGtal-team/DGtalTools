@@ -50,10 +50,16 @@ int main( int argc, char** argv )
     ("threshold,t",  po::value<unsigned int>()->default_value(1), "the value that defines the isosurface in the image (an integer between 0 and 255)." )
     ("adjacency,a",  po::value<unsigned int>()->default_value(0), "0: interior adjacency, 1: exterior adjacency")
     ("output-file,o",  po::value<std::string>()->default_value( "marching-cubes.off" ), "the output OFF file that represents the geometry of the isosurface") ;
+  bool parseOK=true;
   po::variables_map vm;
-  po::store(po::parse_command_line(argc, argv, general_opt), vm);
+  try{
+    po::store(po::parse_command_line(argc, argv, general_opt), vm);  
+  }catch(const std::exception& ex){
+    parseOK=false;
+    trace.info()<< "Error checking program options: "<< ex.what()<< endl;
+  }
   po::notify(vm);
-  if ( vm.count("help") || ( argc <= 1 ) )
+  if ( !parseOK || vm.count("help") || ( argc <= 1 ) )
     {
       std::cout << "Usage: " << argv[0]
                 << " [-i <fileName.vol>] [-t <threshold>] [-a <adjacency>] [-o <output.off>]" << std::endl
