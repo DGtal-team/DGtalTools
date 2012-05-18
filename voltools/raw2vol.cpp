@@ -73,11 +73,17 @@ int main(int argc, char**argv)
     ( "y,y", po::value<unsigned int >(),"y extent." )
     ( "z,z", po::value<unsigned int>(),"z extent." );
   
-
+  bool parseOK=true;
   po::variables_map vm;
-  po::store ( po::parse_command_line ( argc, argv, general_opt ), vm );
+  try{
+    po::store(po::parse_command_line(argc, argv, general_opt), vm);  
+  }catch(const std::exception& ex){
+    parseOK=false;
+    trace.info()<< "Error checking program options: "<< ex.what()<< endl;
+  }
+
   po::notify ( vm );
-  if ( vm.count ( "help" ) ||argc<=1 )
+  if (!parseOK || vm.count ( "help" ) ||argc<=1 )
     {
       trace.info() << "Convert a  8-bit raw file to  vol."<<std::endl
                    << std::endl << "Basic usage: "<<std::endl
