@@ -68,7 +68,7 @@ int main( int argc, char** argv )
     ("max,M", po::value<int>(), "max image threshold value (default 255)")
     
     ("minSize,s", po::value<int>(), "minSize of the extracted freeman chain (default 0)")
-    ("contourSelect,s", po::value<vector <int> >()->multitoken(), 
+    ("contourSelect,c", po::value<vector <int> >()->multitoken(), 
      "Select contour according reference point and maximal distance:  ex. --contourSelect X Y distanceMax")
     ("thresholdRangeMin,r", po::value<vector <int> >()->multitoken(), 
      "use a range interval as threshold (from min) : --thresholdRangeMin min increment max : for each possible i, it define a digital sets [min, min+((i+1)*increment)] such that min+((i+1)*increment)< max  and extract their boundary. ")
