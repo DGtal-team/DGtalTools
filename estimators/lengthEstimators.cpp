@@ -345,11 +345,16 @@ int main( int argc, char** argv )
     ("hMin",   po::value<double>()->default_value(0.0001), "Minimum value for the grid step h (double)" )
     ("steps",   po::value<int>()->default_value(32), "Number of multigrid steps between 1 and hMin (integer)" );
   
-  
+  bool parseOK=true;
   po::variables_map vm;
-  po::store(po::parse_command_line(argc, argv, general_opt), vm);  
+  try{
+    po::store(po::parse_command_line(argc, argv, general_opt), vm);  
+  }catch(const std::exception& ex){
+    parseOK=false;
+    trace.info()<< "Error checking program options: "<< ex.what()<< endl;
+  }
   po::notify(vm);    
-  if(vm.count("help")||argc<=1)
+  if(!parseOK || vm.count("help")||argc<=1)
     {
       trace.info()<< "Generate multigrid length estimations of paramteric shapes using DGtal library. It will output length estimations (and timings) using several algorithms for decreasing grid steps." <<std::endl << "Basic usage: "<<std::endl
       << "\tLengthEstimators [options] --shape <shapeName>"<<std::endl
