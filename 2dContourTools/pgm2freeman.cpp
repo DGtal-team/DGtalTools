@@ -75,12 +75,16 @@ int main( int argc, char** argv )
     ("thresholdRangeMax,R", po::value<vector <int> >()->multitoken(), 
      "use a range interval as threshold (from max) : --thresholdRangeMax min increment max : for each possible i, it define a digital sets [ max-((i)*increment), max] such that max-((i)*increment)>min  and extract their boundary. ");
   
-  
-  
+  bool parseOK=true;
   po::variables_map vm;
-  po::store(po::parse_command_line(argc, argv, general_opt), vm);  
+  try{
+    po::store(po::parse_command_line(argc, argv, general_opt), vm);  
+  }catch(const std::exception& ex){
+    trace.info()<< "Error checking program options: "<< ex.what()<< endl;
+    parseOK=false;
+  }
   po::notify(vm);    
-  if(vm.count("help")||argc<=1)
+  if(vm.count("help")||argc<=1|| !parseOK)
     {
       trace.info()<< "Extract FreemanChains from thresholded image" <<std::endl << "Basic usage: "<<std::endl
       << "\t image2freeman [options] --image <imageName> -min 128 -max 255 > contours.fc"<<std::endl
@@ -103,7 +107,6 @@ int main( int argc, char** argv )
     trace.info() << "Image file name needed"<< endl;
     return 0;
   } 
-  
   if(vm.count("min")){
     minThreshold= vm["min"].as<int>();
   } 
