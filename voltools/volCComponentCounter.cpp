@@ -119,11 +119,16 @@ int main( int argc, char** argv )
     ("help,h", "display this message")
     ("connectivity,c", po::value<unsigned int>()->default_value(6), "object connectivity (6,18,26)"    " (default: 6 )")
     ("input-file,i", po::value<std::string>(), "volume file (Vol)"    " (default: standard input)");
-
+  bool parseOK=true;
   po::variables_map vm;
-  po::store(po::parse_command_line(argc, argv, general_opt), vm);  
+  try{
+    po::store(po::parse_command_line(argc, argv, general_opt), vm);  
+  }catch(const std::exception& ex){
+    parseOK=false;
+    trace.info()<< "Error checking program options: "<< ex.what()<< endl;
+  }  
   po::notify(vm);    
-  if(vm.count("help")||argc<=1)
+  if( parseOK || !vm.count("help")||argc<=1)
     {
       std::cout << "Usage: " << argv[0] << " [input-file]\n"
     << "Count the number of connected component (same values) in a  volume (Vol) file image\n"
