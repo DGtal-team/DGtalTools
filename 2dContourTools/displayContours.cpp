@@ -104,11 +104,18 @@ int main( int argc, char** argv )
     ("scale", po::value<double>(), "scale <value> 1: normal; >1 : larger ; <1 lower resolutions  )");
   
   
-  
+ 
+  bool parseOK=true;
   po::variables_map vm;
-  po::store(po::parse_command_line(argc, argv, general_opt), vm);  
+  try{
+    po::store(po::parse_command_line(argc, argv, general_opt), vm);  
+  }catch(const std::exception& ex){
+    parseOK=false;
+    trace.info()<< "Error checking program options: "<< ex.what()<< endl;
+  }
+
   po::notify(vm);    
-  if(vm.count("help")||argc<=1 || (!(vm.count("FreemanChain")) && !(vm.count("SDP")) && !(vm.count("SFP"))&&
+  if(!parseOK||vm.count("help")||argc<=1 || (!(vm.count("FreemanChain")) && !(vm.count("SDP")) && !(vm.count("SFP"))&&
            !(vm.count("backgroundImage")) ) )
     {
       trace.info()<< "Display discrete contours. " <<std::endl << "Basic usage: "<<std::endl

@@ -98,10 +98,17 @@ int main ( int argc, char**argv )
     ( "sigma,s", po::value<double>()->default_value ( 5.0 ),"Sigma parameter of the Gaussian kernel." )
     ( "neighborhood,n", po::value<unsigned int>()->default_value ( 10 ),"Size of the neighborhood for the convolution (distance on surfel graph)." );
 
+    bool parseOK=true;
     po::variables_map vm;
-    po::store ( po::parse_command_line ( argc, argv, general_opt ), vm );
+    try{
+      po::store(po::parse_command_line(argc, argv, general_opt), vm);  
+    }catch(const std::exception& ex){
+      parseOK=false;
+      trace.info()<< "Error checking program options: "<< ex.what()<< endl;
+    }
+    
     po::notify ( vm );
-    if ( vm.count ( "help" ) ||argc<=1 )
+    if (!parseOK ||  vm.count ( "help" ) ||argc<=1 )
     {
         trace.info() << "Generate normal vector field from a vol file using DGtal library."<<std::endl
                      << "It will output the embedded vector field (Gaussian convolution on elementary normal vectors)"<<std::endl

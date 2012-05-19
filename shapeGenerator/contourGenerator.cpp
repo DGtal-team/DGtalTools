@@ -410,11 +410,17 @@ int main( int argc, char** argv )
     ("format,f",   po::value<string>()->default_value("pts"), "Output format:\n\t  List of pointel coordinates {pts}\n\t  Freman chaincode Vector {fc}" )
     ("outputGeometry,o",   po::value<string>(), "Base name of the file containing the shape geometry (points, tangents, curvature)" );
 
-  
+  bool parseOK=true;
   po::variables_map vm;
-  po::store(po::parse_command_line(argc, argv, general_opt), vm);  
+  try{
+    po::store(po::parse_command_line(argc, argv, general_opt), vm);  
+  }catch(const std::exception& ex){
+    parseOK=false;
+    trace.info()<< "Error checking program options: "<< ex.what()<< endl;
+  }
+ 
   po::notify(vm);    
-  if(vm.count("help")||argc<=1)
+  if(!parseOK || vm.count("help")||argc<=1)
     {
       trace.info()<< "Generate shapes using DGtal library" <<std::endl << "Basic usage: "<<std::endl
       << "\tcontourGenerator [options] --shape <shapeName> --output <outputBasename>"<<std::endl

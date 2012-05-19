@@ -83,10 +83,16 @@ int main( int argc, char** argv )
   general_opt.add_options()
     ( "help,h", "display this message." )
     ( "input,i", po::value<std::string>(), "Input vol file." );
+    bool parseOK=true;
   po::variables_map vm;
-  po::store ( po::parse_command_line ( argc, argv, general_opt ), vm );
+  try{
+    po::store(po::parse_command_line(argc, argv, general_opt), vm);  
+  }catch(const std::exception& ex){
+    parseOK=false;
+    trace.info()<< "Error checking program options: "<< ex.what()<< endl;
+  }
   po::notify ( vm );
-  if ( vm.count ( "help" ) ||argc<=1 )
+  if ( !parseOK || vm.count ( "help" ) ||argc<=1 )
     {
       trace.info() << "Illustration of homotopic thinning of a vol file with 3D viewer."<<std::endl
                    << std::endl << "Basic usage: "<<std::endl
