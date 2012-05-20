@@ -16,12 +16,12 @@
 /**
  * @file freeman2sdp.cpp
  * @ingroup Tools
- * @author Bertrand Kerautret (\c kerautre@loria.fr)
- * LORIA (CNRS, UMR 7503), University of Nancy, France
- *
+ * @author Bertrand Kerautret (\c kerautre@loria.fr) and Jacques-Olivier Lachaud 
+ * LORIA (CNRS, UMR 7503), University of Nancy, France 
+ * (backport from ImaGene)
  * @date 2012/19/05
  *
- * convert freeman chain to a Sequence of Discrete Points. 
+ * convert freeman chain to a Sequence of Discrete Points.  
  *
  * This file is part of the DGtal library.
  */
