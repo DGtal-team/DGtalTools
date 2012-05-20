@@ -2,6 +2,7 @@
 
 SET(DGTAL_TOOLS_SRC
   pgm2freeman
+  freeman2sdp
   displayContours
   curvatureMCMS
   curvatureBC
