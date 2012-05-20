@@ -83,13 +83,13 @@ int main( int argc, char** argv )
   po::notify(vm);    
   if(!parseOK||vm.count("help")||argc<=1 || (!(vm.count("FreemanChain")) ) )
     {
-      trace.info()<< "Transform freeman chain into a Sequence of Discrete Points. " <<std::endl << "Basic usage: "<<std::endl
+      trace.info()<< "Transform freeman chain into a Sequence of Discrete Points. Result is given to std output " <<std::endl << "Basic usage: "<<std::endl
 		  << "\t freeman2sdp [options] --FreemanChain  <fileName>  "<<std::endl
 		  << general_opt << "\n";
       return 0;
     }
   
-  bool oneline = vm.count("online");
+  bool oneline = vm.count("oneLine");
   if( vm.count("FreemanChain") ){
     string fileName = vm["FreemanChain"].as<string>();
     vector< FreemanChain > vectFcs =  PointListReader< Z2i::Point >:: getFreemanChainsFromFile<Z2i::Integer> (fileName); 
@@ -97,7 +97,7 @@ int main( int argc, char** argv )
     for(int i=0; i< vectFcs.size(); i++){
       bool isClosed = vectFcs.at(i).isClosed(); 
       cout << "# grid curve " << i+1 << "/" << vectFcs.size()
-	   << ( (isClosed)?"closed":"open" ) << endl;
+	   << ( (isClosed)?" closed":" open" ) << endl;
       if ( vm.count("info"))
 	cout << "# SDP contour" << i+1<< "/" << vectFcs.size() << " "
 	     << "# size=" << vectFcs.at(i).size() << endl;
