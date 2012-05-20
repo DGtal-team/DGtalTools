@@ -30,30 +30,14 @@
 #include <iostream>
 
 #include "DGtal/base/Common.h"
-
 #include "DGtal/helpers/StdDefs.h"
 
-#include "DGtal/shapes/ShapeFactory.h"
-#include "DGtal/shapes/Shapes.h"
-#include "DGtal/topology/helpers/Surfaces.h"
-
 //image
-#include "DGtal/images/imagesSetsUtils/ImageFromSet.h"
-#include "DGtal/images/imagesSetsUtils/SetFromImage.h"
-#include "DGtal/images/ImageContainerBySTLVector.h"
-#include "DGtal/images/ImageSelector.h"
 #include "DGtal/io/readers/PointListReader.h"
-#include "DGtal/io/boards/Board2D.h"
-#include "DGtal/io/Color.h"
-
-#ifdef WITH_MAGICK
-#include "DGtal/io/readers/MagickReader.h"
-#endif
 
 
 //contour
 #include "DGtal/geometry/curves/representation/FreemanChain.h"
-
 
 
 //boost
