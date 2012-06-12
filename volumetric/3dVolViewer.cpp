@@ -58,7 +58,7 @@ int main( int argc, char** argv )
   po::options_description general_opt("Allowed options are: ");
   general_opt.add_options()
     ("help,h", "display this message")
-    ("input-file,i", po::value<std::string>(), "volume or pgm3d (.p3d or .pgm3d) file" )
+    ("input-file,i", po::value<std::string>(), "vol file (.vol) or pgm3d (.p3d or .pgm3d) file" )
     ("thresholdMin,m",  po::value<int>()->default_value(0), "threshold min to define binary shape" ) 
     ("thresholdMax,M",  po::value<int>()->default_value(255), "threshold max to define binary shape" )
     ("transparency,t",  po::value<uint>()->default_value(255), "transparency") ; 
