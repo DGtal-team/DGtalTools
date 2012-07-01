@@ -2,6 +2,7 @@
 SET(DGTAL_TOOLS_SRC
   volAddBorder
   volCComponentCounter
+  volSubSample
   vol2raw
   raw2vol
 )

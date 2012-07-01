@@ -58,7 +58,7 @@
 #include "DGtal/io/boards/Board2D.h"
 
 #include "DGtal/shapes/GaussDigitizer.h"
-#include "DGtal/geometry/curves/representation/GridCurve.h"
+#include "DGtal/geometry/curves/GridCurve.h"
 #include "DGtal/geometry/curves/estimation/TrueLocalEstimatorOnPoints.h"
 #include "DGtal/geometry/curves/estimation/TrueGlobalEstimatorOnPoints.h"
 #include "DGtal/geometry/curves/estimation/ParametricShapeCurvatureFunctor.h"
