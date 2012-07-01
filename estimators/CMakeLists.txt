@@ -2,6 +2,9 @@ SET(DGTAL_TOOLS_SRC
   estimatorComparator
   lengthEstimators
   vol2normalField
+  curvatureBC
+  curvatureMCMS
+  tangentBC
 )
 
 FOREACH(FILE ${DGTAL_TOOLS_SRC})

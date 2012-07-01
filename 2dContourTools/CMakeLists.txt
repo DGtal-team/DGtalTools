@@ -4,10 +4,7 @@ SET(DGTAL_TOOLS_SRC
   pgm2freeman
   freeman2sdp
   displayContours
-  curvatureMCMS
-  curvatureBC
-  tangentBC
-)
+ )
 
 FOREACH(FILE ${DGTAL_TOOLS_SRC})
   add_executable(${FILE} ${FILE})
