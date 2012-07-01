@@ -37,6 +37,7 @@
 
 #include "DGtal/io/Color.h"
 #include "DGtal/io/colormaps/GradientColorMap.h"
+#include "DGtal/io/readers/PNMReader.h"
 #include "DGtal/images/ImageSelector.h"
 
 
@@ -57,7 +58,7 @@ int main( int argc, char** argv )
   po::options_description general_opt("Allowed options are: ");
   general_opt.add_options()
     ("help,h", "display this message")
-    ("input-file,i", po::value<std::string>(), "volume file" )
+    ("input-file,i", po::value<std::string>(), "vol file (.vol) or pgm3d (.p3d or .pgm3d) file" )
     ("thresholdMin,m",  po::value<int>()->default_value(0), "threshold min to define binary shape" ) 
     ("thresholdMax,M",  po::value<int>()->default_value(255), "threshold max to define binary shape" )
     ("transparency,t",  po::value<uint>()->default_value(255), "transparency") ; 
@@ -94,7 +95,15 @@ int main( int argc, char** argv )
   viewer.show();
  
   typedef ImageSelector<Domain, unsigned char>::Type Image;
-  Image image = VolReader<Image>::importVol( inputFilename );
+  string extension = inputFilename.substr(inputFilename.find_last_of(".") + 1);
+  if(extension!="vol" && extension != "p3d" && extension != "pgm3D"){
+    trace.info() << "File extension not recognized: "<< extension << std::endl;
+    return 0;
+  }
+
+  Image image = (extension=="vol")? VolReader<Image>::importVol( inputFilename ): PNMReader<Image>::importPGM3D( inputFilename );
+
+
 
   trace.info() << "Image loaded: "<<image<< std::endl;
 
