@@ -14,16 +14,16 @@
  *
  **/
 /**
- * @file curvatureBC.cpp
+ * @file curvatureMCMS.cpp
  * @ingroup Tools
  * @author Tristan Roussillon (\c tristan.roussillon@liris.cnrs.fr ) 
  * Laboratoire d'InfoRmatique en Image et Systèmes d'information - LIRIS (CNRS, UMR 5205), CNRS,
  * France
  *
- * @date 2011/07/13
+ * @date 2011/07/19
  *
  * Output the curvature of the Freeman code of a grid curve
- * using the Binomial convolver
+ * using the maximal segments cover
  * 
  * This file is part of the DGtal library.
  */
@@ -39,11 +39,13 @@
 #include "DGtal/topology/helpers/Surfaces.h"
 
 //Grid curve
-#include "DGtal/geometry/curves/representation/FreemanChain.h"
-#include "DGtal/geometry/curves/representation/GridCurve.h"
+#include "DGtal/geometry/curves/FreemanChain.h"
+#include "DGtal/geometry/curves/GridCurve.h"
 
 //Estimators
-#include "DGtal/geometry/curves/evolution/BinomialConvolver.h"
+#include "DGtal/geometry/curves/ArithmeticalDSS.h"
+#include "DGtal/geometry/curves/estimation/MostCenteredMaximalSegmentEstimator.h"
+#include "DGtal/geometry/curves/estimation/SegmentComputerFunctor.h"
 
 
 #include <boost/program_options/options_description.hpp>
@@ -53,6 +55,7 @@
 #include <vector>
 #include <string>
 #include <iomanip>
+
 
 using namespace DGtal;
 
@@ -80,11 +83,12 @@ int main( int argc, char** argv )
     parseOK=false;
     trace.info()<< "Error checking program options: "<< ex.what()<< endl;
   }
+
   po::notify(vm);    
   if(!parseOK || vm.count("help")||argc<=1 || (!(vm.count("FreemanChain"))) )
     {
       trace.info()<< "Curvature using a binomial convolver " <<std::endl << "Basic usage: "<<std::endl
-      << "\t curvatureBC [options] --FreemanChain  <fileName> "<<std::endl
+      << "\t curvatureMCMS [options] --FreemanChain  <fileName> "<<std::endl
       << general_opt << "\n";
       return 0;
     }
@@ -114,29 +118,36 @@ int main( int argc, char** argv )
       << ( (isClosed)?"closed":"open" ) << endl;
 
       Storage vectPts; 
-      FreemanChain::getContourPoints( vectFcs.at(i), vectPts ); 
+      FreemanChain::getContourPoints( vectFcs.at(i), vectPts );
+      if (isClosed) vectPts.pop_back();  
 
       // Binomial
-      std::cout << "# Curvature estimation from binomial convolution" << std::endl;
-      typedef BinomialConvolver<ConstIteratorOnPoints, double> MyBinomialConvolver;
-      std::cout << "# mask size = " << 
-      MyBinomialConvolver::suggestedSize( h, vectPts.begin(), vectPts.end() ) << std::endl;
-      typedef CurvatureFromBinomialConvolverFunctor< MyBinomialConvolver, double >
-      CurvatureBCFct;
-      BinomialConvolverEstimator< MyBinomialConvolver, CurvatureBCFct> BCCurvatureEstimator;
-
-      BCCurvatureEstimator.init( h, vectPts.begin(), vectPts.end(), isClosed );
-
-      vector <double> curvatures( vectPts.size() ); 
-      BCCurvatureEstimator.eval( vectPts.begin(), vectPts.end(), curvatures.begin() ); 
+      std::cout << "# Curvature estimation from maximal segments" << std::endl; 
+      typedef ArithmeticalDSS<ConstIteratorOnPoints,Integer,4> SegmentComputer;
+      typedef CurvatureFromDSSLengthFunctor<SegmentComputer> Functor1;
+      typedef CurvatureFromDSSFunctor<SegmentComputer> Functor2;
+      typedef MostCenteredMaximalSegmentEstimator<SegmentComputer,Functor1> Estimator1;
+      typedef MostCenteredMaximalSegmentEstimator<SegmentComputer,Functor2> Estimator2;
+      SegmentComputer sc;
+      Functor1 f1; 
+      Functor2 f2;
+      Estimator1 CurvatureEstimator1(sc, f1); 
+      Estimator2 CurvatureEstimator2(sc, f2); 
+      CurvatureEstimator1.init( h, vectPts.begin(), vectPts.end(), isClosed );
+      CurvatureEstimator2.init( h, vectPts.begin(), vectPts.end(), isClosed );
+      vector <Functor1::Value> curvatures1( vectPts.size() ); 
+      CurvatureEstimator1.eval( vectPts.begin(), vectPts.end(), curvatures1.begin() ); 
+      vector <Functor2::Value> curvatures2( vectPts.size() ); 
+      CurvatureEstimator2.eval( vectPts.begin(), vectPts.end(), curvatures2.begin() ); 
 
       // Output
-      cout << "# id curvature" << endl;  
+      cout << "# id curvatureFromLength curvatureFromLengthAndWidth" << endl;  
       unsigned int j = 0;
       for ( ConstIteratorOnPoints it = vectPts.begin(), it_end = vectPts.end();
       it != it_end; ++it, ++j ) {
-  cout << j << setprecision( 15 )
-       << " " << curvatures[ j ] << endl;
+         cout << j << setprecision( 15 )
+         << " " << curvatures1[ j ]
+         << " " << curvatures2[ j ] << endl;
       }
 
    }
