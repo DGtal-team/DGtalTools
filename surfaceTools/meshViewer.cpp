@@ -55,7 +55,7 @@ int main( int argc, char** argv )
   po::options_description general_opt("Allowed options are: ");
   general_opt.add_options()
     ("help,h", "display this message")
-    ("input-file,i", po::value<std::string>(), "off file (.off) " )
+    ("input-file,i", po::value<std::string>(), "off file (.off), or OFS file (.ofs) " )
     ("invertNormal,n", "threshold min to define binary shape" ); 
   
   bool parseOK=true;
@@ -94,18 +94,21 @@ int main( int argc, char** argv )
   bool invertNormal= vm.count("invertNormal");
   
   string extension = inputFilename.substr(inputFilename.find_last_of(".") + 1);
-  if(extension!="off" ){
+  if(extension!="off" && extension!="ofs"){
     trace.info() << "File extension not recognized: "<< extension << std::endl;
     return 0;
   }
   
+  
   trace.info() << "Importing mesh... ";
-  
   MeshFromPoints<Display3D::pointD3D> anImportedMesh;
-  OFFReader<Display3D::pointD3D>::importOFFFile(inputFilename, anImportedMesh, invertNormal);
-  
+  if(extension=="off"){
+    OFFReader<Display3D::pointD3D>::importOFFFile(inputFilename, anImportedMesh, invertNormal);
+  }else if (extension=="ofs"){
+    OFFReader<Display3D::pointD3D>::importOFSFile(inputFilename, anImportedMesh, invertNormal);
+  }
   trace.info() << "[done]. "<< std::endl;
-
+  
   viewer << anImportedMesh;
 
   viewer << Viewer3D::updateDisplay;
