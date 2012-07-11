@@ -36,7 +36,7 @@
 #include "DGtal/io/Display3D.h"
 #include "DGtal/io/viewers/Viewer3D.h"
 
-#include "DGtal/io/readers/OFFReader.h"
+#include "DGtal/io/readers/MeshReader.h"
 
 #include <boost/program_options/options_description.hpp>
 #include <boost/program_options/parsers.hpp>
@@ -93,22 +93,20 @@ int main( int argc, char** argv )
 
   bool invertNormal= vm.count("invertNormal");
   
-  string extension = inputFilename.substr(inputFilename.find_last_of(".") + 1);
-  if(extension!="off" && extension!="ofs"){
-    trace.info() << "File extension not recognized: "<< extension << std::endl;
-    return 0;
-  }
   
   
   trace.info() << "Importing mesh... ";
   MeshFromPoints<Display3D::pointD3D> anImportedMesh;
-  if(extension=="off"){
-    OFFReader<Display3D::pointD3D>::importOFFFile(inputFilename, anImportedMesh, invertNormal);
-  }else if (extension=="ofs"){
-    OFFReader<Display3D::pointD3D>::importOFSFile(inputFilename, anImportedMesh, invertNormal);
+  bool import = anImportedMesh << inputFilename;
+  if(!import){
+    trace.info() << "File import failed. " << std::endl;
+    return 0;
   }
-  trace.info() << "[done]. "<< std::endl;
   
+  trace.info() << "[done]. "<< std::endl;
+  if(invertNormal){
+    anImportedMesh.invertVertexFaceOrder();
+  }
   viewer << anImportedMesh;
 
   viewer << Viewer3D::updateDisplay;
