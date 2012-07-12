@@ -96,7 +96,7 @@ int main( int argc, char** argv )
   
   
   trace.info() << "Importing mesh... ";
-  MeshFromPoints<Display3D::pointD3D> anImportedMesh;
+  MeshFromPoints<Display3D::pointD3D> anImportedMesh(true);
   bool import = anImportedMesh << inputFilename;
   if(!import){
     trace.info() << "File import failed. " << std::endl;

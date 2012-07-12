@@ -1,4 +1,5 @@
 SET(DGTAL_TOOLS_SRC
+	ofs2off
 )
 
 
