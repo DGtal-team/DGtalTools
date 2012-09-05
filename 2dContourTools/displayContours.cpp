@@ -52,13 +52,13 @@
 
 
 //contour
-#include "DGtal/geometry/curves/representation/FreemanChain.h"
+#include "DGtal/geometry/curves/FreemanChain.h"
 
 //processing
-#include "DGtal/geometry/curves/representation/ArithmeticalDSS.h"
-#include "DGtal/geometry/curves/representation/GreedyDecomposition.h"
-#include "DGtal/geometry/curves/representation/MaximalSegments.h"
-#include "DGtal/geometry/curves/representation/FP.h"
+#include "DGtal/geometry/curves/ArithmeticalDSS.h"
+#include "DGtal/geometry/curves/GreedyDecomposition.h"
+#include "DGtal/geometry/curves/MaximalSegments.h"
+#include "DGtal/geometry/curves/FP.h"
 
 //boost
 #include <boost/program_options/options_description.hpp>

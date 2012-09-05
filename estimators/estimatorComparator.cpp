@@ -52,7 +52,7 @@
 
 //Digitizer
 #include "DGtal/shapes/GaussDigitizer.h"
-#include "DGtal/geometry/curves/representation/GridCurve.h"
+#include "DGtal/geometry/curves/GridCurve.h"
 
 
 //Estimators
@@ -62,10 +62,10 @@
 #include "DGtal/geometry/curves/estimation/ParametricShapeTangentFunctor.h"
 #include "DGtal/geometry/curves/estimation/ParametricShapeArcLengthFunctor.h"
 
-#include "DGtal/geometry/curves/evolution/BinomialConvolver.h"
+#include "DGtal/geometry/curves/BinomialConvolver.h"
 #include "DGtal/geometry/curves/estimation/MostCenteredMaximalSegmentEstimator.h"
 #include "DGtal/geometry/curves/estimation/SegmentComputerFunctor.h"
-#include "DGtal/geometry/curves/representation/ArithmeticalDSS.h"
+#include "DGtal/geometry/curves/ArithmeticalDSS.h"
 
 using namespace DGtal;
 

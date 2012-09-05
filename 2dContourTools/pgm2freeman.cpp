@@ -5,7 +5,7 @@
 #include "DGtal/images/ImageContainerBySTLVector.h"
 #include "DGtal/images/ImageSelector.h"
 
-#include "DGtal/geometry/curves/representation/FreemanChain.h"
+#include "DGtal/geometry/curves/FreemanChain.h"
 #include "DGtal/geometry/helpers/ContourHelper.h"
 
 #include "DGtal/topology/helpers/Surfaces.h"
