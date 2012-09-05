@@ -4,7 +4,6 @@ compiler:
   - gcc
   - clang
 
-# Change this to your needs
 
 before_script:
   - sudo apt-get -qq install libboost-program-options-dev libboost-system-dev
