@@ -110,10 +110,14 @@ int main( int argc, char** argv )
   Image image = VolReader<Image>::importVol ( filename );
 
   trace.beginBlock("DT Computation");
-  typedef  DistanceTransformation<Image, 0> DTL2;
-  DTL2 dtL2;
+  typedef SimpleThresholdForegroundPredicate<Image> Predicate;
+  Predicate aPredicate(image,0);
+
+  DistanceTransformation<Z3i::Space, Predicate , 2> dt(image.domain(),aPredicate);
+  typedef DistanceTransformation<Z3i::Space, Predicate, 2>::OutputImage ImageLong;
   
-  DTL2::OutputImage resultL2 = dtL2.compute ( image );
+  
+  ImageLong resultL2 = dt.compute ( );
   trace.endBlock();
   trace.info() <<image<<std::endl;
 
