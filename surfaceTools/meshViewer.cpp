@@ -56,6 +56,9 @@ int main( int argc, char** argv )
   general_opt.add_options()
     ("help,h", "display this message")
     ("input-file,i", po::value<std::string>(), "off file (.off), or OFS file (.ofs) " )
+    ("scaleX,x",  po::value<float>()->default_value(1.0), "set the scale value in the X direction (default 1.0)" )
+    ("scaleY,y",  po::value<float>()->default_value(1.0), "set the scale value in the Y direction (default 1.0)" )
+    ("scaleZ,z",  po::value<float>()->default_value(1.0), "set the scale value in the Z direction (default 1.0)") 
     ("invertNormal,n", "threshold min to define binary shape" ); 
   
   bool parseOK=true;
@@ -84,10 +87,13 @@ int main( int argc, char** argv )
 
   
   string inputFilename = vm["input-file"].as<std::string>();
-  
+  float sx = vm["scaleX"].as<float>();
+  float sy = vm["scaleY"].as<float>();
+  float sz = vm["scaleZ"].as<float>();
   
   QApplication application(argc,argv);
   Viewer3D viewer;
+  viewer.setScale(sx,sy,sz);
   viewer.setWindowTitle("simple Volume Viewer");
   viewer.show();
 
