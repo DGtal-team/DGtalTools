@@ -28,7 +28,6 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 #include <iostream>
-#include <QtGui/qapplication.h>
 #include "DGtal/base/Common.h"
 
 #include "DGtal/io/readers/MeshReader.h"
