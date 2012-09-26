@@ -140,11 +140,13 @@ int main( int argc, char** argv )
 
     po::notify(vm);    
     if(!parseOK || vm.count("help") || argc <= 1 ||
-       (vm.count("ratio") + vm.count("sequence") + vm.count("chessboard") + vm.count("city-block") != 1)) {
+       //(vm.count("chessboard") + vm.count("city-block") + vm.count("ratio") + vm.count("sequence") != 1)
+       (vm.count("chessboard") + vm.count("city-block") != 1)
+       ) {
 	trace.info() <<
-	"Compute the 2D translated neighborhood-sequence "
-	"distance transform of a binary image" <<std::endl <<
-	"Basic usage: " <<std::endl
+	    "Compute the 2D translated neighborhood-sequence "
+	    "distance transform of a binary image" << std::endl <<
+	    "Basic usage: " << std::endl
 	<< "\tLUTBasedNSDistanceTransform [-f filename] [-c] (-4|-8|-r <num/den>|-s <sequence>) [-t (pgm|png)]" <<std::endl
 	<< general_opt << "\n";
 	return 0;
@@ -166,6 +168,9 @@ int main( int argc, char** argv )
 
     if (vm.count("city-block")){
 	dist = new D4Distance();
+    }
+    else if (vm.count("chessboard")){
+	dist = new D8Distance();
     }
 
     ImageConsumer<GrayscalePixelType> *output = createImageWriter("-", outputFormat, lineBuffered);
