@@ -14,14 +14,16 @@
  *
  **/
 /**
- * @file displayContours.cpp
+ * @file LUTBasedNSDistanceTransform.cpp
  * @ingroup Tools
- * @author Nicolas Normand (\c kerautre@loria.fr)
- * IRCCyN (CNRS, UMR 6597), University of Nantes, France
+ * @author Nicolas Normand (\c Nicolas.Normand@polytech.univ-nantes.fr)
+ * LUNAM Université, Université de Nantes, IRCCyN UMR CNRS 6597
  *
- * @date 2012/09/04
+ * @date 2012/09/28
  *
- * DGtal convert grey scales image to fremann contour. 
+ * LUTBasedNSDistanceTransform computes the 2D translated neighborhood-sequence
+ * distance transform of a binary image. It reads the input images from its
+ * standard input and writes the result to its standard output.
  *
  * This file is part of the DGtal library.
  */
