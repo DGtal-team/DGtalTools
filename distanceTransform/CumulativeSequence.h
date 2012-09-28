@@ -1,17 +1,36 @@
 // $Id: CumulativeSequence.h 94 2012-07-04 07:32:53Z Nicolas.Normand $
 
-extern "C" {
-typedef struct CumulativeOfPeriodicSequence CumulativeOfPeriodicSequence;
+#include <vector>
 
-CumulativeOfPeriodicSequence *CumulativeOfPeriodicSequenceCreate(int period, int offset, int *values);
+class CumulativeOfPeriodicSequence {
+public:
+    CumulativeOfPeriodicSequence(int length, int offset = 0) :
+	_sequence(length),
+	_offset(offset) {
+    }
 
-CumulativeOfPeriodicSequence *CumulativeOfPeriodicSequenceCreateInverse(CumulativeOfPeriodicSequence *seq);
+    CumulativeOfPeriodicSequence(std::vector<int> sequence, int offset = 0) :
+        _sequence(sequence),
+	_offset(offset)
+    {
+	int sum = 0;
+	for (std::vector<int>::iterator it = _sequence.begin(); 
+	     it != _sequence.end();
+	     it++)
+	{
+	    sum += *it;
+	    *it = sum;
+	}
+    }
 
-void CumulativeOfPeriodicSequenceFree(CumulativeOfPeriodicSequence *seq);
+    CumulativeOfPeriodicSequence *inverse();
 
-int CumulativeOfPeriodicSequenceValueAtIndex(CumulativeOfPeriodicSequence *seq, int i);
+    int valueAtIndex(int i);
 
-int CumulativeOfPeriodicSequenceEquals(CumulativeOfPeriodicSequence *seq1, CumulativeOfPeriodicSequence *seq2);
+    int equals(CumulativeOfPeriodicSequence& seq);
 
-void CumulativeOfPeriodicSequencePrint(CumulativeOfPeriodicSequence *seq);
-}
+    void print();
+private:
+    std::vector<int> _sequence;
+    int _offset;
+};

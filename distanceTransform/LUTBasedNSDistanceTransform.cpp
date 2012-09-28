@@ -77,7 +77,9 @@
 #include "BaseDistanceDT.h"
 #include "D4DistanceDT.h"
 #include "D8DistanceDT.h"
+#include <boost/rational.hpp>
 #include "RatioNSDistanceDT.h"
+#include <boost/tokenizer.hpp>
 #include "PeriodicNSDistanceDT.h"
 
 #include "ImageWriter.h"
@@ -85,6 +87,19 @@
 using namespace DGtal;
 
 ////////////////////////////////////////////////////////////////////////////////
+
+std::vector<int> parseSequence(string string) {
+    std::vector<int> args;
+    boost::tokenizer<> tok(string);
+    for (boost::tokenizer<>::iterator beg = tok.begin(); beg != tok.end(); ++beg){
+	//args.push_back(boost::lexical_cast<short>(*beg));
+	args.push_back(boost::lexical_cast<short>(*beg));
+    }
+    return args;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
 namespace po = boost::program_options;
 
 #define PBM_FILE_FORMAT	1
@@ -108,24 +123,7 @@ int main( int argc, char** argv )
 	("center,c", "Center the distance transform (the default is an asymmetric "
 	 "distance transform)")
 	("input,i", po::value<std::string>(), "Read from file \"arg\" instead of "
-	 "stdin.")
-	("drawContourPoint", po::value<double>(), "<size> display contour points as disk of radius <size>")    
-	("fillContour", "fill the contours with default color")
-	("lineWidth", po::value<double>()->default_value(1.0), "Define the linewidth of the contour (SDP format)") 
-	("withProcessing", po::value<std::string>(), "Processing (used only with --FreemanChain):\n\t DSS segmentation {DSS}\n\t  Maximal segments {MS}\n\t Faithful Polygon {FP}\n\t Minimum Length Polygon {MLP}")   
-	("outputEPS", po::value<std::string>(), " <filename> specify eps format (default format output.eps)")
-	("outputSVG", po::value<std::string>(), " <filename> specify svg format.")
-	("outputFIG", po::value<std::string>(), " <filename> specify fig format.")
-#ifdef WITH_CAIRO
-	("outputPDF", po::value<std::string>(), "outputPDF <filename> specify pdf format. ")
-	("outputPNG", po::value<std::string>(), "outputPNG <filename> specify png format.")
-	("invertYaxis", " invertYaxis invert the Y axis for display contours (used only with --SDP)")
-#endif
-#ifdef WITH_MAGICK
-	("backgroundImage", po::value<std::string>(), "backgroundImage <filename> <alpha> : display image as background with transparency alpha (defaut 1) (transparency works only if cairo is available)")
-	("alphaBG", po::value<double>(), "alphaBG <value> 0-1.0 to display the background image in transparency (default 1.0)")
-#endif
-	("scale", po::value<double>(), "scale <value> 1: normal; >1 : larger ; <1 lower resolutions  )");
+	 "stdin.");
     //------------------------------------------------------------------------//
 
     bool parseOK = true;
@@ -140,9 +138,11 @@ int main( int argc, char** argv )
 
     po::notify(vm);    
     if(!parseOK || vm.count("help") || argc <= 1 ||
-       //(vm.count("chessboard") + vm.count("city-block") + vm.count("ratio") + vm.count("sequence") != 1)
-       (vm.count("chessboard") + vm.count("city-block") != 1)
-       ) {
+       (vm.count("chessboard") +
+	vm.count("city-block") +
+	vm.count("ratio") +
+	vm.count("sequence") != 1))
+    {
 	trace.info() <<
 	    "Compute the 2D translated neighborhood-sequence "
 	    "distance transform of a binary image" << std::endl <<
@@ -166,11 +166,61 @@ int main( int argc, char** argv )
     bool lineBuffered = false;
     BaseDistance *dist = NULL;
 
-    if (vm.count("city-block")){
+    // Distance selection ----------------------------------------------------//
+    if (vm.count("city-block")) {
 	dist = new D4Distance();
     }
-    else if (vm.count("chessboard")){
+    else if (vm.count("chessboard")) {
 	dist = new D8Distance();
+    }
+    else if (vm.count("ratio")) {
+	int num, den;
+	boost::rational<int> ratio;
+	std::istringstream iss(vm["ratio"].as<string>());
+	iss >> ratio;
+	//trace.info() << ratio << std::endl;
+/*	if (!parseRate(vm["ratio"].as<string>(), &num, &den)) {
+	    trace.error() << "Unable to parse num/den from \"%s\"\n"
+			  << vm["ratio"].as<string>();
+	    exit(-1);
+	}*/
+	if (ratio < 0 || ratio > 1) {
+	    fprintf(stderr,
+		    "Invalid ratio %d/%d\n"
+		    "correct ratios num/den are between 0 and 1 inclusive\n",
+		    num, den);
+	    exit(-1);
+	}
+	if (ratio == 0) {
+	    dist = new D4Distance();
+	}
+	else if (ratio == 1) {
+	    dist = new D8Distance();
+	}
+	else {
+	    // TODO: change RatioNSDistance to use boost rational
+	    dist = new RatioNSDistance(ratio.numerator(), ratio.denominator());
+	}	
+    }
+    else if (vm.count("sequence")) {
+	int period = 0;
+	std::vector<int> sequence = parseSequence(vm["sequence"].as<string>());
+	int countOfNeighbors[2] = {0, 0};
+	int i;
+	for (i = 0; i < period; i++) {
+	    countOfNeighbors[sequence[i] - 1]++;
+	}
+	if (countOfNeighbors[0] == 0) {
+	    // d8
+	    dist = new D8Distance();
+	}
+	else if (countOfNeighbors[1] == 0) {
+	    // d4
+	    dist = new D4Distance();
+	}
+	else {
+	    dist = new PeriodicNSDistance(sequence);
+	}		
     }
 
     ImageConsumer<GrayscalePixelType> *output = createImageWriter("-", outputFormat, lineBuffered);

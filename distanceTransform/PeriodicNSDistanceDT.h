@@ -2,9 +2,11 @@
 
 #include "BaseDistanceDT.h"
 
+#include <vector>
+
 class PeriodicNSDistance: public BaseDistance {
 public:
-    PeriodicNSDistance(int period, int *Bvalues);
+    PeriodicNSDistance(std::vector<int> Bvalues);
     ~PeriodicNSDistance();
     BaseDistanceTransform* newTranslatedDistanceTransform(ImageConsumer<GrayscalePixelType>* consumer) const;
     DistanceTransformUntranslator<GrayscalePixelType, GrayscalePixelType>* newDistanceTransformUntranslator(ImageConsumer<GrayscalePixelType>* consumer) const;
