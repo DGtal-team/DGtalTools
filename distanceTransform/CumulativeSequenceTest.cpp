@@ -31,46 +31,45 @@
 #include <assert.h>
 #include <stdio.h>
 
+#include <iostream>
+
 #include "CumulativeSequence.h"
 
-void testSequence(std::vector<int> sequence, int offset) {
+using namespace std;
+
+void testSequence(vector<int> sequence, int offset) {
     int i;
-    CumulativeOfPeriodicSequence *cs, *csi, *csii;
 
-    printf("Sequence: ");
-    cs = new CumulativeOfPeriodicSequence(sequence, offset);
+    cout << "Sequence: ";
+    CumulativeOfPeriodicSequence cs(sequence, offset);
     for (i = 1; i < 15; i++) {
-	printf("%d ", cs->valueAtIndex(i));
+	cout << cs(i) << ' ';
     }
-    cs->print();
+    cout << cs << endl;
 
-    printf("Inverse of sequence: ");
-    csi = cs->inverse();
+    cout << "Inverse of sequence: ";
+    CumulativeOfPeriodicSequence csi(cs.inverse());
     for (i = 1; i < 15; i++) {
-	printf("%d ", csi->valueAtIndex(i));
+	cout << csi(i) << ' ';
     }
-    csi->print();
+    cout << csi << endl;
 
-    printf("Inverse of inverse of sequence: ");
-    csii = csi->inverse();
+    cout << "Inverse of inverse of sequence: ";
+    CumulativeOfPeriodicSequence csii(csi.inverse());
     for (i = 1; i < 15; i++) {
-	printf("%d ", csii->valueAtIndex(i));
+	cout << csii(i) << ' ';
     }
-    csii->print();
+    cout << csii << endl;
 
     printf("\n");
 
-    assert(cs->equals(*cs));
-
-    delete cs;
-    delete csi;
-    delete csii;
+    assert(csii.equals(cs));
 }
 
 int main(int argc, char** argv) {
     //int period;
     //int seq2[4] = {2, 0, 0, 1};
-    std::vector<int> seq2;
+    vector<int> seq2;
     seq2.push_back(2);
     seq2.push_back(0);
     seq2.push_back(0);
@@ -87,7 +86,7 @@ int main(int argc, char** argv) {
     testSequence(seq2, -100);
 
     //int sequence[4] = {1, 2, 0, 3};	// cf. Table 1
-    std::vector<int> sequence;
+    vector<int> sequence;
     sequence.push_back(1);
     sequence.push_back(2);
     sequence.push_back(0);

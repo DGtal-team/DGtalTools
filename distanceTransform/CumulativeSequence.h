@@ -29,6 +29,7 @@
  */
 
 #include <vector>
+#include <ostream>
 
 class CumulativeOfPeriodicSequence {
 public:
@@ -51,13 +52,14 @@ public:
 	}
     }
 
-    CumulativeOfPeriodicSequence *inverse();
+    CumulativeOfPeriodicSequence inverse() const;
 
-    int valueAtIndex(int i);
+    int operator()(int i) const;
 
-    int equals(CumulativeOfPeriodicSequence& seq);
+    int equals(CumulativeOfPeriodicSequence& seq) const;
 
-    void print();
+    //void print() const;
+    friend std::ostream &operator<<(std::ostream &out, const CumulativeOfPeriodicSequence &seq);
 private:
     std::vector<int> _sequence;
     int _offset;

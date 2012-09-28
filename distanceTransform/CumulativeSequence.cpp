@@ -28,76 +28,64 @@
  * This file is part of the DGtal library.
  */
 
-#include <stdlib.h>
-#include <stdio.h>
 #include <assert.h>
-#include <string.h>
-
-#include <algorithm>
 
 #include "CumulativeSequence.h"
 
-int CumulativeOfPeriodicSequence::equals(CumulativeOfPeriodicSequence& seq2) {
-    if (_sequence.size() != seq2._sequence.size())
-	return 0;
-#warning Do this properly
-    return memcmp(_sequence.data(), seq2._sequence.data(), sizeof(CumulativeOfPeriodicSequence) + _sequence.size() * sizeof(int)) == 0;
+int CumulativeOfPeriodicSequence::equals(CumulativeOfPeriodicSequence& seq2) const {
+    return this->_sequence == seq2._sequence;
 }
 
 int mod(int a, int b) {
     return ((a % b) + b) % b;
 }
 
-CumulativeOfPeriodicSequence *CumulativeOfPeriodicSequence::inverse() {
+CumulativeOfPeriodicSequence CumulativeOfPeriodicSequence::inverse() const {
     //CumulativeOfPeriodicSequence *inv = CumulativeOfPeriodicSequenceCreate(_sequence[seq->period - 1], 0, NULL);
-    CumulativeOfPeriodicSequence *inv = new CumulativeOfPeriodicSequence(_sequence[_sequence.size() - 1]);
-    inv->_offset = 0;
+    CumulativeOfPeriodicSequence inv(_sequence[_sequence.size() - 1]);
+    inv._offset = 0;
 
     int xx, yy = 0;
-    yy = mod(_offset, inv->_sequence.size());
+    yy = mod(_offset, inv._sequence.size());
     //yy = CumulativeOfPeriodicSequenceValueAtIndex(seq, 1);
-    //yy %= inv->_sequence.size();
+    //yy %= inv._sequence.size();
     for (xx = 0; xx < _sequence.size(); xx++) {
 	//yy = CumulativeOfPeriodicSequenceValueAtIndex(seq, xx + 1);
-	//yy %= inv->_sequence.size();
-	inv->_sequence[yy]++;
+	//yy %= inv._sequence.size();
+	inv._sequence[yy]++;
 	yy += _sequence[xx] - (xx > 0 ? _sequence[xx-1] : 0);
-	yy %= inv->_sequence.size();
+	yy %= inv._sequence.size();
     }
 
-    for (xx = 1; xx < inv->_sequence.size(); xx++) {
-	inv->_sequence[xx] += inv->_sequence[xx-1];
+    for (xx = 1; xx < inv._sequence.size(); xx++) {
+	inv._sequence[xx] += inv._sequence[xx-1];
     }
     
-    if (valueAtIndex(1) > 0) {
-	yy = valueAtIndex(1);
+    if ((*this)(1) > 0) {
+	yy = (*this)(1);
 	// Find first increasing index
 	xx = 1;
-	while (valueAtIndex(xx) == yy) xx++;
+	while ((*this)(xx) == yy) xx++;
 	// First positive term in inverse must be equal to xx - 1
-	// i.e., inv->value[yy % inv->_sequence.size()] + (yy / inv->_sequence.size()) * inv->_sequence[inv->_sequence.size() - 1] + inv->_offset == xx - 1
-	inv->_offset = xx - 1 - inv->_sequence[yy % inv->_sequence.size()] - (yy / inv->_sequence.size()) * inv->_sequence[inv->_sequence.size() - 1];
+	// i.e., inv.value[yy % inv._sequence.size()] + (yy / inv._sequence.size()) * inv._sequence[inv._sequence.size() - 1] + inv._offset == xx - 1
+	inv._offset = xx - 1 - inv._sequence[yy % inv._sequence.size()] - (yy / inv._sequence.size()) * inv._sequence[inv._sequence.size() - 1];
 	//TODO: assert(CumulativeOfPeriodicSequenceValueAtIndex(inv, yy) == 0);
 	//TODO: assert(CumulativeOfPeriodicSequenceValueAtIndex(inv, yy+1) == xx - 1);
     }
     else {
 	// Find first positive value
 	xx = 0;
-	while (valueAtIndex(xx) == 0) xx++;
+	while ((*this)(xx) == 0) xx++;
 	// seq(xx) > 0 and seq(xx-1) <= 0 then seqinv(1) = xx-1;
-	// i.e., inv->value[0] + inv->_offset == xx-1;
+	// i.e., inv.value[0] + inv._offset == xx-1;
 	
-	inv->_offset = xx - 1 - inv->_sequence[0];
+	inv._offset = xx - 1 - inv._sequence[0];
     }
 
     return inv;
 }
 
-void CumulativeOfPeriodicSequenceFree(CumulativeOfPeriodicSequence *seq) {
-    free(seq);
-}
-
-int CumulativeOfPeriodicSequence::valueAtIndex(int i) {
+int CumulativeOfPeriodicSequence::operator() (int i) const {
     assert(i >= 0);
     if (i == 0) return 0;
     i--;
@@ -106,7 +94,34 @@ int CumulativeOfPeriodicSequence::valueAtIndex(int i) {
 		    _offset, 0L);
 }
 
-void CumulativeOfPeriodicSequence::print() {
+std::ostream &operator<<(std::ostream &out, const CumulativeOfPeriodicSequence &seq) {
+    int i;
+
+    //printf("period: %d, offset: %d, values: ", _sequence.size(), seq->offset);
+    out << '(';
+
+    std::vector<int>::const_iterator it = seq._sequence.begin();
+    out << *it;
+    int prev = *it;
+
+    for (it++; it != seq._sequence.end(); it++) {
+	out << ',' << *it - prev;
+	prev = *it;
+    }
+
+    out <<  ')';
+
+    if (seq._offset > 0) {
+	out << "(+" <<  seq._offset << ')';
+    }
+    else if (seq._offset < 0) {
+	out << '(' << seq._offset << ')';
+    }
+
+    return out;
+}
+
+/*void CumulativeOfPeriodicSequence::print() const {
     int i;
 
     //printf("period: %d, offset: %d, values: ", _sequence.size(), seq->offset);
@@ -124,3 +139,4 @@ void CumulativeOfPeriodicSequence::print() {
     }
     printf("\n");
 }
+*/

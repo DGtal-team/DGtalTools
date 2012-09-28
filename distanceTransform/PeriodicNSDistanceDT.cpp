@@ -65,8 +65,8 @@ period(period) {
     mathbf1d  = c2 + period;
     mathbf2d  = mathbf1d + period;
 
-    CumulativeOfPeriodicSequence *mathbf1_B = new CumulativeOfPeriodicSequence(Bvalues);
-    CumulativeOfPeriodicSequence *mathbf1_Binv = mathbf1_B->inverse();
+    CumulativeOfPeriodicSequence mathbf1_B(Bvalues);
+    CumulativeOfPeriodicSequence mathbf1_Binv(mathbf1_B.inverse());
 
     for (std::vector<int>::iterator it = sequence.begin(); 
 	 it != sequence.end();
@@ -74,8 +74,8 @@ period(period) {
 	*it = 1 - *it;
     }
     
-    CumulativeOfPeriodicSequence *mathbf2_B = new CumulativeOfPeriodicSequence(Bvalues);
-    CumulativeOfPeriodicSequence *mathbf2_Binv = mathbf2_B->inverse();
+    CumulativeOfPeriodicSequence mathbf2_B(Bvalues);
+    CumulativeOfPeriodicSequence mathbf2_Binv(mathbf2_B.inverse());
 
     for (std::vector<int>::iterator it = sequence.begin(); 
 	 it != sequence.end();
@@ -84,13 +84,13 @@ period(period) {
     }
     
     for (i = 0; i < period; i++) {
-	c1[i] = mathbf1_Binv->valueAtIndex(mathbf1_B->valueAtIndex(i) + 1) + 1 - i;
-	c2[i] = mathbf2_Binv->valueAtIndex(mathbf2_B->valueAtIndex(i) + 1) + 1 - i;
-	mathbf1d[i] = mathbf1_B->valueAtIndex(i);
-	mathbf2d[i] = mathbf2_B->valueAtIndex(i);
+	c1[i] = mathbf1_Binv(mathbf1_B(i) + 1) + 1 - i;
+	c2[i] = mathbf2_Binv(mathbf2_B(i) + 1) + 1 - i;
+	mathbf1d[i] = mathbf1_B(i);
+	mathbf2d[i] = mathbf2_B(i);
     }
-    mathbf1d[0] = mathbf1_B->valueAtIndex(period);
-    mathbf2d[0] = mathbf2_B->valueAtIndex(period);
+    mathbf1d[0] = mathbf1_B(period);
+    mathbf2d[0] = mathbf2_B(period);
 
     /*
     for (i = 1; i < 10; i++) {
@@ -106,11 +106,6 @@ period(period) {
 	       + ((i - 2) / data->period) * data->mathbf2[data->period - 1]);
     }
     printf("\n");*/
-
-    delete mathbf1_B;
-    delete mathbf1_Binv;
-    delete mathbf2_B;
-    delete mathbf2_Binv;
 }
 
 PeriodicNSDistance::~PeriodicNSDistance() {
