@@ -28,62 +28,45 @@
  * This file is part of the DGtal library.
  */
 
-extern "C" {
-typedef struct RationalBeattySequence RationalBeattySequence;
+#include <boost/rational.hpp>
 
-RationalBeattySequence *RationalBeattySequenceCreate(int num, int den, int dir);
-
-RationalBeattySequence *RationalBeattySequenceCreateInverse(RationalBeattySequence *seq);
-
-RationalBeattySequence *RationalBeattySequenceCreateComplement(RationalBeattySequence *seq);
-
-void RationalBeattySequenceFree(RationalBeattySequence *seq);
-
-int RationalBeattySequenceValueAtIndex(RationalBeattySequence *seq, int i);
-
-void RationalBeattySequencePrint(RationalBeattySequence *seq);
-
-int RationalBeattySequenceEquals(RationalBeattySequence *seq1, RationalBeattySequence *seq2);
-}
-
-class RationalBeattySeq {
+class RationalBeattySequence {
 private:
-    int num;
-    int den;
-    int offset;
+    boost::rational<int> _ratio;
+    int _offset;
 
 public:
-    RationalBeattySeq(int num, int den, int offset) :
-    num(num),
-    den(den),
-    offset(offset) { }
+    RationalBeattySequence(boost::rational<int> ratio, int offset) :
+	_ratio(ratio),
+	_offset(offset) { }
 
-    RationalBeattySeq invert() const {
-	return RationalBeattySeq(den, num, -offset - 1);
+    RationalBeattySequence invert() const {
+	boost::rational<int> r(_ratio.denominator(), _ratio.numerator());
+	return RationalBeattySequence(r, -_offset - 1);
     }
 
-    RationalBeattySeq complement() const {
-	return RationalBeattySeq(num, num - den, -offset - 1);
+    RationalBeattySequence complement() const {
+	boost::rational<int> r(_ratio.numerator(), _ratio.numerator() - _ratio.denominator());
+	return RationalBeattySequence(r, -_offset - 1);
     }
 
     int operator()(int n) const {
 	//assert(n >= 0);
 	// Floor dir: floor(n*tau) -> (n*num)/den
 	// Ceil dir: ceil(n*tau - 1) -> (n*num+den-1)/den - 1 -> (n*num-1)/den
-	return (num * n + offset) / den;
+	return (_ratio.numerator() * n + _offset) / _ratio.denominator();
     }
 
     void print() const {
-	printf("⌊(%d*n",num);
-	if (offset!=0)
-	    printf("%+d", offset);
-	printf(")/%d⌋\n", den);
+	printf("⌊(%d*n", _ratio.numerator());
+	if (_offset!=0)
+	    printf("%+d", _offset);
+	printf(")/%d⌋\n", _ratio.denominator());
 	//printf("num: %d, den: %d, dir: %d\n", num, den, offset);
     }
 
-    bool equals(RationalBeattySeq &otherSeq) const {
-	return num == otherSeq.num &&
-	       den == otherSeq.den &&
-	       offset == otherSeq.offset;
+    bool equals(RationalBeattySequence &otherSeq) const {
+	return _ratio == otherSeq._ratio &&
+	       _offset == otherSeq._offset;
     }
 };

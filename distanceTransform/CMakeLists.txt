@@ -1,4 +1,6 @@
 
+add_executable(RationalBeattySequenceTest RationalBeattySequenceTest.cpp)
+
 add_executable(CumulativeSequenceTest CumulativeSequence.cpp CumulativeSequenceTest.cpp)
 #target_link_libraries(CumulativeSequenceTest sequence)
 

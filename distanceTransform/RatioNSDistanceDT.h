@@ -33,16 +33,15 @@
 
 class RatioNSDistance: public BaseDistance {
 public:
-    RatioNSDistance(int num, int den);
+    RatioNSDistance(boost::rational<int> ratio);
     BaseDistanceTransform* newTranslatedDistanceTransform(ImageConsumer<GrayscalePixelType>* consumer) const;
     DistanceTransformUntranslator<GrayscalePixelType, GrayscalePixelType>* newDistanceTransformUntranslator(ImageConsumer<GrayscalePixelType>* consumer) const;
 
-    int num;
-    int den;
-    RationalBeattySeq mbf1;
-    RationalBeattySeq mbf2;
-    RationalBeattySeq mbf1i;
-    RationalBeattySeq mbf2i;
+    boost::rational<int> _ratio;
+    RationalBeattySequence mbf1;
+    RationalBeattySequence mbf2;
+    RationalBeattySequence mbf1i;
+    RationalBeattySequence mbf2i;
 };
 
 class RatioNSDistanceTransform : public BaseDistanceTransform {
@@ -50,14 +49,14 @@ protected:
     const RatioNSDistance d;
 
 public:
-    RatioNSDistanceTransform(ImageConsumer<GrayscalePixelType>* consumer, int num, int den);
+    RatioNSDistanceTransform(ImageConsumer<GrayscalePixelType>* consumer, boost::rational<int> ratio);
 
     void processRow(const BinaryPixelType *imageRow);
 };
 
 class RatioNSDistanceTransformUntranslator: public DistanceTransformUntranslator<GrayscalePixelType, GrayscalePixelType> {
 public:
-    RatioNSDistanceTransformUntranslator(ImageConsumer<GrayscalePixelType>* consumer, int dMax, int num, int den);
+    RatioNSDistanceTransformUntranslator(ImageConsumer<GrayscalePixelType>* consumer, int dMax, boost::rational<int> ratio);
     ~RatioNSDistanceTransformUntranslator();
 
     void beginOfImage(int cols, int rows);

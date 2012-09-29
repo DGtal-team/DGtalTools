@@ -79,7 +79,6 @@
 #include "BaseDistanceDT.h"
 #include "D4DistanceDT.h"
 #include "D8DistanceDT.h"
-#include <boost/rational.hpp>
 #include "RatioNSDistanceDT.h"
 #include <boost/tokenizer.hpp>
 #include "PeriodicNSDistanceDT.h"
@@ -200,8 +199,7 @@ int main( int argc, char** argv )
 	    dist = new D8Distance();
 	}
 	else {
-	    // TODO: change RatioNSDistance to use boost rational
-	    dist = new RatioNSDistance(ratio.numerator(), ratio.denominator());
+	    dist = new RatioNSDistance(ratio);
 	}	
     }
     else if (vm.count("sequence")) {

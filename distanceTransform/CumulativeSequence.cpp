@@ -32,7 +32,7 @@
 
 #include "CumulativeSequence.h"
 
-int CumulativeOfPeriodicSequence::equals(CumulativeOfPeriodicSequence& seq2) const {
+int CumulativeOfPeriodicSequence::equals(const CumulativeOfPeriodicSequence& seq2) const {
     return this->_sequence == seq2._sequence;
 }
 

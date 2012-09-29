@@ -46,34 +46,34 @@
 #define C2(num, den, n) (MATHBF2i(num, den, MATHBF2(num, den, n) + 1) + 1)
 #endif
 
-RatioNSDistance::RatioNSDistance(int num, int den) :
-num(num), den(den),
-mbf1(RationalBeattySeq((den - num), den, den - 1)),
-mbf2(RationalBeattySeq(num, den, 0)),
-mbf1i(RationalBeattySeq((den - num), den, den - 1).invert()),
-mbf2i(RationalBeattySeq(num, den, 0).invert()) {
+RatioNSDistance::RatioNSDistance(boost::rational<int> ratio) :
+_ratio(ratio),
+mbf1(RationalBeattySequence(1 - ratio, ratio.denominator() - 1)),
+mbf2(RationalBeattySequence(ratio, 0)),
+mbf1i(RationalBeattySequence(1 - ratio, ratio.denominator() - 1).invert()),
+mbf2i(RationalBeattySequence(ratio, 0).invert()) {
 #ifndef NDEBUG
-    RationalBeattySeq B(num+den, den, 0);
+    RationalBeattySequence B(ratio + 1, 0);
     for (int n = 1; n < 1000; n++) {
 	//printf("%d: %d %d %d %d %d\n", n, B(n)-B(n-1), data->mbf1(n), data->mbf2(n), data->mbf1i(n), data->mbf2i(n));
 	assert(mbf1(n) + mbf2(n) == n);
 	assert(mbf1(n) - mbf1(n - 1) == (B(n)-B(n-1) == 1));
 	assert(mbf2(n) - mbf2(n - 1) == (B(n)-B(n-1) == 2));
-	assert(MATHBF1(num, den, n) == mbf1(n));
-	assert(MATHBF2(num, den, n) == mbf2(n));
-	assert(MATHBF1i(num, den, n) == mbf1i(n));
-	assert(MATHBF2i(num, den, n) == mbf2i(n));
+	assert(MATHBF1(ratio.numerator(), ratio.denominator(), n) == mbf1(n));
+	assert(MATHBF2(ratio.numerator(), ratio.denominator(), n) == mbf2(n));
+	assert(MATHBF1i(ratio.numerator(), ratio.denominator(), n) == mbf1i(n));
+	assert(MATHBF2i(ratio.numerator(), ratio.denominator(), n) == mbf2i(n));
     }
 #endif
 }
 
 BaseDistanceTransform* RatioNSDistance::newTranslatedDistanceTransform(ImageConsumer<GrayscalePixelType>* consumer) const {
-    return new RatioNSDistanceTransform(consumer, num, den);
+    return new RatioNSDistanceTransform(consumer, _ratio);
 }
 
 DistanceTransformUntranslator<GrayscalePixelType, GrayscalePixelType>* RatioNSDistance::newDistanceTransformUntranslator(ImageConsumer<GrayscalePixelType>* consumer) const {
     // FIXME: distance max set to 0
-    return new RatioNSDistanceTransformUntranslator(consumer, 0, num, den);
+    return new RatioNSDistanceTransformUntranslator(consumer, 0, _ratio);
 }
 
 void RatioNSDistanceTransform::processRow(const BinaryPixelType *imageRow) {
@@ -101,7 +101,7 @@ void RatioNSDistanceTransform::processRow(const BinaryPixelType *imageRow) {
 		assert(col + 2 - n1[k].x < _cols + 3);
 		val = std::min(val, dtLines[n1[k].y][col + 2 - n1[k].x]);
 	    }
-	    assert(C1(d.num, d.den, (int) val) == d.mbf1i(d.mbf1(val)+1)+1);
+	    //assert(C1(d.num, d.den, (int) val) == d.mbf1i(d.mbf1(val)+1)+1);
 	    dt = d.mbf1i(d.mbf1(val)+1)+1;
 
 	    val = GRAYSCALE_MAX;
@@ -112,7 +112,7 @@ void RatioNSDistanceTransform::processRow(const BinaryPixelType *imageRow) {
 		assert(col + 2 - n2[k].x < _cols + 3);
 		val = std::min(val, dtLines[n2[k].y][col + 2 - n2[k].x]);
 	    }
-	    assert(C2(d.num, d.den, (int) val) == d.mbf2i(d.mbf2(val)+1)+1);
+	    //assert(C2(d.num, d.den, (int) val) == d.mbf2i(d.mbf2(val)+1)+1);
 	    dt = std::min((int) dt, d.mbf2i(d.mbf2(val)+1)+1);
 
 	    val = GRAYSCALE_MAX;
@@ -132,16 +132,16 @@ void RatioNSDistanceTransform::processRow(const BinaryPixelType *imageRow) {
     rotate();
 }
 
-RatioNSDistanceTransform::RatioNSDistanceTransform(ImageConsumer<GrayscalePixelType>* consumer, int num, int den) :
+RatioNSDistanceTransform::RatioNSDistanceTransform(ImageConsumer<GrayscalePixelType>* consumer, boost::rational<int> ratio) :
     BaseDistanceTransform(consumer),
-    d(num, den) {
+    d(ratio) {
 }
 
-RatioNSDistanceTransformUntranslator::RatioNSDistanceTransformUntranslator(ImageConsumer<GrayscalePixelType>* consumer, int dMax, int num, int den) :
-super(consumer, marginRight),
-_dMax(dMax),
-_imageDMax(0),
-d(num, den) {
+RatioNSDistanceTransformUntranslator::RatioNSDistanceTransformUntranslator(ImageConsumer<GrayscalePixelType>* consumer, int dMax, boost::rational<int> ratio) :
+    super(consumer, marginRight),
+    _dMax(dMax),
+    _imageDMax(0),
+    d(ratio) {
 }
 
 RatioNSDistanceTransformUntranslator::~RatioNSDistanceTransformUntranslator() {
@@ -181,9 +181,9 @@ void RatioNSDistanceTransformUntranslator::processRow(const GrayscalePixelType* 
 	dtmax = std::max(dtmax, dtn);
 	dtn = std::max(0, dtn - 1);
 	//printf("row %d col %d: [%d, %d] ", _curRow, col - 2, _tdtRows[0][col], dtp);
-	assert(C1(d.num, d.den, dtn) == d.mbf1i(d.mbf1(dtn)+1)+1);
+	//assert(C1(d.num, d.den, dtn) == d.mbf1i(d.mbf1(dtn)+1)+1);
 	//printf("%d vs. %d\n", MATHBF2(d.num, den, r - 1), d.mbf2(r-1));
-	assert(MATHBF2(d.num, d.den, d.mbf1i(d.mbf1(dtn)+1)) == d.mbf2(d.mbf1i(d.mbf1(dtn)+1)));
+	//assert(MATHBF2(d.num, d.den, d.mbf1i(d.mbf1(dtn)+1)) == d.mbf2(d.mbf1i(d.mbf1(dtn)+1)));
 	for (int r = d.mbf1i(d.mbf1(dtn)+1)+1, dx = d.mbf2(r-1);
 	     r <= dtp;
 	     r = d.mbf1i(d.mbf1(r)+1)+1) {
@@ -201,33 +201,33 @@ void RatioNSDistanceTransformUntranslator::processRow(const GrayscalePixelType* 
 	    //assert(dx + c1[r % period] - 1 == mathbf2(d, r + c1[r % period] - 1));
 	    //assert(dx + C1(d.num, den, r) - r - 1 == MATHBF2(d.num, den, C1(d.num, den, r) - 1));
 	    //dx += C1(d.num, den, r) - r - 1;
-	    assert(MATHBF2(d.num, d.den, C1(d.num, d.den, r) - 1) == d.mbf2(d.mbf1i(d.mbf1(r)+1)));
+	    //assert(MATHBF2(d.num, d.den, C1(d.num, d.den, r) - 1) == d.mbf2(d.mbf1i(d.mbf1(r)+1)));
 	    dx = d.mbf2(d.mbf1i(d.mbf1(r)+1));
-	    assert(C1(d.num, d.den, r) == d.mbf1i(d.mbf1(r)+1)+1);
+	    //assert(C1(d.num, d.den, r) == d.mbf1i(d.mbf1(r)+1)+1);
 	}
 	//printf("\n");
 
 	dtn = _tdtRows[0][col + 1];
 	dtn = std::max(0, dtn - 1);
 	//printf("row %d col %d: [%d, %d] ", _curRow, col - 2, _tdtRows[0][col + 1], dtp);
-	assert(C2(d.num, d.den, dtn) == d.mbf2i(d.mbf2(dtn)+1)+1);
+	//assert(C2(d.num, d.den, dtn) == d.mbf2i(d.mbf2(dtn)+1)+1);
 	//printf("%d vs. %d\n", MATHBF2(d.num, den, r - 1), d.mbf2(r-1));
-	assert(MATHBF2(d.num, d.den, d.mbf2i(d.mbf2(dtn)+1)) == d.mbf2(d.mbf2i(d.mbf2(dtn)+1)));
+	//assert(MATHBF2(d.num, d.den, d.mbf2i(d.mbf2(dtn)+1)) == d.mbf2(d.mbf2i(d.mbf2(dtn)+1)));
 	for (int r = d.mbf2i(d.mbf2(dtn)+1)+1, dx = d.mbf2(d.mbf2i(d.mbf2(dtn)+1));
 	     r <= dtp;
 	     r = d.mbf2i(d.mbf2(r)+1)+1) {
 
 	    int dy = r - 1;
-	    assert(dx == MATHBF2(d.num, d.den, r - 1));
+	    //assert(dx == MATHBF2(d.num, d.den, r - 1));
 
 	    assert(_curRow - 1 - dy >= 0);
 	    assert(_outputRows[(_curRow - 1 - dy) % _dtRowCount][col - dx] == (GrayscalePixelType) -1);
 	    _outputRows[(_curRow - 1 - dy) % _dtRowCount][col - dx] = r;
 	    //printf("%d ", r);
 	    // Next time we use neighborhood 2, dx is increased by one
-	    assert(dx + 1 == MATHBF2(d.num, d.den, C2(d.num, d.den, r) - 1));
+	    //assert(dx + 1 == MATHBF2(d.num, d.den, C2(d.num, d.den, r) - 1));
 	    dx++;
-	    assert(C2(d.num, d.den, r) == d.mbf2i(d.mbf2(r)+1)+1);
+	    //assert(C2(d.num, d.den, r) == d.mbf2i(d.mbf2(r)+1)+1);
 	}
 	//printf("\n");
     }

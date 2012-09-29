@@ -56,9 +56,8 @@ public:
 
     int operator()(int i) const;
 
-    int equals(CumulativeOfPeriodicSequence& seq) const;
+    int equals(const CumulativeOfPeriodicSequence& seq) const;
 
-    //void print() const;
     friend std::ostream &operator<<(std::ostream &out, const CumulativeOfPeriodicSequence &seq);
 private:
     std::vector<int> _sequence;
