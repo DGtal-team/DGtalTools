@@ -14,7 +14,7 @@
  *
  **/
 /**
- * @file CumulativeSequenceTest.cpp
+ * @file RationalBeattySequenceTest.cpp
  * @ingroup Tools
  * @author Nicolas Normand (\c Nicolas.Normand@polytech.univ-nantes.fr)
  * LUNAM Université, Université de Nantes, IRCCyN UMR CNRS 6597
@@ -31,66 +31,56 @@
 #include <iostream>
 #include <boost/assert.hpp>
 
-#include "CumulativeSequence.h"
+#include "RationalBeattySequence.h"
 
 using namespace std;
 
-void testSequence(vector<int> sequence, int offset) {
+void testSequence(boost::rational<int> ratio, int dir) {
     int i;
 
-    cout << "Sequence: ";
-    CumulativeOfPeriodicSequence cs(sequence, offset);
+    RationalBeattySequence bs(ratio, dir);
+    cout << "Sequence: " << bs << endl;
     for (i = 1; i < 15; i++) {
-	cout << cs(i) << ' ';
+	cout << bs(i) << ' ';
     }
-    cout << cs << endl;
+    cout << endl << endl;
 
-    cout << "Inverse of sequence: ";
-    CumulativeOfPeriodicSequence csi(cs.inverse());
+    RationalBeattySequence bsc = bs.complement();
+    cout << "Complement of sequence: " << bsc << endl;
     for (i = 1; i < 15; i++) {
-	cout << csi(i) << ' ';
+	cout << bsc(i) << ' ';
     }
-    cout << csi << endl;
+    cout << endl << endl;
 
-    cout << "Inverse of inverse of sequence: ";
-    CumulativeOfPeriodicSequence csii(csi.inverse());
+    RationalBeattySequence bscc = bsc.complement();
+    cout << "Complement of complement of sequence: " << bscc << endl;
     for (i = 1; i < 15; i++) {
-	cout << csii(i) << ' ';
+	cout << bscc(i) << ' ';
     }
-    cout << csii << endl;
+    cout << endl << endl;
 
-    printf("\n");
+    RationalBeattySequence bsi = bs.invert();
+    cout << "Inverse of sequence: " << bsi << endl;
+    for (i = 1; i < 15; i++) {
+	cout << bsi(i) << ' ';
+    }
+    cout << endl << endl;
 
-    BOOST_VERIFY(csii.equals(cs));
+    RationalBeattySequence bsii = bsi.invert();
+    cout << "Inverse of inverse of sequence: " << bsii << endl;
+    for (i = 1; i < 15; i++) {
+	cout << bsii(i) << ' ';
+    }
+    cout << endl << endl;
+
+    BOOST_VERIFY(bs.equals(bsii));
+    BOOST_VERIFY(bs.equals(bscc));
 }
 
 int main(int argc, char** argv) {
-    //int period;
-    //int seq2[4] = {2, 0, 0, 1};
-    vector<int> seq2;
-    seq2.push_back(2);
-    seq2.push_back(0);
-    seq2.push_back(0);
-    seq2.push_back(1);
+    testSequence(boost::rational<int>(3, 2), 0);
 
-    testSequence(seq2, -4);
-
-    testSequence(seq2, -1);
-    testSequence(seq2,  0);
-    testSequence(seq2,  1);
-    testSequence(seq2,  10);
-    testSequence(seq2,  100);
-    testSequence(seq2, -10);
-    testSequence(seq2, -100);
-
-    //int sequence[4] = {1, 2, 0, 3};	// cf. Table 1
-    vector<int> sequence;
-    sequence.push_back(1);
-    sequence.push_back(2);
-    sequence.push_back(0);
-    sequence.push_back(3);
-    
-    testSequence(sequence, 0);
+    testSequence(boost::rational<int>(1, 2), 0);
 
     return 0;
 }

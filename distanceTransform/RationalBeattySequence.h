@@ -57,12 +57,21 @@ public:
 	return (_ratio.numerator() * n + _offset) / _ratio.denominator();
     }
 
-    void print() const {
-	printf("⌊(%d*n", _ratio.numerator());
-	if (_offset!=0)
-	    printf("%+d", _offset);
-	printf(")/%d⌋\n", _ratio.denominator());
-	//printf("num: %d, den: %d, dir: %d\n", num, den, offset);
+    friend std::ostream &operator<<(std::ostream &out, const RationalBeattySequence &seq) {
+	out << "⌊";
+	if (seq._offset != 0)
+	    out << '(';
+	if (seq._ratio.numerator() == -1)
+	    out << '-';
+	else if (seq._ratio.numerator() != 1)
+	    out << seq._ratio.numerator();
+	out << 'n';
+	if (seq._offset > 0)
+	    out << '+';
+	if (seq._offset != 0)
+	    out << seq._offset << ')';
+	out << '/' << seq._ratio.denominator() << "⌋";
+	return out;
     }
 
     bool equals(RationalBeattySequence &otherSeq) const {
