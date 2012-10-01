@@ -28,6 +28,8 @@
  * This file is part of the DGtal library.
  */
 
+#include "DGtal/io/Color.h"
+
 #include <boost/rational.hpp>
 
 class RationalBeattySequence {
@@ -41,11 +43,19 @@ public:
 	_offset(offset) { }
 
     RationalBeattySequence invert() const {
+	DGtal::InfiniteNumberException dgtalinfty;
+	if (_ratio <= 0) {
+	    throw dgtalinfty;
+	}
 	boost::rational<int> r(_ratio.denominator(), _ratio.numerator());
 	return RationalBeattySequence(r, -_offset - 1);
     }
 
     RationalBeattySequence complement() const {
+	DGtal::InfiniteNumberException dgtalinfty;
+	if (_ratio <= 1) {
+	    throw dgtalinfty;
+	}
 	boost::rational<int> r(_ratio.numerator(), _ratio.numerator() - _ratio.denominator());
 	return RationalBeattySequence(r, -_offset - 1);
     }

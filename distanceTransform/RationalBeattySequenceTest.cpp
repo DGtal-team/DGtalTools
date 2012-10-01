@@ -45,20 +45,6 @@ void testSequence(boost::rational<int> ratio, int dir) {
     }
     cout << endl << endl;
 
-    RationalBeattySequence bsc = bs.complement();
-    cout << "Complement of sequence: " << bsc << endl;
-    for (i = 1; i < 15; i++) {
-	cout << bsc(i) << ' ';
-    }
-    cout << endl << endl;
-
-    RationalBeattySequence bscc = bsc.complement();
-    cout << "Complement of complement of sequence: " << bscc << endl;
-    for (i = 1; i < 15; i++) {
-	cout << bscc(i) << ' ';
-    }
-    cout << endl << endl;
-
     RationalBeattySequence bsi = bs.invert();
     cout << "Inverse of sequence: " << bsi << endl;
     for (i = 1; i < 15; i++) {
@@ -73,14 +59,64 @@ void testSequence(boost::rational<int> ratio, int dir) {
     }
     cout << endl << endl;
 
+    RationalBeattySequence bsc = bs.complement();
+    cout << "Complement of sequence: " << bsc << endl;
+    for (i = 1; i < 15; i++) {
+	cout << bsc(i) << ' ';
+    }
+    cout << endl << endl;
+
+    RationalBeattySequence bscc = bsc.complement();
+    cout << "Complement of complement of sequence: " << bscc << endl;
+    for (i = 1; i < 15; i++) {
+	cout << bscc(i) << ' ';
+    }
+    cout << endl << endl;
+
     BOOST_VERIFY(bs.equals(bsii));
     BOOST_VERIFY(bs.equals(bscc));
 }
 
 int main(int argc, char** argv) {
-    testSequence(boost::rational<int>(3, 2), 0);
+    try {
+	cout << "Rational Beatty sequence with rate 3/2" << endl;
+	cout << "Test should proceed without errors" << endl;
+	testSequence(boost::rational<int>(3, 2), 0);
+    }
+    catch (exception& e) {
+	cout << e.what() << endl;
+    }
 
-    testSequence(boost::rational<int>(1, 2), 0);
+    cout << endl << endl;
+
+    try {
+	cout << "Rational Beatty sequence with rate 1/2" << endl;
+	cout << "No complementary sequence (rate <= 1), should throw an exception" << endl;
+	testSequence(boost::rational<int>(1, 2), 0);
+    }
+    catch (exception& e) {
+	cout << e.what() << endl;
+    }
+
+    cout << endl << endl;
+
+    try {
+	cout << "Rational Beatty sequence with rate 1" << endl;
+	cout << "No complementary sequence (rate <= 1), should throw an exception" << endl;
+	testSequence(boost::rational<int>(1, 1), 0);
+    }
+    catch (exception& e) {
+	cout << e.what() << endl;
+    }
+
+    try {
+	cout << "Rational Beatty sequence with rate 0" << endl;
+	cout << "No inverse sequence (rate <= 0), should throw an exception" << endl;
+	testSequence(boost::rational<int>(0, 1), 0);
+    }
+    catch (exception& e) {
+	cout << e.what() << endl;
+    }
 
     return 0;
 }
