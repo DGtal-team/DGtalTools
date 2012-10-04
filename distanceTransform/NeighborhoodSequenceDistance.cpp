@@ -14,7 +14,7 @@
  *
  **/
 /**
- * @file BaseDistanceDT.cpp
+ * @file NeighborhoodSequenceDistance.cpp
  * @ingroup Tools
  * @author Nicolas Normand (\c Nicolas.Normand@polytech.univ-nantes.fr)
  * LUNAM Université, Université de Nantes, IRCCyN UMR CNRS 6597
@@ -36,16 +36,20 @@
 
 #include <algorithm>
 
-#include "BaseDistanceDT.h"
+#include "NeighborhoodSequenceDistance.h"
+#include "PeriodicNSDistanceDT.h"
+#include "RatioNSDistanceDT.h"
+#include "D4DistanceDT.h"
+#include "D8DistanceDT.h"
 
-void BaseDistanceTransform::rotate() {
+void NeighborhoodSequenceDistanceTransform::rotate() {
     GrayscalePixelType *t = dtLines[2];
     dtLines[2] = dtLines[1];
     dtLines[1] = dtLines[0];
     dtLines[0] = t;
 }
 
-void BaseDistanceTransform::beginOfImage(int cols, int rows) {
+void NeighborhoodSequenceDistanceTransform::beginOfImage(int cols, int rows) {
     assert(!_inited);
     assert(_cols == 0);
     assert(dtLines[0] == NULL);
@@ -65,7 +69,7 @@ void BaseDistanceTransform::beginOfImage(int cols, int rows) {
     _inited = true;
 }
 
-void BaseDistanceTransform::endOfImage() {
+void NeighborhoodSequenceDistanceTransform::endOfImage() {
     _consumer->endOfImage();
 
     free(dtLines[0]);
@@ -79,7 +83,7 @@ void BaseDistanceTransform::endOfImage() {
     _inited = false;
 }
 
-BaseDistanceTransform::BaseDistanceTransform(ImageConsumer<GrayscalePixelType>* consumer) :
+NeighborhoodSequenceDistanceTransform::NeighborhoodSequenceDistanceTransform(ImageConsumer<GrayscalePixelType>* consumer) :
 super(consumer),
 _inited(false),
 _cols(0) {
@@ -89,5 +93,45 @@ _cols(0) {
     dtLines[2] = NULL;
 }
 
-BaseDistanceTransform::~BaseDistanceTransform() {
+NeighborhoodSequenceDistanceTransform::~NeighborhoodSequenceDistanceTransform() {
+}
+
+NeighborhoodSequenceDistance* NeighborhoodSequenceDistance::newD4Instance() {
+    return new D4Distance();
+}
+
+NeighborhoodSequenceDistance* NeighborhoodSequenceDistance::newD8Instance() {
+    return new D8Distance();
+}
+
+NeighborhoodSequenceDistance* NeighborhoodSequenceDistance::newInstance(std::vector<int> sequence) {
+    int countOfNeighbors[2] = {0, 0};
+    int i;
+    for (std::vector<int>::iterator it = sequence.begin(); it != sequence.end(); it++) {
+	BOOST_VERIFY(*it == 1 || *it == 2);
+	countOfNeighbors[sequence[*it] - 1]++;
+    }
+    if (countOfNeighbors[0] == 0) {
+	// d8
+	return new D8Distance();
+    }
+    else if (countOfNeighbors[1] == 0) {
+	// d4
+	return new D4Distance();
+    }
+    else {
+	return new PeriodicNSDistance(sequence);
+    }		
+}
+
+NeighborhoodSequenceDistance* NeighborhoodSequenceDistance::newInstance(boost::rational<int> ratio) {
+    if (ratio == 0) {
+	return new D4Distance();
+    }
+    else if (ratio == 1) {
+	return new D8Distance();
+    }
+    else {
+	return new RatioNSDistance(ratio);
+    }	
 }

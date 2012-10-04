@@ -31,13 +31,12 @@
 #include <vector>
 #include <ostream>
 
+/**
+ * \brief This class represents non-decreasing sequences of integers produced
+ * by the cumulative sum of periodic sequences.
+ */
 class CumulativeOfPeriodicSequence {
 public:
-    CumulativeOfPeriodicSequence(int length, int offset = 0) :
-	_sequence(length),
-	_offset(offset) {
-    }
-
     CumulativeOfPeriodicSequence(std::vector<int> sequence, int offset = 0) :
         _sequence(sequence),
 	_offset(offset)
@@ -52,13 +51,20 @@ public:
 	}
     }
 
-    CumulativeOfPeriodicSequence inverse() const;
+    CumulativeOfPeriodicSequence invert() const;
 
     int operator()(int i) const;
 
-    int equals(const CumulativeOfPeriodicSequence& seq) const;
+    bool operator==(const CumulativeOfPeriodicSequence& seq) const;
 
     friend std::ostream &operator<<(std::ostream &out, const CumulativeOfPeriodicSequence &seq);
+
+protected:
+    CumulativeOfPeriodicSequence(int length, int offset = 0) :
+    _sequence(length),
+    _offset(offset) {
+    }
+    
 private:
     std::vector<int> _sequence;
     int _offset;

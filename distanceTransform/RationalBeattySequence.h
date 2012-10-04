@@ -32,16 +32,32 @@
 
 #include <boost/rational.hpp>
 
+/**
+ * \brief this class represents rational Beatty sequences.
+ */
 class RationalBeattySequence {
 private:
     boost::rational<int> _ratio;
     int _offset;
 
 public:
-    RationalBeattySequence(boost::rational<int> ratio, int offset) :
+    /**
+     * Constructor. Creates a rational Beatty sequence with parameter **ratio**
+     * and offset **offset**.
+     */
+    RationalBeattySequence(boost::rational<int> ratio, int offset = 0) :
 	_ratio(ratio),
 	_offset(offset) { }
 
+    /**
+     * Creates the Lambek-Moser inverse of the rational Beatty sequence, *i.e.*
+     * the sequence such that:
+     * ∀(n,m) ∈ ℕ², this(n) < m or inverse(n) < m but not both \cite lambek1954amm.
+     *
+     * \throws DGtal::InfiniteNumberException if the sequence isn't a
+     * non-decreasing integer sequence and doesn't have an inverse
+     * (*i.e.* if #_ratio ≤ 0).
+     */
     RationalBeattySequence invert() const {
 	DGtal::InfiniteNumberException dgtalinfty;
 	if (_ratio <= 0) {
@@ -51,6 +67,13 @@ public:
 	return RationalBeattySequence(r, -_offset - 1);
     }
 
+    /**
+     * Creates the complementary sequence of this rational Beatty sequence. Each
+     * integer is produced once by the initial or the complementary sequence.
+     *
+     * \throws DGtal::InfiniteNumberException if the sequence hasn't a
+     * complementary sequence (*i.e.* if #_ratio ≤ 1).
+     */
     RationalBeattySequence complement() const {
 	DGtal::InfiniteNumberException dgtalinfty;
 	if (_ratio <= 1) {
@@ -60,7 +83,10 @@ public:
 	return RationalBeattySequence(r, -_offset - 1);
     }
 
-    int operator()(int n) const {
+    /**
+     * Computes the value of the sequence for index **n**.
+     */
+    int operator()(unsigned int n) const {
 	//assert(n >= 0);
 	// Floor dir: floor(n*tau) -> (n*num)/den
 	// Ceil dir: ceil(n*tau - 1) -> (n*num+den-1)/den - 1 -> (n*num-1)/den
@@ -84,8 +110,8 @@ public:
 	return out;
     }
 
-    bool equals(RationalBeattySequence &otherSeq) const {
+    bool operator==(RationalBeattySequence &otherSeq) const {
 	return _ratio == otherSeq._ratio &&
-	       _offset == otherSeq._offset;
+	_offset == otherSeq._offset;
     }
 };

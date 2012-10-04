@@ -42,7 +42,9 @@
 void freerow(void *);
 
 /**
- * An ImageConsumer accepts pixels one row at a time in the standard scan order.
+ * \brief Template class for image consumers. An ImageConsumer accepts image
+ * data one row at a time from top to bottom.
+ *
  * A call to beginOfImage() initialises the ImageConsumer,
  * followed by as many calls to processRow() as the number of rows in the image
  * and a final call to endOfImage().
@@ -56,8 +58,10 @@ public:
 };
 
 /**
- * A RowImageProducer generates image data row by row. The data is pushed to the
- * ImageConsumer attached to it.
+ * \brief Template class for image producers. A RowImageProducer generates image
+ * data row by row from top to bottom.
+ *
+ * The data is pushed to the ImageConsumer attached to it.
  */
 template <typename outputPixelType>
 class RowImageProducer {
@@ -76,7 +80,9 @@ protected:
 };
 
 /**
- * An ImageFilter is an image consumer and producer.
+ * \brief Template class for image filters. An ImageFilter is an image consumer
+ * and producer.
+ *
  * It redirects calls to beginOfImage(), processRow() and endOfImage() to the
  * next ImageConsumer (optionally modifying the size and content of the image).
  */
@@ -96,7 +102,7 @@ protected:
 };
 
 /**
- * A TeeImageFilter forwards the image data to two ImageConsumer intances
+ * \brief A TeeImageFilter forwards the image data to two ImageConsumer intances
  * instead of one.
  */
 template <typename inputPixelType, typename outputPixelType>

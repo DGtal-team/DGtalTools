@@ -14,7 +14,7 @@
  *
  **/
 /**
- * @file BaseDistanceDT.h
+ * @file NeighborhoodSequenceDistance.h
  * @ingroup Tools
  * @author Nicolas Normand (\c Nicolas.Normand@polytech.univ-nantes.fr)
  * LUNAM Université, Université de Nantes, IRCCyN UMR CNRS 6597
@@ -32,6 +32,9 @@
 #define BASE_DISTANCE_DT_H
 
 #include "ImageFilter.h"
+
+#include <vector>
+#include <boost/rational.hpp>
 
 typedef struct {
     int x;
@@ -74,7 +77,7 @@ protected:
 	assert(_tdtRows[1]);
 	memset(_tdtRows[1], 0, (cols + 1) * sizeof(GrayscalePixelType));
 
-	_curRow = 1;	// Start at 1 to avoid modulus of negative problem
+	_curRow = 1;	// Start at 1 to avoid modulo of negative problem
 	_outRow = _curRow;
 
 	_cols = cols;
@@ -137,12 +140,12 @@ protected:
     inputPixelType *_tdtRows[2];
 };
 
-class BaseDistanceTransform: public ImageFilter<BinaryPixelType, GrayscalePixelType> {
+class NeighborhoodSequenceDistanceTransform: public ImageFilter<BinaryPixelType, GrayscalePixelType> {
 private:
     typedef ImageFilter<BinaryPixelType, GrayscalePixelType> super;
 public:
-    BaseDistanceTransform(ImageConsumer<GrayscalePixelType>* consumer);
-    ~BaseDistanceTransform();
+    NeighborhoodSequenceDistanceTransform(ImageConsumer<GrayscalePixelType>* consumer);
+    ~NeighborhoodSequenceDistanceTransform();
 
     void beginOfImage(int cols, int rows);
     //void processRow(const bit* inputRow);
@@ -156,10 +159,24 @@ protected:
     GrayscalePixelType* dtLines[3];
 };
 
-class BaseDistance {
+/**
+ * \brief Abstract factory for the instanciation of neighborhood sequence
+ * distances.
+ *
+ * Instances of concrete subclasses provides factory methods for the creation
+ * of image filters aimed at:
+ * - computing a translated image transform,
+ * - recentering the translated image transform.
+ */
+class NeighborhoodSequenceDistance {
 public:
-    virtual BaseDistanceTransform* newTranslatedDistanceTransform(ImageConsumer<GrayscalePixelType>* consumer) const = 0;
+    virtual NeighborhoodSequenceDistanceTransform* newTranslatedDistanceTransform(ImageConsumer<GrayscalePixelType>* consumer) const = 0;
     virtual DistanceTransformUntranslator<GrayscalePixelType, GrayscalePixelType>* newDistanceTransformUntranslator(ImageConsumer<GrayscalePixelType>* consumer) const = 0;
+
+    static NeighborhoodSequenceDistance* newD4Instance();
+    static NeighborhoodSequenceDistance* newD8Instance();
+    static NeighborhoodSequenceDistance* newInstance(boost::rational<int> ratio);
+    static NeighborhoodSequenceDistance* newInstance(std::vector<int> sequence);
 };
 
 #endif

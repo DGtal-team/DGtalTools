@@ -66,7 +66,7 @@ period(period) {
     mathbf2d  = mathbf1d + period;
 
     CumulativeOfPeriodicSequence mathbf1_B(Bvalues);
-    CumulativeOfPeriodicSequence mathbf1_Binv(mathbf1_B.inverse());
+    CumulativeOfPeriodicSequence mathbf1_Binv(mathbf1_B.invert());
 
     for (std::vector<int>::iterator it = sequence.begin(); 
 	 it != sequence.end();
@@ -75,7 +75,7 @@ period(period) {
     }
     
     CumulativeOfPeriodicSequence mathbf2_B(Bvalues);
-    CumulativeOfPeriodicSequence mathbf2_Binv(mathbf2_B.inverse());
+    CumulativeOfPeriodicSequence mathbf2_Binv(mathbf2_B.invert());
 
     for (std::vector<int>::iterator it = sequence.begin(); 
 	 it != sequence.end();
@@ -112,7 +112,7 @@ PeriodicNSDistance::~PeriodicNSDistance() {
     free(c1);
 }
 
-BaseDistanceTransform* PeriodicNSDistance::newTranslatedDistanceTransform(ImageConsumer<GrayscalePixelType>* consumer) const {
+NeighborhoodSequenceDistanceTransform* PeriodicNSDistance::newTranslatedDistanceTransform(ImageConsumer<GrayscalePixelType>* consumer) const {
     return new PeriodicNSDistanceTransform(consumer, this);
 }
 
@@ -176,7 +176,7 @@ void PeriodicNSDistanceTransform::processRow(const BinaryPixelType *imageRow) {
 }
 
 PeriodicNSDistanceTransform::PeriodicNSDistanceTransform(ImageConsumer<GrayscalePixelType>* consumer, const PeriodicNSDistance *d) :
-BaseDistanceTransform(consumer),
+NeighborhoodSequenceDistanceTransform(consumer),
 _d(d) {
 }
 

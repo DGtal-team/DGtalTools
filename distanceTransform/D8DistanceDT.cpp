@@ -35,7 +35,7 @@
 
 #include "D8DistanceDT.h"
 
-BaseDistanceTransform* D8Distance::newTranslatedDistanceTransform(ImageConsumer<GrayscalePixelType>* consumer) const {
+NeighborhoodSequenceDistanceTransform* D8Distance::newTranslatedDistanceTransform(ImageConsumer<GrayscalePixelType>* consumer) const {
     return new D8DistanceTransform(consumer);
 }
 
@@ -73,7 +73,7 @@ void D8DistanceTransform::processRow(const BinaryPixelType *imageRow) {
 }
 
 D8DistanceTransform::D8DistanceTransform(ImageConsumer<GrayscalePixelType>* consumer) :
-BaseDistanceTransform(consumer) {
+NeighborhoodSequenceDistanceTransform(consumer) {
 }
 
 D8DistanceTransformUntranslator::D8DistanceTransformUntranslator(ImageConsumer<GrayscalePixelType>* consumer, int dMax) :

@@ -31,6 +31,10 @@
 #include "ImageFilter.h"
 #include "png.h"
 
+/**
+ * \brief A PNGImageWriter is an ImageProducer that pushes PNG images read from
+ * a file.
+ */
 class PNGImageReader: public RowImageProducer<BinaryPixelType> {
 public:
     PNGImageReader(ImageConsumer<BinaryPixelType>* consumer, FILE *input);

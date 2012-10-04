@@ -32,7 +32,7 @@
 
 #include "CumulativeSequence.h"
 
-int CumulativeOfPeriodicSequence::equals(const CumulativeOfPeriodicSequence& seq2) const {
+bool CumulativeOfPeriodicSequence::operator ==(const CumulativeOfPeriodicSequence& seq2) const {
     return this->_sequence == seq2._sequence;
 }
 
@@ -40,7 +40,7 @@ int mod(int a, int b) {
     return ((a % b) + b) % b;
 }
 
-CumulativeOfPeriodicSequence CumulativeOfPeriodicSequence::inverse() const {
+CumulativeOfPeriodicSequence CumulativeOfPeriodicSequence::invert() const {
     //CumulativeOfPeriodicSequence *inv = CumulativeOfPeriodicSequenceCreate(_sequence[seq->period - 1], 0, NULL);
     CumulativeOfPeriodicSequence inv(_sequence[_sequence.size() - 1]);
     inv._offset = 0;

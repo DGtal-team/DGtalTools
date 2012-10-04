@@ -28,31 +28,56 @@
  * This file is part of the DGtal library.
  */
 
-#include "BaseDistanceDT.h"
+#include "NeighborhoodSequenceDistance.h"
 
 #include <vector>
 
-class PeriodicNSDistance: public BaseDistance {
+/**
+ * \brief this class represents neighborhood sequence distances defined by
+ * periodic sequence. It provides factory methods to create translated distance
+ * transform filters and distance transform untranslator filters.
+ */
+class PeriodicNSDistance: public NeighborhoodSequenceDistance {
 public:
+    /**
+     * Constructor.  Creates a neighborhood sequence distance with a periodic
+     * sequence.
+     *
+     * @param Bvalues one period of the sequence.
+     */
     PeriodicNSDistance(std::vector<int> Bvalues);
+
+    /**
+     * Destructor.
+     */
     ~PeriodicNSDistance();
-    BaseDistanceTransform* newTranslatedDistanceTransform(ImageConsumer<GrayscalePixelType>* consumer) const;
+
+    NeighborhoodSequenceDistanceTransform* newTranslatedDistanceTransform(ImageConsumer<GrayscalePixelType>* consumer) const;
+
     DistanceTransformUntranslator<GrayscalePixelType, GrayscalePixelType>* newDistanceTransformUntranslator(ImageConsumer<GrayscalePixelType>* consumer) const;
 
+    friend class PeriodicNSDistanceTransform;
+    friend class PeriodicNSDistanceTransformUntranslator;
+
+protected:
     int mathbf2(int r) const;
+
     GrayscalePixelType C1(int r) const;
+
     GrayscalePixelType C2(int r) const;
 
     int period;
     int *c1;
-
-protected:
     int *c2;
     int *mathbf1d;
     int *mathbf2d;
 };
 
-class PeriodicNSDistanceTransform : public BaseDistanceTransform {
+/**
+ * \brief Implements a single scan translated distance transform for distances
+ * defined by a periodic sequence of neighborhoods.
+ */
+class PeriodicNSDistanceTransform : public NeighborhoodSequenceDistanceTransform {
 public:
     PeriodicNSDistanceTransform(ImageConsumer<GrayscalePixelType>* consumer, const PeriodicNSDistance *d);
     ~PeriodicNSDistanceTransform();
@@ -63,6 +88,10 @@ protected:
     const PeriodicNSDistance *_d;
 };
 
+/**
+ * \brief Implements a recentering algorithm for the translated distance
+ * transforms defined by a periodic sequences of neighborhoods.
+ */
 class PeriodicNSDistanceTransformUntranslator: public DistanceTransformUntranslator<GrayscalePixelType, GrayscalePixelType> {
 public:
     PeriodicNSDistanceTransformUntranslator(ImageConsumer<GrayscalePixelType>* consumer, int dMax, const PeriodicNSDistance *d);

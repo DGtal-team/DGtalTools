@@ -76,12 +76,8 @@
 
 #include "ImageReader.h"
 
-#include "BaseDistanceDT.h"
-#include "D4DistanceDT.h"
-#include "D8DistanceDT.h"
-#include "RatioNSDistanceDT.h"
+#include "NeighborhoodSequenceDistance.h"
 #include <boost/tokenizer.hpp>
-#include "PeriodicNSDistanceDT.h"
 
 #include "ImageWriter.h"
 
@@ -165,14 +161,14 @@ int main( int argc, char** argv )
     char *myName = argv[0];
     char *outputFormat = NULL;
     bool lineBuffered = false;
-    BaseDistance *dist = NULL;
+    NeighborhoodSequenceDistance *dist = NULL;
 
     // Distance selection ----------------------------------------------------//
     if (vm.count("city-block")) {
-	dist = new D4Distance();
+	dist = NeighborhoodSequenceDistance::newD4Instance();
     }
     else if (vm.count("chessboard")) {
-	dist = new D8Distance();
+	dist = NeighborhoodSequenceDistance::newD8Instance();
     }
     else if (vm.count("ratio")) {
 	int num, den;
@@ -192,35 +188,11 @@ int main( int argc, char** argv )
 		    num, den);
 	    exit(-1);
 	}
-	if (ratio == 0) {
-	    dist = new D4Distance();
-	}
-	else if (ratio == 1) {
-	    dist = new D8Distance();
-	}
-	else {
-	    dist = new RatioNSDistance(ratio);
-	}	
+	dist = NeighborhoodSequenceDistance::newInstance(ratio);
     }
     else if (vm.count("sequence")) {
-	int period = 0;
 	std::vector<int> sequence = parseSequence(vm["sequence"].as<string>());
-	int countOfNeighbors[2] = {0, 0};
-	int i;
-	for (i = 0; i < period; i++) {
-	    countOfNeighbors[sequence[i] - 1]++;
-	}
-	if (countOfNeighbors[0] == 0) {
-	    // d8
-	    dist = new D8Distance();
-	}
-	else if (countOfNeighbors[1] == 0) {
-	    // d4
-	    dist = new D4Distance();
-	}
-	else {
-	    dist = new PeriodicNSDistance(sequence);
-	}		
+	dist = NeighborhoodSequenceDistance::newInstance(sequence);
     }
 
     ImageConsumer<GrayscalePixelType> *output = createImageWriter("-", outputFormat, lineBuffered);
@@ -231,7 +203,7 @@ int main( int argc, char** argv )
     if (translateFlag) {
 	output = dist->newDistanceTransformUntranslator(output);
     }
-    BaseDistanceTransform *dt = dist->newTranslatedDistanceTransform(output);
+    NeighborhoodSequenceDistanceTransform *dt = dist->newTranslatedDistanceTransform(output);
 
 #ifdef WITH_NETPBM
     if (inputFormat == 0) {

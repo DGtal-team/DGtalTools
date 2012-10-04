@@ -31,6 +31,9 @@
 #include "ImageFilter.h"
 #include <png.h>
 
+/**
+ * \brief A PNGImageWriter is an ImageConsumer that writes PNG images to a file.
+ */
 class PNGImageWriter : public ImageConsumer<GrayscalePixelType> {
 public:
     PNGImageWriter(FILE* output, bool lineBuffered = false);

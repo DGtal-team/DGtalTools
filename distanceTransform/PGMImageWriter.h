@@ -32,11 +32,12 @@ extern "C" {
 #include <pam.h>
 #include <assert.h>
 }
-//#include <algorithm>
-//#include <iostream>
 
 #include "ImageFilter.h"
 
+/**
+ * \brief A PGMImageWriter is an ImageConsumer that writes PGM images to a file.
+ */
 class PGMImageWriter : public ImageConsumer<GrayscalePixelType> {
 public:
     PGMImageWriter(FILE* output, int format = 0);

@@ -28,24 +28,36 @@
  * This file is part of the DGtal library.
  */
 
-#include "BaseDistanceDT.h"
+#include "NeighborhoodSequenceDistance.h"
 
-class D4Distance: public BaseDistance {
+/**
+ * \brief This class represents the city-block distance. It provides
+ * factory methods to create translated distance transform filters and
+ * distance transform untranslator filters.
+ */
+class D4Distance: public NeighborhoodSequenceDistance {
 public:
-    BaseDistanceTransform* newTranslatedDistanceTransform(ImageConsumer<GrayscalePixelType>* consumer) const;
+    NeighborhoodSequenceDistanceTransform* newTranslatedDistanceTransform(ImageConsumer<GrayscalePixelType>* consumer) const;
     DistanceTransformUntranslator<GrayscalePixelType, GrayscalePixelType>* newDistanceTransformUntranslator(ImageConsumer<GrayscalePixelType>* consumer) const;
 };
 
-class D4DistanceTransform: public BaseDistanceTransform {
+/**
+ * \brief Implements a single scan translated city-block distance transform.
+ */
+class D4DistanceTransform: public NeighborhoodSequenceDistanceTransform {
 public:
     D4DistanceTransform(ImageConsumer<GrayscalePixelType>* consumer);
 
     void processRow(const BinaryPixelType *imageRow);
 
 private:
-    typedef BaseDistanceTransform super;
+    typedef NeighborhoodSequenceDistanceTransform super;
 };
 
+/**
+ * \brief Implements a recentering algorithm for the translated city-block
+ * distance transform.
+ */
 class D4DistanceTransformUntranslator: public DistanceTransformUntranslator<GrayscalePixelType, GrayscalePixelType> {
 private:
     typedef DistanceTransformUntranslator<GrayscalePixelType, GrayscalePixelType> super;

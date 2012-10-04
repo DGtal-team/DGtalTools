@@ -4,7 +4,7 @@ add_executable(RationalBeattySequenceTest RationalBeattySequenceTest.cpp)
 add_executable(CumulativeSequenceTest CumulativeSequence.cpp CumulativeSequenceTest.cpp)
 #target_link_libraries(CumulativeSequenceTest sequence)
 
-add_executable(LUTBasedNSDistanceTransform LUTBasedNSDistanceTransform.cpp ImageFilter.cpp ImageWriter.cpp BaseDistanceDT.cpp D4DistanceDT.cpp D8DistanceDT.cpp RatioNSDistanceDT.cpp PeriodicNSDistanceDT.cpp CumulativeSequence.cpp)
+add_executable(LUTBasedNSDistanceTransform LUTBasedNSDistanceTransform.cpp ImageFilter.cpp ImageWriter.cpp NeighborhoodSequenceDistance.cpp D4DistanceDT.cpp D8DistanceDT.cpp RatioNSDistanceDT.cpp PeriodicNSDistanceDT.cpp CumulativeSequence.cpp)
 
 target_link_libraries (LUTBasedNSDistanceTransform ${DGTAL_LIBRARIES} )
 

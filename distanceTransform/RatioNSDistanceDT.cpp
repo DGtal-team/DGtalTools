@@ -67,7 +67,7 @@ mbf2i(RationalBeattySequence(ratio, 0).invert()) {
 #endif
 }
 
-BaseDistanceTransform* RatioNSDistance::newTranslatedDistanceTransform(ImageConsumer<GrayscalePixelType>* consumer) const {
+NeighborhoodSequenceDistanceTransform* RatioNSDistance::newTranslatedDistanceTransform(ImageConsumer<GrayscalePixelType>* consumer) const {
     return new RatioNSDistanceTransform(consumer, _ratio);
 }
 
@@ -133,7 +133,7 @@ void RatioNSDistanceTransform::processRow(const BinaryPixelType *imageRow) {
 }
 
 RatioNSDistanceTransform::RatioNSDistanceTransform(ImageConsumer<GrayscalePixelType>* consumer, boost::rational<int> ratio) :
-    BaseDistanceTransform(consumer),
+    NeighborhoodSequenceDistanceTransform(consumer),
     d(ratio) {
 }
 

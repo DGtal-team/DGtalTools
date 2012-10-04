@@ -28,23 +28,66 @@
  * This file is part of the DGtal library.
  */
 
-#include "BaseDistanceDT.h"
+#include "NeighborhoodSequenceDistance.h"
 #include "RationalBeattySequence.h"
 
-class RatioNSDistance: public BaseDistance {
+/**
+ * \brief This class represents neighborhood sequence distances defined by
+ * a ratio of neighborhoods. It provides factory methods to create translated
+ * distance transform filters and distance transform untranslator filters.
+ */
+class RatioNSDistance: public NeighborhoodSequenceDistance {
 public:
+    /**
+     * Constructor.  Creates a neighborhood sequence distance defined by a
+     * a ratio of neighborhoods.
+     *
+     * \param ratio ratio of appearance of the 2-neighborhood in the sequence.
+     * **ratio** should be greater than 0 and less than 1. For instance,
+     * **ratio=1/2** creates the octagonal distance, *i.e.* the neighborhood
+     * sequence distance with the periodic sequence of neighborhoods 1,2,1,2...
+     * (strict alternance of neighborhoods).
+     * The sequence of neighborhoods is the first difference of a rational
+     * Beatty sequence with parameter **ratio+1**. In the octagonal case, the
+     * sequence is B(r)=⌊3r/2⌋-⌊3(r-1)/2⌋.
+     .
+     * \latexonly B(r)=\lfloor3r/2\rfloor\endlatexonly
+     */
     RatioNSDistance(boost::rational<int> ratio);
-    BaseDistanceTransform* newTranslatedDistanceTransform(ImageConsumer<GrayscalePixelType>* consumer) const;
+
+    NeighborhoodSequenceDistanceTransform* newTranslatedDistanceTransform(ImageConsumer<GrayscalePixelType>* consumer) const;
+
     DistanceTransformUntranslator<GrayscalePixelType, GrayscalePixelType>* newDistanceTransformUntranslator(ImageConsumer<GrayscalePixelType>* consumer) const;
 
+    friend class RatioNSDistanceTransform;
+    friend class RatioNSDistanceTransformUntranslator;
+
+protected:
+    /**
+     * ratio of appearance of the 2-neighborhood in the sequence.
+     */
     boost::rational<int> _ratio;
+    /**
+     * counts the occurrences of neighorhood 1 in the sequence of neighborhoods.
+     * #mbf1 is a Rational Beatty sequence with parameter 1 - #_ratio.
+     */
     RationalBeattySequence mbf1;
+    /**
+     * counts the occurrences of neighorhood 2 in the sequence of neighborhoods.
+     * #mbf2 is a Rational Beatty sequence with parameter #_ratio.
+     */
     RationalBeattySequence mbf2;
+    //! Lambek-Moser inverse of #mbf1.
     RationalBeattySequence mbf1i;
+    //! Lambek-Moser inverse of #mbf2.
     RationalBeattySequence mbf2i;
 };
 
-class RatioNSDistanceTransform : public BaseDistanceTransform {
+/**
+ * \brief Implements a single scan translated distance transform for distances
+ * defined by a ratio of neighborhoods.
+ */
+class RatioNSDistanceTransform : public NeighborhoodSequenceDistanceTransform {
 protected:
     const RatioNSDistance d;
 
@@ -54,6 +97,10 @@ public:
     void processRow(const BinaryPixelType *imageRow);
 };
 
+/**
+ * \brief Implements a recentering algorithm for the translated distance
+ * transforms defined by a ratio of neighborhoods.
+ */
 class RatioNSDistanceTransformUntranslator: public DistanceTransformUntranslator<GrayscalePixelType, GrayscalePixelType> {
 public:
     RatioNSDistanceTransformUntranslator(ImageConsumer<GrayscalePixelType>* consumer, int dMax, boost::rational<int> ratio);

@@ -28,21 +28,33 @@
  * This file is part of the DGtal library.
  */
 
-#include "BaseDistanceDT.h"
+#include "NeighborhoodSequenceDistance.h"
 
-class D8Distance: public BaseDistance {
+/**
+ * \brief This class represents the chessboard distance. It provides
+ * factory methods to create translated distance transform filters and
+ * distance transform untranslator filters.
+ */
+class D8Distance: public NeighborhoodSequenceDistance {
 public:
-    BaseDistanceTransform* newTranslatedDistanceTransform(ImageConsumer<GrayscalePixelType>* consumer) const;
+    NeighborhoodSequenceDistanceTransform* newTranslatedDistanceTransform(ImageConsumer<GrayscalePixelType>* consumer) const;
     DistanceTransformUntranslator<GrayscalePixelType, GrayscalePixelType>* newDistanceTransformUntranslator(ImageConsumer<GrayscalePixelType>* consumer) const;
 };
 
-class D8DistanceTransform: public BaseDistanceTransform {
+/**
+ * \brief Implements a single scan translated chessboard distance transform.
+ */
+class D8DistanceTransform: public NeighborhoodSequenceDistanceTransform {
 public:
     D8DistanceTransform(ImageConsumer<GrayscalePixelType>* consumer);
     
     void processRow(const BinaryPixelType *imageRow);
 };
 
+/**
+ * \brief Implements a recentering algorithm for the translated chessboard
+ * distance transform.
+ */
 class D8DistanceTransformUntranslator: public DistanceTransformUntranslator<GrayscalePixelType, GrayscalePixelType> {
 private:
     typedef DistanceTransformUntranslator<GrayscalePixelType, GrayscalePixelType> super;

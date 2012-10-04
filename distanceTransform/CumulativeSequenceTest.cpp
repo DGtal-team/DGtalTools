@@ -46,14 +46,14 @@ void testSequence(vector<int> sequence, int offset) {
     cout << cs << endl;
 
     cout << "Inverse of sequence: ";
-    CumulativeOfPeriodicSequence csi(cs.inverse());
+    CumulativeOfPeriodicSequence csi(cs.invert());
     for (i = 1; i < 15; i++) {
 	cout << csi(i) << ' ';
     }
     cout << csi << endl;
 
     cout << "Inverse of inverse of sequence: ";
-    CumulativeOfPeriodicSequence csii(csi.inverse());
+    CumulativeOfPeriodicSequence csii(csi.invert());
     for (i = 1; i < 15; i++) {
 	cout << csii(i) << ' ';
     }
@@ -61,7 +61,7 @@ void testSequence(vector<int> sequence, int offset) {
 
     printf("\n");
 
-    BOOST_VERIFY(csii.equals(cs));
+    BOOST_VERIFY(csii == cs);
 }
 
 int main(int argc, char** argv) {

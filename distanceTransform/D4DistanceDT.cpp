@@ -34,7 +34,7 @@
 
 #include "D4DistanceDT.h"
 
-BaseDistanceTransform* D4Distance::newTranslatedDistanceTransform(ImageConsumer<GrayscalePixelType>* consumer) const {
+NeighborhoodSequenceDistanceTransform* D4Distance::newTranslatedDistanceTransform(ImageConsumer<GrayscalePixelType>* consumer) const {
     return new D4DistanceTransform(consumer);
 }
 
@@ -71,7 +71,7 @@ void D4DistanceTransform::processRow(const BinaryPixelType *imageRow) {
     rotate();
 }
 
-D4DistanceTransform::D4DistanceTransform(ImageConsumer<GrayscalePixelType>* consumer) : BaseDistanceTransform(consumer) {
+D4DistanceTransform::D4DistanceTransform(ImageConsumer<GrayscalePixelType>* consumer) : NeighborhoodSequenceDistanceTransform(consumer) {
 }
 
 D4DistanceTransformUntranslator::D4DistanceTransformUntranslator(ImageConsumer<GrayscalePixelType>* consumer, int dMax) :

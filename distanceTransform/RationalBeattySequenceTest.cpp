@@ -73,8 +73,8 @@ void testSequence(boost::rational<int> ratio, int dir) {
     }
     cout << endl << endl;
 
-    BOOST_VERIFY(bs.equals(bsii));
-    BOOST_VERIFY(bs.equals(bscc));
+    BOOST_VERIFY(bs == bsii);
+    BOOST_VERIFY(bs == bscc);
 }
 
 int main(int argc, char** argv) {
