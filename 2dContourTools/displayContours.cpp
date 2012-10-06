@@ -168,6 +168,7 @@ int main( int argc, char** argv )
     //aBoard <<  SetMode( vectFc.at(0).className(), "InterGrid" );
     aBoard << CustomStyle( vectFc.at(0).className(), 
 			   new CustomColors( Color::Red  ,  Color::None ) );    
+    aBoard.setLineWidth (lineWidth);
     for(unsigned int i=0; i<vectFc.size(); i++){
       aBoard <<  vectFc.at(i) ;
 
@@ -253,6 +254,7 @@ int main( int argc, char** argv )
 	    polyline.push_back(LibBoard::Point(p[0],p[1]));
           }
           aBoard.setPenColor(DGtal::Color::Black);
+	  
           aBoard.drawPolyline(polyline);
 
 	}
