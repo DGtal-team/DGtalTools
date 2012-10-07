@@ -222,10 +222,10 @@ estimateGeometry(Shape& s,
     trueTangentEstimator;
   TrueLocalEstimatorOnPoints< ConstIterator, Shape, CurvatureFunctor >  
     trueCurvatureEstimator;
-  trueTangentEstimator.init( h, r.begin(), r.end(), &s, false);
+  trueTangentEstimator.init( h, r.begin(), r.end());
   tangents = 
     estimateQuantity( trueTangentEstimator, r.begin(), r.end() );
-  trueCurvatureEstimator.init( h, r.begin(), r.end(), &s, false);
+  trueCurvatureEstimator.init( h, r.begin(), r.end());
   curvatures = 
     estimateQuantity( trueCurvatureEstimator, r.begin(), r.end() );
 
