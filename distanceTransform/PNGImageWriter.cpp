@@ -91,7 +91,7 @@ void PNGImageWriter::beginOfImage(int cols, int rows) {
 void PNGImageWriter::processRow(const GrayscalePixelType* inputRow) {
     if (setjmp(png_jmpbuf(_png_ptr))) {
 	png_destroy_write_struct(&_png_ptr, &_info_ptr);
-	fprintf(stderr, "Error during PNGImageWriter::processRow\n");
+	std::cerr << "Error during PNGImageWriter::processRow" << std::endl;
 	exit(1);
     }
 

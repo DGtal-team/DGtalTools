@@ -59,8 +59,6 @@ void testSequence(vector<int> sequence, int offset) {
     }
     cout << csii << endl;
 
-    printf("\n");
-
     BOOST_VERIFY(csii == cs);
 }
 

@@ -51,7 +51,7 @@ PNGImageReader::startImage(size_t readBytes)
 
     if (setjmp(png_jmpbuf(_png_ptr))) {
 	png_destroy_read_struct(&_png_ptr, &_info_ptr, (png_infopp)NULL);
-	fprintf(stderr, "Error during PNGImageReader::PNGImageReader\n");
+	std::cerr << "Error during PNGImageReader::PNGImageReader" << std::endl;
 	exit(1);
     }
 
@@ -103,7 +103,7 @@ void PNGImageReader::produceAllRows(size_t readBytes) {
     startImage(readBytes);
     if (setjmp(png_jmpbuf(_png_ptr))) {
 	png_destroy_read_struct(&_png_ptr, &_info_ptr, (png_infopp)NULL);
-	fprintf(stderr, "Error during PNGImageReader::produceAllRows\n");
+	std::cerr << "Error during PNGImageReader::produceAllRows" << std::endl;
 	exit(1);
     }
 

@@ -55,7 +55,6 @@ mbf2i(RationalBeattySequence(ratio, 0).invert()) {
 #ifndef NDEBUG
     RationalBeattySequence B(ratio + 1, 0);
     for (int n = 1; n < 1000; n++) {
-	//printf("%d: %d %d %d %d %d\n", n, B(n)-B(n-1), data->mbf1(n), data->mbf2(n), data->mbf1i(n), data->mbf2i(n));
 	assert(mbf1(n) + mbf2(n) == n);
 	assert(mbf1(n) - mbf1(n - 1) == (B(n)-B(n-1) == 1));
 	assert(mbf2(n) - mbf2(n - 1) == (B(n)-B(n-1) == 2));
@@ -180,9 +179,7 @@ void RatioNSDistanceTransformUntranslator::processRow(const GrayscalePixelType* 
 	dtn = _tdtRows[0][col];
 	dtmax = std::max(dtmax, dtn);
 	dtn = std::max(0, dtn - 1);
-	//printf("row %d col %d: [%d, %d] ", _curRow, col - 2, _tdtRows[0][col], dtp);
 	//assert(C1(d.num, d.den, dtn) == d.mbf1i(d.mbf1(dtn)+1)+1);
-	//printf("%d vs. %d\n", MATHBF2(d.num, den, r - 1), d.mbf2(r-1));
 	//assert(MATHBF2(d.num, d.den, d.mbf1i(d.mbf1(dtn)+1)) == d.mbf2(d.mbf1i(d.mbf1(dtn)+1)));
 	for (int r = d.mbf1i(d.mbf1(dtn)+1)+1, dx = d.mbf2(r-1);
 	     r <= dtp;
@@ -193,7 +190,6 @@ void RatioNSDistanceTransformUntranslator::processRow(const GrayscalePixelType* 
 	    assert(_curRow - 1 - dy >= 0);
 	    assert(_outputRows[(_curRow - 1 - dy) % _dtRowCount][col - dx] == (GrayscalePixelType) -1);
 	    _outputRows[(_curRow - 1 - dy) % _dtRowCount][col - dx] = r;
-	    //printf("%d ", r);
 	    // Let s be the next radius where neighborhood 1 is used
 	    // s = r + c1[r % period]
 	    // between r and s, neighborhood 2 is used s - r - 1 times
@@ -205,13 +201,10 @@ void RatioNSDistanceTransformUntranslator::processRow(const GrayscalePixelType* 
 	    dx = d.mbf2(d.mbf1i(d.mbf1(r)+1));
 	    //assert(C1(d.num, d.den, r) == d.mbf1i(d.mbf1(r)+1)+1);
 	}
-	//printf("\n");
 
 	dtn = _tdtRows[0][col + 1];
 	dtn = std::max(0, dtn - 1);
-	//printf("row %d col %d: [%d, %d] ", _curRow, col - 2, _tdtRows[0][col + 1], dtp);
 	//assert(C2(d.num, d.den, dtn) == d.mbf2i(d.mbf2(dtn)+1)+1);
-	//printf("%d vs. %d\n", MATHBF2(d.num, den, r - 1), d.mbf2(r-1));
 	//assert(MATHBF2(d.num, d.den, d.mbf2i(d.mbf2(dtn)+1)) == d.mbf2(d.mbf2i(d.mbf2(dtn)+1)));
 	for (int r = d.mbf2i(d.mbf2(dtn)+1)+1, dx = d.mbf2(d.mbf2i(d.mbf2(dtn)+1));
 	     r <= dtp;
@@ -223,16 +216,13 @@ void RatioNSDistanceTransformUntranslator::processRow(const GrayscalePixelType* 
 	    assert(_curRow - 1 - dy >= 0);
 	    assert(_outputRows[(_curRow - 1 - dy) % _dtRowCount][col - dx] == (GrayscalePixelType) -1);
 	    _outputRows[(_curRow - 1 - dy) % _dtRowCount][col - dx] = r;
-	    //printf("%d ", r);
 	    // Next time we use neighborhood 2, dx is increased by one
 	    //assert(dx + 1 == MATHBF2(d.num, d.den, C2(d.num, d.den, r) - 1));
 	    dx++;
 	    //assert(C2(d.num, d.den, r) == d.mbf2i(d.mbf2(r)+1)+1);
 	}
-	//printf("\n");
     }
     _curRow++;
-    //printf("max: %d\n", dtmax);
     for (; _outRow < _curRow - dtmax; _outRow++) {
 	_consumer->processRow(_outputRows[_outRow % _dtRowCount]);
 #ifndef NDEBUG

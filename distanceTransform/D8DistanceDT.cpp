@@ -131,13 +131,10 @@ void D8DistanceTransformUntranslator::processRow(const GrayscalePixelType* input
 	    assert(_curRow - 1 - dy >= 0);
 	    assert(_outputRows[(_curRow - 1 - dy) % _dtRowCount][col - dx] == (GrayscalePixelType) -1);
 	    _outputRows[(_curRow - 1 - dy) % _dtRowCount][col - dx] = r;
-	    //printf("%d ", r);
 	    dx++;
 	}
-	//printf("\n");
     }
     _curRow++;
-    //printf("max: %d\n", dtmax);
     for (; _outRow < _curRow - dtmax; _outRow++) {
 	_consumer->processRow(_outputRows[_outRow % _dtRowCount]);
 #ifndef NDEBUG

@@ -182,10 +182,9 @@ int main( int argc, char** argv )
 	    exit(-1);
 	}*/
 	if (ratio < 0 || ratio > 1) {
-	    fprintf(stderr,
-		    "Invalid ratio %d/%d\n"
-		    "correct ratios num/den are between 0 and 1 inclusive\n",
-		    num, den);
+	    std::cerr <<
+		"Invalid ratio " << ratio << std::endl <<
+		"correct ratios num/den are between 0 and 1 inclusive" << std::endl;
 	    exit(-1);
 	}
 	dist = NeighborhoodSequenceDistance::newInstance(ratio);
@@ -197,7 +196,7 @@ int main( int argc, char** argv )
 
     ImageConsumer<GrayscalePixelType> *output = createImageWriter("-", outputFormat, lineBuffered);
     if (output == NULL) {
-	fprintf(stderr, "Unable to create image output stream (wrong format?)\n");
+	std::cerr << "Unable to create image output stream (wrong format?)" << std::endl;
     }
 
     if (translateFlag) {
@@ -254,7 +253,7 @@ int main( int argc, char** argv )
 #endif
 
     if (inputFormat == 0) {
-	fprintf(stderr, "Input image format not recognized\n");
+	std::cerr << "Input image format not recognized" << std::endl;
     }
 
     if (dt != NULL) {

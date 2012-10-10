@@ -97,7 +97,6 @@ int CumulativeOfPeriodicSequence::operator() (int i) const {
 std::ostream &operator<<(std::ostream &out, const CumulativeOfPeriodicSequence &seq) {
     int i;
 
-    //printf("period: %d, offset: %d, values: ", _sequence.size(), seq->offset);
     out << '(';
 
     std::vector<int>::const_iterator it = seq._sequence.begin();
@@ -120,23 +119,3 @@ std::ostream &operator<<(std::ostream &out, const CumulativeOfPeriodicSequence &
 
     return out;
 }
-
-/*void CumulativeOfPeriodicSequence::print() const {
-    int i;
-
-    //printf("period: %d, offset: %d, values: ", _sequence.size(), seq->offset);
-    printf("(%d", _sequence[0]);
-    for (i = 1; i < _sequence.size(); i++) {
-	//printf("%d ", _sequence[i]);
-	printf(",%d", _sequence[i] - (i > 0 ? _sequence[i-1] : 0));
-    }
-    printf(")");
-    if (_offset > 0) {
-	printf("(+%d)", _offset);
-    }
-    else if (_offset < 0) {
-	printf("(%d)", _offset);
-    }
-    printf("\n");
-}
-*/

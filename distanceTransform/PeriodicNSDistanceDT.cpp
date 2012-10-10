@@ -91,21 +91,6 @@ period(period) {
     }
     mathbf1d[0] = mathbf1_B(period);
     mathbf2d[0] = mathbf2_B(period);
-
-    /*
-    for (i = 1; i < 10; i++) {
-	printf("%d %d, ", i, CumulativeOfPeriodicSequenceValueAtIndex(mathbf2_B, i));
-    }
-    printf("\n");
-    for (i = 1; i < 10; i++) {
-	printf("%d %d, ", (i - 1)/2, CumulativeOfPeriodicSequenceValueAtIndex(mathbf2_B, i - 1));
-    }
-    printf("\n");
-    for (i = 1; i < 10; i++) {
-	printf("%d %d, ", (i - 1)/2, i <= 2 ? 0 : data->mathbf2[((i - 2) % data->period)]
-	       + ((i - 2) / data->period) * data->mathbf2[data->period - 1]);
-    }
-    printf("\n");*/
 }
 
 PeriodicNSDistance::~PeriodicNSDistance() {
@@ -226,7 +211,6 @@ void PeriodicNSDistanceTransformUntranslator::processRow(const GrayscalePixelTyp
 	dtn = _tdtRows[0][col];
 	dtmax = std::max(dtmax, dtn);
 	dtn = std::max(0, dtn - 1);
-	//printf("row %d col %d: [%d, %d] ", _curRow, col - 2, _tdtRows[0][col], dtp);
 	for (int r = _d->c1[dtn % _d->period] + dtn, dx = _d->mathbf2(r - 1);
 	     r <= dtp;
 	     r += _d->c1[r % _d->period]) {
@@ -236,7 +220,6 @@ void PeriodicNSDistanceTransformUntranslator::processRow(const GrayscalePixelTyp
 	    assert(_curRow - 1 - dy >= 0);
 	    assert(_outputRows[(_curRow - 1 - dy) % _dtRowCount][col - dx] == (GrayscalePixelType) -1);
 	    _outputRows[(_curRow - 1 - dy) % _dtRowCount][col - dx] = r;
-	    //printf("%d ", r);
 	    // Let s be the next radius where neighborhood 1 is used
 	    // s = r + c1[r % period]
 	    // between r and s, neighborhood 2 is used s - r - 1 times
@@ -244,11 +227,9 @@ void PeriodicNSDistanceTransformUntranslator::processRow(const GrayscalePixelTyp
 	    assert(dx + _d->c1[r % _d->period] - 1 == _d->mathbf2(r + _d->c1[r % _d->period] - 1));
 	    dx += _d->c1[r % _d->period] - 1;
 	}
-	//printf("\n");
 
 	dtn = _tdtRows[0][col + 1];
 	dtn = std::max(0, dtn - 1);
-	//printf("row %d col %d: [%d, %d] ", _curRow, col - 2, _tdtRows[0][col + 1], dtp);
 	for (int r = _d->C2(dtn), dx = _d->mathbf2(r - 1);
 	     r <= dtp;
 	     r = _d->C2(r)) {
@@ -259,15 +240,12 @@ void PeriodicNSDistanceTransformUntranslator::processRow(const GrayscalePixelTyp
 	    assert(_curRow - 1 - dy >= 0);
 	    //assert(_outputRows[(_curRow - 1 - dy) % _dtRowCount][col - dx] == -1);
 	    _outputRows[(_curRow - 1 - dy) % _dtRowCount][col - dx] = r;
-	    //printf("%d ", r);
 	    // Next time we use neighborhood 2, dx is increased by one
 	    assert(dx + 1 == _d->mathbf2(_d->C2(r) - 1));
 	    dx++;
 	}
-	//printf("\n");
     }
     _curRow++;
-    //printf("max: %d\n", dtmax);
     for (; _outRow < _curRow - dtmax; _outRow++) {
 	_consumer->processRow(_outputRows[_outRow % _dtRowCount]);
 #ifndef NDEBUG
