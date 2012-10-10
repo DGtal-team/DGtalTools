@@ -28,60 +28,64 @@
  * This file is part of the DGtal library.
  */
 
-//#include "MMChainConfig.h"
 #include "ImageWriter.h"
+#include <boost/algorithm/string/predicate.hpp>
 
-bool checkFormat(char const *fromname, char const *format) {
-    if (fromname == NULL)
-	return false;
-
-    int l = strlen(format);
-    return strncasecmp(fromname, format, l) == 0 &&
-	   (fromname[l] == '\0' || fromname[l] == ':');
-}
-
-ImageConsumer<GrayscalePixelType> *createImageWriter(char const *filename, char const *format, bool lineBuffered) {
+/**
+ * Creates an ImageWriter.
+ *
+ * The output image format is determined, in that order, by:
+ * - the **format** parameter if not NULL,
+ * - a prefix ended by ':' in the file format (*e.g.* 'png:filename'),
+ * - the file extension,
+ * If one of these methods specifies a format that is not available, no
+ * ImageWriter is created and the function return NULL.
+ * Il no format is speficied at all, the default format is used in the last
+ * resort.
+ */
+ImageConsumer<GrayscalePixelType> *createImageWriter(std::string filename, std::string format, bool lineBuffered) {
     FILE *output = NULL;
 
-    if (format == NULL) {
-	format = index(filename, ':');
-	if (format != NULL) {
-	    char const *t = format;
-	    format = filename;
-	    filename = t + 1;
+    // Format wasn't specified in arguments, check if there is a prefix for it.
+    if (format == "") {
+	int n = filename.find(':');
+	if (n != std::string::npos) {
+	    format = filename.substr(0, n);
+	    filename = filename.substr(n+1);
 	}
     }
 
-    if (strcmp(filename, "-") == 0) {
+    // Format wasn't specified in arguments nor in the filename prefix, check if
+    // there the file has an extension
+    if (format == "") {
+	int n = filename.rfind('.');
+	if (n != std::string::npos)
+	    format = filename.substr(n+1);
+    }
+
+    if (filename == "-") {
 	output = stdout;
     }
     else {
-	output = fopen(filename, "w");
+	output = fopen(filename.c_str(), "w");
 	// FIXME: where is fclose?
 	if (output == NULL)
 	    return NULL;
     }
-			 
-    if (format == NULL && filename != NULL) {
-	// Guess format from file extension
-	format = rindex(filename, '.');
-	if (format != NULL)
-	    format++;
-    }
 
 #ifdef WITH_NETPBM
-    if (checkFormat(format, "pgm")) {
-	return new PGMImageWriter(output, 1);
+    if (boost::iequals(format, "pgm")) {
+	return new PGMImageWriter(output, lineBuffered);
     }
 #endif
 #ifdef WITH_PNG
-    if (checkFormat(format, "png")) {
+    if (boost::iequals(format, "png")) {
 	return new PNGImageWriter(output, lineBuffered);
     }
 #endif
 
-    // We can't obey the specified format, give up
-    if (format != NULL) {
+    if (format != "") {
+	// We can't obey the specified format, give up
 	return NULL;
     }
 

@@ -29,6 +29,12 @@
  */
 
 ///////////////////////////////////////////////////////////////////////////////
+
+#if !defined(WITH_NETPBM) && !defined(WITH_PNG)
+#warning Neither libpng nor libnetpbm is available, image i/o is disabled,
+#warning use cmake with option -DWITH_PNG or -DWITH_NETPBM
+#endif
+
 #include <iostream>
 
 #include "DGtal/base/Common.h"
@@ -117,6 +123,9 @@ int main( int argc, char** argv )
 	 "(with den >= num >= 0 and den > 0).")
 	("center,c", "Center the distance transform (the default is an asymmetric "
 	 "distance transform)")
+	("output,o", po::value<std::string>(), "Output file name, optionally "
+	 "prefixed with the file format and ':'")
+	("outputFormat,t", po::value<std::string>(), "Output file format")
 	("input,i", po::value<std::string>(), "Read from file \"arg\" instead of "
 	 "stdin.");
     //------------------------------------------------------------------------//
@@ -142,22 +151,14 @@ int main( int argc, char** argv )
 	    "Compute the 2D translated neighborhood-sequence "
 	    "distance transform of a binary image" << std::endl <<
 	    "Basic usage: " << std::endl
-	<< "\tLUTBasedNSDistanceTransform [-f filename] [-c] (-4|-8|-r <num/den>|-s <sequence>) [-t (pgm|png)]" <<std::endl
+	<< "\tLUTBasedNSDistanceTransform [-i filename] [-c] (-4|-8|-r <num/den>|-s <sequence>) [-t (pgm|png)]" <<std::endl
 	<< general_opt << "\n";
 	return 0;
     }
 
-    FILE *input = stdin;
-
-    Board2D aBoard;
-    double scale = 1.0;
-    aBoard.setUnit (0.05*scale, LibBoard::Board::UCentimeter);
-
-    int inputFormat = 0;
     //sourceOfDT source = undefined;
     int translateFlag = 0;
     char *myName = argv[0];
-    char *outputFormat = NULL;
     bool lineBuffered = false;
     NeighborhoodSequenceDistance *dist = NULL;
 
@@ -191,16 +192,51 @@ int main( int argc, char** argv )
 	std::vector<int> sequence = parseSequence(vm["sequence"].as<string>());
 	dist = NeighborhoodSequenceDistance::newInstance(sequence);
     }
+    //------------------------------------------------------------------------//
 
-    ImageConsumer<GrayscalePixelType> *output = createImageWriter("-", outputFormat, lineBuffered);
-    if (output == NULL) {
-	std::cerr << "Unable to create image output stream (wrong format?)" << std::endl;
-    }
+    // Output ----------------------------------------------------------------//
+    ImageConsumer<GrayscalePixelType> *output;
+    {
+	std::string outputFormat("");
+	std::string outputFile("-");
 
-    if (translateFlag) {
-	output = dist->newDistanceTransformUntranslator(output);
+	if (vm.count("outputFormat")) {
+	    outputFormat = vm["outputFormat"].as<string>();
+	}
+	if (vm.count("output")) {
+	    outputFile = vm["output"].as<string>();
+	}
+	
+	output = createImageWriter(outputFile, outputFormat, lineBuffered);
+	if (output == NULL) {
+	    std::cerr << "Unable to create image output stream (unrecognized format?)" << std::endl;
+	}
+
+	if (translateFlag) {
+	    output = dist->newDistanceTransformUntranslator(output);
+	}
     }
     NeighborhoodSequenceDistanceTransform *dt = dist->newTranslatedDistanceTransform(output);
+    //------------------------------------------------------------------------//
+
+    // Input -----------------------------------------------------------------//
+    FILE *input;
+    {
+	std::string inputFile("-");
+	if (vm.count("input")) {
+	    inputFile = vm["input"].as<string>();
+	}
+	if (inputFile == "-") {
+	    input = stdin;
+	}
+	else {
+	    input = fopen(inputFile.c_str(), "r");
+	    // FIXME: where is fclose?
+	    if (input == NULL)
+		std::cerr << "Unable to open input stream";
+	}
+    }
+    int inputFormat = 0;
 
 #ifdef WITH_NETPBM
     if (inputFormat == 0) {
@@ -253,6 +289,7 @@ int main( int argc, char** argv )
     if (inputFormat == 0) {
 	std::cerr << "Input image format not recognized" << std::endl;
     }
+    //------------------------------------------------------------------------//
 
     if (dt != NULL) {
 	delete dt;

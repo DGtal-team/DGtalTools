@@ -38,4 +38,4 @@
 #   include "PNGImageWriter.h"
 #endif
 
-ImageConsumer<GrayscalePixelType>* createImageWriter(char const *filename = NULL, char const *format = NULL, bool lineBuffered=false);
+ImageConsumer<GrayscalePixelType>* createImageWriter(std::string filename = std::string("-"), std::string format = std::string(""), bool lineBuffered=false);

@@ -33,6 +33,8 @@
 
 #include "ImageFilter.h"
 
+#include "string.h"
+
 #include <vector>
 #include <boost/rational.hpp>
 
