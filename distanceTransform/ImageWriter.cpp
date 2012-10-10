@@ -30,6 +30,7 @@
 
 #include "ImageWriter.h"
 #include <boost/algorithm/string/predicate.hpp>
+#include <stdio.h>
 
 /**
  * Creates an ImageWriter.
