@@ -72,8 +72,6 @@
 #include <string>
 
 //Path-based distances
-#define WITH_PNG
-
 #include "ImageReader.h"
 
 #include "NeighborhoodSequenceDistance.h"

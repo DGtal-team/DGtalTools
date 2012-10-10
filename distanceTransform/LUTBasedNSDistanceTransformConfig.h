@@ -4,9 +4,6 @@
 
 #include <limits>
 
-#define WITH_PNG
-//#define WITH_NETPBM
-
 typedef unsigned char  BinaryPixelType;
 typedef unsigned short GrayscalePixelType;
 

@@ -6,10 +6,10 @@ add_executable(CumulativeSequenceTest CumulativeSequence.cpp CumulativeSequenceT
 
 add_executable(LUTBasedNSDistanceTransform LUTBasedNSDistanceTransform.cpp ImageFilter.cpp ImageWriter.cpp NeighborhoodSequenceDistance.cpp D4DistanceDT.cpp D8DistanceDT.cpp RatioNSDistanceDT.cpp PeriodicNSDistanceDT.cpp CumulativeSequence.cpp)
 
-target_link_libraries (LUTBasedNSDistanceTransform ${DGTAL_LIBRARIES} )
+target_link_libraries (LUTBasedNSDistanceTransform ${DGTAL_LIBRARIES})
 
 #if (WITH_PNG)
-    find_package(png REQUIRED)
+    find_package(PNG REQUIRED)
     if (PNG_FOUND)
 	include_directories(${PNG_INCLUDE_DIRS})
 	add_library(pngio PNGImageReader.cpp PNGImageWriter.cpp)
