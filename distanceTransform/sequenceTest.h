@@ -14,12 +14,12 @@
  *
  **/
 /**
- * @file RationalBeattySequenceTest.cpp
+ * @file sequenceTest.h
  * @ingroup Tools
  * @author Nicolas Normand (\c Nicolas.Normand@polytech.univ-nantes.fr)
  * LUNAM Université, Université de Nantes, IRCCyN UMR CNRS 6597
  *
- * @date 2012/09/28
+ * @date 2012/10/11
  *
  * LUTBasedNSDistanceTransform computes the 2D translated neighborhood-sequence
  * distance transform of a binary image. It reads the input images from its
@@ -46,7 +46,8 @@ bool testLambekMoserInverseSequences(sequence &s1, sequence &s2, unsigned int N 
     int i1 = 1;
     int i2 = 1;
     for (int n = 1; n <= N; n++) {
-	// Each positive integer n is expected to be found in one sequence.
+	// Each positive integer n is expected to be equal to a sequence term
+	// plus its rank.
 	if (s1(i1) + i1 == n)
 	    i1++;
 	else if (s2(i2) + i2 == n)
