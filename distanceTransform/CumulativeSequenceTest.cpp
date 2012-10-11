@@ -29,8 +29,8 @@
  */
 
 #include <iostream>
-#include <boost/assert.hpp>
 
+#include "sequenceTest.h"
 #include "CumulativeSequence.h"
 
 using namespace std;
@@ -47,6 +47,7 @@ void testSequence(vector<int> sequence, int offset) {
 
     cout << "Inverse of sequence: ";
     CumulativeOfPeriodicSequence csi(cs.invert());
+    BOOST_VERIFY(testLambekMoserInverseSequences(cs, csi));
     for (i = 1; i < 15; i++) {
 	cout << csi(i) << ' ';
     }
@@ -54,6 +55,7 @@ void testSequence(vector<int> sequence, int offset) {
 
     cout << "Inverse of inverse of sequence: ";
     CumulativeOfPeriodicSequence csii(csi.invert());
+    BOOST_VERIFY(testLambekMoserInverseSequences(csi, csii));
     for (i = 1; i < 15; i++) {
 	cout << csii(i) << ' ';
     }

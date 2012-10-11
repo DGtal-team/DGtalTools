@@ -29,8 +29,8 @@
  */
 
 #include <iostream>
-#include <boost/assert.hpp>
 
+#include "sequenceTest.h"
 #include "RationalBeattySequence.h"
 
 using namespace std;
@@ -46,6 +46,7 @@ void testSequence(boost::rational<int> ratio, int dir) {
     cout << endl << endl;
 
     RationalBeattySequence bsi = bs.invert();
+    BOOST_VERIFY(testLambekMoserInverseSequences(bs, bsi));
     cout << "Inverse of sequence: " << bsi << endl;
     for (i = 1; i < 15; i++) {
 	cout << bsi(i) << ' ';
@@ -53,6 +54,7 @@ void testSequence(boost::rational<int> ratio, int dir) {
     cout << endl << endl;
 
     RationalBeattySequence bsii = bsi.invert();
+    BOOST_VERIFY(testLambekMoserInverseSequences(bsi, bsii));
     cout << "Inverse of inverse of sequence: " << bsii << endl;
     for (i = 1; i < 15; i++) {
 	cout << bsii(i) << ' ';
@@ -60,6 +62,7 @@ void testSequence(boost::rational<int> ratio, int dir) {
     cout << endl << endl;
 
     RationalBeattySequence bsc = bs.complement();
+    BOOST_VERIFY(testComplementarySequences(bs, bsc));
     cout << "Complement of sequence: " << bsc << endl;
     for (i = 1; i < 15; i++) {
 	cout << bsc(i) << ' ';
@@ -67,6 +70,7 @@ void testSequence(boost::rational<int> ratio, int dir) {
     cout << endl << endl;
 
     RationalBeattySequence bscc = bsc.complement();
+    BOOST_VERIFY(testComplementarySequences(bsc, bscc));
     cout << "Complement of complement of sequence: " << bscc << endl;
     for (i = 1; i < 15; i++) {
 	cout << bscc(i) << ' ';
