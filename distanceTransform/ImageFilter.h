@@ -52,6 +52,8 @@ void freerow(void *);
 template <typename inputPixelType>
 class ImageConsumer {
 public:
+    virtual ~ImageConsumer() { }
+
     virtual void processRow(const inputPixelType* inputRow) = 0;
     virtual void beginOfImage(int cols, int rows) = 0;
     virtual void endOfImage() = 0;
