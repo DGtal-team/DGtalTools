@@ -126,6 +126,7 @@ int main( int argc, char** argv )
 	("output,o", po::value<std::string>(), "Output file name, optionally "
 	 "prefixed with the file format and ':'")
 	("outputFormat,t", po::value<std::string>(), "Output file format")
+	("lineBuffered,l", "Flush output after each produced row.")
 	("input,i", po::value<std::string>(), "Read from file \"arg\" instead of "
 	 "stdin.");
     //------------------------------------------------------------------------//
@@ -133,14 +134,14 @@ int main( int argc, char** argv )
     bool parseOK = true;
     po::variables_map vm;
     try {
-	po::store(po::parse_command_line(argc, argv, general_opt), vm);  
+	po::store(po::parse_command_line(argc, argv, general_opt), vm);
     }
     catch (const std::exception& ex) {
 	parseOK = false;
 	trace.info() << "Error checking program options: " << ex.what() << endl;
     }
 
-    po::notify(vm);    
+    po::notify(vm);
     if(!parseOK || vm.count("help") || argc <= 1 ||
        (vm.count("chessboard") +
 	vm.count("city-block") +
@@ -157,9 +158,7 @@ int main( int argc, char** argv )
     }
 
     //sourceOfDT source = undefined;
-    int translateFlag = 0;
     char *myName = argv[0];
-    bool lineBuffered = false;
     NeighborhoodSequenceDistance *dist = NULL;
 
     // Distance selection ----------------------------------------------------//
@@ -197,22 +196,27 @@ int main( int argc, char** argv )
     // Output ----------------------------------------------------------------//
     ImageConsumer<GrayscalePixelType> *output;
     {
-	std::string outputFormat("");
 	std::string outputFile("-");
+	std::string outputFormat("");
+	bool lineBuffered = false;
 
-	if (vm.count("outputFormat")) {
-	    outputFormat = vm["outputFormat"].as<string>();
-	}
 	if (vm.count("output")) {
 	    outputFile = vm["output"].as<string>();
 	}
-	
+	if (vm.count("outputFormat")) {
+	    outputFormat = vm["outputFormat"].as<string>();
+	}
+	if (vm.count("lineBuffered")) {
+	    lineBuffered = true;
+	}
+
 	output = createImageWriter(outputFile, outputFormat, lineBuffered);
+
 	if (output == NULL) {
 	    std::cerr << "Unable to create image output stream (unrecognized format?)" << std::endl;
 	}
 
-	if (translateFlag) {
+	if (vm.count("center")) {
 	    output = dist->newDistanceTransformUntranslator(output);
 	}
     }
@@ -273,7 +277,7 @@ int main( int argc, char** argv )
 
     if (inputFormat == PNG_FILE_FORMAT ||
 	inputFormat == 0 && readBytes == 8 && png_check_sig(signature, 8)) {
-	
+
 	inputFormat = PNG_FILE_FORMAT;
 	PNGImageReader producer(dt, input);
 	dt = NULL;
