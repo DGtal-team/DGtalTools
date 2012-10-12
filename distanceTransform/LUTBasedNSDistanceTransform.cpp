@@ -276,7 +276,7 @@ int main( int argc, char** argv )
     }
 
     if (inputFormat == PNG_FILE_FORMAT ||
-	inputFormat == 0 && readBytes == 8 && png_check_sig(signature, 8)) {
+	(inputFormat == 0 && readBytes == 8 && png_check_sig(signature, 8))) {
 
 	inputFormat = PNG_FILE_FORMAT;
 	PNGImageReader producer(dt, input);
