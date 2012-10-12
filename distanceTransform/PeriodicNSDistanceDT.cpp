@@ -48,13 +48,13 @@ GrayscalePixelType PeriodicNSDistance::C2(int r) const {
     return r + c2[r % period];
 }
 
-PeriodicNSDistance::PeriodicNSDistance(std::vector<int>sequence) :
-period(period) {
+PeriodicNSDistance::PeriodicNSDistance(std::vector<int> sequence) {
+    period = sequence.size();
     std::vector<int>Bvalues = sequence;
 
     int i;
-    for (std::vector<int>::iterator it = sequence.begin(); 
-	 it != sequence.end();
+    for (std::vector<int>::iterator it = Bvalues.begin(); 
+	 it != Bvalues.end();
 	 it++) {
 	assert(*it == 1 || *it == 2);
 	*it = 2 - *it;
@@ -68,8 +68,8 @@ period(period) {
     CumulativeOfPeriodicSequence mathbf1_B(Bvalues);
     CumulativeOfPeriodicSequence mathbf1_Binv(mathbf1_B.invert());
 
-    for (std::vector<int>::iterator it = sequence.begin(); 
-	 it != sequence.end();
+    for (std::vector<int>::iterator it = Bvalues.begin(); 
+	 it != Bvalues.end();
 	 it++) {
 	*it = 1 - *it;
     }
@@ -77,8 +77,8 @@ period(period) {
     CumulativeOfPeriodicSequence mathbf2_B(Bvalues);
     CumulativeOfPeriodicSequence mathbf2_Binv(mathbf2_B.invert());
 
-    for (std::vector<int>::iterator it = sequence.begin(); 
-	 it != sequence.end();
+    for (std::vector<int>::iterator it = Bvalues.begin(); 
+	 it != Bvalues.end();
 	 it++) {
 	*it = 1 + *it;
     }
@@ -111,9 +111,12 @@ void PeriodicNSDistanceTransform::processRow(const BinaryPixelType *imageRow) {
 #define N1_SETMINUS_N2_COUNT  1
 #define N2_SETMINUS_N1_COUNT  5
 #define N1_CAP_N2_COUNT 3
-    static vect n1[N1_SETMINUS_N2_COUNT]   = {{-1, 1}};
-    static vect n2[N2_SETMINUS_N1_COUNT]   = {{1, 0}, {2, 0}, {2, 1}, {1, 2}, {2, 2}};
-    static vect n12[N1_CAP_N2_COUNT] = {{0, 1}, {1, 1}, {0, 2}};
+    static vect n1[N1_SETMINUS_N2_COUNT] = {vect(-1, 1)};
+    static vect n2[N2_SETMINUS_N1_COUNT] = {			     vect(1, 0), vect(2, 0),
+										 vect(2, 1),
+								     vect(1, 2), vect(2, 2)};
+    static vect n12[N1_CAP_N2_COUNT]	 = {		 vect(0, 1), vect(1, 1),
+							 vect(0, 2)};
 
     for (col = 0; col < _cols; col++) {
 	if (imageRow[col] == 0)
@@ -125,31 +128,31 @@ void PeriodicNSDistanceTransform::processRow(const BinaryPixelType *imageRow) {
 
 	    val = GRAYSCALE_MAX;
 	    for (k = 0; k < N1_SETMINUS_N2_COUNT; k++) {
-		assert(n1[k].y >= 0);
-		assert(n1[k].y <= 2);
-		assert(col + 2 - n1[k].x >= 0);
-		assert(col + 2 - n1[k].x < _cols + 3);
-		val = std::min(val, dtLines[n1[k].y][col + 2 - n1[k].x]);
+		assert(n1[k][1] >= 0);
+		assert(n1[k][1] <= 2);
+		assert(col + 2 - n1[k][0] >= 0);
+		assert(col + 2 - n1[k][0] < _cols + 3);
+		val = std::min(val, dtLines[n1[k][1]][col + 2 - n1[k][0]]);
 	    }
 	    dt = val + _d->c1[val % _d->period];
 
 	    val = GRAYSCALE_MAX;
 	    for (k = 0; k < N2_SETMINUS_N1_COUNT; k++) {
-		assert(n2[k].y >= 0);
-		assert(n2[k].y <= 2);
-		assert(col + 2 - n2[k].x >= 0);
-		assert(col + 2 - n2[k].x < _cols + 3);
-		val = std::min(val, dtLines[n2[k].y][col + 2 - n2[k].x]);
+		assert(n2[k][1] >= 0);
+		assert(n2[k][1] <= 2);
+		assert(col + 2 - n2[k][0] >= 0);
+		assert(col + 2 - n2[k][0] < _cols + 3);
+		val = std::min(val, dtLines[n2[k][1]][col + 2 - n2[k][0]]);
 	    }
 	    dt = std::min(dt, _d->C2(val));
 
 	    val = GRAYSCALE_MAX;
 	    for (k = 0; k < N1_CAP_N2_COUNT; k++) {
-		assert(n12[k].y >= 0);
-		assert(n12[k].y <= 2);
-		assert(col + 2 - n12[k].x >= 0);
-		assert(col + 2 - n12[k].x < _cols + 3);
-		val = std::min(val, dtLines[n12[k].y][col + 2 - n12[k].x]);
+		assert(n12[k][1] >= 0);
+		assert(n12[k][1] <= 2);
+		assert(col + 2 - n12[k][0] >= 0);
+		assert(col + 2 - n12[k][0] < _cols + 3);
+		val = std::min(val, dtLines[n12[k][1]][col + 2 - n12[k][0]]);
 	    }
 	    dt = std::min((int) dt, val + 1);
 

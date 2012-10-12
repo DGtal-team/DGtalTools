@@ -47,7 +47,9 @@ DistanceTransformUntranslator<GrayscalePixelType, GrayscalePixelType>* D8Distanc
 void D8DistanceTransform::processRow(const BinaryPixelType *imageRow) {
     int col;
 #define N2_COUNT  8
-    static vect n2[N2_COUNT]   = {{1, 0}, {2, 0}, {2, 1}, {1, 2}, {2, 2}, {0, 1}, {1, 1}, {0, 2}};
+    static vect n2[N2_COUNT] = {	    vect(1, 0), vect(2, 0),
+				vect(0, 1), vect(1, 1), vect(2, 1),
+				vect(0, 2), vect(1, 2), vect(2, 2)};
 
     for (col = 0; col < _cols; col++) {
 	if (imageRow[col] == 0)
@@ -58,11 +60,11 @@ void D8DistanceTransform::processRow(const BinaryPixelType *imageRow) {
 
 	    val = GRAYSCALE_MAX;
 	    for (k = 0; k < N2_COUNT; k++) {
-		assert(n2[k].y >= 0);
-		assert(n2[k].y <= 2);
-		assert(col + 2 - n2[k].x >= 0);
-		assert(col + 2 - n2[k].x < _cols + 3);
-		val = std::min(val, dtLines[n2[k].y][col + 2 - n2[k].x]);
+		assert(n2[k][1] >= 0);
+		assert(n2[k][1] <= 2);
+		assert(col + 2 - n2[k][0] >= 0);
+		assert(col + 2 - n2[k][0] < _cols + 3);
+		val = std::min(val, dtLines[n2[k][1]][col + 2 - n2[k][0]]);
 	    }
 
 	    dtLines[0][col + 2] = val + 1;

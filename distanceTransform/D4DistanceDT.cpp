@@ -46,7 +46,8 @@ DistanceTransformUntranslator<GrayscalePixelType, GrayscalePixelType>* D4Distanc
 void D4DistanceTransform::processRow(const BinaryPixelType *imageRow) {
     int col;
 #define N1_COUNT  4
-    static vect n1[N1_COUNT]   = {{-1, 1}, {0, 1}, {1, 1}, {0, 2}};
+    static vect n1[N1_COUNT] = {vect(-1, 1), vect(0, 1), vect(1, 1),
+					     vect(0, 2)};
 
     for (col = 0; col < _cols; col++) {
 	if (imageRow[col] == 0)
@@ -57,11 +58,11 @@ void D4DistanceTransform::processRow(const BinaryPixelType *imageRow) {
 
 	    val = GRAYSCALE_MAX;
 	    for (k = 0; k < N1_COUNT; k++) {
-		assert(n1[k].y >= 0);
-		assert(n1[k].y <= 2);
-		assert(col + 2 - n1[k].x >= 0);
-		assert(col + 2 - n1[k].x < _cols + 3);
-		val = std::min(val, dtLines[n1[k].y][col + 2 - n1[k].x]);
+		assert(n1[k][1] >= 0);
+		assert(n1[k][1] <= 2);
+		assert(col + 2 - n1[k][0] >= 0);
+		assert(col + 2 - n1[k][0] < _cols + 3);
+		val = std::min(val, dtLines[n1[k][1]][col + 2 - n1[k][0]]);
 	    }
 
 	    dtLines[0][col + 2] = val + 1;

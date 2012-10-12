@@ -37,11 +37,9 @@
 
 #include <vector>
 #include <boost/rational.hpp>
+#include <DGtal/kernel/PointVector.h>
 
-typedef struct {
-    int x;
-    int y;
-} vect;
+typedef PointVector<2, int> vect;
 
 template <typename inputPixelType, typename outputPixelType>
 class DistanceTransformUntranslator: public ImageFilter<inputPixelType, outputPixelType> {

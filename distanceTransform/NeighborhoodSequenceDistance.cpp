@@ -106,10 +106,9 @@ NeighborhoodSequenceDistance* NeighborhoodSequenceDistance::newD8Instance() {
 
 NeighborhoodSequenceDistance* NeighborhoodSequenceDistance::newInstance(std::vector<int> sequence) {
     int countOfNeighbors[2] = {0, 0};
-    int i;
     for (std::vector<int>::iterator it = sequence.begin(); it != sequence.end(); it++) {
 	BOOST_VERIFY(*it == 1 || *it == 2);
-	countOfNeighbors[sequence[*it] - 1]++;
+	countOfNeighbors[*it - 1]++;
     }
     if (countOfNeighbors[0] == 0) {
 	// d8
