@@ -45,7 +45,7 @@ public:
      *
      * @param Bvalues one period of the sequence.
      */
-    PeriodicNSDistance(std::vector<int> Bvalues);
+    PeriodicNSDistance(const std::vector<int> Bvalues);
 
     /**
      * Destructor.

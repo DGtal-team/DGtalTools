@@ -48,7 +48,7 @@ GrayscalePixelType PeriodicNSDistance::C2(int r) const {
     return r + c2[r % period];
 }
 
-PeriodicNSDistance::PeriodicNSDistance(std::vector<int> sequence) {
+PeriodicNSDistance::PeriodicNSDistance(const std::vector<int> sequence) {
     period = sequence.size();
     std::vector<int>Bvalues = sequence;
 
