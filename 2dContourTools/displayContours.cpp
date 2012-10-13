@@ -348,7 +348,7 @@ int main( int argc, char** argv )
     }else if(extension=="eps"){
       aBoard.saveEPS(outputFileName.c_str());
     }else if(extension=="fig"){
-      aBoard.saveFIG(outputFileName.c_str(),LibBoard::Board::BoundingBox, 10.0, vm.count("noXFIGHeader") );
+      aBoard.saveFIG(outputFileName.c_str(),LibBoard::Board::BoundingBox, 10.0, !vm.count("noXFIGHeader") );
     }
 #ifdef WITH_CAIRO
     else
