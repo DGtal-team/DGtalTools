@@ -30,7 +30,6 @@
 
 extern "C" {
 #include <pam.h>
-#include <assert.h>
 }
 
 #include "ImageFilter.h"
@@ -40,7 +39,7 @@ extern "C" {
  */
 class PGMImageWriter : public ImageConsumer<GrayscalePixelType> {
 public:
-    PGMImageWriter(FILE* output, int format = 0);
+    PGMImageWriter(FILE* output, int plainFormat = 1);
 
     void beginOfImage(int cols, int rows);
     void processRow(const GrayscalePixelType* inputRow);
@@ -48,8 +47,7 @@ public:
 
 protected:
     int _cols;
-    int _format;
+    int _plainFormat;
     FILE* _output;
-    struct pam _outpam;
-    tuple * _tuplerow;
+    gray * _outputRow;
 };

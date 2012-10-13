@@ -26,7 +26,7 @@ if (WITH_NETPBM)
 	add_definitions(-DWITH_NETPBM)
 	include_directories(${NETPBM_INCLUDE_DIR})
 	add_library(pbmio PBMImageReader.cpp PGMImageWriter.cpp)
-	target_link_libraries(LUTBasedNSDistanceTransform ${NETPBM_LIBRARIES})
+	target_link_libraries(pbmio ${NETPBM_LIBRARIES})
 	target_link_libraries(LUTBasedNSDistanceTransform pbmio)
 
 #	add_executable(imageFeeder imageFeeder.cpp)

@@ -28,9 +28,9 @@
  * This file is part of the DGtal library.
  */
 
-#include "ImageWriter.h"
 #include <boost/algorithm/string/predicate.hpp>
 #include <stdio.h>
+#include "ImageWriter.h"
 
 /**
  * Creates an ImageWriter.

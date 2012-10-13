@@ -29,52 +29,31 @@
  */
 
 #include "PGMImageWriter.h"
+#include <boost/assert.hpp>
 
-#include <string.h>
-
-PGMImageWriter::PGMImageWriter(FILE* output, int format) :
+PGMImageWriter::PGMImageWriter(FILE* output, int plainFormat) :
 _cols(0),
-_format(format),
+_plainFormat(plainFormat),
 _output(output) {
-    _outpam.size        = sizeof(struct pam);
-    _outpam.len         = sizeof(struct pam);
-    _outpam.file        = output;
-    _outpam.format      = PGM_FORMAT;
-    _outpam.plainformat = 1;
 }
 
 void
 PGMImageWriter::beginOfImage(int cols, int rows) {
     _cols = cols;
-    _outpam.height	         = rows;
-    _outpam.width	         = cols;
-    _outpam.depth            = 1;
-    _outpam.maxval           = 255;
-    _outpam.bytes_per_sample = 1;
-    strncpy(_outpam.tuple_type, PAM_PGM_TUPLETYPE, sizeof(_outpam.tuple_type));
-#ifdef PAM_HAVE_ALLOCATION_DEPTH
-    _outpam.allocation_depth = sizeof(GrayscalePixelType);
-#endif
-#ifdef PAM_HAVE_COMMENT_P
-    _outpam.comment_p        = NULL;
-#endif
-    _tuplerow = pnm_allocpamrow(&_outpam);
-    pnm_writepaminit(&_outpam);
-    //pgm_writepgminit(_output, cols, rows, 255, _format);
+    _outputRow = pgm_allocrow(cols);
+    BOOST_VERIFY(_outputRow != NULL);
+    pgm_writepgminit(_output, cols, rows, 255, 1);
 }
 
 void
 PGMImageWriter::endOfImage() {
-    pnm_freepamrow(_tuplerow);
-    _tuplerow = NULL;
+    pgm_freerow(_outputRow);
 }
 
 void
 PGMImageWriter::processRow(const GrayscalePixelType* inputRow) {
-    // FIXME: type mismatch, change to pgm
-    for (int column = 0; column < _outpam.width; ++column) {
-	_tuplerow[column][0] = inputRow[column];
+    for (int column = 0; column < _cols; ++column) {
+	_outputRow[column] = inputRow[column];
     }
-    pnm_writepamrow(&_outpam, _tuplerow);
-    //pgm_writepgmrow(_output, inputRow, _cols, 255, _format);
+    pgm_writepgmrow(_output, _outputRow, _cols, 255, 1);
 }
