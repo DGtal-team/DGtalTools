@@ -30,7 +30,6 @@
 #include <iostream>
 
 #include "DGtal/base/Common.h"
-
 #include "DGtal/helpers/StdDefs.h"
 
 #include "DGtal/shapes/ShapeFactory.h"
@@ -79,6 +78,7 @@ namespace po = boost::program_options;
 
 int main( int argc, char** argv )
 {
+
   // parse command line ----------------------------------------------
   po::options_description general_opt("Allowed options are: ");
   general_opt.add_options()
@@ -89,10 +89,14 @@ int main( int argc, char** argv )
     ("drawContourPoint", po::value<double>(), "<size> display contour points as disk of radius <size>")    
     ("fillContour", "fill the contours with default color")
     ("lineWidth", po::value<double>()->default_value(1.0), "Define the linewidth of the contour (SDP format)") 
+    ("drawPointOfIndex", po::value<int>(), "<index> Draw the contour point of index <index> (default 0) ") 
+    ("pointSize", po::value<double>()->default_value(2.0), "<size> Set the display point size of the point displayed by drawPointofIndex option (default 2.0) ") 
+    ("noXFIGHeader", " to exclude xfig header in the resulting output stream (no effect with option -outputFile).")
     ("withProcessing", po::value<std::string>(), "Processing (used only with --FreemanChain):\n\t DSS segmentation {DSS}\n\t  Maximal segments {MS}\n\t Faithful Polygon {FP}\n\t Minimum Length Polygon {MLP}")   
-    ("outputEPS", po::value<std::string>(), " <filename> specify eps format (default format output.eps)")
-    ("outputSVG", po::value<std::string>(), " <filename> specify svg format.")
-    ("outputFIG", po::value<std::string>(), " <filename> specify fig format.")
+    ("outputFile,o", po::value<std::string>(), " <filename> save output file automatically according the file format extension.")
+    ("outputStreamEPS", " specify eps for output stream format.")
+    ("outputStreamSVG", " specify svg for output stream format.")
+    ("outputStreamFIG", " specify fig for output stream format.")
 #ifdef WITH_CAIRO
     ("outputPDF", po::value<std::string>(), "outputPDF <filename> specify pdf format. ")
     ("outputPNG", po::value<std::string>(), "outputPNG <filename> specify png format.")
@@ -171,6 +175,13 @@ int main( int argc, char** argv )
     aBoard.setLineWidth (lineWidth);
     for(unsigned int i=0; i<vectFc.size(); i++){
       aBoard <<  vectFc.at(i) ;
+      if(vm.count("drawPointOfIndex")){
+	int index = vm["drawPointOfIndex"].as<int>();
+	double size = vm["pointSize"].as<double>();
+	aBoard.setPenColor(Color::Blue);
+	     
+	aBoard.fillCircle((double)(vectFc.at(i).getPoint(index)[0]), (double)(vectFc.at(i).getPoint(index)[1]), size);
+      }
 
       if(vm.count("withProcessing")){
 	std::string processingName = vm["withProcessing"].as<std::string>();
@@ -254,9 +265,8 @@ int main( int argc, char** argv )
 	    polyline.push_back(LibBoard::Point(p[0],p[1]));
           }
           aBoard.setPenColor(DGtal::Color::Black);
-	  
-          aBoard.drawPolyline(polyline);
-
+	  aBoard.drawPolyline(polyline);
+	  	  
 	}
 
       }
@@ -304,9 +314,10 @@ int main( int argc, char** argv )
 	  aBoard.fillCircle(pt.x, pt.y, pointSize);
 	}
       }
+      
     }
   
-  
+    
     aBoard.setPenColor(Color::Red);
     aBoard.setLineStyle (LibBoard::Shape::SolidStyle );
     aBoard.setLineWidth (lineWidth);
@@ -315,48 +326,53 @@ int main( int argc, char** argv )
     }else{
       aBoard.fillPolyline(contourPt);
     }
+    if(vm.count("drawPointOfIndex")){
+      int index = vm["drawPointOfIndex"].as<int>();
+      double size = vm["pointSize"].as<double>();
+      aBoard.fillCircle((double)(contourPt.at(index).x), (double)(contourPt.at(index).y), size);
+    }
     
+   
   
   }
 
- 
-
 
 
   
+  if(vm.count("outputFile")){
+    string outputFileName= vm["outputFile"].as<string>();
+    string extension = outputFileName.substr(outputFileName.find_last_of(".") + 1);
 
-  
-  if (vm.count("outputSVG")){
-    string outputFileName= vm["outputSVG"].as<string>();
-    aBoard.saveSVG(outputFileName.c_str());
-  } else   
-    if (vm.count("outputFIG")){
-      string outputFileName= vm["outputFIG"].as<string>();
-      aBoard.saveFIG(outputFileName.c_str());
-    } else
-      if (vm.count("outputEPS")){
-	string outputFileName= vm["outputEPS"].as<string>();
-	aBoard.saveEPS(outputFileName.c_str());
-      }  
+    if(extension=="svg"){
+      aBoard.saveSVG(outputFileName.c_str());
+    }else if(extension=="eps"){
+      aBoard.saveEPS(outputFileName.c_str());
+    }else if(extension=="fig"){
+      aBoard.saveFIG(outputFileName.c_str(),LibBoard::Board::BoundingBox, 10.0, !vm.count("noXFIGHeader") );
+    }
 #ifdef WITH_CAIRO
-      else
-	if (vm.count("outputEPS")){
-	  string outputFileName= vm["outputEPS"].as<string>();
-	  aBoard.saveCairo(outputFileName.c_str(),Board2D::CairoEPS );
+    else
+      if (extension=="eps"){
+	aBoard.saveCairo(outputFileName.c_str(),Board2D::CairoEPS );
+      } else 
+	if (extension=="pdf"){
+	  aBoard.saveCairo(outputFileName.c_str(),Board2D::CairoPDF );
 	} else 
-	  if (vm.count("outputPDF")){
-	    string outputFileName= vm["outputPDF"].as<string>();
-	    aBoard.saveCairo(outputFileName.c_str(),Board2D::CairoPDF );
-	  } else 
-	    if (vm.count("outputPNG")){
-	      string outputFileName= vm["outputPNG"].as<string>();
-	      aBoard.saveCairo(outputFileName.c_str(),Board2D::CairoPNG );
-	    }
+	  if (extension=="png"){
+	    aBoard.saveCairo(outputFileName.c_str(),Board2D::CairoPNG );
+	  }
 #endif
-	    else { //default output
-	      string outputFileName= "output.eps";
-	      aBoard.saveEPS(outputFileName.c_str());
-	    }
-  
-}
+  }
+    
+    if (vm.count("outputStreamSVG")){
+    aBoard.saveSVG(cout);
+  } else   
+      if (vm.count("outputStreamFIG")){
+    aBoard.saveFIG(cout, LibBoard::Board::BoundingBox, 10.0,  !vm.count("noXFIGHeader"));
+  } else
+	if (vm.count("outputStreamEPS")){
+    aBoard.saveEPS(cout);
+  } 
+    
+  }
 
