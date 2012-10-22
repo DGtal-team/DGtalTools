@@ -47,7 +47,7 @@ public:
 class D8DistanceTransform: public NeighborhoodSequenceDistanceTransform {
 public:
     D8DistanceTransform(ImageConsumer<GrayscalePixelType>* consumer);
-    
+
     void processRow(const BinaryPixelType *imageRow);
 };
 
@@ -65,7 +65,7 @@ public:
     void beginOfImage(int cols, int rows);
     void processRow(const GrayscalePixelType* inputRow);
     void endOfImage();
-    
+
 protected:
     int _dMax;
     int _imageDMax;

@@ -42,7 +42,7 @@ public:
 	_offset(offset)
     {
 	int sum = 0;
-	for (std::vector<int>::iterator it = _sequence.begin(); 
+	for (std::vector<int>::iterator it = _sequence.begin();
 	     it != _sequence.end();
 	     it++)
 	{
@@ -64,7 +64,7 @@ protected:
     _sequence(length),
     _offset(offset) {
     }
-    
+
 private:
     std::vector<int> _sequence;
     int _offset;

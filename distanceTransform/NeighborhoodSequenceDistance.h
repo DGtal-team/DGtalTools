@@ -66,7 +66,7 @@ protected:
 	assert(_outputRows == NULL);
 	assert(_tdtRows[0] == NULL);
 	assert(_tdtRows[1] == NULL);
-	
+
 	_dtRowCount = dtRowCount;
 	_outputRows = (GrayscalePixelType **)malloc(_dtRowCount * sizeof(GrayscalePixelType *));
 	assert(_outputRows);
@@ -108,7 +108,7 @@ protected:
 	    memset(_tdtRows[0], 0, _cols * sizeof(inputPixelType));
 	else
 	    memcpy(_tdtRows[0], inputRow, _cols * sizeof(inputPixelType));
-    }	
+    }
 
     void endOfImage() {
 	this->processRow(NULL);

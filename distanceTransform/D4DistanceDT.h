@@ -68,7 +68,7 @@ public:
     void beginOfImage(int cols, int rows);
     void processRow(const GrayscalePixelType* inputRow);
     void endOfImage();
-    
+
 protected:
     int _dMax;
     int _imageDMax;
