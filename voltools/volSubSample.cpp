@@ -85,7 +85,8 @@ int main(int argc, char**argv)
   std::string filename = vm["input"].as<std::string>();
   if ( ! ( vm.count ( "output" ) ) ) missingParam ( "--output" );
   std::string outputFileName = vm["output"].as<std::string>();
-
+  
+  
   trace.beginBlock("Loading file");
   typedef ImageContainerBySTLVector<Z3i::Domain, unsigned char>  MyImageC;
 
@@ -110,8 +111,9 @@ int main(int argc, char**argv)
     }
   trace.endBlock();
   
-  
+  trace.beginBlock("Exporting...");
   typedef GrayscaleColorMap<unsigned char> Gray;
   bool res =  VolWriter< MyImageC , Gray>::exportVol(outputFileName, outputImage, 0, 255);
+  trace.endBlock();
   if (res) return 0; else return 1;
 }
