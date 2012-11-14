@@ -57,41 +57,45 @@ void missingParam ( std::string param )
   exit ( 1 );
 }
 
-template<typename Val, typename Image, typename Point>
-Val maxVal(Image &image, Point &p)
+template<typename Val, typename Image, typename Point, typename Domain>
+Val maxVal(Image &image, Point &p, Domain& domain)
 {
   typename Image::Domain dom( p*2, p*2 + Point::diagonal(1));
   Val v=image(p*2);
   for(typename Image::Domain::ConstIterator it=dom.begin(), itend=dom.end();
       it != itend;
       ++it)
-    if ( image( *it) > v) v=image(*it);
+    if ( domain.isInside(*it) &&  image( *it) > v) v=image(*it);
   
   return v;    
 } 
-template<typename Val, typename Image, typename Point>
-Val minVal(Image &image, Point &p)
+template<typename Val, typename Image, typename Point, typename Domain>
+Val minVal(Image &image, Point &p, Domain& domain)
 {
   typename Image::Domain dom( p*2, p*2 + Point::diagonal(1));
   Val v=image(p*2);
   for(typename Image::Domain::ConstIterator it=dom.begin(), itend=dom.end();
       it != itend;
       ++it)
-    if ( image( *it) < v) v=image(*it);
+    if (  domain.isInside(*it)&&  image( *it) < v) v=image(*it);
   
   return v;    
 } 
-template<typename Val, typename Image, typename Point>
-Val meanVal(Image &image, Point &p)
+template<typename Val, typename Image, typename Point, typename Domain>
+Val meanVal(Image &image, Point &p, Domain& domain)
 {
   typename Image::Domain dom( p*2, p*2 + Point::diagonal(1));
   int v=0;
+  int nb=0;
   for(typename Image::Domain::ConstIterator it=dom.begin(), itend=dom.end();
       it != itend;
       ++it)
-      v+=image(*it);
-  
-  return static_cast<unsigned char>( v/8 );
+    if ( domain.isInside(*it) )
+      {
+	nb++;
+	v+=image(*it);
+      }
+  return static_cast<unsigned char>( v/nb );
 } 
 
 
@@ -156,7 +160,7 @@ int main(int argc, char**argv)
       for(MyImageC::Domain::ConstIterator it = outputImage.domain().begin(),
 	    itend = outputImage.domain().end(); it != itend; ++it)
 	{
-	  val = maxVal<unsigned char, MyImageC, Point>(imageC, *it);
+	  val = maxVal<unsigned char, MyImageC, Point>(imageC, *it, imageC.domain());
 	  outputImage.setValue( *it , val );
 	}
     else
@@ -164,7 +168,7 @@ int main(int argc, char**argv)
 	for(MyImageC::Domain::ConstIterator it = outputImage.domain().begin(),
 	      itend = outputImage.domain().end(); it != itend; ++it)
 	  {
-	    val = minVal<unsigned char, MyImageC, Point>(imageC, *it);
+	    val = minVal<unsigned char, MyImageC, Point>(imageC, *it, imageC.domain());
 	    outputImage.setValue( *it , val);
 	  }  
       else
@@ -173,7 +177,7 @@ int main(int argc, char**argv)
 	for(MyImageC::Domain::ConstIterator it = outputImage.domain().begin(),
 	      itend = outputImage.domain().end(); it != itend; ++it)
 	  {
-	    val = meanVal<unsigned char, MyImageC, Point>(imageC, *it);
+	    val = meanVal<unsigned char, MyImageC, Point>(imageC, *it, imageC.domain());
 	    outputImage.setValue( *it , val );
 	  }
       else
