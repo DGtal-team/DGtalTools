@@ -57,6 +57,47 @@ void missingParam ( std::string param )
   exit ( 1 );
 }
 
+template<typename Val, typename Image, typename Point, typename Domain>
+Val maxVal(Image &image, Point &p, Domain& domain)
+{
+  typename Image::Domain dom( p*2, p*2 + Point::diagonal(1));
+  Val v=image(p*2);
+  for(typename Image::Domain::ConstIterator it=dom.begin(), itend=dom.end();
+      it != itend;
+      ++it)
+    if ( domain.isInside(*it) &&  image( *it) > v) v=image(*it);
+  
+  return v;    
+} 
+template<typename Val, typename Image, typename Point, typename Domain>
+Val minVal(Image &image, Point &p, Domain& domain)
+{
+  typename Image::Domain dom( p*2, p*2 + Point::diagonal(1));
+  Val v=image(p*2);
+  for(typename Image::Domain::ConstIterator it=dom.begin(), itend=dom.end();
+      it != itend;
+      ++it)
+    if (  domain.isInside(*it)&&  image( *it) < v) v=image(*it);
+  
+  return v;    
+} 
+template<typename Val, typename Image, typename Point, typename Domain>
+Val meanVal(Image &image, Point &p, Domain& domain)
+{
+  typename Image::Domain dom( p*2, p*2 + Point::diagonal(1));
+  int v=0;
+  int nb=0;
+  for(typename Image::Domain::ConstIterator it=dom.begin(), itend=dom.end();
+      it != itend;
+      ++it)
+    if ( domain.isInside(*it) )
+      {
+	nb++;
+	v+=image(*it);
+      }
+  return static_cast<unsigned char>( v/nb );
+} 
+
 
 int main(int argc, char**argv)
 {
@@ -66,7 +107,9 @@ int main(int argc, char**argv)
   general_opt.add_options()
     ( "help,h", "display this message." )
     ( "input,i", po::value<std::string>(), "Input vol file." )
-    ( "output,o", po::value<string>(),"Output filename." );
+    ( "output,o", po::value<string>(),"Output filename." )
+    ("function,f",   po::value<string>()->default_value("mean"), "Function used to the down-sampling: {none,max, min, mean}" );
+  
 
   po::variables_map vm;
   po::store ( po::parse_command_line ( argc, argv, general_opt ), vm );
@@ -83,35 +126,69 @@ int main(int argc, char**argv)
   //Parse options
   if ( ! ( vm.count ( "input" ) ) ) missingParam ( "--input" );
   std::string filename = vm["input"].as<std::string>();
+  std::string function = vm["function"].as<std::string>();
   if ( ! ( vm.count ( "output" ) ) ) missingParam ( "--output" );
   std::string outputFileName = vm["output"].as<std::string>();
-
+  
+  
   trace.beginBlock("Loading file");
   typedef ImageContainerBySTLVector<Z3i::Domain, unsigned char>  MyImageC;
 
   MyImageC  imageC = VolReader< MyImageC >::importVol ( filename );
-  MyImageC  outputImage( Z3i::Domain( imageC.domain().lowerBound() - Vector().diagonal(1),
-                                      (imageC.domain().upperBound()-imageC.domain().lowerBound())/Vector().diagonal(2) + Vector().diagonal(1)));
+  MyImageC  outputImage( Z3i::Domain( imageC.domain().lowerBound(),
+                                      (imageC.domain().upperBound()-imageC.domain().lowerBound())/Vector().diagonal(2)));
 
   trace.endBlock();
   unsigned int cpt=0;
   unsigned int maxS = imageC.domain().size();
   Point subvector = Vector().diagonal(2);
-
+  Point p;
+  unsigned char val;
   trace.beginBlock("Down-scaling the volume...");
+  trace.info()<<"Function= "<<function<<std::endl;
+  trace.info() << outputImage.domain() << std::endl;
   //Fast Copy
-  for(MyImageC::Domain::ConstIterator it = imageC.domain().begin(),
-        itend = imageC.domain().end(); it != itend; ++it)
-    {
-      trace.info() << cpt; 
-      trace.progressBar( cpt, maxS);
-      cpt++;
-      outputImage.setValue( *it/subvector , imageC(*it));
-    }
+  if (function == "none")
+    for(MyImageC::Domain::ConstIterator it = outputImage.domain().begin(),
+	  itend = outputImage.domain().end(); it != itend; ++it)
+      {
+	p = (*it) * 2;
+	outputImage.setValue( *it , imageC( p ));
+      }
+  else
+    if (function == "max")
+      for(MyImageC::Domain::ConstIterator it = outputImage.domain().begin(),
+	    itend = outputImage.domain().end(); it != itend; ++it)
+	{
+	  val = maxVal<unsigned char, MyImageC, Point>(imageC, *it, imageC.domain());
+	  outputImage.setValue( *it , val );
+	}
+    else
+      if (function == "min")
+	for(MyImageC::Domain::ConstIterator it = outputImage.domain().begin(),
+	      itend = outputImage.domain().end(); it != itend; ++it)
+	  {
+	    val = minVal<unsigned char, MyImageC, Point>(imageC, *it, imageC.domain());
+	    outputImage.setValue( *it , val);
+	  }  
+      else
+	
+      if (function == "mean")
+	for(MyImageC::Domain::ConstIterator it = outputImage.domain().begin(),
+	      itend = outputImage.domain().end(); it != itend; ++it)
+	  {
+	    val = meanVal<unsigned char, MyImageC, Point>(imageC, *it, imageC.domain());
+	    outputImage.setValue( *it , val );
+	  }
+      else
+	trace.error() << "Bad function !"<<std::endl;
+
+
   trace.endBlock();
   
-  
+  trace.beginBlock("Exporting...");
   typedef GrayscaleColorMap<unsigned char> Gray;
   bool res =  VolWriter< MyImageC , Gray>::exportVol(outputFileName, outputImage, 0, 255);
+  trace.endBlock();
   if (res) return 0; else return 1;
 }
