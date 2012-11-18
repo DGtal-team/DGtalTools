@@ -3,8 +3,6 @@ SET(DGTAL_TOOLS_SRC
   volAddBorder
   volCComponentCounter
   volSubSample
-  vol2raw
-  raw2vol
 )
 
 FOREACH(FILE ${DGTAL_TOOLS_SRC})

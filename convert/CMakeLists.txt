@@ -1,9 +1,10 @@
 
-
 SET(DGTAL_TOOLS_SRC
   pgm2freeman
   freeman2sdp
-  displayContours
+  vol2raw
+  raw2vol
+  ofs2off
  )
 
 FOREACH(FILE ${DGTAL_TOOLS_SRC})
