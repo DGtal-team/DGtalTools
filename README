@@ -28,7 +28,7 @@ http://libdgtal.org/doc/stable/tutorials.html).
 Actually the DGTal project is organized as follows:
 
 
-* convert/: utilities to convert various simple file formats:
+* converters/: utilities to convert various simple file formats:
       freeman2sdp: convert freeman chain towards a Sequence of Discrete Points.
       pgm2freeman: to extract a freeman chain contour from a grayscale image.
       raw2vol and vol2raw: transform 3D volumes files from (resp. to) raw to vol.

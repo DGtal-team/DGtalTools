@@ -28,6 +28,6 @@ SET(VERSION ${DGtalTools_VERSION_MAJOR}.${DGtalTools_VERSION_MINOR}.${DGtalTools
 add_subdirectory(volumetric)
 add_subdirectory(shapeGenerator)
 add_subdirectory(estimators)
-add_subdirectory(convert)
+add_subdirectory(converters)
 add_subdirectory(volumetric/voltools)
 add_subdirectory(visualisation)
