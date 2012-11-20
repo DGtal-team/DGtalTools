@@ -1,10 +1,13 @@
 
-
-SET(DGTAL_TOOLS_SRC_image
-  CComponentCounter3D
+SET(DGTAL_TOOLS_SRC
+  pgm2freeman
+  freeman2sdp
+  vol2raw
+  raw2vol
+  ofs2off
  )
 
-FOREACH(FILE ${DGTAL_TOOLS_SRC_image})
+FOREACH(FILE ${DGTAL_TOOLS_SRC})
   add_executable(${FILE} ${FILE})
   target_link_libraries (${FILE} ${DGTAL_LIBRARIES} )
   install(TARGETS ${FILE} 
