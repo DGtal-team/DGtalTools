@@ -109,7 +109,6 @@ int main(int argc, char**argv)
 
   MyImageC  imageC = RawReader< MyImageC >::importRaw8 ( filename, Z3i::Vector(x,y,z) );
   
-  typedef GrayscaleColorMap<unsigned char> Gray;
-  bool res =  VolWriter< MyImageC , Gray>::exportVol(outputFileName, imageC, 0, 255);
+  bool res =  VolWriter< MyImageC>::exportVol(outputFileName, imageC);
   if (res) return 0; else return 1;
 }
