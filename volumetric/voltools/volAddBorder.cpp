@@ -30,7 +30,6 @@
 #include <DGtal/io/readers/VolReader.h>
 #include <DGtal/io/writers/VolWriter.h>
 #include <DGtal/helpers/StdDefs.h>
-#include "DGtal/io/colormaps/GrayscaleColorMap.h"
 #include <DGtal/images/Image.h>
 #include <DGtal/images/ImageContainerBySTLVector.h>
 
@@ -102,7 +101,7 @@ int main(int argc, char**argv)
         itend = imageC.domain().end(); it != itend; ++it)
     outputImage.setValue( *it , imageC(*it));
   
-  typedef GrayscaleColorMap<unsigned char> Gray;
-  bool res =  VolWriter< MyImageC , Gray>::exportVol(outputFileName, outputImage, 0, 255);
+
+  bool res =  VolWriter< MyImageC>::exportVol(outputFileName, outputImage);
   if (res) return 0; else return 1;
 }
