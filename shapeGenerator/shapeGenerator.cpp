@@ -42,13 +42,11 @@
 #include "DGtal/helpers/StdDefs.h"
 #include "DGtal/topology/helpers/Surfaces.h"
 
-
-#include "DGtal/io/colormaps/GrayscaleColorMap.h"
 #include "DGtal/images/imagesSetsUtils/ImageFromSet.h"
 #include "DGtal/images/imagesSetsUtils/SetFromImage.h"
 #include "DGtal/images/ImageContainerBySTLVector.h"
 
-#include "DGtal/io/writers/PNMWriter.h"
+#include "DGtal/io/writers/PGMWriter.h"
 #include "DGtal/io/writers/RawWriter.h"
 #include "DGtal/io/writers/VolWriter.h"
 #include "DGtal/io/boards/Board2D.h"
@@ -182,9 +180,7 @@ unsigned int checkAndRetrunIndex(const std::string &shapeName)
 template <typename Set, typename Image>
 struct Exporter
 { 
-  typedef GrayscaleColorMap<unsigned char> Gray;
-
-  
+ 
   /** 
    * Export a given Set into an image file.
    * 
@@ -202,10 +198,10 @@ struct Exporter
     Image  image = ImageFromSet<Image>::template create<Set>(aSet, 255, true);
     
     if  (outputFormat == "pgm")
-      PNMWriter<Image,Gray>::exportPGM(outputName+"."+outputFormat,image,0,255);
+      PGMWriter<Image>::exportPGM(outputName+"."+outputFormat,image);
     else
       if (outputFormat == "raw")
-	RawWriter<Image,Gray>::exportRaw8(outputName+"."+outputFormat,image,0,255);
+	RawWriter<Image>::exportRaw8(outputName+"."+outputFormat,image);
       else
 	if (outputFormat == "svg")
 	  {

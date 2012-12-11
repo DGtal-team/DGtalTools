@@ -51,10 +51,6 @@
 #include "DGtal/images/imagesSetsUtils/ImageFromSet.h"
 #include "DGtal/images/imagesSetsUtils/SetFromImage.h"
 #include "DGtal/images/ImageContainerBySTLVector.h"
-
-#include "DGtal/io/writers/PNMWriter.h"
-#include "DGtal/io/writers/RawWriter.h"
-#include "DGtal/io/writers/VolWriter.h"
 #include "DGtal/io/boards/Board2D.h"
 
 #include "DGtal/shapes/GaussDigitizer.h"
