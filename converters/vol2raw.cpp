@@ -30,7 +30,6 @@
 #include <DGtal/io/readers/VolReader.h>
 #include <DGtal/io/writers/RawWriter.h>
 #include <DGtal/helpers/StdDefs.h>
-#include "DGtal/io/colormaps/GrayscaleColorMap.h"
 #include <DGtal/images/Image.h>
 #include <DGtal/images/ImageContainerBySTLVector.h>
 
@@ -95,7 +94,6 @@ int main(int argc, char**argv)
 
   MyImageC  imageC = VolReader< MyImageC >::importVol ( filename );
   
-  typedef GrayscaleColorMap<unsigned char> Gray;
-  bool res =  RawWriter< MyImageC , Gray>::exportRaw8(outputFileName, imageC, 0, 255);
+  bool res =  RawWriter< MyImageC >::exportRaw8(outputFileName, imageC);
   if (res) return 0; else return 1;
 }
