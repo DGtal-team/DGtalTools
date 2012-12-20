@@ -6,6 +6,7 @@
 
 #include "DGtal/geometry/helpers/ContourHelper.h"
 #include "DGtal/topology/helpers/Surfaces.h"
+#include "DGtal/geometry/curves/GridCurve.h"
 
 #include <boost/program_options/options_description.hpp>
 #include <boost/program_options/parsers.hpp>
@@ -27,18 +28,38 @@ namespace po = boost::program_options;
 
 
 
+
+std::vector<LibBoard::Point> basicSampleContour(const std::vector<Point> &aContour, unsigned int rate){
+  std::vector<LibBoard::Point> result;
+  for(unsigned int i=0; i< aContour.size(); i++){
+    if((i%rate)==0){
+      result.push_back(LibBoard::Point(aContour.at(i)[0],aContour.at(i)[1]));
+    } 
+  }
+
+  return result;
+}
+
+
+
+
+
+
+
+
+
 int main( int argc, char** argv )
 {
   
-  typedef  ImageContainerBySTLVector< Z2i::Domain, unsigned int> Image;
+  typedef ImageContainerBySTLVector< Z2i::Domain, unsigned int> Image;
   typedef IntervalThresholder<Image::Value> Binarizer; 
-  
+
   
   // parse command line ----------------------------------------------
   po::options_description general_opt("Allowed options are: ");
   general_opt.add_options()
     ("help,h", "display this message")
-    ("image,i", po::value<std::string>(), "image file name")
+    ("pgmImage,i", po::value<std::string>(), "pgm image file name")
     ("output,o", po::value<std::string>(), "output image file name")
     ("step,s", po::value<int>(), "step value of threshold (default value 10)")
     ("sampling,p", po::value<int>(), "sampling value (default value 10)");
@@ -55,21 +76,21 @@ int main( int argc, char** argv )
   if(vm.count("help")||argc<=1|| !parseOK)
     {
       trace.info()<< "Vectorialise  an pgm image in eps format" <<std::endl << "Basic usage: "<<std::endl
-      << "\t pgm2eps [options] --image <imageName> -step 50 > resultVecto.eos "<<std::endl
-      << general_opt << "\n";
+		  << "\t pgm2eps [options] --image <imageName> -step 50 > resultVecto.eos "<<std::endl
+		  << general_opt << "\n";
       return 0;
     }
 
   unsigned int step =10;
-  unsigned int sampling =10;
+  unsigned int samplingFreq =10;
 
   //Parse options
-  if (!(vm.count("image"))){
+  if (!(vm.count("pgmImage"))){
     trace.info() << "Image file name needed"<< endl;
     return 0;
   } 
   
-  string imageFileName = vm["image"].as<std::string>();
+  string imageFileName = vm["pgmImage"].as<std::string>();
   string imageOutput = vm["output"].as<std::string>();
   Image imageSRC = PNMReader<Image>::importPGM( imageFileName ); 
   
@@ -93,37 +114,36 @@ int main( int argc, char** argv )
     step= vm["step"].as<int>();
   } 
   if(vm.count("sampling")){
-    sampling= vm["sampling"].as<int>();
+    samplingFreq= vm["sampling"].as<int>();
   } 
 
 
-  Board2D exportVecto;
-  
+  Board2D exportVecto;  
   SurfelAdjacency<2> sAdj( true );
 
   for( unsigned int i= step; i<= 255; i+=step){
     Binarizer b(0, i); 
     PointFunctorPredicate<Image,Binarizer> predicate(image, b);
     trace.info()<< "preocessing step " << i << endl;
-    std::vector< std::vector< Z2i::Point >  >  vectContours;
+    std::vector< std::vector< Point >  >  vectContours;
     Surfaces<Z2i::KSpace>::extractAllPointContours4C( vectContours,
 						      ks, predicate, sAdj );  
     
     for(unsigned int k=0; k< vectContours.size(); k++){
       vector<Z2i::Point> aContour = vectContours.at(k);
-      vector<LibBoard::Point> aPolygon;
+      GridCurve<Z2i::K2> aCurve; //grid curve
+      vector<LibBoard::Point> aContourSampled = basicSampleContour(aContour, samplingFreq);
       
-      for(unsigned int l=0; l < aContour.size(); l++){
-	if(l%sampling==0){
-	  aPolygon.push_back(LibBoard::Point(aContour.at(l)[0],aContour.at(l)[1]));
-	}
-      }
-      
-      unsigned int val = i;
-      exportVecto.setPenColor(DGtal::Color(val,val,val));
-      exportVecto.fillPolyline(aPolygon, 256-i);
+      exportVecto.setPenColor(DGtal::Color(i,i,i));
+      exportVecto.fillPolyline(aContourSampled);
     }
+
+      
+
+      
+      
   }
+  
 
   
   string extension = imageOutput.substr(imageOutput.find_last_of(".") + 1);
