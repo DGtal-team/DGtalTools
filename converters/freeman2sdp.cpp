@@ -89,6 +89,7 @@ int main( int argc, char** argv )
       return 0;
     }
   
+
   bool oneline = vm.count("oneLine");
   if( vm.count("FreemanChain") ){
     std::string fileName = vm["FreemanChain"].as<std::string>();
