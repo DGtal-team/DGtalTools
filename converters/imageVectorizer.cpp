@@ -12,8 +12,13 @@
 #include <boost/program_options/parsers.hpp>
 #include <boost/program_options/variables_map.hpp>
 
+
+#include "DGtal/geometry/curves/FrechetShortcut.h"
 #include "DGtal/io/boards/Board2D.h"
 
+#include "DGtal/geometry/curves/CForwardSegmentComputer.h"
+#include "DGtal/geometry/curves/GreedySegmentation.h"
+#include "DGtal/geometry/curves/GeometricalDSS.h"
 
 #include <vector>
 #include <string>
@@ -36,13 +41,57 @@ std::vector<LibBoard::Point> basicSampleContour(const std::vector<Point> &aConto
       result.push_back(LibBoard::Point(aContour.at(i)[0],aContour.at(i)[1]));
     } 
   }
-
   return result;
 }
 
 
 
+std::vector<LibBoard::Point> frechetSampleContour(const GridCurve<Z2i::K2> &curve, double errMax){
+  std::vector<LibBoard::Point> result;
+  
+  typedef Curve::PointsRange::ConstIterator Iterator;
+  typedef FrechetShortcut<Iterator,int> SegmentComputer;
+  typedef GreedySegmentation<SegmentComputer> Segmentation;
+  typedef GridCurve<Z2i::K2>::PointsRange Range; //range
+  Range r = curve.getPointsRange(); //range
+  
+  typedef GreedySegmentation<SegmentComputer> Segmentation;  
+  Segmentation theSegmentation( r.begin(), r.end(), SegmentComputer(errMax) );  
+  Segmentation::SegmentComputerIterator it = theSegmentation.begin();
+  Segmentation::SegmentComputerIterator itEnd = theSegmentation.end();
+  for ( ; it != itEnd; ++it) {
+    Point p = *(*it).begin();
+    result.push_back(LibBoard::Point(p[0],p[1])); 
 
+    }
+  return result;
+}
+
+
+
+std::vector<LibBoard::Point> DSSSampleContour(const GridCurve<Z2i::K2> &curve){
+  std::vector<LibBoard::Point> result;  
+  typedef Curve::PointsRange::ConstIterator Iterator;
+  typedef ArithmeticalDSS<Iterator,int,8> SegmentComputer; 
+  typedef GreedySegmentation<SegmentComputer> Segmentation;
+  typedef GridCurve<Z2i::K2>::PointsRange Range; //range
+  Range r = curve.getPointsRange(); //range
+  SegmentComputer recognitionAlgorithm;
+  Segmentation theSegmentation( r.begin(), r.end(), recognitionAlgorithm );  
+  Segmentation::SegmentComputerIterator it = theSegmentation.begin();
+  Segmentation::SegmentComputerIterator itEnd = theSegmentation.end();
+  for ( ; it != itEnd; ++it) {
+    Point p = *(*it).begin();
+    result.push_back(LibBoard::Point(p[0],p[1])); 
+
+    }
+  return result;
+}
+
+
+
+  
+  
 
 
 
@@ -62,7 +111,9 @@ int main( int argc, char** argv )
     ("pgmImage,i", po::value<std::string>(), "pgm image file name")
     ("output,o", po::value<std::string>(), "output image file name")
     ("step,s", po::value<int>(), "step value of threshold (default value 10)")
-    ("sampling,p", po::value<int>(), "sampling value (default value 10)");
+    ("samplingFrechet,f", po::value<double>(), "samplingFrechet (default value 1.0)")
+    ("samplingDSS,a", "samplingDSS based sampling")
+    ("samplingBasic,p", po::value<int>(), "samplingBasic value (default value 10)");
   
   bool parseOK=true;
   po::variables_map vm;
@@ -83,6 +134,7 @@ int main( int argc, char** argv )
 
   unsigned int step =10;
   unsigned int samplingFreq =10;
+  double frechetErr = 1.0;
 
   //Parse options
   if (!(vm.count("pgmImage"))){
@@ -105,6 +157,9 @@ int main( int argc, char** argv )
 	itend = imageSRC.domain().end(); it != itend; ++it)
     image.setValue( *it , imageSRC(*it));
   
+  trace.error() <<  "lower bound " << image.domain().lowerBound() << endl;
+  trace.error() <<  "upper bound " << image.domain().upperBound() << endl;
+  
   if(! ks.init( image.domain().lowerBound(), 
 		image.domain().upperBound(), true )){
     trace.error() << "Problem in KSpace initialisation"<< endl;
@@ -113,8 +168,11 @@ int main( int argc, char** argv )
   if(vm.count("step")){
     step= vm["step"].as<int>();
   } 
-  if(vm.count("sampling")){
-    samplingFreq= vm["sampling"].as<int>();
+  if(vm.count("samplingBasic")){
+    samplingFreq= vm["samplingBasic"].as<int>();
+  } 
+  if(vm.count("samplingFrechet")){
+    frechetErr= vm["samplingFrechet"].as<double>();
   } 
 
 
@@ -122,7 +180,7 @@ int main( int argc, char** argv )
   SurfelAdjacency<2> sAdj( true );
 
   for( unsigned int i= step; i<= 255; i+=step){
-    Binarizer b(0, i); 
+    Binarizer b(i, 255); 
     PointFunctorPredicate<Image,Binarizer> predicate(image, b);
     trace.info()<< "preocessing step " << i << endl;
     std::vector< std::vector< Point >  >  vectContours;
@@ -130,12 +188,23 @@ int main( int argc, char** argv )
 						      ks, predicate, sAdj );  
     
     for(unsigned int k=0; k< vectContours.size(); k++){
+
       vector<Z2i::Point> aContour = vectContours.at(k);
       GridCurve<Z2i::K2> aCurve; //grid curve
-      vector<LibBoard::Point> aContourSampled = basicSampleContour(aContour, samplingFreq);
+      aCurve.initFromVector(aContour);
+      vector<LibBoard::Point> aContourSampled;
+      if(vm.count("samplingFrechet")){
+	aContourSampled  = frechetSampleContour(aCurve, frechetErr);
+      }else if(vm.count("samplingDSS")){
+	aContourSampled = DSSSampleContour(aCurve);
+      }else{
+	aContourSampled = basicSampleContour(aContour, samplingFreq);
+      }
       
-      exportVecto.setPenColor(DGtal::Color(i,i,i));
-      exportVecto.fillPolyline(aContourSampled);
+      if(aContourSampled.size()>0){
+	exportVecto.setPenColor(DGtal::Color(i,i,i));
+	exportVecto.fillPolyline(aContourSampled);
+      }
     }
 
       
