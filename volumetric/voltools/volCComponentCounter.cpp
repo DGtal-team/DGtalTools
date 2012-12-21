@@ -28,7 +28,7 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 #include <iostream>
-
+#include "DGtal/helpers/StdDefs.h"
 #include "DGtal/base/Common.h"
 #include "DGtal/io/readers/VolReader.h"
 #include "DGtal/io/Color.h"
