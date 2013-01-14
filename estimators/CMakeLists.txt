@@ -3,7 +3,7 @@ SET(DGTAL_TOOLS_SRC
   lengthEstimators
   vol2normalField
   curvatureBC
-#  curvatureMCMS
+  curvatureMCMS
   tangentBC
 )
 

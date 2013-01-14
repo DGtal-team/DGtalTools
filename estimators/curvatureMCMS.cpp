@@ -45,7 +45,7 @@
 //Estimators
 #include "DGtal/geometry/curves/ArithmeticalDSS.h"
 #include "DGtal/geometry/curves/estimation/MostCenteredMaximalSegmentEstimator.h"
-#include "DGtal/geometry/curves/estimation/SegmentComputerFunctor.h"
+#include "DGtal/geometry/curves/estimation/SegmentComputerEstimators.h"
 
 
 #include <boost/program_options/options_description.hpp>
@@ -58,8 +58,51 @@
 
 
 using namespace DGtal;
+using namespace std;
 
+///////////////////////////////////////////////////////////////////////////////
+/*
+  Curvature estimation from the length of the most centered maximal segments
+  @param h grid step
+  @param itb begin iterator on points
+  @param ite end iterator on points
+  @param ito output iterator on curvature
+ */
+template<typename I, typename O>
+void estimationFromLength( double h, const I& itb, const I& ite, const O& ito )
+{
+  typedef ArithmeticalDSS<I,int,4> SegmentComputer;
+  SegmentComputer sc;
+  typedef CurvatureFromDSSLengthEstimator<SegmentComputer> SCEstimator;
+  SCEstimator f; 
+  typedef MostCenteredMaximalSegmentEstimator<SegmentComputer,SCEstimator> Estimator;
+  Estimator CurvatureEstimator(sc, f);
 
+  CurvatureEstimator.init( h, itb, ite );
+  CurvatureEstimator.eval( itb, ite, ito ); 
+}
+
+/*
+  Curvature estimation from the length and width
+  of the most centered maximal segments
+  @param h grid step
+  @param itb begin iterator on points
+  @param ite end iterator on points
+  @param ito output iterator on curvature
+ */
+template<typename I, typename O>
+void estimationFromLengthAndWidth( double h, const I& itb, const I& ite, const O& ito )
+{
+  typedef ArithmeticalDSS<I,int,4> SegmentComputer;
+  SegmentComputer sc;
+  typedef CurvatureFromDSSEstimator<SegmentComputer> SCEstimator;
+  SCEstimator f; 
+  typedef MostCenteredMaximalSegmentEstimator<SegmentComputer,SCEstimator> Estimator;
+  Estimator CurvatureEstimator(sc, f);
+
+  CurvatureEstimator.init( h, itb, ite );
+  CurvatureEstimator.eval( itb, ite, ito ); 
+}
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -68,7 +111,7 @@ namespace po = boost::program_options;
 int main( int argc, char** argv )
 {
   // parse command line ----------------------------------------------
-  po::options_description general_opt("Allowed options are: ");
+  po::options_description general_opt("Allowed options are");
   general_opt.add_options()
     ("help,h", "display this message")
     ("FreemanChain,f", po::value<std::string>(), "FreemanChain file name")
@@ -87,16 +130,15 @@ int main( int argc, char** argv )
   po::notify(vm);    
   if(!parseOK || vm.count("help")||argc<=1 || (!(vm.count("FreemanChain"))) )
     {
-      trace.info()<< "Curvature using a binomial convolver " <<std::endl << "Basic usage: "<<std::endl
-      << "\t curvatureMCMS [options] --FreemanChain  <fileName> "<<std::endl
-      << general_opt << "\n";
+      trace.info() << "Curvature using length of most centered segment computers " << std::endl; 
+      trace.info() << "Basic usage: " << std::endl
+		   << "\t curvatureMCMS [options] --FreemanChain  <fileName> "<< std::endl
+		   << general_opt << "\n";
       return 0;
     }
   
   
   double h = vm["GridStep"].as<double>();  
-
-
  
   if(vm.count("FreemanChain")){
     string fileName = vm["FreemanChain"].as<string>();
@@ -104,50 +146,52 @@ int main( int argc, char** argv )
     typedef Z2i::Space Space; 
     typedef Space::Point Point; 
     typedef Space::Integer Integer;  
+    typedef Z2i::KSpace KSpace; 
     typedef FreemanChain<Integer> FreemanChain; 
-    typedef vector< Point > Storage;
-    typedef Storage::const_iterator ConstIteratorOnPoints; 
 
-    vector< FreemanChain > vectFcs =  PointListReader< Point >:: getFreemanChainsFromFile<Integer> (fileName); 
-   
+    vector< FreemanChain > vectFcs =  PointListReader< Point >::getFreemanChainsFromFile<Integer> (fileName);  
 
     for(unsigned int i=0; i<vectFcs.size(); i++){
 
-      bool isClosed = vectFcs.at(i).isClosed(); 
-      cout << "# grid curve " << i+1 << "/" << vectFcs.size() << " "
-      << ( (isClosed)?"closed":"open" ) << endl;
+      // Freeman chain
+      FreemanChain fc = vectFcs.at(i); 
+      // Create GridCurve
+      GridCurve<> gridcurve;
+      gridcurve.initFromPointsRange( fc.begin(), fc.end() );
 
-      Storage vectPts; 
-      FreemanChain::getContourPoints( vectFcs.at(i), vectPts );
-      if (isClosed) vectPts.pop_back();  
+      cout << "# grid curve " << i+1 << "/" 
+	   << gridcurve.size() << " "
+	   << ( (gridcurve.isClosed())?"closed":"open" ) << endl;
 
-      // Binomial
-      std::cout << "# Curvature estimation from maximal segments" << std::endl; 
-      typedef ArithmeticalDSS<ConstIteratorOnPoints,Integer,4> SegmentComputer;
-      typedef CurvatureFromDSSLengthFunctor<SegmentComputer> Functor1;
-      typedef CurvatureFromDSSFunctor<SegmentComputer> Functor2;
-      typedef MostCenteredMaximalSegmentEstimator<SegmentComputer,Functor1> Estimator1;
-      typedef MostCenteredMaximalSegmentEstimator<SegmentComputer,Functor2> Estimator2;
-      SegmentComputer sc;
-      Functor1 f1; 
-      Functor2 f2;
-      Estimator1 CurvatureEstimator1(sc, f1); 
-      Estimator2 CurvatureEstimator2(sc, f2); 
-      CurvatureEstimator1.init( h, vectPts.begin(), vectPts.end(), isClosed );
-      CurvatureEstimator2.init( h, vectPts.begin(), vectPts.end(), isClosed );
-      vector <Functor1::Value> curvatures1( vectPts.size() ); 
-      CurvatureEstimator1.eval( vectPts.begin(), vectPts.end(), curvatures1.begin() ); 
-      vector <Functor2::Value> curvatures2( vectPts.size() ); 
-      CurvatureEstimator2.eval( vectPts.begin(), vectPts.end(), curvatures2.begin() ); 
+      // Create range of incident points
+      typedef GridCurve<KSpace>::PointsRange Range;
+      Range r = gridcurve.getPointsRange();//building range
+ 
+      // Estimation
+      cout << "# Curvature estimation from maximal segments" << endl; 
+      std::vector<double> estimations1; 
+      std::vector<double> estimations2; 
+      if (gridcurve.isOpen())
+        { 
+	  cout << "# open grid curve" << endl;
+	  estimationFromLength( h, r.begin(), r.end(), back_inserter(estimations1) ); 
+	  estimationFromLengthAndWidth( h, r.begin(), r.end(), back_inserter(estimations2) ); 
+        }
+      else
+        { 
+	  cout << "# closed grid curve" << endl;
+	  estimationFromLength( h, r.c(), r.c(), back_inserter(estimations1) ); 
+	  estimationFromLengthAndWidth( h, r.c(), r.c(), back_inserter(estimations2) ); 
+        }
 
       // Output
       cout << "# id curvatureFromLength curvatureFromLengthAndWidth" << endl;  
       unsigned int j = 0;
-      for ( ConstIteratorOnPoints it = vectPts.begin(), it_end = vectPts.end();
-      it != it_end; ++it, ++j ) {
-         cout << j << setprecision( 15 )
-         << " " << curvatures1[ j ]
-         << " " << curvatures2[ j ] << endl;
+      for ( Range::ConstIterator it = r.begin(), itEnd = r.end();
+      it != itEnd; ++it, ++j ) {
+	cout << j << setprecision( 15 )
+	     << " " << estimations1[ j ]
+	     << " " << estimations2[ j ] << endl;
       }
 
    }
