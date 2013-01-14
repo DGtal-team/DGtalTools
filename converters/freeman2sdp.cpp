@@ -77,7 +77,7 @@ int main( int argc, char** argv )
     po::store(po::parse_command_line(argc, argv, general_opt), vm);  
   }catch(const std::exception& ex){
     parseOK=false;
-    trace.info()<< "Error checking program options: "<< ex.what()<< endl;
+    trace.info()<< "Error checking program options: "<< ex.what()<< std::endl;
   }
 
   po::notify(vm);    
@@ -91,25 +91,25 @@ int main( int argc, char** argv )
   
   bool oneline = vm.count("oneLine");
   if( vm.count("FreemanChain") ){
-    string fileName = vm["FreemanChain"].as<string>();
-    vector< FreemanChain > vectFcs =  PointListReader< Z2i::Point >:: getFreemanChainsFromFile<Z2i::Integer> (fileName); 
+    std::string fileName = vm["FreemanChain"].as<std::string>();
+    std::vector< FreemanChain > vectFcs =  PointListReader< Z2i::Point >:: getFreemanChainsFromFile<Z2i::Integer> (fileName); 
     
     for(int i=0; i< vectFcs.size(); i++){
       bool isClosed = vectFcs.at(i).isClosed(); 
-      cout << "# grid curve " << i+1 << "/" << vectFcs.size()
-	   << ( (isClosed)?" closed":" open" ) << endl;
+      std::cout << "# grid curve " << i+1 << "/" << vectFcs.size()
+                << ( (isClosed)?" closed":" open" ) << std::endl;
       if ( vm.count("info"))
-	cout << "# SDP contour" << i+1<< "/" << vectFcs.size() << " "
-	     << "# size=" << vectFcs.at(i).size() << endl;
-      vector<Z2i::Point> vectPts; 
+        std::cout << "# SDP contour" << i+1<< "/" << vectFcs.size() << " "
+                  << "# size=" << vectFcs.at(i).size() << std::endl;
+      std::vector<Z2i::Point> vectPts; 
       FreemanChain::getContourPoints( vectFcs.at(i), vectPts ); 
       for(int k=0; k < vectPts.size(); k++){
-	cout << vectPts.at(k)[0] << " "<< vectPts.at(k)[1];
+        std::cout << vectPts.at(k)[0] << " "<< vectPts.at(k)[1];
 	if(!oneline){
-	  cout << endl;
+          std::cout << std::endl;
 	}
       }
-      cout << endl;
+      std::cout << std::endl;
     }
     
   }

@@ -148,8 +148,8 @@ int main( int argc, char** argv )
  
       for ( DigitalSet::Iterator it = S.begin(); it != S.end(); ++it )
         {
-	  trace.progressBar((double)nb, (double)S.size()); 
-	  trace.info() << nb<<" "; nb++;
+	  //trace.progressBar((double)nb, (double)S.size()); 
+          nb++;
 	  if (resultL2( *it ) <= layer*layer)
 	    {
 	      if ( shape.isSimple( *it ) )
