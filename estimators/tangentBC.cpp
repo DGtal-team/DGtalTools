@@ -68,7 +68,7 @@ int main( int argc, char** argv )
     po::store(po::parse_command_line(argc, argv, general_opt), vm);  
   }catch(const std::exception& ex){
     parseOK=false;
-    trace.info()<< "Error checking program options: "<< ex.what()<< endl;
+    trace.info()<< "Error checking program options: "<< ex.what()<< std::endl;
   }
 
   po::notify(vm);    
@@ -87,24 +87,24 @@ int main( int argc, char** argv )
 
  
   if(vm.count("FreemanChain")){
-    string fileName = vm["FreemanChain"].as<string>();
+    std::string fileName = vm["FreemanChain"].as<std::string>();
 
     typedef Z2i::Space Space; 
     typedef Space::Point Point; 
     typedef PointVector<2, double> RealPoint; 
     typedef Space::Integer Integer;  
     typedef FreemanChain<Integer> FreemanChain; 
-    typedef vector< Point > Storage;
+    typedef std::vector< Point > Storage;
     typedef Storage::const_iterator ConstIteratorOnPoints; 
 
-    vector< FreemanChain > vectFcs =  
+    std::vector< FreemanChain > vectFcs =  
       PointListReader< Point >:: getFreemanChainsFromFile<Integer> (fileName); 
-
+    
     for(unsigned int i=0; i<vectFcs.size(); i++){
 
       bool isClosed = vectFcs.at(i).isClosed(); 
-      cout << "# grid curve " << i << "/" << vectFcs.size() << " "
-      << ( (isClosed)?"closed":"open" ) << endl;
+      std::cout << "# grid curve " << i << "/" << vectFcs.size() << " "
+                << ( (isClosed)?"closed":"open" ) << std::endl;
 
       Storage vectPts; 
       FreemanChain::getContourPoints( vectFcs.at(i), vectPts ); 
@@ -115,19 +115,19 @@ int main( int argc, char** argv )
       std::cout << "# mask size = " << 
       MyBinomialConvolver::suggestedSize( h, vectPts.begin(), vectPts.end() ) << std::endl;
       typedef 
-  TangentFromBinomialConvolverFunctor< MyBinomialConvolver, RealPoint >
-  TangentBCFct;
+        TangentFromBinomialConvolverFunctor< MyBinomialConvolver, RealPoint >
+        TangentBCFct;
       BinomialConvolverEstimator< MyBinomialConvolver, TangentBCFct> 
-  BCTangentEstimator;
-
+        BCTangentEstimator;
+      
       BCTangentEstimator.init( h, vectPts.begin(), vectPts.end(), isClosed );
 
-      vector<RealPoint> tangents( vectPts.size() ); 
+      std::vector<RealPoint> tangents( vectPts.size() ); 
       BCTangentEstimator.eval( vectPts.begin(), vectPts.end(), 
              tangents.begin() ); 
 
       // Output
-      cout << "# id tangent.x tangent.y angle(atan2(y,x))" << endl;  
+      std::cout << "# id tangent.x tangent.y angle(atan2(y,x))" << std::endl;  
       unsigned int j = 0;
       for ( ConstIteratorOnPoints 
         it = vectPts.begin(), it_end = vectPts.end();
@@ -135,10 +135,10 @@ int main( int argc, char** argv )
   {
     double x = tangents[ j ][ 0 ];
     double y = tangents[ j ][ 1 ];
-    cout << j << setprecision( 15 )
-         << " " << x << " " << y 
-         << " " << atan2( y, x )
-         << endl;
+    std::cout << j << std::setprecision( 15 )
+              << " " << x << " " << y 
+              << " " << atan2( y, x )
+              << std::endl;
   }
 
     }
