@@ -64,7 +64,7 @@
 
 #include "DGtal/geometry/curves/BinomialConvolver.h"
 #include "DGtal/geometry/curves/estimation/MostCenteredMaximalSegmentEstimator.h"
-#include "DGtal/geometry/curves/estimation/SegmentComputerFunctor.h"
+#include "DGtal/geometry/curves/estimation/SegmentComputerEstimators.h"
 #include "DGtal/geometry/curves/ArithmeticalDSS.h"
 
 using namespace DGtal;
@@ -149,12 +149,12 @@ void displayList()
   trace.emphase()<<"2D Shapes:"<<std::endl;
   for(unsigned int i=0; i<shapes2D.size(); ++i)
     trace.info()<<"\t"<<shapes2D[i]<<"\t"
-    <<shapesDesc[i]<<std::endl
-    <<"\t\tRequired parameter(s): "
-    << shapesParam1[i]<<" "
-          << shapesParam2[i]<<" "
-          << shapesParam3[i]<<" "
-          << shapesParam4[i]<<std::endl;
+		<<shapesDesc[i]<<std::endl
+		<<"\t\tRequired parameter(s): "
+		<< shapesParam1[i]<<" "
+		<< shapesParam2[i]<<" "
+		<< shapesParam3[i]<<" "
+		<< shapesParam4[i]<<std::endl;
   
 }
 
@@ -189,7 +189,7 @@ unsigned int checkAndReturnIndex(const std::string &shapeName)
 template <typename Estimator, typename ConstIterator>
 std::vector<typename Estimator::Quantity>
 estimateQuantity( Estimator & estimator, 
-      ConstIterator it, ConstIterator it_end )
+		  ConstIterator it, ConstIterator it_end )
 {
   std::vector<typename Estimator::Quantity> values;
   for ( ; it != it_end; ++it )
@@ -199,11 +199,107 @@ estimateQuantity( Estimator & estimator,
   return values;
 }
 
+template <typename I, typename Shape >
+void
+estimations( const I& itb, const I& ite, Shape& aShape, double h )
+{
+  // True values
+  std::cout << "# True values computation" << std::endl;  
+  typedef ParametricShapeTangentFunctor< Shape > TangentFunctor;
+  typedef ParametricShapeCurvatureFunctor< Shape > CurvatureFunctor;
+  
+  TrueLocalEstimatorOnPoints< I, Shape, TangentFunctor >  
+    trueTangentEstimator;
+  TrueLocalEstimatorOnPoints< I, Shape, CurvatureFunctor >  
+    trueCurvatureEstimator;
+ 
+  trueTangentEstimator.attach( &aShape ); 
+  trueTangentEstimator.init( h, itb, ite );
+  std::vector<typename TrueLocalEstimatorOnPoints< I, Shape, TangentFunctor >::Quantity > trueTangents; 
+  trueTangentEstimator.eval(itb, ite, std::back_inserter(trueTangents));  
+
+  trueCurvatureEstimator.attach( &aShape ); 
+  trueCurvatureEstimator.init( h, itb, ite );
+  std::vector<typename TrueLocalEstimatorOnPoints< I, Shape, CurvatureFunctor >::Quantity> trueCurvatures; 
+  trueCurvatureEstimator.eval(itb, ite, std::back_inserter(trueCurvatures));  
+  
+  // Maximal Segments
+  std::cout << "# Maximal DSS tangent estimation" << std::endl;  
+  typedef ArithmeticalDSS<I,int,4> SegmentComputer;
+  typedef TangentFromDSSEstimator<SegmentComputer> SCFunctor;
+  SegmentComputer sc;
+  SCFunctor f; 
+  MostCenteredMaximalSegmentEstimator<SegmentComputer,SCFunctor> MSTangentEstimator(sc, f); 
+   
+  Clock c;
+    
+  c.startClock();
+  MSTangentEstimator.init( h, itb, ite );
+  std::vector<typename SCFunctor::Quantity> MSTangents;
+  MSTangentEstimator.eval(itb, ite, std::back_inserter(MSTangents)); 
+  double TMST = c.stopClock();
+
+  // // Binomial
+  // std::cout << "# Tangent and curvature estimation from binomial convolution" << std::endl;
+  // typedef BinomialConvolver<I, double> MyBinomialConvolver;
+  // std::cout << "# mask size = " << 
+  //   MyBinomialConvolver::suggestedSize( h, itb, ite ) << std::endl;
+  // typedef TangentFromBinomialConvolverFunctor< MyBinomialConvolver, DGtal::PointVector<2,double> >
+  //   TangentBCFct;
+  // typedef CurvatureFromBinomialConvolverFunctor< MyBinomialConvolver, double >
+  //   CurvatureBCFct;
+  // BinomialConvolverEstimator< MyBinomialConvolver, TangentBCFct> BCTangentEstimator;
+  // BinomialConvolverEstimator< MyBinomialConvolver, CurvatureBCFct> BCCurvatureEstimator;
+    
+  // c.startClock();
+  // BCTangentEstimator.init( h, itb, ite, true );
+  // std::vector<DGtal::PointVector<2,double> > BCTangents = 
+  //   estimateQuantity( BCTangentEstimator, itb, ite );
+  // double TBCTan = c.stopClock();
+
+  // c.startClock();
+  // BCCurvatureEstimator.init( h, itb, ite, true );
+  // std::vector<double> BCCurvatures =
+  //   estimateQuantity( BCCurvatureEstimator, itb, ite );
+  // double TBCCurv = c.stopClock();
+
+  // Output
+  std::cout // << "# Time-BCtangent = "<<TBCTan <<std::endl
+	    // << "# Time-BCcurvature = "<<TBCCurv<<std::endl
+	    << "# Time-MStangent = "<<TMST<<std::endl
+	    << "# id x y tangentx tangenty curvature"
+	    << " BCtangentx BCtangenty BCcurvature"
+	    << " MStangentx MStangenty"
+	    << std::endl;
+
+  unsigned int i = 0;
+  if (isNotEmpty(itb, ite))
+    {
+      I it = itb; 
+      do {
+	std::cerr << *it << std::endl; 
+	std::cout << i << setprecision( 15 )
+		  << " " << it->operator[](0) << " " << it->operator[](1) 
+		  << " " << trueTangents[ i ][ 0 ]
+		  << " " << trueTangents[ i ][ 1 ]
+		  << " " << trueCurvatures[ i ]
+		  // << " " << BCTangents[ i ][ 0 ]
+		  // << " " << BCTangents[ i ][ 1 ]
+		  // << " " << BCCurvatures[ i ]
+		  << " " << MSTangents[ i ][ 0 ]
+		  << " " << MSTangents[ i ][ 1 ]
+		  << std::endl;
+	++it; 
+	++i; 
+      } while (it != ite); 
+    }
+}
+
 template <typename Space, typename Shape>
 bool
 compareShapeEstimators( const string & name,
-      Shape & aShape, 
-      double h )
+			Shape & aShape, 
+			double h )
 {
   // Types
   typedef typename Space::Point Point;
@@ -231,7 +327,7 @@ compareShapeEstimators( const string & name,
   if ( ! ok )
     {
       std::cerr << "[compareShapeEstimators]"
-    << " error in creating KSpace." << std::endl;
+		<< " error in creating KSpace." << std::endl;
       return false;
     }
   try {
@@ -247,98 +343,16 @@ compareShapeEstimators( const string & name,
     // Ranges
     PointsRange r = gridcurve.getPointsRange(); 
     std::cout << "# range size = " << r.size() << std::endl;  
-
     // Estimations
-    // True values
-    std::cout << "# True values computation" << std::endl;  
-    typedef ParametricShapeTangentFunctor< Shape > TangentFunctor;
-    typedef ParametricShapeCurvatureFunctor< Shape > CurvatureFunctor;
-  
-    TrueLocalEstimatorOnPoints< ConstIteratorOnPoints, Shape, TangentFunctor >  
-      trueTangentEstimator;
-    TrueLocalEstimatorOnPoints< ConstIteratorOnPoints, Shape, CurvatureFunctor >  
-      trueCurvatureEstimator;
-  
-    trueTangentEstimator.init( h, r.begin(), r.end(), &aShape, gridcurve.isClosed());
-    std::vector<RealPoint> trueTangents = 
-      estimateQuantity( trueTangentEstimator, r.begin(), r.end() );
-    trueCurvatureEstimator.init( h, r.begin(), r.end(), &aShape, gridcurve.isClosed());
-    std::vector<double> trueCurvatures = 
-      estimateQuantity( trueCurvatureEstimator, r.begin(), r.end() );
-  
-    // Maximal Segments
-    std::cout << "# Maximal DSS tangent estimation" << std::endl;  
-    typedef ArithmeticalDSS<ConstIteratorOnPoints,Integer,4> SegmentComputer;
-    typedef TangentFromDSSFunctor<SegmentComputer> SCFunctor;
-    SegmentComputer sc;
-    SCFunctor f; 
-    MostCenteredMaximalSegmentEstimator<SegmentComputer,SCFunctor> MSTangentEstimator(sc, f); 
-   
-    Clock c;
-    
-    c.startClock();
-    MSTangentEstimator.init( h, r.begin(), r.end(), gridcurve.isClosed() );
-    std::vector<typename SCFunctor::Value> MSTangents = 
-      estimateQuantity( MSTangentEstimator, r.begin(), r.end() );
-    double TMST = c.stopClock();
-
-
-    // Binomial
-    std::cout << "# Tangent and curvature estimation from binomial convolution" << std::endl;
-    typedef BinomialConvolver<ConstIteratorOnPoints, double> MyBinomialConvolver;
-    std::cout << "# mask size = " << 
-      MyBinomialConvolver::suggestedSize( h, r.begin(), r.end() ) << std::endl;
-    typedef TangentFromBinomialConvolverFunctor< MyBinomialConvolver, RealPoint >
-      TangentBCFct;
-    typedef CurvatureFromBinomialConvolverFunctor< MyBinomialConvolver, double >
-      CurvatureBCFct;
-    BinomialConvolverEstimator< MyBinomialConvolver, TangentBCFct> BCTangentEstimator;
-    BinomialConvolverEstimator< MyBinomialConvolver, CurvatureBCFct> BCCurvatureEstimator;
-    
-    c.startClock();
-    BCTangentEstimator.init( h, r.begin(), r.end(), gridcurve.isClosed() );
-    std::vector<RealPoint> BCTangents = 
-      estimateQuantity( BCTangentEstimator, r.begin(), r.end() );
-    double TBCTan = c.stopClock();
-
-    c.startClock();
-    BCCurvatureEstimator.init( h, r.begin(), r.end(), gridcurve.isClosed() );
-    std::vector<double> BCCurvatures =
-      estimateQuantity( BCCurvatureEstimator, r.begin(), r.end() );
-    double TBCCurv = c.stopClock();
-
-    // Output
-    std::cout << "# Shape = "<< name <<std::endl
-        << "# Time-BCtangent = "<<TBCTan <<std::endl
-        << "# Time-BCcurvature = "<<TBCCurv<<std::endl
-        << "# Time-MStangent = "<<TMST<<std::endl
-        << "# id x y tangentx tangenty curvature"
-        << " BCtangentx BCtangenty BCcurvature"
-        << " MStangentx MStangenty"
-        << std::endl;  
-    unsigned int i = 0;
-    for ( ConstIteratorOnPoints it = r.begin(), it_end = r.end();
-    it != it_end; ++it, ++i )
-      {
-  Point p = *it;
-  std::cout << i << setprecision( 15 )
-      << " " << p[ 0 ] << " " << p[ 1 ] 
-      << " " << trueTangents[ i ][ 0 ]
-      << " " << trueTangents[ i ][ 1 ]
-      << " " << trueCurvatures[ i ]
-      << " " << BCTangents[ i ][ 0 ]
-      << " " << BCTangents[ i ][ 1 ]
-      << " " << BCCurvatures[ i ]
-      << " " << MSTangents[ i ][ 0 ]
-      << " " << MSTangents[ i ][ 1 ]
-      << std::endl;
-      }
-    return true;
-  }    
+    if (gridcurve.isClosed())
+      estimations( r.c(), r.c(), aShape, h ); 
+    else 
+      estimations( r.begin(), r.end(), aShape, h ); 
+  }
   catch ( InputException e )
     {
       std::cerr << "[compareShapeEstimators]"
-    << " error in finding a bel." << std::endl;
+		<< " error in finding a bel." << std::endl;
       return false;
     }
 }
@@ -393,8 +407,8 @@ int main( int argc, char** argv )
   if(!parseOK || vm.count("help")||argc<=1)
     {
       trace.info()<< "Compare local estimators on implicit shapes using DGtal library" <<std::endl << "Basic usage: "<<std::endl
-      << "\testimatorComparator [options] --shape <shapeName> --output <outputBasename>"<<std::endl
-      << general_opt << "\n";
+		  << "\testimatorComparator [options] --shape <shapeName> --output <outputBasename>"<<std::endl
+		  << general_opt << "\n";
       return 0;
     }
   
@@ -422,7 +436,7 @@ int main( int argc, char** argv )
   typedef Space::RealPoint RealPoint;
 
   RealPoint center( vm["center_x"].as<double>(),
-        vm["center_y"].as<double>() );
+		    vm["center_y"].as<double>() );
   double h = vm["gridstep"].as<double>();
   if (id ==0)
     {

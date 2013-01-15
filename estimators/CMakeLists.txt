@@ -1,5 +1,5 @@
 SET(DGTAL_TOOLS_SRC
-#  estimatorComparator
+  estimatorComparator
   lengthEstimators
   vol2normalField
   curvatureBC
