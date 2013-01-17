@@ -239,7 +239,7 @@ int main( int argc, char** argv )
 	} else if (processingName == "FP") {
 
 	  typedef FP<vector<Z2i::Point>::iterator,int,4> FP;
-	  FP theFP( vPts.begin(),vPts.end(),isClosed );
+	  FP theFP( vPts.begin(),vPts.end() );
           aBoard << CustomStyle( theFP.className(), 
 				 new CustomPenColor( DGtal::Color::Black ) ); 
           aBoard << theFP;
@@ -248,7 +248,7 @@ int main( int argc, char** argv )
 	} else if (processingName == "MLP") {
 
 	  typedef FP<vector<Z2i::Point>::iterator,int,4> FP;
-	  FP theFP( vPts.begin(),vPts.end(),isClosed );
+	  FP theFP( vPts.begin(),vPts.end() );
 
           vector<FP::RealPoint> v( theFP.size() );
           theFP.copyMLP( v.begin() );
