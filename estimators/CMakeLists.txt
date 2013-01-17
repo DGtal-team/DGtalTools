@@ -1,9 +1,9 @@
 SET(DGTAL_TOOLS_SRC
-#  estimatorComparator
+  localEstimators
   lengthEstimators
   vol2normalField
   curvatureBC
-#  curvatureMCMS
+  curvatureMCMS
   tangentBC
 )
 
