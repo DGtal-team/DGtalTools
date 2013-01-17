@@ -420,9 +420,47 @@ computeLocalEstimations( const string & name,
 	  }
 
 	//Binomial convolver
+	vector <RealPoint> BCTangents; 
+	vector <double> BCCurvatures; 
 	if (options.at(2) != '0')
 	  {
-	    std::cerr << "TODO" << std::endl; 
+	    {
+	    std::cout << "# Tangents estimation from binomial convolution" << std::endl;
+	    typedef typename PointsRange::ConstIterator I; 
+	    typedef BinomialConvolver<I, double> MyBinomialConvolver;
+	    std::cout << "# mask size = " << 
+	      MyBinomialConvolver::suggestedSize( h, pointsRange.begin(), pointsRange.end() ) << std::endl;
+	    typedef TangentFromBinomialConvolverFunctor< MyBinomialConvolver, RealPoint >
+	      TangentBCFct;
+	    BinomialConvolverEstimator< MyBinomialConvolver, TangentBCFct> BCTangentEstimator;
+
+	    Clock c;
+	    c.startClock();
+	    BCTangentEstimator.init( h, pointsRange.begin(), pointsRange.end(), true );
+	    BCTangentEstimator.eval( pointsRange.begin(), pointsRange.end(), std::back_inserter(BCTangents) ); 
+	    double time = c.stopClock();
+	    std::cout << "# Time: " << time << std::endl; 
+	    estimationError(BCTangents.size(), pointsRange.size()); 
+	    }
+
+	    {
+	    std::cout << "# Curvature estimation from binomial convolution" << std::endl;
+	    typedef typename PointsRange::ConstIterator I; 
+	    typedef BinomialConvolver<I, double> MyBinomialConvolver;
+	    std::cout << "# mask size = " << 
+	      MyBinomialConvolver::suggestedSize( h, pointsRange.begin(), pointsRange.end() ) << std::endl;
+	    typedef CurvatureFromBinomialConvolverFunctor< MyBinomialConvolver, double >
+	      CurvatureBCFct;
+	    BinomialConvolverEstimator< MyBinomialConvolver, CurvatureBCFct> BCCurvatureEstimator;
+
+	    Clock c;
+	    c.startClock();
+	    BCCurvatureEstimator.init( h, pointsRange.begin(), pointsRange.end(), true );
+	    BCCurvatureEstimator.eval( pointsRange.begin(), pointsRange.end(), std::back_inserter(BCCurvatures) ); 
+	    double time = c.stopClock();
+	    std::cout << "# Time: " << time << std::endl; 
+	    estimationError(BCCurvatures.size(), pointsRange.size());
+	    }
 	  }
 
 	// Output
@@ -456,8 +494,8 @@ computeLocalEstimations( const string & name,
 			<< " " << MDCACurvatures[ i ];
 	    if (options.at(2) != '0')
 	      std::cout << " " << BCTangents[ i ][ 0 ]
-			<< " " << BCTangents[ i ][ 1 ]
-			<< " " << BCCurvatures[ i ]
+	      		<< " " << BCTangents[ i ][ 1 ]
+	      		<< " " << BCCurvatures[ i ];
 	    std::cout << std::endl;
 	  }
 
