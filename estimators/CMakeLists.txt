@@ -1,5 +1,5 @@
 SET(DGTAL_TOOLS_SRC
-  localEstimators
+  2dlocalEstimators
   lengthEstimators
   vol2normalField
   curvatureBC
