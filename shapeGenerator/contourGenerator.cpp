@@ -146,12 +146,12 @@ void displayList()
   trace.emphase()<<"2D Shapes:"<<std::endl;
   for(unsigned int i=0; i<shapes2D.size(); ++i)
     trace.info()<<"\t"<<shapes2D[i]<<"\t"
-    <<shapesDesc[i]<<std::endl
-    <<"\t\tRequired parameter(s): "
-    << shapesParam1[i]<<" "
-          << shapesParam2[i]<<" "
-          << shapesParam3[i]<<" "
-          << shapesParam4[i]<<std::endl;
+		<<shapesDesc[i]<<std::endl
+		<<"\t\tRequired parameter(s): "
+		<< shapesParam1[i]<<" "
+		<< shapesParam2[i]<<" "
+		<< shapesParam3[i]<<" "
+		<< shapesParam4[i]<<std::endl;
   
 }
 
@@ -181,20 +181,18 @@ unsigned int checkAndReturnIndex(const std::string &shapeName)
   return pos;
 }
 
-template <typename Estimator, typename ConstIterator>
-std::vector<typename Estimator::Quantity>
-estimateQuantity( Estimator & estimator, 
-      ConstIterator it, ConstIterator it_end )
-{
-  std::vector<typename Estimator::Quantity> values;
-  for ( ; it != it_end; ++it )
-    {
-      values.push_back( estimator.eval( it ) );
-    }
-  return values;
-}
 
-
+/** 
+ * Provides ground truth for tangent and curvature estimations.
+ * 
+ * @param s implicit shape
+ * @param h grid step
+ * @param r range of points at which the estimation is computed
+ * @param points returned vector of points
+ * @param tangents returned vector of (normalized) tangent vectors
+ * @param curvature returned vector of curvature values
+ * 
+ */
 template <typename Shape, typename Range, typename Point, typename Quantity>
 void
 estimateGeometry(Shape& s, 
@@ -205,35 +203,38 @@ estimateGeometry(Shape& s,
                  vector<Quantity>& curvatures) {
 
   typedef typename Range::ConstIterator ConstIterator; 
-  typedef ParametricShapeTangentFunctor< Shape > TangentFunctor;
-  typedef ParametricShapeCurvatureFunctor< Shape > CurvatureFunctor;
-
   for (ConstIterator i = r.begin(); i != r.end(); ++i) {
     Point p( *i ); 
     p *= h; 
     points.push_back(p); 
   } 
 
-  TrueLocalEstimatorOnPoints< ConstIterator, Shape, TangentFunctor >  
+  typedef typename Range::ConstCirculator ConstCirculator; 
+
+  typedef ParametricShapeTangentFunctor< Shape > TangentFunctor;
+  TrueLocalEstimatorOnPoints< ConstCirculator, Shape, TangentFunctor >  
     trueTangentEstimator;
-  TrueLocalEstimatorOnPoints< ConstIterator, Shape, CurvatureFunctor >  
+  trueTangentEstimator.attach(&s); 
+  trueTangentEstimator.init( h, r.c(), r.c());
+  trueTangentEstimator.eval(r.c(), r.c(), std::back_inserter(tangents) ); 
+
+  typedef ParametricShapeCurvatureFunctor< Shape > CurvatureFunctor;
+  TrueLocalEstimatorOnPoints< ConstCirculator, Shape, CurvatureFunctor >  
     trueCurvatureEstimator;
-  trueTangentEstimator.init( h, r.begin(), r.end());
-  tangents = 
-    estimateQuantity( trueTangentEstimator, r.begin(), r.end() );
-  trueCurvatureEstimator.init( h, r.begin(), r.end());
-  curvatures = 
-    estimateQuantity( trueCurvatureEstimator, r.begin(), r.end() );
+  trueCurvatureEstimator.attach(&s); 
+  trueCurvatureEstimator.init( h, r.c(), r.c());
+  trueCurvatureEstimator.eval(r.c(), r.c(), std::back_inserter(curvatures) ); 
 
 }
 
 template <typename Space, typename Shape>
 bool
 generateContour( 
-     Shape & aShape, 
-     double h,
-     const std::string & outputFormat,
-     const std::string & outputFileName  )
+		Shape & aShape, 
+		double h,
+		const std::string & outputFormat,
+		bool withGeom, 
+		const std::string & outputFileName  )
 {
   // Types
   typedef typename Space::Point Point;
@@ -260,7 +261,7 @@ generateContour(
   if ( ! ok )
     {
       std::cerr << "[generateContour]"
-    << " error in creating KSpace." << std::endl;
+		<< " error in creating KSpace." << std::endl;
       return false;
     }
   try {
@@ -279,90 +280,93 @@ generateContour(
     if ( outputFormat == "pts" )
       {
 
-  for ( ConstIteratorOnPoints it = r.begin(), it_end = r.end();
-        it != it_end; ++it )
-    {
-      Point p = *it;
-      std::cout << p[ 0 ] << " " << p[ 1 ] << std::endl;
-    }
-  return true;
+	for ( ConstIteratorOnPoints it = r.begin(), it_end = r.end();
+	      it != it_end; ++it )
+	  {
+	    Point p = *it;
+	    std::cout << p[ 0 ] << " " << p[ 1 ] << std::endl;
+	  }
+	return true;
       }
     else if ( outputFormat == "fc" )
       {
-  ConstIteratorOnPoints it = r.begin();
-  Point p = *it++;
-  std::cout << p[ 0 ] << " " << p[ 1 ] << " ";
-  for ( ConstIteratorOnPoints it_end = r.end(); it != it_end; ++it )
-    {
-      Point p2 = *it;
-      Vector v = p2 - p;
-      if ( v.at( 0 ) == 1 ) std::cout << '0';
-      if ( v.at( 1 ) == 1 ) std::cout << '1';
-      if ( v.at( 0 ) == -1 ) std::cout << '2';
-      if ( v.at( 1 ) == -1 ) std::cout << '3';
-      p = p2;
-    }
-  // close freemanchain if necessary.
-  Point p2= *(r.begin());
-  Vector v = p2 - p;
-  if ( v.norm1() == 1 )
-    {
-      if ( v.at( 0 ) == 1 ) std::cout << '0';
-      if ( v.at( 1 ) == 1 ) std::cout << '1';
-      if ( v.at( 0 ) == -1 ) std::cout << '2';
-      if ( v.at( 1 ) == -1 ) std::cout << '3';
-    }
-  std::cout << std::endl;
+	ConstIteratorOnPoints it = r.begin();
+	Point p = *it++;
+	std::cout << p[ 0 ] << " " << p[ 1 ] << " ";
+	for ( ConstIteratorOnPoints it_end = r.end(); it != it_end; ++it )
+	  {
+	    Point p2 = *it;
+	    Vector v = p2 - p;
+	    if ( v.at( 0 ) == 1 ) std::cout << '0';
+	    if ( v.at( 1 ) == 1 ) std::cout << '1';
+	    if ( v.at( 0 ) == -1 ) std::cout << '2';
+	    if ( v.at( 1 ) == -1 ) std::cout << '3';
+	    p = p2;
+	  }
+	// close freemanchain if necessary.
+	Point p2= *(r.begin());
+	Vector v = p2 - p;
+	if ( v.norm1() == 1 )
+	  {
+	    if ( v.at( 0 ) == 1 ) std::cout << '0';
+	    if ( v.at( 1 ) == 1 ) std::cout << '1';
+	    if ( v.at( 0 ) == -1 ) std::cout << '2';
+	    if ( v.at( 1 ) == -1 ) std::cout << '3';
+	  }
+	std::cout << std::endl;
       } 
 
-    // write geometry of the shape
-  std::stringstream s; 
-  s << outputFileName << ".geom"; 
-  ofstream outstream(s.str().c_str()); //output stream
-  if (!outstream.is_open()) return false;
-  else {
-    outstream << "# " << outputFileName << std::endl;  
-    outstream << "# Pointel (x,y), Midpoint of the following linel (x',y')" << std::endl;  
-    outstream << "# id x y tangentx tangenty curvaturexy" 
-    << " x' y' tangentx' tangenty' curvaturex'y'" << std::endl; 
+    if (withGeom)
+      {
+	// write geometry of the shape
+	std::stringstream s; 
+	s << outputFileName << ".geom"; 
+	ofstream outstream(s.str().c_str()); //output stream
+	if (!outstream.is_open()) return false;
+	else {
+	  outstream << "# " << outputFileName << std::endl;  
+	  outstream << "# Pointel (x,y), Midpoint of the following linel (x',y')" << std::endl;  
+	  outstream << "# id x y tangentx tangenty curvaturexy" 
+		    << " x' y' tangentx' tangenty' curvaturex'y'" << std::endl; 
 
-    vector<RealPoint> truePoints, truePoints2; 
-    vector<RealPoint> trueTangents, trueTangents2; 
-    vector<double> trueCurvatures, trueCurvatures2; 
+	  vector<RealPoint> truePoints, truePoints2; 
+	  vector<RealPoint> trueTangents, trueTangents2; 
+	  vector<double> trueCurvatures, trueCurvatures2; 
 
-    estimateGeometry<Shape, Range, RealPoint, double>
-    (aShape, h, r, truePoints, trueTangents, trueCurvatures);
+	  estimateGeometry<Shape, Range, RealPoint, double>
+	    (aShape, h, r, truePoints, trueTangents, trueCurvatures);
 
-    estimateGeometry<Shape, MidPointsRange, RealPoint, double>
-    (aShape, h, gridcurve.getMidPointsRange(), truePoints2, trueTangents2, trueCurvatures2);
+	  estimateGeometry<Shape, MidPointsRange, RealPoint, double>
+	    (aShape, h, gridcurve.getMidPointsRange(), truePoints2, trueTangents2, trueCurvatures2);
 
     
-    unsigned int n = (unsigned int)r.size(); 
-    for (unsigned int i = 0; i < n; ++i ) {
-      outstream << setprecision( 15 ) << i 
-      << " " << truePoints[ i ][ 0 ]
-      << " " << truePoints[ i ][ 1 ]
-      << " " << trueTangents[ i ][ 0 ]
-      << " " << trueTangents[ i ][ 1 ]
-      << " " << trueCurvatures[ i ]
-      << " " << truePoints2[ i ][ 0 ]
-      << " " << truePoints2[ i ][ 1 ]
-      << " " << trueTangents2[ i ][ 0 ]
-      << " " << trueTangents2[ i ][ 1 ]
-      << " " << trueCurvatures2[ i ]
-      << std::endl;
-    }
+	  unsigned int n = (unsigned int)r.size(); 
+	  for (unsigned int i = 0; i < n; ++i ) {
+	    outstream << setprecision( 15 ) << i 
+		      << " " << truePoints[ i ][ 0 ]
+		      << " " << truePoints[ i ][ 1 ]
+		      << " " << trueTangents[ i ][ 0 ]
+		      << " " << trueTangents[ i ][ 1 ]
+		      << " " << trueCurvatures[ i ]
+		      << " " << truePoints2[ i ][ 0 ]
+		      << " " << truePoints2[ i ][ 1 ]
+		      << " " << trueTangents2[ i ][ 0 ]
+		      << " " << trueTangents2[ i ][ 1 ]
+		      << " " << trueCurvatures2[ i ]
+		      << std::endl;
+	  }
 
-  }
-  outstream.close();
+	}
+	outstream.close();
+      }
 
-/////////////////
+    /////////////////
 
   }    
   catch ( InputException e )
     {
       std::cerr << "[generateContour]"
-    << " error in finding a bel." << std::endl;
+		<< " error in finding a bel." << std::endl;
       return false;
     }
   return true;
@@ -386,11 +390,11 @@ namespace po = boost::program_options;
 int main( int argc, char** argv )
 {
   // parse command line ----------------------------------------------
-  po::options_description general_opt("Allowed options are: ");
+  po::options_description general_opt("Allowed options are");
   general_opt.add_options()
     ("help,h", "display this message")
-    ("shape,s", po::value<std::string>(), "Shape name")
     ("list,l",  "List all available shapes")
+    ("shape,s", po::value<std::string>(), "Shape name")
     ("radius,R",  po::value<double>(), "Radius of the shape" )
     ("axis1,A",  po::value<double>(), "Half big axis of the shape (ellipse)" )
     ("axis2,a",  po::value<double>(), "Half small axis of the shape (ellipse)" )
@@ -418,9 +422,10 @@ int main( int argc, char** argv )
   po::notify(vm);    
   if(!parseOK || vm.count("help")||argc<=1)
     {
-      trace.info()<< "Generate shapes using DGtal library" <<std::endl << "Basic usage: "<<std::endl
-      << "\tcontourGenerator [options] --shape <shapeName> --output <outputBasename>"<<std::endl
-      << general_opt << "\n";
+      trace.info()<< "Generate contours of 2d digital shapes using DGtal library" <<std::endl 
+		  << "Basic usage: "<<std::endl
+		  << "\tcontourGenerator --shape <shapeName> [requiredParam] [otherOptions]"<<std::endl
+		  << general_opt << "\n";
       return 0;
     }
   
@@ -437,8 +442,10 @@ int main( int argc, char** argv )
   if (!(vm.count("shape"))) missingParam("--shape");
   std::string shapeName = vm["shape"].as<std::string>();
     
-  if (!(vm.count("outputGeometry"))) missingParam("--outputGeometry");
-  std::string outputFileName = vm["outputGeometry"].as<std::string>();
+  bool withGeom = true; 
+  std::string outputFileName; 
+  if (!(vm.count("outputGeometry"))) withGeom = false;
+  else outputFileName = vm["outputGeometry"].as<std::string>();
 
   if (!(vm.count("format"))) missingParam("--format");
   std::string outputFormat = vm["format"].as<std::string>();
@@ -452,22 +459,22 @@ int main( int argc, char** argv )
   typedef Space::RealPoint RealPoint;
 
   RealPoint center( vm["center_x"].as<double>(),
-        vm["center_y"].as<double>() );
+		    vm["center_y"].as<double>() );
   double h = vm["gridstep"].as<double>();
   if (id ==0)
     {
       if (!(vm.count("radius"))) missingParam("--radius");
       double radius = vm["radius"].as<double>();
       Ball2D<Space> ball(Z2i::Point(0,0), radius);
-      generateContour<Space>( ball, h, outputFormat, outputFileName ); 
+      generateContour<Space>( ball, h, outputFormat, withGeom, outputFileName );  
     }
   else if (id ==1)
     {
       if (!(vm.count("width"))) missingParam("--width");
       double width = vm["width"].as<double>();
       ImplicitHyperCube<Space> object(Z2i::Point(0,0), width/2);
-          trace.error()<< "Not available.";
-          trace.info()<<std::endl; 
+      trace.error()<< "Not available.";
+      trace.info()<<std::endl; 
     }
   else if (id ==2)
     {
@@ -476,8 +483,8 @@ int main( int argc, char** argv )
       double radius = vm["radius"].as<double>();
       double power = vm["power"].as<double>();
       ImplicitRoundedHyperCube<Space> ball(Z2i::Point(0,0), radius, power);
-          trace.error()<< "Not available.";
-          trace.info()<<std::endl;
+      trace.error()<< "Not available.";
+      trace.info()<<std::endl;
     }
   else if (id ==3)
     {
@@ -490,7 +497,7 @@ int main( int argc, char** argv )
       unsigned int k = vm["k"].as<unsigned int>();
       double phi = vm["phi"].as<double>();
       Flower2D<Space> flower( center, radius, varsmallradius, k, phi );
-      generateContour<Space>( flower, h, outputFormat, outputFileName  ); 
+      generateContour<Space>( flower, h, outputFormat, withGeom, outputFileName  ); 
     }
   else if (id ==4)
     {
@@ -501,7 +508,7 @@ int main( int argc, char** argv )
       unsigned int k = vm["k"].as<unsigned int>();
       double phi = vm["phi"].as<double>();
       NGon2D<Space> object( center, radius, k, phi );
-      generateContour<Space>( object, h, outputFormat, outputFileName  ); 
+      generateContour<Space>( object, h, outputFormat, withGeom, outputFileName  ); 
     }
   else if (id ==5)
     {
@@ -514,7 +521,7 @@ int main( int argc, char** argv )
       unsigned int k = vm["k"].as<unsigned int>();
       double phi = vm["phi"].as<double>();
       AccFlower2D<Space> accflower( center, radius, varsmallradius, k, phi );
-      generateContour<Space>( accflower, h, outputFormat, outputFileName  ); 
+      generateContour<Space>( accflower, h, outputFormat, withGeom, outputFileName  ); 
     } 
   else if (id ==6)
     {
@@ -525,6 +532,6 @@ int main( int argc, char** argv )
       double a2 = vm["axis2"].as<double>();
       double phi = vm["phi"].as<double>();
       Ellipse2D<Space> ellipse( center, a1, a2, phi );
-      generateContour<Space>( ellipse, h, outputFormat, outputFileName  ); 
+      generateContour<Space>( ellipse, h, outputFormat, withGeom, outputFileName  ); 
     } 
 }
