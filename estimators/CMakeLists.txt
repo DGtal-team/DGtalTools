@@ -1,9 +1,9 @@
 SET(DGTAL_TOOLS_SRC
-#  estimatorComparator
+  2dLocalEstimators
   lengthEstimators
   vol2normalField
   curvatureBC
-#  curvatureMCMS
+  curvatureMCMS
   tangentBC
 )
 
@@ -15,4 +15,3 @@ FOREACH(FILE ${DGTAL_TOOLS_SRC})
         LIBRARY DESTINATION lib
         ARCHIVE DESTINATION lib)
 ENDFOREACH(FILE)
-
