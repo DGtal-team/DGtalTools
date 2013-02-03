@@ -83,7 +83,6 @@ int main( int argc, char** argv )
   typedef ImageSelector < Domain, int>::Type Image;
   Image image = VolReader<Image>::importVol(inputFilename);
   DigitalSet set3d (image.domain());
-  SetPredicate<DigitalSet> set3dPredicate( set3d );
   SetFromImage<DigitalSet>::append<Image>(set3d, image,
                                           threshold, 255 );
   trace.endBlock();
@@ -114,7 +113,7 @@ int main( int argc, char** argv )
   typedef DigitalSurface< MySetOfSurfels > MyDigitalSurface;
   MySetOfSurfels theSetOfSurfels( ks, surfAdj );
   Surfaces<KSpace>::sMakeBoundary( theSetOfSurfels.surfelSet(),
-                                   ks, set3dPredicate,
+                                   ks, set3d,
                                    image.domain().lowerBound(),
                                    image.domain().upperBound() );
   MyDigitalSurface digSurf( theSetOfSurfels );
