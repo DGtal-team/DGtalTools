@@ -47,8 +47,6 @@
 #include <boost/program_options/parsers.hpp>
 #include <boost/program_options/variables_map.hpp>
 
-
-#include "DGtal/geometry/volumes/distance/SeparableMetricHelper.h"
 #include "DGtal/geometry/volumes/distance/DistanceTransformation.h"
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -113,11 +111,7 @@ int main( int argc, char** argv )
   typedef SimpleThresholdForegroundPredicate<Image> Predicate;
   Predicate aPredicate(image,0);
 
-  DistanceTransformation<Z3i::Space, Predicate , 2> dt(image.domain(),aPredicate);
-  typedef DistanceTransformation<Z3i::Space, Predicate, 2>::OutputImage ImageLong;
-  
-  
-  ImageLong resultL2 = dt.compute ( );
+  DistanceTransformation<Z3i::Space, Predicate , Z3i::L2Metric> dt(image.domain(),aPredicate, Z3i::L2Metric() );
   trace.endBlock();
   trace.info() <<image<<std::endl;
 
@@ -129,7 +123,6 @@ int main( int argc, char** argv )
   
   trace.beginBlock("Constructing Set");
   DigitalSet shape_set( domain );
-  SetPredicate<DigitalSet> set3dPredicate( shape_set );
   SetFromImage<DigitalSet>::append<Image>(shape_set, image,
                                           0, 255);
   trace.info() << shape_set<<std::endl;
@@ -148,9 +141,9 @@ int main( int argc, char** argv )
  
       for ( DigitalSet::Iterator it = S.begin(); it != S.end(); ++it )
         {
-	  //trace.progressBar((double)nb, (double)S.size()); 
+	  trace.progressBar((double)nb, (double)S.size()); 
           nb++;
-	  if (resultL2( *it ) <= layer*layer)
+	  if (dt( *it ) <= layer)
 	    {
 	      if ( shape.isSimple( *it ) )
 		Q.push( it );
