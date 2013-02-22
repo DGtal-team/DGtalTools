@@ -297,10 +297,10 @@ generateContour(
 	  {
 	    Point p2 = *it;
 	    Vector v = p2 - p;
-	    if ( v.at( 0 ) == 1 ) std::cout << '0';
-	    if ( v.at( 1 ) == 1 ) std::cout << '1';
-	    if ( v.at( 0 ) == -1 ) std::cout << '2';
-	    if ( v.at( 1 ) == -1 ) std::cout << '3';
+	    if ( v[0 ]== 1 ) std::cout << '0';
+	    if ( v[ 1 ] == 1 ) std::cout << '1';
+	    if ( v[ 0 ] == -1 ) std::cout << '2';
+	    if ( v[ 1 ] == -1 ) std::cout << '3';
 	    p = p2;
 	  }
 	// close freemanchain if necessary.
@@ -308,10 +308,10 @@ generateContour(
 	Vector v = p2 - p;
 	if ( v.norm1() == 1 )
 	  {
-	    if ( v.at( 0 ) == 1 ) std::cout << '0';
-	    if ( v.at( 1 ) == 1 ) std::cout << '1';
-	    if ( v.at( 0 ) == -1 ) std::cout << '2';
-	    if ( v.at( 1 ) == -1 ) std::cout << '3';
+	    if ( v[ 0 ] == 1 ) std::cout << '0';
+	    if ( v[ 1 ] == 1 ) std::cout << '1';
+	    if ( v[ 0 ] == -1 ) std::cout << '2';
+	    if ( v[ 1 ] == -1 ) std::cout << '3';
 	  }
 	std::cout << std::endl;
       } 
