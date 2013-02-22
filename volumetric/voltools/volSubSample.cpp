@@ -138,8 +138,6 @@ int main(int argc, char**argv)
                                       (imageC.domain().upperBound()-imageC.domain().lowerBound())/Vector().diagonal(2)));
 
   trace.endBlock();
-  unsigned int cpt=0;
-  unsigned int maxS = imageC.domain().size();
   Point subvector = Vector().diagonal(2);
   Point p;
   unsigned char val;
