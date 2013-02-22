@@ -15,7 +15,8 @@ ENDFOREACH(FILE)
 
 if (  WITH_VISU3D_QGLVIEWER )
   SET(DGTAL_EXAMPLES_QGL_SRC
-    3dVolViewer)
+    3dVolViewer
+    3dCurvatureViewer)
   FOREACH(FILE ${DGTAL_EXAMPLES_QGL_SRC}) 
     add_executable(${FILE} ${FILE})
     target_link_libraries ( ${FILE} ${DGTAL_LIBRARIES})   
