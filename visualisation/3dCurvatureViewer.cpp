@@ -217,8 +217,8 @@ int main( int argc, char** argv )
 
         // Drawing results
         SCellToMidPoint< Z3i::KSpace > midpoint( KSpaceShape );
-        typedef typename Matrix3x3::RowVector RowVector;
-        typedef typename Matrix3x3::ColumnVector ColumnVector;
+        typedef  Matrix3x3::RowVector RowVector;
+        typedef  Matrix3x3::ColumnVector ColumnVector;
         for ( unsigned int i = 0; i < results.size(); ++i )
         {
             CurvInformation current = results[ i ];
