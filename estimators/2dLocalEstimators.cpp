@@ -14,7 +14,7 @@
  *
  **/
 /**
- * @file localEstimators.cpp
+ * @file 2dLocalEstimators.cpp
  * @ingroup Tools
  * @author Jacques-Olivier Lachaud (\c jacques-olivier.lachaud@univ-savoie.fr )
  * Laboratory of Mathematics (CNRS, UMR 5807), University of Savoie, France
@@ -23,7 +23,10 @@
  * @author Tristan Roussillon (\c tristan.roussillon@liris.cnrs.fr ) 
  * Laboratoire d'InfoRmatique en Image et Systèmes d'information - LIRIS (CNRS, UMR 5205), CNRS,
  * France
-
+ * @author Jeremy Levallois (\c jeremy.levallois@liris.cnrs.fr )
+ * Laboratoire d'InfoRmatique en Image et Systèmes d'information - LIRIS (CNRS, UMR 5205), Universite de Lyon, France
+ * LAboratoire de MAthematiques - LAMA (CNRS, UMR 5807), Universite de Savoie, France
+ *
  * @date 2011/07/04
  *
  * DGtal shape generator
@@ -49,10 +52,14 @@
 #include "DGtal/shapes/Shapes.h"
 #include "DGtal/helpers/StdDefs.h"
 #include "DGtal/topology/helpers/Surfaces.h"
+#include "DGtal/topology/DigitalSurface.h"
 
 //Digitizer
 #include "DGtal/shapes/GaussDigitizer.h"
 #include "DGtal/geometry/curves/GridCurve.h"
+#include "DGtal/topology/LightImplicitDigitalSurface.h"
+#include "DGtal/graph/DepthFirstVisitor.h"
+#include "DGtal/graph/GraphVisitorRange.h"
 
 
 //Estimators
@@ -67,6 +74,10 @@
 #include "DGtal/geometry/curves/estimation/SegmentComputerEstimators.h"
 #include "DGtal/geometry/curves/ArithmeticalDSS.h"
 #include "DGtal/geometry/curves/GeometricalDCA.h"
+
+#include "DGtal/images/ImageHelper.h"
+#include "DGtal/geometry/surfaces/FunctorOnCells.h"
+#include "DGtal/geometry/surfaces/estimation/IntegralInvariantMeanCurvatureEstimator.h"
 
 using namespace DGtal;
 
@@ -247,13 +258,15 @@ estimation( Estimator & estimator, double h,
  * @param name shape name
  * @param aShape shape
  * @param h grid step
+ * @param radiusKernel Euclidean radius of the convolution kernel for Integral Invariants estimators
  *
  */
 template <typename Space, typename Shape>
 bool
 computeLocalEstimations( const string & name,
 			Shape & aShape, 
-			 double h, 
+             double h,
+             double radiusKernel,
 			 const string & options )
 {
   // Types
@@ -264,10 +277,11 @@ computeLocalEstimations( const string & name,
   typedef HyperRectDomain<Space> Domain;
   typedef KhalimskySpaceND<Space::dimension,Integer> KSpace;
   typedef typename KSpace::SCell SCell;
+  typedef GaussDigitizer<Space,Shape> Digitizer;
 
 
   // Digitizer
-  GaussDigitizer<Space,Shape> dig;  
+  Digitizer dig;
   dig.attach( aShape ); // attaches the shape.
   Vector vlow(-1,-1); Vector vup(1,1);
   dig.init( aShape.getLowerBound()+vlow, aShape.getUpperBound()+vup, h ); 
@@ -436,7 +450,7 @@ computeLocalEstimations( const string & name,
 
 	    Clock c;
 	    c.startClock();
-	    BCTangentEstimator.init( h, pointsRange.begin(), pointsRange.end(), true );
+        BCTangentEstimator.init( h, pointsRange.begin(), pointsRange.end(), true );
 	    BCTangentEstimator.eval( pointsRange.begin(), pointsRange.end(), std::back_inserter(BCTangents) ); 
 	    double time = c.stopClock();
 	    std::cout << "# Time: " << time << std::endl; 
@@ -463,6 +477,52 @@ computeLocalEstimations( const string & name,
 	    }
 	  }
 
+    //Integral Invariants
+    vector <double> IICurvatures;
+    if (options.at(3) != '0')
+      {
+        {
+        std::cout << "# Curvature estimation from integral invariants" << std::endl;
+
+        typedef LightImplicitDigitalSurface< KSpace, Digitizer > LightImplicitDigSurface;
+        typedef DigitalSurface< LightImplicitDigSurface > DigSurface;
+        typedef DepthFirstVisitor< DigSurface > Visitor;
+        typedef GraphVisitorRange< Visitor > VisitorRange;
+        typedef typename VisitorRange::ConstIterator I;
+
+        LightImplicitDigSurface LightImplDigSurf( K, dig, SAdj, bel );
+        DigSurface digSurf( LightImplDigSurf );
+
+        double re_convolution_kernel = radiusKernel * std::pow( h, 1.0/3.0 );
+        std::cout << "# full kernel (digital) size = " <<
+          re_convolution_kernel / h << std::endl;
+
+        typedef typename ImageSelector< Domain, unsigned int >::Type Image;
+        Image image( domain );
+        DGtal::imageFromRangeAndValue( domain.begin(), domain.end(), image );
+
+        typedef ImageToConstantFunctor< Image, Digitizer > MyPointFunctor;
+        MyPointFunctor pointFct( &image, &dig, 1 );
+        typedef FunctorOnCells< MyPointFunctor, KSpace > CurvatureIIFct;
+        CurvatureIIFct functor ( pointFct, K );
+        IntegralInvariantMeanCurvatureEstimator< KSpace, CurvatureIIFct> IICurvatureEstimator( K, functor );
+
+
+        VisitorRange range( new Visitor( digSurf, *digSurf.begin() ) );
+        I ibegin = range.begin();
+        I iend = range.end();
+
+        Clock c;
+        c.startClock();
+        IICurvatureEstimator.init( h, re_convolution_kernel );
+        back_insert_iterator< std::vector< double > > IICurvaturesIterator( IICurvatures );
+        IICurvatureEstimator.eval( ibegin, iend, IICurvaturesIterator );
+        double time = c.stopClock();
+        std::cout << "# Time: " << time << std::endl;
+        estimationError(IICurvatures.size(), pointsRange.size());
+        }
+      }
+
 	// Output
 	std::cout << "# id x y tx ty k"; 
 	if (options.at(0) != '0')
@@ -471,9 +531,13 @@ computeLocalEstimations( const string & name,
 	  std::cout << " MDCAtx MDCAty MDCAk"; 
 	if (options.at(2) != '0')
 	  std::cout << " BCtx BCty BCk"; 
+    if (options.at(3) != '0')
+      std::cout << " IIk";
 	std::cout << std::endl;
 
 	unsigned int i = 0;
+    unsigned int prsize = pointsRange.size() - 1;
+
 	for (typename PointsRange::ConstIterator it = pointsRange.begin(), 
 	       itEnd = pointsRange.end(); 
 	     it != itEnd; ++it, ++i)
@@ -496,6 +560,8 @@ computeLocalEstimations( const string & name,
 	      std::cout << " " << BCTangents[ i ][ 0 ]
 	      		<< " " << BCTangents[ i ][ 1 ]
 	      		<< " " << BCCurvatures[ i ];
+        if (options.at(3) != '0')
+          std::cout << " " << IICurvatures[ prsize - i ];
 	    std::cout << std::endl;
 	  }
 
@@ -529,6 +595,7 @@ int main( int argc, char** argv )
     ("list,l",  "List all available shapes")
     ("shape,s", po::value<std::string>(), "Shape name")
     ("radius,R",  po::value<double>(), "Radius of the shape" )
+    ("kernelradius,K",  po::value<double>()->default_value(0.5), "Radius of the convolution kernel (Integral invariants estimators)" )
     ("axis1,A",  po::value<double>(), "Half big axis of the shape (ellipse)" )
     ("axis2,a",  po::value<double>(), "Half small axis of the shape (ellipse)" )
     ("smallradius,r",  po::value<double>()->default_value(5), "Small radius of the shape" )
@@ -540,7 +607,7 @@ int main( int argc, char** argv )
     ("center_x,x",   po::value<double>()->default_value(0.0), "x-coordinate of the shape center (double)" )
     ("center_y,y",   po::value<double>()->default_value(0.0), "y-coordinate of the shape center (double)" )
     ("gridstep,g",  po::value<double>()->default_value(1.0), "Grid step for the digitization" )
-    ("estimators,e",  po::value<std::string>()->default_value("100"), "the i-th estimator is disabled iff there is a 0 at position i" ); 
+    ("estimators,e",  po::value<std::string>()->default_value("1000"), "the i-th estimator is disabled iff there is a 0 at position i" );
     
   
   bool parseOK=true;
@@ -562,6 +629,7 @@ int main( int argc, char** argv )
 		  << "\t - Maximal DSS based estimators" << std::endl
 		  << "\t - Maximal DCA based estimators" << std::endl
 		  << "\t - Binomial convolver based estimators" << std::endl
+		  << "\t - Integral Invariants based estimators" << std::endl
 		  << std::endl
 		  << "The i-th family of estimators is enabled if the i-th character of the binary word is not 0. "
 		  << "The default binary word is '100'. This means that the first family of estimators, "
@@ -584,9 +652,9 @@ int main( int argc, char** argv )
   if (!(vm.count("shape"))) missingParam("--shape");
   std::string shapeName = vm["shape"].as<std::string>();
     
-  int nb = 3; //number of available methods
+  int nb = 4; //number of available methods
   std::string options = vm["estimators"].as<std::string>();
-  if (options.size() < 3)
+  if (options.size() < nb)
     {
       trace.error() << " At least " << nb 
 		    << " characters are required "
@@ -609,9 +677,11 @@ int main( int argc, char** argv )
   if (id ==0)
     {
       if (!(vm.count("radius"))) missingParam("--radius");
+      //if (!(vm.count("kernelradius"))) missingParam("--kernelradius");
       double radius = vm["radius"].as<double>();
+      double radiuskernel = vm["kernelradius"].as<double>();
       Ball2D<Space> ball(Z2i::Point(0,0), radius);
-      computeLocalEstimations<Space>( "Ball", ball, h, options ); 
+      computeLocalEstimations<Space>( "Ball", ball, h, radiuskernel, options );
     }
   else if (id ==1)
     {
@@ -637,23 +707,27 @@ int main( int argc, char** argv )
       if (!(vm.count("radius"))) missingParam("--radius");
       if (!(vm.count("k"))) missingParam("--k");
       if (!(vm.count("phi"))) missingParam("--phi");
+      //if (!(vm.count("kernelradius"))) missingParam("--kernelradius");
       double radius = vm["radius"].as<double>();
       double varsmallradius = vm["varsmallradius"].as<double>();
       unsigned int k = vm["k"].as<unsigned int>();
       double phi = vm["phi"].as<double>();
+      double radiuskernel = vm["kernelradius"].as<double>();
       Flower2D<Space> flower( center, radius, varsmallradius, k, phi );
-      computeLocalEstimations<Space>( "Flower", flower, h, options ); 
+      computeLocalEstimations<Space>( "Flower", flower, h, radiuskernel, options );
     }
   else if (id ==4)
     {
       if (!(vm.count("radius"))) missingParam("--radius");
       if (!(vm.count("k"))) missingParam("--k");
       if (!(vm.count("phi"))) missingParam("--phi");
+      //if (!(vm.count("kernelradius"))) missingParam("--kernelradius");
       double radius = vm["radius"].as<double>();
       unsigned int k = vm["k"].as<unsigned int>();
       double phi = vm["phi"].as<double>();
+      double radiuskernel = vm["kernelradius"].as<double>();
       NGon2D<Space> object( center, radius, k, phi );
-      computeLocalEstimations<Space>( "NGon", object, h, options ); 
+      computeLocalEstimations<Space>( "NGon", object, h, radiuskernel, options );
     }
   else if (id ==5)
     {
@@ -661,22 +735,26 @@ int main( int argc, char** argv )
       if (!(vm.count("radius"))) missingParam("--radius");
       if (!(vm.count("k"))) missingParam("--k");
       if (!(vm.count("phi"))) missingParam("--phi");
+      //if (!(vm.count("kernelradius"))) missingParam("--kernelradius");
       double radius = vm["radius"].as<double>();
       double varsmallradius = vm["varsmallradius"].as<double>();
       unsigned int k = vm["k"].as<unsigned int>();
       double phi = vm["phi"].as<double>();
+      double radiuskernel = vm["kernelradius"].as<double>();
       AccFlower2D<Space> accflower( center, radius, varsmallradius, k, phi );
-      computeLocalEstimations<Space>( "AccFlower", accflower, h, options ); 
+      computeLocalEstimations<Space>( "AccFlower", accflower, h, radiuskernel, options );
     } 
   else if (id ==6)
     {
       if (!(vm.count("axis1"))) missingParam("--axis1");
       if (!(vm.count("axis2"))) missingParam("--axis2");
       if (!(vm.count("phi"))) missingParam("--phi");
+      //if (!(vm.count("kernelradius"))) missingParam("--kernelradius");
       double a1 = vm["axis1"].as<double>();
       double a2 = vm["axis2"].as<double>();
       double phi = vm["phi"].as<double>();
+      double radiuskernel = vm["kernelradius"].as<double>();
       Ellipse2D<Space> ellipse( center, a1, a2, phi );
-      computeLocalEstimations<Space>( "Ellipse", ellipse, h, options ); 
+      computeLocalEstimations<Space>( "Ellipse", ellipse, h, radiuskernel, options );
     } 
 }
