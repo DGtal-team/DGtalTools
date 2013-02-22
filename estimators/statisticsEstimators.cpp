@@ -33,7 +33,7 @@
 #include <sstream>
 #include <vector>
 #include <string>
-
+#include <math.h>
 #include <boost/foreach.hpp>
 #include <boost/tokenizer.hpp>
 
@@ -172,7 +172,7 @@ int ComputeStatisticsFromString ( const unsigned int idColumnData1, const unsign
 
   for ( int index = 0; index < sizeVector1; ++index )
   {
-      absd1d2 = std::abs ( data1[index] - data2[index] );
+      absd1d2 = abs ( data1[index] - data2[index] );
       if ( Linf < absd1d2 )
           Linf = absd1d2;
       L1 += absd1d2;
@@ -188,7 +188,7 @@ int ComputeStatisticsFromString ( const unsigned int idColumnData1, const unsign
       << std::endl;
 
   double meanL1 = L1 / (double)sizeVector1;
-  double meanL2 = ( std::sqrt ( L2 )) / (double)sizeVector1;
+  double meanL2 = ( sqrt ( L2 )) / (double)sizeVector1;
   std::cout
       << h << " "
       << radius << " "
