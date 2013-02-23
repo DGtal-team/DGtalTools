@@ -36,6 +36,13 @@ Actually the DGTal project is organized as follows:
 
 
 * estimators/:
+      2dLocalEstimators: program to compare local curvature/tangent estimators on implicit shapes:
+	 -Maximal DSS based estimators
+	 - Maximal DCA based estimators
+	 - Binomial convolver based estimators
+	 - Integral Invariants based estimators
+      3dLocalEstimators: program to compare  3D local curvature (mean or gaussian) estimators on 3D implicit shapes.
+
       lengthEstimator: program to generate multigrid analysis of length estimators.
       tangentBC: tangent estimator using the Binomial convolver.
       curvatureBC: curvature estimator using the Binomial convolver.
@@ -53,7 +60,8 @@ Actually the DGTal project is organized as follows:
       3dVolViewer: volume file (.vol and .pgm3d) viewer with QGLViewer.
       displayContours: display discrete contours from various format (.fc (freemanchain), .sdp).
       meshViewer: display 3D mesh from OFS or OFF format. 
-  
+      3dCurvatureViewer: permits to compute and visualize mean or gaussian curvature of binary shapes.
+
 
  * volumetric/:
       3dVolMarchingCubes: marching cubes form a Vol file	
