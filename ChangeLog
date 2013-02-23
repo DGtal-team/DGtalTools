@@ -1,7 +1,5 @@
 
 
-
-
 	====  Release 0.6 ====
 
 * estimators/:
@@ -10,18 +8,18 @@
 	 - Maximal DCA based estimators
 	 - Binomial convolver based estimators
 	 - Integral Invariants based estimators
-	3dLocalEstimators: program to compare  3D local curvature (mean or gaussian) estimators on 3D implicit shapes:
+	3dLocalEstimators: program to compare  3D local curvature (mean or gaussian) estimators on 3D implicit shapes.
 
 
 * visualization/:
-	3dCurvatureViewer.cpp: permits to compute and visualize mean or gaussian curvature of a binary shape.
+	3dCurvatureViewer: permits to compute and visualize mean or gaussian curvature of binary shapes.
 
 
-Various updates fort 0.6 DGtal compatibility.
+Various updates for 0.6 DGtal compatibility.
 
 
 
-	
+
 	==== From initial Release 0.1 ====
 
 
