@@ -1,0 +1,60 @@
+
+
+	====  Release 0.6 ====
+
+* estimators/:
+	2dLocalEstimators: program to compare local curvature/tangent estimators on implicit shapes:
+	 -Maximal DSS based estimators
+	 - Maximal DCA based estimators
+	 - Binomial convolver based estimators
+	 - Integral Invariants based estimators
+	3dLocalEstimators: program to compare  3D local curvature (mean or gaussian) estimators on 3D implicit shapes.
+
+
+* visualization/:
+	3dCurvatureViewer: permits to compute and visualize mean or gaussian curvature of binary shapes.
+
+
+Various updates for 0.6 DGtal compatibility.
+
+
+
+
+	==== From initial Release 0.1 ====
+
+
+* converters/: utilities to convert various simple file formats:
+      freeman2sdp: convert freeman chain towards a Sequence of Discrete Points.
+      pgm2freeman: to extract a freeman chain contour from a grayscale image.
+      raw2vol and vol2raw: transform 3D volumes files from (resp. to) raw to vol.
+      ofs2off: convert OFS mesh format towards a OFF variant.
+
+* estimators/:
+      lengthEstimator: program to generate multigrid analysis of length estimators.
+      tangentBC: tangent estimator using the Binomial convolver.
+      curvatureBC: curvature estimator using the Binomial convolver.
+      curvatureMCMS: curvature estimator using the maximal segments cover  (to be updated for current DGtal version).
+      estimatorComparator: program to perform comparison of local quantity estimators (to be updated for current DGtal version).
+      vol2normalField: compute the normal vector field of a given vol file .
+
+
+* shapeGenerator/:
+      shapeGenerator: generate multigrid shape
+      contourGenerator: generate multigrid shape contours
+
+
+* visualization/:
+      3dVolViewer: volume file (.vol and .pgm3d) viewer with QGLViewer.
+      displayContours: display discrete contours from various format (.fc (freemanchain), .sdp).
+      meshViewer: display 3D mesh from OFS or OFF format.
+
+ * volumetric/:
+      3dVolMarchingCubes: marching cubes form a Vol file
+      homotopicThinning3D: ultimate skeleton from vol file
+
+* volumetric/volTools:
+      volAddBorder: add a 1 voxel boundary with value 0 to a vol file.
+      volCComponentCounter: a simple program to count the number of connected components in a 3D image.
+      volSubSample: sub sample a vol file (division by 2 in each direction).
+
+
