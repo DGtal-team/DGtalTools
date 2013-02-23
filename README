@@ -42,7 +42,6 @@ Actually the DGTal project is organized as follows:
 	 - Binomial convolver based estimators
 	 - Integral Invariants based estimators
       3dLocalEstimators: program to compare  3D local curvature (mean or gaussian) estimators on 3D implicit shapes.
-
       lengthEstimator: program to generate multigrid analysis of length estimators.
       tangentBC: tangent estimator using the Binomial convolver.
       curvatureBC: curvature estimator using the Binomial convolver.
