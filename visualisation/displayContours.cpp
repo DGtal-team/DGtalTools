@@ -87,7 +87,7 @@ int main( int argc, char** argv )
     ("SDP", po::value<std::string>(), "Import a contour as a Sequence of Discrete Points (SDP format)")
     ("SFP", po::value<std::string>(), "Import a contour as a Sequence of Floating Points (SFP format)")
     ("drawContourPoint", po::value<double>(), "<size> display contour points as disk of radius <size>")    
-    ("fillContour", "fill the contours with default color")
+    ("fillContour", "fill the contours with default color (gray)")
     ("lineWidth", po::value<double>()->default_value(1.0), "Define the linewidth of the contour (SDP format)") 
     ("drawPointOfIndex", po::value<int>(), "<index> Draw the contour point of index <index> (default 0) ") 
     ("pointSize", po::value<double>()->default_value(2.0), "<size> Set the display point size of the point displayed by drawPointofIndex option (default 2.0) ") 
@@ -132,7 +132,7 @@ int main( int argc, char** argv )
   
   
   double lineWidth=  vm["lineWidth"].as<double>();
-  
+  bool filled = vm.count("fillContour");
   double scale=1.0;
   if(vm.count("scale")){
     scale = vm["scale"].as<double>();
@@ -169,11 +169,10 @@ int main( int argc, char** argv )
   if(vm.count("FreemanChain")){
     string fileName = vm["FreemanChain"].as<string>();
     vector< FreemanChain<int> > vectFc =  PointListReader< Z2i::Point>:: getFreemanChainsFromFile<int> (fileName); 
-    //aBoard <<  SetMode( vectFc.at(0).className(), "InterGrid" );
     aBoard << CustomStyle( vectFc.at(0).className(), 
-			   new CustomColors( Color::Red  ,  Color::None ) );    
+			   new CustomColors( Color::Red  ,  filled?  Color::Gray: Color::None  ) );    
     aBoard.setLineWidth (lineWidth);
-    for(unsigned int i=0; i<vectFc.size(); i++){
+    for(unsigned int i=0; i<vectFc.size(); i++){  
       aBoard <<  vectFc.at(i) ;
       if(vm.count("drawPointOfIndex")){
 	int index = vm["drawPointOfIndex"].as<int>();
@@ -282,7 +281,6 @@ int main( int argc, char** argv )
   if(vm.count("SDP") || vm.count("SFP")){
     bool drawPoints= vm.count("drawContourPoint");
     bool invertYaxis = vm.count("invertYaxis");
-    bool filled = vm.count("fillContour");
     double pointSize=1.0;
     if(drawPoints){
       pointSize = vm["drawContourPoint"].as<double>();
@@ -319,6 +317,7 @@ int main( int argc, char** argv )
   
     
     aBoard.setPenColor(Color::Red);
+    aBoard.setFillColor(Color::Gray);
     aBoard.setLineStyle (LibBoard::Shape::SolidStyle );
     aBoard.setLineWidth (lineWidth);
     if(!filled){
@@ -345,12 +344,8 @@ int main( int argc, char** argv )
 
     if(extension=="svg"){
       aBoard.saveSVG(outputFileName.c_str());
-    }else if(extension=="eps"){
-      aBoard.saveEPS(outputFileName.c_str());
-    }else if(extension=="fig"){
-      aBoard.saveFIG(outputFileName.c_str(),LibBoard::Board::BoundingBox, 10.0, !vm.count("noXFIGHeader") );
     }
-#ifdef WITH_CAIRO
+    #ifdef WITH_CAIRO
     else
       if (extension=="eps"){
 	aBoard.saveCairo(outputFileName.c_str(),Board2D::CairoEPS );
@@ -361,7 +356,12 @@ int main( int argc, char** argv )
 	  if (extension=="png"){
 	    aBoard.saveCairo(outputFileName.c_str(),Board2D::CairoPNG );
 	  }
-#endif
+    #endif
+    else if(extension=="eps"){
+      aBoard.saveEPS(outputFileName.c_str());
+    }else if(extension=="fig"){
+      aBoard.saveFIG(outputFileName.c_str(),LibBoard::Board::BoundingBox, 10.0, !vm.count("noXFIGHeader") );
+    }
   }
     
     if (vm.count("outputStreamSVG")){
