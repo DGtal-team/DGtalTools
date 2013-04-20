@@ -1,10 +1,12 @@
 
 
+	
+
 	====  Release 0.6 ====
 
 * estimators/:
 	2dLocalEstimators: program to compare local curvature/tangent estimators on implicit shapes:
-	 -Maximal DSS based estimators
+	 - Maximal DSS based estimators
 	 - Maximal DCA based estimators
 	 - Binomial convolver based estimators
 	 - Integral Invariants based estimators
