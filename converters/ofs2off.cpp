@@ -33,7 +33,7 @@
 #include "DGtal/io/readers/MeshReader.h"
 #include "DGtal/io/writers/MeshWriter.h"
 #include "DGtal/io/Display3D.h"
-#include "DGtal/shapes/fromPoints/MeshFromPoints.h"
+#include "DGtal/shapes/Mesh.h"
 
 #include <boost/program_options/options_description.hpp>
 #include <boost/program_options/parsers.hpp>
@@ -84,7 +84,7 @@ int main( int argc, char** argv )
   string outputFilename = vm["output-file"].as<std::string>();
   
   // We store the colors
-  MeshFromPoints<Display3D::pointD3D> anImportedMesh(true);
+  Mesh<Display3D::pointD3D> anImportedMesh(true);
   bool import = anImportedMesh << inputFilename;
   bool exported = anImportedMesh >> outputFilename;
   if(!import || !exported){
