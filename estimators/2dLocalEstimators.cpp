@@ -263,11 +263,11 @@ estimation( Estimator & estimator, double h,
  */
 template <typename Space, typename Shape>
 bool
-computeLocalEstimations( const string & name,
+computeLocalEstimations( const std::string & name,
 			Shape & aShape, 
              double h,
              double radiusKernel,
-			 const string & options )
+			 const std::string & options )
 {
   // Types
   typedef typename Space::Point Point;
@@ -434,8 +434,8 @@ computeLocalEstimations( const string & name,
 	  }
 
 	//Binomial convolver
-	vector <RealPoint> BCTangents; 
-	vector <double> BCCurvatures; 
+	std::vector <RealPoint> BCTangents; 
+	std::vector <double> BCCurvatures; 
 	if (options.at(2) != '0')
 	  {
 	    {
@@ -478,7 +478,7 @@ computeLocalEstimations( const string & name,
 	  }
 
     //Integral Invariants
-    vector <double> IICurvatures;
+	std::vector <double> IICurvatures;
     if (options.at(3) != '0')
       {
         {
@@ -515,7 +515,7 @@ computeLocalEstimations( const string & name,
         Clock c;
         c.startClock();
         IICurvatureEstimator.init( h, re_convolution_kernel );
-        back_insert_iterator< std::vector< double > > IICurvaturesIterator( IICurvatures );
+        std::back_insert_iterator< std::vector< double > > IICurvaturesIterator( IICurvatures );
         IICurvatureEstimator.eval( ibegin, iend, IICurvaturesIterator );
         double time = c.stopClock();
         std::cout << "# Time: " << time << std::endl;
@@ -542,7 +542,7 @@ computeLocalEstimations( const string & name,
 	       itEnd = pointsRange.end(); 
 	     it != itEnd; ++it, ++i)
 	  {
-	    std::cout << i << setprecision( 15 )
+	    std::cout << i << std::setprecision( 15 )
 		      << " " << it->operator[](0) << " " << it->operator[](1) 
 		      << " " << trueTangents[ i ][ 0 ]
 		      << " " << trueTangents[ i ][ 1 ]
@@ -616,7 +616,7 @@ int main( int argc, char** argv )
     po::store(po::parse_command_line(argc, argv, general_opt), vm);  
   }catch(const std::exception& ex){
     parseOK=false;
-    trace.info()<< "Error checking program options: "<< ex.what()<< endl;
+    trace.info()<< "Error checking program options: "<< ex.what()<< std::endl;
   }
   po::notify(vm);    
   if(!parseOK || vm.count("help")||argc<=1)
