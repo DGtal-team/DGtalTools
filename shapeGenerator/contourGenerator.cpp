@@ -198,9 +198,9 @@ void
 estimateGeometry(Shape& s, 
                  const double& h,
                  const Range& r, 
-                 vector<Point>& points, 
-                 vector<Point>& tangents, 
-                 vector<Quantity>& curvatures) {
+                 std::vector<Point>& points, 
+                 std::vector<Point>& tangents, 
+                 std::vector<Quantity>& curvatures) {
 
   typedef typename Range::ConstIterator ConstIterator; 
   for (ConstIterator i = r.begin(); i != r.end(); ++i) {
@@ -321,7 +321,7 @@ generateContour(
 	// write geometry of the shape
 	std::stringstream s; 
 	s << outputFileName << ".geom"; 
-	ofstream outstream(s.str().c_str()); //output stream
+	std::ofstream outstream(s.str().c_str()); //output stream
 	if (!outstream.is_open()) return false;
 	else {
 	  outstream << "# " << outputFileName << std::endl;  
@@ -329,9 +329,9 @@ generateContour(
 	  outstream << "# id x y tangentx tangenty curvaturexy" 
 		    << " x' y' tangentx' tangenty' curvaturex'y'" << std::endl; 
 
-	  vector<RealPoint> truePoints, truePoints2; 
-	  vector<RealPoint> trueTangents, trueTangents2; 
-	  vector<double> trueCurvatures, trueCurvatures2; 
+	  std::vector<RealPoint> truePoints, truePoints2; 
+	  std::vector<RealPoint> trueTangents, trueTangents2; 
+	  std::vector<double> trueCurvatures, trueCurvatures2; 
 
 	  estimateGeometry<Shape, Range, RealPoint, double>
 	    (aShape, h, r, truePoints, trueTangents, trueCurvatures);
@@ -342,7 +342,7 @@ generateContour(
     
 	  unsigned int n = (unsigned int)r.size(); 
 	  for (unsigned int i = 0; i < n; ++i ) {
-	    outstream << setprecision( 15 ) << i 
+	    outstream << std::setprecision( 15 ) << i 
 		      << " " << truePoints[ i ][ 0 ]
 		      << " " << truePoints[ i ][ 1 ]
 		      << " " << trueTangents[ i ][ 0 ]
@@ -407,8 +407,8 @@ int main( int argc, char** argv )
     ("center_x,x",   po::value<double>()->default_value(0.0), "x-coordinate of the shape center (double)" )
     ("center_y,y",   po::value<double>()->default_value(0.0), "y-coordinate of the shape center (double)" )
     ("gridstep,g",  po::value<double>()->default_value(1.0), "Gridstep for the digitization" )
-    ("format,f",   po::value<string>()->default_value("pts"), "Output format:\n\t  List of pointel coordinates {pts}\n\t  Freman chaincode Vector {fc}" )
-    ("outputGeometry,o",   po::value<string>(), "Base name of the file containing the shape geometry (points, tangents, curvature)" );
+    ("format,f",   po::value<std::string>()->default_value("pts"), "Output format:\n\t  List of pointel coordinates {pts}\n\t  Freman chaincode Vector {fc}" )
+    ("outputGeometry,o",   po::value<std::string>(), "Base name of the file containing the shape geometry (points, tangents, curvature)" );
 
   bool parseOK=true;
   po::variables_map vm;
@@ -416,7 +416,7 @@ int main( int argc, char** argv )
     po::store(po::parse_command_line(argc, argv, general_opt), vm);  
   }catch(const std::exception& ex){
     parseOK=false;
-    trace.info()<< "Error checking program options: "<< ex.what()<< endl;
+    trace.info()<< "Error checking program options: "<< ex.what()<< std::endl;
   }
  
   po::notify(vm);    
