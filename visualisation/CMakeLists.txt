@@ -16,10 +16,10 @@ ENDFOREACH(FILE)
 if (  WITH_VISU3D_QGLVIEWER )
   SET(DGTAL_EXAMPLES_QGL_SRC
     3dVolViewer
-    3dTestViewer
-    3dCurvatureViewer)
+    3dCurvatureViewer
+    meshViewer)
   FOREACH(FILE ${DGTAL_EXAMPLES_QGL_SRC}) 
-    add_executable(${FILE} ${FILE} specificClasses/Viewer3DSpecial)
+    add_executable(${FILE} ${FILE})
     target_link_libraries ( ${FILE} ${DGTAL_LIBRARIES}  )   
     install(TARGETS ${FILE} 
         RUNTIME DESTINATION bin
@@ -27,3 +27,8 @@ if (  WITH_VISU3D_QGLVIEWER )
         ARCHIVE DESTINATION lib)
   ENDFOREACH(FILE)
 endif ( WITH_VISU3D_QGLVIEWER   )
+
+
+
+add_executable(3dTestViewer 3dTestViewer specificClasses/Viewer3DSpecial  )
+target_link_libraries ( 3dTestViewer   ${DGTAL_LIBRARIES}  )   
