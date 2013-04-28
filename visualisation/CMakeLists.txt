@@ -30,5 +30,5 @@ endif ( WITH_VISU3D_QGLVIEWER   )
 
 
 
-add_executable(3dTestViewer 3dTestViewer specificClasses/Viewer3DSpecial  )
-target_link_libraries ( 3dTestViewer   ${DGTAL_LIBRARIES}  )   
+add_executable(3dImageViewer 3dImageViewer specificClasses/Viewer3DImage  )
+target_link_libraries ( 3dImageViewer   ${DGTAL_LIBRARIES}  )   
