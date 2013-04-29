@@ -108,10 +108,7 @@ Viewer3DImage::keyPressEvent ( QKeyEvent *e )
 {
   
   bool handled = false;
-  if( e->key() == Qt::Key_E){
-    std::cout << "handle by Viewer3D special" << std::endl;
-    handled=true;
-  }
+ 
   if( e->key() == Qt::Key_I){
     std::cout << "Image generation" << std::endl;
     handled=true;
@@ -133,33 +130,49 @@ Viewer3DImage::keyPressEvent ( QKeyEvent *e )
     handled=true;
   }
   if( e->key() == Qt::Key_Up ||  e->key() == Qt::Key_Down){
-    int dirStep = (e->key() == Qt::Key_Up)? 5.0: -5.0; 
+    int dirStep = (e->key() == Qt::Key_Up)? 5: -5; 
     if((e->modifiers() & Qt::ShiftModifier)){
       dirStep/=5;
     }
     int aSliceNum=0;
     int aSliceMax=0;
+    bool stoped=false;
     if(myCurrentSliceDim==0){
-      mySliceXPos+=dirStep;
-      aSliceNum=mySliceXPos;
       aSliceMax=my3dImage->extent()[0];
+      if(mySliceXPos+dirStep<aSliceMax&&mySliceXPos+dirStep>=0){
+	 mySliceXPos+=dirStep;
+      }else{
+	stoped=true;
+      }
+      aSliceNum=mySliceXPos;
     }else if(myCurrentSliceDim==1){
-      mySliceYPos+=dirStep;
-      aSliceNum=mySliceYPos;
       aSliceMax=my3dImage->extent()[1];
+      if(mySliceYPos+dirStep<aSliceMax&&mySliceYPos+dirStep>=0){
+	 mySliceYPos+=dirStep;
+      }else{
+	stoped=true;
+      }
+      aSliceNum=mySliceYPos;
     }else if(myCurrentSliceDim==2){
-       mySliceZPos+=dirStep;
-       aSliceNum=mySliceZPos;
        aSliceMax=my3dImage->extent()[2];
+       if(mySliceZPos+dirStep<aSliceMax&&mySliceZPos+dirStep>=0){
+	 mySliceZPos+=dirStep;
+       }else{
+	 stoped=true;
+       }
+       aSliceNum=mySliceZPos;
     }
-    if(aSliceNum>=0 && aSliceNum < aSliceMax){
-      Image2D sliceImage = DGtal::extractLowerDimImage<Image3D, Image2D>(*my3dImage, myCurrentSliceDim, aSliceNum);
-      (*this) << DGtal::UpdateImageData<Image2D>(myCurrentSliceDim, sliceImage, 
-						 (myCurrentSliceDim==0)? dirStep: 0.0, 
-						 (myCurrentSliceDim==1)? dirStep: 0.0,
-						 (myCurrentSliceDim==2)? dirStep: 0.0);
-      (*this).updateList(false);
-      (*this).update();
+    if(!stoped){
+      std::cerr << "slice num =" << aSliceNum << std::endl;
+      
+	Image2D sliceImage = DGtal::extractLowerDimImage<Image3D, Image2D>(*my3dImage, myCurrentSliceDim, aSliceNum);
+	(*this) << DGtal::UpdateImageData<Image2D>(myCurrentSliceDim, sliceImage, 
+						   (myCurrentSliceDim==0)? dirStep: 0.0, 
+						   (myCurrentSliceDim==1)? dirStep: 0.0,
+						   (myCurrentSliceDim==2)? dirStep: 0.0);
+	(*this).updateList(false);
+	(*this).update();
+      
     }
     handled=true;
    }
