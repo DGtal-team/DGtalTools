@@ -19,11 +19,11 @@ class Viewer3DImage: public DGtal::Viewer3D
 public:
   
   Viewer3DImage(){
-    Viewer3D();
     mySliceXPos=0;
     mySliceYPos=0;
     mySliceZPos=0;
     myCurrentSliceDim=0;
+    Viewer3D();
   }
   
   
