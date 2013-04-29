@@ -138,17 +138,21 @@ Viewer3DImage::keyPressEvent ( QKeyEvent *e )
       dirStep/=5;
     }
     int aSliceNum=0;
+    int aSliceMax=0;
     if(myCurrentSliceDim==0){
       mySliceXPos+=dirStep;
       aSliceNum=mySliceXPos;
-     }else if(myCurrentSliceDim==1){
+      aSliceMax=my3dImage->extent()[0];
+    }else if(myCurrentSliceDim==1){
       mySliceYPos+=dirStep;
       aSliceNum=mySliceYPos;
+      aSliceMax=my3dImage->extent()[1];
     }else if(myCurrentSliceDim==2){
        mySliceZPos+=dirStep;
        aSliceNum=mySliceZPos;
+       aSliceMax=my3dImage->extent()[2];
     }
-    if(aSliceNum>=0){
+    if(aSliceNum>=0 && aSliceNum < aSliceMax){
       Image2D sliceImage = DGtal::extractLowerDimImage<Image3D, Image2D>(*my3dImage, myCurrentSliceDim, aSliceNum);
       (*this) << DGtal::UpdateImageData<Image2D>(myCurrentSliceDim, sliceImage, 
 						 (myCurrentSliceDim==0)? dirStep: 0.0, 
