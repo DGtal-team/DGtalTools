@@ -202,7 +202,7 @@ void missingParam(std::string param)
 
 template <typename Shape, typename Space>
 bool
-lengthEstimators( const string & /*name*/,
+lengthEstimators( const std::string & /*name*/,
       Shape & aShape, 
       double h )
 {
@@ -299,7 +299,7 @@ lengthEstimators( const string & /*name*/,
     fp = FPlength.eval();
     Tfp = c.stopClock();
 
-    cout << setprecision( 15 ) << h << " " << rp.size() << " " << trueValue 
+    std::cout << std::setprecision( 15 ) << h << " " << rp.size() << " " << trueValue 
    << " " << l1
    << " " << blue
    << " " << rosen
@@ -312,7 +312,7 @@ lengthEstimators( const string & /*name*/,
    << " " << Tdss
    << " " << Tmlp
    << " " << Tfp     
-   << endl;
+   << std::endl;
     return true;
   }    
   catch ( InputException e )
@@ -351,7 +351,7 @@ int main( int argc, char** argv )
     po::store(po::parse_command_line(argc, argv, general_opt), vm);  
   }catch(const std::exception& ex){
     parseOK=false;
-    trace.info()<< "Error checking program options: "<< ex.what()<< endl;
+    trace.info()<< "Error checking program options: "<< ex.what()<< std::endl;
   }
   po::notify(vm);    
   if(!parseOK || vm.count("help")||argc<=1)
@@ -382,10 +382,10 @@ int main( int argc, char** argv )
 
 
 ///////////////////////////////////
-  cout << "#h nbPoints true-length L1 BLUE RosenProffit "
+  std::cout << "#h nbPoints true-length L1 BLUE RosenProffit "
        << "DSS MLP FP Time-L1 Time-BLUE Time-RosenProffitt "
        << "Time-DSS Time-MLP Time-FP" <<std::endl;
-  cout << "# timings are given in msec." <<std::endl;
+  std::cout << "# timings are given in msec." <<std::endl;
   
   double h = 1; 
   double step = exp( log(hMin) / (double)nbSteps);
