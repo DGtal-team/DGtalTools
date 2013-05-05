@@ -116,7 +116,7 @@ estimateQuantity( Estimator & estimator,
 {
   std::vector<typename Estimator::Quantity> values;
 
-  back_insert_iterator< std::vector< typename Estimator::Quantity > > valuesIterator( values );
+  std::back_insert_iterator< std::vector< typename Estimator::Quantity > > valuesIterator( values );
   estimator.eval ( it, it_end, valuesIterator );
 
   return values;
@@ -256,7 +256,7 @@ compareShapeEstimators( const std::string & name,
     for ( int i = 0; abegin != aend; ++abegin, ++i )
     {
       Surfel p = *abegin;
-      std::cout << i << setprecision( 15 )
+      std::cout << i << std::setprecision( 15 )
                 << " " << p.myCoordinates[ 0 ] << " " << p.myCoordinates[ 1 ] << " " << p.myCoordinates[ 2 ]
                 << " " << trueMeanCurvatures[ i ]
                 << " " << trueGaussianCurvatures[ i ]
