@@ -56,7 +56,7 @@ int main( int argc, char** argv )
     po::store(po::parse_command_line(argc, argv, general_opt), vm);  
   }catch(const std::exception& ex){
     parseOK=false;
-    trace.info()<< "Error checking program options: "<< ex.what()<< endl;
+    trace.info()<< "Error checking program options: "<< ex.what()<< std::endl;
   }
   po::notify(vm);
   if ( !parseOK || vm.count("help") || ( argc <= 1 ) )
@@ -72,10 +72,10 @@ int main( int argc, char** argv )
       trace.error() << "The input file name was defined." << std::endl;
       return 1;
     }
-  string inputFilename = vm["input-file"].as<std::string>();
+  std::string inputFilename = vm["input-file"].as<std::string>();
   unsigned int threshold = vm["threshold"].as<unsigned int>();
   bool intAdjacency = ( vm["adjacency"].as<unsigned int>() == 0 );
-  string outputFilename = vm["output-file"].as<std::string>();
+  std::string outputFilename = vm["output-file"].as<std::string>();
   //! [3dVolMarchingCubes-parseCommandLine]
 
   //! [3dVolMarchingCubes-readVol]
@@ -130,7 +130,7 @@ int main( int argc, char** argv )
   CellEmbedder cellEmbedder;
   MyEmbedder trivialEmbedder;
   cellEmbedder.init( ks, image, trivialEmbedder, threshold );
-  ofstream out( outputFilename.c_str() );
+  std::ofstream out( outputFilename.c_str() );
   if ( out.good() )
     digSurf.exportEmbeddedSurfaceAs3DOFF( out, cellEmbedder );
   out.close();
