@@ -78,7 +78,7 @@ int main( int argc, char** argv )
     po::store(po::parse_command_line(argc, argv, general_opt), vm);  
   }catch(const std::exception& ex){
     parseOK=false;
-    trace.info()<< "Error checking program options: "<< ex.what()<< endl;
+    trace.info()<< "Error checking program options: "<< ex.what()<< std::endl;
   }
   po::notify(vm);    
   if(!parseOK || vm.count("help")||argc<=1 || (!(vm.count("FreemanChain"))) )
@@ -95,23 +95,23 @@ int main( int argc, char** argv )
 
  
   if(vm.count("FreemanChain")){
-    string fileName = vm["FreemanChain"].as<string>();
+    std::string fileName = vm["FreemanChain"].as<std::string>();
 
     typedef Z2i::Space Space; 
     typedef Space::Point Point; 
     typedef Space::Integer Integer;  
     typedef FreemanChain<Integer> FreemanChain; 
-    typedef vector< Point > Storage;
+    typedef std::vector< Point > Storage;
     typedef Storage::const_iterator ConstIteratorOnPoints; 
 
-    vector< FreemanChain > vectFcs =  PointListReader< Point >:: getFreemanChainsFromFile<Integer> (fileName); 
+    std::vector< FreemanChain > vectFcs =  PointListReader< Point >:: getFreemanChainsFromFile<Integer> (fileName); 
    
 
     for(unsigned int i=0; i<vectFcs.size(); i++){
 
       bool isClosed = vectFcs.at(i).isClosed(); 
-      cout << "# grid curve " << i+1 << "/" << vectFcs.size() << " "
-      << ( (isClosed)?"closed":"open" ) << endl;
+      std::cout << "# grid curve " << i+1 << "/" << vectFcs.size() << " "
+      << ( (isClosed)?"closed":"open" ) << std::endl;
 
       Storage vectPts; 
       FreemanChain::getContourPoints( vectFcs.at(i), vectPts ); 
@@ -127,16 +127,16 @@ int main( int argc, char** argv )
 
       BCCurvatureEstimator.init( h, vectPts.begin(), vectPts.end(), isClosed );
 
-      vector <double> curvatures( vectPts.size() ); 
+      std::vector <double> curvatures( vectPts.size() ); 
       BCCurvatureEstimator.eval( vectPts.begin(), vectPts.end(), curvatures.begin() ); 
 
       // Output
-      cout << "# id curvature" << endl;  
+      std::cout << "# id curvature" << std::endl;  
       unsigned int j = 0;
       for ( ConstIteratorOnPoints it = vectPts.begin(), it_end = vectPts.end();
       it != it_end; ++it, ++j ) {
-  cout << j << setprecision( 15 )
-       << " " << curvatures[ j ] << endl;
+  std::cout << j << std::setprecision( 15 )
+       << " " << curvatures[ j ] << std::endl;
       }
 
    }

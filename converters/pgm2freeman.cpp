@@ -31,7 +31,7 @@ void saveAllContoursAsFc(std::vector< std::vector< Z2i::Point >  >  vectContours
   for(unsigned int k=0; k<vectContoursBdryPointels.size(); k++){
     if(vectContoursBdryPointels.at(k).size()>minSize){
       	  FreemanChain<Z2i::Integer> fc (vectContoursBdryPointels.at(k));    
-	  cout << fc.x0 << " " << fc.y0   << " " << fc.chain << endl; 
+	  std::cout << fc.x0 << " " << fc.y0   << " " << fc.chain << std::endl; 
 	  
     }
   }
@@ -48,7 +48,7 @@ void saveSelContoursAsFC(std::vector< std::vector< Z2i::Point >  >  vectContours
 						      (ptMean[1]-refPoint[1])*(ptMean[1]-refPoint[1])));
       if(distance<=selectDistanceMax){
 	FreemanChain<Z2i::Integer> fc (vectContoursBdryPointels.at(k));    
-	cout << fc.x0 << " " << fc.y0   << " " << fc.chain << endl; 
+	std::cout << fc.x0 << " " << fc.y0   << " " << fc.chain << std::endl; 
       }      
     }    
   }
@@ -68,11 +68,11 @@ int main( int argc, char** argv )
     ("max,M", po::value<int>(), "max image threshold value (default 255)")
     
     ("minSize,s", po::value<int>(), "minSize of the extracted freeman chain (default 0)")
-    ("contourSelect,c", po::value<vector <int> >()->multitoken(), 
+    ("contourSelect,c", po::value<std::vector <int> >()->multitoken(), 
      "Select contour according reference point and maximal distance:  ex. --contourSelect X Y distanceMax")
-    ("thresholdRangeMin,r", po::value<vector <int> >()->multitoken(), 
+    ("thresholdRangeMin,r", po::value<std::vector <int> >()->multitoken(), 
      "use a range interval as threshold (from min) : --thresholdRangeMin min increment max : for each possible i, it define a digital sets [min, min+((i+1)*increment)] such that min+((i+1)*increment)< max  and extract their boundary. ")
-    ("thresholdRangeMax,R", po::value<vector <int> >()->multitoken(), 
+    ("thresholdRangeMax,R", po::value<std::vector <int> >()->multitoken(), 
      "use a range interval as threshold (from max) : --thresholdRangeMax min increment max : for each possible i, it define a digital sets [ max-((i)*increment), max] such that max-((i)*increment)>min  and extract their boundary. ");
   
   bool parseOK=true;
@@ -80,7 +80,7 @@ int main( int argc, char** argv )
   try{
     po::store(po::parse_command_line(argc, argv, general_opt), vm);  
   }catch(const std::exception& ex){
-    trace.info()<< "Error checking program options: "<< ex.what()<< endl;
+    trace.info()<< "Error checking program options: "<< ex.what()<< std::endl;
     parseOK=false;
   }
   po::notify(vm);    
@@ -104,7 +104,7 @@ int main( int argc, char** argv )
 
   //Parse options
   if (!(vm.count("image"))){
-    trace.info() << "Image file name needed"<< endl;
+    trace.info() << "Image file name needed"<< std::endl;
     return 0;
   } 
   if(vm.count("min")){
@@ -118,9 +118,9 @@ int main( int argc, char** argv )
   } 
   if(vm.count("contourSelect")){
     select=true;
-    vector<int> cntConstraints= vm["contourSelect"].as<vector <int> >();
+    std::vector<int> cntConstraints= vm["contourSelect"].as<std::vector <int> >();
     if(cntConstraints.size()!=3){
-      trace.info() << "Incomplete option \"--contourSelect\""<< endl;
+      trace.info() << "Incomplete option \"--contourSelect\""<< std::endl;
       return 0;
     }
     selectCenter[0]= cntConstraints.at(0);
@@ -134,14 +134,14 @@ int main( int argc, char** argv )
     max= (int)maxThreshold;
     increment =  (int)(maxThreshold- minThreshold);
   }else{
-    vector<int> vectRange;
+    std::vector<int> vectRange;
     if ( vm.count("thresholdRangeMax")){
-      vectRange= vm["thresholdRangeMax"].as<vector <int> >();
+      vectRange= vm["thresholdRangeMax"].as<std::vector <int> >();
     }else{
-      vectRange= vm["thresholdRangeMin"].as<vector <int> >();
+      vectRange= vm["thresholdRangeMin"].as<std::vector <int> >();
     }
     if(vectRange.size()!=3){
-      trace.info() << "Incomplete option \"--thresholdRange\""<< endl;
+      trace.info() << "Incomplete option \"--thresholdRange\""<< std::endl;
       return 0;
     }
     min=vectRange.at(0);
@@ -156,13 +156,13 @@ int main( int argc, char** argv )
   
   typedef ImageSelector < Z2i::Domain, unsigned char>::Type Image;
   typedef IntervalThresholder<Image::Value> Binarizer; 
-  string imageFileName = vm["image"].as<std::string>();
+  std::string imageFileName = vm["image"].as<std::string>();
   Image image = PNMReader<Image>::importPGM( imageFileName ); 
   
   Z2i::KSpace ks;
   if(! ks.init( image.domain().lowerBound(), 
 		image.domain().upperBound(), true )){
-    trace.error() << "Problem in KSpace initialisation"<< endl;
+    trace.error() << "Problem in KSpace initialisation"<< std::endl;
   }
   
   
@@ -200,7 +200,7 @@ int main( int argc, char** argv )
       }else{
 	saveAllContoursAsFc(vectContoursBdryPointels,  minSize); 
       }
-      trace.info() << " [done]" << endl;
+      trace.info() << " [done]" << std::endl;
     }
   }
 
