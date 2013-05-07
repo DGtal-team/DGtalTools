@@ -53,22 +53,41 @@ Viewer3DImage::init(){
 void 
 Viewer3DImage::setVolImage(Image3D * an3DImage){
   my3dImage = an3DImage;
+ // Adding X slice in the viewer.
+  DGtal::MinusOneDimensionDomainFunctor<DGtal::Z2i::Point>  invFunctorX(0);
+  DGtal::Z2i::Domain domain2DX((invFunctorX.operator()(my3dImage->domain().lowerBound())), 
+			       (invFunctorX.operator()(my3dImage->domain().upperBound())));
+ 
+ DGtal::AddOneDimensionDomainFunctor<DGtal::Z3i::Point> aSliceFunctorX(0, mySliceXPos);
+ SliceImageAdapter sliceImageX(*my3dImage, domain2DX, aSliceFunctorX, DGtal::DefaultFunctor()); 
+ (*this) << sliceImageX;
+ (*this) << DGtal::UpdateImagePosition(0, DGtal::Display3D::xDirection, mySliceXPos, 0.0, 0.0);
 
-  // Adding X slice in the viewer.
-  Image2D sliceImageX = DGtal::extractLowerDimImage<Image3D, Image2D>(*my3dImage, 0, mySliceXPos);
-  (*this) << sliceImageX;
-  (*this) << DGtal::UpdateImagePosition(0, DGtal::Display3D::xDirection, mySliceXPos, 0.0, 0.0);
 
 
   // Adding Y slice in the viewer.
-  Image2D sliceImageY = DGtal::extractLowerDimImage<Image3D, Image2D>(*my3dImage, 1, mySliceYPos);
-  (*this) << sliceImageY; 
-  (*this) << DGtal::UpdateImagePosition(1, DGtal::Display3D::yDirection, 0.0, mySliceYPos, 0.0);
+  DGtal::MinusOneDimensionDomainFunctor<DGtal::Z2i::Point>  invFunctorY(1);
+  DGtal::Z2i::Domain domain2DY((invFunctorY.operator()(my3dImage->domain().lowerBound())), 
+			       (invFunctorY.operator()(my3dImage->domain().upperBound())));
+ 
+ DGtal::AddOneDimensionDomainFunctor<DGtal::Z3i::Point> aSliceFunctorY(1, mySliceYPos);
+ SliceImageAdapter sliceImageY(*my3dImage, domain2DY, aSliceFunctorY, DGtal::DefaultFunctor()); 
+ (*this) << sliceImageY;
+ (*this) << DGtal::UpdateImagePosition(1, DGtal::Display3D::yDirection, 0.0,mySliceYPos, 0.0);
 
-  // Adding Y slice in the viewer.
-  Image2D sliceImageZ = DGtal::extractLowerDimImage<Image3D, Image2D>(*my3dImage, 2, mySliceZPos);
-  (*this) << sliceImageZ;
-  (*this) << DGtal::UpdateImagePosition(2, DGtal::Display3D::zDirection, 0.0, 0.0, mySliceZPos);
+
+
+ 
+ 
+   // Adding Z slice in the viewer.
+  DGtal::MinusOneDimensionDomainFunctor<DGtal::Z2i::Point>  invFunctorZ(2);
+  DGtal::Z2i::Domain domain2DZ((invFunctorZ.operator()(my3dImage->domain().lowerBound())), 
+			       (invFunctorZ.operator()(my3dImage->domain().upperBound())));
+ 
+ DGtal::AddOneDimensionDomainFunctor<DGtal::Z3i::Point> aSliceFunctorZ(2, mySliceZPos);
+ SliceImageAdapter sliceImageZ(*my3dImage, domain2DZ, aSliceFunctorZ, DGtal::DefaultFunctor()); 
+ (*this) << sliceImageZ;
+ (*this) << DGtal::UpdateImagePosition(2, DGtal::Display3D::zDirection, 0.0, 0.0, mySliceZPos);
 
     
   (*this) << Viewer3D::updateDisplay;
@@ -138,7 +157,7 @@ Viewer3DImage::keyPressEvent ( QKeyEvent *e )
     int aSliceMax=0;
     bool stoped=false;
     if(myCurrentSliceDim==0){
-      aSliceMax=my3dImage->extent()[0];
+      aSliceMax=my3dImage->domain().upperBound()[0]+1;
       if(mySliceXPos+dirStep<aSliceMax&&mySliceXPos+dirStep>=0){
 	 mySliceXPos+=dirStep;
       }else{
@@ -146,7 +165,7 @@ Viewer3DImage::keyPressEvent ( QKeyEvent *e )
       }
       aSliceNum=mySliceXPos;
     }else if(myCurrentSliceDim==1){
-      aSliceMax=my3dImage->extent()[1];
+      aSliceMax=my3dImage->domain().upperBound()[1]+1;
       if(mySliceYPos+dirStep<aSliceMax&&mySliceYPos+dirStep>=0){
 	 mySliceYPos+=dirStep;
       }else{
@@ -154,7 +173,7 @@ Viewer3DImage::keyPressEvent ( QKeyEvent *e )
       }
       aSliceNum=mySliceYPos;
     }else if(myCurrentSliceDim==2){
-       aSliceMax=my3dImage->extent()[2];
+      aSliceMax=my3dImage->domain().upperBound()[2]+1;
        if(mySliceZPos+dirStep<aSliceMax&&mySliceZPos+dirStep>=0){
 	 mySliceZPos+=dirStep;
        }else{
@@ -165,13 +184,20 @@ Viewer3DImage::keyPressEvent ( QKeyEvent *e )
     if(!stoped){
       std::cerr << "slice num =" << aSliceNum << std::endl;
       
-	Image2D sliceImage = DGtal::extractLowerDimImage<Image3D, Image2D>(*my3dImage, myCurrentSliceDim, aSliceNum);
-	(*this) << DGtal::UpdateImageData<Image2D>(myCurrentSliceDim, sliceImage, 
-						   (myCurrentSliceDim==0)? dirStep: 0.0, 
-						   (myCurrentSliceDim==1)? dirStep: 0.0,
-						   (myCurrentSliceDim==2)? dirStep: 0.0);
-	(*this).updateList(false);
-	(*this).update();
+      // Adding X slice in the viewer.
+      DGtal::MinusOneDimensionDomainFunctor<DGtal::Z2i::Point>  invFunctor(myCurrentSliceDim);
+      DGtal::Z2i::Domain domain2D((invFunctor.operator()(my3dImage->domain().lowerBound())), 
+				  (invFunctor.operator()(my3dImage->domain().upperBound())));
+      
+      DGtal::AddOneDimensionDomainFunctor<DGtal::Z3i::Point> aSliceFunctor(myCurrentSliceDim, aSliceNum);
+      SliceImageAdapter sliceImage(*my3dImage, domain2D, aSliceFunctor, DGtal::DefaultFunctor()); 
+      
+      (*this) << DGtal::UpdateImageData<SliceImageAdapter>(myCurrentSliceDim, sliceImage, 
+							   (myCurrentSliceDim==0)? dirStep: 0.0, 
+							   (myCurrentSliceDim==1)? dirStep: 0.0,
+							   (myCurrentSliceDim==2)? dirStep: 0.0);
+      (*this).updateList(false);
+      (*this).update();
       
     }
     handled=true;
