@@ -35,12 +35,13 @@
 #include <QtGui/qapplication.h>
 #include "DGtal/io/Display3D.h"
 #include "DGtal/io/viewers/Viewer3D.h"
-
 #include "DGtal/io/readers/MeshReader.h"
+#include "DGtal/helpers/StdDefs.h"
 
 #include <boost/program_options/options_description.hpp>
 #include <boost/program_options/parsers.hpp>
 #include <boost/program_options/variables_map.hpp>
+
 
 using namespace std;
 using namespace DGtal;
@@ -59,7 +60,8 @@ int main( int argc, char** argv )
     ("scaleX,x",  po::value<float>()->default_value(1.0), "set the scale value in the X direction (default 1.0)" )
     ("scaleY,y",  po::value<float>()->default_value(1.0), "set the scale value in the Y direction (default 1.0)" )
     ("scaleZ,z",  po::value<float>()->default_value(1.0), "set the scale value in the Z direction (default 1.0)") 
-    ("invertNormal,n", "threshold min to define binary shape" ); 
+    ("invertNormal,n", "threshold min to define binary shape" )
+    ("drawVertex,v", "draw the vertex of the mesh" ); 
   
   bool parseOK=true;
   po::variables_map vm;
@@ -102,7 +104,7 @@ int main( int argc, char** argv )
   
   
   trace.info() << "Importing mesh... ";
-  MeshFromPoints<Display3D::pointD3D> anImportedMesh(true);
+  Mesh<Display3D::pointD3D> anImportedMesh(true);
   bool import = anImportedMesh << inputFilename;
   if(!import){
     trace.info() << "File import failed. " << std::endl;
@@ -114,7 +116,16 @@ int main( int argc, char** argv )
     anImportedMesh.invertVertexFaceOrder();
   }
   viewer << anImportedMesh;
-
+  
+  if(vm.count("drawVertex")){
+    for( Mesh<Display3D::pointD3D>::VertexStorage::const_iterator it = anImportedMesh.VertexBegin();  
+  	 it!=anImportedMesh.VertexEnd(); ++it){
+      DGtal::Z3i::Point pt;
+      pt[0]=(*it).x; pt[1]=(*it).y; pt[2]=(*it).z;
+      viewer << pt;
+    }
+  }
+       
   viewer << Viewer3D::updateDisplay;
   return application.exec();
 }
