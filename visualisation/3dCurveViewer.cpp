@@ -118,19 +118,50 @@ void displayDSS3d( Viewer3D & viewer,
   viewer << CustomColors3D( color3d, color3d ) << dss3d;
 }
 
+template <typename Point1, typename Point2>
+void assign( Point1 & p1, const Point2 & p2 )
+{
+  p1[ 0 ] = p2[ 0 ];
+  p1[ 1 ] = p2[ 1 ];
+  p1[ 2 ] = p2[ 2 ];
+}
+
+template <typename KSpace, typename ArithmeticalDSS3d>
+void displayDSS3dTangent( Viewer3D & viewer, 
+			  const KSpace & ks, const ArithmeticalDSS3d & dss3d,
+			  const DGtal::Color & color3d )
+{
+  typedef typename ArithmeticalDSS3d::Point3d Point;
+  typedef typename ArithmeticalDSS3d::PointD3d PointD3d;
+  typedef Display3D::pointD3D PointD3D;  
+  Point directionZ3;
+  PointD3d P1, P2, direction, intercept, thickness;
+  dss3d.getParameters( directionZ3, intercept, thickness );
+  assign( direction, directionZ3 );
+  direction /= direction.norm();
+  assign( P1, *dss3d.begin() );
+  assign( P2, *(dss3d.end()-1) );
+  double t1 = (P1 - intercept).dot( direction );
+  double t2 = (P2 - intercept).dot( direction );
+  
+  PointD3d Q1 = intercept + t1 * direction;
+  PointD3d Q2 = intercept + t2 * direction;
+  
+  viewer.addLine( Q1[ 0 ]-0.5, Q1[ 1 ]-0.5, Q1[ 2 ]-0.5, 
+		  Q2[ 0 ]-0.5, Q2[ 1 ]-0.5, Q2[ 2 ]-0.5, 
+		  color3d, MS3D_LINESIZE );
+}
+
 template <typename KSpace, typename ArithmeticalDSS3d>
 void displayProj2d( Viewer3D & viewer, 
 		    const KSpace & ks, const ArithmeticalDSS3d & dss3d,
 		    const DGtal::Color & color2d )
 {
-  typedef typename ArithmeticalDSS3d::ConstIterator ConstIterator3d;
   typedef typename ArithmeticalDSS3d::ArithmeticalDSS2d ArithmeticalDSS2d;
   typedef typename ArithmeticalDSS2d::ConstIterator ConstIterator2d;
   typedef typename ArithmeticalDSS2d::Point Point2d;
   typedef typename KSpace::Cell Cell;
   typedef typename KSpace::Point Point3d;
-  typedef DGtal::PointVector<2,double> PointD2d;
-  typedef Display3D::pointD3D PointD3d;  
   Point3d b = ks.lowerBound();
   for ( DGtal::Dimension i = 0; i < 3; ++i )
     {
@@ -162,7 +193,7 @@ void displayDSS2d( Viewer3D & viewer,
   typedef typename KSpace::Cell Cell;
   typedef typename KSpace::Point Point3d;
   typedef DGtal::PointVector<2,double> PointD2d;
-  typedef Display3D::pointD3D PointD3d;  
+  typedef Display3D::pointD3D PointD3D;  
   Point3d b = ks.lowerBound();
   for ( DGtal::Dimension i = 0; i < 3; ++i )
     {
@@ -173,8 +204,8 @@ void displayDSS2d( Viewer3D & viewer,
       pts2d.push_back( dss2d.project(*dss2d.myF, dss2d.myLf) );
       pts2d.push_back( dss2d.project(*dss2d.myL, dss2d.myLf) );
       pts2d.push_back( dss2d.project(*dss2d.myL, dss2d.myUf) );
-      std::vector<PointD3d> bb;
-      PointD3d p3;
+      std::vector<PointD3D> bb;
+      PointD3D p3;
       for ( unsigned int j = 0; j < pts2d.size(); ++j )
 	{
 	  switch (i) {
@@ -198,7 +229,8 @@ void displayDSS2d( Viewer3D & viewer,
 template <typename KSpace, typename PointIterator>
 bool displayCover( Viewer3D & viewer, 
 		   const KSpace & ks, PointIterator b, PointIterator e,
-		   bool dss3d, bool proj2d, bool dss2d, int nbColors )
+		   bool dss3d, bool proj2d, bool dss2d, bool tangent,
+		   int nbColors )
 {
   typedef typename PointIterator::value_type Point;
   typedef ArithmeticalDSS3d<PointIterator,int,4> SegmentComputer;  
@@ -233,11 +265,12 @@ bool displayCover( Viewer3D & viewer,
                    << dssYZ.getA() << "," << dssYZ.getB() << "," << dssYZ.getMu()
                    << ")" << std::endl;
       //trace.info() << ms3d << std::endl;  // information
-      Color color = cmap_hue( c );
 
-      if ( dss3d )  displayDSS3d( viewer, ks, ms3d, color );
-      if ( dss2d )  displayDSS2d( viewer, ks, ms3d, color );
-      if ( proj2d ) displayProj2d( viewer, ks, ms3d, CURVE2D_COLOR );
+      Color color = cmap_hue( c );
+      if ( tangent ) displayDSS3dTangent( viewer, ks, ms3d, color );
+      if ( dss3d )   displayDSS3d( viewer, ks, ms3d, color );
+      if ( dss2d )   displayDSS2d( viewer, ks, ms3d, color );
+      if ( proj2d )  displayProj2d( viewer, ks, ms3d, CURVE2D_COLOR );
       c++;
     } 
   return true;
@@ -270,12 +303,13 @@ int main(int argc, char **argv)
     ("input,i", po::value<std::string>(), "the name of the text file containing the list of 3D points (x y z per line)" )
     ("box,b",  po::value<int>()->default_value( 0 ), "specifies the the tightness of the bounding box around the curve with a given integer displacement <arg> to enlarge it (0 is tight)" )
     ("viewBox,v",  po::value<string>()->default_value( "WIRED" ), "displays the bounding box, <arg>=WIRED means that only edges are displayed, <arg>=COLORED adds colors for planes (XY is red, XZ green, YZ, blue)." )
+    ("curve3d,C", "displays the 3D curve")
     ("curve2d,c", "displays the 2D projections of the 3D curve on the bounding box")
     ("cover3d,3", "displays the 3D tangential cover of the curve" )
     ("cover2d,2", "displays the 2D projections of the 3D tangential cover of the curve" )
     ("nbColors,n",  po::value<int>()->default_value( 3 ), "sets the number of successive colors used for displaying 2d and 3d maximal segments (default is 3: red, green, blue)" )
-
-; 
+    ("tangent,t", "displays the tangents to the curve" )
+    ; 
   po::positional_options_description pos_opt; 
   pos_opt.add("input", 1);
 
@@ -297,7 +331,7 @@ int main(int argc, char **argv)
 		<< "Display a 3D curve given as the <input> filename (with possibly projections and/or tangent information) by using QGLviewer.\n"
 		<< general_opt << "\n\n";
       std::cout << "Example:\n"
-		<< "3dCurveViewer -b 1 -3 -2 -c ${DGTAL_HOME}/examples/samples/sinus.dat\n";
+		<< "3dCurveViewer -C -b 1 -3 -2 -c ${DGTAL_HOME}/examples/samples/sinus.dat\n";
       return 0;
     }
 
@@ -352,11 +386,13 @@ int main(int argc, char **argv)
 			   vm.count( "cover3d" ),
 			   vm.count( "curve2d" ),
 			   vm.count( "cover2d" ),
+			   vm.count( "tangent" ),
 			   vm["nbColors"].as<int>() );
   // Display 3D curve points.
-  viewer << CustomColors3D( CURVE3D_COLOR, CURVE3D_COLOR )
-         << gc.getPointsRange()
-         << sequence.back(); // curiously, last point is not displayed.
+  if ( vm.count( "curve3d" ) )
+    viewer << CustomColors3D( CURVE3D_COLOR, CURVE3D_COLOR )
+	   << gc.getPointsRange()
+	   << sequence.back(); // curiously, last point is not displayed.
 
   // ----------------------------------------------------------------------
   // User "interaction".
