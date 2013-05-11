@@ -14,8 +14,8 @@
 
 
 * visualization/:
-	3dCurvatureViewer: permits to compute and visualize mean or gaussian curvature of binary shapes.
-
+	3dCurvatureViewer: computes and displays mean or gaussian curvature of vol binary shapes.
+	3dCurveViewer: displays 3D curves with tangential cover and projections onto bounding box.
 
 Various updates for 0.6 DGtal compatibility.
 
