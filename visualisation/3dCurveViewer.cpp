@@ -331,7 +331,7 @@ int main(int argc, char **argv)
 		<< "Display a 3D curve given as the <input> filename (with possibly projections and/or tangent information) by using QGLviewer.\n"
 		<< general_opt << "\n\n";
       std::cout << "Example:\n"
-		<< "3dCurveViewer -C -b 1 -3 -2 -c ${DGTAL_HOME}/examples/samples/sinus.dat\n";
+		<< "3dCurveViewer -C -b 1 -3 -2 -c ${DGTAL}/examples/samples/sinus.dat\n";
       return 0;
     }
 
