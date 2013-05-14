@@ -3,7 +3,7 @@
 #include "DGtal/io/Display3D.h"
 #include "DGtal/images/ImageSelector.h"
 #include "DGtal/images/ImageContainerBySTLVector.h"
-
+#include "DGtal/images/ConstImageAdapter.h"
 
 class Viewer3DImage: public DGtal::Viewer3D 
 {
@@ -11,7 +11,7 @@ class Viewer3DImage: public DGtal::Viewer3D
   typedef DGtal::ImageContainerBySTLVector<DGtal::Z3i::Domain, unsigned char> Image3D;
   typedef DGtal::ImageContainerBySTLVector<DGtal::Z2i::Domain, unsigned char> Image2D;
  
-  typedef DGtal::ConstImageAdapter<Image3D, Image2D::Domain, DGtal::AddOneDimensionDomainFunctor< DGtal::Z3i::Point>,
+  typedef DGtal::ConstImageAdapter<Image3D, Image2D::Domain, DGtal::Projector< DGtal::Z3i::Space>,
 				  Image3D::Value,  DGtal::DefaultFunctor >  SliceImageAdapter;
 
 
