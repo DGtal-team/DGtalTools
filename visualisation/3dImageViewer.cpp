@@ -123,13 +123,13 @@ int main( int argc, char** argv )
     mode=Viewer3DImage::InterGrid;
   else
     mode=Viewer3DImage::Empty;
-  
+   
   Viewer3DImage viewer(mode);
   viewer.setWindowTitle("simple Volume Viewer");
   viewer.show();
   
   
-  if(extension=="vol" || extension=="pgm3d" || extension=="pgm3D"){
+
    Image3D image = (extension=="vol")? VolReader<Image3D>::importVol( inputFilename ): PNMReader<Image3D>::importPGM3D( inputFilename );
     trace.info() << "Image loaded: "<<image<< std::endl;
     viewer.setVolImage(&image);
@@ -155,15 +155,6 @@ int main( int argc, char** argv )
       }
       viewer<< Viewer3D::updateDisplay;
     }
-  }else if(extension=="sdp"){
-    vector<Z3i::Point> vectVoxels = PointListReader<Z3i::Point>::getPointsFromFile(inputFilename);
-    for(int i=0;i< vectVoxels.size(); i++){
-      viewer << vectVoxels.at(i);
-    }
-
-
-    
-  }
   
 
   return application.exec();
