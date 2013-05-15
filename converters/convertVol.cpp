@@ -89,7 +89,7 @@ int main( int argc, char** argv )
   Image3D inputImage = DGtal::GenericReader<Image3D>::import(inputFilename);
   trace.info() << "[done] " << std::endl ; 
   trace.info() << "Writing output file " << outputFilename ; 
-  DGtal::GenericWriter<Image3D>::exporT(outputFilename,  inputImage);
+  DGtal::GenericWriter<Image3D>::exportFile(outputFilename,  inputImage);
   trace.info() << "[done] " << std::endl ;   
 
 
