@@ -111,7 +111,7 @@ int main( int argc, char** argv )
 
       bool isClosed = vectFcs.at(i).isClosed(); 
       std::cout << "# grid curve " << i+1 << "/" << vectFcs.size() << " "
-	   << ( (isClosed)?"closed":"open" ) << std::endl;
+      << ( (isClosed)?"closed":"open" ) << std::endl;
 
       Storage vectPts; 
       FreemanChain::getContourPoints( vectFcs.at(i), vectPts ); 
@@ -135,7 +135,7 @@ int main( int argc, char** argv )
       unsigned int j = 0;
       for ( ConstIteratorOnPoints it = vectPts.begin(), it_end = vectPts.end();
       it != it_end; ++it, ++j ) {
-	std::cout << j << std::setprecision( 15 )
+  std::cout << j << std::setprecision( 15 )
        << " " << curvatures[ j ] << std::endl;
       }
 

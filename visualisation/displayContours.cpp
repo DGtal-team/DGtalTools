@@ -169,7 +169,6 @@ int main( int argc, char** argv )
   if(vm.count("FreemanChain")){
     std::string fileName = vm["FreemanChain"].as<std::string>();
     std::vector< FreemanChain<int> > vectFc =  PointListReader< Z2i::Point>:: getFreemanChainsFromFile<int> (fileName); 
-    //aBoard <<  SetMode( vectFc.at(0).className(), "InterGrid" );
     aBoard << CustomStyle( vectFc.at(0).className(), 
 			   new CustomColors( Color::Red  ,  filled?  Color::Gray: Color::None  ) );    
     aBoard.setLineWidth (lineWidth);
@@ -204,7 +203,7 @@ int main( int argc, char** argv )
           Decomposition4 theDecomposition( vPts.begin(),vPts.end(),computer,isClosed );
           //for each segment
           aBoard << SetMode( computer.className(), "BoundingBox" );
-	  std::string className = computer.className() + "/BoundingBox";
+          std::string className = computer.className() + "/BoundingBox";
           for ( Decomposition4::SegmentIterator it = theDecomposition.begin();
 		it != theDecomposition.end(); ++it ) 
             {
@@ -225,7 +224,7 @@ int main( int argc, char** argv )
 
           //for each segment
           aBoard << SetMode( computer.className(), "BoundingBox" );
-	  std::string className = computer.className() + "/BoundingBox";
+          std::string className = computer.className() + "/BoundingBox";
           for ( Decomposition4::SegmentIterator it = theDecomposition.begin();
 		it != theDecomposition.end(); ++it ) 
             {
@@ -250,7 +249,7 @@ int main( int argc, char** argv )
 	  typedef FP<std::vector<Z2i::Point>::iterator,int,4> FP;
 	  FP theFP( vPts.begin(),vPts.end() );
 
-	  std::vector<FP::RealPoint> v( theFP.size() );
+          std::vector<FP::RealPoint> v( theFP.size() );
           theFP.copyMLP( v.begin() );
 
           //polyline to draw
@@ -366,13 +365,13 @@ int main( int argc, char** argv )
   }
     
     if (vm.count("outputStreamSVG")){
-      aBoard.saveSVG(std::cout);
+    aBoard.saveSVG(std::cout);
   } else   
       if (vm.count("outputStreamFIG")){
-	aBoard.saveFIG(std::cout, LibBoard::Board::BoundingBox, 10.0,  !vm.count("noXFIGHeader"));
+    aBoard.saveFIG(std::cout, LibBoard::Board::BoundingBox, 10.0,  !vm.count("noXFIGHeader"));
   } else
 	if (vm.count("outputStreamEPS")){
-	  aBoard.saveEPS(std::cout);
+    aBoard.saveEPS(std::cout);
   } 
     
   }

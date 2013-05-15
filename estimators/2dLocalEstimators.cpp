@@ -478,7 +478,7 @@ computeLocalEstimations( const std::string & name,
 	  }
 
     //Integral Invariants
-	std::vector <double> IICurvatures;
+    std::vector <double> IICurvatures;
     if (options.at(3) != '0')
       {
         {
