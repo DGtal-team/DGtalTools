@@ -18,12 +18,14 @@ class Viewer3DImage: public DGtal::Viewer3D
 
 
 public:
+  enum ModeVisu { BoundingBox, InterGrid, Grid, Empty};
   
-  Viewer3DImage(){
+  Viewer3DImage(ModeVisu aMode=BoundingBox){
     mySliceXPos=0;
     mySliceYPos=0;
     mySliceZPos=0;
     myCurrentSliceDim=0;
+    myMode=aMode;
     Viewer3D();
   }
   
@@ -35,7 +37,7 @@ public:
   
   void setVolImage(Image3D * an3DImage);
   
-
+  
 
   
 protected:
@@ -47,9 +49,9 @@ protected:
   int mySliceXPos;
   int mySliceYPos;
   int mySliceZPos;
-
   int myCurrentSliceDim ;
-
+  
+  ModeVisu myMode;
 };
 
 

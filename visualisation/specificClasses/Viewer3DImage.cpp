@@ -48,7 +48,6 @@ Viewer3DImage::init(){
    setKeyDescription ( Qt::Key_Down, "Move the current 2D image slice to 5 in the negative direction of the current axis." );
    setKeyDescription ( Qt::Key_Shift, "Change the slice move with step 1 (5 by default)" );
 
-
 }
 
 
@@ -56,6 +55,31 @@ Viewer3DImage::init(){
 void 
 Viewer3DImage::setVolImage(Image3D * an3DImage){
   my3dImage = an3DImage;
+
+  switch (myMode) {
+  case BoundingBox:
+    (*this) << DGtal::SetMode3D("ConstImageAdapter", "BoundingBox");
+    break;
+  case InterGrid:
+    (*this) << DGtal::SetMode3D("ConstImageAdapter", "InterGrid");
+    break;
+  case Grid:
+    (*this) << DGtal::SetMode3D("ConstImageAdapter", "Grid");
+    break;
+  case Empty:
+    (*this) << DGtal::SetMode3D("ConstImageAdapter", "");
+    break;
+  }
+
+  
+  (*this).updateList(false);
+  (*this).update();
+  
+    
+
+
+
+
  // Adding X slice in the viewer.
   DGtal::Projector<DGtal::Z2i::Space>  invFunctorX; invFunctorX.initRemoveOneDim(0);
   DGtal::Z2i::Domain domain2DX(invFunctorX(my3dImage->domain().lowerBound()), 
@@ -63,7 +87,8 @@ Viewer3DImage::setVolImage(Image3D * an3DImage){
   
   DGtal::Projector<DGtal::Z3i::Space> aSliceFunctorX(mySliceXPos); aSliceFunctorX.initAddOneDim(0);
   SliceImageAdapter sliceImageX(*my3dImage, domain2DX, aSliceFunctorX, DGtal::DefaultFunctor()); 
-  (*this) << DGtal::SetMode3D(sliceImageX.className(), "BoundingBox");
+  
+  std::cout << "image:" << sliceImageX.className();
   (*this) << sliceImageX;
   (*this) << DGtal::UpdateImagePosition(0, DGtal::Display3D::xDirection, mySliceXPos, 0.0, 0.0);
 
