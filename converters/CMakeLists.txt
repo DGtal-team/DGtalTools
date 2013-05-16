@@ -4,12 +4,11 @@ SET(DGTAL_TOOLS_SRC
   freeman2sdp
   vol2raw
   raw2vol
-  ofs2off
- )
+  ofs2off )
 
 FOREACH(FILE ${DGTAL_TOOLS_SRC})
   add_executable(${FILE} ${FILE})
-  target_link_libraries (${FILE} ${DGTAL_LIBRARIES} )
+  target_link_libraries (${FILE} ${DGTAL_LIBRARIES} ${DGtalToolsLibDependencies} )
   install(TARGETS ${FILE} 
         RUNTIME DESTINATION bin
         LIBRARY DESTINATION lib
