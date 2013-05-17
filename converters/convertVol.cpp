@@ -72,6 +72,8 @@ int main( int argc, char** argv )
       std::cout << "Usage: " << argv[0] << " [input-file] [output-file]\n"
 		<< "Convert volumetric  file into volumetric file from different formats (pgm3d, vol, longvol) "
 		<< general_opt << "\n";
+      std::cout << "Example:\n"
+		<< "convertVol -i ${DGtal}/examples/samples/lobster.vol -o convertedVol.p3d \n";
       return 0;
     }
   
@@ -87,10 +89,10 @@ int main( int argc, char** argv )
   
   trace.info() << "Reading input file " << inputFilename ; 
   Image3D inputImage = DGtal::GenericReader<Image3D>::import(inputFilename);
-  trace.info() << "[done] " << std::endl ; 
+  trace.info() << " [done] " << std::endl ; 
   trace.info() << "Writing output file " << outputFilename ; 
   DGtal::GenericWriter<Image3D>::exportFile(outputFilename,  inputImage);
-  trace.info() << "[done] " << std::endl ;   
+  trace.info() << " [done] " << std::endl ;   
 
 
   return 0;
