@@ -29,8 +29,8 @@
 
 #include <iostream>
 #include <DGtal/base/Common.h>
-#include <DGtal/io/readers/VolReader.h>
-#include <DGtal/io/writers/VolWriter.h>
+#include <DGtal/io/readers/GenericReader.h>
+#include <DGtal/io/writers/GenericWriter.h>
 #include <DGtal/helpers/StdDefs.h>
 #include <DGtal/images/Image.h>
 #include <DGtal/images/ImageContainerBySTLVector.h>
@@ -91,8 +91,10 @@ int main(int argc, char**argv)
     {
       trace.info() << "Crop an 3D vol image from to points. It returns the interior of the shape"<<std::endl
                    << std::endl << "Basic usage: "<<std::endl
-                   << "\t volCrop --input <volFileName> --o <volOutputFileName> (in vol format)"<<std::endl
+                   << "\t volCrop --input <volFileName> --o <volOutputFileName> (both files can be independently in vol, pgm3D, p3d format)"<<std::endl
                    << general_opt << "\n";
+      std::cout << "Example:\n"
+		<< "volCrop --xMin 50 --yMin 50 --zMin 10 --xMax 150 --yMax 150 --zMax 50 -i ${DGtal}/examples/samples/lobster.vol -o croppedLobster.p3d \n";
       return 0;
     }
 
@@ -112,7 +114,7 @@ int main(int argc, char**argv)
     
   trace.beginBlock("Loading file");
   typedef ImageContainerBySTLVector<Z3i::Domain, unsigned char>  MyImageC;
-  MyImageC  imageC = VolReader< MyImageC >::importVol ( filename );
+  MyImageC  imageC = GenericReader< MyImageC >::import ( filename );
   DefaultFunctor df;  
   
   typedef ConstImageAdapter<MyImageC, Domain, DefaultFunctor, MyImageC::Value, DefaultFunctor > ConstImageAdapterForSubImage;
@@ -121,7 +123,7 @@ int main(int argc, char**argv)
   trace.endBlock();
 
   trace.beginBlock("Exporting...");
-  bool res =  VolWriter<ConstImageAdapterForSubImage>::exportVol(outputFileName, subImage);
+  bool res =  GenericWriter<ConstImageAdapterForSubImage>::exportFile(outputFileName, subImage);
   trace.endBlock();
   if (res) return 0; else return 1;
 }
