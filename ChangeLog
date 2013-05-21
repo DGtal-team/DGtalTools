@@ -1,6 +1,12 @@
 
+	====  Release 0.7 ====
 
-	
+
+
+* volumetric/volTools:
+      convertVol: a simple generic volume image converters (can process actually pgm3d, vol, longvol, raw (for writing)).
+
+
 
 	====  Release 0.6 ====
 
