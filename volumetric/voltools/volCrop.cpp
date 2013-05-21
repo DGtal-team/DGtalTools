@@ -32,7 +32,6 @@
 #include <DGtal/io/readers/GenericReader.h>
 #include <DGtal/io/writers/GenericWriter.h>
 #include <DGtal/helpers/StdDefs.h>
-#include <DGtal/images/Image.h>
 #include <DGtal/images/ImageContainerBySTLVector.h>
 #include <DGtal/images/ConstImageAdapter.h>
 #include <boost/program_options/options_description.hpp>
