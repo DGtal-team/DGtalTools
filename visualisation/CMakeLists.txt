@@ -2,7 +2,6 @@ SET(DGTAL_TOOLS_SRC
 	displayContours
 )
 
-
 FOREACH(FILE ${DGTAL_TOOLS_SRC})
   add_executable(${FILE} ${FILE})
   target_link_libraries (${FILE} ${DGTAL_LIBRARIES} ${DGtalToolsLibDependencies})
