@@ -198,7 +198,7 @@ void drawSegments(Board& aBoard,
  * @tparam Integer a model of integer
  */
 template <typename Pattern, typename Integer>
-void displayConvexHull(const Pattern& aP, const Integer& aD)
+void displayConvexHull(const Pattern& aP, const Integer& aD, bool withFDT = false)
 {
   typedef typename Pattern::Fraction Fraction; 
   typedef typename Pattern::Quotient Quotient; 
@@ -252,7 +252,7 @@ void displayConvexHull(const Pattern& aP, const Integer& aD)
   EvenConvexHullMap<Point> evenH(Zn);
   drawSegments( aBoard, evenConvergents.begin(), evenConvergents.end(), evenH ); 
 
-  //four last segments
+  //display the four last segments
   drawSegment( aBoard, Point(0,0), Zn ); 
   if (evenConvergents.size() != 0)
     {
@@ -270,16 +270,52 @@ void displayConvexHull(const Pattern& aP, const Integer& aD)
 	}
     }
 
-  //save the file
-  aBoard.saveEPS("convexHull.eps");
-  
+  if (withFDT)
+    {//display internal edges
+
+      //first internal edge
+      if (evenConvergents.size() != 0)
+	drawSegment( aBoard, 
+		     Point(0,0), 
+		     evenH(*evenConvergents.rbegin()) ); 
+      //other internal edges
+      typedef typename Convergents::const_reverse_iterator RI; 
+      RI oddRit = oddConvergents.rbegin(); 
+      RI evenRit = evenConvergents.rbegin(); 
+      bool hasToContinue = true; 
+      while (hasToContinue) 
+	{
+	  if (oddRit != oddConvergents.rend())
+	    {	      
+	      drawSegment( aBoard, 
+			   oddH(*oddRit), 
+			   evenH(*evenRit) ); 
+	    }
+	  else 
+	    hasToContinue = false; 
+	  ++evenRit; 
+
+	  if ( (hasToContinue) && (evenRit != evenConvergents.rend()) )
+	    {	      
+	      drawSegment( aBoard, 
+			   oddH(*oddRit), 
+			   evenH(*evenRit) ); 
+	    }
+	  else 
+	    hasToContinue = false; 
+	  ++oddRit; 
+	}
+
+      aBoard.saveEPS("FDT.eps");
+    }
+  else
+    {
+      aBoard.saveEPS("CH.eps");
+    }  
 }
 
 
 //proc CDT
-
-//proc FDT
-
 
 /** 
  * Missing parameter error message.
@@ -374,8 +410,7 @@ int main(int argc, char **argv)
     }
   else if (type == "FDT")
     {
-      trace.info() << " FDT " << std::endl; 
-
+      displayConvexHull(pattern, d, true); 
     }
   else if (type == "CH")
     {
