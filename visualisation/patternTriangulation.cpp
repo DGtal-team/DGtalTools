@@ -189,11 +189,15 @@ void drawSegments(Board& aBoard,
 ///////////////////////////////////////////////////////////////////////////////
 /** 
  * Procedure that displays the convex hull
- * of a given pattern.
+ * and possibly the farthest-point Delaunay 
+ * triangulation of a given pattern.
  * 
  * @param aP irreductible pattern
  * @param aD number of repetitions of the pattern
- * 
+ * @param withFDT boolean equal to true to 
+ * display the internal edges of the 
+ * farthest-point Delaunay triangulation
+ *
  * @tparam Pattern a model of pattern
  * @tparam Integer a model of integer
  */
@@ -314,9 +318,63 @@ void displayConvexHull(const Pattern& aP, const Integer& aD, bool withFDT = fals
     }  
 }
 
+///////////////////////////////////////////////////////////////////////////////
+/** 
+ * Procedure that displays the main facet
+ * of a pattern.  
+ *
+ * @param aBoard board to display
+ * @param aP irreductible pattern
+ * 
+ * @tparam Board a model of 2d board
+ * @tparam Pattern a model of patter
+ */
+template <typename Board, typename Pattern>
+void drawMainFacet(Board& aBoard, const Pattern& aP)
+{
+  typedef typename Pattern::Fraction Fraction; 
+  typedef typename Pattern::Quotient Quotient; 
+  typedef typename Pattern::Point2I Point;  
+  typedef typename Pattern::Vector2I Vector;  
 
-//proc CDT
+  Point O = aP.U(NumberTraits<Quotient>::ZERO); 
+  Point Zn = aP.U(NumberTraits<Quotient>::ONE); 
+  Vector B = aP.bezout(); 
 
+  aBoard.drawTriangle( O[0], O[1], Zn[0], Zn[1], B[0], B[1] ); 
+}
+
+/** 
+ * Procedure that displays the upper part
+ * of the closest-point Delaunay triangulation
+ * of a given pattern.
+ * 
+ * @param aP irreductible pattern
+ * @param aD number of repetitions of the pattern
+ * 
+ * @tparam Pattern a model of pattern
+ * @tparam Integer a model of integer
+ */
+template <typename Pattern, typename Integer>
+void displayPartialCDT(const Pattern& aP, const Integer& aD)
+{
+  std::cout << "partial CDT" << std::endl; 
+
+  typedef typename Pattern::Fraction Fraction; 
+  typedef typename Pattern::Quotient Quotient; 
+  typedef typename Pattern::Vector2I Vector;  
+  typedef std::vector<Vector> Convergents; 
+  typedef typename Pattern::Point2I Point;  
+  
+  Board2D aBoard;
+  drawMainFacet(aBoard, aP); 
+
+
+  aBoard.saveEPS("CDT.eps");
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
 /** 
  * Missing parameter error message.
  * 
@@ -330,6 +388,7 @@ void missingParam(std::string param)
 }
 
 
+///////////////////////////////////////////////////////////////////////////////
 /**
    Main function.
 
@@ -406,7 +465,7 @@ int main(int argc, char **argv)
   string type = vm["triangulation"].as<string>();
   if (type == "CDT")
     {
-      trace.info() << " CDT " << std::endl; 
+      displayPartialCDT(pattern, d); 
     }
   else if (type == "FDT")
     {
