@@ -31,7 +31,7 @@
 #include <iostream>
 #include <iterator>
 #include "DGtal/base/Common.h"
-#include "DGtal/kernel/CanonicDigitalSurfaceEmbedder.h"
+#include "DGtal/topology/CanonicDigitalSurfaceEmbedder.h"
 #include "DGtal/topology/DigitalSurface.h"
 #include "DGtal/topology/DigitalSetBoundary.h"
 #include "DGtal/topology/ImplicitDigitalSurface.h"
