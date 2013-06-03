@@ -47,6 +47,7 @@
 #include "DGtal/helpers/StdDefs.h"
 
 #include "DGtal/arithmetic/LighterSternBrocot.h"
+#include "DGtal/arithmetic/IntegerComputer.h"
 #include "DGtal/arithmetic/Pattern.h"
 
 #include "DGtal/io/boards/Board2D.h"
@@ -243,13 +244,14 @@ void displayConvexHull(const Pattern& aP, const Integer& aD, bool withFDT = fals
 	}
     }
 
-  //display the two main lists
+  //display the domain
   Point Zn = Point(aD*zn.q(),aD*zn.p()); 
   aBoard << Z2i::Domain( Point(0,0), Zn ); 
   aBoard << SetMode( Zn.className(), "Grid" );
   aBoard.setLineStyle(Board2D::Shape::SolidStyle); 
   aBoard.setPenColor(DGtal::Color::Black);
 
+  //display the two main lists
   OddConvexHullMap<Point> oddH;
   drawSegments( aBoard, oddConvergents.begin(), oddConvergents.end(), oddH ); 
 
@@ -319,29 +321,226 @@ void displayConvexHull(const Pattern& aP, const Integer& aD, bool withFDT = fals
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+// /** 
+//  * //TO REMOVE 
+//  * Procedure that displays the main facet
+//  * of a pattern.  
+//  *
+//  * @param aBoard board to display
+//  * @param aP irreductible pattern
+//  * 
+//  * @tparam Board a model of 2d board
+//  * @tparam Pattern a model of patter
+//  */
+// template <typename Board, typename Pattern>
+// void drawMainFacet(Board& aBoard, const Pattern& aP)
+// {
+//   typedef typename Pattern::Fraction Fraction; 
+//   typedef typename Pattern::Quotient Quotient; 
+//   typedef typename Pattern::Point2I Point;  
+//   typedef typename Pattern::Vector2I Vector;  
+
+//   Point O = aP.U(NumberTraits<Quotient>::ZERO); 
+//   Point Zn = aP.U(NumberTraits<Quotient>::ONE); 
+//   Vector B = aP.bezout(); 
+
+//   aBoard.drawTriangle( O[0], O[1], Zn[0], Zn[1], B[0], B[1] ); 
+// }
+
 /** 
- * Procedure that displays the main facet
- * of a pattern.  
+ * Procedure that displays a triangle
  *
  * @param aBoard board to display
- * @param aP irreductible pattern
+ * @param aP a first point
+ * @param aQ a second point
+ * @param aR a third point
  * 
  * @tparam Board a model of 2d board
- * @tparam Pattern a model of patter
+ * @tparam Point a model of point
  */
-template <typename Board, typename Pattern>
-void drawMainFacet(Board& aBoard, const Pattern& aP)
+template <typename Board, typename Point>
+void drawTriangle(Board& aBoard, 
+		  const Point& aP, const Point& aQ, const Point& aR)
+{
+  aBoard.drawTriangle( aP[0], aP[1], aQ[0], aQ[1], aR[0], aR[1] ); 
+}
+
+//pb mySlope is private et non protected...
+// template <typename TFraction>
+// struct MyPattern : public DGtal::Pattern<TFraction> 
+// {
+// public: 
+//   typedef TFraction Fraction;
+//   typedef MyPattern<TFraction> Self;
+//   typedef typename Fraction::Integer Integer;
+//   typedef typename Fraction::Quotient Quotient;
+
+//   typedef IntegerComputer<Integer> IC;
+//   typedef typename IC::Point2I Point2I;
+//   typedef typename IC::Vector2I Vector2I;
+
+// public: 
+//   MyPattern( Integer p, Integer q ) : mySlope(p, q); 
+//   MyPattern( Fraction f = Fraction( 0, 0 ) ) : mySlope(f); 
+
+// public: 
+//   Vector2I positiveBezout() const
+//   {
+//     bezout(); 
+//   }
+// }; 
+
+// //EN FAIRE DES FONCTEURS
+// template<typename Pattern>
+// typename Pattern::Vector2I
+// getPositiveBezout(const Pattern& aP)
+// {
+//   return aP.bezout(); 
+// }
+
+// template<typename Pattern>
+// typename Pattern::Vector2I
+// getNegativeBezout(const Pattern& aP)
+// {
+//   return aP.slope().even() 
+//     ? aP.U( 1 ) - aP.previousPattern().U( 1 ) 
+//     : aP.previousPattern().U( 1 );
+// }
+
+/** 
+ * A helper class that provides two methods 
+ * that returns positive or negative Bezout
+ * point of a pattern. 
+ * The positive Bezout point lies on the left side
+ * whereas the negative Bezout point lies on the
+ * right side of the straight line that has the slope
+ * of the pattern. 
+ */
+struct InDirectBezoutComputer
+{
+  /** 
+   * @return the positive Bezout point 
+   * 
+   * @param aP any pattern
+   *
+   * @tparam Pattern a model of pattern
+   */
+  template<typename Pattern>
+  typename Pattern::Vector2I
+  getPositiveBezout(const Pattern& aP) const
+  {
+    return aP.bezout(); 
+  }
+
+  /** 
+   * @return the negative Bezout point 
+   * 
+   * @param aP any pattern
+   *
+   * @tparam Pattern a model of pattern
+   */
+  template<typename Pattern>
+  typename Pattern::Vector2I
+  getNegativeBezout(const Pattern& aP) const
+  {
+    return aP.slope().even() 
+      ? aP.U( 1 ) - aP.previousPattern().U( 1 ) 
+      : aP.previousPattern().U( 1 );
+  }
+
+}; 
+ 
+/** 
+ * A helper class that provides two methods 
+ * that returns positive or negative Bezout
+ * point of a pattern. 
+ * The positive Bezout point lies on the right side
+ * whereas the negative Bezout point lies on the
+ * left side of the straight line that has the slope
+ * of the pattern. 
+ */
+struct DirectBezoutComputer
+{
+  /** 
+   * @return the positive Bezout point 
+   * 
+   * @param aP any pattern
+   *
+   * @tparam Pattern a model of pattern
+   */
+  template<typename Pattern>
+  typename Pattern::Vector2I
+  getPositiveBezout(const Pattern& aP) const
+  {
+    return aP.slope().even() 
+      ? aP.U( 1 ) - aP.previousPattern().U( 1 ) 
+      : aP.previousPattern().U( 1 );
+  }
+
+  /** 
+   * @return the negative Bezout point 
+   * 
+   * @param aP any pattern
+   *
+   * @tparam Pattern a model of pattern
+   */
+  template<typename Pattern>
+  typename Pattern::Vector2I
+  getNegativeBezout(const Pattern& aP) const
+  {
+    return aP.bezout(); 
+  }
+
+}; 
+
+/** 
+ * Procedure that displays the upper part
+ * of the closest-point Delaunay triangulation
+ * of a given pattern.
+ * 
+ * @param aBoard board on which the triangulation
+ * is displayed
+ * @param aP irreductible pattern
+ * @param aStartingPoint first point of the pattern
+ * 
+ * @tparam Board a model of board
+ * @tparam Pattern a model of pattern
+ * @tparam BezoutComputer a type having
+ * getPositiveBezout and getNegativeBezout methods
+ * in order to adapt patterns. 
+ */
+template <typename Board, typename Pattern, typename BezoutComputer>
+void displayPartialCDT(Board& aBoard, 
+		       const Pattern& aP, 
+		       const typename Pattern::Point2I& aStartingPoint,
+		       const BezoutComputer& aBC )
 {
   typedef typename Pattern::Fraction Fraction; 
-  typedef typename Pattern::Quotient Quotient; 
-  typedef typename Pattern::Point2I Point;  
   typedef typename Pattern::Vector2I Vector;  
+  typedef typename Pattern::Point2I Point;  
+  
+  Fraction f = aP.slope();
+  // std::cout << f.p() << "/" << f.q() << std::endl;  
+  if ( (f.p() >= 1)&&(f.q() >= 1) )
+    {
+      Point O = aStartingPoint; 
+      Point Zn = aStartingPoint + aP.v();
+      Vector v1 = aBC.getNegativeBezout(aP); 
+      Point B = aStartingPoint + v1; 
+      drawTriangle(aBoard, O, Zn, B); 
 
-  Point O = aP.U(NumberTraits<Quotient>::ZERO); 
-  Point Zn = aP.U(NumberTraits<Quotient>::ONE); 
-  Vector B = aP.bezout(); 
-
-  aBoard.drawTriangle( O[0], O[1], Zn[0], Zn[1], B[0], B[1] ); 
+      if ( (f.p() > 1)||(f.q() > 1) )
+	{
+	  //recursive calls 
+	  // - first pattern
+	  displayPartialCDT(aBoard, Pattern(Fraction(v1[1],v1[0])), O, aBC); 
+	  // - second pattern 
+	  Vector v2 = aBC.getPositiveBezout(aP); 
+	  displayPartialCDT(aBoard, Pattern(Fraction(v2[1],v2[0])), B, aBC); 
+	}
+    }
+  // else 
+  //   std::cout << " stop " << std::endl;   
 }
 
 /** 
@@ -359,20 +558,27 @@ template <typename Pattern, typename Integer>
 void displayPartialCDT(const Pattern& aP, const Integer& aD)
 {
   std::cout << "partial CDT" << std::endl; 
-
-  typedef typename Pattern::Fraction Fraction; 
-  typedef typename Pattern::Quotient Quotient; 
-  typedef typename Pattern::Vector2I Vector;  
-  typedef std::vector<Vector> Convergents; 
-  typedef typename Pattern::Point2I Point;  
   
-  Board2D aBoard;
-  drawMainFacet(aBoard, aP); 
+  Board2D aBoard; 
 
+  //display the domain
+  typedef typename Pattern::Point2I Point;  
+  typedef typename Pattern::Fraction Fraction;  
+  Fraction zn = aP.slope(); 
+  Point Zn = Point(aD*zn.q(),aD*zn.p()); 
+  aBoard << Z2i::Domain( Point(0,0), Zn ); 
+  aBoard << SetMode( Zn.className(), "Grid" );
+  aBoard.setLineStyle(Board2D::Shape::SolidStyle); 
+  aBoard.setPenColor(DGtal::Color::Black);
 
+  //display the upper part of the triangulation
+  for (Integer i = 0; i < aD; ++i)
+    {
+      displayPartialCDT( aBoard, aP, Point(i*zn.q(), i*zn.p()), InDirectBezoutComputer() );
+    }
+ 
   aBoard.saveEPS("CDT.eps");
 }
-
 
 ///////////////////////////////////////////////////////////////////////////////
 /** 
@@ -458,9 +664,10 @@ int main(int argc, char **argv)
   typedef DGtal::int32_t Quotient;
   typedef LighterSternBrocot<Integer, Quotient, StdMapRebinder> SB;
   typedef SB::Fraction Fraction; // the type for fractions
-  typedef Pattern<Fraction> MyPattern; // the type for patterns
+  typedef Pattern<Fraction> Pattern; // the type for patterns
  
-  MyPattern pattern( a, b );
+  Pattern pattern( a, b );
+  //MyPattern essai(a, b); 
 
   string type = vm["triangulation"].as<string>();
   if (type == "CDT")
