@@ -167,7 +167,8 @@ void drawSegment(Board& aBoard, const Point& aP, const Point& aQ)
  * 
  * @tparam Board a model of 2d board
  * @tparam Iterator at least a model of forward iterator
- * @tparam Functor a model of unary functor
+ * @tparam Functor a model of unary functor mapping 
+ * points to points
  */
 template <typename Board, typename Iterator, typename Functor>
 void drawSegments(Board& aBoard, 
@@ -214,7 +215,7 @@ void displayConvexHull(const Pattern& aP, const Integer& aD, bool withFDT = fals
   Board2D aBoard;
 
   //list of convergents
-  Convergents convergents, oddConvergents, evenConvergents;
+  Convergents oddConvergents, evenConvergents;
 
   //fill the lists
   Fraction zn = aP.slope();
@@ -563,6 +564,7 @@ void displayPartialCDT(const Pattern& aP, const Integer& aD)
 
   //display the domain
   typedef typename Pattern::Point2I Point;  
+  typedef typename Pattern::Quotient Quotient;  
   typedef typename Pattern::Fraction Fraction;  
   Fraction zn = aP.slope(); 
   Point Zn = Point(aD*zn.q(),aD*zn.p()); 
@@ -576,9 +578,107 @@ void displayPartialCDT(const Pattern& aP, const Integer& aD)
     {
       displayPartialCDT( aBoard, aP, Point(i*zn.q(), i*zn.p()), InDirectBezoutComputer() );
     }
+
+  //display the lower parts of the triangulation
+  // - getting the reversed patterns
+  typedef typename Pattern::Vector2I Vector;  
+  typedef std::vector<Vector> Convergents; 
+  Convergents oddConvergents, evenConvergents;
+  // TO FACTORIZE
+  // // aD > 1
+  // if (aD > 1)
+  //   {
+  //     Fraction znm1 = zn.father(); 
+  //     znm1.selfDisplay(std::cout);   std::cout << std::endl;  
+  //     if (zn.odd())
+  // 	oddConvergents.push_back(Vector(znm1.q(),znm1.p())); 
+  //     else 
+  // 	evenConvergents.push_back(Vector(znm1.q(),znm1.p())); 
+  //   }
+  // aD >= 1
+  for (Quotient i = 1; i <= zn.k(); ++i)
+    {
+      Fraction zk = zn.reduced(i); 
+      zk.selfDisplay(std::cout); 
+      std::cout << " " << zn.k() - i << std::endl;
+      if (((zn.k() - i)%2) == 1 )
+	{ //odd
+	  oddConvergents.push_back(Vector(zk.q(),zk.p())); 
+	}
+      else //even
+	{
+	  evenConvergents.push_back(Vector(zk.q(),zk.p())); 
+	}
+    }
+  // - displaying the reversed patterns...
+  //  - of odd slope: 
+  Point rPStartingPoint; 
+  OddConvexHullMap<Point> oddH;
+  {
+    typedef typename Convergents::const_reverse_iterator Iterator; 
+    Iterator itb = evenConvergents.rbegin(); 
+    Iterator ite = evenConvergents.rend(); 
+    Point aStartingPoint = oddH( *oddConvergents.rbegin() ); 
+    //
+    Point p = aStartingPoint; 
+    std::cout << p << std::endl; 
+    Iterator it = itb; 
+    if (it != ite)
+      {
+	for (++it; it != ite; ++it) 
+	  {
+	    std::cout << p << "(" << (*it)[1] << ", " <<  (*it)[0] << ")" << std::endl; 
+	    displayPartialCDT( aBoard, Pattern( (*it)[1], (*it)[0] ), p, DirectBezoutComputer() ); 
+	    p += *it; 
+	  }
+      }
+    rPStartingPoint = p; 
+  }
+  //  - of even slope: 
+  EvenConvexHullMap<Point> evenH(Zn);
+  {
+    typedef typename Convergents::const_reverse_iterator Iterator; 
+    Iterator itb = oddConvergents.rbegin(); 
+    Iterator ite = oddConvergents.rend(); 
+    Point aStartingPoint = evenH( *evenConvergents.rbegin() ); 
+    //
+    Point p = aStartingPoint;
+    std::cout << p << std::endl; 
+    Iterator it = itb; 
+    for ( ; it != ite; ++it) 
+      {
+	std::cout << p << std::endl; 
+	p -= *it; 
+	std::cout << p << "(" << (*it)[1] << ", " <<  (*it)[0] << ")" << std::endl; 
+	displayPartialCDT( aBoard, Pattern( (*it)[1], (*it)[0] ), p, DirectBezoutComputer() ); 
+      }
+  }
+  //  - of same slope: 
+  {
+    for (Integer i = 0; i < (aD-1); ++i)
+      {
+	Point p = rPStartingPoint + i*aP.v(); 
+	displayPartialCDT( aBoard, aP, p, DirectBezoutComputer() );
+      }
+  }
+
  
   aBoard.saveEPS("CDT.eps");
 }
+
+// template <typename Board, typename Point, typename Iterator>
+// void displayReversedPatterns(Board& aBoard, 
+// 			     const Point& aStartingPoint, 
+// 			     const Iterator& itb, const Iterator& ite) 
+// {
+//   Point p = aStartingPoint; 
+//   Iterator it = itb; 
+//   for ( ; it != ite; ++it) 
+//     {
+//       displayPartialCDT( aBoard, Pattern( (*it)[1], (*it)[2] ), p, DirectBezoutComputer() ); 
+//       p += *it; 
+//     }
+// }
 
 ///////////////////////////////////////////////////////////////////////////////
 /** 
