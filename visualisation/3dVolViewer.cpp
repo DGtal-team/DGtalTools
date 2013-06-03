@@ -63,7 +63,9 @@ int main( int argc, char** argv )
     ("input-file,i", po::value<std::string>(), "vol file (.vol) , pgm3d (.p3d or .pgm3d) file or sdp (sequence of discrete points)" )
     ("thresholdMin,m",  po::value<int>()->default_value(0), "threshold min to define binary shape" ) 
     ("thresholdMax,M",  po::value<int>()->default_value(255), "threshold max to define binary shape" )
+    ("numMaxVoxel,n",  po::value<int>()->default_value(10000), "set the maximal voxel number to be displayed." )
     ("transparency,t",  po::value<uint>()->default_value(255), "transparency") ; 
+
   bool parseOK=true;
   po::variables_map vm;
   try{
@@ -90,7 +92,14 @@ int main( int argc, char** argv )
   int thresholdMin = vm["thresholdMin"].as<int>();
   int thresholdMax = vm["thresholdMax"].as<int>();
   unsigned char transp = vm["transparency"].as<uint>();
- 
+  
+  bool limitDisplay=false;
+  if(vm.count("numMaxVoxel")){
+    limitDisplay=true;
+  }
+  unsigned int numDisplayedMax = vm["numMaxVoxel"].as<int>();
+  
+  
   QApplication application(argc,argv);
   Viewer3D viewer;
   viewer.setWindowTitle("simple Volume Viewer");
@@ -104,6 +113,7 @@ int main( int argc, char** argv )
   }
   
   if(extension=="vol" || extension=="pgm3d" || extension=="pgm3D"){
+    unsigned int numDisplayed=0;
     Image image = GenericReader<Image>::import (inputFilename );
     trace.info() << "Image loaded: "<<image<< std::endl;
     Domain domain = image.domain();
@@ -114,12 +124,14 @@ int main( int argc, char** argv )
     gradient.addColor(Color::Red);
     for(Domain::ConstIterator it = domain.begin(), itend=domain.end(); it!=itend; ++it){
       unsigned char  val= image( (*it) );     
-      
+      if(limitDisplay && numDisplayed > numDisplayedMax)
+	break;
       Color c= gradient(val);
       if(val<=thresholdMax && val >=thresholdMin){
 	viewer <<  CustomColors3D(Color((float)(c.red()), (float)(c.green()),(float)(c.blue()), transp),
 				  Color((float)(c.red()), (float)(c.green()),(float)(c.blue()), transp));     
 	viewer << *it;     
+	numDisplayed++;
       }     
     }
   }else if(extension=="sdp"){
