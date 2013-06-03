@@ -1,11 +1,11 @@
 
 	====  Release 0.7 ====
 
-
-
 * volumetric/volTools:
       convertVol: a simple generic volume image converters (can process actually pgm3d, vol, longvol, raw (for writing)).
 
+* visualization	:
+	3dVolViewer: new option to limit the number of displayed voxels.
 
 
 	====  Release 0.6 ====
