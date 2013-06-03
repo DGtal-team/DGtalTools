@@ -152,8 +152,7 @@ int main( int argc, char** argv )
   if(vm.count("backgroundImage")){
     std::string imageName = vm["backgroundImage"].as<std::string>();
     typedef ImageSelector<Z2i::Domain, unsigned char>::Type Image;
-    DGtal::GenericReader<Image> reader;
-    Image img = reader.import( imageName );
+     Image img = DGtal::GenericReader<Image>::import( imageName );
     Z2i::Point ptInf = img.domain().lowerBound(); 
     Z2i::Point ptSup = img.domain().upperBound(); 
     unsigned int width = abs(ptSup[0]-ptInf[0]+1);
