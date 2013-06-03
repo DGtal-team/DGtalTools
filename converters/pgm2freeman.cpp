@@ -1,5 +1,5 @@
 #include "DGtal/io/colormaps/GrayscaleColorMap.h"
-#include "DGtal/io/readers/PNMReader.h"
+#include "DGtal/io/readers/GenericReader.h"
 
 
 #include "DGtal/images/ImageContainerBySTLVector.h"
@@ -157,7 +157,7 @@ int main( int argc, char** argv )
   typedef ImageSelector < Z2i::Domain, unsigned char>::Type Image;
   typedef IntervalThresholder<Image::Value> Binarizer; 
   std::string imageFileName = vm["image"].as<std::string>();
-  Image image = PNMReader<Image>::importPGM( imageFileName ); 
+  Image image = GenericReader::<Image>::import( imageFileName ); 
   
   Z2i::KSpace ks;
   if(! ks.init( image.domain().lowerBound(), 
