@@ -32,7 +32,7 @@
 
 #include "DGtal/base/Common.h"
 #include "DGtal/helpers/StdDefs.h"
-#include "DGtal/io/readers/VolReader.h"
+#include "DGtal/io/readers/GenericReader.h"
 #include "DGtal/io/viewers/Viewer3D.h"
 #include "DGtal/io/DrawWithDisplay3DModifier.h"
 #include "DGtal/io/readers/PointListReader.h"
@@ -40,7 +40,6 @@
 
 #include "DGtal/io/Color.h"
 #include "DGtal/io/colormaps/GradientColorMap.h"
-#include "DGtal/io/readers/PNMReader.h"
 #include "DGtal/images/ImageSelector.h"
 
 
@@ -105,7 +104,7 @@ int main( int argc, char** argv )
   }
   
   if(extension=="vol" || extension=="pgm3d" || extension=="pgm3D"){
-    Image image = (extension=="vol")? VolReader<Image>::importVol( inputFilename ): PNMReader<Image>::importPGM3D( inputFilename );
+    Image image = GenericReader<Image>::import (inputFilename );
     trace.info() << "Image loaded: "<<image<< std::endl;
     Domain domain = image.domain();
     GradientColorMap<long> gradient( thresholdMin, thresholdMax);
