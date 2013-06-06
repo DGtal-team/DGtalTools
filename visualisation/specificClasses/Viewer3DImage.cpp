@@ -74,10 +74,6 @@ Viewer3DImage::setVolImage(Image3D * an3DImage){
   (*this).update();
   
     
-
-
-
-
  // Adding X slice in the viewer.
   DGtal::Projector<DGtal::Z2i::Space>  invFunctorX; invFunctorX.initRemoveOneDim(0);
   DGtal::Z2i::Domain domain2DX(invFunctorX(my3dImage->domain().lowerBound()), 
@@ -89,7 +85,6 @@ Viewer3DImage::setVolImage(Image3D * an3DImage){
   std::cout << "image:" << sliceImageX.className();
   (*this) << sliceImageX;
   (*this) << DGtal::UpdateImagePosition(0, DGtal::Display3D::xDirection, mySliceXPos, 0.0, 0.0);
-
 
 
   // Adding Y slice in the viewer.
@@ -120,7 +115,6 @@ Viewer3DImage::setVolImage(Image3D * an3DImage){
     
   (*this) << Viewer3D::updateDisplay;
 }
-
 
 
 
@@ -210,8 +204,6 @@ Viewer3DImage::keyPressEvent ( QKeyEvent *e )
        aSliceNum=mySliceZPos;
     }
     if(!stoped){
-      std::cerr << "slice num =" << aSliceNum << std::endl;
-      
       // Adding X slice in the viewer.
       DGtal::Projector<DGtal::Z2i::Space>  invFunctor; invFunctor.initRemoveOneDim(myCurrentSliceDim);
       DGtal::Z2i::Domain domain2D(invFunctor(my3dImage->domain().lowerBound()), 
@@ -226,8 +218,7 @@ Viewer3DImage::keyPressEvent ( QKeyEvent *e )
 							   (myCurrentSliceDim==1)? dirStep: 0.0,
 							   (myCurrentSliceDim==2)? dirStep: 0.0);
       (*this).updateList(false);
-      (*this).update();
-      
+      (*this).update();      
     }
     handled=true;
    }
