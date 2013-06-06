@@ -45,9 +45,7 @@
 #include "DGtal/io/boards/Board2D.h"
 #include "DGtal/io/Color.h"
 
-#ifdef WITH_MAGICK
-#include "DGtal/io/readers/MagickReader.h"
-#endif
+ #include "DGtal/io/readers/GenericReader.h"
 
 
 //contour
@@ -67,6 +65,7 @@
 //STL
 #include <vector>
 #include <string>
+
 
 using namespace DGtal;
 
@@ -102,10 +101,10 @@ int main( int argc, char** argv )
     ("outputPNG", po::value<std::string>(), "outputPNG <filename> specify png format.")
     ("invertYaxis", " invertYaxis invert the Y axis for display contours (used only with --SDP)")
 #endif
-#ifdef WITH_MAGICK
-    ("backgroundImage", po::value<std::string>(), "backgroundImage <filename> <alpha> : display image as background with transparency alpha (defaut 1) (transparency works only if cairo is available)")
-    ("alphaBG", po::value<double>(), "alphaBG <value> 0-1.0 to display the background image in transparency (default 1.0)")
-#endif
+
+    ("backgroundImage", po::value<std::string>(), "backgroundImage <filename> : display image as background ")
+    ("alphaBG", po::value<double>(), "alphaBG <value> 0-1.0 to display the background image in transparency (default 1.0), (transparency works only if cairo is available)")
+
     ("scale", po::value<double>(), "scale <value> 1: normal; >1 : larger ; <1 lower resolutions  )");
   
   
@@ -144,7 +143,7 @@ int main( int argc, char** argv )
 
 
 
-#ifdef WITH_MAGICK
+
   double alpha=1.0;
   if(vm.count("alphaBG")){
     alpha = vm["alphaBG"].as<double>(); 
@@ -153,8 +152,7 @@ int main( int argc, char** argv )
   if(vm.count("backgroundImage")){
     std::string imageName = vm["backgroundImage"].as<std::string>();
     typedef ImageSelector<Z2i::Domain, unsigned char>::Type Image;
-    DGtal::MagickReader<Image> reader;
-    Image img = reader.importImage( imageName );
+    Image img = DGtal::GenericReader<Image>::import( imageName );
     Z2i::Point ptInf = img.domain().lowerBound(); 
     Z2i::Point ptSup = img.domain().upperBound(); 
     unsigned int width = abs(ptSup[0]-ptInf[0]+1);
@@ -162,7 +160,7 @@ int main( int argc, char** argv )
     
     aBoard.drawImage(imageName, 0-0.5,height-0.5, width, height, -1, alpha );
   }
-#endif
+
  
 
  
