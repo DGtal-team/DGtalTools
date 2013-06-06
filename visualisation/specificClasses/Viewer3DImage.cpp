@@ -18,8 +18,6 @@
 #include "DGtal/images/ImageHelper.h"
 #include "DGtal/images/ConstImageAdapter.h"
 #include "DGtal/images/ImageSelector.h"
-#include "DGtal/io/writers/PGMWriter.h"
-#include "DGtal/io/readers/PNMReader.h"
 
 #include <QKeyEvent>
 

@@ -40,7 +40,7 @@
 
 #include "DGtal/io/Color.h"
 #include "DGtal/io/colormaps/GradientColorMap.h"
-#include "DGtal/io/readers/PNMReader.h"
+#include "DGtal/io/readers/GenericReader.h"
 #include "DGtal/images/ImageSelector.h"
 
 
@@ -130,7 +130,7 @@ int main( int argc, char** argv )
   
   
 
-   Image3D image = (extension=="vol")? VolReader<Image3D>::importVol( inputFilename ): PNMReader<Image3D>::importPGM3D( inputFilename );
+  Image3D image = GenericReader<Image3D>::import( inputFilename );
     trace.info() << "Image loaded: "<<image<< std::endl;
     viewer.setVolImage(&image);
     viewer << Z3i::Point(512, 512, 0);
