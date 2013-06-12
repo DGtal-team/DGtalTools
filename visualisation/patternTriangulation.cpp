@@ -27,9 +27,13 @@
 
 /**
  * Description of patternTriangulation <p>
- *
- * Display the Delaunay triangulation of a digital pattern
- * described by its rational slope.
+ * @brief
+ * Display the convex hull, the Delaunay triangulation
+ * (the circumcircle of each triangle is empty) 
+ * or the farthest-point Delaunay triangulation
+ * (the circumcircle of each triangle contains
+ * the whole set of points) 
+ * of a digital pattern described by its rational slope.
  */
 
 #include <iostream>
@@ -47,7 +51,6 @@
 #include "DGtal/helpers/StdDefs.h"
 
 #include "DGtal/arithmetic/LighterSternBrocot.h"
-#include "DGtal/arithmetic/IntegerComputer.h"
 #include "DGtal/arithmetic/Pattern.h"
 
 #include "DGtal/io/boards/Board2D.h"
@@ -60,6 +63,7 @@ namespace po = boost::program_options;
 ///////////////////////////////////////////////////////////////////////////////
 
 /** 
+ * @brief
  * A model of point functor that 
  * maps an odd convergent to a convex hull vertex
  *
@@ -98,6 +102,7 @@ private:
 }; 
 
 /** 
+ * @brief
  * A model of point functor that 
  * maps an odd convergent to a convex hull vertex
  *
@@ -190,6 +195,41 @@ void drawSegments(Board& aBoard,
 
 ///////////////////////////////////////////////////////////////////////////////
 /** 
+ * Procedure that computes the convergents
+ * of a given fraction and store them in 
+ * two separated containers, one for the 
+ * odd convergents and the other for the 
+ * even convergents. 
+ *
+ * @param aZn any fraction 
+ * @param odd the container of the odd convergents
+ * @param even the container of the even convergents 
+ *
+ * @tparam Fraction a model of fraction 
+ * @tparam Container a model of pushable container
+ *
+ */
+template<typename Fraction, typename Container>
+void fillConvergents(const Fraction& aZn, 
+		Container& odd, Container& even)
+{
+  typedef typename Container::value_type Vector; 
+
+  for (typename Fraction::Quotient i = 1; i <= aZn.k(); ++i)
+    {
+      Fraction zk = aZn.reduced(i); 
+      if (((aZn.k() - i)%2) == 1 )
+	{ //odd
+	  odd.push_back(Vector(zk.q(),zk.p())); 
+	}
+      else 
+	{ //even
+	  even.push_back(Vector(zk.q(),zk.p())); 
+	}
+    }
+}
+
+/** 
  * Procedure that displays the convex hull
  * and possibly the farthest-point Delaunay 
  * triangulation of a given pattern.
@@ -223,27 +263,13 @@ void displayConvexHull(const Pattern& aP, const Integer& aD, bool withFDT = fals
   if (aD > 1)
     {
       Fraction znm1 = zn.father(); 
-      znm1.selfDisplay(std::cout);   std::cout << std::endl;  
       if (zn.odd())
 	oddConvergents.push_back(Vector(znm1.q(),znm1.p())); 
       else 
 	evenConvergents.push_back(Vector(znm1.q(),znm1.p())); 
     }
   // aD >= 1
-  for (Quotient i = 1; i <= zn.k(); ++i)
-    {
-      Fraction zk = zn.reduced(i); 
-      zk.selfDisplay(std::cout); 
-      std::cout << " " << zn.k() - i << std::endl;
-      if (((zn.k() - i)%2) == 1 )
-	{ //odd
-	  oddConvergents.push_back(Vector(zk.q(),zk.p())); 
-	}
-      else 
-	{
-	  evenConvergents.push_back(Vector(zk.q(),zk.p())); 
-	}
-    }
+  fillConvergents( zn, oddConvergents, evenConvergents ); 
 
   //display the domain
   Point Zn = Point(aD*zn.q(),aD*zn.p()); 
@@ -322,32 +348,6 @@ void displayConvexHull(const Pattern& aP, const Integer& aD, bool withFDT = fals
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// /** 
-//  * //TO REMOVE 
-//  * Procedure that displays the main facet
-//  * of a pattern.  
-//  *
-//  * @param aBoard board to display
-//  * @param aP irreductible pattern
-//  * 
-//  * @tparam Board a model of 2d board
-//  * @tparam Pattern a model of patter
-//  */
-// template <typename Board, typename Pattern>
-// void drawMainFacet(Board& aBoard, const Pattern& aP)
-// {
-//   typedef typename Pattern::Fraction Fraction; 
-//   typedef typename Pattern::Quotient Quotient; 
-//   typedef typename Pattern::Point2I Point;  
-//   typedef typename Pattern::Vector2I Vector;  
-
-//   Point O = aP.U(NumberTraits<Quotient>::ZERO); 
-//   Point Zn = aP.U(NumberTraits<Quotient>::ONE); 
-//   Vector B = aP.bezout(); 
-
-//   aBoard.drawTriangle( O[0], O[1], Zn[0], Zn[1], B[0], B[1] ); 
-// }
-
 /** 
  * Procedure that displays a triangle
  *
@@ -365,48 +365,6 @@ void drawTriangle(Board& aBoard,
 {
   aBoard.drawTriangle( aP[0], aP[1], aQ[0], aQ[1], aR[0], aR[1] ); 
 }
-
-//pb mySlope is private et non protected...
-// template <typename TFraction>
-// struct MyPattern : public DGtal::Pattern<TFraction> 
-// {
-// public: 
-//   typedef TFraction Fraction;
-//   typedef MyPattern<TFraction> Self;
-//   typedef typename Fraction::Integer Integer;
-//   typedef typename Fraction::Quotient Quotient;
-
-//   typedef IntegerComputer<Integer> IC;
-//   typedef typename IC::Point2I Point2I;
-//   typedef typename IC::Vector2I Vector2I;
-
-// public: 
-//   MyPattern( Integer p, Integer q ) : mySlope(p, q); 
-//   MyPattern( Fraction f = Fraction( 0, 0 ) ) : mySlope(f); 
-
-// public: 
-//   Vector2I positiveBezout() const
-//   {
-//     bezout(); 
-//   }
-// }; 
-
-// //EN FAIRE DES FONCTEURS
-// template<typename Pattern>
-// typename Pattern::Vector2I
-// getPositiveBezout(const Pattern& aP)
-// {
-//   return aP.bezout(); 
-// }
-
-// template<typename Pattern>
-// typename Pattern::Vector2I
-// getNegativeBezout(const Pattern& aP)
-// {
-//   return aP.slope().even() 
-//     ? aP.U( 1 ) - aP.previousPattern().U( 1 ) 
-//     : aP.previousPattern().U( 1 );
-// }
 
 /** 
  * A helper class that provides two methods 
@@ -503,6 +461,8 @@ struct DirectBezoutComputer
  * is displayed
  * @param aP irreductible pattern
  * @param aStartingPoint first point of the pattern
+ * @param aBC helper object returning the positive
+ * or negative Bezout point of a pattern
  * 
  * @tparam Board a model of board
  * @tparam Pattern a model of pattern
@@ -521,7 +481,6 @@ void displayPartialCDT(Board& aBoard,
   typedef typename Pattern::Point2I Point;  
   
   Fraction f = aP.slope();
-  // std::cout << f.p() << "/" << f.q() << std::endl;  
   if ( (f.p() >= 1)&&(f.q() >= 1) )
     {
       Point O = aStartingPoint; 
@@ -540,8 +499,6 @@ void displayPartialCDT(Board& aBoard,
 	  displayPartialCDT(aBoard, Pattern(Fraction(v2[1],v2[0])), B, aBC); 
 	}
     }
-  // else 
-  //   std::cout << " stop " << std::endl;   
 }
 
 /** 
@@ -556,17 +513,16 @@ void displayPartialCDT(Board& aBoard,
  * @tparam Integer a model of integer
  */
 template <typename Pattern, typename Integer>
-void displayPartialCDT(const Pattern& aP, const Integer& aD)
+void displayCDT(const Pattern& aP, const Integer& aD)
 {
-  std::cout << "partial CDT" << std::endl; 
-  
   Board2D aBoard; 
 
-  //display the domain
   typedef typename Pattern::Point2I Point;  
   typedef typename Pattern::Quotient Quotient;  
   typedef typename Pattern::Fraction Fraction;  
   Fraction zn = aP.slope(); 
+
+  //display the domain
   Point Zn = Point(aD*zn.q(),aD*zn.p()); 
   aBoard << Z2i::Domain( Point(0,0), Zn ); 
   aBoard << SetMode( Zn.className(), "Grid" );
@@ -583,74 +539,43 @@ void displayPartialCDT(const Pattern& aP, const Integer& aD)
   // - getting the reversed patterns
   typedef typename Pattern::Vector2I Vector;  
   typedef std::vector<Vector> Convergents; 
+  typedef typename std::vector<Vector>::const_reverse_iterator ReverseIterator; 
   Convergents oddConvergents, evenConvergents;
-  // TO FACTORIZE
-  // // aD > 1
-  // if (aD > 1)
-  //   {
-  //     Fraction znm1 = zn.father(); 
-  //     znm1.selfDisplay(std::cout);   std::cout << std::endl;  
-  //     if (zn.odd())
-  // 	oddConvergents.push_back(Vector(znm1.q(),znm1.p())); 
-  //     else 
-  // 	evenConvergents.push_back(Vector(znm1.q(),znm1.p())); 
-  //   }
-  // aD >= 1
-  for (Quotient i = 1; i <= zn.k(); ++i)
-    {
-      Fraction zk = zn.reduced(i); 
-      zk.selfDisplay(std::cout); 
-      std::cout << " " << zn.k() - i << std::endl;
-      if (((zn.k() - i)%2) == 1 )
-	{ //odd
-	  oddConvergents.push_back(Vector(zk.q(),zk.p())); 
-	}
-      else //even
-	{
-	  evenConvergents.push_back(Vector(zk.q(),zk.p())); 
-	}
-    }
+  fillConvergents( zn, oddConvergents, evenConvergents ); 
   // - displaying the reversed patterns...
-  //  - of odd slope: 
   Point rPStartingPoint; 
+  //  - of odd slope: 
   OddConvexHullMap<Point> oddH;
   {
-    typedef typename Convergents::const_reverse_iterator Iterator; 
-    Iterator itb = evenConvergents.rbegin(); 
-    Iterator ite = evenConvergents.rend(); 
+    ReverseIterator itb = evenConvergents.rbegin(); 
+    ReverseIterator ite = evenConvergents.rend(); 
     Point aStartingPoint = oddH( *oddConvergents.rbegin() ); 
     //
     Point p = aStartingPoint; 
-    std::cout << p << std::endl; 
-    Iterator it = itb; 
+    ReverseIterator it = itb; 
     if (it != ite)
       {
-	for (++it; it != ite; ++it) 
-	  {
-	    std::cout << p << "(" << (*it)[1] << ", " <<  (*it)[0] << ")" << std::endl; 
-	    displayPartialCDT( aBoard, Pattern( (*it)[1], (*it)[0] ), p, DirectBezoutComputer() ); 
-	    p += *it; 
-	  }
+  	for (++it; it != ite; ++it) 
+  	  {
+  	    displayPartialCDT( aBoard, Pattern( (*it)[1], (*it)[0] ), p, DirectBezoutComputer() ); 
+  	    p += *it; 
+  	  }
       }
     rPStartingPoint = p; 
   }
   //  - of even slope: 
   EvenConvexHullMap<Point> evenH(Zn);
   {
-    typedef typename Convergents::const_reverse_iterator Iterator; 
-    Iterator itb = oddConvergents.rbegin(); 
-    Iterator ite = oddConvergents.rend(); 
+    ReverseIterator itb = oddConvergents.rbegin(); 
+    ReverseIterator ite = oddConvergents.rend(); 
     Point aStartingPoint = evenH( *evenConvergents.rbegin() ); 
     //
     Point p = aStartingPoint;
-    std::cout << p << std::endl; 
-    Iterator it = itb; 
+    ReverseIterator it = itb; 
     for ( ; it != ite; ++it) 
       {
-	std::cout << p << std::endl; 
-	p -= *it; 
-	std::cout << p << "(" << (*it)[1] << ", " <<  (*it)[0] << ")" << std::endl; 
-	displayPartialCDT( aBoard, Pattern( (*it)[1], (*it)[0] ), p, DirectBezoutComputer() ); 
+  	p -= *it; 
+  	displayPartialCDT( aBoard, Pattern( (*it)[1], (*it)[0] ), p, DirectBezoutComputer() ); 
       }
   }
   //  - of same slope: 
@@ -666,25 +591,12 @@ void displayPartialCDT(const Pattern& aP, const Integer& aD)
   aBoard.saveEPS("CDT.eps");
 }
 
-// template <typename Board, typename Point, typename Iterator>
-// void displayReversedPatterns(Board& aBoard, 
-// 			     const Point& aStartingPoint, 
-// 			     const Iterator& itb, const Iterator& ite) 
-// {
-//   Point p = aStartingPoint; 
-//   Iterator it = itb; 
-//   for ( ; it != ite; ++it) 
-//     {
-//       displayPartialCDT( aBoard, Pattern( (*it)[1], (*it)[2] ), p, DirectBezoutComputer() ); 
-//       p += *it; 
-//     }
-// }
 
 ///////////////////////////////////////////////////////////////////////////////
 /** 
  * Missing parameter error message.
  * 
- * @param param 
+ * @param param parameter missing
  */
 void missingParam(std::string param)
 {
@@ -696,12 +608,12 @@ void missingParam(std::string param)
 
 ///////////////////////////////////////////////////////////////////////////////
 /**
-   Main function.
-
-   @param argc the number of parameters given on the line command.
-
-   @param argv an array of C-string, such that argv[0] is the name of
-   the program, argv[1] the first parameter, etc.
+ *   Main function.
+ *
+ *  @param argc the number of parameters given on the line command.
+ *
+ *  @param argv an array of C-string, such that argv[0] is the name of
+ *  the program, argv[1] the first parameter, etc.
 */
 int main(int argc, char **argv)
 {
@@ -767,12 +679,11 @@ int main(int argc, char **argv)
   typedef Pattern<Fraction> Pattern; // the type for patterns
  
   Pattern pattern( a, b );
-  //MyPattern essai(a, b); 
 
   string type = vm["triangulation"].as<string>();
   if (type == "CDT")
     {
-      displayPartialCDT(pattern, d); 
+      displayCDT(pattern, d); 
     }
   else if (type == "FDT")
     {
