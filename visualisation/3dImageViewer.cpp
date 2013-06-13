@@ -77,7 +77,10 @@ int main( int argc, char** argv )
     ("thresholdImage", "threshold the image to define binary shape" ) 
     ("thresholdMin,m",  po::value<int>()->default_value(0), "threshold min to define binary shape" ) 
     ("thresholdMax,M",  po::value<int>()->default_value(255), "threshold max to define binary shape" )
+    ("displaySDP,s", po::value<std::string>(), "display a set of discrete points (.sdp)" )
+    ("colorSDP,c", po::value<std::vector <int> >()->multitoken(), "set the color  discrete points: r g b a " )
     ("transparency,t",  po::value<uint>()->default_value(255), "transparency") ; 
+  
   bool parseOK=true;
   po::variables_map vm;
   try{
@@ -90,8 +93,8 @@ int main( int argc, char** argv )
   if( !parseOK || vm.count("help")||argc<=1)
     {
       std::cout << "Usage: " << argv[0] << " [input-file]\n"
-    << "Display volume file as a voxel set by using QGLviewer"
-    << general_opt << "\n";
+		<< "Display volume file as a voxel set by using QGLviewer"
+		<< general_opt << "\n";
       return 0;
     }
   
@@ -131,31 +134,41 @@ int main( int argc, char** argv )
   
 
   Image3D image = GenericReader<Image3D>::import( inputFilename );
-    trace.info() << "Image loaded: "<<image<< std::endl;
-    viewer.setVolImage(&image);
-    viewer << Z3i::Point(512, 512, 0);
+  trace.info() << "Image loaded: "<<image<< std::endl;
+  viewer.setVolImage(&image);
+  viewer << Z3i::Point(512, 512, 0);
 
-    viewer << Viewer3D::updateDisplay;
-    if(vm.count("thresholdImage")){
-      Domain domain = image.domain();
-      GradientColorMap<long> gradient( thresholdMin, thresholdMax);
-      gradient.addColor(Color::Blue);
-      gradient.addColor(Color::Green);
-      gradient.addColor(Color::Yellow);
-      gradient.addColor(Color::Red);
-      for(Domain::ConstIterator it = domain.begin(), itend=domain.end(); it!=itend; ++it){
-	unsigned char  val= image( (*it) );     
+  viewer << Viewer3D::updateDisplay;
+  if(vm.count("thresholdImage")){
+    Domain domain = image.domain();
+    GradientColorMap<long> gradient( thresholdMin, thresholdMax);
+    gradient.addColor(Color::Blue);
+    gradient.addColor(Color::Green);
+    gradient.addColor(Color::Yellow);
+    gradient.addColor(Color::Red);
+    for(Domain::ConstIterator it = domain.begin(), itend=domain.end(); it!=itend; ++it){
+      unsigned char  val= image( (*it) );     
       
-	Color c= gradient(val);
-	if(val<=thresholdMax && val >=thresholdMin){
-	  viewer <<  CustomColors3D(Color((float)(c.red()), (float)(c.green()),(float)(c.blue()), transp),
-				    Color((float)(c.red()), (float)(c.green()),(float)(c.blue()), transp));     
-	  viewer << *it;     
-	}     
-      }
-      viewer<< Viewer3D::updateDisplay;
+      Color c= gradient(val);
+      if(val<=thresholdMax && val >=thresholdMin){
+	viewer <<  CustomColors3D(Color((float)(c.red()), (float)(c.green()),(float)(c.blue()), transp),
+				  Color((float)(c.red()), (float)(c.green()),(float)(c.blue()), transp));     
+	viewer << *it;     
+      }     
     }
-  
+  }
 
+  if(vm.count("displaySDP")){
+    if(vm.count("colorSDP")){
+      std::vector<int> vcol= vm["colorSDP"].as<std::vector<int > >();
+      Color c(vcol[0], vcol[1], vcol[2], vcol[3]);
+      viewer << CustomColors3D(c, c);
+    }
+    vector<Z3i::Point> vectVoxels = PointListReader<Z3i::Point>::getPointsFromFile(vm["displaySDP"].as<std::string>());
+    for(int i=0;i< vectVoxels.size(); i++){
+      viewer << vectVoxels.at(i);
+    }
+  }
+  viewer << Viewer3D::updateDisplay;
   return application.exec();
 }
