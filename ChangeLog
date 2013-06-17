@@ -1,12 +1,16 @@
 
 	====  Release 0.7 ====
 
+* volumetric:
+        convertVol: a simple generic volume image converters (can process actually pgm3d, vol, longvol, raw (for writing)).
+	volSubSample, volAddBorder, 3dVolMarchingCubes, volCComponentCounter exploits now the GenericReader/Writer class and is no more limited to vol format.
+
 * volumetric/volTools:
-      convertVol: a simple generic volume image converters (can process actually pgm3d, vol, longvol, raw (for writing)).
+	volTools directory moved into volumetric.
 
 * visualization	:
 	3dVolViewer: new option to limit the number of displayed voxels.
-
+	3dImageViewer: new tools to display slice image.
 
 	====  Release 0.6 ====
 
