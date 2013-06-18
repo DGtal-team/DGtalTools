@@ -32,7 +32,7 @@
 
 #include "DGtal/base/Common.h"
 #include "DGtal/helpers/StdDefs.h"
-#include "DGtal/io/readers/GenericReader.h"
+#include "DGtal/io/readers/VolReader.h"
 #include "DGtal/io/viewers/Viewer3D.h"
 #include "DGtal/io/DrawWithDisplay3DModifier.h"
 #include "DGtal/io/readers/PointListReader.h"
@@ -40,12 +40,17 @@
 
 #include "DGtal/io/Color.h"
 #include "DGtal/io/colormaps/GradientColorMap.h"
+#include "DGtal/io/readers/GenericReader.h"
 #include "DGtal/images/ImageSelector.h"
 
+
+
+#include "specificClasses/Viewer3DImage.h"
 
 #include <boost/program_options/options_description.hpp>
 #include <boost/program_options/parsers.hpp>
 #include <boost/program_options/variables_map.hpp>
+
 
 using namespace std;
 using namespace DGtal;
@@ -56,16 +61,26 @@ namespace po = boost::program_options;
 
 int main( int argc, char** argv )
 {
+
+  typedef DGtal::ImageContainerBySTLVector<DGtal::Z3i::Domain,  unsigned char > Image3D;
+  typedef DGtal::ImageContainerBySTLVector<DGtal::Z2i::Domain,  unsigned char > Image2D;
+
+  
   // parse command line ----------------------------------------------
   po::options_description general_opt("Allowed options are: ");
   general_opt.add_options()
     ("help,h", "display this message")
     ("input-file,i", po::value<std::string>(), "vol file (.vol) , pgm3d (.p3d or .pgm3d) file or sdp (sequence of discrete points)" )
+    ("grid", "draw slice images using grid mode. " ) 
+    ("intergrid", "draw slice images using inter grid mode. " ) 
+    ("emptyMode", "remove the default boundingbox display " ) 
+    ("thresholdImage", "threshold the image to define binary shape" ) 
     ("thresholdMin,m",  po::value<int>()->default_value(0), "threshold min to define binary shape" ) 
     ("thresholdMax,M",  po::value<int>()->default_value(255), "threshold max to define binary shape" )
-    ("numMaxVoxel,n",  po::value<int>()->default_value(10000), "set the maximal voxel number to be displayed." )
+    ("displaySDP,s", po::value<std::string>(), "display a set of discrete points (.sdp)" )
+    ("colorSDP,c", po::value<std::vector <int> >()->multitoken(), "set the color  discrete points: r g b a " )
     ("transparency,t",  po::value<uint>()->default_value(255), "transparency") ; 
-
+  
   bool parseOK=true;
   po::variables_map vm;
   try{
@@ -78,8 +93,8 @@ int main( int argc, char** argv )
   if( !parseOK || vm.count("help")||argc<=1)
     {
       std::cout << "Usage: " << argv[0] << " [input-file]\n"
-    << "Display volume file as a voxel set by using QGLviewer"
-    << general_opt << "\n";
+		<< "Display volume file as a voxel set by using QGLviewer"
+		<< general_opt << "\n";
       return 0;
     }
   
@@ -92,30 +107,39 @@ int main( int argc, char** argv )
   int thresholdMin = vm["thresholdMin"].as<int>();
   int thresholdMax = vm["thresholdMax"].as<int>();
   unsigned char transp = vm["transparency"].as<uint>();
-  
-  bool limitDisplay=false;
-  if(vm.count("numMaxVoxel")){
-    limitDisplay=true;
-  }
-  unsigned int numDisplayedMax = vm["numMaxVoxel"].as<int>();
-  
-  
-  QApplication application(argc,argv);
-  Viewer3D viewer;
-  viewer.setWindowTitle("simple Volume Viewer");
-  viewer.show();
  
-  typedef ImageSelector<Domain, unsigned char>::Type Image;
+  QApplication application(argc,argv);
+ 
+
+
   string extension = inputFilename.substr(inputFilename.find_last_of(".") + 1);
   if(extension!="vol" && extension != "p3d" && extension != "pgm3D" && extension != "pgm3d" && extension != "sdp"){
     trace.info() << "File extension not recognized: "<< extension << std::endl;
     return 0;
   }
+  Viewer3DImage::ModeVisu mode;
+  if(vm.count("emptyMode"))
+    mode=Viewer3DImage::Empty;
+  else if(vm.count("grid"))
+    mode=Viewer3DImage::Grid;
+  else if(vm.count("intergrid"))
+    mode=Viewer3DImage::InterGrid;
+  else
+    mode=Viewer3DImage::BoundingBox;
+   
+  Viewer3DImage viewer(mode);
+  viewer.setWindowTitle("simple Volume Viewer");
+  viewer.show();
   
-  if(extension=="vol" || extension=="pgm3d" || extension=="pgm3D"){
-    unsigned int numDisplayed=0;
-    Image image = GenericReader<Image>::import (inputFilename );
-    trace.info() << "Image loaded: "<<image<< std::endl;
+  
+
+  Image3D image = GenericReader<Image3D>::import( inputFilename );
+  trace.info() << "Image loaded: "<<image<< std::endl;
+  viewer.setVolImage(&image);
+  viewer << Z3i::Point(512, 512, 0);
+
+  viewer << Viewer3D::updateDisplay;
+  if(vm.count("thresholdImage")){
     Domain domain = image.domain();
     GradientColorMap<long> gradient( thresholdMin, thresholdMax);
     gradient.addColor(Color::Blue);
@@ -124,27 +148,27 @@ int main( int argc, char** argv )
     gradient.addColor(Color::Red);
     for(Domain::ConstIterator it = domain.begin(), itend=domain.end(); it!=itend; ++it){
       unsigned char  val= image( (*it) );     
-      if(limitDisplay && numDisplayed > numDisplayedMax)
-	break;
+      
       Color c= gradient(val);
       if(val<=thresholdMax && val >=thresholdMin){
 	viewer <<  CustomColors3D(Color((float)(c.red()), (float)(c.green()),(float)(c.blue()), transp),
 				  Color((float)(c.red()), (float)(c.green()),(float)(c.blue()), transp));     
 	viewer << *it;     
-	numDisplayed++;
       }     
     }
-  }else if(extension=="sdp"){
-    vector<Z3i::Point> vectVoxels = PointListReader<Z3i::Point>::getPointsFromFile(inputFilename);
+  }
+
+  if(vm.count("displaySDP")){
+    if(vm.count("colorSDP")){
+      std::vector<int> vcol= vm["colorSDP"].as<std::vector<int > >();
+      Color c(vcol[0], vcol[1], vcol[2], vcol[3]);
+      viewer << CustomColors3D(c, c);
+    }
+    vector<Z3i::Point> vectVoxels = PointListReader<Z3i::Point>::getPointsFromFile(vm["displaySDP"].as<std::string>());
     for(int i=0;i< vectVoxels.size(); i++){
       viewer << vectVoxels.at(i);
     }
-
-
-    
   }
-  
-
   viewer << Viewer3D::updateDisplay;
   return application.exec();
 }
