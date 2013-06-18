@@ -4,9 +4,9 @@
 * volumetric/volTools:
       convertVol: a simple generic volume image converters (can process actually pgm3d, vol, longvol, raw (for writing)).
 
-* visualization	:
-	3dVolViewer: new option to limit the number of displayed voxels.
-
+* visualisation/:
+	- 3dVolViewer: new option to limit the number of displayed voxels.
+	- patternTriangulation: a new tool that draws with Board2D the convex hull, the closest-point Delaunay triangulation or the farthest-point Delaunay triangulation of a pattern.
 
 	====  Release 0.6 ====
 
@@ -19,7 +19,7 @@
 	3dLocalEstimators: program to compare  3D local curvature (mean or gaussian) estimators on 3D implicit shapes.
 
 
-* visualization/:
+* visualisation/:
 	3dCurvatureViewer: computes and displays mean or gaussian curvature of vol binary shapes.
 	3dCurveViewer: displays 3D curves with tangential cover and projections onto bounding box.
 
