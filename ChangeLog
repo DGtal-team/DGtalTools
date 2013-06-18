@@ -6,6 +6,8 @@
 * volumetric/volTools:
       convertVol: a simple generic volume image converters (can process actually pgm3d, vol, longvol, raw (for writing)).
 
+* visualisation/
+	- patternTriangulation: a tool that draws with Board2D the convex hull, the closest-point Delaunay triangulation or the farthest-point Delaunay triangulation of a pattern.
 
 
 	====  Release 0.6 ====
