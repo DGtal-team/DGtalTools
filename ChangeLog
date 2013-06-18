@@ -2,15 +2,16 @@
 	====  Release 0.7 ====
 
 * volumetric:
-        convertVol: a simple generic volume image converters (can process actually pgm3d, vol, longvol, raw (for writing)).
+    convertVol: a simple generic volume image converters (can process actually pgm3d, vol, longvol, raw (for writing)).
 	volSubSample, volAddBorder, 3dVolMarchingCubes, volCComponentCounter exploits now the GenericReader/Writer class and is no more limited to vol format.
 
 * volumetric/volTools:
 	volTools directory moved into volumetric.
 
-* visualization	:
-	3dVolViewer: new option to limit the number of displayed voxels.
-	3dImageViewer: new tools to display slice image.
+* visualisation/:
+	- 3dVolViewer: new option to limit the number of displayed voxels.
+	- 3dImageViewer: new tools to display slice image.
+	- patternTriangulation: a new tool that draws with Board2D the convex hull, the closest-point Delaunay triangulation or the farthest-point Delaunay triangulation of a pattern.
 
 	====  Release 0.6 ====
 
@@ -23,7 +24,7 @@
 	3dLocalEstimators: program to compare  3D local curvature (mean or gaussian) estimators on 3D implicit shapes.
 
 
-* visualization/:
+* visualisation/:
 	3dCurvatureViewer: computes and displays mean or gaussian curvature of vol binary shapes.
 	3dCurveViewer: displays 3D curves with tangential cover and projections onto bounding box.
 

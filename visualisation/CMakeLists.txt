@@ -1,5 +1,6 @@
 SET(DGTAL_TOOLS_SRC
 	displayContours
+        patternTriangulation
 )
 
 FOREACH(FILE ${DGTAL_TOOLS_SRC})
