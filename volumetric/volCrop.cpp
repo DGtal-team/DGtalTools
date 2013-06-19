@@ -29,8 +29,8 @@
 
 #include <iostream>
 #include <DGtal/base/Common.h>
-#include <DGtal/io/readers/GenericReader.h>
-#include <DGtal/io/writers/GenericWriter.h>
+#include <DGtal/io/readers/VolReader.h>
+#include <DGtal/io/writers/VolWriter.h>
 #include <DGtal/helpers/StdDefs.h>
 #include <DGtal/images/ImageContainerBySTLVector.h>
 #include <DGtal/images/ConstImageAdapter.h>
@@ -113,7 +113,7 @@ int main(int argc, char**argv)
     
   trace.beginBlock("Loading file");
   typedef ImageContainerBySTLVector<Z3i::Domain, unsigned char>  MyImageC;
-  MyImageC  imageC = GenericReader< MyImageC >::import ( filename );
+  MyImageC  imageC = VolReader< MyImageC >::importVol ( filename );
   DefaultFunctor df;  
   
   typedef ConstImageAdapter<MyImageC, Domain, DefaultFunctor, MyImageC::Value, DefaultFunctor > ConstImageAdapterForSubImage;
@@ -122,7 +122,7 @@ int main(int argc, char**argv)
   trace.endBlock();
 
   trace.beginBlock("Exporting...");
-  bool res =  GenericWriter<ConstImageAdapterForSubImage>::exportFile(outputFileName, subImage);
+  bool res =  VolWriter< ConstImageAdapterForSubImage>::exportVol(outputFileName, subImage);
   trace.endBlock();
   if (res) return 0; else return 1;
 }

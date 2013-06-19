@@ -27,8 +27,8 @@
 
 #include <iostream>
 #include <DGtal/base/Common.h>
-#include <DGtal/io/readers/GenericReader.h>
-#include <DGtal/io/writers/GenericWriter.h>
+#include <DGtal/io/readers/VolReader.h>
+#include <DGtal/io/writers/VolWriter.h>
 #include <DGtal/helpers/StdDefs.h>
 #include <DGtal/images/Image.h>
 #include <DGtal/images/ImageContainerBySTLVector.h>
@@ -117,7 +117,7 @@ int main(int argc, char**argv)
     {
       trace.info() << "Brutally sub sample a vol file (division by 2 in each direction)."<<std::endl
                    << std::endl << "Basic usage: "<<std::endl
-                   << "\tvolSubSample --input <3dInputFileName> --o <3dOutputFileName> "<<std::endl
+                   << "\tvolSubSample --input <volFileName> --o <volOutputFileName> "<<std::endl
                    << general_opt << "\n";
       return 0;
     }
@@ -133,7 +133,7 @@ int main(int argc, char**argv)
   trace.beginBlock("Loading file");
   typedef ImageContainerBySTLVector<Z3i::Domain, unsigned char>  MyImageC;
 
-  MyImageC  imageC = GenericReader< MyImageC >::import ( filename );
+  MyImageC  imageC = VolReader< MyImageC >::importVol ( filename );
   MyImageC  outputImage( Z3i::Domain( imageC.domain().lowerBound(),
                                       (imageC.domain().upperBound()-imageC.domain().lowerBound())/Vector().diagonal(2)));
 
@@ -184,7 +184,7 @@ int main(int argc, char**argv)
   trace.endBlock();
   
   trace.beginBlock("Exporting...");
-  bool res =  GenericWriter< MyImageC>::exportFile(outputFileName, outputImage);
+  bool res =  VolWriter< MyImageC>::exportVol(outputFileName, outputImage);
   trace.endBlock();
   if (res) return 0; else return 1;
 }

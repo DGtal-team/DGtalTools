@@ -30,7 +30,7 @@
 #include <iostream>
 
 #include "DGtal/base/Common.h"
-#include "DGtal/io/readers/GenericReader.h"
+#include "DGtal/io/readers/VolReader.h"
 #include "DGtal/io/Color.h"
 #include "DGtal/images/ImageSelector.h"
 #include "DGtal/helpers/StdDefs.h"
@@ -133,7 +133,7 @@ int main( int argc, char** argv )
   if( parseOK || !vm.count("help")||argc<=1)
     {
       std::cout << "Usage: " << argv[0] << " [input-file]\n"
-    << "Count the number of connected component (same values) in a 3d image file image\n"
+    << "Count the number of connected component (same values) in a  volume (Vol) file image\n"
     << general_opt << "\n";
       return 0;
     }
@@ -148,7 +148,7 @@ int main( int argc, char** argv )
    }
 
  typedef ImageSelector<Domain, unsigned char>::Type Image;
- Image image = GenericReader<Image>::import( inputFilename );
+ Image image = VolReader<Image>::importVol( inputFilename );
 
  trace.info() << "Image loaded: "<<image<< std::endl;
 
