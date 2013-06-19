@@ -27,8 +27,8 @@
 
 #include <iostream>
 #include <DGtal/base/Common.h>
-#include <DGtal/io/readers/GenericReader.h>
-#include <DGtal/io/writers/GenericWriter.h>
+#include <DGtal/io/readers/VolReader.h>
+#include <DGtal/io/writers/VolWriter.h>
 #include <DGtal/helpers/StdDefs.h>
 #include <DGtal/images/Image.h>
 #include <DGtal/images/ImageContainerBySTLVector.h>
@@ -77,9 +77,9 @@ int main(int argc, char**argv)
   po::notify ( vm );
   if ( !parseOK || vm.count ( "help" ) ||argc<=1 )
     {
-      trace.info() << "Add a border of one voxel with value 0 around a 3dImage file."<<std::endl
+      trace.info() << "Add a border of one voxel with value 0 around a vol file."<<std::endl
                    << std::endl << "Basic usage: "<<std::endl
-                   << "\tvolAddBorder --input <3dImageInputFileName> --o <3dImageOutputFileName> "<<std::endl
+                   << "\tvolAddBorder --input <volFileName> --o <volOutputFileName> "<<std::endl
                    << general_opt << "\n";
       return 0;
     }
@@ -92,7 +92,7 @@ int main(int argc, char**argv)
 
   typedef ImageContainerBySTLVector<Z3i::Domain, unsigned char>  MyImageC;
 
-  MyImageC  imageC = GenericReader< MyImageC >::import ( filename );
+  MyImageC  imageC = VolReader< MyImageC >::importVol ( filename );
   MyImageC  outputImage( Z3i::Domain( imageC.domain().lowerBound() - Vector().diagonal(1),
                                       imageC.domain().upperBound() + Vector().diagonal(1)));
   
@@ -102,6 +102,6 @@ int main(int argc, char**argv)
     outputImage.setValue( *it , imageC(*it));
   
 
-  bool res =  GenericWriter< MyImageC>::exportFile(outputFileName, outputImage);
+  bool res =  VolWriter< MyImageC>::exportVol(outputFileName, outputImage);
   if (res) return 0; else return 1;
 }
