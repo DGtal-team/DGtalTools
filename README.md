@@ -1,4 +1,3 @@
-
 DGtalTools is a separate github project containing tools constructed
 using DGtal library. The main goal of this part is to gather simple
 and useful tools exploiting the structures and algorithms defined in
@@ -72,13 +71,31 @@ ShapeGenerator
 
 Visualization
 -------------
-  - 3dVolViewer: volume file (.vol and .pgm3d) viewer with QGLViewer.
+  - 3dCurvatureViewer: permits to compute and visualize mean or gaussian curvature of binary shapes.
   - 3dImageViewer: tools to display 3d slice images with QGLViewer.
+  - 3dVolViewer: volume file (.vol and .pgm3d) viewer with QGLViewer.
   - displayContours: display discrete contours from various format (.fc (freemanchain), .sdp).
   - meshViewer: display 3D mesh from OFS or OFF format. 
-  - 3dCurvatureViewer: permits to compute and visualize mean or gaussian curvature of binary shapes.
-
-
+  - patternTriangulation: a new tool that draws with Board2D the convex hull, the closest-point Delaunay triangulation or the farthest-point Delaunay triangulation of a pattern.
+ 
+  
+Here are some illustration of such tools:
+<center>
+<table>
+<tr>
+<td><img height=130 src="https://f.cloud.github.com/assets/772865/684607/450c064e-da00-11e2-8830-76eb90a5efd7.png"></td>
+<td><img width=130 src="https://f.cloud.github.com/assets/772865/684569/59a2f6fa-d9fe-11e2-84ba-a48842f4aafb.png" ></td>
+<td><img height=130 src="https://f.cloud.github.com/assets/772865/684590/778bea9a-d9ff-11e2-8e04-6e3e8a39ae3c.png"></td>
+<td><img height=130 src="https://f.cloud.github.com/assets/772865/684598/c3adcf4c-d9ff-11e2-8c3f-e67c8abd0c76.png"></td>
+<td><img height=130 src="https://f.cloud.github.com/assets/772865/684622/d698405a-da00-11e2-8aa0-19212a58ce23.png"></td>
+</tr>
+<td>3dCurvatureViewer</td>
+<td>3dImageViewer</td>
+<td>3dVolViewer</td>
+<td>displayContours</td>
+<td>meshViewer</td>
+</table>
+<center>
 Volumetric
 ----------
   - 3dVolMarchingCubes: marching cubes form a Vol file	
@@ -86,7 +103,7 @@ Volumetric
   - volAddBorder: add a 1 voxel boundary with value 0 to a vol file.
   - volCComponentCounter: a simple program to count the number of connected components in a 3D image.
   - volSubSample: sub sample a vol file (division by 2 in each direction).
-
+  
 
 
 How to build the tools
