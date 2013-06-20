@@ -38,7 +38,7 @@
 #include "DGtal/shapes/Shapes.h"
 #include "DGtal/helpers/StdDefs.h"
 
-#include "DGtal/io/readers/VolReader.h"
+#include "DGtal/io/readers/GenericReader.h"
 #include "DGtal/images/imagesSetsUtils/SetFromImage.h"
 #include "DGtal/images/imagesSetsUtils/SimpleThresholdForegroundPredicate.h"
 #include "DGtal/images/ImageSelector.h"
@@ -92,9 +92,9 @@ int main( int argc, char** argv )
   po::notify ( vm );
   if ( !parseOK || vm.count ( "help" ) ||argc<=1 )
     {
-      trace.info() << "Illustration of homotopic thinning of a vol file with 3D viewer."<<std::endl
+      trace.info() << "Illustration of homotopic thinning of a 3d image file (vol,longvol,pgm3d...) with 3D viewer."<<std::endl
                    << std::endl << "Basic usage: "<<std::endl
-                   << "\thomotopicThinning3d [options] --input <volFileName>"<<std::endl
+                   << "\thomotopicThinning3d [options] --input <3dImageFileName>  {vol,longvol,pgm3d...} "<<std::endl
                    << general_opt << "\n";
       return 0;
     }
@@ -105,7 +105,7 @@ int main( int argc, char** argv )
   
   
   typedef ImageSelector < Z3i::Domain, unsigned char>::Type Image;
-  Image image = VolReader<Image>::importVol ( filename );
+  Image image = GenericReader<Image>::import ( filename );
 
   trace.beginBlock("DT Computation");
   typedef SimpleThresholdForegroundPredicate<Image> Predicate;
