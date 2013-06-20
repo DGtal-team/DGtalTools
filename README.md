@@ -18,8 +18,7 @@ DGtal. The resulting tools could be useful to:
 
 The source code of the tools can also be used to non DGtal familiar
 user to show how to include the DGtal library framework directly in their
-own source code (in complement of DGtal tutorial
-http://libdgtal.org/doc/stable/tutorials.html).
+own source code (in complement of DGtal tutorial http://libdgtal.org/doc/stable/tutorials.html).
 
 
 Organisation
