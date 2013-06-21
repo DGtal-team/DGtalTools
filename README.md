@@ -90,6 +90,7 @@ ShapeGenerator
 Visualization
 -------------
   - 3dCurvatureViewer: permits to compute and visualize mean or gaussian curvature of binary shapes.
+  - 3dCurveViewer: displays 3D curves with tangential cover and projections onto bounding box.
   - 3dImageViewer: tools to display 3d slice images with QGLViewer.
   - 3dVolViewer: volume file (.vol and .pgm3d) viewer with QGLViewer.
   - displayContours: display discrete contours from various format (.fc (freemanchain), .sdp).
@@ -97,17 +98,19 @@ Visualization
   - patternTriangulation: a new tool that draws with Board2D the convex hull, the closest-point Delaunay triangulation or the farthest-point Delaunay triangulation of a pattern.
  
   
-Here are some illustration of such tools:
+Here are some illustrations of such a tools:
 <center>
 <table>
 <tr>
 <td><img height=130 src="https://f.cloud.github.com/assets/772865/684607/450c064e-da00-11e2-8830-76eb90a5efd7.png"></td>
-<td><img width=130 src="https://f.cloud.github.com/assets/772865/684569/59a2f6fa-d9fe-11e2-84ba-a48842f4aafb.png" ></td>
+<td><img height=130 src="https://f.cloud.github.com/assets/772865/685853/d96a5252-da44-11e2-9872-7f0160be8f5d.png"></td>
+<td><img height=130 src="https://f.cloud.github.com/assets/772865/684569/59a2f6fa-d9fe-11e2-84ba-a48842f4aafb.png" ></td>
 <td><img height=130 src="https://f.cloud.github.com/assets/772865/684590/778bea9a-d9ff-11e2-8e04-6e3e8a39ae3c.png"></td>
 <td><img height=130 src="https://f.cloud.github.com/assets/772865/684598/c3adcf4c-d9ff-11e2-8c3f-e67c8abd0c76.png"></td>
 <td><img height=130 src="https://f.cloud.github.com/assets/772865/684622/d698405a-da00-11e2-8aa0-19212a58ce23.png"></td>
 </tr>
 <td>3dCurvatureViewer</td>
+<td>3dCurveViewer </td>
 <td>3dImageViewer</td>
 <td>3dVolViewer</td>
 <td>displayContours</td>
