@@ -1,5 +1,8 @@
 	====  Release 0.7 ====
 
+* converters/:
+	- vol2sdp: a simple tools to extract digital points from 3d vol files.
+
 * volumetric:
     convertVol: a simple generic volume image converters (can process actually pgm3d, vol, longvol, raw (for writing)).
     homotopicThinning3D exploits now the GenericReader class and is no more limited to vol format.
