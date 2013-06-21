@@ -1,3 +1,6 @@
+DGtalTools
+==========
+
 DGtalTools is a separate github project containing tools constructed
 using DGtal library. The main goal of this part is to gather simple
 and useful tools exploiting the structures and algorithms defined in
@@ -51,10 +54,10 @@ Estimators
 ----------
  
   - 2dLocalEstimators: program to compare local curvature/tangent estimators on implicit shapes
-  - Maximal DSS based estimators
-  - Maximal DCA based estimators
-  - Binomial convolver based estimators
-  - Integral Invariants based estimators
+    - Maximal DSS based estimators
+    - Maximal DCA based estimators
+    - Binomial convolver based estimators
+    - Integral Invariants based estimators
   - 3dLocalEstimators: program to compare  3D local curvature (mean or gaussian) estimators on 3D implicit shapes.
   - lengthEstimator: program to generate multigrid analysis of length estimators.
   - tangentBC: tangent estimator using the Binomial convolver.
@@ -68,6 +71,21 @@ ShapeGenerator
 --------------
   - shapeGenerator: generate multigrid shape
   - contourGenerator: generate multigrid shape contours
+ <center>
+<table>
+<tr>
+<td><img height=130 src="https://f.cloud.github.com/assets/772865/684690/eff46c16-da02-11e2-861e-ddc366b247e8.png"></td>
+<td><img height=130 src="https://f.cloud.github.com/assets/772865/684694/39a9cc2a-da03-11e2-9f49-3aff0e886c35.png"></td>
+<td><img height=130 src="https://f.cloud.github.com/assets/772865/684695/42b657ca-da03-11e2-985e-e468084b5c01.png"></td>
+</tr>
+<tr>
+<td> grid size = 1</td> <td> grid size= 0.1</td> <td> grid size = 0.01</td>
+</tr>
+<tr>
+<td colspan=3 > Illustration of the shapeGenerator tools </td>
+</tr>
+</table>
+</center>
 
 Visualization
 -------------
@@ -95,7 +113,7 @@ Here are some illustration of such tools:
 <td>displayContours</td>
 <td>meshViewer</td>
 </table>
-<center>
+</center>
 Volumetric
 ----------
   - 3dVolMarchingCubes: marching cubes form a Vol file	
