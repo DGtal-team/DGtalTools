@@ -27,13 +27,14 @@ if (  WITH_VISU3D_QGLVIEWER )
         LIBRARY DESTINATION lib
         ARCHIVE DESTINATION lib)
   ENDFOREACH(FILE)
+  add_executable(3dImageViewer 3dImageViewer specificClasses/Viewer3DImage  )
+  target_link_libraries ( 3dImageViewer   ${DGTAL_LIBRARIES}  ${DGtalToolsLibDependencies})   
+  install(TARGETS 3dImageViewer 
+        RUNTIME DESTINATION bin
+        LIBRARY DESTINATION lib
+        ARCHIVE DESTINATION lib)
+
 endif ( WITH_VISU3D_QGLVIEWER   )
 
 
 
-add_executable(3dImageViewer 3dImageViewer specificClasses/Viewer3DImage  )
-target_link_libraries ( 3dImageViewer   ${DGTAL_LIBRARIES}  ${DGtalToolsLibDependencies})   
-install(TARGETS 3dImageViewer 
-        RUNTIME DESTINATION bin
-        LIBRARY DESTINATION lib
-        ARCHIVE DESTINATION lib)
