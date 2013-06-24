@@ -45,10 +45,10 @@ Converters
 Utilities to convert various simple file formats:
 
   - freeman2sdp: convert freeman chain towards a Sequence of Discrete Points.
-  -  pgm2freeman: to extract a freeman chain contour from a grayscale image.
+  - pgm2freeman: to extract a freeman chain contour from a grayscale image.
   - raw2vol and vol2raw: transform 3D volumes files from (resp. to) raw to vol.
   - ofs2off: convert OFS mesh format towards a OFF variant. 
-
+  - vol2sdp: a simple tools to extract digital points from 3d vol files.
 
 Estimators
 ----------
