@@ -80,6 +80,7 @@ int main( int argc, char** argv )
     ("thresholdMax,M",  po::value<int>()->default_value(255), "threshold max to define binary shape" )
     ("displaySDP,s", po::value<std::string>(), "display a set of discrete points (.sdp)" )
     ("displayDigitalSurface", "display the digital surface instead to display all the set of voxels (used with thresholdImage or displaySDP options)" )
+    ("colorizeCC", "colorize each Connected Components of the surface displayed by displayDigitalSurface option." )
     ("colorSDP,c", po::value<std::vector <int> >()->multitoken(), "set the color  discrete points: r g b a " )
     
     ("transparency,t",  po::value<uint>()->default_value(255), "transparency") ; 
@@ -192,12 +193,32 @@ int main( int argc, char** argv )
     K.init(low, upp , true);
     SurfelAdjacency<3> SAdj( true );
     vector<vector<SCell> > vectConnectedSCell;
-    trace.info() << "Extracting surface  set ..." ;
+    trace.info() << "Extracting surface  set ... " ;
     Surfaces<KSpace>::extractAllConnectedSCell(vectConnectedSCell,K, SAdj, set3d, true);
     trace.info()<< " [done] " <<std::endl;
+    GradientColorMap<long> gradient( 0, vectConnectedSCell.size());
+    gradient.addColor(DGtal::Color::Red);
+    gradient.addColor(DGtal::Color::Yellow);
+    gradient.addColor(DGtal::Color::Green);
+    gradient.addColor(DGtal::Color::Cyan);
+    gradient.addColor(DGtal::Color::Blue);
+    gradient.addColor(DGtal::Color::Magenta);
+    gradient.addColor(DGtal::Color::Red);
+        
     viewer << SetMode3D(vectConnectedSCell.at(0).at(0).className(), "Basic");
     for(unsigned int i= 0; i <vectConnectedSCell.size(); i++){
       for(unsigned int j= 0; j <vectConnectedSCell.at(i).size(); j++){
+	if(vm.count("colorizeCC")){
+	  DGtal::Color c= gradient(i);
+	  viewer << CustomColors3D(Color(250, 0,0, transp), Color(c.red(),
+								  c.green(),
+								  c.blue(), transp));	    
+	}else  if(vm.count("colorSDP")){
+	  std::vector<int> vcol= vm["colorSDP"].as<std::vector<int > >();
+	  Color c(vcol[0], vcol[1], vcol[2], vcol[3]);
+	  viewer << CustomColors3D(c, c);
+	}
+
 	viewer << vectConnectedSCell.at(i).at(j);
       }
     }
