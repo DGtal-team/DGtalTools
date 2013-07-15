@@ -72,8 +72,8 @@
 #include "DGtal/geometry/curves/BinomialConvolver.h"
 #include "DGtal/geometry/curves/estimation/MostCenteredMaximalSegmentEstimator.h"
 #include "DGtal/geometry/curves/estimation/SegmentComputerEstimators.h"
-#include "DGtal/geometry/curves/ArithmeticalDSS.h"
-#include "DGtal/geometry/curves/GeometricalDCA.h"
+#include "DGtal/geometry/curves/ArithmeticalDSSComputer.h"
+#include "DGtal/geometry/curves/StabbingCircleComputer.h"
 
 #include "DGtal/images/ImageHelper.h"
 #include "DGtal/geometry/surfaces/FunctorOnCells.h"
@@ -352,7 +352,7 @@ computeLocalEstimations( const std::string & name,
 	    std::cout << "# Most centered maximal DSS tangent estimation" << std::endl;  
 	    {
 	      typedef typename PointsRange::ConstCirculator C; 
-	      typedef ArithmeticalDSS< C, int, 4 > SegmentComputer;
+	      typedef ArithmeticalDSSComputer< C, int, 4 > SegmentComputer;
 	      typedef TangentFromDSSEstimator<SegmentComputer> SCFunctor;
 	      SegmentComputer sc;
 	      SCFunctor f; 
@@ -366,7 +366,7 @@ computeLocalEstimations( const std::string & name,
 		      << " (from length only)" << std::endl;  
 	    {
 	      typedef typename PointsRange::ConstCirculator C; 
-	      typedef ArithmeticalDSS< C, int, 4 > SegmentComputer;
+	      typedef ArithmeticalDSSComputer< C, int, 4 > SegmentComputer;
 	      typedef CurvatureFromDSSLengthEstimator<SegmentComputer> SCFunctor;
 	      SegmentComputer sc;
 	      SCFunctor f; 
@@ -381,7 +381,7 @@ computeLocalEstimations( const std::string & name,
 		      << " (from length and width)" << std::endl;  
 	    {
 	      typedef typename PointsRange::ConstCirculator C; 
-	      typedef ArithmeticalDSS< C, int, 4 > SegmentComputer;
+	      typedef ArithmeticalDSSComputer< C, int, 4 > SegmentComputer;
 	      typedef CurvatureFromDSSEstimator<SegmentComputer> SCFunctor;
 	      SegmentComputer sc;
 	      SCFunctor f; 
@@ -404,7 +404,7 @@ computeLocalEstimations( const std::string & name,
 	      typedef typename GridCurve<KSpace>::IncidentPointsRange Range; 
 	      typedef typename Range::ConstCirculator C;
 	      Range r = gridcurve.getIncidentPointsRange(); 
-	      typedef GeometricalDCA<C> SegmentComputer;
+	      typedef StabbingCircleComputer<C> SegmentComputer;
 	      typedef TangentFromDCAEstimator<SegmentComputer> SCFunctor;
 	      SegmentComputer sc;
 	      SCFunctor f; 
@@ -421,7 +421,7 @@ computeLocalEstimations( const std::string & name,
 	      typedef typename GridCurve<KSpace>::IncidentPointsRange Range; 
 	      typedef typename Range::ConstCirculator C;
 	      Range r = gridcurve.getIncidentPointsRange(); 
-	      typedef GeometricalDCA<C> SegmentComputer;
+	      typedef StabbingCircleComputer<C> SegmentComputer;
 	      typedef CurvatureFromDCAEstimator<SegmentComputer> SCFunctor;
 	      SegmentComputer sc;
 	      SCFunctor f; 
