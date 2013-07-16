@@ -82,7 +82,9 @@ int main( int argc, char** argv )
     ("displayDigitalSurface", "display the digital surface instead of display all the set of voxels (used with thresholdImage or displaySDP options)" )
     ("colorizeCC", "colorize each Connected Components of the surface displayed by displayDigitalSurface option." )
     ("colorSDP,c", po::value<std::vector <int> >()->multitoken(), "set the color  discrete points: r g b a " )
-    
+    ("scaleX,x",  po::value<float>()->default_value(1.0), "set the scale value in the X direction (default 1.0)" )
+    ("scaleY,y",  po::value<float>()->default_value(1.0), "set the scale value in the Y direction (default 1.0)" )
+    ("scaleZ,z",  po::value<float>()->default_value(1.0), "set the scale value in the Z direction (default 1.0)")
     ("transparency,t",  po::value<uint>()->default_value(255), "transparency") ; 
   
   bool parseOK=true;
@@ -114,6 +116,9 @@ int main( int argc, char** argv )
  
   QApplication application(argc,argv);
  
+  float sx = vm["scaleX"].as<float>();
+  float sy = vm["scaleY"].as<float>();
+  float sz = vm["scaleZ"].as<float>();
 
 
   string extension = inputFilename.substr(inputFilename.find_last_of(".") + 1);
@@ -132,9 +137,10 @@ int main( int argc, char** argv )
     mode=Viewer3DImage::BoundingBox;
    
   Viewer3DImage viewer(mode);
+  viewer.setScale(sx,sy,sz);
   viewer.setWindowTitle("simple Volume Viewer");
   viewer.show();
-  
+
   
 
   Image3D image = GenericReader<Image3D>::import( inputFilename );
