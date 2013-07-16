@@ -79,7 +79,7 @@ int main( int argc, char** argv )
     ("thresholdMin,m",  po::value<int>()->default_value(0), "threshold min to define binary shape" ) 
     ("thresholdMax,M",  po::value<int>()->default_value(255), "threshold max to define binary shape" )
     ("displaySDP,s", po::value<std::string>(), "display a set of discrete points (.sdp)" )
-    ("displayDigitalSurface", "display the digital surface instead to display all the set of voxels (used with thresholdImage or displaySDP options)" )
+    ("displayDigitalSurface", "display the digital surface instead of display all the set of voxels (used with thresholdImage or displaySDP options)" )
     ("colorizeCC", "colorize each Connected Components of the surface displayed by displayDigitalSurface option." )
     ("colorSDP,c", po::value<std::vector <int> >()->multitoken(), "set the color  discrete points: r g b a " )
     
