@@ -83,6 +83,7 @@ int main( int argc, char** argv )
     ("colorizeCC", "colorize each Connected Components of the surface displayed by displayDigitalSurface option." )
     ("colorSDP,c", po::value<std::vector <int> >()->multitoken(), "set the color  discrete points: r g b a " )
     
+
     ("transparency,t",  po::value<uint>()->default_value(255), "transparency") ; 
   
   bool parseOK=true;
