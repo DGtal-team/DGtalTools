@@ -101,7 +101,7 @@ int main( int argc, char** argv )
   
   
   QApplication application(argc,argv);
-  Viewer3D viewer;
+  Viewer3D<> viewer;
   viewer.setWindowTitle("simple Volume Viewer");
   viewer.show();
  
@@ -145,6 +145,6 @@ int main( int argc, char** argv )
   }
   
 
-  viewer << Viewer3D::updateDisplay;
+  viewer << Viewer3D<>::updateDisplay;
   return application.exec();
 }

@@ -140,7 +140,7 @@ int main( int argc, char** argv )
     MyCellFunctor functor ( pointFunctor, KSpaceShape ); // Creation of a functor on Cells, returning true if the cell is inside the shape
 
     QApplication application( argc, argv );
-    Viewer3D viewer;
+    Viewer3D<> viewer;
     viewer.show();
 //    viewer << SetMode3D(image.domain().className(), "BoundingBox") << image.domain();
 
@@ -266,7 +266,7 @@ int main( int argc, char** argv )
         }
     }
 
-    viewer << Viewer3D::updateDisplay;
+    viewer << Viewer3D<>::updateDisplay;
     return application.exec();
 }
 
