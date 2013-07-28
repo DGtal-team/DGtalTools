@@ -2,6 +2,8 @@
 
 * converters/:
 	- vol2sdp: a simple tools to extract digital points from 3d vol files.
+	- vol2slice: tool to extract all slices from 3d volumic images.
+	- slice2vol: tool to merge slices into one 3d volumic file.
 
 * volumetric:
     convertVol: a simple generic volume image converters (can process actually pgm3d, vol, longvol, raw (for writing)).
