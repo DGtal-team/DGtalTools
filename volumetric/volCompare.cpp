@@ -56,18 +56,28 @@ std::vector<int> getTPTNFPFNVoxelsStats(const Image3D &refImage, const Image3D &
   int trueNeg = 0;
   int falsePos = 0;
   int falseNeg = 0;
+  int totPosRef=0;
+  int totPosComp=0;
+  int totNegRef=0;
+  int totNegComp=0;
 
   for(Image3D::Domain::ConstIterator it = refImage.domain().begin(); it!=refImage.domain().end(); it++){
     if(refImage(*it)< refMax && refImage(*it) > refMin){
+      totPosRef++;
       if(compImage(*it)< compMax && compImage(*it) > compMin){
+	totPosComp++;
 	truePos++;
       }else{
+	totNegComp++;
 	falseNeg++;
       }
     }else{
+      totNegRef++;
       if(compImage(*it)< compMax && compImage(*it) > compMin){
 	falsePos++;
+	totPosComp++;
       }else{
+	totNegComp++;
 	trueNeg++;
       }      
     }
@@ -77,6 +87,11 @@ std::vector<int> getTPTNFPFNVoxelsStats(const Image3D &refImage, const Image3D &
   res.push_back(trueNeg);
   res.push_back(falsePos);
   res.push_back(falseNeg);
+  res.push_back(totPosRef);
+  res.push_back(totPosComp);
+  res.push_back(totNegRef);
+  res.push_back(totNegComp);
+  
   return res;
 }
 
@@ -139,7 +154,10 @@ int main(int argc, char**argv)
  trace.info() << "True Negatives:" << vectStats.at(1)<< std::endl;
  trace.info() << "False Positives:" << vectStats.at(2)<< std::endl;
  trace.info() << "False Negatives:" << vectStats.at(3)<< std::endl;
- 
+ trace.info() << "Tot Positives ref=:" << vectStats.at(4)<< std::endl; 
+ trace.info() << "Tot Positives comp=:" << vectStats.at(5)<< std::endl; 
+ trace.info() << "Tot Negatives ref=:" << vectStats.at(6)<< std::endl; 
+ trace.info() << "Tot Negatives comp=:" << vectStats.at(7)<< std::endl; 
 
    return 1;
 }
