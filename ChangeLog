@@ -1,13 +1,15 @@
 	====  Release 0.7 ====
 
 * converters/:
-	- vol2sdp: a simple tools to extract digital points from 3d vol files.
+	- vol2sdp: a simple tool to extract digital points from 3d vol files.
+	- sdp2vol: a simple tool to create a 3d vol image from 3d digital points.
 	- vol2slice: tool to extract all slices from 3d volumic images.
 	- slice2vol: tool to merge slices into one 3d volumic file.
 
 * volumetric:
     convertVol: a simple generic volume image converters (can process actually pgm3d, vol, longvol, raw (for writing)).
     homotopicThinning3D exploits now the GenericReader class and is no more limited to vol format.
+    volCompare: to apply basic comparaisons between two volumetric images (shape defined from thresholds).
 
 * volumetric/volTools:
 	volTools directory moved into volumetric.

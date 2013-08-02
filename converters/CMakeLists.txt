@@ -8,7 +8,8 @@ SET(DGTAL_TOOLS_SRC
   convertVol 
   vol2sdp
   slice2vol
-  vol2slice)
+  vol2slice
+  sdp2vol)
 
 FOREACH(FILE ${DGTAL_TOOLS_SRC})
   add_executable(${FILE} ${FILE})
