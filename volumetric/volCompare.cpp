@@ -62,9 +62,9 @@ std::vector<int> getTPTNFPFNVoxelsStats(const Image3D &refImage, const Image3D &
   int totNegComp=0;
 
   for(Image3D::Domain::ConstIterator it = refImage.domain().begin(); it!=refImage.domain().end(); it++){
-    if(refImage(*it)< refMax && refImage(*it) > refMin){
+    if(refImage(*it) <= refMax && refImage(*it) >= refMin){
       totPosRef++;
-      if(compImage(*it)< compMax && compImage(*it) > compMin){
+      if(compImage(*it) <= compMax && compImage(*it) >= compMin){
 	totPosComp++;
 	truePos++;
       }else{
@@ -73,7 +73,7 @@ std::vector<int> getTPTNFPFNVoxelsStats(const Image3D &refImage, const Image3D &
       }
     }else{
       totNegRef++;
-      if(compImage(*it)< compMax && compImage(*it) > compMin){
+      if(compImage(*it) <= compMax && compImage(*it) >= compMin){
 	falsePos++;
 	totPosComp++;
       }else{
