@@ -164,12 +164,15 @@ int main(int argc, char**argv)
      }
      po::notify(vm);    
   
-     if ( vm.count ( "help" )  )
+     if ( vm.count ( "help" ) || ! vm.count("referenceVol")||! vm.count("comparedVol") )
        {
-	 trace.info() << "Volume compare different value from a ref."<<std::endl
+	 trace.info() << "apply basic comparaisons (true/false positive count, statistics on distances) between two volumetric images (shape defined from thresholds)"<<std::endl
 		      << std::endl << "Basic usage: "<<std::endl
 		      << "\t volCompare --referenceVol <volReferenceFilename> --comparedVol <volComparedFilename> "<<std::endl
-		      << general_opt << "\n";
+		      << general_opt << "\n"
+		      << "Typical use :\n  volCompare -r imageRef.pgm3d --refMin 128 --refMax 255 -c imageDiffExt.pgm3d --compMin 128 --compMax 255 -f \n" ;
+
+
 	 return 0;
        }
 
