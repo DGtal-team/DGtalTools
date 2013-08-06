@@ -47,10 +47,17 @@ using namespace Z3i;
 
 namespace po = boost::program_options;
 
-typedef ImageContainerBySTLVector < Z3i::Domain, unsigned int > Image3D;
-typedef ImageContainerBySTLVector < Z2i::Domain, unsigned int > Image2D;
+typedef ImageContainerBySTLVector < Z3i::Domain,  int > Image3D;
+typedef ImageContainerBySTLVector < Z2i::Domain,  int > Image2D;
 
 
+bool 
+isDiff(const Image3D &refImage, const Image3D &compImage, 
+       int refMin, int refMax,  int compMin, int compMax, const Point &pt){
+  bool isRefOn = (refImage(pt)<= refMax) && (refImage(pt) >= refMin);
+  bool isCompOn = (compImage(pt)<= compMax) && (compImage(pt) >= compMin);
+  return ((!isRefOn && isCompOn) || (isRefOn && !isCompOn));
+}
 
 
 
@@ -59,9 +66,9 @@ getStatsFromDistanceMap(Statistic<int> & stats, const Image3D &refImage, const I
 			int refMin, int refMax,  int compMin, int compMax, 
 			bool statOnFalsePositiveOnly=false){
 
-  // Get the digital set from ref image by computing the surface
+  // Get the digital set from ref image by computing the surface (use -1 and +1 since the interval of append function are open)
   Z3i::DigitalSet set3dRef (refImage.domain()); 
-  SetFromImage<Z3i::DigitalSet>::append<Image3D>(set3dRef, refImage, refMin,refMax);  
+  SetFromImage<Z3i::DigitalSet>::append<Image3D>(set3dRef, refImage, refMin-1,refMax+1);  
   typedef NotPointPredicate<Z3i::DigitalSet> NegPredicate;
   
 
@@ -69,19 +76,22 @@ getStatsFromDistanceMap(Statistic<int> & stats, const Image3D &refImage, const I
   typedef  DistanceTransformation<Z3i::Space, NegPredicate, Z3i::L2Metric> DTL2;   
   DTL2 dtL2(&(refImage.domain()), NegPredicate(set3dRef), &Z3i::l2Metric);
 
-  // Get the set of point of compImage:
+  // Get the set of point of compImage: (use -1 and +1 since the interval of append function are open)
   Z3i::DigitalSet set3dComp (compImage.domain()); 
-  SetFromImage<Z3i::DigitalSet>::append<Image3D>(set3dComp, compImage, compMin, compMax);
+  SetFromImage<Z3i::DigitalSet>::append<Image3D>(set3dComp, compImage, compMin-1, compMax+1);
 
   int distanceMax=0;
+  unsigned int nbAdded =0;
   //Applying stats from the set to be compared (from compImage)
   for(Z3i::DigitalSet::ConstIterator it= set3dComp.begin();  it!= set3dComp.end(); ++it){
-    if(!statOnFalsePositiveOnly || (refImage(*it)!=compImage(*it))){
+    if((!statOnFalsePositiveOnly) || (isDiff(refImage, compImage, refMin, refMax, compMin, compMax, *it))){
       int distance = dtL2(*it);   
       stats.addValue(distance);
+      nbAdded++;
     }
   }
-
+  if(nbAdded==0)
+    trace.error() << "No point added to statistics, will failed..." << endl;
 }
 
 
@@ -208,6 +218,7 @@ int main(int argc, char**argv)
      trace.info() << "Computing Distance Map stats ...";
      Statistic<int> statDistances(true); 
      getStatsFromDistanceMap(statDistances, imageRef, imageComp, refMin, refMax, compMin, compMax, vm.count("statsFromFalsePosOnly") );
+     
      trace.info() << " [done] " << std::endl;
      std::cout << "distance max= " << statDistances.max() << std::endl;
      std::cout << "distance mean= " << statDistances.mean() << std::endl; 
