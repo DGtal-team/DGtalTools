@@ -90,6 +90,7 @@ getStatsFromDistanceMap(Statistic<int> & stats, const Image3D &refImage, const I
       nbAdded++;
     }
   }
+  
   if(nbAdded==0)
     trace.error() << "No point added to statistics, will failed..." << endl;
 }
