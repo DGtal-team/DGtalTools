@@ -68,7 +68,7 @@ getStatsFromDistanceMap(Statistic<int> & stats, const Image3D &refImage, const I
 
   // Get the digital set from ref image by computing the surface (use -1 and +1 since the interval of append function are open)
   Z3i::DigitalSet set3dRef (refImage.domain()); 
-  SetFromImage<Z3i::DigitalSet>::append<Image3D>(set3dRef, refImage, refMin-1,refMax+1);  
+  SetFromImage<Z3i::DigitalSet>::append<Image3D>(set3dRef, refImage, refMin-1,refMax);  
   typedef NotPointPredicate<Z3i::DigitalSet> NegPredicate;
   
 
@@ -78,7 +78,7 @@ getStatsFromDistanceMap(Statistic<int> & stats, const Image3D &refImage, const I
 
   // Get the set of point of compImage: (use -1 and +1 since the interval of append function are open)
   Z3i::DigitalSet set3dComp (compImage.domain()); 
-  SetFromImage<Z3i::DigitalSet>::append<Image3D>(set3dComp, compImage, compMin-1, compMax+1);
+  SetFromImage<Z3i::DigitalSet>::append<Image3D>(set3dComp, compImage, compMin-1, compMax);
 
   int distanceMax=0;
   unsigned int nbAdded =0;
