@@ -8,8 +8,8 @@
 * volumetric:
     convertVol: a simple generic volume image converters (can process actually pgm3d, vol, longvol, raw (for writing)).
     homotopicThinning3D exploits now the GenericReader class and is no more limited to vol format.
-	volFlip: tool to flip all volume slice image according a given dimension.
-	
+    volFlip: tool to flip all volume slice images according a given dimension.
+
 * volumetric/volTools:
 	volTools directory moved into volumetric.
 

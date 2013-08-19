@@ -68,8 +68,8 @@ int main(int argc, char**argv)
     ( "help,h", "display this message." )
     ( "input,i", po::value<std::string>(), "Input vol file." )
     ( "imagePlane",po::value<std::vector <unsigned int> >()->multitoken(),
-      "specify the image definition from its dimension (default 0, 1 i.e. Z=cst.)" )
-    ( "flipDimension", po::value<unsigned int>(), "specify which dimension will be used to apply the flip." )
+      "arg=  {0,1,2} x {0,1,2} defines the axis of the slice image which will be transformed (by default arg= 0 1  i.e. the slice image defined in the X,Y plane (Z=cst)" )
+    ( "flipDimension", po::value<unsigned int>(), "specify which axis will be used to apply the flip." )
     ( "output,o", po::value<string>()->default_value("output.vol"),"Output filename." );
   bool parseOK=true;
   
@@ -86,12 +86,12 @@ int main(int argc, char**argv)
   if (!parseOK || ! ( vm.count ( "input" ) ) || ! ( vm.count ( "output" ) ) || ! ( vm.count ( "imagePlane" ) ) 
       || ! ( vm.count ( "flipDimension" ) ) || vm.count ( "help" ))
     {
-      trace.info() << "Flip 2D slice image of an 3D vol image"<<std::endl
+      trace.info() << "Flip 2D slice image of an 3D vol image (mirror transformation)"<<std::endl
                    << std::endl << "Basic usage: "<<std::endl
                    << "\t volFlip --input <volFileName> --imagePlane 0 1 --flipDimension 0 --o <volOutputFileName> (vol, longvol, p3d format)"<<std::endl
                    << general_opt << "\n";
       std::cout << "Example:\n"
-		<< "volFlip --imagePlane 0 1 --flipDimension 0 -i ${DGtal}/examples/samples/lobster.vol -o flippedXxyLobster.p3d \n";
+		<< "volFlip --imagePlane 0 1 --flipDimension 0 -i ${DGtal}/examples/samples/lobster.vol -o flippedXxyLobster.p3d \n The resulting Z slice images (Z= cst) of flippedXxyLobster.p3d will appears flipped according the x axis.  ";
       return 0;
     }
 
