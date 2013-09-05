@@ -62,7 +62,7 @@ isDiff(const Image3D &refImage, const Image3D &compImage,
 
 
 void
-getStatsFromDistanceMap(Statistic<int> & stats, const Image3D &refImage, const Image3D &compImage, 
+getStatsFromDistanceMap(Statistic<double> & stats, const Image3D &refImage, const Image3D &compImage, 
 			int refMin, int refMax,  int compMin, int compMax, 
 			bool statOnFalsePositiveOnly=false){
 
@@ -80,12 +80,11 @@ getStatsFromDistanceMap(Statistic<int> & stats, const Image3D &refImage, const I
   Z3i::DigitalSet set3dComp (compImage.domain()); 
   SetFromImage<Z3i::DigitalSet>::append<Image3D>(set3dComp, compImage, compMin-1, compMax);
 
-  int distanceMax=0;
-  unsigned int nbAdded =0;
+  unsigned int nbAdded=0;
   //Applying stats from the set to be compared (from compImage)
   for(Z3i::DigitalSet::ConstIterator it= set3dComp.begin();  it!= set3dComp.end(); ++it){
     if((!statOnFalsePositiveOnly) || (isDiff(refImage, compImage, refMin, refMax, compMin, compMax, *it))){
-      int distance = dtL2(*it);   
+      DTL2::Value distance = dtL2(*it);   
       stats.addValue(distance);
       nbAdded++;
     }
@@ -217,7 +216,7 @@ int main(int argc, char**argv)
 
 
      trace.info() << "Computing Distance Map stats ...";
-     Statistic<int> statDistances(true); 
+     Statistic<double> statDistances(true); 
      getStatsFromDistanceMap(statDistances, imageRef, imageComp, refMin, refMax, compMin, compMax, vm.count("statsFromFalsePosOnly") );
      
      trace.info() << " [done] " << std::endl;
