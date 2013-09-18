@@ -100,8 +100,8 @@ getStatsFromDistanceMap(Statistic<double> & stats, const Image3D &refImage, cons
 
 
 // total ref: True Positive, True Negative, False Positive, False Negative
-std::vector<int> getTPTNFPFNVoxelsStats(const Image3D &refImage, const Image3D &compImage, int refMin, int refMax, 
-					int compMin, int compMax){
+std::vector<int> getVoxelsStats(const Image3D &refImage,  int refMin, int refMax, const Image3D &compImage, 
+				int compMin, int compMax){
   int truePos = 0; 
   int trueNeg = 0;
   int falsePos = 0;
@@ -151,78 +151,79 @@ std::vector<int> getTPTNFPFNVoxelsStats(const Image3D &refImage, const Image3D &
 int main(int argc, char**argv)
 {
 
-
+  
   // parse command line ----------------------------------------------
+  // A = ref
+  // B= comp
   po::options_description general_opt ( "Allowed options are: " );
   general_opt.add_options()
     ( "help,h", "display this message." )
-    ( "referenceVol,r", po::value<std::string>(), "Input reference vol filename." )
-    ( "refMin", po::value<int>()->default_value(0), "min threshold for a voxel to be considered as belonging to the compared object. (default 0)" )
-    ( "refMax", po::value<int>()->default_value(128), "max threshold for a voxel to be considered as belonging to the compared object. (default 128)" )
-    ( "compMin", po::value<int>()->default_value(0), "min threshold for a voxel to be considered as belonging to the compared object. (default 0)" )
-    ( "compMax", po::value<int>()->default_value(128), "max threshold for a voxel to be considered as belonging to the compared object. (default 128)" )
-    ( "comparedVol,c", po::value<string>(),"Compared vol filename." )
-    ("statsFromFalsePosOnly,f" , "apply distance map stats from all false positive voxels (else compute stats from all distances of the compared object).");
+    ( "volA,a", po::value<std::string>(), "Input filename of volume A." )
+    ( "volB,b", po::value<std::string>(), "Input filename of volume B." )
+    ( "aMin", po::value<int>()->default_value(0), "min threshold for a voxel to be considered as belonging to the object of volume A. (default 0)" )
+    ( "aMax", po::value<int>()->default_value(128), "max threshold for a voxel to be considered as belonging to the object of volume A. (default 128)" )
+    ( "bMin", po::value<int>()->default_value(0), "min threshold for a voxel to be considered as belonging to the object of volume B. (default 0)" )
+    ( "bMax", po::value<int>()->default_value(128), "max threshold for a voxel to be considered as belonging to the object of volume B. (default 128)" )
+    ("statsFromBnotInAOnly" , "apply distance map stats only for voxels of B which are not in A (else compute stats from all distances of the object B).");
   
-     bool parseOK=true;
-     po::variables_map vm;
-     try{
-       po::store(po::parse_command_line(argc, argv, general_opt), vm);  
-     }catch(const std::exception& ex){
-       parseOK=false;
-       trace.info()<< "Error checking program options: "<< ex.what()<< endl;
-     }
-     po::notify(vm);    
+  bool parseOK=true;
+  po::variables_map vm;
+  try{
+    po::store(po::parse_command_line(argc, argv, general_opt), vm);  
+  }catch(const std::exception& ex){
+    parseOK=false;
+    trace.info()<< "Error checking program options: "<< ex.what()<< endl;
+  }
+  po::notify(vm);    
   
-     if ( vm.count ( "help" ) || ! vm.count("referenceVol")||! vm.count("comparedVol") )
-       {
-	 trace.info() << "apply basic comparaisons (true/false positive count, statistics on distances) between two volumetric images (shape defined from thresholds)"<<std::endl
-		      << std::endl << "Basic usage: "<<std::endl
-		      << "\t volCompare --referenceVol <volReferenceFilename> --comparedVol <volComparedFilename> "<<std::endl
-		      << general_opt << "\n"
-		      << "Typical use :\n  volCompare -r imageRef.pgm3d --refMin 128 --refMax 255 -c imageDiffExt.pgm3d --compMin 128 --compMax 255 -f \n" ;
+  if ( vm.count ( "help" ) || ! vm.count("volA")||! vm.count("volB") )
+    {
+      trace.info() << "apply basic comparaisons (Number of voxels (B-A), (A-B), ...etc,  statistics on distances) between two volumetric images A and B (shape defined from thresholds). Usefull to determine classical statistics like false positive related stats."<<std::endl
+		   << std::endl << "Basic usage: "<<std::endl
+		   << "\t volCompare --volA <volAFilename> --volB <volBFilename> "<<std::endl
+		   << general_opt << "\n"
+		   << "Typical use :\n  volCompare -a imageA.pgm3d --aMin 128 --aMax 255 -b imageB.pgm3d --bMin 128 --bMax 255 --statsFromBnotInAOnly \n" ;
+
+      return 0;
+    }
+
+  if(! vm.count("volA")||! vm.count("volB"))
+    {
+      trace.error() << " Reference and compared volume filename are needed to be defined" << endl;      
+      return 0;
+    }
+ 
+  std::string volAFilename = vm["volA"].as<std::string>();
+  std::string volBFilename = vm["volB"].as<std::string>();
+ 
+  int aMin =  vm["aMin"].as<int>();
+  int aMax =  vm["aMax"].as<int>();
+  int bMin = vm["bMin"].as<int>();
+  int bMax = vm["bMax"].as<int>();
+ 
+  Image3D imageA = GenericReader<Image3D>::import(volAFilename);
+  Image3D imageB = GenericReader<Image3D>::import(volBFilename);
+ 
+  std::vector<int> vectStats = getVoxelsStats(imageA, aMin, aMax,  imageB,  bMin, bMax);
+  std::cout << "True Positives:" << vectStats.at(0)<< std::endl;
+  std::cout << "True Negatives:" << vectStats.at(1)<< std::endl;
+  std::cout << "False Positives:" << vectStats.at(2)<< std::endl;
+  std::cout << "False Negatives:" << vectStats.at(3)<< std::endl;
+  std::cout << "Tot Positives ref=:" << vectStats.at(4)<< std::endl; 
+  std::cout << "Tot Positives comp=:" << vectStats.at(5)<< std::endl; 
+  std::cout << "Tot Negatives ref=:" << vectStats.at(6)<< std::endl; 
+  std::cout << "Tot Negatives comp=:" << vectStats.at(7)<< std::endl; 
+ 
 
 
-	 return 0;
-       }
-
-     if(! vm.count("referenceVol")||! vm.count("comparedVol"))
-       {
-	 trace.error() << " Reference and compared volume filename are needed to be defined" << endl;      
-	 return 0;
-       }
- 
-     std::string referenceVolFilename = vm["referenceVol"].as<std::string>();
-     std::string compareVolFilename = vm["comparedVol"].as<std::string>();
- 
-     int refMin =  vm["refMin"].as<int>();
-     int refMax =  vm["refMax"].as<int>();
-     int compMin = vm["compMin"].as<int>();
-     int compMax = vm["compMax"].as<int>();
- 
-     Image3D imageRef = GenericReader<Image3D>::import(referenceVolFilename);
-     Image3D imageComp = GenericReader<Image3D>::import(compareVolFilename);
- 
-    std:vector<int> vectStats = getTPTNFPFNVoxelsStats(imageRef, imageComp, refMin, refMax, compMin, compMax);
-     std::cout << "True Positives:" << vectStats.at(0)<< std::endl;
-     std::cout << "True Negatives:" << vectStats.at(1)<< std::endl;
-     std::cout << "False Positives:" << vectStats.at(2)<< std::endl;
-     std::cout << "False Negatives:" << vectStats.at(3)<< std::endl;
-     std::cout << "Tot Positives ref=:" << vectStats.at(4)<< std::endl; 
-     std::cout << "Tot Positives comp=:" << vectStats.at(5)<< std::endl; 
-     std::cout << "Tot Negatives ref=:" << vectStats.at(6)<< std::endl; 
-     std::cout << "Tot Negatives comp=:" << vectStats.at(7)<< std::endl; 
- 
-
-
-     trace.info() << "Computing Distance Map stats ...";
-     Statistic<double> statDistances(true); 
-     getStatsFromDistanceMap(statDistances, imageRef, imageComp, refMin, refMax, compMin, compMax, vm.count("statsFromFalsePosOnly") );
+  trace.info() << "Computing Distance Map stats ...";
+  Statistic<double> statDistances(true); 
+  getStatsFromDistanceMap(statDistances, imageRef, imageComp, refMin, refMax, compMin, compMax, vm.count("statsFromFalsePosOnly") );
      
-     trace.info() << " [done] " << std::endl;
-     std::cout << "distance max= " << statDistances.max() << std::endl;
-     std::cout << "distance mean= " << statDistances.mean() << std::endl; 
-     std::cout << "distance variance= " << statDistances.variance() << std::endl; 
-     std::cout << "distance mediane= " << statDistances.median() << std::endl; 
-     return 1;
-     }
+  trace.info() << " [done] " << std::endl;
+  std::cout << "distance max= " << statDistances.max() << std::endl;
+  std::cout << "distance mean= " << statDistances.mean() << std::endl; 
+  std::cout << "distance variance= " << statDistances.variance() << std::endl; 
+  std::cout << "distance mediane= " << statDistances.median() << std::endl; 
+  return 1;
+}
