@@ -124,9 +124,14 @@ int main( int argc, char** argv )
   //Implicit surface
   IntervalForegroundPredicate<Image> simplePredicate ( image, minThreshold, maxThreshold );
   SurfelAdjacency< KSpace::dimension > SAdj ( true );
-
-  Surfel bel = Surfaces<KSpace>::findABel ( K, simplePredicate, 10000 );
-
+  Surfel bel;
+  try{
+     bel = Surfaces<KSpace>::findABel ( K, simplePredicate, 10000 );
+  }catch(const DGtal::InputException &e){
+    trace.error()<< "Error findinf starting bel: "<< e.what()<< endl;
+    trace.error() << "The interval you use: ]" << minThreshold << ","<< maxThreshold << "] "<< " produces probably an empty set of voxel. " << endl; 
+    return 0;
+  }
   LightImplicitDigitalSurface<KSpace, IntervalForegroundPredicate<Image> > LightImplDigSurf ( K, simplePredicate, SAdj, bel );
   DigitalSurface< LightImplicitDigitalSurface<KSpace, IntervalForegroundPredicate<Image> > > surf ( LightImplDigSurf );
 
