@@ -47,12 +47,13 @@ Utilities to convert various simple file formats:
   - freeman2sdp: convert freeman chain towards a Sequence of Discrete Points.
   - pgm2freeman: to extract a freeman chain contour from a grayscale image.
   - raw2vol and vol2raw: transform 3D volumes files from (resp. to) raw to vol.
-  - ofs2off: convert OFS mesh format towards a OFF variant. 
+  - ofs2off: convert OFS mesh format towards a OFF variant.
   - vol2sdp: a simple tools to extract digital points from 3d vol files.
+  - vol2off: extract dual surface of a digital object (equiv. Marching Cubes)
 
 Estimators
 ----------
- 
+
   - 2dLocalEstimators: program to compare local curvature/tangent estimators on implicit shapes
     - Maximal DSS based estimators
     - Maximal DCA based estimators
@@ -67,7 +68,7 @@ Estimators
   - vol2normalField: compute the normal vector field of a given vol file .
 
 
-ShapeGenerator    
+ShapeGenerator
 --------------
   - shapeGenerator: generate multigrid shape
   - contourGenerator: generate multigrid shape contours
@@ -94,10 +95,10 @@ Visualization
   - 3dImageViewer: tools to display 3d slice images with QGLViewer.
   - 3dVolViewer: volume file (.vol and .pgm3d) viewer with QGLViewer.
   - displayContours: display discrete contours from various format (.fc (freemanchain), .sdp).
-  - meshViewer: display 3D mesh from OFS or OFF format. 
+  - meshViewer: display 3D mesh from OFS or OFF format.
   - patternTriangulation: a new tool that draws with Board2D the convex hull, the closest-point Delaunay triangulation or the farthest-point Delaunay triangulation of a pattern.
- 
-  
+
+
 Here are some illustrations of such a tools:
 <center>
 <table>
@@ -119,16 +120,15 @@ Here are some illustrations of such a tools:
 </center>
 Volumetric
 ----------
-  - 3dVolMarchingCubes: marching cubes form a Vol file	
+  - 3dVolMarchingCubes: marching cubes form a Vol file
   - homotopicThinning3D: ultimate skeleton from vol file
   - volAddBorder: add a 1 voxel boundary with value 0 to a vol file.
   - volCComponentCounter: a simple program to count the number of connected components in a 3D image.
   - volSubSample: sub sample a vol file (division by 2 in each direction).
-  
+
 
 
 How to build the tools
 ======================
   - use cmake tool to generate a build script (MakeFile, VS project,..) from the CMakeLists.txt
   - DGtal must be installed in your system. Concerning DGtal dependencies (boost, Qt,...), all the dependencies used to compile your DGtal library must be present to build the DGtalTools.
-   
