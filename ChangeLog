@@ -6,6 +6,7 @@
 	- slice2vol: tool to merge slices into one 3d volumic file.
 	- longvol2vol: convert longvol to vol file using different
 	conversion policies.
+	- pgm2freeman: add new possibility to set automatically a threshold from the otsu algorithm.
 
 * volumetric:
     convertVol: a simple generic volume image converters (can process actually pgm3d, vol, longvol, raw (for writing)).
