@@ -26,6 +26,60 @@ using namespace DGtal;
 namespace po = boost::program_options;
 
 
+typedef ImageSelector < Z2i::Domain, unsigned char>::Type Image;
+
+
+
+std::vector<unsigned int> getHistoFromImage(const Image &image){
+  const Image::Domain &imgDom = image.domain();
+  std::vector<unsigned int> vectHisto(imgDom.size());
+  for(Image::Domain::ConstIterator it=imgDom.begin(); it!= imgDom.end(); ++it){
+    vectHisto[image(*it)]++;
+  }
+  return vectHisto;
+}
+
+
+
+unsigned int 
+getOtsuThreshold(const Image &image){
+  std::vector<unsigned int> histo = getHistoFromImage(image);
+  unsigned int imageSize = image.domain().size();
+  unsigned int sumA = 0;
+  unsigned int sumB = imageSize;
+  unsigned int muA=0;
+  unsigned int muB=0;
+  unsigned int sumMuAll= 0;
+  for( unsigned int t=0; t< histo.size();t++){
+    sumMuAll+=histo[t]*t;
+  }
+  
+  unsigned int thresholdRes=0;
+  double valMax=0.0;
+  for( unsigned int t=0; t< histo.size(); t++){
+    sumA+=histo[t];
+    if(sumA==0)
+      continue; 
+    sumB=imageSize-sumA;
+    if(sumB==0){
+      break;
+    }
+    
+    muA+=histo[t]*t;
+    muB=sumMuAll-muA;
+    double muAr=muA/(double)sumA;
+    double muBr=muB/(double)sumB;
+    double sigma=  (double)sumA*(double)sumB*(muAr-muBr)*(muAr-muBr);
+    if(valMax<=sigma){
+      valMax=sigma;
+      thresholdRes=t;
+    }
+  }
+  return thresholdRes;
+}
+
+
+
 
 void saveAllContoursAsFc(std::vector< std::vector< Z2i::Point >  >  vectContoursBdryPointels, unsigned int minSize){
   for(unsigned int k=0; k<vectContoursBdryPointels.size(); k++){
@@ -88,6 +142,7 @@ int main( int argc, char** argv )
     {
       trace.info()<< "Extract FreemanChains from thresholded image" <<std::endl << "Basic usage: "<<std::endl
       << "\t image2freeman [options] --image <imageName> -min 128 -max 255 > contours.fc"<<std::endl
+      << "Note that if you don't specify any threshold a threshold threshold max is automatically defined from the Otsu algorithm with min=0. "<<std::endl
       << general_opt << "\n";
       return 0;
     }
@@ -100,6 +155,11 @@ int main( int argc, char** argv )
   bool thresholdRange=vm.count("thresholdRangeMin")||vm.count("thresholdRangeMax");
   Z2i::Point selectCenter;
   unsigned int selectDistanceMax = 0; 
+ 
+  typedef IntervalThresholder<Image::Value> Binarizer; 
+  std::string imageFileName = vm["image"].as<std::string>();
+
+  Image image = GenericReader<Image>::import( imageFileName ); 
   
 
   //Parse options
@@ -132,7 +192,14 @@ int main( int argc, char** argv )
   if(! thresholdRange){
     min=(int)minThreshold;
     max= (int)maxThreshold;
-    increment =  (int)(maxThreshold- minThreshold);
+    increment =  (int)(maxThreshold - minThreshold);
+    if(!vm.count("min")&&!vm.count("max")) {
+      min=0;
+      trace.info() << "Min/Max threshold values not specified, set min to 0 and computing max with the otsu algorithm...";     
+      max = getOtsuThreshold(image);
+      trace.info() << "[done] (max= " << max << ") "<< std::endl;
+    }
+    
   }else{
     std::vector<int> vectRange;
     if ( vm.count("thresholdRangeMax")){
@@ -153,13 +220,7 @@ int main( int argc, char** argv )
 
  
 
-  
-  typedef ImageSelector < Z2i::Domain, unsigned char>::Type Image;
-  typedef IntervalThresholder<Image::Value> Binarizer; 
-  std::string imageFileName = vm["image"].as<std::string>();
-
-  Image image = GenericReader<Image>::import( imageFileName ); 
-  
+ 
   Z2i::KSpace ks;
   if(! ks.init( image.domain().lowerBound(), 
 		image.domain().upperBound(), true )){
