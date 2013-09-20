@@ -142,7 +142,7 @@ int main( int argc, char** argv )
     {
       trace.info()<< "Extract FreemanChains from thresholded image" <<std::endl << "Basic usage: "<<std::endl
       << "\t image2freeman [options] --image <imageName> -min 128 -max 255 > contours.fc"<<std::endl
-      << "Note that if you don't specify any threshold a threshold t is automatically defined from the Otsu algorithm. "<<std::endl
+      << "Note that if you don't specify any threshold a threshold threshold max is automatically defined from the Otsu algorithm with min=0. "<<std::endl
       << general_opt << "\n";
       return 0;
     }
@@ -193,12 +193,9 @@ int main( int argc, char** argv )
     min=(int)minThreshold;
     max= (int)maxThreshold;
     increment =  (int)(maxThreshold - minThreshold);
-    if(!vm.count("min")){
-      trace.info() << "Min threshold value not specified, computing it with the otsu algorithm...";
-      min = getOtsuThreshold(image);      
-      trace.info() << "[done] (min= " << min << ") "<< std::endl;
-    }else if(!vm.count("max")){
-      trace.info() << "Max threshold value not specified, , computing it with the otsu algorithm...";
+    if(!vm.count("min")&&!vm.count("max")) {
+      min=0;
+      trace.info() << "Min/Max threshold values not specified, set min to 0 and computing max with the otsu algorithm...";     
       max = getOtsuThreshold(image);
       trace.info() << "[done] (max= " << max << ") "<< std::endl;
     }
