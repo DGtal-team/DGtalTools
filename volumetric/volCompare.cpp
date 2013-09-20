@@ -62,8 +62,8 @@ isDiff(const Image3D &refImage, const Image3D &compImage,
 
 
 void
-getStatsFromDistanceMap(Statistic<double> & stats, const Image3D &refImage, const Image3D &compImage, 
-			int refMin, int refMax,  int compMin, int compMax, 
+getStatsFromDistanceMap(Statistic<double> & stats, const Image3D &refImage, int refMin, int refMax,
+			const Image3D &compImage,   int compMin, int compMax, 
 			bool statOnFalsePositiveOnly=false){
 
   // Get the digital set from ref image by computing the surface (use -1 and +1 since the interval of append function are open)
@@ -218,7 +218,7 @@ int main(int argc, char**argv)
 
   trace.info() << "Computing Distance Map stats ...";
   Statistic<double> statDistances(true); 
-  getStatsFromDistanceMap(statDistances, imageRef, imageComp, refMin, refMax, compMin, compMax, vm.count("statsFromFalsePosOnly") );
+  getStatsFromDistanceMap(statDistances, imageA, aMin, aMax, imageB, bMin, bMax, vm.count("statsFromFalsePosOnly") );
      
   trace.info() << " [done] " << std::endl;
   std::cout << "distance max= " << statDistances.max() << std::endl;
