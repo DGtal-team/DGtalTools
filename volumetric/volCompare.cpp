@@ -97,11 +97,11 @@ getStatsFromDistanceMap(Statistic<double> & stats, const Image3D &imageA, int aM
 
 
 
-
-
 // total ref: True Positive, True Negative, False Positive, False Negative
 std::vector<int> getVoxelsStats(const Image3D &imageA,  int aMin, int aMax, const Image3D &imageB, 
-				int bMin, int bMax){
+				int bMin, int bMax, bool exportStatVoxels,  std::vector<Point> &vectPtBinA,  
+				std::vector<Point> &vectPtCompBinCompA,  std::vector<Point> &vectPtBnotInA, 
+				std::vector<Point> &vectPtnotBInA ){
   int numBinA = 0; // true positif with A as ref shape.
   int numCompBinCompA = 0; // true neg with A as ref shape.
   int numBnotInA = 0; // false pos with A as ref shape
@@ -119,9 +119,11 @@ std::vector<int> getVoxelsStats(const Image3D &imageA,  int aMin, int aMax, cons
       if(imageB(*it) <= bMax && imageB(*it) >= bMin){
 	numTotalInB++;
 	numBinA++;
+	if(exportStatVoxels) vectPtBinA.push_back(*it);
       }else{
 	numTotalinCompB++;
 	numNotBinA++;
+	if(exportStatVoxels) vectPtnotBInA.push_back(*it);
       }
       // voxels outside A
     }else{
@@ -130,9 +132,11 @@ std::vector<int> getVoxelsStats(const Image3D &imageA,  int aMin, int aMax, cons
       if(imageB(*it) <= bMax && imageB(*it) >= bMin){
 	numBnotInA++;
 	numTotalInB++;
+	if(exportStatVoxels) vectPtBnotInA.push_back(*it);
       }else{
 	numTotalinCompB++;
 	numCompBinCompA++;
+	if(exportStatVoxels) vectPtCompBinCompA.push_back(*it);
       }      
     }
   }
@@ -152,6 +156,26 @@ std::vector<int> getVoxelsStats(const Image3D &imageA,  int aMin, int aMax, cons
 
 
 
+// total ref: True Positive, True Negative, False Positive, False Negative
+std::vector<int> getVoxelsStats(const Image3D &imageA,  int aMin, int aMax, const Image3D &imageB, 
+				int bMin, int bMax ){
+  std::vector<Point> v1, v2, v3, v4;
+  return getVoxelsStats(imageA, aMin, aMax, imageB, bMin, bMax, false, v1, v2, v3, v4);
+}
+
+
+void 
+exportSetofPoints(string filename, std::vector<Point> aVectPoint){
+  std::ofstream ofs;
+  ofs.open(filename.c_str(), std::ofstream::out );
+  ofs<< "# Set of 3d points with format: x y z" << std::endl;
+  for (unsigned int i =0; i< aVectPoint.size(); i++){
+    ofs << aVectPoint.at(i)[0] << " " << aVectPoint.at(i)[1] << " "<< aVectPoint.at(i)[2] << std::endl;
+  }
+  ofs.close();
+}
+
+
 int main(int argc, char**argv)
 {
 
@@ -169,7 +193,8 @@ int main(int argc, char**argv)
     ( "bMin", po::value<int>()->default_value(0), "min threshold for a voxel to be considered as belonging to the object of volume B. (default 0)" )
     ( "bMax", po::value<int>()->default_value(128), "max threshold for a voxel to be considered as belonging to the object of volume B. (default 128)" )
     ("statsFromBnotInAOnly" , "apply distance map stats only for voxels of B which are not in A (else compute stats from all distances of the object B).")
-    ("displayTFstats", "Change the comparison diplay by using the  true/false/positive/negative notation and considering the shape A as reference.");
+    ("displayTFstats", "Change the comparison diplay by using the  true/false/positive/negative notation and considering the shape A as reference.")
+    ("exportSDP", "Export voxels belonging to each categorie (voxels of ( B in A) , (NOT in B and NOT in A),   (B and NOT in A) and (Voxels of NOT in B and in A)). ") ;
   
   bool parseOK=true;
   po::variables_map vm;
@@ -208,16 +233,35 @@ int main(int argc, char**argv)
  
   Image3D imageA = GenericReader<Image3D>::import(volAFilename);
   Image3D imageB = GenericReader<Image3D>::import(volBFilename);
- 
-  std::vector<int> vectStats = getVoxelsStats(imageA, aMin, aMax,  imageB,  bMin, bMax);
+  std::vector<Point> voxelsBinA, voxelsNotInBNotInA, voxelsBNotInA, voxelsNotInBInA; 
+  std::vector<int> vectStats;
+  if(vm.count("exportSDP")){
+    vectStats = getVoxelsStats(imageA, aMin, aMax,  imageB,  bMin, bMax, true, voxelsBinA, voxelsNotInBNotInA, voxelsBNotInA, voxelsNotInBInA);    
+  }else{
+    vectStats = getVoxelsStats(imageA, aMin, aMax,  imageB,  bMin, bMax);
+  }
+
   if(vm.count("displayTFstats")){
     std::cout << "# Statistics given with the reference shape A: "<< volAFilename<< " (defined with threshold min: " << aMin << " and max: " << aMax << " )"<< endl;
     std::cout << "# and with the compared shape B: "<< volBFilename << "  (defined with threshold min: " << bMin << " and max: " << bMax << " )"<< endl;
     std::cout << "# #True_Positive #TrueNegative #FalsePositive #FalseNegative  #TotalinA #TotalInB #TotalComplementOfRef #TotalComplementOfComp "<< endl;    
+
+    if(vm.count("exportSDP")){
+      exportSetofPoints("truePos.sdp",  voxelsBinA);
+      exportSetofPoints("trueNeg.sdp",  voxelsNotInBNotInA);
+      exportSetofPoints("falsePos.sdp", voxelsBNotInA);
+      exportSetofPoints("falseNeg.sdp", voxelsNotInBInA);
+    }
   }else{ 
     std::cout << "# Statistics given with the shape A: "<< volAFilename<< " (defined with threshold min: " << aMin << " and max: " << aMax << " )"<< endl;
     std::cout << "# and shape B: "<< volBFilename << "  (defined with threshold min: " << bMin << " and max: " << bMax << " )"<< endl;
     std::cout << "# #(Voxels of B in A) #(Voxels of NOT in B and NOT in A) #(Voxels of B and NOT in A)  #(Voxels of NOT in B and in A) #(Voxels in A) #(Voxels in B) #(Voxels not in A) #(Voxels not in B) "<< endl;    
+    if(vm.count("exportSDP")){
+      exportSetofPoints("inBinA.sdp",  voxelsBinA);
+      exportSetofPoints("notinBnotinA.sdp",  voxelsNotInBNotInA);
+      exportSetofPoints("inBnotinA.sdp", voxelsBNotInA);
+      exportSetofPoints("notinBinA.sdp", voxelsNotInBInA);
+    }
   }
 
   for(unsigned int i=0; i< vectStats.size(); i++) 
@@ -232,7 +276,7 @@ int main(int argc, char**argv)
      
   trace.info() << " [done] " << std::endl;
   std::cout << "# Statistics from distances " << std::endl;
-  std::cout << "# Max(MinDistance(shape B to shape B) Mean(MinDistance(shape B to shape B) Variance(MinDistance(shape B to shape B) Mediane(MinDistance(shape B to shape B)  " << std::endl;
+  std::cout << "# Max(MinDistance(shape B to shape A) Mean(MinDistance(shape B to shape A) Variance(MinDistance(shape B to shape A) Mediane(MinDistance(shape B to shape A)  " << std::endl;
   std::cout << statDistances.max() << " " << statDistances.mean()  << " " << statDistances.variance()  << "  "<< statDistances.median() << std::endl; 
   return 1;
 }
