@@ -52,38 +52,38 @@ typedef ImageContainerBySTLVector < Z2i::Domain,  int > Image2D;
 
 
 bool 
-isDiff(const Image3D &refImage, const Image3D &compImage, 
-       int refMin, int refMax,  int compMin, int compMax, const Point &pt){
-  bool isRefOn = (refImage(pt)<= refMax) && (refImage(pt) >= refMin);
-  bool isCompOn = (compImage(pt)<= compMax) && (compImage(pt) >= compMin);
+isDiff(const Image3D &imageA, int aMin, int aMax, const Image3D &imageB, 
+       int bMin, int bMax, const Point &pt){
+  bool isRefOn = (imageA(pt)<= aMax) && (imageA(pt) >= aMin);
+  bool isCompOn = (imageB(pt)<= bMax) && (imageB(pt) >= bMin);
   return ((!isRefOn && isCompOn) || (isRefOn && !isCompOn));
 }
 
 
 
 void
-getStatsFromDistanceMap(Statistic<double> & stats, const Image3D &refImage, int refMin, int refMax,
-			const Image3D &compImage,   int compMin, int compMax, 
+getStatsFromDistanceMap(Statistic<double> & stats, const Image3D &imageA, int aMin, int aMax,
+			const Image3D & imageB,  int bMin, int bMax, 
 			bool statOnFalsePositiveOnly=false){
 
   // Get the digital set from ref image by computing the surface (use -1 and +1 since the interval of append function are open)
-  Z3i::DigitalSet set3dRef (refImage.domain()); 
-  SetFromImage<Z3i::DigitalSet>::append<Image3D>(set3dRef, refImage, refMin-1,refMax);  
+  Z3i::DigitalSet set3dRef (imageA.domain()); 
+  SetFromImage<Z3i::DigitalSet>::append<Image3D>(set3dRef, imageA, aMin-1,aMax);  
   typedef NotPointPredicate<Z3i::DigitalSet> NegPredicate;
   
 
   // Applying the distance transform on the digital surface of the set: 
   typedef  DistanceTransformation<Z3i::Space, NegPredicate, Z3i::L2Metric> DTL2;   
-  DTL2 dtL2(&(refImage.domain()), NegPredicate(set3dRef), &Z3i::l2Metric);
+  DTL2 dtL2(&(imageA.domain()), NegPredicate(set3dRef), &Z3i::l2Metric);
 
-  // Get the set of point of compImage: (use -1 and +1 since the interval of append function are open)
-  Z3i::DigitalSet set3dComp (compImage.domain()); 
-  SetFromImage<Z3i::DigitalSet>::append<Image3D>(set3dComp, compImage, compMin-1, compMax);
+  // Get the set of point of imageB: (use -1 and +1 since the interval of append function are open)
+  Z3i::DigitalSet set3dComp (imageB.domain()); 
+  SetFromImage<Z3i::DigitalSet>::append<Image3D>(set3dComp, imageB, bMin-1, bMax);
 
   unsigned int nbAdded=0;
-  //Applying stats from the set to be compared (from compImage)
+  //Applying stats from the set to be compared (from imageB)
   for(Z3i::DigitalSet::ConstIterator it= set3dComp.begin();  it!= set3dComp.end(); ++it){
-    if((!statOnFalsePositiveOnly) || (isDiff(refImage, compImage, refMin, refMax, compMin, compMax, *it))){
+    if((!statOnFalsePositiveOnly) || (isDiff(imageA, aMin, aMax, imageB, bMin, bMax, *it))){
       DTL2::Value distance = dtL2(*it);   
       stats.addValue(distance);
       nbAdded++;
@@ -100,47 +100,51 @@ getStatsFromDistanceMap(Statistic<double> & stats, const Image3D &refImage, int 
 
 
 // total ref: True Positive, True Negative, False Positive, False Negative
-std::vector<int> getVoxelsStats(const Image3D &refImage,  int refMin, int refMax, const Image3D &compImage, 
-				int compMin, int compMax){
-  int truePos = 0; 
-  int trueNeg = 0;
-  int falsePos = 0;
-  int falseNeg = 0;
-  int totPosRef=0;
-  int totPosComp=0;
-  int totNegRef=0;
-  int totNegComp=0;
+std::vector<int> getVoxelsStats(const Image3D &imageA,  int aMin, int aMax, const Image3D &imageB, 
+				int bMin, int bMax){
+  int numBinA = 0; // true positif with A as ref shape.
+  int numCompBinCompA = 0; // true neg with A as ref shape.
+  int numBnotInA = 0; // false pos with A as ref shape
+  int numNotBinA = 0; // false neg with A as ref shape
+  int numTotalInA = 0; // total pos in reference shape
+  int numTotalInB = 0; // total pos in compared shape
+  int numTotalinCompA = 0; //total in complement A 
+  int numTotalinCompB = 0; //total in complement B
 
-  for(Image3D::Domain::ConstIterator it = refImage.domain().begin(); it!=refImage.domain().end(); it++){
-    if(refImage(*it) <= refMax && refImage(*it) >= refMin){
-      totPosRef++;
-      if(compImage(*it) <= compMax && compImage(*it) >= compMin){
-	totPosComp++;
-	truePos++;
+  for(Image3D::Domain::ConstIterator it = imageA.domain().begin(); it!=imageA.domain().end(); it++){
+    // voxels in A
+    if(imageA(*it) <= aMax && imageA(*it) >= aMin){
+      numTotalInA++;
+      //voxels in B 
+      if(imageB(*it) <= bMax && imageB(*it) >= bMin){
+	numTotalInB++;
+	numBinA++;
       }else{
-	totNegComp++;
-	falseNeg++;
+	numTotalinCompB++;
+	numNotBinA++;
       }
+      // voxels outside A
     }else{
-      totNegRef++;
-      if(compImage(*it) <= compMax && compImage(*it) >= compMin){
-	falsePos++;
-	totPosComp++;
+      numTotalinCompA++;
+      // voxels in B
+      if(imageB(*it) <= bMax && imageB(*it) >= bMin){
+	numBnotInA++;
+	numTotalInB++;
       }else{
-	totNegComp++;
-	trueNeg++;
+	numTotalinCompB++;
+	numCompBinCompA++;
       }      
     }
   }
   std::vector<int> res;
-  res.push_back(truePos);
-  res.push_back(trueNeg);
-  res.push_back(falsePos);
-  res.push_back(falseNeg);
-  res.push_back(totPosRef);
-  res.push_back(totPosComp);
-  res.push_back(totNegRef);
-  res.push_back(totNegComp);
+  res.push_back(numBinA);
+  res.push_back(numCompBinCompA);
+  res.push_back(numBnotInA);
+  res.push_back(numNotBinA);
+  res.push_back(numTotalInA);
+  res.push_back(numTotalInB);
+  res.push_back(numTotalinCompA);
+  res.push_back(numTotalinCompB);
   
   return res;
 }
@@ -164,7 +168,8 @@ int main(int argc, char**argv)
     ( "aMax", po::value<int>()->default_value(128), "max threshold for a voxel to be considered as belonging to the object of volume A. (default 128)" )
     ( "bMin", po::value<int>()->default_value(0), "min threshold for a voxel to be considered as belonging to the object of volume B. (default 0)" )
     ( "bMax", po::value<int>()->default_value(128), "max threshold for a voxel to be considered as belonging to the object of volume B. (default 128)" )
-    ("statsFromBnotInAOnly" , "apply distance map stats only for voxels of B which are not in A (else compute stats from all distances of the object B).");
+    ("statsFromBnotInAOnly" , "apply distance map stats only for voxels of B which are not in A (else compute stats from all distances of the object B).")
+    ("displayTFstats", "Change the comparison diplay by using the  true/false/positive/negative notation and considering the shape A as reference.");
   
   bool parseOK=true;
   po::variables_map vm;
@@ -189,15 +194,15 @@ int main(int argc, char**argv)
 
   if(! vm.count("volA")||! vm.count("volB"))
     {
-      trace.error() << " Reference and compared volume filename are needed to be defined" << endl;      
+      trace.error() << " The two volume filename are needed to be defined" << endl;      
       return 0;
     }
  
   std::string volAFilename = vm["volA"].as<std::string>();
   std::string volBFilename = vm["volB"].as<std::string>();
  
-  int aMin =  vm["aMin"].as<int>();
-  int aMax =  vm["aMax"].as<int>();
+  int aMin = vm["aMin"].as<int>();
+  int aMax = vm["aMax"].as<int>();
   int bMin = vm["bMin"].as<int>();
   int bMax = vm["bMax"].as<int>();
  
@@ -205,15 +210,20 @@ int main(int argc, char**argv)
   Image3D imageB = GenericReader<Image3D>::import(volBFilename);
  
   std::vector<int> vectStats = getVoxelsStats(imageA, aMin, aMax,  imageB,  bMin, bMax);
-  std::cout << "True Positives:" << vectStats.at(0)<< std::endl;
-  std::cout << "True Negatives:" << vectStats.at(1)<< std::endl;
-  std::cout << "False Positives:" << vectStats.at(2)<< std::endl;
-  std::cout << "False Negatives:" << vectStats.at(3)<< std::endl;
-  std::cout << "Tot Positives ref=:" << vectStats.at(4)<< std::endl; 
-  std::cout << "Tot Positives comp=:" << vectStats.at(5)<< std::endl; 
-  std::cout << "Tot Negatives ref=:" << vectStats.at(6)<< std::endl; 
-  std::cout << "Tot Negatives comp=:" << vectStats.at(7)<< std::endl; 
- 
+  if(vm.count("displayTFstats")){
+    std::cout << "# Statistics given with the reference shape A: "<< volAFilename<< " (defined with threshold min: " << aMin << " and max: " << aMax << " )"<< endl;
+    std::cout << "# and with the compared shape B: "<< volBFilename << "  (defined with threshold min: " << bMin << " and max: " << bMax << " )"<< endl;
+    std::cout << "# #True_Positive #TrueNegative #FalsePositive #FalseNegative  #TotalinA #TotalInB #TotalComplementOfRef #TotalComplementOfComp "<< endl;    
+  }else{ 
+    std::cout << "# Statistics given with the shape A: "<< volAFilename<< " (defined with threshold min: " << aMin << " and max: " << aMax << " )"<< endl;
+    std::cout << "# and shape B: "<< volBFilename << "  (defined with threshold min: " << bMin << " and max: " << bMax << " )"<< endl;
+    std::cout << "# #(Voxels of B in A) #(Voxels of NOT in B and NOT in A) #(Voxels of B and NOT in A)  #(Voxels of NOT in B and in A) #(Voxels in A) #(Voxels in B) #(Voxels not in A) #(Voxels not in B) "<< endl;    
+  }
+
+  for(unsigned int i=0; i< vectStats.size(); i++) 
+    std::cout << vectStats.at(i) << " "; 
+  std::cout << endl;
+  
 
 
   trace.info() << "Computing Distance Map stats ...";
@@ -221,9 +231,8 @@ int main(int argc, char**argv)
   getStatsFromDistanceMap(statDistances, imageA, aMin, aMax, imageB, bMin, bMax, vm.count("statsFromFalsePosOnly") );
      
   trace.info() << " [done] " << std::endl;
-  std::cout << "distance max= " << statDistances.max() << std::endl;
-  std::cout << "distance mean= " << statDistances.mean() << std::endl; 
-  std::cout << "distance variance= " << statDistances.variance() << std::endl; 
-  std::cout << "distance mediane= " << statDistances.median() << std::endl; 
+  std::cout << "# Statistics from distances " << std::endl;
+  std::cout << "# Max(MinDistance(shape B to shape B) Mean(MinDistance(shape B to shape B) Variance(MinDistance(shape B to shape B) Mediane(MinDistance(shape B to shape B)  " << std::endl;
+  std::cout << statDistances.max() << " " << statDistances.mean()  << " " << statDistances.variance()  << "  "<< statDistances.median() << std::endl; 
   return 1;
 }
