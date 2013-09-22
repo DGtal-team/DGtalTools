@@ -280,3 +280,4 @@ int main(int argc, char**argv)
   std::cout << statDistances.max() << " " << statDistances.mean()  << " " << statDistances.variance()  << "  "<< statDistances.median() << std::endl; 
   return 1;
 }
+
