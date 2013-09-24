@@ -40,6 +40,8 @@
 #include <boost/program_options/options_description.hpp>
 #include <boost/program_options/parsers.hpp>
 #include <boost/program_options/variables_map.hpp>
+#include <limits>
+
 
 using namespace std;
 using namespace DGtal;
@@ -49,6 +51,23 @@ namespace po = boost::program_options;
 
 typedef ImageContainerBySTLVector < Z3i::Domain,  int > Image3D;
 typedef ImageContainerBySTLVector < Z2i::Domain,  int > Image2D;
+
+
+double
+getRMSE(const Image3D & imageA, const Image3D &imageB){
+  double sumDiff=0;
+  for(Image3D::Domain::ConstIterator it = imageA.domain().begin(); it!=imageA.domain().end(); it++){
+    sumDiff+=(imageA(*it)-imageB(*it))*(imageA(*it)-imageB(*it));
+  }
+  return sqrt(sumDiff/imageA.domain().size());
+}
+
+
+double
+getPSNR(const Image3D & imageA, const Image3D &imageB, double rmsd){
+  unsigned long long int d =  std::numeric_limits<Image3D::Value>::max();
+  double res= 10.0*log10(d*d/rmsd);
+}
 
 
 bool 
@@ -97,7 +116,7 @@ getStatsFromDistanceMap(Statistic<double> & stats, const Image3D &imageA, int aM
 
 
 
-// total ref: True Positive, True Negative, False Positive, False Negative
+
 std::vector<int> getVoxelsStats(const Image3D &imageA,  int aMin, int aMax, const Image3D &imageB, 
 				int bMin, int bMax, bool exportStatVoxels,  std::vector<Point> &vectPtBinA,  
 				std::vector<Point> &vectPtCompBinCompA,  std::vector<Point> &vectPtBnotInA, 
@@ -208,7 +227,7 @@ int main(int argc, char**argv)
   
   if ( vm.count ( "help" ) || ! vm.count("volA")||! vm.count("volB") )
     {
-      trace.info() << "apply basic comparaisons (Number of voxels (B-A), (A-B), ...etc,  statistics on distances) between two volumetric images A and B (shape defined from thresholds). Usefull to determine classical statistics like false positive related stats."<<std::endl
+      trace.info() << "apply basic comparaisons (Number of voxels (B-A), (A-B), ...etc,  statistics on distances, RMSE, PSNR) between two volumetric images A and B (shape defined from thresholds). Usefull to determine classical statistics like false positive related stats."<<std::endl
 		   << std::endl << "Basic usage: "<<std::endl
 		   << "\t volCompare --volA <volAFilename> --volB <volBFilename> "<<std::endl
 		   << general_opt << "\n"
@@ -244,7 +263,7 @@ int main(int argc, char**argv)
   if(vm.count("displayTFstats")){
     std::cout << "# Statistics given with the reference shape A: "<< volAFilename<< " (defined with threshold min: " << aMin << " and max: " << aMax << " )"<< endl;
     std::cout << "# and with the compared shape B: "<< volBFilename << "  (defined with threshold min: " << bMin << " and max: " << bMax << " )"<< endl;
-    std::cout << "# #True_Positive #TrueNegative #FalsePositive #FalseNegative  #TotalinA #TotalInB #TotalComplementOfRef #TotalComplementOfComp "<< endl;    
+    std::cout << "# #True_Positive #TrueNegative #FalsePositive #FalseNegative  #TotalinA #TotalInB #TotalComplementOfRef #TotalComplementOfComp RMSE PSNR "<< endl;    
 
     if(vm.count("exportSDP")){
       exportSetofPoints("truePos.sdp",  voxelsBinA);
@@ -266,10 +285,12 @@ int main(int argc, char**argv)
 
   for(unsigned int i=0; i< vectStats.size(); i++) 
     std::cout << vectStats.at(i) << " "; 
-  std::cout << endl;
   
-
-
+  double rmse= getRMSE(imageA, imageB);
+  double psnr= getPSNR(imageA, imageB, rmse);
+  
+  std::cout << rmse << " " << psnr << endl;
+   
   trace.info() << "Computing Distance Map stats ...";
   Statistic<double> statDistances(true); 
   getStatsFromDistanceMap(statDistances, imageA, aMin, aMax, imageB, bMin, bMax, vm.count("statsFromFalsePosOnly") );
