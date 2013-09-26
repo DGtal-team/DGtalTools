@@ -86,27 +86,31 @@ void displayAxes( Viewer3D<space, kspace> & viewer,
                 (double)upperBound[ 2 ]-0.5 );
   if ( ( mode == "WIRED" ) || ( mode == "COLORED" ) )
     {
-      viewer.addLine( p0[ 0 ], p0[ 1 ], p0[ 2 ], p1[ 0 ], p0[ 1 ], p0[ 2 ], AXIS_COLOR, AXIS_LINESIZE );
-      viewer.addLine( p0[ 0 ], p0[ 1 ], p0[ 2 ], p0[ 0 ], p1[ 1 ], p0[ 2 ], AXIS_COLOR, AXIS_LINESIZE );
-      viewer.addLine( p0[ 0 ], p0[ 1 ], p0[ 2 ], p0[ 0 ], p0[ 1 ], p1[ 2 ], AXIS_COLOR, AXIS_LINESIZE );
-      viewer.addLine( p1[ 0 ], p0[ 1 ], p0[ 2 ], p1[ 0 ], p1[ 1 ], p0[ 2 ], AXIS_COLOR, AXIS_LINESIZE );
-      viewer.addLine( p1[ 0 ], p0[ 1 ], p0[ 2 ], p1[ 0 ], p0[ 1 ], p1[ 2 ], AXIS_COLOR, AXIS_LINESIZE );
-      viewer.addLine( p0[ 0 ], p1[ 1 ], p0[ 2 ], p1[ 0 ], p1[ 1 ], p0[ 2 ], AXIS_COLOR, AXIS_LINESIZE );
-      viewer.addLine( p0[ 0 ], p1[ 1 ], p0[ 2 ], p0[ 0 ], p1[ 1 ], p1[ 2 ], AXIS_COLOR, AXIS_LINESIZE );
-      viewer.addLine( p0[ 0 ], p0[ 1 ], p1[ 2 ], p1[ 0 ], p0[ 1 ], p1[ 2 ], AXIS_COLOR, AXIS_LINESIZE );
-      viewer.addLine( p0[ 0 ], p0[ 1 ], p1[ 2 ], p0[ 0 ], p1[ 1 ], p1[ 2 ], AXIS_COLOR, AXIS_LINESIZE );
-      viewer.addLine( p1[ 0 ], p1[ 1 ], p0[ 2 ], p1[ 0 ], p1[ 1 ], p1[ 2 ], AXIS_COLOR, AXIS_LINESIZE );
-      viewer.addLine( p1[ 0 ], p0[ 1 ], p1[ 2 ], p1[ 0 ], p1[ 1 ], p1[ 2 ], AXIS_COLOR, AXIS_LINESIZE );
-      viewer.addLine( p0[ 0 ], p1[ 1 ], p1[ 2 ], p1[ 0 ], p1[ 1 ], p1[ 2 ], AXIS_COLOR, AXIS_LINESIZE );
+      viewer.setLineColor(AXIS_COLOR);
+      viewer.addLine( p0[ 0 ], p0[ 1 ], p0[ 2 ], p1[ 0 ], p0[ 1 ], p0[ 2 ],  AXIS_LINESIZE );
+      viewer.addLine( p0[ 0 ], p0[ 1 ], p0[ 2 ], p0[ 0 ], p1[ 1 ], p0[ 2 ],  AXIS_LINESIZE );
+      viewer.addLine( p0[ 0 ], p0[ 1 ], p0[ 2 ], p0[ 0 ], p0[ 1 ], p1[ 2 ],  AXIS_LINESIZE );
+      viewer.addLine( p1[ 0 ], p0[ 1 ], p0[ 2 ], p1[ 0 ], p1[ 1 ], p0[ 2 ],  AXIS_LINESIZE );
+      viewer.addLine( p1[ 0 ], p0[ 1 ], p0[ 2 ], p1[ 0 ], p0[ 1 ], p1[ 2 ],  AXIS_LINESIZE );
+      viewer.addLine( p0[ 0 ], p1[ 1 ], p0[ 2 ], p1[ 0 ], p1[ 1 ], p0[ 2 ],  AXIS_LINESIZE );
+      viewer.addLine( p0[ 0 ], p1[ 1 ], p0[ 2 ], p0[ 0 ], p1[ 1 ], p1[ 2 ],  AXIS_LINESIZE );
+      viewer.addLine( p0[ 0 ], p0[ 1 ], p1[ 2 ], p1[ 0 ], p0[ 1 ], p1[ 2 ],  AXIS_LINESIZE );
+      viewer.addLine( p0[ 0 ], p0[ 1 ], p1[ 2 ], p0[ 0 ], p1[ 1 ], p1[ 2 ],  AXIS_LINESIZE );
+      viewer.addLine( p1[ 0 ], p1[ 1 ], p0[ 2 ], p1[ 0 ], p1[ 1 ], p1[ 2 ],  AXIS_LINESIZE );
+      viewer.addLine( p1[ 0 ], p0[ 1 ], p1[ 2 ], p1[ 0 ], p1[ 1 ], p1[ 2 ],  AXIS_LINESIZE );
+      viewer.addLine( p0[ 0 ], p1[ 1 ], p1[ 2 ], p1[ 0 ], p1[ 1 ], p1[ 2 ],  AXIS_LINESIZE );
     }
   if ( mode == "COLORED" )
     {
+      viewer.setFillColor(XY_COLOR);
       viewer.addQuad( p1[ 0 ], p1[ 1 ], p1[ 2 ], p1[ 0 ], p0[ 1 ], p1[ 2 ],
-		      p0[ 0 ], p0[ 1 ], p1[ 2 ], p0[ 0 ], p1[ 1 ], p1[ 2 ], XY_COLOR );
+		      p0[ 0 ], p0[ 1 ], p1[ 2 ], p0[ 0 ], p1[ 1 ], p1[ 2 ] );
+      viewer.setFillColor(XZ_COLOR);
       viewer.addQuad( p1[ 0 ], p1[ 1 ], p1[ 2 ], p0[ 0 ], p1[ 1 ], p1[ 2 ],
-		      p0[ 0 ], p1[ 1 ], p0[ 2 ], p1[ 0 ], p1[ 1 ], p0[ 2 ], XZ_COLOR );
+		      p0[ 0 ], p1[ 1 ], p0[ 2 ], p1[ 0 ], p1[ 1 ], p0[ 2 ] );
+      viewer.setFillColor(YZ_COLOR);
       viewer.addQuad( p1[ 0 ], p1[ 1 ], p1[ 2 ], p1[ 0 ], p0[ 1 ], p1[ 2 ],
-		      p1[ 0 ], p0[ 1 ], p0[ 2 ], p1[ 0 ], p1[ 1 ], p0[ 2 ], YZ_COLOR );
+		      p1[ 0 ], p0[ 1 ], p0[ 2 ], p1[ 0 ], p1[ 1 ], p0[ 2 ] );
     }
 }
 
@@ -133,7 +137,7 @@ void displayDSS3dTangent( Viewer3D<space, kspace> & viewer,
 {
   typedef typename ArithmeticalDSS3d::Point3d Point;
   typedef typename ArithmeticalDSS3d::PointD3d PointD3d;
-  typedef typename Display3D<>::ballD3D PointD3D;  
+  typedef typename Display3D<>::BallD3D PointD3D;  
   Point directionZ3;
   PointD3d P1, P2, direction, intercept, thickness;
   dss3d.getParameters( directionZ3, intercept, thickness );
@@ -146,10 +150,10 @@ void displayDSS3dTangent( Viewer3D<space, kspace> & viewer,
   
   PointD3d Q1 = intercept + t1 * direction;
   PointD3d Q2 = intercept + t2 * direction;
-  
+  viewer.setLineColor(color3d);
   viewer.addLine( Q1[ 0 ]-0.5, Q1[ 1 ]-0.5, Q1[ 2 ]-0.5, 
 		  Q2[ 0 ]-0.5, Q2[ 1 ]-0.5, Q2[ 2 ]-0.5, 
-		  color3d, MS3D_LINESIZE );
+		   MS3D_LINESIZE );
 }
 
 template <typename KSpace, typename ArithmeticalDSS3d, typename space, typename kspace >
@@ -193,7 +197,7 @@ void displayDSS2d( Viewer3D<space, kspace> & viewer,
   typedef typename KSpace::Cell Cell;
   typedef typename KSpace::Point Point3d;
   typedef DGtal::PointVector<2,double> PointD2d;
-  typedef typename Display3D<>::ballD3D PointD3D;  
+  typedef typename Display3D<>::BallD3D PointD3D;  
   Point3d b = ks.lowerBound();
   for ( DGtal::Dimension i = 0; i < 3; ++i )
     {
@@ -215,10 +219,12 @@ void displayDSS2d( Viewer3D<space, kspace> & viewer,
 	  }
 	  bb.push_back( p3 );
 	}
-      for ( unsigned int j = 0; j < pts2d.size(); ++j )
-        viewer.addLine( bb[ j ].x, bb[ j ].y, bb[ j ].z,
+      for ( unsigned int j = 0; j < pts2d.size(); ++j ){
+	viewer.setLineColor(color2d);
+	viewer.addLine( bb[ j ].x, bb[ j ].y, bb[ j ].z,
                         bb[ (j+1)%4 ].x, bb[ (j+1)%4 ].y, bb[ (j+1)%4 ].z,
-                        color2d, MS3D_LINESIZE );
+			MS3D_LINESIZE );
+      }
     } // for ( DGtal::Dimension i = 0; i < 3; ++i )
 }
 

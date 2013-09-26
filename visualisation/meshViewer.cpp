@@ -100,10 +100,9 @@ int main( int argc, char** argv )
 
   bool invertNormal= vm.count("invertNormal");
   
-  
-  
+    
   trace.info() << "Importing mesh... ";
-  Mesh<Display3D<>::ballD3D> anImportedMesh(true);
+  Mesh< Display3D<>::RealPoint> anImportedMesh(true);
   bool import = anImportedMesh << inputFilename;
   if(!import){
     trace.info() << "File import failed. " << std::endl;
@@ -117,10 +116,10 @@ int main( int argc, char** argv )
   viewer << anImportedMesh;
   
   if(vm.count("drawVertex")){
-    for( Mesh<Display3D<>::ballD3D>::VertexStorage::const_iterator it = anImportedMesh.VertexBegin();  
+    for( Mesh<Display3D<>::RealPoint>::VertexStorage::const_iterator it = anImportedMesh.VertexBegin();  
   	 it!=anImportedMesh.VertexEnd(); ++it){
       DGtal::Z3i::Point pt;
-      pt[0]=(*it).x; pt[1]=(*it).y; pt[2]=(*it).z;
+      pt[0]=(*it)[0]; pt[1]=(*it)[1]; pt[2]=(*it)[2];
       viewer << pt;
     }
   }
