@@ -94,8 +94,7 @@ int main( int argc, char** argv )
   float sz = vm["scaleZ"].as<float>();
   
   QApplication application(argc,argv);
-  Viewer3D viewer;
-  viewer.setScale(sx,sy,sz);
+  Viewer3D<> viewer;
   viewer.setWindowTitle("simple Volume Viewer");
   viewer.show();
 
@@ -104,7 +103,7 @@ int main( int argc, char** argv )
   
   
   trace.info() << "Importing mesh... ";
-  Mesh<Display3D::pointD3D> anImportedMesh(true);
+  Mesh<Display3D<>::ballD3D> anImportedMesh(true);
   bool import = anImportedMesh << inputFilename;
   if(!import){
     trace.info() << "File import failed. " << std::endl;
@@ -118,7 +117,7 @@ int main( int argc, char** argv )
   viewer << anImportedMesh;
   
   if(vm.count("drawVertex")){
-    for( Mesh<Display3D::pointD3D>::VertexStorage::const_iterator it = anImportedMesh.VertexBegin();  
+    for( Mesh<Display3D<>::ballD3D>::VertexStorage::const_iterator it = anImportedMesh.VertexBegin();  
   	 it!=anImportedMesh.VertexEnd(); ++it){
       DGtal::Z3i::Point pt;
       pt[0]=(*it).x; pt[1]=(*it).y; pt[2]=(*it).z;
@@ -126,6 +125,6 @@ int main( int argc, char** argv )
     }
   }
        
-  viewer << Viewer3D::updateDisplay;
+  viewer << Viewer3D<>::updateDisplay;
   return application.exec();
 }

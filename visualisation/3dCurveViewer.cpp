@@ -73,8 +73,8 @@ const double MS3D_LINESIZE = 3.0;
 ///////////////////////////////////////////////////////////////////////////////
 // Functions for displaying the tangential cover of a 3D curve.
 ///////////////////////////////////////////////////////////////////////////////
-template <typename Point, typename RealPoint>
-void displayAxes( Viewer3D & viewer, 
+template <typename Point, typename RealPoint, typename space, typename kspace >
+void displayAxes( Viewer3D<space, kspace> & viewer, 
                   const Point & lowerBound, const Point & upperBound,
 		  const std::string & mode )
 {
@@ -110,8 +110,8 @@ void displayAxes( Viewer3D & viewer,
     }
 }
 
-template <typename KSpace, typename ArithmeticalDSS3d>
-void displayDSS3d( Viewer3D & viewer, 
+template <typename KSpace, typename ArithmeticalDSS3d, typename space, typename kspace >
+void displayDSS3d( Viewer3D<space, kspace> & viewer, 
 		   const KSpace & ks, const ArithmeticalDSS3d & dss3d,
 		   const DGtal::Color & color3d )
 {
@@ -126,14 +126,14 @@ void assign( Point1 & p1, const Point2 & p2 )
   p1[ 2 ] = p2[ 2 ];
 }
 
-template <typename KSpace, typename ArithmeticalDSS3d>
-void displayDSS3dTangent( Viewer3D & viewer, 
+template <typename KSpace, typename ArithmeticalDSS3d, typename space, typename kspace >
+void displayDSS3dTangent( Viewer3D<space, kspace> & viewer, 
 			  const KSpace & ks, const ArithmeticalDSS3d & dss3d,
 			  const DGtal::Color & color3d )
 {
   typedef typename ArithmeticalDSS3d::Point3d Point;
   typedef typename ArithmeticalDSS3d::PointD3d PointD3d;
-  typedef Display3D::pointD3D PointD3D;  
+  typedef typename Display3D<>::ballD3D PointD3D;  
   Point directionZ3;
   PointD3d P1, P2, direction, intercept, thickness;
   dss3d.getParameters( directionZ3, intercept, thickness );
@@ -152,8 +152,8 @@ void displayDSS3dTangent( Viewer3D & viewer,
 		  color3d, MS3D_LINESIZE );
 }
 
-template <typename KSpace, typename ArithmeticalDSS3d>
-void displayProj2d( Viewer3D & viewer, 
+template <typename KSpace, typename ArithmeticalDSS3d, typename space, typename kspace >
+void displayProj2d( Viewer3D<space, kspace> & viewer, 
 		    const KSpace & ks, const ArithmeticalDSS3d & dss3d,
 		    const DGtal::Color & color2d )
 {
@@ -181,8 +181,8 @@ void displayProj2d( Viewer3D & viewer,
     }
 }
 
-template <typename KSpace, typename ArithmeticalDSS3d>
-void displayDSS2d( Viewer3D & viewer, 
+template <typename KSpace, typename ArithmeticalDSS3d, typename space, typename kspace >
+void displayDSS2d( Viewer3D<space, kspace> & viewer, 
 		   const KSpace & ks, const ArithmeticalDSS3d & dss3d,
 		   const DGtal::Color & color2d )
 {
@@ -193,7 +193,7 @@ void displayDSS2d( Viewer3D & viewer,
   typedef typename KSpace::Cell Cell;
   typedef typename KSpace::Point Point3d;
   typedef DGtal::PointVector<2,double> PointD2d;
-  typedef Display3D::pointD3D PointD3D;  
+  typedef typename Display3D<>::ballD3D PointD3D;  
   Point3d b = ks.lowerBound();
   for ( DGtal::Dimension i = 0; i < 3; ++i )
     {
@@ -226,8 +226,8 @@ void displayDSS2d( Viewer3D & viewer,
  * segmentation test
  *
  */
-template <typename KSpace, typename PointIterator>
-bool displayCover( Viewer3D & viewer, 
+template <typename KSpace, typename PointIterator, typename space, typename kspace >
+bool displayCover( Viewer3D<space, kspace> & viewer, 
 		   const KSpace & ks, PointIterator b, PointIterator e,
 		   bool dss3d, bool proj2d, bool dss2d, bool tangent,
 		   int nbColors )
@@ -352,7 +352,7 @@ int main(int argc, char **argv)
   inputStream.close();
   
   // start viewer
-  Viewer3D viewer;
+  Viewer3D<> viewer;
   trace.beginBlock ( "Tool 3dCurveViewer" );
 
   // ----------------------------------------------------------------------
@@ -380,7 +380,7 @@ int main(int argc, char **argv)
   viewer.show();
   // Display axes.
   if ( vm.count( "viewBox" ) )
-    displayAxes<Point,RealPoint>( viewer, lowerBound, upperBound, vm[ "viewBox" ].as<std::string>() );
+    displayAxes<Point,RealPoint, Z3i::Space, Z3i::KSpace>( viewer, lowerBound, upperBound, vm[ "viewBox" ].as<std::string>() );
   // Display 3D tangential cover.
   bool res = displayCover( viewer, ks, sequence.begin(), sequence.end(),
 			   vm.count( "cover3d" ),
@@ -396,7 +396,7 @@ int main(int argc, char **argv)
 
   // ----------------------------------------------------------------------
   // User "interaction".
-  viewer << Viewer3D::updateDisplay;
+  viewer << Viewer3D<>::updateDisplay;
   application.exec();
   trace.emphase() << ( res ? "Passed." : "Error." ) << endl;
   trace.endBlock();

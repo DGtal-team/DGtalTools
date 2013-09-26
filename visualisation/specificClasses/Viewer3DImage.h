@@ -1,3 +1,17 @@
+
+#if defined(Viewer3DImage_RECURSES)
+#error Recursive header files inclusion detected in Viewer3DImage.h
+#else // defined(Viewer3DImage_RECURSES)
+/** Prevents recursive inclusion of headers. */
+#define Viewer3DImage_RECURSES
+
+
+#if !defined Viewer3DImage_h
+#define Viewer3DImage_h
+/** Prevents repeated inclusion of headers. */
+
+
+
 #include "DGtal/helpers/StdDefs.h"
 #include "DGtal/io/viewers/Viewer3D.h"
 #include "DGtal/io/Display3D.h"
@@ -5,7 +19,8 @@
 #include "DGtal/images/ImageContainerBySTLVector.h"
 #include "DGtal/images/ConstImageAdapter.h"
 
-class Viewer3DImage: public DGtal::Viewer3D 
+template < typename Space = DGtal::Z3i::Space, typename KSpace = DGtal::Z3i::KSpace>
+class Viewer3DImage: public DGtal::Viewer3D <Space, KSpace>
 {
 
   typedef DGtal::ImageContainerBySTLVector<DGtal::Z3i::Domain, unsigned char> Image3D;
@@ -20,13 +35,12 @@ class Viewer3DImage: public DGtal::Viewer3D
 public:
   enum ModeVisu { BoundingBox, InterGrid, Grid, Empty};
   
-  Viewer3DImage(ModeVisu aMode=BoundingBox){
+  Viewer3DImage(ModeVisu aMode=BoundingBox) : DGtal::Viewer3D<Space, KSpace>(){
     mySliceXPos=0;
     mySliceYPos=0;
     mySliceZPos=0;
     myCurrentSliceDim=0;
     myMode=aMode;
-    Viewer3D();
   }
   
   
@@ -55,5 +69,8 @@ protected:
 };
 
 
+#endif // undefined viewer3dimage
 
+#undef Viewer3DImage_RECURSES
+#endif // else defined(Viewer3DImage_RECURSES)
 
