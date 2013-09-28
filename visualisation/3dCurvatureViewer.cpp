@@ -247,21 +247,21 @@ int main( int argc, char** argv )
 
 
 	    viewer.setLineColor(DGtal::Color ( 20,200,200 ));
-            viewer.addLine ( center[0] -  0.5 * curv1[0],
-                             center[1] -  0.5 * curv1[1],
-                             center[2] -  0.5 * curv1[2],
-                             center[0] +  0.5 * curv1[0],
-                             center[1] +  0.5 * curv1[1],
-                             center[2] +  0.5 * curv1[2],
+            viewer.addLine ( DGtal::Z3i::RealPoint(center[0] -  0.5 * curv1[0],
+						   center[1] -  0.5 * curv1[1],
+						   center[2] -  0.5 * curv1[2]),
+                             DGtal::Z3i::RealPoint(center[0] +  0.5 * curv1[0],
+						   center[1] +  0.5 * curv1[1],
+						   center[2] +  0.5 * curv1[2]),
 			     5.0 );
 	    
 	    viewer.setLineColor(DGtal::Color ( 20,200,200 ));
-            viewer.addLine ( center[0] -  0.5 * curv2[0],
-                             center[1] -  0.5 * curv2[1],
-                             center[2] -  0.5 * curv2[2],
-                             center[0] +  0.5 * curv2[0],
-                             center[1] +  0.5 * curv2[1],
-                             center[2] +  0.5 * curv2[2],
+            viewer.addLine ( DGtal::Z3i::RealPoint(center[0] -  0.5 * curv2[0],
+						   center[1] -  0.5 * curv2[1],
+						   center[2] -  0.5 * curv2[2]),
+                             DGtal::Z3i::RealPoint(center[0] +  0.5 * curv2[0],
+						   center[1] +  0.5 * curv2[1],
+						   center[2] +  0.5 * curv2[2]),
 			     5.0 );
 
             ++abegin2;
