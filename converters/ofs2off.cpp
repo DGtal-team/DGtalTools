@@ -21,7 +21,7 @@
  *
  * @date 2012/07/08
  *
- * 
+ *
  *
  * This file is part of the DGtalTools.
  */
@@ -54,17 +54,17 @@ int main( int argc, char** argv )
     ("help,h", "display this message")
     ("input-file,i", po::value<std::string>(), "ofs file (.ofs) " )
     ("output-file,o", po::value<std::string>(), "ofs file (.off) " );
-    
-  
+
+
   bool parseOK=true;
   po::variables_map vm;
   try{
-    po::store(po::parse_command_line(argc, argv, general_opt), vm);  
+    po::store(po::parse_command_line(argc, argv, general_opt), vm);
   }catch(const std::exception& ex){
     parseOK=false;
     trace.info()<< "Error checking program options: "<< ex.what()<< endl;
   }
-  po::notify(vm);    
+  po::notify(vm);
   if( !parseOK || vm.count("help")||argc<=1)
     {
       std::cout << "Usage: " << argv[0] << " [input-file] [output-file]\n"
@@ -72,19 +72,19 @@ int main( int argc, char** argv )
 		<< general_opt << "\n";
       return 0;
     }
-  
+
   if(! vm.count("input-file")||! vm.count("output-file"))
     {
-      trace.error() << " Input and output filename are needed to be defined" << endl;      
+      trace.error() << " Input and output filename are needed to be defined" << endl;
       return 0;
     }
 
-  
+
   string inputFilename = vm["input-file"].as<std::string>();
   string outputFilename = vm["output-file"].as<std::string>();
-  
+
   // We store the colors
-  Mesh<Display3D<>::ballD3D> anImportedMesh(true);
+  Mesh<Display3D<>::BallD3D> anImportedMesh(true);
   bool import = anImportedMesh << inputFilename;
   bool exported = anImportedMesh >> outputFilename;
   if(!import || !exported){
@@ -92,13 +92,10 @@ int main( int argc, char** argv )
     return 0;
   }
 
-  
-  
+
+
   trace.info() << "[done]. "<< std::endl;
 
   return 0;
-  
+
 }
-
-
-

@@ -74,7 +74,7 @@ const double MS3D_LINESIZE = 3.0;
 // Functions for displaying the tangential cover of a 3D curve.
 ///////////////////////////////////////////////////////////////////////////////
 template <typename Point, typename RealPoint, typename space, typename kspace >
-void displayAxes( Viewer3D<space, kspace> & viewer, 
+void displayAxes( Viewer3D<space, kspace> & viewer,
                   const Point & lowerBound, const Point & upperBound,
 		  const std::string & mode )
 {
@@ -111,7 +111,7 @@ void displayAxes( Viewer3D<space, kspace> & viewer,
 }
 
 template <typename KSpace, typename ArithmeticalDSS3d, typename space, typename kspace >
-void displayDSS3d( Viewer3D<space, kspace> & viewer, 
+void displayDSS3d( Viewer3D<space, kspace> & viewer,
 		   const KSpace & ks, const ArithmeticalDSS3d & dss3d,
 		   const DGtal::Color & color3d )
 {
@@ -127,13 +127,13 @@ void assign( Point1 & p1, const Point2 & p2 )
 }
 
 template <typename KSpace, typename ArithmeticalDSS3d, typename space, typename kspace >
-void displayDSS3dTangent( Viewer3D<space, kspace> & viewer, 
+void displayDSS3dTangent( Viewer3D<space, kspace> & viewer,
 			  const KSpace & ks, const ArithmeticalDSS3d & dss3d,
 			  const DGtal::Color & color3d )
 {
   typedef typename ArithmeticalDSS3d::Point3d Point;
   typedef typename ArithmeticalDSS3d::PointD3d PointD3d;
-  typedef typename Display3D<>::ballD3D PointD3D;  
+  typedef typename Display3D<>::BallD3D PointD3D;
   Point directionZ3;
   PointD3d P1, P2, direction, intercept, thickness;
   dss3d.getParameters( directionZ3, intercept, thickness );
@@ -143,17 +143,17 @@ void displayDSS3dTangent( Viewer3D<space, kspace> & viewer,
   assign( P2, *(dss3d.end()-1) );
   double t1 = (P1 - intercept).dot( direction );
   double t2 = (P2 - intercept).dot( direction );
-  
+
   PointD3d Q1 = intercept + t1 * direction;
   PointD3d Q2 = intercept + t2 * direction;
-  
-  viewer.addLine( Q1[ 0 ]-0.5, Q1[ 1 ]-0.5, Q1[ 2 ]-0.5, 
-		  Q2[ 0 ]-0.5, Q2[ 1 ]-0.5, Q2[ 2 ]-0.5, 
+
+  viewer.addLine( Q1[ 0 ]-0.5, Q1[ 1 ]-0.5, Q1[ 2 ]-0.5,
+		  Q2[ 0 ]-0.5, Q2[ 1 ]-0.5, Q2[ 2 ]-0.5,
 		  color3d, MS3D_LINESIZE );
 }
 
 template <typename KSpace, typename ArithmeticalDSS3d, typename space, typename kspace >
-void displayProj2d( Viewer3D<space, kspace> & viewer, 
+void displayProj2d( Viewer3D<space, kspace> & viewer,
 		    const KSpace & ks, const ArithmeticalDSS3d & dss3d,
 		    const DGtal::Color & color2d )
 {
@@ -176,13 +176,13 @@ void displayProj2d( Viewer3D<space, kspace> & viewer,
 	  case 2: q = Point3d( 2*p[ 0 ]+1, 2*p[ 1 ]+1, 2*b[ i ]   ); break;
 	  }
 	  Cell c = ks.uCell( q );
-	  viewer << CustomColors3D( color2d, color2d ) << c; 
+	  viewer << CustomColors3D( color2d, color2d ) << c;
 	}
     }
 }
 
 template <typename KSpace, typename ArithmeticalDSS3d, typename space, typename kspace >
-void displayDSS2d( Viewer3D<space, kspace> & viewer, 
+void displayDSS2d( Viewer3D<space, kspace> & viewer,
 		   const KSpace & ks, const ArithmeticalDSS3d & dss3d,
 		   const DGtal::Color & color2d )
 {
@@ -193,7 +193,7 @@ void displayDSS2d( Viewer3D<space, kspace> & viewer,
   typedef typename KSpace::Cell Cell;
   typedef typename KSpace::Point Point3d;
   typedef DGtal::PointVector<2,double> PointD2d;
-  typedef typename Display3D<>::ballD3D PointD3D;  
+  typedef typename Display3D<>::BallD3D PointD3D;
   Point3d b = ks.lowerBound();
   for ( DGtal::Dimension i = 0; i < 3; ++i )
     {
@@ -209,15 +209,15 @@ void displayDSS2d( Viewer3D<space, kspace> & viewer,
       for ( unsigned int j = 0; j < pts2d.size(); ++j )
 	{
 	  switch (i) {
-	  case 0: p3.x = (double) b[ i ]-0.5; p3.y = pts2d[ j ][ 0 ];     p3.z = pts2d[ j ][ 1 ];     break;
-	  case 1: p3.x = pts2d[ j ][ 0 ];     p3.y = (double) b[ i ]-0.5; p3.z = pts2d[ j ][ 1 ];     break;
-	  case 2: p3.x = pts2d[ j ][ 0 ];     p3.y = pts2d[ j ][ 1 ];     p3.z = (double) b[ i ]-0.5; break;
+	  case 0: p3[0] = (double) b[ i ]-0.5; p3[1] = pts2d[ j ][ 0 ];     p3[2] = pts2d[ j ][ 1 ];     break;
+	  case 1: p3[0] = pts2d[ j ][ 0 ];     p3[1] = (double) b[ i ]-0.5; p3[2] = pts2d[ j ][ 1 ];     break;
+	  case 2: p3[0] = pts2d[ j ][ 0 ];     p3[1] = pts2d[ j ][ 1 ];     p3[2] = (double) b[ i ]-0.5; break;
 	  }
 	  bb.push_back( p3 );
 	}
       for ( unsigned int j = 0; j < pts2d.size(); ++j )
-        viewer.addLine( bb[ j ].x, bb[ j ].y, bb[ j ].z,
-                        bb[ (j+1)%4 ].x, bb[ (j+1)%4 ].y, bb[ (j+1)%4 ].z,
+        viewer.addLine( bb[ j ][0], bb[ j ][1], bb[ j ][2],
+                        bb[ (j+1)%4 ][0], bb[ (j+1)%4 ][1], bb[ (j+1)%4 ][2],
                         color2d, MS3D_LINESIZE );
     } // for ( DGtal::Dimension i = 0; i < 3; ++i )
 }
@@ -227,13 +227,13 @@ void displayDSS2d( Viewer3D<space, kspace> & viewer,
  *
  */
 template <typename KSpace, typename PointIterator, typename space, typename kspace >
-bool displayCover( Viewer3D<space, kspace> & viewer, 
+bool displayCover( Viewer3D<space, kspace> & viewer,
 		   const KSpace & ks, PointIterator b, PointIterator e,
 		   bool dss3d, bool proj2d, bool dss2d, bool tangent,
 		   int nbColors )
 {
   typedef typename PointIterator::value_type Point;
-  typedef ArithmeticalDSS3d<PointIterator,int,4> SegmentComputer;  
+  typedef ArithmeticalDSS3d<PointIterator,int,4> SegmentComputer;
   typedef SaturatedSegmentation<SegmentComputer> Decomposition;
   typedef typename Decomposition::SegmentComputerIterator SegmentComputerIterator;
   typedef typename SegmentComputer::ArithmeticalDSS2d ArithmeticalDSS2d;
@@ -242,7 +242,7 @@ bool displayCover( Viewer3D<space, kspace> & viewer,
 
   viewer << SetMode3D( algo.className(), "BoundingBox" );
   HueShadeColorMap<int> cmap_hue( 0, nbColors, 1 );
-           
+
   unsigned int c = 0;
   for ( SegmentComputerIterator i = theDecomposition.begin();
         i != theDecomposition.end(); ++i)
@@ -253,15 +253,15 @@ bool displayCover( Viewer3D<space, kspace> & viewer,
       const ArithmeticalDSS2d & dssYZ = ms3d.arithmeticalDSS2dYZ();
       Point f = *ms3d.begin();
       Point l = *(ms3d.end() - 1);
-      trace.info() << "- " << c 
-                   << " MS3D," 
+      trace.info() << "- " << c
+                   << " MS3D,"
                    << " [" << f[ 0 ] << "," << f[ 1 ] << ","<< f[ 2 ] << "]"
                    << "->[" << l[ 0 ] << "," << l[ 1 ] << ","<< l[ 2 ] << "]"
-                   << ", XY(" 
+                   << ", XY("
                    << dssXY.getA() << "," << dssXY.getB() << "," << dssXY.getMu()
-                   << "), XZ(" 
+                   << "), XZ("
                    << dssXZ.getA() << "," << dssXZ.getB() << "," << dssXZ.getMu()
-                   << "), YZ(" 
+                   << "), YZ("
                    << dssYZ.getA() << "," << dssYZ.getB() << "," << dssYZ.getMu()
                    << ")" << std::endl;
       //trace.info() << ms3d << std::endl;  // information
@@ -272,7 +272,7 @@ bool displayCover( Viewer3D<space, kspace> & viewer,
       if ( dss2d )   displayDSS2d( viewer, ks, ms3d, color );
       if ( proj2d )  displayProj2d( viewer, ks, ms3d, CURVE2D_COLOR );
       c++;
-    } 
+    }
   return true;
 }
 
@@ -309,8 +309,8 @@ int main(int argc, char **argv)
     ("cover2d,2", "displays the 2D projections of the 3D tangential cover of the curve" )
     ("nbColors,n",  po::value<int>()->default_value( 3 ), "sets the number of successive colors used for displaying 2d and 3d maximal segments (default is 3: red, green, blue)" )
     ("tangent,t", "displays the tangents to the curve" )
-    ; 
-  po::positional_options_description pos_opt; 
+    ;
+  po::positional_options_description pos_opt;
   pos_opt.add("input", 1);
 
   // parse command line ----------------------------------------------
@@ -324,7 +324,7 @@ int main(int argc, char **argv)
     parseOK = false;
     trace.info() << "Error checking program options: "<< ex.what() << endl;
   }
-  po::notify( vm );    
+  po::notify( vm );
   if( !parseOK || vm.count("help")||argc<=1)
     {
       std::cout << "Usage: " << argv[0] << " [options] input\n"
@@ -344,13 +344,13 @@ int main(int argc, char **argv)
   inputStream.open ( input.c_str(), ios::in);
   try {
     sequence = PointListReader<Point>::getPointsFromInputStream( inputStream );
-    if ( sequence.size() == 0) throw IOException(); 
+    if ( sequence.size() == 0) throw IOException();
   }
   catch (DGtal::IOException & ioe) {
     trace.error() << "Size is null." << std::endl;
   }
   inputStream.close();
-  
+
   // start viewer
   Viewer3D<> viewer;
   trace.beginBlock ( "Tool 3dCurveViewer" );
@@ -366,8 +366,8 @@ int main(int argc, char **argv)
     }
   lowerBound -= Point::diagonal( b );
   upperBound += Point::diagonal( b+1 );
-  K3 ks; ks.init( lowerBound, upperBound, true ); 
-  GridCurve<K3> gc( ks ); 
+  K3 ks; ks.init( lowerBound, upperBound, true );
+  GridCurve<K3> gc( ks );
   try {
     gc.initFromPointsVector( sequence );
   } catch (DGtal::ConnectivityException& /*ce*/) {
