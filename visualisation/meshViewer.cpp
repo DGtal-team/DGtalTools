@@ -103,7 +103,7 @@ int main( int argc, char** argv )
 
 
   trace.info() << "Importing mesh... ";
-  Mesh<Display3D<>::BallD3D> anImportedMesh(true);
+  Mesh<DGtal::Z3i::RealPoint> anImportedMesh(true);
   bool import = anImportedMesh << inputFilename;
   if(!import){
     trace.info() << "File import failed. " << std::endl;
@@ -117,7 +117,7 @@ int main( int argc, char** argv )
   viewer << anImportedMesh;
 
   if(vm.count("drawVertex")){
-    for( Mesh<Display3D<>::BallD3D>::VertexStorage::const_iterator it = anImportedMesh.VertexBegin();
+    for( Mesh<DGtal::Z3i::RealPoint>::VertexStorage::const_iterator it = anImportedMesh.VertexBegin();
   	 it!=anImportedMesh.VertexEnd(); ++it){
       DGtal::Z3i::Point pt;
       pt[0]=(*it)[0]; pt[1]=(*it)[1]; pt[2]=(*it)[2];
