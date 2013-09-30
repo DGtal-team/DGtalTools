@@ -13,8 +13,8 @@
     convertVol: a simple generic volume image converters (can process actually pgm3d, vol, longvol, raw (for writing)).
     homotopicThinning3D exploits now the GenericReader class and is no more limited to vol format.
     volFlip: tool to flip all volume slice images according a given dimension.
-    volCompareStats: apply basic statistics on comparaison between two volumetric images (shape defined from thresholds): computes true/false -+, precision, recall f-mean RMSE, PSNR.
-    volCompareDistances: apply euclidean distance comparisons between two shapes  (shape defined from thresholds).
+    volImageMetrics: apply basic statistics on comparaison between two volumetric images (shape defined from thresholds): computes true/false -+, precision, recall f-mean RMSE, PSNR.
+    volShapeMetrics: apply euclidean distance comparisons between two shapes  (shape defined from thresholds).
 
 * volumetric/volTools:
 	volTools directory moved into volumetric.

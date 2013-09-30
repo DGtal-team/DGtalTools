@@ -125,6 +125,8 @@ Volumetric
   - volAddBorder: add a 1 voxel boundary with value 0 to a vol file.
   - volCComponentCounter: a simple program to count the number of connected components in a 3D image.
   - volSubSample: sub sample a vol file (division by 2 in each direction).
+  - volImageMetrics: apply basic statistics on comparaison between two volumetric images (shape defined from thresholds): computes true/false -+, precision, recall f-mean RMSE, PSNR.
+  - volShapeMetrics: apply euclidean distance comparisons between two shapes  (shape defined from thresholds).
 
 
 

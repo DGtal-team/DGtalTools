@@ -141,7 +141,7 @@ int main(int argc, char**argv)
   
   if ( vm.count ( "help" ) || ! vm.count("volA")||! vm.count("volB") )
     {
-      trace.info() << "apply comparaisons based on distance measures between two volumetric images A and B (shape defined from thresholds)" <<std::endl
+      trace.info() << "apply shape measure based on euclidean distance between two volumetric images A and B (shape defined from thresholds)" <<std::endl
 		   << std::endl << "Basic usage: "<<std::endl
 		   << "\t volShapeMetrics --volA <volAFilename> --volB <volBFilename> "<<std::endl
 		   << general_opt << "\n"
