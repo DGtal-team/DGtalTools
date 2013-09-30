@@ -15,7 +15,7 @@
  **/
 
 /**
- * @file volCompare.cpp
+ * @file volImageMetrics.cpp
  *
  * @author Bertrand Kerautret (\c kerautre@loria.fr )
  * LORIA (CNRS, UMR 7503), University of Nancy, France
@@ -34,7 +34,6 @@
 #include <DGtal/images/Image.h>
 #include <DGtal/images/ImageContainerBySTLVector.h>
 #include <DGtal/images/imagesSetsUtils/SetFromImage.h>
-#include <DGtal/geometry/volumes/distance/DistanceTransformation.h>
 #include <DGtal/math/Statistic.h>
 
 #include <boost/program_options/options_description.hpp>
@@ -132,7 +131,7 @@ getVoxelsStats(const Image3D &imageA,  int aMin, int aMax, const Image3D &imageB
 // total ref: True Positive, True Negative, False Positive, False Negative
 void
 getVoxelsStats(const Image3D &imageA,  int aMin, int aMax, const Image3D &imageB, 
-				int bMin, int bMax, bool precisionRecallFMean ){
+	       int bMin, int bMax, bool precisionRecallFMean ){
   std::vector<Point> v1, v2, v3, v4;
   return getVoxelsStats(imageA, aMin, aMax, imageB, bMin, bMax, false, v1, v2, v3, v4, precisionRecallFMean);
 }
@@ -161,8 +160,8 @@ int main(int argc, char**argv)
   po::options_description general_opt ( "Allowed options are: " );
   general_opt.add_options()
     ( "help,h", "display this message." )
-    ( "volA,a", po::value<std::string>(), "Input filename of volume A." )
-    ( "volB,b", po::value<std::string>(), "Input filename of volume B." )
+    ( "volA,a", po::value<std::string>(), "Input filename of volume A (vol format, and other pgm3d can also be used)." )
+    ( "volB,b", po::value<std::string>(), "Input filename of volume B (vol format, and other pgm3d can also be used)." )
     ( "aMin", po::value<int>()->default_value(0), "min threshold for a voxel to be considered as belonging to the object of volume A. (default 0)" )
     ( "aMax", po::value<int>()->default_value(128), "max threshold for a voxel to be considered as belonging to the object of volume A. (default 128)" )
     ( "bMin", po::value<int>()->default_value(0), "min threshold for a voxel to be considered as belonging to the object of volume B. (default 0)" )
@@ -184,9 +183,9 @@ int main(int argc, char**argv)
     {
       trace.info() << "apply basic comparaisons (Number of voxels (B-A), (A-B), ...etc,  RMSE, PSNR) between two volumetric images A and B (shape defined from thresholds). Usefull to determine classical statistics like false positive related stats."<<std::endl
 		   << std::endl << "Basic usage: "<<std::endl
-		   << "\t volCompareStats --volA <volAFilename> --volB <volBFilename> "<<std::endl
+		   << "\t volImageMetrics --volA <volAFilename> --volB <volBFilename> "<<std::endl
 		   << general_opt << "\n"
-		   << "Typical use :\n  volCompareStats -a imageA.pgm3d --aMin 128 --aMax 255 -b imageB.pgm3d --bMin 128 --bMax 255 \n" ;
+		   << "Typical use :\n  volImageMetrics -a imageA.vol --aMin 128 --aMax 255 -b imageB.vol --bMin 128 --bMax 255 \n" ;
 
       return 0;
     }
@@ -209,7 +208,8 @@ int main(int argc, char**argv)
   Image3D imageB = GenericReader<Image3D>::import(volBFilename);
  
   if(vm.count("displayTFstats")){
-    std::cout << "# Statistics given with the reference shape A: "<< volAFilename<< " (defined with threshold min: " << aMin << " and max: " << aMax << " )"<< endl;
+
+    std::cout << "# Statistics (generated with volImageMetrics) given with the reference shape A: "<< volAFilename<< " (defined with threshold min: " << aMin << " and max: " << aMax << " )"<< endl;
     std::cout << "# and with the compared shape B: "<< volBFilename << "  (defined with threshold min: " << bMin << " and max: " << bMax << " )"<< endl;
     std::cout << "# #True_Positive #TrueNegative #FalsePositive #FalseNegative  #TotalinA #TotalInB #TotalComplementOfRef #TotalComplementOfComp Precision Recall F-Mean RMSE PSNR "<< endl;    
     

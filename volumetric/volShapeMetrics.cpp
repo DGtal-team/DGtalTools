@@ -15,7 +15,7 @@
  **/
 
 /**
- * @file volCompare.cpp
+ * @file volShapeMetrics.cpp
  *
  * @author Bertrand Kerautret (\c kerautre@loria.fr )
  * LORIA (CNRS, UMR 7503), University of Nancy, France
@@ -121,8 +121,8 @@ int main(int argc, char**argv)
   po::options_description general_opt ( "Allowed options are: " );
   general_opt.add_options()
     ( "help,h", "display this message." )
-    ( "volA,a", po::value<std::string>(), "Input filename of volume A." )
-    ( "volB,b", po::value<std::string>(), "Input filename of volume B." )
+    ( "volA,a", po::value<std::string>(), "Input filename of volume A (vol format, and other pgm3d can also be used)." )
+    ( "volB,b", po::value<std::string>(), "Input filename of volume B (vol format, and other pgm3d can also be used)." )
     ( "aMin", po::value<int>()->default_value(0), "min threshold for a voxel to be considered as belonging to the object of volume A. (default 0)" )
     ( "aMax", po::value<int>()->default_value(128), "max threshold for a voxel to be considered as belonging to the object of volume A. (default 128)" )
     ( "bMin", po::value<int>()->default_value(0), "min threshold for a voxel to be considered as belonging to the object of volume B. (default 0)" )
@@ -143,9 +143,9 @@ int main(int argc, char**argv)
     {
       trace.info() << "apply comparaisons based on distance measures between two volumetric images A and B (shape defined from thresholds)" <<std::endl
 		   << std::endl << "Basic usage: "<<std::endl
-		   << "\t volCompareDistances --volA <volAFilename> --volB <volBFilename> "<<std::endl
+		   << "\t volShapeMetrics --volA <volAFilename> --volB <volBFilename> "<<std::endl
 		   << general_opt << "\n"
-		   << "Typical use :\n  volCompareDistances -a imageA.pgm3d --aMin 128 --aMax 255 -b imageB.pgm3d --bMin 128 --bMax 255 --statsFromBnotInAOnly \n" ;
+		   << "Typical use :\n  volShapeMetrics -a imageA.vol --aMin 128 --aMax 255 -b imageB.vol --bMin 128 --bMax 255 --statsFromBnotInAOnly \n" ;
 
       return 0;
     }
