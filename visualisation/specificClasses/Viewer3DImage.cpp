@@ -35,23 +35,23 @@ using namespace qglviewer;
 // Standard services - public :
 
 
-
+template < typename Space, typename KSpace>
 void
-Viewer3DImage::init(){
-   Viewer3D::init();
-   setKeyDescription ( Qt::Key_X, "Change the current axis to X for the current 2D image slice setting." );
-   setKeyDescription ( Qt::Key_Y, "Change the current axis to Y for the current 2D image slice setting." );
-   setKeyDescription ( Qt::Key_Z, "Change the current axis to Z for the current 2D image slice setting." );
-   setKeyDescription ( Qt::Key_Up, "Move the current 2D image slice to 5 in the positive direction of the current axis." );
-   setKeyDescription ( Qt::Key_Down, "Move the current 2D image slice to 5 in the negative direction of the current axis." );
-   setKeyDescription ( Qt::Key_Shift, "Change the slice move with step 1 (5 by default)" );
+Viewer3DImage< Space, KSpace>::init(){
+   DGtal::Viewer3D<>::init();
+   QGLViewer::setKeyDescription ( Qt::Key_X, "Change the current axis to X for the current 2D image slice setting." );
+   QGLViewer::setKeyDescription ( Qt::Key_Y, "Change the current axis to Y for the current 2D image slice setting." );
+   QGLViewer::setKeyDescription ( Qt::Key_Z, "Change the current axis to Z for the current 2D image slice setting." );
+   QGLViewer::setKeyDescription ( Qt::Key_Up, "Move the current 2D image slice to 5 in the positive direction of the current axis." );
+   QGLViewer::setKeyDescription ( Qt::Key_Down, "Move the current 2D image slice to 5 in the negative direction of the current axis." );
+   QGLViewer::setKeyDescription ( Qt::Key_Shift, "Change the slice move with step 1 (5 by default)" );
 
 }
 
 
-
+template < typename Space, typename KSpace>
 void 
-Viewer3DImage::setVolImage(Image3D * an3DImage){
+Viewer3DImage< Space, KSpace>::setVolImage(Image3D * an3DImage){
   my3dImage = an3DImage;
 
   switch (myMode) {
@@ -84,7 +84,7 @@ Viewer3DImage::setVolImage(Image3D * an3DImage){
   
   std::cout << "image:" << sliceImageX.className();
   (*this) << sliceImageX;
-  (*this) << DGtal::UpdateImagePosition(0, DGtal::Display3D::xDirection, mySliceXPos, 0.0, 0.0);
+  (*this) << DGtal::UpdateImagePosition< Space, KSpace >(0, DGtal::Viewer3D<>::xDirection, mySliceXPos, 0.0, 0.0);
 
 
   // Adding Y slice in the viewer.
@@ -95,7 +95,7 @@ Viewer3DImage::setVolImage(Image3D * an3DImage){
   DGtal::Projector<DGtal::Z3i::Space> aSliceFunctorY(mySliceYPos); aSliceFunctorY.initAddOneDim(1);
   SliceImageAdapter sliceImageY(*my3dImage, domain2DY, aSliceFunctorY, DGtal::DefaultFunctor()); 
   (*this) << sliceImageY;
-  (*this) << DGtal::UpdateImagePosition(1, DGtal::Display3D::yDirection, 0.0,mySliceYPos, 0.0);
+  (*this) << DGtal::UpdateImagePosition< Space, KSpace >(1, DGtal::Viewer3D<>::yDirection, 0.0,mySliceYPos, 0.0);
 
 
 
@@ -110,16 +110,16 @@ Viewer3DImage::setVolImage(Image3D * an3DImage){
   aSliceFunctorZ.initRemoveOneDim(2);
   SliceImageAdapter sliceImageZ(*my3dImage, domain2DZ, aSliceFunctorZ, DGtal::DefaultFunctor()); 
   (*this) << sliceImageZ;
-  (*this) << DGtal::UpdateImagePosition(2, DGtal::Display3D::zDirection, 0.0, 0.0, mySliceZPos);
+  (*this) << DGtal::UpdateImagePosition< Space, KSpace > (2, DGtal::Viewer3D<>::zDirection, 0.0, 0.0, mySliceZPos);
 
     
-  (*this) << Viewer3D::updateDisplay;
+  (*this) << DGtal::Viewer3D<>::updateDisplay;
 }
 
 
-
+template < typename Space, typename KSpace>
 QString
-Viewer3DImage::helpString() const
+Viewer3DImage< Space, KSpace>::helpString() const
 {
   QString text ( "<h2> Viewer3DImage</h2>" );
   text += "Use the mouse to move the camera around the object. ";
@@ -143,9 +143,9 @@ Viewer3DImage::helpString() const
 
 
 
-
+template < typename Space, typename KSpace>
 void
-Viewer3DImage::keyPressEvent ( QKeyEvent *e )
+Viewer3DImage< Space, KSpace>::keyPressEvent ( QKeyEvent *e )
 {
   
   bool handled = false;
@@ -225,7 +225,7 @@ Viewer3DImage::keyPressEvent ( QKeyEvent *e )
 
    
   if ( !handled )
-    DGtal::Viewer3D::keyPressEvent ( e );
+    DGtal::Viewer3D<>::keyPressEvent ( e );
   
 }
 

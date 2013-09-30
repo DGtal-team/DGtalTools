@@ -46,7 +46,7 @@
 
 
 
-#include "specificClasses/Viewer3DImage.h"
+#include "specificClasses/Viewer3DImage.cpp"
 
 #include <boost/program_options/options_description.hpp>
 #include <boost/program_options/parsers.hpp>
@@ -122,17 +122,17 @@ int main( int argc, char** argv )
     trace.info() << "File extension not recognized: "<< extension << std::endl;
     return 0;
   }
-  Viewer3DImage::ModeVisu mode;
+  Viewer3DImage<>::ModeVisu mode;
   if(vm.count("emptyMode"))
-    mode=Viewer3DImage::Empty;
+    mode=Viewer3DImage<>::Empty;
   else if(vm.count("grid"))
-    mode=Viewer3DImage::Grid;
+    mode=Viewer3DImage<>::Grid;
   else if(vm.count("intergrid"))
-    mode=Viewer3DImage::InterGrid;
+    mode=Viewer3DImage<>::InterGrid;
   else
-    mode=Viewer3DImage::BoundingBox;
+    mode=Viewer3DImage<>::BoundingBox;
    
-  Viewer3DImage viewer(mode);
+  Viewer3DImage<> viewer(mode);
   viewer.setWindowTitle("simple Volume Viewer");
   viewer.show();
   
@@ -149,7 +149,7 @@ int main( int argc, char** argv )
   
   
   
-  viewer << Viewer3D::updateDisplay;
+  viewer << Viewer3D<>::updateDisplay;
   if(vm.count("thresholdImage")){
     GradientColorMap<long> gradient( thresholdMin, thresholdMax);
     gradient.addColor(Color::Blue);
@@ -206,7 +206,7 @@ int main( int argc, char** argv )
     gradient.addColor(DGtal::Color::Magenta);
     gradient.addColor(DGtal::Color::Red);
         
-    viewer << SetMode3D(vectConnectedSCell.at(0).at(0).className(), "Basic");
+    viewer << DGtal::SetMode3D(vectConnectedSCell.at(0).at(0).className(), "Basic");
     for(unsigned int i= 0; i <vectConnectedSCell.size(); i++){
       for(unsigned int j= 0; j <vectConnectedSCell.at(i).size(); j++){
 	if(vm.count("colorizeCC")){
@@ -225,6 +225,6 @@ int main( int argc, char** argv )
     }
   }
   
-  viewer << Viewer3D::updateDisplay;
+  viewer << Viewer3D<>::updateDisplay;
   return application.exec();
 }
