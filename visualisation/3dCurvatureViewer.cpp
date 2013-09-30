@@ -140,7 +140,7 @@ int main( int argc, char** argv )
     MyCellFunctor functor ( pointFunctor, KSpaceShape ); // Creation of a functor on Cells, returning true if the cell is inside the shape
 
     QApplication application( argc, argv );
-    Viewer3D viewer;
+    Viewer3D<> viewer;
     viewer.show();
 //    viewer << SetMode3D(image.domain().className(), "BoundingBox") << image.domain();
 
@@ -246,27 +246,29 @@ int main( int argc, char** argv )
 //                             DGtal::Color ( 0,0,0 ), 5.0 ); // don't show the normal
 
 
-            viewer.addLine ( center[0] -  0.5 * curv1[0],
-                             center[1] -  0.5 * curv1[1],
-                             center[2] -  0.5 * curv1[2],
-                             center[0] +  0.5 * curv1[0],
-                             center[1] +  0.5 * curv1[1],
-                             center[2] +  0.5 * curv1[2],
-                             DGtal::Color ( 20,200,200 ), 5.0 );
-
-            viewer.addLine ( center[0] -  0.5 * curv2[0],
-                             center[1] -  0.5 * curv2[1],
-                             center[2] -  0.5 * curv2[2],
-                             center[0] +  0.5 * curv2[0],
-                             center[1] +  0.5 * curv2[1],
-                             center[2] +  0.5 * curv2[2],
-                             DGtal::Color ( 200,20,20 ), 5.0 );
+	    viewer.setLineColor(DGtal::Color ( 20,200,200 ));
+            viewer.addLine ( DGtal::Z3i::RealPoint(center[0] -  0.5 * curv1[0],
+						   center[1] -  0.5 * curv1[1],
+						   center[2] -  0.5 * curv1[2]),
+                             DGtal::Z3i::RealPoint(center[0] +  0.5 * curv1[0],
+						   center[1] +  0.5 * curv1[1],
+						   center[2] +  0.5 * curv1[2]),
+			     5.0 );
+	    
+	    viewer.setLineColor(DGtal::Color ( 20,200,200 ));
+            viewer.addLine ( DGtal::Z3i::RealPoint(center[0] -  0.5 * curv2[0],
+						   center[1] -  0.5 * curv2[1],
+						   center[2] -  0.5 * curv2[2]),
+                             DGtal::Z3i::RealPoint(center[0] +  0.5 * curv2[0],
+						   center[1] +  0.5 * curv2[1],
+						   center[2] +  0.5 * curv2[2]),
+			     5.0 );
 
             ++abegin2;
         }
     }
 
-    viewer << Viewer3D::updateDisplay;
+    viewer << Viewer3D<>::updateDisplay;
     return application.exec();
 }
 

@@ -21,7 +21,7 @@
  *
  * @date 2012/07/08
  *
- * 
+ *
  *
  * This file is part of the DGtalTools.
  */
@@ -59,19 +59,19 @@ int main( int argc, char** argv )
     ("input-file,i", po::value<std::string>(), "off file (.off), or OFS file (.ofs) " )
     ("scaleX,x",  po::value<float>()->default_value(1.0), "set the scale value in the X direction (default 1.0)" )
     ("scaleY,y",  po::value<float>()->default_value(1.0), "set the scale value in the Y direction (default 1.0)" )
-    ("scaleZ,z",  po::value<float>()->default_value(1.0), "set the scale value in the Z direction (default 1.0)") 
+    ("scaleZ,z",  po::value<float>()->default_value(1.0), "set the scale value in the Z direction (default 1.0)")
     ("invertNormal,n", "threshold min to define binary shape" )
-    ("drawVertex,v", "draw the vertex of the mesh" ); 
-  
+    ("drawVertex,v", "draw the vertex of the mesh" );
+
   bool parseOK=true;
   po::variables_map vm;
   try{
-    po::store(po::parse_command_line(argc, argv, general_opt), vm);  
+    po::store(po::parse_command_line(argc, argv, general_opt), vm);
   }catch(const std::exception& ex){
     parseOK=false;
     trace.info()<< "Error checking program options: "<< ex.what()<< endl;
   }
-  po::notify(vm);    
+  po::notify(vm);
   if( !parseOK || vm.count("help")||argc<=1)
     {
       std::cout << "Usage: " << argv[0] << " [input-file]\n"
@@ -79,53 +79,52 @@ int main( int argc, char** argv )
     << general_opt << "\n";
       return 0;
     }
-  
+
   if(! vm.count("input-file"))
     {
-      trace.error() << " The file name was defined" << endl;      
+      trace.error() << " The file name was defined" << endl;
       return 0;
     }
 
 
-  
+
   string inputFilename = vm["input-file"].as<std::string>();
   float sx = vm["scaleX"].as<float>();
   float sy = vm["scaleY"].as<float>();
   float sz = vm["scaleZ"].as<float>();
-  
+
   QApplication application(argc,argv);
-  Viewer3D viewer;
-  viewer.setScale(sx,sy,sz);
+  Viewer3D<> viewer;
   viewer.setWindowTitle("simple Volume Viewer");
   viewer.show();
 
   bool invertNormal= vm.count("invertNormal");
-  
-  
-  
+
+
+
   trace.info() << "Importing mesh... ";
-  Mesh<Display3D::pointD3D> anImportedMesh(true);
+  Mesh<DGtal::Z3i::RealPoint> anImportedMesh(true);
   bool import = anImportedMesh << inputFilename;
   if(!import){
     trace.info() << "File import failed. " << std::endl;
     return 0;
   }
-  
+
   trace.info() << "[done]. "<< std::endl;
   if(invertNormal){
     anImportedMesh.invertVertexFaceOrder();
   }
   viewer << anImportedMesh;
-  
+
   if(vm.count("drawVertex")){
-    for( Mesh<Display3D::pointD3D>::VertexStorage::const_iterator it = anImportedMesh.VertexBegin();  
+    for( Mesh<DGtal::Z3i::RealPoint>::VertexStorage::const_iterator it = anImportedMesh.VertexBegin();
   	 it!=anImportedMesh.VertexEnd(); ++it){
       DGtal::Z3i::Point pt;
-      pt[0]=(*it).x; pt[1]=(*it).y; pt[2]=(*it).z;
+      pt[0]=(*it)[0]; pt[1]=(*it)[1]; pt[2]=(*it)[2];
       viewer << pt;
     }
   }
-       
-  viewer << Viewer3D::updateDisplay;
+
+  viewer << Viewer3D<>::updateDisplay;
   return application.exec();
 }
