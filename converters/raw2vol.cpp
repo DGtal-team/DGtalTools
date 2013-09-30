@@ -87,7 +87,7 @@ int main(int argc, char**argv)
     {
       trace.info() << "Convert a  8-bit raw file to  vol."<<std::endl
                    << std::endl << "Basic usage: "<<std::endl
-                   << "\tvol2raw -x 128 -y 128 -z 128 --input <RawFileName> --o <VolOutputFileName> "<<std::endl
+                   << "\traw2vol -x 128 -y 128 -z 128 --input <RawFileName> --output <VolOutputFileName> "<<std::endl
                    << general_opt << "\n";
       return 0;
     }
@@ -108,7 +108,13 @@ int main(int argc, char**argv)
   typedef ImageContainerBySTLVector<Z3i::Domain, unsigned char>  MyImageC;
 
   MyImageC  imageC = RawReader< MyImageC >::importRaw8 ( filename, Z3i::Vector(x,y,z) );
-  
   bool res =  VolWriter< MyImageC>::exportVol(outputFileName, imageC);
-  if (res) return 0; else return 1;
+
+  if (res)
+    return 0;
+  else 
+    {
+      trace.error()<< "Error while exporting the volume."<<std::endl;
+      return 1;
+    }
 }

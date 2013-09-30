@@ -86,27 +86,49 @@ void displayAxes( Viewer3D<space, kspace> & viewer,
                 (double)upperBound[ 2 ]-0.5 );
   if ( ( mode == "WIRED" ) || ( mode == "COLORED" ) )
     {
-      viewer.addLine( p0[ 0 ], p0[ 1 ], p0[ 2 ], p1[ 0 ], p0[ 1 ], p0[ 2 ], AXIS_COLOR, AXIS_LINESIZE );
-      viewer.addLine( p0[ 0 ], p0[ 1 ], p0[ 2 ], p0[ 0 ], p1[ 1 ], p0[ 2 ], AXIS_COLOR, AXIS_LINESIZE );
-      viewer.addLine( p0[ 0 ], p0[ 1 ], p0[ 2 ], p0[ 0 ], p0[ 1 ], p1[ 2 ], AXIS_COLOR, AXIS_LINESIZE );
-      viewer.addLine( p1[ 0 ], p0[ 1 ], p0[ 2 ], p1[ 0 ], p1[ 1 ], p0[ 2 ], AXIS_COLOR, AXIS_LINESIZE );
-      viewer.addLine( p1[ 0 ], p0[ 1 ], p0[ 2 ], p1[ 0 ], p0[ 1 ], p1[ 2 ], AXIS_COLOR, AXIS_LINESIZE );
-      viewer.addLine( p0[ 0 ], p1[ 1 ], p0[ 2 ], p1[ 0 ], p1[ 1 ], p0[ 2 ], AXIS_COLOR, AXIS_LINESIZE );
-      viewer.addLine( p0[ 0 ], p1[ 1 ], p0[ 2 ], p0[ 0 ], p1[ 1 ], p1[ 2 ], AXIS_COLOR, AXIS_LINESIZE );
-      viewer.addLine( p0[ 0 ], p0[ 1 ], p1[ 2 ], p1[ 0 ], p0[ 1 ], p1[ 2 ], AXIS_COLOR, AXIS_LINESIZE );
-      viewer.addLine( p0[ 0 ], p0[ 1 ], p1[ 2 ], p0[ 0 ], p1[ 1 ], p1[ 2 ], AXIS_COLOR, AXIS_LINESIZE );
-      viewer.addLine( p1[ 0 ], p1[ 1 ], p0[ 2 ], p1[ 0 ], p1[ 1 ], p1[ 2 ], AXIS_COLOR, AXIS_LINESIZE );
-      viewer.addLine( p1[ 0 ], p0[ 1 ], p1[ 2 ], p1[ 0 ], p1[ 1 ], p1[ 2 ], AXIS_COLOR, AXIS_LINESIZE );
-      viewer.addLine( p0[ 0 ], p1[ 1 ], p1[ 2 ], p1[ 0 ], p1[ 1 ], p1[ 2 ], AXIS_COLOR, AXIS_LINESIZE );
+      viewer.setLineColor(AXIS_COLOR);
+      viewer.addLine( DGtal::Z3i::RealPoint(p0[ 0 ], p0[ 1 ], p0[ 2 ]),
+		      DGtal::Z3i::RealPoint(p1[ 0 ], p0[ 1 ], p0[ 2 ]),  AXIS_LINESIZE );
+      viewer.addLine( DGtal::Z3i::RealPoint(p0[ 0 ], p0[ 1 ], p0[ 2 ]),
+		      DGtal::Z3i::RealPoint(p0[ 0 ], p1[ 1 ], p0[ 2 ]),  AXIS_LINESIZE );
+      viewer.addLine( DGtal::Z3i::RealPoint(p0[ 0 ], p0[ 1 ], p0[ 2 ]),
+		      DGtal::Z3i::RealPoint(p0[ 0 ], p0[ 1 ], p1[ 2 ]),  AXIS_LINESIZE );
+      viewer.addLine( DGtal::Z3i::RealPoint(p1[ 0 ], p0[ 1 ], p0[ 2 ]),
+		      DGtal::Z3i::RealPoint(p1[ 0 ], p1[ 1 ], p0[ 2 ]),  AXIS_LINESIZE );
+      viewer.addLine( DGtal::Z3i::RealPoint(p1[ 0 ], p0[ 1 ], p0[ 2 ]),
+		      DGtal::Z3i::RealPoint(p1[ 0 ], p0[ 1 ], p1[ 2 ]),  AXIS_LINESIZE );
+      viewer.addLine( DGtal::Z3i::RealPoint(p0[ 0 ], p1[ 1 ], p0[ 2 ]),
+		      DGtal::Z3i::RealPoint(p1[ 0 ], p1[ 1 ], p0[ 2 ]),  AXIS_LINESIZE );
+      viewer.addLine( DGtal::Z3i::RealPoint(p0[ 0 ], p1[ 1 ], p0[ 2 ]),
+		      DGtal::Z3i::RealPoint(p0[ 0 ], p1[ 1 ], p1[ 2 ]),  AXIS_LINESIZE );
+      viewer.addLine( DGtal::Z3i::RealPoint(p0[ 0 ], p0[ 1 ], p1[ 2 ]),
+		      DGtal::Z3i::RealPoint(p1[ 0 ], p0[ 1 ], p1[ 2 ]),  AXIS_LINESIZE );
+      viewer.addLine( DGtal::Z3i::RealPoint(p0[ 0 ], p0[ 1 ], p1[ 2 ]),
+		      DGtal::Z3i::RealPoint(p0[ 0 ], p1[ 1 ], p1[ 2 ]),  AXIS_LINESIZE );
+      viewer.addLine( DGtal::Z3i::RealPoint(p1[ 0 ], p1[ 1 ], p0[ 2 ]),
+		      DGtal::Z3i::RealPoint(p1[ 0 ], p1[ 1 ], p1[ 2 ]),  AXIS_LINESIZE );
+      viewer.addLine( DGtal::Z3i::RealPoint(p1[ 0 ], p0[ 1 ], p1[ 2 ]),
+		      DGtal::Z3i::RealPoint(p1[ 0 ], p1[ 1 ], p1[ 2 ]),  AXIS_LINESIZE );
+      viewer.addLine( DGtal::Z3i::RealPoint(p0[ 0 ], p1[ 1 ], p1[ 2 ]),
+		      DGtal::Z3i::RealPoint(p1[ 0 ], p1[ 1 ], p1[ 2 ]),  AXIS_LINESIZE );
     }
   if ( mode == "COLORED" )
     {
-      viewer.addQuad( p1[ 0 ], p1[ 1 ], p1[ 2 ], p1[ 0 ], p0[ 1 ], p1[ 2 ],
-		      p0[ 0 ], p0[ 1 ], p1[ 2 ], p0[ 0 ], p1[ 1 ], p1[ 2 ], XY_COLOR );
-      viewer.addQuad( p1[ 0 ], p1[ 1 ], p1[ 2 ], p0[ 0 ], p1[ 1 ], p1[ 2 ],
-		      p0[ 0 ], p1[ 1 ], p0[ 2 ], p1[ 0 ], p1[ 1 ], p0[ 2 ], XZ_COLOR );
-      viewer.addQuad( p1[ 0 ], p1[ 1 ], p1[ 2 ], p1[ 0 ], p0[ 1 ], p1[ 2 ],
-		      p1[ 0 ], p0[ 1 ], p0[ 2 ], p1[ 0 ], p1[ 1 ], p0[ 2 ], YZ_COLOR );
+      viewer.setFillColor(XY_COLOR);
+      viewer.addQuad(DGtal::Z3i::RealPoint(p1[ 0 ], p1[ 1 ], p1[ 2 ]),
+		     DGtal::Z3i::RealPoint(p1[ 0 ], p0[ 1 ], p1[ 2 ]),
+		     DGtal::Z3i::RealPoint(p0[ 0 ], p0[ 1 ], p1[ 2 ]),
+		     DGtal::Z3i::RealPoint(p0[ 0 ], p1[ 1 ], p1[ 2 ]) );
+      viewer.setFillColor(XZ_COLOR);
+      viewer.addQuad(DGtal::Z3i::RealPoint(p1[ 0 ], p1[ 1 ], p1[ 2 ]),
+		     DGtal::Z3i::RealPoint(p0[ 0 ], p1[ 1 ], p1[ 2 ]),
+		     DGtal::Z3i::RealPoint(p0[ 0 ], p1[ 1 ], p0[ 2 ]),
+		     DGtal::Z3i::RealPoint(p1[ 0 ], p1[ 1 ], p0[ 2 ]));
+      viewer.setFillColor(YZ_COLOR);
+      viewer.addQuad(DGtal::Z3i::RealPoint(p1[ 0 ], p1[ 1 ], p1[ 2 ]),
+		     DGtal::Z3i::RealPoint(p1[ 0 ], p0[ 1 ], p1[ 2 ]),
+		     DGtal::Z3i::RealPoint(p1[ 0 ], p0[ 1 ], p0[ 2 ]),
+		     DGtal::Z3i::RealPoint(p1[ 0 ], p1[ 1 ], p0[ 2 ]));
     }
 }
 
@@ -146,10 +168,10 @@ void displayDSS3dTangent( Viewer3D<space, kspace> & viewer,
 
   PointD3d Q1 = intercept + t1 * direction;
   PointD3d Q2 = intercept + t2 * direction;
-
-  viewer.addLine( Q1[ 0 ]-0.5, Q1[ 1 ]-0.5, Q1[ 2 ]-0.5,
-		  Q2[ 0 ]-0.5, Q2[ 1 ]-0.5, Q2[ 2 ]-0.5,
-		  color3d, MS3D_LINESIZE );
+  viewer.setLineColor(color3d);
+  viewer.addLine( DGtal::Z3i::RealPoint(Q1[ 0 ]-0.5, Q1[ 1 ]-0.5, Q1[ 2 ]-0.5), 
+		  DGtal::Z3i::RealPoint(Q2[ 0 ]-0.5, Q2[ 1 ]-0.5, Q2[ 2 ]-0.5), 
+		   MS3D_LINESIZE );
 }
 
 template <typename KSpace, typename ArithmeticalDSS3d, typename space, typename kspace >
@@ -209,16 +231,18 @@ void displayDSS2d( Viewer3D<space, kspace> & viewer,
       for ( unsigned int j = 0; j < pts2d.size(); ++j )
 	{
 	  switch (i) {
-	  case 0: p3[0] = (double) b[ i ]-0.5; p3[1] = pts2d[ j ][ 0 ];     p3[2] = pts2d[ j ][ 1 ];     break;
-	  case 1: p3[0] = pts2d[ j ][ 0 ];     p3[1] = (double) b[ i ]-0.5; p3[2] = pts2d[ j ][ 1 ];     break;
-	  case 2: p3[0] = pts2d[ j ][ 0 ];     p3[1] = pts2d[ j ][ 1 ];     p3[2] = (double) b[ i ]-0.5; break;
+	  case 0: p3.center[0] = (double) b[ i ]-0.5; p3.center[1] = pts2d[ j ][ 0 ];  p3.center[2] = pts2d[ j ][ 1 ]; break;
+	  case 1: p3.center[0] = pts2d[ j ][ 0 ];  p3.center[1] = (double) b[ i ]-0.5; p3.center[2] = pts2d[ j ][ 1 ];     break;
+	  case 2: p3.center[0] = pts2d[ j ][ 0 ];  p3.center[1] = pts2d[ j ][ 1 ];     p3.center[2] = (double) b[ i ]-0.5; break;
 	  }
 	  bb.push_back( p3 );
 	}
-      for ( unsigned int j = 0; j < pts2d.size(); ++j )
-        viewer.addLine( bb[ j ][0], bb[ j ][1], bb[ j ][2],
-                        bb[ (j+1)%4 ][0], bb[ (j+1)%4 ][1], bb[ (j+1)%4 ][2],
-                        color2d, MS3D_LINESIZE );
+      for ( unsigned int j = 0; j < pts2d.size(); ++j ){
+	viewer.setLineColor(color2d);
+	viewer.addLine( DGtal::Z3i::RealPoint(bb[ j ].center[0], bb[ j ].center[1], bb[ j ].center[2]),
+                        DGtal::Z3i::RealPoint(bb[ (j+1)%4 ].center[0], bb[ (j+1)%4 ].center[1], bb[ (j+1)%4 ].center[2]),
+			MS3D_LINESIZE );
+      }
     } // for ( DGtal::Dimension i = 0; i < 3; ++i )
 }
 
