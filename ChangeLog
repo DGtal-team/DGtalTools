@@ -15,7 +15,7 @@
     volFlip: tool to flip all volume slice images according a given dimension.
 
 * volumetric/volTools:
-	volTools directory moved into volumetric.
+	volTools directory moved into volumetric. 
 
 * visualisation/:
 	- 3dCurveViewer: A tool for visualizing the tangential cover of 3d curves.
