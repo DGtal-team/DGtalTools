@@ -59,7 +59,9 @@ protected:
   virtual void keyPressEvent ( QKeyEvent *e );
   virtual void init();
   Image3D *my3dImage;
-
+  float myScaleX;
+  float myScaleY;
+  float myScaleZ;
   int mySliceXPos;
   int mySliceYPos;
   int mySliceZPos;

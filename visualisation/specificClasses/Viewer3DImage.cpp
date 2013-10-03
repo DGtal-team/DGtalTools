@@ -45,7 +45,7 @@ Viewer3DImage< Space, KSpace>::init(){
    QGLViewer::setKeyDescription ( Qt::Key_Up, "Move the current 2D image slice to 5 in the positive direction of the current axis." );
    QGLViewer::setKeyDescription ( Qt::Key_Down, "Move the current 2D image slice to 5 in the negative direction of the current axis." );
    QGLViewer::setKeyDescription ( Qt::Key_Shift, "Change the slice move with step 1 (5 by default)" );
-
+   
 }
 
 
