@@ -240,7 +240,7 @@ Viewer3DImage< Space, KSpace>::keyPressEvent ( QKeyEvent *e )
 							   (myCurrentSliceDim==0)? dirStep: 0.0, 
 							   (myCurrentSliceDim==1)? dirStep: 0.0,
 							   (myCurrentSliceDim==2)? dirStep: 0.0, 
-							   myAngleRotation, Display3D::zDirection);
+							   myAngleRotation, DGtal::Viewer3D<>::zDirection);
       (*this).updateList(false);
       (*this).update();      
     }
