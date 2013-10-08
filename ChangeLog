@@ -20,7 +20,7 @@
 * visualisation/:
 	- 3dCurveViewer: A tool for visualizing the tangential cover of 3d curves.
 	- 3dVolViewer: new option to limit the number of displayed voxels.
-	- 3dImageViewer: new tools to display slice image with interactive translatation or roations.
+	- 3dImageViewer: new tool to display slice image with interactive translatations or rotations.
 	- patternTriangulation: a new tool that draws with Board2D the convex hull, the closest-point Delaunay triangulation or the farthest-point Delaunay triangulation of a pattern.
 
 	====  Release 0.6 ====

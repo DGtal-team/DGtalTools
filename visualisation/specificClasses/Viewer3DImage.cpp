@@ -110,8 +110,6 @@ Viewer3DImage< Space, KSpace>::setVolImage(Image3D * an3DImage){
   DGtal::Z3i::Point centerZ((my3dImage->domain().upperBound())[0]/2, (my3dImage->domain().upperBound())[1]/2, mySliceZPos);
     
   DGtal::SliceRotator2D<DGtal::Z3i::Domain> aSliceFunctorZ(2, my3dImage->domain(), mySliceZPos, 2, myAngleRotation, centerZ );
-  //DGtal::Projector<DGtal::Z3i::Space> aSliceFunctorZ(mySliceZPos); aSliceFunctorZ.initAddOneDim(2);;  
-  //aSliceFunctorZ.initRemoveOneDim(2);
   MyRotatorSliceImageAdapter sliceImageZ(*my3dImage, domain2DZ, aSliceFunctorZ, DGtal::DefaultFunctor()); 
   (*this) << sliceImageZ;
   (*this) << DGtal::UpdateImagePosition< Space, KSpace > (2, DGtal::Viewer3D<>::zDirection, 0.0, 0.0, mySliceZPos);
