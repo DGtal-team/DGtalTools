@@ -70,85 +70,6 @@ getPSNR(const Image3D & imageA, const Image3D &imageB, double rmsd){
 
 
 
-void
-getVoxelsStats(const Image3D &imageA,  int aMin, int aMax, const Image3D &imageB, 
-	       int bMin, int bMax, bool exportStatVoxels,  std::vector<Point> &vectPtBinA,  
-	       std::vector<Point> &vectPtCompBinCompA,  std::vector<Point> &vectPtBnotInA, 
-	       std::vector<Point> &vectPtnotBInA, bool precisionRecallFMean ){
-  int numBinA = 0; // true positif with A as ref shape.
-  int numCompBinCompA = 0; // true neg with A as ref shape.
-  int numBnotInA = 0; // false pos with A as ref shape
-  int numNotBinA = 0; // false neg with A as ref shape
-  int numTotalInA = 0; // total pos in reference shape
-  int numTotalInB = 0; // total pos in compared shape
-  int numTotalinCompA = 0; //total in complement A 
-  int numTotalinCompB = 0; //total in complement B
-
-  for(Image3D::Domain::ConstIterator it = imageA.domain().begin(); it!=imageA.domain().end(); it++){
-    // voxels in A
-    if(imageA(*it) <= aMax && imageA(*it) >= aMin){
-      numTotalInA++;
-      //voxels in B 
-      if(imageB(*it) <= bMax && imageB(*it) >= bMin){
-	numTotalInB++;
-	numBinA++;
-	if(exportStatVoxels) vectPtBinA.push_back(*it);
-      }else{
-	numTotalinCompB++;
-	numNotBinA++;
-	if(exportStatVoxels) vectPtnotBInA.push_back(*it);
-      }
-      // voxels outside A
-    }else{
-      numTotalinCompA++;
-      // voxels in B
-      if(imageB(*it) <= bMax && imageB(*it) >= bMin){
-	numBnotInA++;
-	numTotalInB++;
-	if(exportStatVoxels) vectPtBnotInA.push_back(*it);
-      }else{
-	numTotalinCompB++;
-	numCompBinCompA++;
-	if(exportStatVoxels) vectPtCompBinCompA.push_back(*it);
-      }      
-    }
-  }
-
-  std::cout << numBinA << " " << numCompBinCompA << " " << numBnotInA 
-	    << " " << numNotBinA  << " " << numTotalInA << " " 
-	    << numTotalInB << " " << numTotalinCompA << " " << numTotalinCompB;
-  if(precisionRecallFMean){
-    double precision = (double)numBinA/(numBinA + numBnotInA);
-    double recall = (double)numBinA/(numBinA+numNotBinA);
-    double fmean = (2.0*precision*recall)/(precision+recall);
-    std::cout << " " << precision<<  " " << recall << " " << fmean ; 
-  }
-}
-
-
-
-
-// total ref: True Positive, True Negative, False Positive, False Negative
-void
-getVoxelsStats(const Image3D &imageA,  int aMin, int aMax, const Image3D &imageB, 
-	       int bMin, int bMax, bool precisionRecallFMean ){
-  std::vector<Point> v1, v2, v3, v4;
-  return getVoxelsStats(imageA, aMin, aMax, imageB, bMin, bMax, false, v1, v2, v3, v4, precisionRecallFMean);
-}
-
-
-void 
-exportSetofPoints(string filename, std::vector<Point> aVectPoint){
-  std::ofstream ofs;
-  ofs.open(filename.c_str(), std::ofstream::out );
-  ofs<< "# Set of 3d points with format: x y z" << std::endl;
-  for (unsigned int i =0; i< aVectPoint.size(); i++){
-    ofs << aVectPoint.at(i)[0] << " " << aVectPoint.at(i)[1] << " "<< aVectPoint.at(i)[2] << std::endl;
-  }
-  ofs.close();
-}
-
-
 
 int main(int argc, char**argv)
 {
@@ -161,13 +82,7 @@ int main(int argc, char**argv)
   general_opt.add_options()
     ( "help,h", "display this message." )
     ( "volA,a", po::value<std::string>(), "Input filename of volume A (vol format, and other pgm3d can also be used)." )
-    ( "volB,b", po::value<std::string>(), "Input filename of volume B (vol format, and other pgm3d can also be used)." )
-    ( "aMin", po::value<int>()->default_value(0), "min threshold for a voxel to be considered as belonging to the object of volume A. (default 0)" )
-    ( "aMax", po::value<int>()->default_value(128), "max threshold for a voxel to be considered as belonging to the object of volume A. (default 128)" )
-    ( "bMin", po::value<int>()->default_value(0), "min threshold for a voxel to be considered as belonging to the object of volume B. (default 0)" )
-    ( "bMax", po::value<int>()->default_value(128), "max threshold for a voxel to be considered as belonging to the object of volume B. (default 128)" )
-    ("displayTFstats", "Change the comparison diplay by using the  true/false/positive/negative notation and considering the shape A as reference. It also display precision/recall/f-mean statistics.")
-    ("exportSDP", "Export voxels belonging to each categorie (voxels of ( B in A) , (NOT in B and NOT in A),   (B and NOT in A) and (Voxels of NOT in B and in A)). ") ;
+    ( "volB,b", po::value<std::string>(), "Input filename of volume B (vol format, and other pgm3d can also be used)." ));
   
   bool parseOK=true;
   po::variables_map vm;
@@ -181,11 +96,11 @@ int main(int argc, char**argv)
   
   if ( vm.count ( "help" ) || ! vm.count("volA")||! vm.count("volB") )
     {
-      trace.info() << "apply basic comparaisons (Number of voxels (B-A), (A-B), ...etc,  RMSE, PSNR) between two volumetric images A and B (shape defined from thresholds). Usefull to determine classical statistics like false positive related stats."<<std::endl
+      trace.info() << "apply basic image measures (RMSE, PSNR) between two volumetric images A and B."<<std::endl
 		   << std::endl << "Basic usage: "<<std::endl
 		   << "\t volImageMetrics --volA <volAFilename> --volB <volBFilename> "<<std::endl
 		   << general_opt << "\n"
-		   << "Typical use :\n  volImageMetrics -a imageA.vol --aMin 128 --aMax 255 -b imageB.vol --bMin 128 --bMax 255 \n" ;
+		   << "Typical use :\n  volImageMetrics -a imageA.vol  -b imageB.vol \n" ;
 
       return 0;
     }
@@ -198,54 +113,20 @@ int main(int argc, char**argv)
  
   std::string volAFilename = vm["volA"].as<std::string>();
   std::string volBFilename = vm["volB"].as<std::string>();
- 
-  int aMin = vm["aMin"].as<int>();
-  int aMax = vm["aMax"].as<int>();
-  int bMin = vm["bMin"].as<int>();
-  int bMax = vm["bMax"].as<int>();
- 
+  
   Image3D imageA = GenericReader<Image3D>::import(volAFilename);
   Image3D imageB = GenericReader<Image3D>::import(volBFilename);
  
   if(vm.count("displayTFstats")){
 
-    std::cout << "# Statistics (generated with volImageMetrics) given with the reference shape A: "<< volAFilename<< " (defined with threshold min: " << aMin << " and max: " << aMax << " )"<< endl;
-    std::cout << "# and with the compared shape B: "<< volBFilename << "  (defined with threshold min: " << bMin << " and max: " << bMax << " )"<< endl;
-    std::cout << "# #True_Positive #TrueNegative #FalsePositive #FalseNegative  #TotalinA #TotalInB #TotalComplementOfRef #TotalComplementOfComp Precision Recall F-Mean RMSE PSNR "<< endl;    
+    std::cout << "# Statistics (generated with volImageMetrics) given with the image A: "<< volAFilename<< "and the image B: "<< volBFilename << endl;
+    std::cout << "#  RMSE PSNR "<< endl;    
     
-    if(vm.count("exportSDP")){
-      std::vector<Point> voxelsBinA, voxelsNotInBNotInA, voxelsBNotInA, voxelsNotInBInA; 
-      getVoxelsStats(imageA, aMin, aMax,  imageB,  bMin, bMax, true, voxelsBinA, voxelsNotInBNotInA, voxelsBNotInA, voxelsNotInBInA, true);    
-      exportSetofPoints("truePos.sdp",  voxelsBinA);
-      exportSetofPoints("trueNeg.sdp",  voxelsNotInBNotInA);
-      exportSetofPoints("falsePos.sdp", voxelsBNotInA);
-      exportSetofPoints("falseNeg.sdp", voxelsNotInBInA);
-    }else{
-      getVoxelsStats(imageA, aMin, aMax,  imageB,  bMin, bMax, true);
-    }
+    double rmse= getRMSE(imageA, imageB);
+    double psnr= getPSNR(imageA, imageB, rmse);
     
-  }else{ 
-    std::cout << "# Statistics given with the shape A: "<< volAFilename<< " (defined with threshold min: " << aMin << " and max: " << aMax << " )"<< endl;
-    std::cout << "# and shape B: "<< volBFilename << "  (defined with threshold min: " << bMin << " and max: " << bMax << " )"<< endl;
-    std::cout << "# #(Voxels of B in A) #(Voxels of NOT in B and NOT in A) #(Voxels of B and NOT in A)  #(Voxels of NOT in B and in A) #(Voxels in A) #(Voxels in B) #(Voxels not in A) #(Voxels not in B)  RMSE PSNR "<< endl;    
-
-    if(vm.count("exportSDP")){
-      std::vector<Point> voxelsBinA, voxelsNotInBNotInA, voxelsBNotInA, voxelsNotInBInA; 
-      getVoxelsStats(imageA, aMin, aMax,  imageB,  bMin, bMax, true, voxelsBinA, voxelsNotInBNotInA, voxelsBNotInA, voxelsNotInBInA, false);    
-      exportSetofPoints("inBinA.sdp",  voxelsBinA);
-      exportSetofPoints("notinBnotinA.sdp",  voxelsNotInBNotInA);
-      exportSetofPoints("inBnotinA.sdp", voxelsBNotInA);
-      exportSetofPoints("notinBinA.sdp", voxelsNotInBInA);
-    }else{
-      getVoxelsStats(imageA, aMin, aMax,  imageB,  bMin, bMax, false);
-    }
-  }  
-
-  double rmse= getRMSE(imageA, imageB);
-  double psnr= getPSNR(imageA, imageB, rmse);
-  
-  std::cout << " " << rmse << " " << psnr << endl;
-
-  return 1;
+    std::cout << " " << rmse << " " << psnr << endl;
+    
+    return 1;
 }
 
