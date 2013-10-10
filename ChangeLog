@@ -10,12 +10,14 @@
 	- pgm2freeman: add new possibility to set automatically a threshold from the otsu algorithm.
 
 * volumetric:
-    convertVol: a simple generic volume image converters (can process actually pgm3d, vol, longvol, raw (for writing)).
-    homotopicThinning3D exploits now the GenericReader class and is no more limited to vol format.
-    volFlip: tool to flip all volume slice images according a given dimension.
-    volImageMetrics: apply basic statistics on comparaison between two volumetric images (shape defined from thresholds): computes true/false -+, precision, recall f-mean RMSE, PSNR.
-    volShapeMetrics: apply euclidean distance comparisons between two shapes  (shape defined from thresholds).
-
+	- convertVol: a simple generic volume image converters (can process actually pgm3d, vol, longvol, raw (for writing)).
+	- homotopicThinning3D exploits now the GenericReader class and is no more limited to vol format.
+	- volFlip: tool to flip all volume slice images according a given dimension.
+	- volImageMetrics: apply basic measures from two volumetric images:  RMSE and PSNR.
+	- volShapeMetrics: Apply shape measures for comparing two volumetric images A and B (shape defined from thresholds): 
+		* Measures from voxel partition (true/false+-, precision recall, f-measure) 
+		* Measures bases on euclidean distance between the two Shape A and B.
+	
 * volumetric/volTools:
 	volTools directory moved into volumetric.
 

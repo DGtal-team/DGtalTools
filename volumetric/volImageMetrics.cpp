@@ -73,16 +73,12 @@ getPSNR(const Image3D & imageA, const Image3D &imageB, double rmsd){
 
 int main(int argc, char**argv)
 {
-
   
-  // parse command line ----------------------------------------------
-  // A = ref
-  // B= comp
   po::options_description general_opt ( "Allowed options are: " );
   general_opt.add_options()
     ( "help,h", "display this message." )
     ( "volA,a", po::value<std::string>(), "Input filename of volume A (vol format, and other pgm3d can also be used)." )
-    ( "volB,b", po::value<std::string>(), "Input filename of volume B (vol format, and other pgm3d can also be used)." ));
+    ( "volB,b", po::value<std::string>(), "Input filename of volume B (vol format, and other pgm3d can also be used)." );
   
   bool parseOK=true;
   po::variables_map vm;
@@ -96,7 +92,7 @@ int main(int argc, char**argv)
   
   if ( vm.count ( "help" ) || ! vm.count("volA")||! vm.count("volB") )
     {
-      trace.info() << "apply basic image measures (RMSE, PSNR) between two volumetric images A and B."<<std::endl
+      trace.info() << "Apply basic image measures (RMSE, PSNR) between two volumetric images A and B."<<std::endl
 		   << std::endl << "Basic usage: "<<std::endl
 		   << "\t volImageMetrics --volA <volAFilename> --volB <volBFilename> "<<std::endl
 		   << general_opt << "\n"
@@ -117,16 +113,15 @@ int main(int argc, char**argv)
   Image3D imageA = GenericReader<Image3D>::import(volAFilename);
   Image3D imageB = GenericReader<Image3D>::import(volBFilename);
  
-  if(vm.count("displayTFstats")){
-
-    std::cout << "# Statistics (generated with volImageMetrics) given with the image A: "<< volAFilename<< "and the image B: "<< volBFilename << endl;
-    std::cout << "#  RMSE PSNR "<< endl;    
+  
+  std::cout << "# Image based measures (generated with volImageMetrics) given with the image A: "<< volAFilename<< "and the image B: "<< volBFilename << endl;
+  std::cout << "#  RMSE PSNR "<< endl;    
+  
+  double rmse= getRMSE(imageA, imageB);
+  double psnr= getPSNR(imageA, imageB, rmse);
     
-    double rmse= getRMSE(imageA, imageB);
-    double psnr= getPSNR(imageA, imageB, rmse);
-    
-    std::cout << " " << rmse << " " << psnr << endl;
-    
-    return 1;
+  std::cout << " " << rmse << " " << psnr << endl;
+  
+  return 1;
 }
 
