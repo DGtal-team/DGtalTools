@@ -129,7 +129,9 @@ int main( int argc, char** argv )
   trace.endBlock();
 
   trace.beginBlock("Computing skeleton");
-  Object26_6 shape( dt26_6, shape_set );
+  // (6,18) and (6,26) seem ok.
+  // (18,6) and (26,6) give weird results (but perhaps ok !).
+  Object6_18 shape( dt6_18, shape_set );
   int nb_simple=0; 
   int layer = 1;
   std::queue<DigitalSet::Iterator> Q;
