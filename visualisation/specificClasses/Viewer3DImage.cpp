@@ -35,23 +35,23 @@ using namespace qglviewer;
 // Standard services - public :
 
 
-
+template < typename Space, typename KSpace>
 void
-Viewer3DImage::init(){
-   Viewer3D::init();
-   setKeyDescription ( Qt::Key_X, "Change the current axis to X for the current 2D image slice setting." );
-   setKeyDescription ( Qt::Key_Y, "Change the current axis to Y for the current 2D image slice setting." );
-   setKeyDescription ( Qt::Key_Z, "Change the current axis to Z for the current 2D image slice setting." );
-   setKeyDescription ( Qt::Key_Up, "Move the current 2D image slice to 5 in the positive direction of the current axis." );
-   setKeyDescription ( Qt::Key_Down, "Move the current 2D image slice to 5 in the negative direction of the current axis." );
-   setKeyDescription ( Qt::Key_Shift, "Change the slice move with step 1 (5 by default)" );
-
+Viewer3DImage< Space, KSpace>::init(){
+   DGtal::Viewer3D<>::init();
+   QGLViewer::setKeyDescription ( Qt::Key_X, "Change the current axis to X for the current 2D image slice setting." );
+   QGLViewer::setKeyDescription ( Qt::Key_Y, "Change the current axis to Y for the current 2D image slice setting." );
+   QGLViewer::setKeyDescription ( Qt::Key_Z, "Change the current axis to Z for the current 2D image slice setting." );
+   QGLViewer::setKeyDescription ( Qt::Key_Up, "Move the current 2D image slice to 5 in the positive direction of the current axis." );
+   QGLViewer::setKeyDescription ( Qt::Key_Down, "Move the current 2D image slice to 5 in the negative direction of the current axis." );
+   QGLViewer::setKeyDescription ( Qt::Key_Shift, "Change the slice move with step 1 (5 by default)" );
+   
 }
 
 
-
+template < typename Space, typename KSpace>
 void 
-Viewer3DImage::setVolImage(Image3D * an3DImage){
+Viewer3DImage< Space, KSpace>::setVolImage(Image3D * an3DImage){
   my3dImage = an3DImage;
 
   switch (myMode) {
@@ -79,12 +79,13 @@ Viewer3DImage::setVolImage(Image3D * an3DImage){
   DGtal::Z2i::Domain domain2DX(invFunctorX(my3dImage->domain().lowerBound()), 
 			       invFunctorX(my3dImage->domain().upperBound()));
   
-  DGtal::Projector<DGtal::Z3i::Space> aSliceFunctorX(mySliceXPos); aSliceFunctorX.initAddOneDim(0);
-  SliceImageAdapter sliceImageX(*my3dImage, domain2DX, aSliceFunctorX, DGtal::DefaultFunctor()); 
-  
+    
+  DGtal::SliceRotator2D<DGtal::Z3i::Domain> aSliceFunctorX(0, my3dImage->domain(), mySliceXPos,2, myAngleRotation );
+  MyRotatorSliceImageAdapter sliceImageX(*my3dImage, domain2DX, aSliceFunctorX, DGtal::DefaultFunctor()); 
+    
   std::cout << "image:" << sliceImageX.className();
   (*this) << sliceImageX;
-  (*this) << DGtal::UpdateImagePosition(0, DGtal::Display3D::xDirection, mySliceXPos, 0.0, 0.0);
+  (*this) << DGtal::UpdateImagePosition< Space, KSpace >(0, DGtal::Viewer3D<>::xDirection, mySliceXPos, 0.0, 0.0);
 
 
   // Adding Y slice in the viewer.
@@ -95,7 +96,7 @@ Viewer3DImage::setVolImage(Image3D * an3DImage){
   DGtal::Projector<DGtal::Z3i::Space> aSliceFunctorY(mySliceYPos); aSliceFunctorY.initAddOneDim(1);
   SliceImageAdapter sliceImageY(*my3dImage, domain2DY, aSliceFunctorY, DGtal::DefaultFunctor()); 
   (*this) << sliceImageY;
-  (*this) << DGtal::UpdateImagePosition(1, DGtal::Display3D::yDirection, 0.0,mySliceYPos, 0.0);
+  (*this) << DGtal::UpdateImagePosition< Space, KSpace >(1, DGtal::Viewer3D<>::yDirection, 0.0,mySliceYPos, 0.0);
 
 
 
@@ -106,20 +107,21 @@ Viewer3DImage::setVolImage(Image3D * an3DImage){
   DGtal::Z2i::Domain domain2DZ(invFunctorZ(my3dImage->domain().lowerBound()), 
 			       invFunctorZ(my3dImage->domain().upperBound()));
  
-  DGtal::Projector<DGtal::Z3i::Space> aSliceFunctorZ(mySliceZPos); aSliceFunctorZ.initAddOneDim(2);; 
-  aSliceFunctorZ.initRemoveOneDim(2);
-  SliceImageAdapter sliceImageZ(*my3dImage, domain2DZ, aSliceFunctorZ, DGtal::DefaultFunctor()); 
+  DGtal::Z3i::Point centerZ((my3dImage->domain().upperBound())[0]/2, (my3dImage->domain().upperBound())[1]/2, mySliceZPos);
+    
+  DGtal::SliceRotator2D<DGtal::Z3i::Domain> aSliceFunctorZ(2, my3dImage->domain(), mySliceZPos, 2, myAngleRotation, centerZ );
+  MyRotatorSliceImageAdapter sliceImageZ(*my3dImage, domain2DZ, aSliceFunctorZ, DGtal::DefaultFunctor()); 
   (*this) << sliceImageZ;
-  (*this) << DGtal::UpdateImagePosition(2, DGtal::Display3D::zDirection, 0.0, 0.0, mySliceZPos);
+  (*this) << DGtal::UpdateImagePosition< Space, KSpace > (2, DGtal::Viewer3D<>::zDirection, 0.0, 0.0, mySliceZPos);
 
     
-  (*this) << Viewer3D::updateDisplay;
+  (*this) << DGtal::Viewer3D<>::updateDisplay;
 }
 
 
-
+template < typename Space, typename KSpace>
 QString
-Viewer3DImage::helpString() const
+Viewer3DImage< Space, KSpace>::helpString() const
 {
   QString text ( "<h2> Viewer3DImage</h2>" );
   text += "Use the mouse to move the camera around the object. ";
@@ -143,9 +145,9 @@ Viewer3DImage::helpString() const
 
 
 
-
+template < typename Space, typename KSpace>
 void
-Viewer3DImage::keyPressEvent ( QKeyEvent *e )
+Viewer3DImage< Space, KSpace>::keyPressEvent ( QKeyEvent *e )
 {
   
   bool handled = false;
@@ -175,6 +177,12 @@ Viewer3DImage::keyPressEvent ( QKeyEvent *e )
     if((e->modifiers() & Qt::ShiftModifier)){
       dirStep/=5;
     }
+    if((e->modifiers() & Qt::MetaModifier)){
+      myAngleRotation =(e->key() == Qt::Key_Down)? 0.1: -0.1;
+      dirStep=0;
+    }else{
+      myAngleRotation=0.0;
+    }
     int aSliceNum=0;
     int aSliceMax=0;
     bool stoped=false;
@@ -203,29 +211,43 @@ Viewer3DImage::keyPressEvent ( QKeyEvent *e )
        }
        aSliceNum=mySliceZPos;
     }
+
     if(!stoped){
+      double myTotalAngleRotation=0.0;
+      if(myCurrentSliceDim==0){
+	myTotalAngleRotationX+=myAngleRotation;
+	myTotalAngleRotation = myTotalAngleRotationX;
+      }else if (myCurrentSliceDim==1){
+	myTotalAngleRotationY+=myAngleRotation;
+	myTotalAngleRotation = myTotalAngleRotationY;
+      }else if (myCurrentSliceDim==2){
+	myTotalAngleRotationZ+=myAngleRotation;
+	myTotalAngleRotation = myTotalAngleRotationZ;
+      }
+      
+      DGtal::SliceRotator2D<DGtal::Z3i::Domain> aSliceFunctor(myCurrentSliceDim, my3dImage->domain(), 
+							      aSliceNum, 2, myTotalAngleRotation);
       // Adding X slice in the viewer.
       DGtal::Projector<DGtal::Z2i::Space>  invFunctor; invFunctor.initRemoveOneDim(myCurrentSliceDim);
       DGtal::Z2i::Domain domain2D(invFunctor(my3dImage->domain().lowerBound()), 
 				  invFunctor(my3dImage->domain().upperBound()));
       
-      DGtal::Projector<DGtal::Z3i::Space> aSliceFunctor(aSliceNum); 
-      aSliceFunctor.initAddOneDim(myCurrentSliceDim);
-      SliceImageAdapter sliceImage(*my3dImage, domain2D, aSliceFunctor, DGtal::DefaultFunctor()); 
+      MyRotatorSliceImageAdapter sliceImage(*my3dImage, domain2D, aSliceFunctor, DGtal::DefaultFunctor()); 
       
-      (*this) << DGtal::UpdateImageData<SliceImageAdapter>(myCurrentSliceDim, sliceImage, 
+      (*this) << DGtal::UpdateImageData<MyRotatorSliceImageAdapter>(myCurrentSliceDim, sliceImage, 
 							   (myCurrentSliceDim==0)? dirStep: 0.0, 
 							   (myCurrentSliceDim==1)? dirStep: 0.0,
-							   (myCurrentSliceDim==2)? dirStep: 0.0);
+							   (myCurrentSliceDim==2)? dirStep: 0.0, 
+							   myAngleRotation, DGtal::Viewer3D<>::zDirection);
       (*this).updateList(false);
       (*this).update();      
     }
     handled=true;
-   }
+  }
 
    
   if ( !handled )
-    DGtal::Viewer3D::keyPressEvent ( e );
+    DGtal::Viewer3D<>::keyPressEvent ( e );
   
 }
 

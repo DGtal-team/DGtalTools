@@ -46,7 +46,7 @@
 
 
 
-#include "specificClasses/Viewer3DImage.h"
+#include "specificClasses/Viewer3DImage.cpp"
 
 #include <boost/program_options/options_description.hpp>
 #include <boost/program_options/parsers.hpp>
@@ -82,8 +82,9 @@ int main( int argc, char** argv )
     ("displayDigitalSurface", "display the digital surface instead of display all the set of voxels (used with thresholdImage or displaySDP options)" )
     ("colorizeCC", "colorize each Connected Components of the surface displayed by displayDigitalSurface option." )
     ("colorSDP,c", po::value<std::vector <int> >()->multitoken(), "set the color  discrete points: r g b a " )
-    
-
+    ("scaleX,x",  po::value<float>()->default_value(1.0), "set the scale value in the X direction (default 1.0)" )
+    ("scaleY,y",  po::value<float>()->default_value(1.0), "set the scale value in the Y direction (default 1.0)" )
+    ("scaleZ,z",  po::value<float>()->default_value(1.0), "set the scale value in the Z direction (default 1.0)")    
     ("transparency,t",  po::value<uint>()->default_value(255), "transparency") ; 
   
   bool parseOK=true;
@@ -115,27 +116,29 @@ int main( int argc, char** argv )
  
   QApplication application(argc,argv);
  
-
+  float sx = vm["scaleX"].as<float>();
+  float sy = vm["scaleY"].as<float>();
+  float sz = vm["scaleZ"].as<float>();
 
   string extension = inputFilename.substr(inputFilename.find_last_of(".") + 1);
   if(extension!="vol" && extension != "p3d" && extension != "pgm3D" && extension != "pgm3d" && extension != "sdp" && extension != "pgm" ){
     trace.info() << "File extension not recognized: "<< extension << std::endl;
     return 0;
   }
-  Viewer3DImage::ModeVisu mode;
+  Viewer3DImage<>::ModeVisu mode;
   if(vm.count("emptyMode"))
-    mode=Viewer3DImage::Empty;
+    mode=Viewer3DImage<>::Empty;
   else if(vm.count("grid"))
-    mode=Viewer3DImage::Grid;
+    mode=Viewer3DImage<>::Grid;
   else if(vm.count("intergrid"))
-    mode=Viewer3DImage::InterGrid;
+    mode=Viewer3DImage<>::InterGrid;
   else
-    mode=Viewer3DImage::BoundingBox;
+    mode=Viewer3DImage<>::BoundingBox;
    
-  Viewer3DImage viewer(mode);
+  Viewer3DImage<> viewer(mode);
   viewer.setWindowTitle("simple Volume Viewer");
   viewer.show();
-  
+  viewer.setGLScale(sx, sy, sz);  
   
 
   Image3D image = GenericReader<Image3D>::import( inputFilename );
@@ -149,7 +152,7 @@ int main( int argc, char** argv )
   
   
   
-  viewer << Viewer3D::updateDisplay;
+  viewer << Viewer3D<>::updateDisplay;
   if(vm.count("thresholdImage")){
     GradientColorMap<long> gradient( thresholdMin, thresholdMax);
     gradient.addColor(Color::Blue);
@@ -206,7 +209,7 @@ int main( int argc, char** argv )
     gradient.addColor(DGtal::Color::Magenta);
     gradient.addColor(DGtal::Color::Red);
         
-    viewer << SetMode3D(vectConnectedSCell.at(0).at(0).className(), "Basic");
+    viewer << DGtal::SetMode3D(vectConnectedSCell.at(0).at(0).className(), "Basic");
     for(unsigned int i= 0; i <vectConnectedSCell.size(); i++){
       for(unsigned int j= 0; j <vectConnectedSCell.at(i).size(); j++){
 	if(vm.count("colorizeCC")){
@@ -225,6 +228,6 @@ int main( int argc, char** argv )
     }
   }
   
-  viewer << Viewer3D::updateDisplay;
+  viewer << Viewer3D<>::updateDisplay;
   return application.exec();
 }

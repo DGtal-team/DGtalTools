@@ -21,7 +21,7 @@
  *
  * @date 2013/05/07
  *
- * 
+ *
  *
  * This file is part of the DGtalTools.
  */
@@ -55,7 +55,7 @@ int main( int argc, char** argv )
   typedef ImageContainerBySTLVector < Z2i::Domain, unsigned char > Image2D;
   typedef DGtal::ConstImageAdapter<Image3D, Image2D::Domain, DGtal::Projector< DGtal::Z3i::Space>,
 				   Image3D::Value,  DGtal::DefaultFunctor >  SliceImageAdapter;
-  
+
 
   // parse command line ----------------------------------------------
   po::options_description general_opt("Allowed options are: ");
@@ -64,18 +64,18 @@ int main( int argc, char** argv )
     ("input-file,i", po::value<std::string >(), "input volumetric file (.vol, .longvol, .pgm3d) " )
     ("output-files,o", po::value<std::string>(), "base_name.extension:  extracted 2D slice volumetric files (will result n files base_name_xxx.extension) " )
     ("sliceOrientation,s", po::value<unsigned int>()->default_value(2), "specify the slice orientation for which the slice are defined (by default =2 (Z direction))" );
-  
-  
+
+
   bool parseOK=true;
   po::variables_map vm;
   try{
-    po::store(po::parse_command_line(argc, argv, general_opt), vm);  
+    po::store(po::parse_command_line(argc, argv, general_opt), vm);
   }catch(const std::exception& ex){
     parseOK=false;
     trace.info()<< "Error checking program options: "<< ex.what()<< endl;
   }
-  po::notify(vm);    
-  
+  po::notify(vm);
+
 
   if( !parseOK || vm.count("help"))
     {
@@ -87,10 +87,10 @@ int main( int argc, char** argv )
                 << "see slice2vol"<< endl;
       return 0;
     }
-  
+
   if(! vm.count("input-file")||! vm.count("output-files"))
     {
-      trace.error() << " Input and output filename are needed to be defined" << endl;      
+      trace.error() << " Input and output filename are needed to be defined" << endl;
       return 0;
     }
 
@@ -99,33 +99,30 @@ int main( int argc, char** argv )
 
   std::string inputFileName = vm["input-file"].as<std::string>();
   std::string outputFileName = vm["output-files"].as<std::string>();
-  std::string outputExt = outputFileName.substr(outputFileName.find_last_of(".")+1); 
-  std::string outputBasename = outputFileName.substr(0, outputFileName.find_last_of(".")); 
+  std::string outputExt = outputFileName.substr(outputFileName.find_last_of(".")+1);
+  std::string outputBasename = outputFileName.substr(0, outputFileName.find_last_of("."));
   unsigned int sliceOrientation = vm["sliceOrientation"].as<unsigned int>();
-  
-  trace.info()<< "Importing volume file base name:  " << outputBasename << " extension: " << outputExt << " ..." ; 
+
+  trace.info()<< "Importing volume file base name:  " << outputBasename << " extension: " << outputExt << " ..." ;
   Image3D input3dImage = GenericReader<Image3D>::import(inputFileName);
-  trace.info()<< "[done]" << endl;  
+  trace.info()<< "[done]" << endl;
 
 
   //Processing each slice
+#pragma omp parallel for schedule(dynamic)
   for( unsigned int i=0; i <= input3dImage.domain().upperBound()[sliceOrientation]; i++){
     trace.info() << "Exporting slice image "<< i ;
     DGtal::Projector<DGtal::Z2i::Space>  invFunctor; invFunctor.initRemoveOneDim(sliceOrientation);
-    DGtal::Z2i::Domain domain2D(invFunctor(input3dImage.domain().lowerBound()), 
+    DGtal::Z2i::Domain domain2D(invFunctor(input3dImage.domain().lowerBound()),
   				invFunctor(input3dImage.domain().upperBound()));
     DGtal::Projector<DGtal::Z3i::Space> aSliceFunctor(i); aSliceFunctor.initAddOneDim(sliceOrientation);
-    SliceImageAdapter sliceImage(input3dImage, domain2D, aSliceFunctor, DGtal::DefaultFunctor()); 
-    stringstream outName; outName << outputBasename << "_" <<  boost::format("%|05|")% i <<"."<< outputExt ; 
+    SliceImageAdapter sliceImage(input3dImage, domain2D, aSliceFunctor, DGtal::DefaultFunctor());
+    stringstream outName; outName << outputBasename << "_" <<  boost::format("%|05|")% i <<"."<< outputExt ;
     trace.info() << ": "<< outName.str() ;
-    GenericWriter<SliceImageAdapter>::exportFile(outName.str(), sliceImage); 
+    GenericWriter<SliceImageAdapter>::exportFile(outName.str(), sliceImage);
     trace.info() << " [done]"<< endl;
-  } 
+  }
 
 
-  return 0;  
+  return 0;
 }
-
-
-
-

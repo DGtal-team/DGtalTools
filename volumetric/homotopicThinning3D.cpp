@@ -172,7 +172,7 @@ int main( int argc, char** argv )
 
   // Display by using two different list to manage OpenGL transparency.
   QApplication application(argc,argv);
-  Viewer3D viewer;
+  Viewer3D<> viewer;
   viewer.setWindowTitle("simpleExample3DViewer");
   viewer.show();  
   
@@ -184,7 +184,7 @@ int main( int argc, char** argv )
   viewer << CustomColors3D(Color(250, 0,0, 25), Color(250, 0,0, 5));
   viewer << shape_set;
 
-  viewer<< Viewer3D::updateDisplay;
+  viewer<< Viewer3D<>::updateDisplay;
    
   return application.exec();
 
