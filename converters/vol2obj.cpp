@@ -96,7 +96,8 @@ int main( int argc, char** argv )
 
   typedef ImageSelector<Domain, unsigned char>::Type Image;
   string extension = inputFilename.substr(inputFilename.find_last_of(".") + 1);
-  if(extension!="vol" && extension != "p3d" && extension != "pgm3D" && extension != "pgm3d" && extension != "sdp" && extension != "pgm")
+  if(extension!="vol" && extension != "p3d" && extension != "pgm3D" &&
+     extension != "pgm3d" && extension != "sdp" && extension != "pgm")
     {
       trace.info() << "File extension not recognized: "<< extension << std::endl;
       return 0;
@@ -122,9 +123,6 @@ int main( int argc, char** argv )
         for(int i=0;i< vectVoxels.size(); i++){
           board << vectVoxels.at(i);
         }
-
-
-
       }
 
 
