@@ -10,6 +10,7 @@ SET(DGTAL_TOOLS_SRC
   slice2vol
   vol2slice
   vol2off
+  vol2obj
   longvol2vol)
 
 FOREACH(FILE ${DGTAL_TOOLS_SRC})

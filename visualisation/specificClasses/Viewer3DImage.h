@@ -29,6 +29,8 @@ class Viewer3DImage: public DGtal::Viewer3D <Space, KSpace>
   typedef DGtal::ConstImageAdapter<Image3D, Image2D::Domain, DGtal::Projector< DGtal::Z3i::Space>,
 				  Image3D::Value,  DGtal::DefaultFunctor >  SliceImageAdapter;
 
+  typedef DGtal::ConstImageAdapter<Image3D, DGtal::Z2i::Domain, DGtal::SliceRotator2D< DGtal::Z3i::Domain >,
+				   Image3D::Value,  DGtal::DefaultFunctor >  MyRotatorSliceImageAdapter;
 
 
 
@@ -39,6 +41,10 @@ public:
     mySliceXPos=0;
     mySliceYPos=0;
     mySliceZPos=0;
+    myTotalAngleRotationX=0.0;
+    myTotalAngleRotationY=0.0;
+    myTotalAngleRotationZ=0.0;
+    myAngleRotation=0.0;
     myCurrentSliceDim=0;
     myMode=aMode;
   }
@@ -59,11 +65,17 @@ protected:
   virtual void keyPressEvent ( QKeyEvent *e );
   virtual void init();
   Image3D *my3dImage;
-
+  float myScaleX;
+  float myScaleY;
+  float myScaleZ;
   int mySliceXPos;
   int mySliceYPos;
   int mySliceZPos;
   int myCurrentSliceDim ;
+  double myAngleRotation;
+  double myTotalAngleRotationX;
+  double myTotalAngleRotationY;
+  double myTotalAngleRotationZ;
   
   ModeVisu myMode;
 };

@@ -4,6 +4,7 @@
 	- vol2sdp: a simple tools to extract digital points from 3d vol files.
 	- sdp2vol: a simple tool to create a 3d vol image from 3d digital points.
 	- vol2off: extract dual surface of a digital object (equiv. Marching Cubes)
+	- vol2obj: convert a volume file into OBJ format (all voxels belonging to threshold interval)
 	- vol2slice: tool to extract all slices from 3d volumic images.
 	- slice2vol: tool to merge slices into one 3d volumic file.
 	- longvol2vol: convert longvol to vol file using different conversion policies.
@@ -24,7 +25,7 @@
 * visualisation/:
 	- 3dCurveViewer: A tool for visualizing the tangential cover of 3d curves.
 	- 3dVolViewer: new option to limit the number of displayed voxels.
-	- 3dImageViewer: new tools to display slice image.
+	- 3dImageViewer: new tool to display slice image with interactive translatations or rotations.
 	- patternTriangulation: a new tool that draws with Board2D the convex hull, the closest-point Delaunay triangulation or the farthest-point Delaunay triangulation of a pattern.
 
 	====  Release 0.6 ====
