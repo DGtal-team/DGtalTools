@@ -31,13 +31,14 @@
 #include <QtGui/qapplication.h>
 
 #include "DGtal/base/Common.h"
+#include "DGtal/base/BasicFunctors.h"
 #include "DGtal/helpers/StdDefs.h"
 #include "DGtal/io/readers/VolReader.h"
 #include "DGtal/io/viewers/Viewer3D.h"
 #include "DGtal/io/DrawWithDisplay3DModifier.h"
 #include "DGtal/io/readers/PointListReader.h"
 #include "DGtal/topology/helpers/Surfaces.h"
- #include "DGtal/topology/SurfelAdjacency.h"
+#include "DGtal/topology/SurfelAdjacency.h"
 
 #include "DGtal/io/Color.h"
 #include "DGtal/io/colormaps/GradientColorMap.h"
@@ -84,7 +85,11 @@ int main( int argc, char** argv )
     ("colorSDP,c", po::value<std::vector <int> >()->multitoken(), "set the color  discrete points: r g b a " )
     ("scaleX,x",  po::value<float>()->default_value(1.0), "set the scale value in the X direction (default 1.0)" )
     ("scaleY,y",  po::value<float>()->default_value(1.0), "set the scale value in the Y direction (default 1.0)" )
-    ("scaleZ,z",  po::value<float>()->default_value(1.0), "set the scale value in the Z direction (default 1.0)")    
+    ("scaleZ,z",  po::value<float>()->default_value(1.0), "set the scale value in the Z direction (default 1.0)")
+#ifdef WITH_ITK
+    ("dicomMin", po::value<int>()->default_value(-1000), "set minimum density threshold on Hounsfield scale")
+    ("dicomMax", po::value<int>()->default_value(3000), "set maximum density threshold on Hounsfield scale")
+#endif    
     ("transparency,t",  po::value<uint>()->default_value(255), "transparency") ; 
   
   bool parseOK=true;
@@ -121,7 +126,11 @@ int main( int argc, char** argv )
   float sz = vm["scaleZ"].as<float>();
 
   string extension = inputFilename.substr(inputFilename.find_last_of(".") + 1);
-  if(extension!="vol" && extension != "p3d" && extension != "pgm3D" && extension != "pgm3d" && extension != "sdp" && extension != "pgm" ){
+  if(extension!="vol" && extension != "p3d" && extension != "pgm3D" && extension != "pgm3d" && extension != "sdp" && extension != "pgm"
+#ifdef WITH_ITK
+     && extension !="dcm"
+#endif
+     ){
     trace.info() << "File extension not recognized: "<< extension << std::endl;
     return 0;
   }
@@ -140,8 +149,17 @@ int main( int argc, char** argv )
   viewer.show();
   viewer.setGLScale(sx, sy, sz);  
   
-
+#ifdef WITH_ITK
+   int dicomMin = vm["dicomMin"].as<int>();
+   int dicomMax = vm["dicomMax"].as<int>();
+   typedef DGtal::RescalingFunctor<int ,unsigned char > RescalFCT;
+   
+   Image3D image = extension == "dcm" ? DicomReader< Image3D,  RescalFCT  >::importDicom( inputFilename, 
+											  RescalFCT(dicomMin,dicomMax, 0, 255) ) : 
+     GenericReader<Image3D>::import( inputFilename );
+#else
   Image3D image = GenericReader<Image3D>::import( inputFilename );
+#endif
   Domain domain = image.domain();
   
   trace.info() << "Image loaded: "<<image<< std::endl;
