@@ -31,17 +31,17 @@
 #include <QtGui/qapplication.h>
 
 #include "DGtal/base/Common.h"
+#include "DGtal/base/BasicFunctors.h"
 #include "DGtal/helpers/StdDefs.h"
 #include "DGtal/io/readers/GenericReader.h"
+#include "DGtal/io/readers/DicomReader.h"
 #include "DGtal/io/viewers/Viewer3D.h"
 #include "DGtal/io/DrawWithDisplay3DModifier.h"
 #include "DGtal/io/readers/PointListReader.h"
 
-
 #include "DGtal/io/Color.h"
 #include "DGtal/io/colormaps/GradientColorMap.h"
 #include "DGtal/images/ImageSelector.h"
-
 
 #include <boost/program_options/options_description.hpp>
 #include <boost/program_options/parsers.hpp>
@@ -64,6 +64,10 @@ int main( int argc, char** argv )
     ("thresholdMin,m",  po::value<int>()->default_value(0), "threshold min to define binary shape" ) 
     ("thresholdMax,M",  po::value<int>()->default_value(255), "threshold max to define binary shape" )
     ("numMaxVoxel,n",  po::value<int>()->default_value(10000), "set the maximal voxel number to be displayed." )
+#ifdef WITH_ITK
+    ("dicomMin", po::value<int>()->default_value(-1000), "set minimum density threshold on Hounsfield scale")
+    ("dicomMax", po::value<int>()->default_value(3000), "set maximum density threshold on Hounsfield scale")
+#endif    
     ("transparency,t",  po::value<uint>()->default_value(255), "transparency") ; 
 
   bool parseOK=true;
@@ -112,9 +116,26 @@ int main( int argc, char** argv )
     return 0;
   }
   
-  if(extension=="vol" || extension=="pgm3d" || extension=="pgm3D"){
+  if(extension=="vol" || extension=="pgm3d" || extension=="pgm3D"
+#ifdef WITH_ITK
+    || extension =="dcm"
+#endif
+){
     unsigned int numDisplayed=0;
-    Image image = GenericReader<Image>::import (inputFilename );
+    
+#ifdef WITH_ITK
+   int dicomMin = vm["dicomMin"].as<int>();
+   int dicomMax = vm["dicomMax"].as<int>();
+   typedef DGtal::RescalingFunctor<int ,unsigned char > RescalFCT;
+   Image image = extension == "dcm" ? DicomReader< Image,  RescalFCT  >::importDicom( inputFilename, 
+											  RescalFCT(dicomMin,
+												    dicomMax,
+												    0, 255) ) : 
+     GenericReader<Image>::import( inputFilename );
+#else
+   Image image = GenericReader<Image>::import (inputFilename );
+#endif
+
     trace.info() << "Image loaded: "<<image<< std::endl;
     Domain domain = image.domain();
     GradientColorMap<long> gradient( thresholdMin, thresholdMax);
@@ -139,12 +160,7 @@ int main( int argc, char** argv )
     for(int i=0;i< vectVoxels.size(); i++){
       viewer << vectVoxels.at(i);
     }
-
-
-    
   }
-  
-
   viewer << Viewer3D<>::updateDisplay;
   return application.exec();
 }
