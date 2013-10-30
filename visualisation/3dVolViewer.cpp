@@ -34,7 +34,9 @@
 #include "DGtal/base/BasicFunctors.h"
 #include "DGtal/helpers/StdDefs.h"
 #include "DGtal/io/readers/GenericReader.h"
+#ifdef WITH_ITK
 #include "DGtal/io/readers/DicomReader.h"
+#endif
 #include "DGtal/io/viewers/Viewer3D.h"
 #include "DGtal/io/DrawWithDisplay3DModifier.h"
 #include "DGtal/io/readers/PointListReader.h"

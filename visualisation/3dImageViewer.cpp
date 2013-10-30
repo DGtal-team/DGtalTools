@@ -43,7 +43,10 @@
 #include "DGtal/io/Color.h"
 #include "DGtal/io/colormaps/GradientColorMap.h"
 #include "DGtal/io/readers/GenericReader.h"
+#ifdef WITH_ITK
 #include "DGtal/io/readers/DicomReader.h"
+#endif
+
 #include "DGtal/images/ImageSelector.h"
 
 
