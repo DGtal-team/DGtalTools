@@ -111,7 +111,11 @@ int main( int argc, char** argv )
  
   typedef ImageSelector<Domain, unsigned char>::Type Image;
   string extension = inputFilename.substr(inputFilename.find_last_of(".") + 1);
-  if(extension!="vol" && extension != "p3d" && extension != "pgm3D" && extension != "pgm3d" && extension != "sdp" && extension != "pgm"){
+  if(extension!="vol" && extension != "p3d" && extension != "pgm3D" && extension != "pgm3d" && extension != "sdp" && extension != "pgm" 
+ #ifdef WITH_ITK
+    && extension !="dcm"
+#endif
+){
     trace.info() << "File extension not recognized: "<< extension << std::endl;
     return 0;
   }
