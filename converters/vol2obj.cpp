@@ -105,7 +105,6 @@ int main( int argc, char** argv )
 
   if(extension=="vol" || extension=="pgm3d" || extension=="pgm3D")
     {
-      unsigned int numDisplayed=0;
       Image image = GenericReader<Image>::import (inputFilename );
       trace.info() << "Image loaded: "<<image<< std::endl;
       Domain domain = image.domain();

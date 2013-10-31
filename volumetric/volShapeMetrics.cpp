@@ -275,7 +275,7 @@ int main(int argc, char**argv)
       std::cout << "*** for parts of B which are not in A only ***" ;
     }
   }
- std:cout << std::endl; 
+  std::cout << std::endl; 
 
   
   if(vm.count("exportSDP")){
