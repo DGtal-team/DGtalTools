@@ -78,7 +78,7 @@ int main( int argc, char** argv )
 		<< "Convert dicom file into a volumetric file (.vol, .longvol .pgm3d) ."
 		<< general_opt << "\n";
       std::cout << "Example:\n"
-		<< "dicom2vol -i ${DGtal}/tests/samples/dicomSample/1629.dcm -o sample.vol \n";
+		<< "dicom2vol -i ${DGtal}/tests/samples/dicomSample/1629.dcm --dicomMin -500 --dicomMax -100 -o sample.vol \n";
       return 0;
     }
   
