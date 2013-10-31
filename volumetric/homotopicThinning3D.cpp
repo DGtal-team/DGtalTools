@@ -111,8 +111,6 @@ int main( int argc, char** argv )
   Image image = GenericReader<Image>::import ( filename );
 
   trace.beginBlock("DT Computation");
-  //typedef SimpleThresholdForegroundPredicate<Image> Predicate;
-  //Predicate aPredicate(image,0);
   typedef IntervalForegroundPredicate<Image> Predicate;
   Predicate aPredicate(image, vm[ "min" ].as<int>(), vm[ "max" ].as<int>() );
 
@@ -120,7 +118,7 @@ int main( int argc, char** argv )
   trace.endBlock();
   trace.info() <<image<<std::endl;
 
-  // Domain cretation from two bounding points.
+  // Domain creation from two bounding points.
   Point c( 0, 0, 0 );
   Point p1( -50, -50, -50 );
   Point p2( 50, 50, 50 );
