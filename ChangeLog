@@ -2,12 +2,13 @@
 
 * converters/:
 	- vol2sdp: a simple tools to extract digital points from 3d vol files.
-	- sdp2vol: a simple tool to create a 3d vol image from 3d digital points.
 	- vol2off: extract dual surface of a digital object (equiv. Marching Cubes)
 	- vol2obj: convert a volume file into OBJ format (all voxels belonging to threshold interval)
 	- vol2slice: tool to extract all slices from 3d volumic images.
 	- slice2vol: tool to merge slices into one 3d volumic file.
+	- sdp2vol: a simple tool to create a 3d vol image from 3d digital points.
 	- longvol2vol: convert longvol to vol file using different conversion policies.
+	- dicom2vol: convert dicom images into 3d volumic file (need itk option in DGtal).
 	- pgm2freeman: add new possibility to set automatically a threshold from the otsu algorithm.
 
 * volumetric:
