@@ -62,13 +62,13 @@ using namespace DGtal;
 using namespace std;
 
 const Color  AXIS_COLOR( 0, 0, 0, 255 );
-const double AXIS_LINESIZE = 2.0;
+const double AXIS_LINESIZE = 0.1;
 const Color  XY_COLOR( 0, 0, 255, 50 );
 const Color  XZ_COLOR( 0, 255, 0, 50 );
 const Color  YZ_COLOR( 255, 0, 0, 50 );
 const Color  CURVE3D_COLOR( 100, 100, 140, 128 );
 const Color  CURVE2D_COLOR( 200, 200, 200, 100 );
-const double MS3D_LINESIZE = 3.0;
+const double MS3D_LINESIZE = 0.05;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Functions for displaying the tangential cover of a 3D curve.
