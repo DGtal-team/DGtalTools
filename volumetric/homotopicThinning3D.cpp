@@ -38,7 +38,7 @@
 #include "DGtal/shapes/Shapes.h"
 #include "DGtal/helpers/StdDefs.h"
 
-#include "DGtal/io/readers/VolReader.h"
+#include "DGtal/io/readers/GenericReader.h"
 #include "DGtal/images/imagesSetsUtils/SetFromImage.h"
 #include "DGtal/images/imagesSetsUtils/SimpleThresholdForegroundPredicate.h"
 #include "DGtal/images/ImageSelector.h"
@@ -80,7 +80,10 @@ int main( int argc, char** argv )
   po::options_description general_opt ( "Allowed options are: " );
   general_opt.add_options()
     ( "help,h", "display this message." )
-    ( "input,i", po::value<std::string>(), "Input vol file." );
+    ( "input,i", po::value<std::string>(), "Input vol file." )
+    ( "min,m", po::value<int>()->default_value( 0 ), "Minimum (excluded) value for threshold." )
+    ( "max,M", po::value<int>()->default_value( 255 ), "Maximum (included) value for threshold." )
+    ;
     bool parseOK=true;
   po::variables_map vm;
   try{
@@ -92,9 +95,9 @@ int main( int argc, char** argv )
   po::notify ( vm );
   if ( !parseOK || vm.count ( "help" ) ||argc<=1 )
     {
-      trace.info() << "Illustration of homotopic thinning of a vol file with 3D viewer."<<std::endl
+      trace.info() << "Illustration of homotopic thinning of a 3d image file (vol,longvol,pgm3d...) with 3D viewer."<<std::endl
                    << std::endl << "Basic usage: "<<std::endl
-                   << "\thomotopicThinning3d [options] --input <volFileName>"<<std::endl
+                   << "\thomotopicThinning3d [options] --input <3dImageFileName>  {vol,longvol,pgm3d...} "<<std::endl
                    << general_opt << "\n";
       return 0;
     }
@@ -105,17 +108,17 @@ int main( int argc, char** argv )
   
   
   typedef ImageSelector < Z3i::Domain, unsigned char>::Type Image;
-  Image image = VolReader<Image>::importVol ( filename );
+  Image image = GenericReader<Image>::import ( filename );
 
   trace.beginBlock("DT Computation");
-  typedef SimpleThresholdForegroundPredicate<Image> Predicate;
-  Predicate aPredicate(image,0);
+  typedef IntervalForegroundPredicate<Image> Predicate;
+  Predicate aPredicate(image, vm[ "min" ].as<int>(), vm[ "max" ].as<int>() );
 
   DistanceTransformation<Z3i::Space, Predicate , Z3i::L2Metric> dt(image.domain(),aPredicate, Z3i::L2Metric() );
   trace.endBlock();
   trace.info() <<image<<std::endl;
 
-  // Domain cretation from two bounding points.
+  // Domain creation from two bounding points.
   Point c( 0, 0, 0 );
   Point p1( -50, -50, -50 );
   Point p2( 50, 50, 50 );
@@ -124,11 +127,13 @@ int main( int argc, char** argv )
   trace.beginBlock("Constructing Set");
   DigitalSet shape_set( domain );
   SetFromImage<DigitalSet>::append<Image>(shape_set, image,
-                                          0, 255);
+                                          vm[ "min" ].as<int>(), vm[ "max" ].as<int>() );
   trace.info() << shape_set<<std::endl;
   trace.endBlock();
 
   trace.beginBlock("Computing skeleton");
+  // (6,18), (18,6), (26,6) seem ok.
+  // (6,26) gives sometimes weird results (but perhaps ok !).
   Object26_6 shape( dt26_6, shape_set );
   int nb_simple=0; 
   int layer = 1;
@@ -139,9 +144,10 @@ int main( int argc, char** argv )
       int nb=0;
       DigitalSet & S = shape.pointSet();
  
+      trace.progressBar(0, (double)S.size());
       for ( DigitalSet::Iterator it = S.begin(); it != S.end(); ++it )
         {
-	  trace.progressBar((double)nb, (double)S.size()); 
+	  if ( nb % 100 == 0 ) trace.progressBar((double)nb, (double)S.size()); 
           nb++;
 	  if (dt( *it ) <= layer)
 	    {
@@ -149,6 +155,7 @@ int main( int argc, char** argv )
 		Q.push( it );
 	    }
 	}
+      trace.progressBar( (double)S.size(), (double)S.size() );
       nb_simple = 0;
       while ( ! Q.empty() )
         {
@@ -160,7 +167,7 @@ int main( int argc, char** argv )
               ++nb_simple;
             }
         }
-      trace.info() << "Nb simple points : "<<nb_simple<<std::endl;
+      trace.info() << "Nb simple points : "<<nb_simple<< " " << std::endl;
       ++layer;
      }
   while ( nb_simple != 0 );
@@ -172,7 +179,7 @@ int main( int argc, char** argv )
 
   // Display by using two different list to manage OpenGL transparency.
   QApplication application(argc,argv);
-  Viewer3D viewer;
+  Viewer3D<> viewer;
   viewer.setWindowTitle("simpleExample3DViewer");
   viewer.show();  
   
@@ -184,7 +191,7 @@ int main( int argc, char** argv )
   viewer << CustomColors3D(Color(250, 0,0, 25), Color(250, 0,0, 5));
   viewer << shape_set;
 
-  viewer<< Viewer3D::updateDisplay;
+  viewer<< Viewer3D<>::updateDisplay;
    
   return application.exec();
 

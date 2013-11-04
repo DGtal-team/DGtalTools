@@ -14,26 +14,27 @@
  *
  **/
 /**
- * @file visuDistanceTransform.cpp
- * @ingroup surfaceTools
+ * @file dicom2vol.cpp
+ * @ingroup conerters
  * @author Bertrand Kerautret (\c kerautre@loria.fr )
  * LORIA (CNRS, UMR 7503), University of Nancy, France
  *
- * @date 2012/07/08
+ * @date 2013/10/30
  *
- *
+ * 
  *
  * This file is part of the DGtalTools.
  */
 
 ///////////////////////////////////////////////////////////////////////////////
 #include <iostream>
+#include <fstream>
 #include "DGtal/base/Common.h"
-
-#include "DGtal/io/readers/MeshReader.h"
-#include "DGtal/io/writers/MeshWriter.h"
-#include "DGtal/io/Display3D.h"
-#include "DGtal/shapes/Mesh.h"
+#include "DGtal/helpers/StdDefs.h"
+#include "DGtal/base/BasicFunctors.h"
+#include "DGtal/images/ImageContainerBySTLVector.h"
+#include "DGtal/io/writers/GenericWriter.h"
+#include "DGtal/io/readers/DicomReader.h"
 
 #include <boost/program_options/options_description.hpp>
 #include <boost/program_options/parsers.hpp>
@@ -48,54 +49,65 @@ namespace po = boost::program_options;
 
 int main( int argc, char** argv )
 {
+  typedef ImageContainerBySTLVector < Z3i::Domain, unsigned char > Image3D;
+
+  
   // parse command line ----------------------------------------------
   po::options_description general_opt("Allowed options are: ");
   general_opt.add_options()
     ("help,h", "display this message")
-    ("input-file,i", po::value<std::string>(), "ofs file (.ofs) " )
-    ("output-file,o", po::value<std::string>(), "ofs file (.off) " );
+    ("input-file,i", po::value<std::string>(), "dicom image  (.dcm) " )
+    ("output-file,o", po::value<std::string>(), "volumetric file (.vol, .longvol .pgm3d) " )
+    ("dicomMin", po::value<int>()->default_value(-1000), "set minimum density threshold on Hounsfield scale")
+    ("dicomMax", po::value<int>()->default_value(3000), "set maximum density threshold on Hounsfield scale");
 
-
+  
+  
   bool parseOK=true;
   po::variables_map vm;
   try{
-    po::store(po::parse_command_line(argc, argv, general_opt), vm);
+    po::store(po::parse_command_line(argc, argv, general_opt), vm);  
   }catch(const std::exception& ex){
     parseOK=false;
     trace.info()<< "Error checking program options: "<< ex.what()<< endl;
   }
-  po::notify(vm);
+  po::notify(vm);    
   if( !parseOK || vm.count("help")||argc<=1)
     {
       std::cout << "Usage: " << argv[0] << " [input-file] [output-file]\n"
-		<< "Convert OFS file into OFF mesh format"
+		<< "Convert dicom file into a volumetric file (.vol, .longvol .pgm3d) ."
 		<< general_opt << "\n";
+      std::cout << "Example:\n"
+		<< "dicom2vol -i ${DGtal}/tests/samples/dicomSample/1629.dcm --dicomMin -500 --dicomMax -100 -o sample.vol \n";
       return 0;
     }
-
-  if(! vm.count("input-file")||! vm.count("output-file"))
+  
+  if(! vm.count("input-file") ||! vm.count("output-file"))
     {
-      trace.error() << " Input and output filename are needed to be defined" << endl;
+      trace.error() << " Input and output filename are needed to be defined" << endl;      
       return 0;
     }
 
-
+  
   string inputFilename = vm["input-file"].as<std::string>();
   string outputFilename = vm["output-file"].as<std::string>();
+  int dicomMin = vm["dicomMin"].as<int>();
+  int dicomMax = vm["dicomMax"].as<int>();
+  typedef DGtal::RescalingFunctor<int ,unsigned char > RescalFCT;
+  
+  trace.info() << "Reading input dicom file " << inputFilename ; 
+  Image3D inputImage = DicomReader< Image3D,  RescalFCT  >::importDicom(inputFilename, 
+									RescalFCT(dicomMin,dicomMax, 0, 255) );
+  trace.info() << " [done] " << std::endl ; 
+  trace.info() << " converting into vol file... " ; 
+  inputImage >> outputFilename; 
+  trace.info() << " [done] " << std::endl ;   
 
-  // We store the colors
-  Mesh<Display3D<>::BallD3D> anImportedMesh(true);
-  bool import = anImportedMesh << inputFilename;
-  bool exported = anImportedMesh >> outputFilename;
-  if(!import || !exported){
-    trace.info() << "Conversion failed: " <<  (exported? "Reading OFS failed. ":  "Export OFF failed. ") << std::endl;
-    return 0;
-  }
-
-
-
-  trace.info() << "[done]. "<< std::endl;
 
   return 0;
-
+  
 }
+
+
+
+

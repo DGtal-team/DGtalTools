@@ -1,6 +1,13 @@
 
 SET(DGTAL_TOOLS_SRC
   3dVolMarchingCubes
+  volAddBorder
+  volCComponentCounter
+  volSubSample
+  volCrop
+  volImageMetrics
+  volShapeMetrics
+  volFlip
 )
 
 

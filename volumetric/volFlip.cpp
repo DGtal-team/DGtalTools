@@ -1,4 +1,3 @@
-
 /**
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Lesser General Public License as
@@ -20,7 +19,7 @@
  * @author Bertrand Kerautret (\c kerautre@loria.fr )
  * LORIA (CNRS, UMR 7503), University of Nancy, France
  *
- * @date 2013/05/05
+ * @date 2013/08/06
  *
  * 
  *
@@ -29,9 +28,10 @@
 
 #include <iostream>
 #include <DGtal/base/Common.h>
-#include <DGtal/io/readers/GenericReader.h>
-#include <DGtal/io/writers/GenericWriter.h>
 #include <DGtal/helpers/StdDefs.h>
+#include "DGtal/io/readers/GenericReader.h"
+#include "DGtal/io/writers/GenericWriter.h"
+
 #include <DGtal/images/ImageContainerBySTLVector.h>
 #include <DGtal/images/ConstImageAdapter.h>
 #include <boost/program_options/options_description.hpp>
@@ -67,12 +67,9 @@ int main(int argc, char**argv)
   general_opt.add_options()
     ( "help,h", "display this message." )
     ( "input,i", po::value<std::string>(), "Input vol file." )
-    ( "xMin", po::value<unsigned int>()->default_value(0), "x coordinate of lower point." )
-    ( "yMin", po::value<unsigned int >()->default_value(0), "y coordinate of lower point." )
-    ( "zMin", po::value<unsigned int >()->default_value(0), "z coordinate of lower point." )
-    ( "xMax", po::value<unsigned int >(), "x coordinate of upper point." )
-    ( "yMax", po::value<unsigned int>(), "y coordinate of upper point." )
-    ( "zMax", po::value<unsigned int>(), "z coordinate of upper point." )
+    ( "imagePlane",po::value<std::vector <unsigned int> >()->multitoken(),
+      "arg=  {0,1,2} x {0,1,2} defines the axis of the slice image which will be transformed (by default arg= 0 1  i.e. the slice image defined in the X,Y plane (Z=cst)" )
+    ( "flipDimension", po::value<unsigned int>(), "specify which axis will be used to apply the flip." )
     ( "output,o", po::value<string>()->default_value("output.vol"),"Output filename." );
   bool parseOK=true;
   
@@ -86,43 +83,58 @@ int main(int argc, char**argv)
     trace.info()<< "Error checking program options: "<< ex.what()<< endl;
   }
   po::notify ( vm );
-  if (!parseOK || vm.count ( "help" ))
+  if (!parseOK || ! ( vm.count ( "input" ) ) || ! ( vm.count ( "output" ) ) || ! ( vm.count ( "imagePlane" ) ) 
+      || ! ( vm.count ( "flipDimension" ) ) || vm.count ( "help" ))
     {
-      trace.info() << "Crop an 3D vol image from to points. It returns the interior of the shape"<<std::endl
+      trace.info() << "Flip 2D slice image of an 3D vol image (mirror transformation)"<<std::endl
                    << std::endl << "Basic usage: "<<std::endl
-                   << "\t volCrop --input <volFileName> --o <volOutputFileName> (both files can be independently in vol, pgm3D, p3d format)"<<std::endl
+                   << "\t volFlip --input <volFileName> --imagePlane 0 1 --flipDimension 0 --o <volOutputFileName> (vol, longvol, p3d format)"<<std::endl
                    << general_opt << "\n";
       std::cout << "Example:\n"
-		<< "volCrop --xMin 50 --yMin 50 --zMin 10 --xMax 150 --yMax 150 --zMax 50 -i ${DGtal}/examples/samples/lobster.vol -o croppedLobster.p3d \n";
+		<< "volFlip --imagePlane 0 1 --flipDimension 0 -i ${DGtal}/examples/samples/lobster.vol -o flippedXxyLobster.p3d \n The resulting Z slice images (Z= cst) of flippedXxyLobster.p3d will appears flipped according the x axis.  ";
       return 0;
     }
 
 
   //Parse options
   if ( ! ( vm.count ( "input" ) ) ) missingParam ( "--input" );
-  if ( ! ( vm.count ( "xMax" ) ) ) missingParam ( "--xMax" );
-  if ( ! ( vm.count ( "yMax" ) ) ) missingParam ( "--yMax" );
-  if ( ! ( vm.count ( "zMax" ) ) ) missingParam ( "--zMax" );
-
-  std::string filename = vm["input"].as<std::string>();
   if ( ! ( vm.count ( "output" ) ) ) missingParam ( "--output" );
-  std::string outputFileName = vm["output"].as<std::string>();
+  if ( ! ( vm.count ( "imagePlane" ) ) || vm["imagePlane"].as<std::vector<unsigned int > >().size()!=2 ) missingParam ( "--imagePlane" );
+  if ( ! ( vm.count ( "flipDimension" ) ) ) missingParam ( "--flipDimension" );
 
-  Z3i::Point ptLow( vm["xMin"].as<unsigned int>(), vm["yMin"].as<unsigned int>(),vm["zMin"].as<unsigned int>());
-  Z3i::Point ptMax( vm["xMax"].as<unsigned int>(), vm["yMax"].as<unsigned int>(),vm["zMax"].as<unsigned int>());
+
+  std::string inputFilename = vm["input"].as<std::string>();
+  std::string outputFileName = vm["output"].as<std::string>();
+  
+  unsigned int dimFirstImg = vm["imagePlane"].as<std::vector<unsigned int > >().at(0);
+  unsigned int dimSecondImg = vm["imagePlane"].as<std::vector<unsigned int > >().at(1);
+  unsigned int dimFlip = vm["flipDimension"].as<unsigned int>();
+  
+  unsigned int normalImgDim = (dimFirstImg!=2 && dimSecondImg!=2)? 2 :( (dimFirstImg!=1 && dimSecondImg!=1)? 1:  0    );  
+    
     
   trace.beginBlock("Loading file");
-  typedef ImageContainerBySTLVector<Z3i::Domain, unsigned char>  MyImageC;
-  MyImageC  imageC = GenericReader< MyImageC >::import ( filename );
-  DefaultFunctor df;  
-  
-  typedef ConstImageAdapter<MyImageC, Domain, DefaultFunctor, MyImageC::Value, DefaultFunctor > ConstImageAdapterForSubImage;
-  Domain subDomain(ptLow, ptMax);
-  ConstImageAdapterForSubImage subImage(imageC, subDomain, df, df);
+  typedef ImageContainerBySTLVector<Z3i::Domain, unsigned char>  Image3D;
+  Image3D  imageSRC =  GenericReader<Image3D>::import ( inputFilename );
   trace.endBlock();
+  Image3D  imageRes(imageSRC.domain());
+  for( unsigned int i=0; i <= imageSRC.domain().upperBound()[normalImgDim]; i++){
+    Point startPoint(0,0, 0);
+    startPoint[normalImgDim]=i;
+    for( Domain::ConstSubRange::ConstIterator 
+	   it = imageSRC.domain().subRange(dimFirstImg, dimSecondImg, 
+					   startPoint).begin(),
+	   itend =  imageSRC.domain().subRange(dimFirstImg, dimSecondImg, startPoint).end();
+	 it != itend; ++it){
+      Point pt = *it;
+      pt[dimFlip]= imageSRC.domain().upperBound()[dimFlip] - pt[dimFlip] ;
+      imageRes.setValue(*it, imageSRC(pt)); 
+    }
+  }  
+  
 
   trace.beginBlock("Exporting...");
-  bool res =  GenericWriter<ConstImageAdapterForSubImage>::exportFile(outputFileName, subImage);
+  bool res =  VolWriter< Image3D>::exportVol(outputFileName, imageRes);
   trace.endBlock();
   if (res) return 0; else return 1;
 }

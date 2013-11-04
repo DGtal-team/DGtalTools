@@ -5,16 +5,33 @@ SET(DGTAL_TOOLS_SRC
   vol2raw
   raw2vol
   ofs2off
-  convertVol )
+  convertVol
+  vol2sdp
+  slice2vol
+  vol2slice
+  vol2off
+  vol2obj
+  longvol2vol)
 
 FOREACH(FILE ${DGTAL_TOOLS_SRC})
   add_executable(${FILE} ${FILE})
   target_link_libraries (${FILE} ${DGTAL_LIBRARIES} ${DGtalToolsLibDependencies} )
-  install(TARGETS ${FILE} 
+  install(TARGETS ${FILE}
         RUNTIME DESTINATION bin
         LIBRARY DESTINATION lib
         ARCHIVE DESTINATION lib)
 ENDFOREACH(FILE)
 
 
-
+if (  WITH_ITK )
+  SET(DGTAL_TOOLS_ITK
+    dicom2vol)
+  FOREACH(FILE ${DGTAL_TOOLS_ITK})
+     add_executable(${FILE} ${FILE})
+     target_link_libraries (${FILE} ${DGTAL_LIBRARIES} ${DGtalToolsLibDependencies} )
+     install(TARGETS ${FILE}
+        RUNTIME DESTINATION bin
+        LIBRARY DESTINATION lib
+        ARCHIVE DESTINATION lib)
+ENDFOREACH(FILE)
+ENDIF( WITH_ITK )
