@@ -93,8 +93,8 @@ Visualization
 -------------
   - 3dCurvatureViewer: permits to compute and visualize mean or gaussian curvature of binary shapes.
   - 3dCurveViewer: displays 3D curves with tangential cover and projections onto bounding box.
-  - 3dImageViewer: tools to display 3d slice images with QGLViewer.
-  - 3dVolViewer: volume file (.vol and .pgm3d) viewer with QGLViewer.
+  - 3dImageViewer: tools to display 3d slice images (.vol, .pgm3d and  dicom with ITK) with QGLViewer.
+  - 3dVolViewer: volume file (.vol, .pgm3d and dicom with ITK ) viewer with QGLViewer.
   - displayContours: display discrete contours from various format (.fc (freemanchain), .sdp).
   - meshViewer: display 3D mesh from OFS or OFF format.
   - patternTriangulation: a new tool that draws with Board2D the convex hull, the closest-point Delaunay triangulation or the farthest-point Delaunay triangulation of a pattern.

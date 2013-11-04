@@ -43,6 +43,10 @@
 #include "DGtal/io/Color.h"
 #include "DGtal/io/colormaps/GradientColorMap.h"
 #include "DGtal/io/readers/GenericReader.h"
+#ifdef WITH_ITK
+#include "DGtal/io/readers/DicomReader.h"
+#endif
+
 #include "DGtal/images/ImageSelector.h"
 
 
@@ -155,7 +159,9 @@ int main( int argc, char** argv )
    typedef DGtal::RescalingFunctor<int ,unsigned char > RescalFCT;
    
    Image3D image = extension == "dcm" ? DicomReader< Image3D,  RescalFCT  >::importDicom( inputFilename, 
-											  RescalFCT(dicomMin,dicomMax, 0, 255) ) : 
+											  RescalFCT(dicomMin,
+												    dicomMax,
+												    0, 255) ) : 
      GenericReader<Image3D>::import( inputFilename );
 #else
   Image3D image = GenericReader<Image3D>::import( inputFilename );

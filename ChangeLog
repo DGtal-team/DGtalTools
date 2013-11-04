@@ -19,14 +19,14 @@
 	- volShapeMetrics: Apply shape measures for comparing two volumetric images A and B (shape defined from thresholds): 
 		* Measures from voxel partition (true/false+-, precision recall, f-measure) 
 		* Measures bases on euclidean distance between the two Shape A and B.
-	
+
 * volumetric/volTools:
 	volTools directory moved into volumetric.
 
 * visualisation/:
 	- 3dCurveViewer: A tool for visualizing the tangential cover of 3d curves.
-	- 3dVolViewer: new option to limit the number of displayed voxels.
-	- 3dImageViewer: new tool to display slice image with interactive translatations or rotations.
+	- 3dVolViewer: new option to limit the number of displayed voxels (can open dicom format if WITH_ITK is set to true).
+	- 3dImageViewer: new tool to display slice image with interactive translatations or rotations (can open dicom format  if WITH_ITK is set to true).
 	- patternTriangulation: a new tool that draws with Board2D the convex hull, the closest-point Delaunay triangulation or the farthest-point Delaunay triangulation of a pattern.
 
 	====  Release 0.6 ====
