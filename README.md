@@ -50,6 +50,7 @@ Utilities to convert various simple file formats:
   - ofs2off: convert OFS mesh format towards a OFF variant.
   - vol2sdp: a simple tools to extract digital points from 3d vol files.
   - vol2off: extract dual surface of a digital object (equiv. Marching Cubes)
+  - dicom2vol: convert dicom images into 3d volumic file
 
 Estimators
 ----------
