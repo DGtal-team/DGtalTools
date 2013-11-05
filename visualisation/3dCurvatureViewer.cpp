@@ -81,7 +81,7 @@ void usage( int argc, char** argv )
     trace.info() << "\t - <filename.vol> file you want to show the curvature information."<< std::endl;
     trace.info() << "\t - <re> Euclidean radius of the kernel."<< std::endl;
     trace.info() << "\t - <\"mean\" || \"gaussian\" || \"princurv{1,2}\"> show mean or Gaussian curvature on shape."<< std::endl;
-    trace.info() << "Example : "<< argv[ 0 ] << " Al.150.vol 7 \"princurv1""<< std::endl;
+    trace.info() << "Example : "<< argv[ 0 ] << " Al.150.vol 7 \"princurv1" << std::endl;
 }
 
 int main( int argc, char** argv )
