@@ -65,7 +65,7 @@ int main( int argc, char** argv )
     ("input-file,i", po::value<std::string>(), "vol file (.vol) , pgm3d (.p3d or .pgm3d, pgm (with 3 dims)) file or sdp (sequence of discrete points)" )
     ("thresholdMin,m",  po::value<int>()->default_value(0), "threshold min to define binary shape" ) 
     ("thresholdMax,M",  po::value<int>()->default_value(255), "threshold max to define binary shape" )
-    ("numMaxVoxel,n",  po::value<int>()->default_value(10000), "set the maximal voxel number to be displayed." )
+    ("numMaxVoxel,n",  po::value<int>()->default_value(500000), "set the maximal voxel number to be displayed." )
 #ifdef WITH_ITK
     ("dicomMin", po::value<int>()->default_value(-1000), "set minimum density threshold on Hounsfield scale")
     ("dicomMax", po::value<int>()->default_value(3000), "set maximum density threshold on Hounsfield scale")
@@ -84,7 +84,7 @@ int main( int argc, char** argv )
   if( !parseOK || vm.count("help")||argc<=1)
     {
       std::cout << "Usage: " << argv[0] << " [input-file]\n"
-    << "Display volume file as a voxel set by using QGLviewer"
+                << "Display volume file as a voxel set by using QGLviewer"<< endl;
     << general_opt << "\n";
       return 0;
     }
