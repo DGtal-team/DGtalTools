@@ -84,8 +84,8 @@ int main( int argc, char** argv )
   if( !parseOK || vm.count("help")||argc<=1)
     {
       std::cout << "Usage: " << argv[0] << " [input-file]\n"
-                << "Display volume file as a voxel set by using QGLviewer"<< endl;
-    << general_opt << "\n";
+                << "Display volume file as a voxel set by using QGLviewer"<< endl
+                << general_opt << "\n";
       return 0;
     }
   
