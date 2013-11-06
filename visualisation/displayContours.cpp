@@ -52,7 +52,7 @@
 #include "DGtal/geometry/curves/FreemanChain.h"
 
 //processing
-#include "DGtal/geometry/curves/ArithmeticalDSS.h"
+#include "DGtal/geometry/curves/ArithmeticalDSSComputer.h"
 #include "DGtal/geometry/curves/GreedyDecomposition.h"
 #include "DGtal/geometry/curves/MaximalSegments.h"
 #include "DGtal/geometry/curves/FP.h"
@@ -193,7 +193,7 @@ int main( int argc, char** argv )
 
 	if (processingName == "DSS") {
 
-          typedef ArithmeticalDSS<std::vector<Z2i::Point>::iterator,int,4> DSS4;
+          typedef ArithmeticalDSSComputer<std::vector<Z2i::Point>::iterator,int,4> DSS4;
           typedef deprecated::GreedyDecomposition<DSS4> Decomposition4;
 
           //Segmentation
@@ -213,7 +213,7 @@ int main( int argc, char** argv )
 
 	} else if (processingName == "MS") {
 
-          typedef ArithmeticalDSS<std::vector<Z2i::Point>::iterator,int,4> DSS4;
+          typedef ArithmeticalDSSComputer<std::vector<Z2i::Point>::iterator,int,4> DSS4;
           typedef deprecated::MaximalSegments<DSS4> Decomposition4;
 
           //Segmentation
