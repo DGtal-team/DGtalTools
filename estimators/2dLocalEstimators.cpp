@@ -621,7 +621,7 @@ computeLocalEstimations( const std::string & filename,
           typedef typename Range::ConstCirculator C;
           Range r = gridcurve.getIncidentPointsRange();
           typedef StabbingCircleComputer<C> SegmentComputer;
-          typedef CurvatureFromDCAEstimator<SegmentComputer> SCFunctor;
+          typedef CurvatureFromDCAEstimator<SegmentComputer, false> SCFunctor;
           SegmentComputer sc;
           SCFunctor f;
           MostCenteredMaximalSegmentEstimator<SegmentComputer,SCFunctor> MDCACurvatureEstimator(sc, f);
