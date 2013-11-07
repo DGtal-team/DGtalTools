@@ -97,7 +97,7 @@ int main( int argc, char** argv )
   Viewer3D<> viewer;
   viewer.setWindowTitle("simple Volume Viewer");
   viewer.show();
-
+  viewer.setGLScale(sx, sy, sz);  
   bool invertNormal= vm.count("invertNormal");
 
 

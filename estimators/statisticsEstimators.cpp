@@ -135,7 +135,7 @@ int ComputeStatisticsFromString ( const unsigned int idColumnData1, const unsign
     if ( h != 0.0 && radius != 0.0 )
       break;
 
-    int pos;
+    unsigned int pos;
 
     pos = line.find("# h = ");
     if ( pos != std::string::npos )

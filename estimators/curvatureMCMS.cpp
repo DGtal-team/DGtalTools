@@ -43,7 +43,7 @@
 #include "DGtal/geometry/curves/GridCurve.h"
 
 //Estimators
-#include "DGtal/geometry/curves/ArithmeticalDSS.h"
+#include "DGtal/geometry/curves/ArithmeticalDSSComputer.h"
 #include "DGtal/geometry/curves/estimation/MostCenteredMaximalSegmentEstimator.h"
 #include "DGtal/geometry/curves/estimation/SegmentComputerEstimators.h"
 
@@ -71,7 +71,7 @@ using namespace std;
 template<typename I, typename O>
 void estimationFromLength( double h, const I& itb, const I& ite, const O& ito )
 {
-  typedef ArithmeticalDSS<I,int,4> SegmentComputer;
+  typedef ArithmeticalDSSComputer<I,int,4> SegmentComputer;
   SegmentComputer sc;
   typedef CurvatureFromDSSLengthEstimator<SegmentComputer> SCEstimator;
   SCEstimator f; 
@@ -93,7 +93,7 @@ void estimationFromLength( double h, const I& itb, const I& ite, const O& ito )
 template<typename I, typename O>
 void estimationFromLengthAndWidth( double h, const I& itb, const I& ite, const O& ito )
 {
-  typedef ArithmeticalDSS<I,int,4> SegmentComputer;
+  typedef ArithmeticalDSSComputer<I,int,4> SegmentComputer;
   SegmentComputer sc;
   typedef CurvatureFromDSSEstimator<SegmentComputer> SCEstimator;
   SCEstimator f; 

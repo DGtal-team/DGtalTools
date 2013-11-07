@@ -51,7 +51,7 @@
 #include "DGtal/kernel/domains/HyperRectDomain.h"
 #include "DGtal/topology/KhalimskySpaceND.h"
 #include "DGtal/geometry/curves/GridCurve.h"
-#include "DGtal/geometry/curves/ArithmeticalDSS3d.h"
+#include "DGtal/geometry/curves/StandardDSS6Computer.h"
 #include "DGtal/geometry/curves/SaturatedSegmentation.h"
 #include "DGtal/io/viewers/Viewer3D.h"
 #include "DGtal/io/readers/PointListReader.h"
@@ -132,9 +132,9 @@ void displayAxes( Viewer3D<space, kspace> & viewer,
     }
 }
 
-template <typename KSpace, typename ArithmeticalDSS3d, typename space, typename kspace >
+template <typename KSpace, typename StandardDSS6Computer, typename space, typename kspace >
 void displayDSS3d( Viewer3D<space, kspace> & viewer,
-		   const KSpace & ks, const ArithmeticalDSS3d & dss3d,
+		   const KSpace & ks, const StandardDSS6Computer & dss3d,
 		   const DGtal::Color & color3d )
 {
   viewer << CustomColors3D( color3d, color3d ) << dss3d;
@@ -148,13 +148,13 @@ void assign( Point1 & p1, const Point2 & p2 )
   p1[ 2 ] = p2[ 2 ];
 }
 
-template <typename KSpace, typename ArithmeticalDSS3d, typename space, typename kspace >
+template <typename KSpace, typename StandardDSS6Computer, typename space, typename kspace >
 void displayDSS3dTangent( Viewer3D<space, kspace> & viewer,
-			  const KSpace & ks, const ArithmeticalDSS3d & dss3d,
+			  const KSpace & ks, const StandardDSS6Computer & dss3d,
 			  const DGtal::Color & color3d )
 {
-  typedef typename ArithmeticalDSS3d::Point3d Point;
-  typedef typename ArithmeticalDSS3d::PointD3d PointD3d;
+  typedef typename StandardDSS6Computer::Point3d Point;
+  typedef typename StandardDSS6Computer::PointD3d PointD3d;
   typedef typename Display3D<>::BallD3D PointD3D;
   Point directionZ3;
   PointD3d P1, P2, direction, intercept, thickness;
@@ -171,23 +171,23 @@ void displayDSS3dTangent( Viewer3D<space, kspace> & viewer,
   viewer.setLineColor(color3d);
   viewer.addLine( DGtal::Z3i::RealPoint(Q1[ 0 ]-0.5, Q1[ 1 ]-0.5, Q1[ 2 ]-0.5), 
 		  DGtal::Z3i::RealPoint(Q2[ 0 ]-0.5, Q2[ 1 ]-0.5, Q2[ 2 ]-0.5), 
-		   MS3D_LINESIZE );
+		  MS3D_LINESIZE );
 }
 
-template <typename KSpace, typename ArithmeticalDSS3d, typename space, typename kspace >
+template <typename KSpace, typename StandardDSS6Computer, typename space, typename kspace >
 void displayProj2d( Viewer3D<space, kspace> & viewer,
-		    const KSpace & ks, const ArithmeticalDSS3d & dss3d,
+		    const KSpace & ks, const StandardDSS6Computer & dss3d,
 		    const DGtal::Color & color2d )
 {
-  typedef typename ArithmeticalDSS3d::ArithmeticalDSS2d ArithmeticalDSS2d;
-  typedef typename ArithmeticalDSS2d::ConstIterator ConstIterator2d;
-  typedef typename ArithmeticalDSS2d::Point Point2d;
+  typedef typename StandardDSS6Computer::ArithmeticalDSSComputer2d ArithmeticalDSSComputer2d;
+  typedef typename ArithmeticalDSSComputer2d::ConstIterator ConstIterator2d;
+  typedef typename ArithmeticalDSSComputer2d::Point Point2d;
   typedef typename KSpace::Cell Cell;
   typedef typename KSpace::Point Point3d;
   Point3d b = ks.lowerBound();
   for ( DGtal::Dimension i = 0; i < 3; ++i )
     {
-      const ArithmeticalDSS2d & dss2d = dss3d.arithmeticalDSS2d( i );
+      const ArithmeticalDSSComputer2d & dss2d = dss3d.arithmeticalDSS2d( i );
       for ( ConstIterator2d itP = dss2d.begin(), itPEnd = dss2d.end(); itP != itPEnd; ++itP )
 	{
 	  Point2d p = *itP;
@@ -203,15 +203,15 @@ void displayProj2d( Viewer3D<space, kspace> & viewer,
     }
 }
 
-template <typename KSpace, typename ArithmeticalDSS3d, typename space, typename kspace >
+template <typename KSpace, typename StandardDSS6Computer, typename space, typename kspace >
 void displayDSS2d( Viewer3D<space, kspace> & viewer,
-		   const KSpace & ks, const ArithmeticalDSS3d & dss3d,
+		   const KSpace & ks, const StandardDSS6Computer & dss3d,
 		   const DGtal::Color & color2d )
 {
-  typedef typename ArithmeticalDSS3d::ConstIterator ConstIterator3d;
-  typedef typename ArithmeticalDSS3d::ArithmeticalDSS2d ArithmeticalDSS2d;
-  typedef typename ArithmeticalDSS2d::ConstIterator ConstIterator2d;
-  typedef typename ArithmeticalDSS2d::Point Point2d;
+  typedef typename StandardDSS6Computer::ConstIterator ConstIterator3d;
+  typedef typename StandardDSS6Computer::ArithmeticalDSSComputer2d ArithmeticalDSSComputer2d;
+  typedef typename ArithmeticalDSSComputer2d::ConstIterator ConstIterator2d;
+  typedef typename ArithmeticalDSSComputer2d::Point Point2d;
   typedef typename KSpace::Cell Cell;
   typedef typename KSpace::Point Point3d;
   typedef DGtal::PointVector<2,double> PointD2d;
@@ -219,7 +219,7 @@ void displayDSS2d( Viewer3D<space, kspace> & viewer,
   Point3d b = ks.lowerBound();
   for ( DGtal::Dimension i = 0; i < 3; ++i )
     {
-      const ArithmeticalDSS2d & dss2d = dss3d.arithmeticalDSS2d( i );
+      const ArithmeticalDSSComputer2d & dss2d = dss3d.arithmeticalDSS2d( i );
       // draw 2D bounding boxes for each arithmetical dss 2D.
       std::vector<PointD2d> pts2d;
       pts2d.push_back( dss2d.project(*dss2d.myF, dss2d.myUf) );
@@ -257,10 +257,10 @@ bool displayCover( Viewer3D<space, kspace> & viewer,
 		   int nbColors )
 {
   typedef typename PointIterator::value_type Point;
-  typedef ArithmeticalDSS3d<PointIterator,int,4> SegmentComputer;
+  typedef StandardDSS6Computer<PointIterator,int,4> SegmentComputer;
   typedef SaturatedSegmentation<SegmentComputer> Decomposition;
   typedef typename Decomposition::SegmentComputerIterator SegmentComputerIterator;
-  typedef typename SegmentComputer::ArithmeticalDSS2d ArithmeticalDSS2d;
+  typedef typename SegmentComputer::ArithmeticalDSSComputer2d ArithmeticalDSSComputer2d;
   SegmentComputer algo;
   Decomposition theDecomposition(b, e, algo);
 
@@ -272,9 +272,9 @@ bool displayCover( Viewer3D<space, kspace> & viewer,
         i != theDecomposition.end(); ++i)
     {
       SegmentComputer ms3d(*i);
-      const ArithmeticalDSS2d & dssXY = ms3d.arithmeticalDSS2dXY();
-      const ArithmeticalDSS2d & dssXZ = ms3d.arithmeticalDSS2dXZ();
-      const ArithmeticalDSS2d & dssYZ = ms3d.arithmeticalDSS2dYZ();
+      const ArithmeticalDSSComputer2d & dssXY = ms3d.arithmeticalDSS2dXY();
+      const ArithmeticalDSSComputer2d & dssXZ = ms3d.arithmeticalDSS2dXZ();
+      const ArithmeticalDSSComputer2d & dssYZ = ms3d.arithmeticalDSS2dYZ();
       Point f = *ms3d.begin();
       Point l = *(ms3d.end() - 1);
       trace.info() << "- " << c

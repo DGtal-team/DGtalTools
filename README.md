@@ -50,6 +50,7 @@ Utilities to convert various simple file formats:
   - ofs2off: convert OFS mesh format towards a OFF variant.
   - vol2sdp: a simple tools to extract digital points from 3d vol files.
   - vol2off: extract dual surface of a digital object (equiv. Marching Cubes)
+  - dicom2vol: convert dicom images into 3d volumic file
 
 Estimators
 ----------
@@ -92,8 +93,8 @@ Visualization
 -------------
   - 3dCurvatureViewer: permits to compute and visualize mean or gaussian curvature of binary shapes.
   - 3dCurveViewer: displays 3D curves with tangential cover and projections onto bounding box.
-  - 3dImageViewer: tools to display 3d slice images with QGLViewer.
-  - 3dVolViewer: volume file (.vol and .pgm3d) viewer with QGLViewer.
+  - 3dImageViewer: tools to display 3d slice images (.vol, .pgm3d and  dicom with ITK) with QGLViewer.
+  - 3dVolViewer: volume file (.vol, .pgm3d and dicom with ITK ) viewer with QGLViewer.
   - displayContours: display discrete contours from various format (.fc (freemanchain), .sdp).
   - meshViewer: display 3D mesh from OFS or OFF format.
   - patternTriangulation: a new tool that draws with Board2D the convex hull, the closest-point Delaunay triangulation or the farthest-point Delaunay triangulation of a pattern.
@@ -125,6 +126,8 @@ Volumetric
   - volAddBorder: add a 1 voxel boundary with value 0 to a vol file.
   - volCComponentCounter: a simple program to count the number of connected components in a 3D image.
   - volSubSample: sub sample a vol file (division by 2 in each direction).
+  - volImageMetrics: apply basic statistics on comparaison between two volumetric images (shape defined from thresholds): computes true/false -+, precision, recall f-mean RMSE, PSNR.
+  - volShapeMetrics: apply euclidean distance comparisons between two shapes  (shape defined from thresholds).
 
 
 
