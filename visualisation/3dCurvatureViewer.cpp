@@ -243,11 +243,11 @@ int main( int argc, char** argv )
                    << unsignedSurfel;
 
 
-            ColumnVector normal = current.vectors.column(0).getNormalized(); // don't show the normal
+            //ColumnVector normal = current.vectors.column(0).getNormalized(); // don't show the normal
             ColumnVector curv1 = current.vectors.column(1).getNormalized();
             ColumnVector curv2 = current.vectors.column(2).getNormalized();
 
-            SCellToMidPoint< KSpace > embedder( K );
+            CanonicSCellEmbedder< KSpace > embedder( K );
             double eps = 0.01;
             RealPoint center = embedder( *abegin2 ) + eps*embedder( *abegin2 );
 

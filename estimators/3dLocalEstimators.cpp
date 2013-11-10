@@ -52,6 +52,7 @@
 #include "DGtal/topology/DigitalSurface.h"
 #include "DGtal/graph/DepthFirstVisitor.h"
 #include "DGtal/geometry/volumes/KanungoNoise.h"
+#include "DGtal/topology/CanonicSCellEmbedder.h"
 
 
 
@@ -82,7 +83,7 @@ estimateTrueMeanCurvatureQuantity( const ConstIterator & it_begin,
                                    Shape * aShape )
 {
     typedef typename KSpace::Space::RealPoint RealPoint;
-    typedef SCellToMidPoint< KSpace > Embedder;
+    typedef CanonicSCellEmbedder< KSpace > Embedder;
 
     Embedder embedder( K );
     RealPoint currentRealPoint;
@@ -105,7 +106,7 @@ estimateTrueGaussianCurvatureQuantity( const ConstIterator & it_begin,
                                        Shape * aShape )
 {
     typedef typename KSpace::Space::RealPoint RealPoint;
-    typedef SCellToMidPoint< KSpace > Embedder;
+    typedef CanonicSCellEmbedder< KSpace > Embedder;
 
     Embedder embedder( K );
     RealPoint currentRealPoint;
@@ -128,7 +129,7 @@ estimateTruePrincipalCurvaturesQuantity( const ConstIterator & it_begin,
                                                   Shape * aShape )
 {
     typedef typename KSpace::Space::RealPoint RealPoint;
-    typedef SCellToMidPoint< KSpace > Embedder;
+    typedef CanonicSCellEmbedder< KSpace > Embedder;
 
     Embedder embedder( K );
     RealPoint currentRealPoint;
