@@ -54,6 +54,7 @@
 #include "DGtal/graph/GraphVisitorRange.h"
 
 // Integral Invariant includes
+#include "DGtal/topology/CanonicSCellEmbedder.h"
 #include "DGtal/geometry/surfaces/FunctorOnCells.h"
 #include "DGtal/geometry/surfaces/estimation/IntegralInvariantMeanCurvatureEstimator.h"
 #include "DGtal/geometry/surfaces/estimation/IntegralInvariantGaussianCurvatureEstimator.h"
@@ -216,7 +217,7 @@ int main( int argc, char** argv )
         estimator.evalComplete ( abegin, aend, resultsIterator ); // Computation
 
         // Drawing results
-        SCellToMidPoint< Z3i::KSpace > midpoint( KSpaceShape );
+	CanonicSCellEmbedder<Z3i::KSpace> midpoint = CanonicSCellEmbedder<Z3i::KSpace>(KSpaceShape); 
         typedef  Matrix3x3::RowVector RowVector;
         typedef  Matrix3x3::ColumnVector ColumnVector;
         for ( unsigned int i = 0; i < results.size(); ++i )
