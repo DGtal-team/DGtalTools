@@ -163,11 +163,11 @@ int main ( int argc, char**argv )
     SurfaceEmbedder surfaceEmbedder ( digSurf );
 
     //Convolution kernel
-    GaussianConvolutionWeights < MyDigitalSurface::Size > Gkernel ( sigma );
+    deprecated::GaussianConvolutionWeights < MyDigitalSurface::Size > Gkernel ( sigma );
 
     //Estimator definition
-    typedef LocalConvolutionNormalVectorEstimator  < MyDigitalSurface,
-            GaussianConvolutionWeights< MyDigitalSurface::Size>  > MyGaussianEstimator;
+    typedef deprecated::LocalConvolutionNormalVectorEstimator  < MyDigitalSurface,
+                                                     deprecated::GaussianConvolutionWeights< MyDigitalSurface::Size>  > MyGaussianEstimator;
     BOOST_CONCEPT_ASSERT ( ( CNormalVectorEstimator< MyGaussianEstimator > ) );
     MyGaussianEstimator myNormalEstimatorG ( digSurf, Gkernel );
 
@@ -181,7 +181,7 @@ int main ( int argc, char**argv )
     trace.info() << "Generating the NOFF surface "<< std::endl;
     ofstream out2 ( ( outputFileName + ".off" ).c_str() );
     if ( out2.good() )
-        digSurf.exportAs3DNOFF ( out2 ,mySurfelEmbedderG );
+      digSurf.exportAs3DNOFF ( out2 ,mySurfelEmbedderG );
     out2.close();
 
     trace.info() << "Generating the polar coordinates file"<< std::endl;
