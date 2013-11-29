@@ -15,11 +15,11 @@
  **/
 
 /**
- * @file raw2vol.cpp
- * @author David Coeurjolly (\c david.coeurjolly@liris.cnrs.fr )
+ * @file raw2HDF5.cpp
+ * @author Martial Tola (\c martial.tola@liris.cnrs.fr )
  * Laboratoire d'InfoRmatique en Image et Systèmes d'information - LIRIS (CNRS, UMR 5205), CNRS, France
  *
- * @date 2012/05/01
+ * @date 2013/09/11
  *
  *
  * This file is part of the DGtal library.
@@ -28,9 +28,7 @@
 #include <iostream>
 #include <DGtal/base/Common.h>
 #include <DGtal/io/readers/RawReader.h>
-#include <DGtal/io/writers/VolWriter.h>
-#include <DGtal/io/readers/VolReader.h>
-#include <DGtal/io/writers/RawWriter.h>
+#include <DGtal/io/writers/HDF5Writer.h>
 #include <DGtal/helpers/StdDefs.h>
 #include "DGtal/io/colormaps/GrayscaleColorMap.h"
 #include <DGtal/images/Image.h>
@@ -68,7 +66,7 @@ int main(int argc, char**argv)
   general_opt.add_options()
     ( "help,h", "display this message." )
     ( "input,i", po::value<std::string>(), "Input raw file." )
-    ( "output,o", po::value<string>(),"Output vol filename." )
+    ( "output,o", po::value<string>(),"Output HDF5 filename." )
     ( "x,x", po::value<unsigned int>(),"x extent." )
     ( "y,y", po::value<unsigned int >(),"y extent." )
     ( "z,z", po::value<unsigned int>(),"z extent." );
@@ -85,9 +83,9 @@ int main(int argc, char**argv)
   po::notify ( vm );
   if (!parseOK || vm.count ( "help" ) ||argc<=1 )
     {
-      trace.info() << "Convert a  8-bit raw file to  vol."<<std::endl
+      trace.info() << "Convert a 3D 8-bit raw file to HDF5."<<std::endl
                    << std::endl << "Basic usage: "<<std::endl
-                   << "\traw2vol -x 128 -y 128 -z 128 --input <RawFileName> --output <VolOutputFileName> "<<std::endl
+                   << "\traw2HDF5 -x 128 -y 128 -z 128 --input <RawFileName> --output <HDF5OutputFileName> "<<std::endl
                    << general_opt << "\n";
       return 0;
     }
@@ -108,13 +106,13 @@ int main(int argc, char**argv)
   typedef ImageContainerBySTLVector<Z3i::Domain, unsigned char>  MyImageC;
 
   MyImageC  imageC = RawReader< MyImageC >::importRaw8 ( filename, Z3i::Vector(x,y,z) );
-  bool res =  VolWriter< MyImageC>::exportVol(outputFileName, imageC);
+  bool res =  HDF5Writer< MyImageC>::exportHDF5_3D(outputFileName, imageC, "/UInt8Array3D");
 
   if (res)
     return 0;
   else 
     {
-      trace.error()<< "Error while exporting the volume."<<std::endl;
+      trace.error()<< "Error while exporting the HDF5 file."<<std::endl;
       return 1;
     }
 }
