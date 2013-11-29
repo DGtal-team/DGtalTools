@@ -59,6 +59,7 @@
 #include "DGtal/geometry/surfaces/estimation/IntegralInvariantMeanCurvatureEstimator.h"
 #include "DGtal/geometry/surfaces/estimation/IntegralInvariantGaussianCurvatureEstimator.h"
 #include "DGtal/geometry/surfaces/FunctorOnCells.h"
+#include "DGtal/topology/CanonicSCellEmbedder.h"
 
 #include "DGtal/topology/LightImplicitDigitalSurface.h"
 #include "DGtal/images/imagesSetsUtils/SimpleThresholdForegroundPredicate.h"
@@ -80,7 +81,7 @@ std::vector<double>
 estimateTrueMeanCurvatureQuantity( Shape aShape, KSpace K, double h, ConstIterator it, ConstIterator it_end )
 {
   typedef typename Shape::RealPoint RealPoint;
-  SCellToMidPoint<KSpace> midpoint(K);
+  CanonicSCellEmbedder<KSpace> midpoint(K); 
 
   std::vector<double> values;
   for ( ; it != it_end; ++it )
@@ -97,7 +98,7 @@ std::vector<double>
 estimateTrueGaussianCurvatureQuantity( Shape aShape, KSpace K, double h, ConstIterator it, ConstIterator it_end )
 {
   typedef typename Shape::RealPoint RealPoint;
-  SCellToMidPoint<KSpace> midpoint(K);
+  CanonicSCellEmbedder<KSpace> midpoint(K); 
 
   std::vector<double> values;
   for ( ; it != it_end; ++it )
