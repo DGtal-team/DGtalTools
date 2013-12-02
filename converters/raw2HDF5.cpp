@@ -30,7 +30,6 @@
 #include <DGtal/io/readers/RawReader.h>
 #include <DGtal/io/writers/HDF5Writer.h>
 #include <DGtal/helpers/StdDefs.h>
-#include "DGtal/io/colormaps/GrayscaleColorMap.h"
 #include <DGtal/images/Image.h>
 #include <DGtal/images/ImageContainerBySTLVector.h>
 
