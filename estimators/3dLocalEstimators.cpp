@@ -464,10 +464,12 @@ compareShapeEstimators( const std::string & filename,
                     trace.beginBlock( "Monge mean curvature" );
 
                     typedef MongeJetFittingMeanCurvatureEstimator<Surfel, CanonicSCellEmbedder<KSpace> > FunctorMean;
-                    typedef LocalEstimatorFromSurfelFunctorAdapter<typename MyDigitalSurface::DigitalSurfaceContainer, Z3i::L2Metric, FunctorMean> ReporterH;
-                    CanonicSCellEmbedder<KSpace> * embedder = new CanonicSCellEmbedder<KSpace>( K );
-                    FunctorMean estimatorH( *embedder, h );
-                    ReporterH reporterH(surf.container(), Z3i::l2Metric, estimatorH);
+                    typedef ConstValueFunctor< double > ConvFunctor;
+                    typedef LocalEstimatorFromSurfelFunctorAdapter<typename MyDigitalSurface::DigitalSurfaceContainer, Z3i::L2Metric, FunctorMean, ConvFunctor> ReporterH;
+                    CanonicSCellEmbedder<KSpace> embedder( K );
+                    FunctorMean estimatorH( embedder, h );
+                    ConvFunctor convFunc(1.0);
+                    ReporterH reporterH( surf.container(), Z3i::l2Metric, estimatorH, convFunc);
                     c.startClock();
                     reporterH.init( h , re_convolution_kernel / h  );
 
@@ -489,7 +491,7 @@ compareShapeEstimators( const std::string & filename,
                     file << "# time = " << TMongeMeanCurv << std::endl;
                     file.close();
                     delete range;
-                    delete embedder;
+
 
                     trace.endBlock();
                 }
@@ -500,10 +502,12 @@ compareShapeEstimators( const std::string & filename,
                     trace.beginBlock( "Monge Gaussian curvature" );
 
                     typedef MongeJetFittingGaussianCurvatureEstimator<Surfel, CanonicSCellEmbedder<KSpace> > FunctorGaussian;
-                    typedef LocalEstimatorFromSurfelFunctorAdapter<typename MyDigitalSurface::DigitalSurfaceContainer, Z3i::L2Metric, FunctorGaussian> ReporterK;
-                    CanonicSCellEmbedder<KSpace> * embedder = new CanonicSCellEmbedder<KSpace>( K );
-                    FunctorGaussian estimatorK( *embedder, h );
-                    ReporterK reporterK(surf.container(), Z3i::l2Metric, estimatorK);
+                    typedef ConstValueFunctor< double > ConvFunctor;
+                    typedef LocalEstimatorFromSurfelFunctorAdapter<typename MyDigitalSurface::DigitalSurfaceContainer, Z3i::L2Metric, FunctorGaussian, ConvFunctor> ReporterK;
+                    CanonicSCellEmbedder<KSpace> embedder( K );
+                    FunctorGaussian estimatorK( embedder, h );
+                    ConvFunctor convFunc(1.0);
+                    ReporterK reporterK(surf.container(), Z3i::l2Metric, estimatorK, convFunc);
                     c.startClock();
                     reporterK.init( h , re_convolution_kernel / h  );
 
@@ -526,7 +530,7 @@ compareShapeEstimators( const std::string & filename,
                     file << "# time = " << TMongeGaussCurv << std::endl;
                     file.close();
                     delete range;
-                    delete embedder;
+
 
                     trace.endBlock();
                 }
@@ -537,10 +541,12 @@ compareShapeEstimators( const std::string & filename,
                     trace.beginBlock( "Monge Principal Curvature" );
 
                     typedef MongeJetFittingPrincipalCurvaturesEstimator<Surfel, CanonicSCellEmbedder<KSpace> > FunctorPrincCurv;
-                    typedef LocalEstimatorFromSurfelFunctorAdapter<typename MyDigitalSurface::DigitalSurfaceContainer, Z3i::L2Metric, FunctorPrincCurv> ReporterK;
-                    CanonicSCellEmbedder<KSpace> * embedder = new CanonicSCellEmbedder<KSpace>( K );
-                    FunctorPrincCurv estimatorK( *embedder, h );
-                    ReporterK reporterK(surf.container(), Z3i::l2Metric, estimatorK);
+                    typedef ConstValueFunctor< double > ConvFunctor;
+                    typedef LocalEstimatorFromSurfelFunctorAdapter<typename MyDigitalSurface::DigitalSurfaceContainer, Z3i::L2Metric, FunctorPrincCurv, ConvFunctor> ReporterK;
+                    CanonicSCellEmbedder<KSpace> embedder( K );
+                    FunctorPrincCurv estimatorK( embedder, h );
+                    ConvFunctor convFunc(1.0);
+                    ReporterK reporterK(surf.container(), Z3i::l2Metric, estimatorK, convFunc);
                     c.startClock();
                     reporterK.init( h , re_convolution_kernel / h  );
 
@@ -560,7 +566,7 @@ compareShapeEstimators( const std::string & filename,
                     file << "# time = " << TMongeGaussCurv << std::endl;
                     file.close();
                     delete range;
-                    delete embedder;
+
 
                     trace.endBlock();
                 }
@@ -840,10 +846,12 @@ compareShapeEstimators( const std::string & filename,
                     trace.beginBlock( "Monge mean curvature" );
 
                     typedef MongeJetFittingMeanCurvatureEstimator<Surfel, CanonicSCellEmbedder<KSpace> > FunctorMean;
-                    typedef LocalEstimatorFromSurfelFunctorAdapter<typename MyDigitalSurface::DigitalSurfaceContainer, Z3i::L2Metric, FunctorMean> ReporterH;
-                    CanonicSCellEmbedder<KSpace> * embedder = new CanonicSCellEmbedder<KSpace>( K );
-                    FunctorMean estimatorH( *embedder, h );
-                    ReporterH reporterH(surf.container(), Z3i::l2Metric, estimatorH);
+                    typedef ConstValueFunctor< double > ConvFunctor;
+                    typedef LocalEstimatorFromSurfelFunctorAdapter<typename MyDigitalSurface::DigitalSurfaceContainer, Z3i::L2Metric, FunctorMean, ConvFunctor> ReporterH;
+                    CanonicSCellEmbedder<KSpace> embedder( K );
+                    FunctorMean estimatorH( embedder, h );
+                    ConvFunctor convFunc(1.0);
+                    ReporterH reporterH(surf.container(), Z3i::l2Metric, estimatorH, convFunc);
                     c.startClock();
                     reporterH.init( h , re_convolution_kernel / h  );
 
@@ -864,7 +872,7 @@ compareShapeEstimators( const std::string & filename,
                     file << "# time = " << TMongeMeanCurv << std::endl;
                     file.close();
                     delete range;
-                    delete embedder;
+
 
                     trace.endBlock();
                 }
@@ -875,10 +883,12 @@ compareShapeEstimators( const std::string & filename,
                     trace.beginBlock( "Monge Gaussian curvature" );
 
                     typedef MongeJetFittingGaussianCurvatureEstimator<Surfel, CanonicSCellEmbedder<KSpace> > FunctorGaussian;
-                    typedef LocalEstimatorFromSurfelFunctorAdapter<typename MyDigitalSurface::DigitalSurfaceContainer, Z3i::L2Metric, FunctorGaussian> ReporterK;
-                    CanonicSCellEmbedder<KSpace> * embedder = new CanonicSCellEmbedder<KSpace>( K );
-                    FunctorGaussian estimatorK( *embedder, h );
-                    ReporterK reporterK(surf.container(), Z3i::l2Metric, estimatorK);
+                    typedef ConstValueFunctor< double > ConvFunctor;
+                    typedef LocalEstimatorFromSurfelFunctorAdapter<typename MyDigitalSurface::DigitalSurfaceContainer, Z3i::L2Metric, FunctorGaussian, ConvFunctor> ReporterK;
+                    CanonicSCellEmbedder<KSpace> embedder( K );
+                    FunctorGaussian estimatorK( embedder, h );
+                    ConvFunctor convFunc(1.0);
+                    ReporterK reporterK(surf.container(), Z3i::l2Metric, estimatorK, convFunc);
                     c.startClock();
                     reporterK.init( h , re_convolution_kernel / h  );
 
@@ -898,7 +908,7 @@ compareShapeEstimators( const std::string & filename,
                     file << "# time = " << TMongeGaussCurv << std::endl;
                     file.close();
                     delete range;
-                    delete embedder;
+
 
                     trace.endBlock();
                 }
@@ -909,10 +919,12 @@ compareShapeEstimators( const std::string & filename,
                     trace.beginBlock( "Monge Principal Curvature" );
 
                     typedef MongeJetFittingPrincipalCurvaturesEstimator<Surfel, CanonicSCellEmbedder<KSpace> > FunctorPrincCurv;
-                    typedef LocalEstimatorFromSurfelFunctorAdapter<typename MyDigitalSurface::DigitalSurfaceContainer, Z3i::L2Metric, FunctorPrincCurv> ReporterK;
-                    CanonicSCellEmbedder<KSpace> * embedder = new CanonicSCellEmbedder<KSpace>( K );
-                    FunctorPrincCurv estimatorK( *embedder, h );
-                    ReporterK reporterK(surf.container(), Z3i::l2Metric, estimatorK);
+                    typedef ConstValueFunctor< double > ConvFunctor;
+                    typedef LocalEstimatorFromSurfelFunctorAdapter<typename MyDigitalSurface::DigitalSurfaceContainer, Z3i::L2Metric, FunctorPrincCurv, ConvFunctor> ReporterK;
+                    CanonicSCellEmbedder<KSpace> embedder( K );
+                    FunctorPrincCurv estimatorK( embedder, h );
+                    ConvFunctor convFunc(1.0);
+                    ReporterK reporterK(surf.container(), Z3i::l2Metric, estimatorK, convFunc);
                     c.startClock();
                     reporterK.init( h , re_convolution_kernel / h  );
 
@@ -932,7 +944,7 @@ compareShapeEstimators( const std::string & filename,
                     file << "# time = " << TMongeGaussCurv << std::endl;
                     file.close();
                     delete range;
-                    delete embedder;
+
 
                     trace.endBlock();
                 }

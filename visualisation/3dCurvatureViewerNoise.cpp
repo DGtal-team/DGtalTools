@@ -14,7 +14,7 @@
  *
  **/
 /**
- * @file 3dCurvatureViewer.cpp
+ * @file 3dCurvatureViewerNoise.cpp
  * @ingroup surfaceTools
  * @author Jérémy Levallois (\c jeremy.levallois@liris.cnrs.fr )
  * Laboratoire d'InfoRmatique en Image et Systèmes d'information - LIRIS (CNRS, UMR 5205), INSA-Lyon, France
@@ -79,11 +79,12 @@ const double AXIS_LINESIZE = 0.1;
 void usage( int argc, char** argv )
 {
     trace.info() << "Usage: " << argv[ 0 ]
-          << " <fileName.vol> <re> <\"mean\" || \"gaussian\" || \"princurv{1,2}\">"<< std::endl;
+          << " <fileName.vol> <re> <\"mean\" || \"gaussian\" || \"princurv{1,2}\"> <noise>"<< std::endl;
     trace.info() << "\t - <filename.vol> file you want to show the curvature information."<< std::endl;
     trace.info() << "\t - <re> Euclidean radius of the kernel."<< std::endl;
     trace.info() << "\t - <\"mean\" || \"gaussian\" || \"princurv{1,2}\"> show mean or Gaussian curvature on shape."<< std::endl;
-    trace.info() << "Example : "<< argv[ 0 ] << " Al.150.vol 7 \"princurv1" << std::endl;
+    trace.info() << "\t - <noise> is the level of Kanungo noise ( double value in ]0,1[ )."<< std::endl;
+    trace.info() << "Example : "<< argv[ 0 ] << " Al.150.vol 7 \"princurv1\" 0.5" << std::endl;
 }
 
 int main( int argc, char** argv )
@@ -98,7 +99,7 @@ int main( int argc, char** argv )
     double re_convolution_kernel = atof(argv[2]);
 
     std::string mode = argv[ 3 ];
-    if ( mode != "gaussian" && mode != "mean" && mode != "princurv1" && mode != "princurv2")
+    if (( mode.compare("gaussian") != 0 ) && ( mode.compare("mean") != 0 ) && ( mode.compare("princurv1") != 0 ) && ( mode.compare("princurv2") != 0 ))
     {
         usage( argc, argv );
         return 0;
@@ -165,13 +166,13 @@ int main( int argc, char** argv )
     SurfelConstIterator abegin2 = range2.begin();
 
     trace.beginBlock("curvature computation");
-    if( mode == "mean" || mode == "gaussian" )
+    if( ( mode.compare("gaussian") == 0 ) || ( mode.compare("mean") == 0 ) )
     {
         typedef double Quantity;
         std::vector< Quantity > results;
         back_insert_iterator< std::vector< Quantity > > resultsIterator( results ); // output iterator for results of Integral Invariante curvature computation
 
-        if ( mode == "mean" )
+        if ( ( mode.compare("mean") == 0 ) )
         {
             typedef IntegralInvariantMeanCurvatureEstimator< Z3i::KSpace, MyCellFunctor > MyIIMeanEstimator;
 
@@ -179,7 +180,7 @@ int main( int argc, char** argv )
             estimator.init( h, re_convolution_kernel ); // Initialisation for a given Euclidean radius of the convolution kernel
             estimator.eval ( abegin, aend, resultsIterator ); // Computation
         }
-        else if ( mode == "gaussian" )
+        else if ( ( mode.compare("gaussian") == 0 ) )
         {
             typedef IntegralInvariantGaussianCurvatureEstimator< Z3i::KSpace, MyCellFunctor > MyIIGaussianEstimator;
 
@@ -274,7 +275,7 @@ int main( int argc, char** argv )
 //                             DGtal::Color ( 0,0,0 ), 5.0 ); // don't show the normal
 
 
-            if( mode == "princurv1" )
+            if( ( mode.compare("princurv1") == 0 ) )
             {
                 viewer.setLineColor(AXIS_COLOR_BLUE);
                 viewer.addLine (
