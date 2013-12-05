@@ -39,7 +39,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 #include <iostream>
 #include "DGtal/base/Common.h"
-
+#include <cstring>
 // Shape constructors
 #include "DGtal/io/readers/VolReader.h"
 #include "DGtal/images/ImageSelector.h"
@@ -69,7 +69,7 @@ using namespace DGtal;
 const Color  AXIS_COLOR_RED( 200, 20, 20, 255 );
 const Color  AXIS_COLOR_GREEN( 20, 200, 20, 255 );
 const Color  AXIS_COLOR_BLUE( 20, 20, 200, 255 );
-const double AXIS_LINESIZE = 0.03;
+const double AXIS_LINESIZE = 0.05;
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -96,7 +96,7 @@ int main( int argc, char** argv )
     double re_convolution_kernel = atof(argv[2]);
 
     std::string mode = argv[ 3 ];
-    if ( mode != "gaussian" && mode != "mean" && mode != "princurv1" && mode != "princurv2")
+    if (( mode.compare("gaussian") != 0 ) && ( mode.compare("mean") != 0 ) && ( mode.compare("princurv1") != 0 ) && ( mode.compare("princurv2") != 0 ))
     {
         usage( argc, argv );
         return 0;
@@ -104,6 +104,7 @@ int main( int argc, char** argv )
 
     // Construction of the shape from vol file
     typedef Z3i::Space::RealPoint RealPoint;
+    typedef Z3i::Point Point;
     typedef ImageSelector< Z3i::Domain, bool>::Type Image;
     typedef SimpleThresholdForegroundPredicate< Image > ImagePredicate;
     typedef Z3i::KSpace KSpace;
@@ -121,7 +122,7 @@ int main( int argc, char** argv )
 
     Z3i::KSpace K;
 
-    bool space_ok = K.init( domain.lowerBound(), domain.upperBound(), true );
+    bool space_ok = K.init( domain.lowerBound(), domain.upperBound() + Point(1,1,1), true );
     if (!space_ok)
     {
       trace.error() << "Error in the Khalimsky space construction."<<std::endl;
@@ -158,13 +159,13 @@ int main( int argc, char** argv )
     SurfelConstIterator abegin2 = range2.begin();
 
     trace.beginBlock("curvature computation");
-    if( mode == "mean" || mode == "gaussian" )
+    if( ( mode.compare("gaussian") == 0 ) || ( mode.compare("mean") == 0 ) )
     {
         typedef double Quantity;
         std::vector< Quantity > results;
         back_insert_iterator< std::vector< Quantity > > resultsIterator( results ); // output iterator for results of Integral Invariante curvature computation
 
-        if ( mode == "mean" )
+        if ( ( mode.compare("mean") == 0 ) )
         {
             typedef IntegralInvariantMeanCurvatureEstimator< Z3i::KSpace, MyCellFunctor > MyIIMeanEstimator;
 
@@ -172,13 +173,22 @@ int main( int argc, char** argv )
             estimator.init( h, re_convolution_kernel ); // Initialisation for a given Euclidean radius of the convolution kernel
             estimator.eval ( abegin, aend, resultsIterator ); // Computation
         }
-        else if ( mode == "gaussian" )
+        else if ( ( mode.compare("gaussian") == 0 ) )
         {
             typedef IntegralInvariantGaussianCurvatureEstimator< Z3i::KSpace, MyCellFunctor > MyIIGaussianEstimator;
+            typedef CurvatureInformations CurvInformation;
+            std::vector< CurvInformation > results2;
+            back_insert_iterator< std::vector< CurvInformation > > resultsIterator2( results2 );
+
 
             MyIIGaussianEstimator estimator ( K, functor );
             estimator.init( h, re_convolution_kernel ); // Initialisation for a given Euclidean radius of the convolution kernel
-            estimator.eval ( abegin, aend, resultsIterator ); // Computation
+            estimator.evalPrincipalCurvatures ( abegin, aend, resultsIterator2 ); // Computation
+
+            for(int i = 0; i < results2.size(); ++i)
+              {
+                results.push_back(results2[i].k1 * results2[i].k2);
+              }
         }
 
         // Drawing results
@@ -233,9 +243,17 @@ int main( int argc, char** argv )
         // Drawing results
         typedef  Matrix3x3::RowVector RowVector;
         typedef  Matrix3x3::ColumnVector ColumnVector;
+        CanonicSCellEmbedder< KSpace > embedder( K );
+
         for ( unsigned int i = 0; i < results.size(); ++i )
         {
             CurvInformation current = results[ i ];
+            DGtal::Dimension kDim = K.sOrthDir( *abegin2 );
+            SCell outer = K.sIndirectIncident( *abegin2, kDim);
+            if ( predicate(embedder(outer)) )
+            {
+              outer = K.sDirectIncident( *abegin2, kDim);
+            }
 
             Cell unsignedSurfel = K.uCell( K.sKCoords(*abegin2) );
             viewer << CustomColors3D( DGtal::Color(255,255,255,255),
@@ -247,9 +265,8 @@ int main( int argc, char** argv )
             ColumnVector curv1 = current.vectors.column(1).getNormalized();
             ColumnVector curv2 = current.vectors.column(2).getNormalized();
 
-            CanonicSCellEmbedder< KSpace > embedder( K );
             double eps = 0.01;
-            RealPoint center = embedder( *abegin2 ) + eps*embedder( *abegin2 );
+            RealPoint center = embedder( outer );// + eps*embedder( *abegin2 );
 
 //            viewer.addLine ( center[0] - 0.5 * normal[ 0],
 //                             center[1] - 0.5 * normal[1],
@@ -260,7 +277,7 @@ int main( int argc, char** argv )
 //                             DGtal::Color ( 0,0,0 ), 5.0 ); // don't show the normal
 
 
-            if( mode == "princurv1" )
+            if( ( mode.compare("princurv1") == 0 ) )
             {
                 viewer.setLineColor(AXIS_COLOR_BLUE);
                 viewer.addLine (
