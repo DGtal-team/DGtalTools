@@ -85,6 +85,7 @@ int main( int argc, char** argv )
     ("thresholdMin,m",  po::value<int>()->default_value(0), "threshold min to define binary shape" ) 
     ("thresholdMax,M",  po::value<int>()->default_value(255), "threshold max to define binary shape" )
     ("displaySDP,s", po::value<std::string>(), "display a set of discrete points (.sdp)" )
+    ("SDPindex", po::value<std::vector <unsigned int> >()->multitoken(), "specify the sdp index (by default 0,1,2).")
     ("displayMesh", po::value<std::string>(), "display a Mesh given in OFF or OFS format. " )
     ("displayDigitalSurface", "display the digital surface instead of display all the set of voxels (used with thresholdImage or displaySDP options)" )
     ("colorizeCC", "colorize each Connected Components of the surface displayed by displayDigitalSurface option." )
@@ -127,7 +128,7 @@ int main( int argc, char** argv )
   unsigned char transp = vm["transparency"].as<uint>();
  
   QApplication application(argc,argv);
- 
+
   float sx = vm["scaleX"].as<float>();
   float sy = vm["scaleY"].as<float>();
   float sz = vm["scaleZ"].as<float>();
@@ -211,10 +212,22 @@ int main( int argc, char** argv )
       Color c(vcol[0], vcol[1], vcol[2], vcol[3]);
       viewer << CustomColors3D(c, c);
     }
-    vector<Z3i::Point> vectVoxels = PointListReader<Z3i::Point>::getPointsFromFile(vm["displaySDP"].as<std::string>());
+    
+    vector<Z3i::Point> vectVoxels;
+    if(vm.count("SDPindex")) {
+      std::vector<unsigned int > vectIndex = vm["SDPindex"].as<std::vector<unsigned int > >();
+        if(vectIndex.size()!=3){
+          trace.error() << "you need to specify the three index of vertex." << std::endl; 
+          return 0;
+        }
+        vectVoxels = PointListReader<Z3i::Point>::getPointsFromFile(vm["displaySDP"].as<std::string>(), vectIndex);
+    }else{
+      vectVoxels = PointListReader<Z3i::Point>::getPointsFromFile(vm["displaySDP"].as<std::string>());
+    }
     for(int i=0;i< vectVoxels.size(); i++){
       if(!vm.count("displayDigitalSurface")){
-	viewer << vectVoxels.at(i);
+        trace.info()<< "displaying voxel: " << vectVoxels.at(i) << std::endl;
+        viewer << vectVoxels.at(i);
       }else{
 	set3d.insert(vectVoxels.at(i));
       }
