@@ -158,15 +158,15 @@ int main( int argc, char** argv )
   viewer.setGLScale(sx, sy, sz);  
   
 #ifdef WITH_ITK
-   int dicomMin = vm["dicomMin"].as<int>();
-   int dicomMax = vm["dicomMax"].as<int>();
-   typedef DGtal::RescalingFunctor<int ,unsigned char > RescalFCT;
+  int dicomMin = vm["dicomMin"].as<int>();
+  int dicomMax = vm["dicomMax"].as<int>();
+  typedef DGtal::RescalingFunctor<int ,unsigned char > RescalFCT;
    
-   Image3D image = extension == "dcm" ? DicomReader< Image3D,  RescalFCT  >::importDicom( inputFilename, 
-											  RescalFCT(dicomMin,
-												    dicomMax,
-												    0, 255) ) : 
-     GenericReader<Image3D>::import( inputFilename );
+  Image3D image = extension == "dcm" ? DicomReader< Image3D,  RescalFCT  >::importDicom( inputFilename, 
+                                                                                         RescalFCT(dicomMin,
+                                                                                                   dicomMax,
+                                                                                                   0, 255) ) : 
+    GenericReader<Image3D>::import( inputFilename );
 #else
   Image3D image = GenericReader<Image3D>::import( inputFilename );
 #endif
@@ -192,9 +192,9 @@ int main( int argc, char** argv )
       Color c= gradient(val);
       if(val<=thresholdMax && val >=thresholdMin){
 	if(!vm.count("displayDigitalSurface")){
-	    viewer <<  CustomColors3D(Color((float)(c.red()), (float)(c.green()),(float)(c.blue()), transp),
-				      Color((float)(c.red()), (float)(c.green()),(float)(c.blue()), transp));     
-	    viewer << *it;     
+          viewer <<  CustomColors3D(Color((float)(c.red()), (float)(c.green()),(float)(c.blue()), transp),
+                                    Color((float)(c.red()), (float)(c.green()),(float)(c.blue()), transp));     
+          viewer << *it;     
 	}
       }else{
 	set3d.insert(*it);
@@ -216,17 +216,16 @@ int main( int argc, char** argv )
     vector<Z3i::Point> vectVoxels;
     if(vm.count("SDPindex")) {
       std::vector<unsigned int > vectIndex = vm["SDPindex"].as<std::vector<unsigned int > >();
-        if(vectIndex.size()!=3){
-          trace.error() << "you need to specify the three index of vertex." << std::endl; 
-          return 0;
-        }
-        vectVoxels = PointListReader<Z3i::Point>::getPointsFromFile(vm["displaySDP"].as<std::string>(), vectIndex);
+      if(vectIndex.size()!=3){
+        trace.error() << "you need to specify the three indexes of vertex." << std::endl; 
+        return 0;
+      }
+      vectVoxels = PointListReader<Z3i::Point>::getPointsFromFile(vm["displaySDP"].as<std::string>(), vectIndex);
     }else{
       vectVoxels = PointListReader<Z3i::Point>::getPointsFromFile(vm["displaySDP"].as<std::string>());
     }
     for(int i=0;i< vectVoxels.size(); i++){
       if(!vm.count("displayDigitalSurface")){
-        trace.info()<< "displaying voxel: " << vectVoxels.at(i) << std::endl;
         viewer << vectVoxels.at(i);
       }else{
 	set3d.insert(vectVoxels.at(i));
