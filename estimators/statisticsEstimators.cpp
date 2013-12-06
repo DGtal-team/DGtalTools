@@ -31,193 +31,248 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
-#include <vector>
 #include <string>
+#include <cmath>
 #include <math.h>
+#include <limits>
 #include <boost/foreach.hpp>
 #include <boost/tokenizer.hpp>
+#include <boost/program_options/options_description.hpp>
+#include <boost/program_options/parsers.hpp>
+#include <boost/program_options/variables_map.hpp>
 
-int LoadingStringFromFile ( std::string & parseDataFile, std::string & parseParamFile, const std::string filename )
+#include "DGtal/base/Common.h"
+
+using namespace DGtal;
+
+/**
+ * @brief LoadingStringFromFile Load the current line from an open file, and go to the next line.
+ *
+ * @param[in,out] file an open file
+ * @param[out] value a string who will be override by value of the current line of file
+ * @return true if the file is ok, false else
+ */
+bool LoadingStringFromFile( std::ifstream & file, std::string & value )
 {
-  std::ifstream myfile;
-  std::stringstream ss_data;
-  std::stringstream ss_param;
-
-  myfile.open ( filename.c_str() );
-  if ( myfile.is_open() )
-  {
-    std::string currentLine;
-    while ( myfile.good() )
+    if( file.good() )
     {
-      getline ( myfile, currentLine );
-      if (currentLine.size() > 0 && currentLine[0] == '#')
-      {
-        ss_param << currentLine << '\n';
-      }
-      else
-      {
-        ss_data << currentLine << '\n';
-      }
+        std::getline( file, value );
+        return true;
     }
-    myfile.close();
-    parseDataFile = ss_data.str();
-    parseParamFile = ss_param.str();
-  }
-  else
-  {
-    //std::cout << "estimatorStatistics@LoadingStringFromFile error : Can't open file " << filename << std::endl;
-    return 0; //silent exit
-  }
-  return 1;
+    return false;
 }
 
-int ComputeStatisticsFromString ( const unsigned int idColumnData1, const unsigned int idColumnData2, const std::string & inputdata, const std::string & inputparam )
+/**
+ * @brief split Split a string by a delimiter, and return an array of string contening the splitted string
+ *
+ * @param[in] s the input string
+ * @param[in] delim the delimiter
+ * @param[out] elems array filled with splitted strings
+ */
+void split( const std::string & s, char delim, std::vector< std::string > & elems )
 {
-
-  std::vector<double> data1, data2;
-
-  boost::char_separator<char> sep_lines("\n");
-  boost::char_separator<char> sep_column(" ");
-
-  boost::tokenizer< boost::char_separator<char> > tokens_lines(inputdata, sep_lines);
-  BOOST_FOREACH (const std::string & line, tokens_lines)
-  {
-    boost::tokenizer< boost::char_separator<char> > tokens(line, sep_column);
-    boost::tokenizer< boost::char_separator<char> >::iterator beg = tokens.begin();
-    boost::tokenizer< boost::char_separator<char> >::iterator current = beg;
-
-    boost::tokenizer< boost::char_separator<char> >::iterator itdata1;
-    boost::tokenizer< boost::char_separator<char> >::iterator itdata2;
-
-    for ( int i = 0; i < idColumnData1; ++i )
-      ++current;
-    itdata1 = current;
-    current = beg;
-    for ( int i = 0; i < idColumnData2; ++i )
-      ++current;
-    itdata2 = current;
-
-    std::string cstring = ( (std::string)(*itdata1) );
-    if ( cstring != "NA" && cstring != "" )
+    std::stringstream ss( s );
+    std::string item;
+    while( std::getline( ss, item, delim ))
     {
-      data1.push_back ( atof ( cstring.c_str() ) );
+        elems.push_back( item );
     }
-    else
-    {
-      return 0;
-    }
-
-    cstring = ( (std::string)(*itdata2) );
-    if ( cstring != "NA" && cstring != "" )
-    {
-      data2.push_back ( atof ( cstring.c_str() ) );
-    }
-    else
-    {
-      return 0;
-    }
-  }
-
-  unsigned int sizeVector1 = data1.size();
-  unsigned int sizeVector2 = data2.size();
-  if ( sizeVector1 == 0 || sizeVector2 == 0 )
-  {
-    return 0;
-  }
-
-  double h = 0.0;
-  double radius = 0.0;
-
-  boost::tokenizer< boost::char_separator<char> > tokens_param(inputparam, sep_lines);
-  BOOST_FOREACH (const std::string & cline, tokens_param)
-  {
-    std::string line = cline;
-    if ( h != 0.0 && radius != 0.0 )
-      break;
-
-    unsigned int pos;
-
-    pos = line.find("# h = ");
-    if ( pos != std::string::npos )
-    {
-      h = atof ( (line.erase ( pos, 5 )).c_str() );
-      continue;
-    }
-
-    pos = line.find("# computed kernel radius = ");
-    if ( pos != std::string::npos)
-    {
-      radius = atof ( (line.erase ( pos, 26 )).c_str() );
-      continue;
-    }
-  }
-
-  if (h == 0.0 )
-  {
-    std::cout << "estimatorStatistics@ComputeStatisticsFromString error : h param can't found. h = " << h << std::endl;
-    return 0;
-  }
-
-  if ( sizeVector1 != sizeVector2 )
-  {
-    std::cout << "estimatorStatistics@ComputeStatisticsFromString error : data1 & data 2 haven't the same size." << sizeVector1 << " " << sizeVector2 << std::endl;
-    return 0;
-  }
-
-  double absd1d2 = 0.0;
-
-  double L1 = 0.0;
-  double L2 = 0.0;
-  double Linf = 0.0;
-
-  for ( int index = 0; index < sizeVector1; ++index )
-  {
-      absd1d2 = abs ( data1[index] - data2[index] );
-      if ( Linf < absd1d2 )
-          Linf = absd1d2;
-      L1 += absd1d2;
-      L2 += absd1d2 * absd1d2;
-  }
-
-  std::cout
-      << "# h | "
-      << "Kernel radius | "
-      << "L1 Mean Error | "
-      << "L2 Mean Error | "
-      << "Loo Mean Error"
-      << std::endl;
-
-  double meanL1 = L1 / (double)sizeVector1;
-  double meanL2 = ( sqrt ( L2 )) / (double)sizeVector1;
-  std::cout
-      << h << " "
-      << radius << " "
-      << meanL1 << " "
-      << meanL2 << " "
-      << Linf
-  << std::endl;
-
-  return 1;
 }
+
+/**
+ * @brief ComputeStatistics From two file names (string), and two column id, compute statistics (L1, L2, Loo).
+ * @param inputdata1 first filename to compare ("myFile1.dat")
+ * @param inputdata2 second filename to compare ("myFile2.dat")
+ * @param idColumnData1 id of the column to compare from first file
+ * @param idColumnData2 id of the column to compare from second file
+ * @param isMongeMean hack for some values. Check second file result orientation with first file result. ( file1 : 5, file2 = -5 -> 5 if isMongeMean = true )
+ * @param output an iterator who write string
+ * @return 1 if all is good, 0 else
+ */
+int ComputeStatistics ( const std::string & inputdata1,
+                        const std::string & inputdata2,
+                        const unsigned int & idColumnData1,
+                        const unsigned int & idColumnData2,
+                        const bool & isMongeMean,
+                        std::ofstream & output )
+{
+    std::ifstream file1( inputdata1.c_str() );
+    std::ifstream file2( inputdata2.c_str() );
+
+    double absd1d2;
+    double L1 = 0.0;
+    double L2 = 0.0;
+    double Linf = 0.0;
+
+    std::string s1, s2;
+    double v1, v2;
+    double h = - std::numeric_limits<double>::max();
+
+    unsigned int nb_elements = 0;
+    bool finish = false;
+    while(( LoadingStringFromFile( file1, s1 ) && LoadingStringFromFile( file2, s2 )) && !finish )
+    {
+        while ( s1[ 0 ] == '#' )
+        {
+            int p = s1.find( "# h = " );
+            if ( p != std::string::npos )
+            {
+                h = atof((s1.erase( p, 5 )).c_str());
+            }
+            if( ! LoadingStringFromFile( file1, s1 ) )
+            {
+                s1 = "NA";
+                finish = true;
+            }
+        }
+
+        while ( s2[ 0 ] == '#' )
+        {
+            if( ! LoadingStringFromFile( file2, s2 ) )
+            {
+                s2 = "NA";
+                finish = true;
+            }
+        }
+
+        if ( s1 == "NA" || s1 == "-nan" || s1 == "-inf" || s1 == "inf" || s1 == "" || s1 == " " )
+            continue;
+        if ( s2 == "NA" || s2 == "-nan" || s2 == "-inf" || s2 == "inf" || s2 == "" || s2 == " " )
+            continue;
+
+        std::vector< std::string > elems1;
+        split( s1, ' ', elems1 );
+        std::vector< std::string > elems2;
+        split( s2, ' ', elems2 );
+
+        if( elems1.size() <= idColumnData1 )
+        {
+            std::cerr << "Can't found " << idColumnData1 << " column on file1 (" << inputdata1 << "). Is the file/column exist ?" << std::endl;
+            continue;
+        }
+        if( elems2.size() <= idColumnData2 )
+        {
+            std::cerr << "Can't found " << idColumnData2 << " column on file2 (" << inputdata2 << "). Is the file/column exist ?" << std::endl;
+            continue;
+        }
+
+        v1 = atof( elems1[ idColumnData1 ].c_str() );
+        v2 = atof( elems2[ idColumnData2 ].c_str() );
+
+        if( isMongeMean && (( v1 >= 0.0 ) ^ ( v2 >= 0.0 ))) // hack for Monge. Can be reversed.
+        {
+            v2 = -v2;
+        }
+
+        absd1d2 = std::abs ( v1 - v2 );
+        if ( Linf < absd1d2 )
+        {
+            Linf = absd1d2;
+        }
+        L1 += absd1d2;
+        L2 += absd1d2 * absd1d2;
+
+        ++nb_elements;
+    }
+
+    if( h == - std::numeric_limits<double>::max())
+    {
+        std::cerr << "Can't found h value on file1 (" << inputdata1 << "). Is the file exist ?" << std::endl;
+        return 0;
+    }
+
+    double meanL1 = L1 / (double)nb_elements;
+    double meanL2 = ( sqrt ( L2 )) / (double)nb_elements;
+
+    output << h << " "
+           << meanL1 << " "
+           << meanL2 << " "
+           << Linf
+           << std::endl;
+
+    return 1;
+}
+
+/**
+ * Missing parameter error message.
+ *
+ * @param param
+ */
+void missingParam( std::string param )
+{
+    trace.error() << " Parameter: " << param << " is required.";
+    trace.info() << std::endl;
+    exit( 1 );
+}
+
+namespace po = boost::program_options;
 
 int main( int argc, char** argv )
 {
-  if (argc != 4)
-  {
-    std::cout << "argc = " << argc << std::endl;
-    std::cout << "ERROR. You need to specify a file and two column ID" << std::endl;
-  }
-  std::string filename = argv[1];
-  int column1 = atoi(argv[2]);
-  int column2 = atoi(argv[3]);
+    po::options_description general_opt("Allowed options are");
+    general_opt.add_options()
+            ("help,h", "display this message")
+            ("file1,f", po::value< std::string >(), "File 1")
+            ("file2,F", po::value< std::string >(), "File 2")
+            ("column1,c",  po::value< unsigned int >(), "Column of file 1" )
+            ("column2,C",  po::value< unsigned int >(), "Column of file 2" )
+            ("output,o", po::value< std::string >(), "Output file")
+            ("monge,m",  po::value< bool >()->default_value( false ), "Is from Monge mean computation (optional)" );
 
-  std::string inputData;
-  std::string inputParam;
 
-  if ( LoadingStringFromFile ( inputData, inputParam, filename ) == 0 )
-    return 0;
-  if ( ComputeStatisticsFromString ( column1, column2, inputData, inputParam ) == 0 )
-    return 0;
+    bool parseOK = true;
+    po::variables_map vm;
+    try
+    {
+        po::store( po::parse_command_line( argc, argv, general_opt ), vm );
+    }
+    catch( const std::exception & ex )
+    {
+        parseOK = false;
+        trace.info() << "Error checking program options: " << ex.what() << std::endl;
+    }
+    po::notify( vm );
+    if( !parseOK || vm.count("help") || argc <= 1 )
+    {
+        trace.info()<< "Compute satistics (L1, L2, Loo) from results of two extimators" <<std::endl
+                    << "Basic usage: "<<std::endl
+                    << "\tstatisticsEstimators_0memory --file1 <file1> --column1 <column1> --file2 <file2> --column2 <column2> --output <output>"<<std::endl
+                    << std::endl;
 
-  return 0;
+        return 0;
+    }
+
+
+    if (!(vm.count("file1"))) missingParam("--file1");
+    if (!(vm.count("file2"))) missingParam("--file2");
+    if (!(vm.count("column1"))) missingParam("--column1");
+    if (!(vm.count("column2"))) missingParam("--column2");
+    if (!(vm.count("output"))) missingParam("--output");
+
+    std::string filename1 = vm["file1"].as< std::string >();
+    std::string filename2 = vm["file2"].as< std::string >();
+    unsigned int column1 = vm["column1"].as< unsigned int >();
+    unsigned int column2 = vm["column2"].as< unsigned int >();
+    std::string output_filename = vm["output"].as< std::string >();
+    bool isMongeMean = vm["monge"].as< bool >();
+
+    std::ofstream file( output_filename.c_str(), std::ofstream::out | std::ofstream::app );
+
+    if( file.eof() )
+    {
+        file << "# h | "
+             << "L1 Mean Error | "
+             << "L2 Mean Error | "
+             << "Loo Mean Error"
+             << std::endl;
+    }
+
+    if ( ComputeStatistics( filename1, filename2, column1, column2, isMongeMean, file ) == 0 )
+    {
+        file.close();
+        return -1;
+    }
+
+    file.close();
+    return 1;
 }
