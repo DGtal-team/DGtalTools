@@ -22,6 +22,12 @@
 		* Measures from voxel partition (true/false+-, precision recall, f-measure) 
 		* Measures bases on euclidean distance between the two Shape A and B.
 
+* estimators:
+	- 2dLocalEstimators: Improvement of 2dLocalEstimators + possibility to compare with noised data.
+	- 3dLocalEstimators: Adding possibility to compare curvature (mean, gaussian and principal curvatures)
+	  with Integral Invariant and Monge via Jet Fitting + possibility to compare with noised data.
+
+
 * volumetric/volTools:
 	volTools directory moved into volumetric.
 
