@@ -53,8 +53,8 @@
 
 //processing
 #include "DGtal/geometry/curves/ArithmeticalDSSComputer.h"
-#include "DGtal/geometry/curves/GreedyDecomposition.h"
-#include "DGtal/geometry/curves/MaximalSegments.h"
+#include "DGtal/geometry/curves/GreedySegmentation.h"
+#include "DGtal/geometry/curves/SaturatedSegmentation.h"
 #include "DGtal/geometry/curves/FP.h"
 
 //boost
@@ -194,18 +194,20 @@ int main( int argc, char** argv )
 	if (processingName == "DSS") {
 
           typedef ArithmeticalDSSComputer<std::vector<Z2i::Point>::iterator,int,4> DSS4;
-          typedef deprecated::GreedyDecomposition<DSS4> Decomposition4;
+          typedef GreedySegmentation<DSS4> Decomposition4;
 
-          //Segmentation
 	  DSS4 computer;
-          Decomposition4 theDecomposition( vPts.begin(),vPts.end(),computer,isClosed );
+          Decomposition4 theDecomposition( vPts.begin(),vPts.end(),computer );
+
           //for each segment
-          aBoard << SetMode( computer.className(), "BoundingBox" );
-          std::string className = computer.className() + "/BoundingBox";
-          for ( Decomposition4::SegmentIterator it = theDecomposition.begin();
+          std::string className;
+          for ( Decomposition4::SegmentComputerIterator it = theDecomposition.begin();
 		it != theDecomposition.end(); ++it ) 
             {
-	      DSS4 segment(*it);
+	      DSS4::Primitive segment(it->primitive());
+
+	      aBoard << SetMode( segment.className(), "BoundingBox" );
+	      className = segment.className() + "/BoundingBox";
 	      aBoard << CustomStyle( className, 
 				     new CustomPenColor( DGtal::Color::Gray ) ); 
 	      aBoard << segment; // draw each segment
@@ -214,24 +216,25 @@ int main( int argc, char** argv )
 	} else if (processingName == "MS") {
 
           typedef ArithmeticalDSSComputer<std::vector<Z2i::Point>::iterator,int,4> DSS4;
-          typedef deprecated::MaximalSegments<DSS4> Decomposition4;
+          typedef SaturatedSegmentation<DSS4> Decomposition4;
 
           //Segmentation
 	  DSS4 computer;
-          Decomposition4 theDecomposition( vPts.begin(),vPts.end(),computer,isClosed );
+          Decomposition4 theDecomposition( vPts.begin(),vPts.end(),computer );
 
           //for each segment
-          aBoard << SetMode( computer.className(), "BoundingBox" );
-          std::string className = computer.className() + "/BoundingBox";
-          for ( Decomposition4::SegmentIterator it = theDecomposition.begin();
+          std::string className;
+          for ( Decomposition4::SegmentComputerIterator it = theDecomposition.begin();
 		it != theDecomposition.end(); ++it ) 
             {
-	      DSS4 segment(*it);
+	      DSS4::Primitive segment(it->primitive());
+
+	      aBoard << SetMode( segment.className(), "BoundingBox" );
+	      className = segment.className() + "/BoundingBox";
 	      aBoard << CustomStyle( className, 
-				     new CustomPenColor( DGtal::Color::Black ) ); 
+				     new CustomPenColor( DGtal::Color::Gray ) ); 
 	      aBoard << segment; // draw each segment
             } 
-
 
 	} else if (processingName == "FP") {
 

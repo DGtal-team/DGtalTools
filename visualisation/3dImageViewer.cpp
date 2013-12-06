@@ -37,6 +37,7 @@
 #include "DGtal/io/viewers/Viewer3D.h"
 #include "DGtal/io/DrawWithDisplay3DModifier.h"
 #include "DGtal/io/readers/PointListReader.h"
+#include "DGtal/io/readers/MeshReader.h"
 #include "DGtal/topology/helpers/Surfaces.h"
 #include "DGtal/topology/SurfelAdjacency.h"
 
@@ -84,9 +85,11 @@ int main( int argc, char** argv )
     ("thresholdMin,m",  po::value<int>()->default_value(0), "threshold min to define binary shape" ) 
     ("thresholdMax,M",  po::value<int>()->default_value(255), "threshold max to define binary shape" )
     ("displaySDP,s", po::value<std::string>(), "display a set of discrete points (.sdp)" )
+    ("displayMesh", po::value<std::string>(), "display a Mesh given in OFF or OFS format. " )
     ("displayDigitalSurface", "display the digital surface instead of display all the set of voxels (used with thresholdImage or displaySDP options)" )
     ("colorizeCC", "colorize each Connected Components of the surface displayed by displayDigitalSurface option." )
     ("colorSDP,c", po::value<std::vector <int> >()->multitoken(), "set the color  discrete points: r g b a " )
+    ("colorMesh", po::value<std::vector <int> >()->multitoken(), "set the color of Mesh (given from displayMesh option) : r g b a " )
     ("scaleX,x",  po::value<float>()->default_value(1.0), "set the scale value in the X direction (default 1.0)" )
     ("scaleY,y",  po::value<float>()->default_value(1.0), "set the scale value in the Y direction (default 1.0)" )
     ("scaleZ,z",  po::value<float>()->default_value(1.0), "set the scale value in the Z direction (default 1.0)")
@@ -201,6 +204,10 @@ int main( int argc, char** argv )
   if(vm.count("displaySDP")){
     if(vm.count("colorSDP")){
       std::vector<int> vcol= vm["colorSDP"].as<std::vector<int > >();
+      if(vcol.size()<4){
+        trace.error() << "Not enough parameter: color specification should contains four elements: red, green, blue and alpha values."  << std::endl;
+        return 0;
+      }
       Color c(vcol[0], vcol[1], vcol[2], vcol[3]);
       viewer << CustomColors3D(c, c);
     }
@@ -212,6 +219,22 @@ int main( int argc, char** argv )
 	set3d.insert(vectVoxels.at(i));
       }
     }
+  }
+  
+  if(vm.count("displayMesh")){
+    if(vm.count("colorMesh")){
+      std::vector<int> vcol= vm["colorMesh"].as<std::vector<int > >();
+      if(vcol.size()<4){
+        trace.error() << "Not enough parameter: color specification should contains four elements: red, green, blue and alpha values." << std::endl;
+        return 0;
+      }
+      Color c(vcol[0], vcol[1], vcol[2], vcol[3]);
+      viewer.setFillColor(c);
+    }
+    
+    DGtal::Mesh<Z3i::RealPoint> aMesh;
+    MeshReader<Z3i::RealPoint>::importOFFFile(vm["displayMesh"].as<std::string>(), aMesh);
+    viewer << aMesh;
   }
   
   if(vm.count("displayDigitalSurface")){

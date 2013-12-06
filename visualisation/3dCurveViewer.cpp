@@ -62,13 +62,13 @@ using namespace DGtal;
 using namespace std;
 
 const Color  AXIS_COLOR( 0, 0, 0, 255 );
-const double AXIS_LINESIZE = 2.0;
+const double AXIS_LINESIZE = 0.1;
 const Color  XY_COLOR( 0, 0, 255, 50 );
 const Color  XZ_COLOR( 0, 255, 0, 50 );
 const Color  YZ_COLOR( 255, 0, 0, 50 );
 const Color  CURVE3D_COLOR( 100, 100, 140, 128 );
 const Color  CURVE2D_COLOR( 200, 200, 200, 100 );
-const double MS3D_LINESIZE = 3.0;
+const double MS3D_LINESIZE = 0.05;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Functions for displaying the tangential cover of a 3D curve.
@@ -219,13 +219,14 @@ void displayDSS2d( Viewer3D<space, kspace> & viewer,
   Point3d b = ks.lowerBound();
   for ( DGtal::Dimension i = 0; i < 3; ++i )
     {
-      const ArithmeticalDSSComputer2d & dss2d = dss3d.arithmeticalDSS2d( i );
+      const typename ArithmeticalDSSComputer2d::Primitive & dss2d 
+	= dss3d.arithmeticalDSS2d( i ).primitive();
       // draw 2D bounding boxes for each arithmetical dss 2D.
       std::vector<PointD2d> pts2d;
-      pts2d.push_back( dss2d.project(*dss2d.myF, dss2d.myUf) );
-      pts2d.push_back( dss2d.project(*dss2d.myF, dss2d.myLf) );
-      pts2d.push_back( dss2d.project(*dss2d.myL, dss2d.myLf) );
-      pts2d.push_back( dss2d.project(*dss2d.myL, dss2d.myUf) );
+      pts2d.push_back( dss2d.project(dss2d.back(), dss2d.Uf()) );
+      pts2d.push_back( dss2d.project(dss2d.back(), dss2d.Lf()) );
+      pts2d.push_back( dss2d.project(dss2d.front(), dss2d.Lf()) );
+      pts2d.push_back( dss2d.project(dss2d.front(), dss2d.Uf()) );
       std::vector<PointD3D> bb;
       PointD3D p3;
       for ( unsigned int j = 0; j < pts2d.size(); ++j )
@@ -282,11 +283,11 @@ bool displayCover( Viewer3D<space, kspace> & viewer,
                    << " [" << f[ 0 ] << "," << f[ 1 ] << ","<< f[ 2 ] << "]"
                    << "->[" << l[ 0 ] << "," << l[ 1 ] << ","<< l[ 2 ] << "]"
                    << ", XY("
-                   << dssXY.getA() << "," << dssXY.getB() << "," << dssXY.getMu()
+                   << dssXY.a() << "," << dssXY.b() << "," << dssXY.mu()
                    << "), XZ("
-                   << dssXZ.getA() << "," << dssXZ.getB() << "," << dssXZ.getMu()
+                   << dssXZ.a() << "," << dssXZ.b() << "," << dssXZ.mu()
                    << "), YZ("
-                   << dssYZ.getA() << "," << dssYZ.getB() << "," << dssYZ.getMu()
+                   << dssYZ.a() << "," << dssYZ.b() << "," << dssYZ.mu()
                    << ")" << std::endl;
       //trace.info() << ms3d << std::endl;  // information
 

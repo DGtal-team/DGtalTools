@@ -255,7 +255,7 @@ lengthEstimators( const std::string & /*name*/,
     trueLengthEstimator.init( h, rp.begin(), rp.end(), &aShape, gridcurve.isClosed());
 
     L1LengthEstimator< typename ArrowsRange::ConstCirculator > l1length;
-    DSSLengthEstimator< typename PointsRange::ConstIterator > DSSlength;
+    DSSLengthEstimator< typename PointsRange::ConstCirculator > DSSlength;
     MLPLengthEstimator< typename PointsRange::ConstIterator > MLPlength;
     FPLengthEstimator< typename PointsRange::ConstIterator > FPlength;
     BLUELocalLengthEstimator< typename ArrowsRange::ConstIterator > BLUElength;
@@ -285,7 +285,7 @@ lengthEstimators( const std::string & /*name*/,
     Trosen = c.stopClock();
     
     c.startClock();
-    DSSlength.init(h, rp.begin(), rp.end(), gridcurve.isClosed());
+    DSSlength.init(h, rp.c(), rp.c());
     dss = DSSlength.eval();
     Tdss = c.stopClock();
     
@@ -294,7 +294,7 @@ lengthEstimators( const std::string & /*name*/,
     mlp = MLPlength.eval();
     Tmlp = c.stopClock();
 
-    c.startClock();;
+    c.startClock();
     FPlength.init(h, rp.begin(), rp.end(), gridcurve.isClosed());
     fp = FPlength.eval();
     Tfp = c.stopClock();

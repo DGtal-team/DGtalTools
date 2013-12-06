@@ -162,9 +162,10 @@ int main( int argc, char** argv )
       }     
     }
   }else if(extension=="sdp"){
-    vector<Z3i::Point> vectVoxels = PointListReader<Z3i::Point>::getPointsFromFile(inputFilename);
+    vector<Z3i::RealPoint> vectVoxels = PointListReader<Z3i::RealPoint>::getPointsFromFile(inputFilename);
     for(int i=0;i< vectVoxels.size(); i++){
-      viewer << vectVoxels.at(i);
+      viewer << vectVoxels.at(i);//Z3i::Point((unsigned int)vectVoxels.at(i)[0],(unsigned int)vectVoxels.at(i)[1],
+      //(unsigned int )vectVoxels.at(i)[2]);
     }
   }
   viewer << Viewer3D<>::updateDisplay;
