@@ -64,7 +64,7 @@
 
 //processing
 #include "DGtal/geometry/curves/ArithmeticalDSS.h"
-#include "DGtal/geometry/curves/GreedyDecomposition.h"
+#include "DGtal/geometry/curves/GreedySegmentation.h"
 #include "DGtal/geometry/curves/MaximalSegments.h"
 #include "DGtal/geometry/curves/FP.h"
 
