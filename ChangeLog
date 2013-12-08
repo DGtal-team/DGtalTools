@@ -39,6 +39,11 @@
 	- 3dCurvatureViewer: Now allow to draw principal curvature directions on objets.
 	- 3dCurvatureViewerNoise: Same as 3dCurvatureViewer, but allow to add some noise to objects.
 
+
+* distanceTransform
+	- LUTBasedNSDistanceTransform: Compute the 2D translated neighborhood-sequence distance transform of a binary image.
+	- CumulativeSequenceTest and RationalBeattySequenceTest: tests from LUTBasedNSDistanceTransform.
+
 	====  Release 0.6 ====
 
 * estimators/:
