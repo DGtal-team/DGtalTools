@@ -39,6 +39,11 @@
 ///////////////////////////////////////////////////////////////////////////////
 #include <iostream>
 #include "DGtal/base/Common.h"
+#include <cstring>
+
+#include <boost/program_options/options_description.hpp>
+#include <boost/program_options/parsers.hpp>
+#include <boost/program_options/variables_map.hpp>
 
 // Shape constructors
 #include "DGtal/io/readers/VolReader.h"
@@ -76,245 +81,288 @@ const double AXIS_LINESIZE = 0.1;
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void usage( int argc, char** argv )
+/**
+ * Missing parameter error message.
+ *
+ * @param param
+ */
+void missingParam( std::string param )
 {
-    trace.info() << "Usage: " << argv[ 0 ]
-          << " <fileName.vol> <re> <\"mean\" || \"gaussian\" || \"princurv{1,2}\"> <noise>"<< std::endl;
-    trace.info() << "\t - <filename.vol> file you want to show the curvature information."<< std::endl;
-    trace.info() << "\t - <re> Euclidean radius of the kernel."<< std::endl;
-    trace.info() << "\t - <\"mean\" || \"gaussian\" || \"princurv{1,2}\"> show mean or Gaussian curvature on shape."<< std::endl;
-    trace.info() << "\t - <noise> is the level of Kanungo noise ( double value in ]0,1[ )."<< std::endl;
-    trace.info() << "Example : "<< argv[ 0 ] << " Al.150.vol 7 \"princurv1\" 0.5" << std::endl;
+  trace.error() << " Parameter: " << param << " is required.";
+  trace.info() << std::endl;
+  exit( 1 );
 }
+
+namespace po = boost::program_options;
 
 int main( int argc, char** argv )
 {
-    if ( argc != 5 )
+  // parse command line ----------------------------------------------
+  po::options_description general_opt("Allowed options are");
+  general_opt.add_options()
+      ("help,h", "display this message")
+      ("file,f", po::value< std::string >(), ".vol file")
+      ("radius,r",  po::value< double >(), "Kernel radius for IntegralInvariant" )
+      ("noise,n",  po::value< double >(), "Level of Kanungo noise ]0;1[" )
+      ("properties,p", po::value< std::string >(), "type of output : mean, gaussian, prindir1 or prindir2");
+
+  bool parseOK = true;
+  po::variables_map vm;
+  try
+  {
+    po::store( po::parse_command_line( argc, argv, general_opt ), vm );
+  }
+  catch( const std::exception & ex )
+  {
+    parseOK = false;
+    trace.info() << "Error checking program options: " << ex.what() << std::endl;
+  }
+  po::notify( vm );
+
+  if (!(vm.count("file"))) missingParam("--file");
+  if (!(vm.count("radius"))) missingParam("--radius");
+  if (!(vm.count("noise"))) missingParam("--noise");
+  if (!(vm.count("properties"))) missingParam("--properties");
+  double h = 1.0;
+  double re_convolution_kernel = vm["radius"].as< double >();
+
+  bool somethingWrong = false;
+  std::string mode = vm["properties"].as< std::string >();
+  if (( mode.compare("gaussian") != 0 ) && ( mode.compare("mean") != 0 ) && ( mode.compare("prindir1") != 0 ) && ( mode.compare("prindir2") != 0 ))
+  {
+    somethingWrong = true;
+  }
+
+  double noiseLevel = vm["noise"].as< double >();
+  if( noiseLevel < 0.0 || noiseLevel > 1.0 )
+  {
+    somethingWrong = true;
+  }
+
+  if( somethingWrong || !parseOK || vm.count("help") || argc <= 1 )
+  {
+    trace.info()<< "Visualisation of 3d curvature from .vol file using curvature from Integral Invariant" <<std::endl
+                << "Basic usage: "<<std::endl
+                << "\t3dCurvatureViewer --file <file.vol> --radius <radius> --noise <noise> --properties <\"mean\">"<<std::endl
+                << std::endl
+                << "Below are the different available properties: " << std::endl
+                << "\t - \"mean\" for the mean curvature" << std::endl
+                << "\t - \"gaussian\" for the Gaussian curvature" << std::endl
+                << "\t - \"prindir1\" for the first principal curvature direction" << std::endl
+                << "\t - \"prindir2\" for the second principal curvature direction" << std::endl
+                << std::endl;
+    return 0;
+  }
+
+
+  // Construction of the shape from vol file
+  typedef Z3i::Space::RealPoint RealPoint;
+  typedef Z3i::Point Point;
+  typedef ImageSelector< Z3i::Domain, bool>::Type Image;
+  typedef SimpleThresholdForegroundPredicate< Image > ImagePredicate;
+  typedef Z3i::KSpace KSpace;
+  typedef typename KSpace::SCell SCell;
+  typedef typename KSpace::Cell Cell;
+  typedef typename KSpace::Surfel Surfel;
+  typedef KanungoNoise< ImagePredicate, Z3i::Domain > KanungoPredicate;
+  typedef LightImplicitDigitalSurface< Z3i::KSpace, KanungoPredicate > MyLightImplicitDigitalSurface;
+  typedef DigitalSurface< MyLightImplicitDigitalSurface > MyDigitalSurface;
+
+  std::string filename = vm["file"].as< std::string >();
+  Image image = VolReader<Image>::importVol( filename );
+  ImagePredicate predicate = ImagePredicate( image, 0 );
+
+  Z3i::Domain domain = image.domain();
+
+  Z3i::KSpace K;
+
+  bool space_ok = K.init( domain.lowerBound(), domain.upperBound(), true );
+  if (!space_ok)
+  {
+    trace.error() << "Error in the Khalimsky space construction."<<std::endl;
+    return 2;
+  }
+
+  CanonicSCellEmbedder< KSpace > embedder( K );
+
+  SurfelAdjacency< Z3i::KSpace::dimension > SAdj( true );
+  KanungoPredicate * noisifiedObject = new KanungoPredicate( predicate, domain, noiseLevel );
+  Surfel bel = Surfaces< Z3i::KSpace >::findABel( K, *noisifiedObject, 100000 );
+  MyLightImplicitDigitalSurface LightImplDigSurf( K, *noisifiedObject, SAdj, bel );
+  MyDigitalSurface digSurf( LightImplDigSurf );
+
+  typedef DepthFirstVisitor<MyDigitalSurface> Visitor;
+  typedef GraphVisitorRange< Visitor > VisitorRange;
+  typedef VisitorRange::ConstIterator SurfelConstIterator;
+  VisitorRange range( new Visitor( digSurf, *digSurf.begin() ) );
+  SurfelConstIterator abegin = range.begin();
+  SurfelConstIterator aend = range.end();
+
+  typedef ImageToConstantFunctor< Image, KanungoPredicate > MyPointFunctor;
+  MyPointFunctor pointFunctor( &image, noisifiedObject, 1 );
+
+  // Integral Invariant stuff
+
+  typedef FunctorOnCells< MyPointFunctor, Z3i::KSpace > MyCellFunctor;
+  MyCellFunctor functor ( pointFunctor, K ); // Creation of a functor on Cells, returning true if the cell is inside the shape
+
+  QApplication application( argc, argv );
+  typedef Viewer3D<Z3i::Space, Z3i::KSpace> Viewer;
+  Viewer viewer( K );
+  viewer.show();
+  //    viewer << SetMode3D(image.domain().className(), "BoundingBox") << image.domain();
+
+  VisitorRange range2( new Visitor( digSurf, *digSurf.begin() ) );
+  SurfelConstIterator abegin2 = range2.begin();
+
+  trace.beginBlock("curvature computation");
+  if( ( mode.compare("gaussian") == 0 ) || ( mode.compare("mean") == 0 ) )
+  {
+    typedef double Quantity;
+    std::vector< Quantity > results;
+    back_insert_iterator< std::vector< Quantity > > resultsIterator( results ); // output iterator for results of Integral Invariante curvature computation
+
+    if ( ( mode.compare("mean") == 0 ) )
     {
-        usage( argc, argv );
-        return 0;
+      typedef IntegralInvariantMeanCurvatureEstimator< Z3i::KSpace, MyCellFunctor > MyIIMeanEstimator;
+
+      MyIIMeanEstimator estimator ( K, functor );
+      estimator.init( h, re_convolution_kernel ); // Initialisation for a given Euclidean radius of the convolution kernel
+      estimator.eval ( abegin, aend, resultsIterator ); // Computation
+    }
+    else if ( ( mode.compare("gaussian") == 0 ) )
+    {
+      typedef IntegralInvariantGaussianCurvatureEstimator< Z3i::KSpace, MyCellFunctor > MyIIGaussianEstimator;
+
+      MyIIGaussianEstimator estimator ( K, functor );
+      estimator.init( h, re_convolution_kernel ); // Initialisation for a given Euclidean radius of the convolution kernel
+      estimator.eval ( abegin, aend, resultsIterator ); // Computation
     }
 
-    double h = 1.0;
-    double re_convolution_kernel = atof(argv[2]);
-
-    std::string mode = argv[ 3 ];
-    if (( mode.compare("gaussian") != 0 ) && ( mode.compare("mean") != 0 ) && ( mode.compare("princurv1") != 0 ) && ( mode.compare("princurv2") != 0 ))
+    // Drawing results
+    Quantity min = numeric_limits < Quantity >::max();
+    Quantity max = numeric_limits < Quantity >::min();
+    for ( unsigned int i = 0; i < results.size(); ++i )
     {
-        usage( argc, argv );
-        return 0;
+      if ( results[ i ] < min )
+      {
+        min = results[ i ];
+      }
+      else if ( results[ i ] > max )
+      {
+        max = results[ i ];
+      }
     }
 
-    double noiseLevel = atof(argv[4]);
+    typedef GradientColorMap< Quantity > Gradient;
+    Gradient cmap_grad( min, max );
+    cmap_grad.addColor( Color( 50, 50, 255 ) );
+    cmap_grad.addColor( Color( 255, 0, 0 ) );
+    cmap_grad.addColor( Color( 255, 255, 10 ) );
 
-    // Construction of the shape from vol file
-    typedef Z3i::Space::RealPoint RealPoint;
-    typedef Z3i::Point Point;
-    typedef ImageSelector< Z3i::Domain, bool>::Type Image;
-    typedef SimpleThresholdForegroundPredicate< Image > ImagePredicate;
-    typedef Z3i::KSpace KSpace;
-    typedef typename KSpace::SCell SCell;
-    typedef typename KSpace::Cell Cell;
-    typedef typename KSpace::Surfel Surfel;
-    typedef KanungoNoise< ImagePredicate, Z3i::Domain > KanungoPredicate;
-    typedef LightImplicitDigitalSurface< Z3i::KSpace, KanungoPredicate > MyLightImplicitDigitalSurface;
-    typedef DigitalSurface< MyLightImplicitDigitalSurface > MyDigitalSurface;
-
-    std::string filename = argv[1];
-    Image image = VolReader<Image>::importVol( filename );
-    ImagePredicate predicate = ImagePredicate( image, 0 );
-
-    Z3i::Domain domain = image.domain();
-
-    Z3i::KSpace K;
-
-    bool space_ok = K.init( domain.lowerBound(), domain.upperBound() + Point(1,1,1), true );
-    if (!space_ok)
+    for ( unsigned int i = 0; i < results.size(); ++i )
     {
-      trace.error() << "Error in the Khalimsky space construction."<<std::endl;
-      return 2;
+      viewer << CustomColors3D( Color::Black, cmap_grad( results[ i ] ))
+             << *abegin2;
+      ++abegin2;
     }
+  }
+  else
+  {
+    typedef double Quantity;
+    typedef EigenValues3D< Quantity >::Matrix33 Matrix3x3;
+    typedef EigenValues3D< Quantity >::Vector3 Vector3;
+    typedef CurvatureInformations CurvInformation;
 
-    SurfelAdjacency< Z3i::KSpace::dimension > SAdj( true );
-    KanungoPredicate * noisifiedObject = new KanungoPredicate( predicate, domain, noiseLevel );
-    Surfel bel = Surfaces< Z3i::KSpace >::findABel( K, *noisifiedObject, 100000 );
-    MyLightImplicitDigitalSurface LightImplDigSurf( K, *noisifiedObject, SAdj, bel );
-    MyDigitalSurface digSurf( LightImplDigSurf );
+    std::vector< CurvInformation > results;
+    back_insert_iterator< std::vector< CurvInformation > > resultsIterator( results ); // output iterator for results of Integral Invariante curvature computation
 
-    typedef DepthFirstVisitor<MyDigitalSurface> Visitor;
-    typedef GraphVisitorRange< Visitor > VisitorRange;
-    typedef VisitorRange::ConstIterator SurfelConstIterator;
-    VisitorRange range( new Visitor( digSurf, *digSurf.begin() ) );
-    SurfelConstIterator abegin = range.begin();
-    SurfelConstIterator aend = range.end();
+    typedef IntegralInvariantGaussianCurvatureEstimator< Z3i::KSpace, MyCellFunctor > MyIIGaussianEstimator;
 
-    typedef ImageToConstantFunctor< Image, KanungoPredicate > MyPointFunctor;
-    MyPointFunctor pointFunctor( &image, noisifiedObject, 1 );
+    MyIIGaussianEstimator estimator ( K, functor );
+    estimator.init ( h, re_convolution_kernel ); // Initialisation for a given Euclidean radius of the convolution kernel
+    estimator.evalPrincipalCurvatures ( abegin, aend, resultsIterator ); // Computation
 
-    // Integral Invariant stuff
+    trace.endBlock();
 
-    typedef FunctorOnCells< MyPointFunctor, Z3i::KSpace > MyCellFunctor;
-    MyCellFunctor functor ( pointFunctor, K ); // Creation of a functor on Cells, returning true if the cell is inside the shape
+    trace.beginBlock("viewer");
 
-    QApplication application( argc, argv );
-    typedef Viewer3D<Z3i::Space, Z3i::KSpace> Viewer;
-    Viewer viewer( K );
-    viewer.show();
-//    viewer << SetMode3D(image.domain().className(), "BoundingBox") << image.domain();
+    // Drawing results
+    typedef  Matrix3x3::RowVector RowVector;
+    typedef  Matrix3x3::ColumnVector ColumnVector;
 
-    VisitorRange range2( new Visitor( digSurf, *digSurf.begin() ) );
-    SurfelConstIterator abegin2 = range2.begin();
-
-    trace.beginBlock("curvature computation");
-    if( ( mode.compare("gaussian") == 0 ) || ( mode.compare("mean") == 0 ) )
+    for ( unsigned int i = 0; i < results.size(); ++i )
     {
-        typedef double Quantity;
-        std::vector< Quantity > results;
-        back_insert_iterator< std::vector< Quantity > > resultsIterator( results ); // output iterator for results of Integral Invariante curvature computation
-
-        if ( ( mode.compare("mean") == 0 ) )
-        {
-            typedef IntegralInvariantMeanCurvatureEstimator< Z3i::KSpace, MyCellFunctor > MyIIMeanEstimator;
-
-            MyIIMeanEstimator estimator ( K, functor );
-            estimator.init( h, re_convolution_kernel ); // Initialisation for a given Euclidean radius of the convolution kernel
-            estimator.eval ( abegin, aend, resultsIterator ); // Computation
-        }
-        else if ( ( mode.compare("gaussian") == 0 ) )
-        {
-            typedef IntegralInvariantGaussianCurvatureEstimator< Z3i::KSpace, MyCellFunctor > MyIIGaussianEstimator;
-
-            MyIIGaussianEstimator estimator ( K, functor );
-            estimator.init( h, re_convolution_kernel ); // Initialisation for a given Euclidean radius of the convolution kernel
-            estimator.eval ( abegin, aend, resultsIterator ); // Computation
-        }
-
-        // Drawing results
-        Quantity min = numeric_limits < Quantity >::max();
-        Quantity max = numeric_limits < Quantity >::min();
-        for ( unsigned int i = 0; i < results.size(); ++i )
-        {
-            if ( results[ i ] < min )
-            {
-                min = results[ i ];
-            }
-            else if ( results[ i ] > max )
-            {
-                max = results[ i ];
-            }
-        }
-
-        typedef GradientColorMap< Quantity > Gradient;
-        Gradient cmap_grad( min, max );
-        cmap_grad.addColor( Color( 50, 50, 255 ) );
-        cmap_grad.addColor( Color( 255, 0, 0 ) );
-        cmap_grad.addColor( Color( 255, 255, 10 ) );
-
-        for ( unsigned int i = 0; i < results.size(); ++i )
-        {
-//            std::cout << results[ i ] << std::endl;
-            viewer << CustomColors3D( Color::Black, cmap_grad( results[ i ] ))
-                   << *abegin2;
-            ++abegin2;
-        }
-    }
-    else
-    {
-        typedef double Quantity;
-        typedef EigenValues3D< Quantity >::Matrix33 Matrix3x3;
-        typedef EigenValues3D< Quantity >::Vector3 Vector3;
-        typedef CurvatureInformations CurvInformation;
-
-        std::vector< CurvInformation > results;
-        back_insert_iterator< std::vector< CurvInformation > > resultsIterator( results ); // output iterator for results of Integral Invariante curvature computation
-
-        typedef IntegralInvariantGaussianCurvatureEstimator< Z3i::KSpace, MyCellFunctor > MyIIGaussianEstimator;
-
-        MyIIGaussianEstimator estimator ( K, functor );
-        estimator.init ( h, re_convolution_kernel ); // Initialisation for a given Euclidean radius of the convolution kernel
-        estimator.evalPrincipalCurvatures ( abegin, aend, resultsIterator ); // Computation
-
-        trace.endBlock();
-
-        trace.beginBlock("viewer");
-
-        // Drawing results
-        typedef  Matrix3x3::RowVector RowVector;
-        typedef  Matrix3x3::ColumnVector ColumnVector;
-        CanonicSCellEmbedder< KSpace > embedder( K );
-
-        for ( unsigned int i = 0; i < results.size(); ++i )
-        {
-            CurvInformation current = results[ i ];
-            DGtal::Dimension kDim = K.sOrthDir( *abegin2 );
-            SCell outer = K.sIndirectIncident( *abegin2, kDim);
-            /*if ( predicate(embedder(outer)) )
+      CurvInformation current = results[ i ];
+      DGtal::Dimension kDim = K.sOrthDir( *abegin2 );
+      SCell outer = K.sIndirectIncident( *abegin2, kDim);
+      /*if ( predicate(embedder(outer)) )
             {
               outer = K.sDirectIncident( *abegin2, kDim);
             }*/
 
-            Cell unsignedSurfel = K.uCell( K.sKCoords(*abegin2) );
-            viewer << CustomColors3D( DGtal::Color(255,255,255,255),
-                                      DGtal::Color(255,255,255,255))
-                   << unsignedSurfel;
+      Cell unsignedSurfel = K.uCell( K.sKCoords(*abegin2) );
+      viewer << CustomColors3D( DGtal::Color(255,255,255,255),
+                                DGtal::Color(255,255,255,255))
+             << unsignedSurfel;
 
 
-            //ColumnVector normal = current.vectors.column(0).getNormalized(); // don't show the normal
-            ColumnVector curv1 = current.vectors.column(1).getNormalized();
-            ColumnVector curv2 = current.vectors.column(2).getNormalized();
+      //ColumnVector normal = current.vectors.column(0).getNormalized(); // don't show the normal
+      ColumnVector curv1 = current.vectors.column(1).getNormalized();
+      ColumnVector curv2 = current.vectors.column(2).getNormalized();
 
-            double eps = 0.01;
-            RealPoint center = embedder( outer );// + eps*embedder( *abegin2 );
+      double eps = 0.01;
+      RealPoint center = embedder( outer );// + eps*embedder( *abegin2 );
 
-//            viewer.addLine ( center[0] - 0.5 * normal[ 0],
-//                             center[1] - 0.5 * normal[1],
-//                             center[2] - 0.5* normal[2],
-//                             center[0] +  0.5 * normal[0],
-//                             center[1] +  0.5 * normal[1],
-//                             center[2] +  0.5 * normal[2],
-//                             DGtal::Color ( 0,0,0 ), 5.0 ); // don't show the normal
+      //            viewer.addLine ( center[0] - 0.5 * normal[ 0],
+      //                             center[1] - 0.5 * normal[1],
+      //                             center[2] - 0.5* normal[2],
+      //                             center[0] +  0.5 * normal[0],
+      //                             center[1] +  0.5 * normal[1],
+      //                             center[2] +  0.5 * normal[2],
+      //                             DGtal::Color ( 0,0,0 ), 5.0 ); // don't show the normal
 
 
-            if( ( mode.compare("princurv1") == 0 ) )
-            {
-                viewer.setLineColor(AXIS_COLOR_BLUE);
-                viewer.addLine (
-                            RealPoint(
-                                center[0] -  0.5 * curv1[0],
-                                center[1] -  0.5 * curv1[1],
-                                center[2] -  0.5 * curv1[2]
-                            ),
-                            RealPoint(
-                                center[0] +  0.5 * curv1[0],
-                                center[1] +  0.5 * curv1[1],
-                                center[2] +  0.5 * curv1[2]
-                            ),
-                            AXIS_LINESIZE );
-            }
-            else
-            {
-                viewer.setLineColor(AXIS_COLOR_RED);
-                viewer.addLine (
-                            RealPoint(
-                                center[0] -  0.5 * curv2[0],
-                                center[1] -  0.5 * curv2[1],
-                                center[2] -  0.5 * curv2[2]
-                            ),
-                            RealPoint(
-                                center[0] +  0.5 * curv2[0],
-                                center[1] +  0.5 * curv2[1],
-                                center[2] +  0.5 * curv2[2]
-                            ),
-                            AXIS_LINESIZE );
-            }
+      if( ( mode.compare("prindir1") == 0 ) )
+      {
+        viewer.setLineColor(AXIS_COLOR_BLUE);
+        viewer.addLine (
+              RealPoint(
+                center[0] -  0.5 * curv1[0],
+            center[1] -  0.5 * curv1[1],
+            center[2] -  0.5 * curv1[2]
+            ),
+            RealPoint(
+              center[0] +  0.5 * curv1[0],
+            center[1] +  0.5 * curv1[1],
+            center[2] +  0.5 * curv1[2]
+            ),
+            AXIS_LINESIZE );
+      }
+      else
+      {
+        viewer.setLineColor(AXIS_COLOR_RED);
+        viewer.addLine (
+              RealPoint(
+                center[0] -  0.5 * curv2[0],
+            center[1] -  0.5 * curv2[1],
+            center[2] -  0.5 * curv2[2]
+            ),
+            RealPoint(
+              center[0] +  0.5 * curv2[0],
+            center[1] +  0.5 * curv2[1],
+            center[2] +  0.5 * curv2[2]
+            ),
+            AXIS_LINESIZE );
+      }
 
-            ++abegin2;
-        }
-        trace.endBlock();
+      ++abegin2;
     }
+    trace.endBlock();
+  }
 
-    viewer << Viewer3D<>::updateDisplay;
-    return application.exec();
+  viewer << Viewer3D<>::updateDisplay;
+  return application.exec();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
