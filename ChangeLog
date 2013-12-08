@@ -22,6 +22,12 @@
 		* Measures from voxel partition (true/false+-, precision recall, f-measure) 
 		* Measures bases on euclidean distance between the two Shape A and B.
 
+* estimators:
+	- 2dLocalEstimators: Improvement of 2dLocalEstimators + possibility to compare with noised data.
+	- 3dLocalEstimators: Adding possibility to compare curvature (mean, gaussian and principal curvatures)
+	  with Integral Invariant and Monge via Jet Fitting + possibility to compare with noised data.
+
+
 * volumetric/volTools:
 	volTools directory moved into volumetric.
 
@@ -30,6 +36,8 @@
 	- 3dVolViewer: new option to limit the number of displayed voxels (can open dicom format if WITH_ITK is set to true).
 	- 3dImageViewer: new tool to display slice image with interactive translatations or rotations (can open dicom format  if WITH_ITK is set to true).
 	- patternTriangulation: a new tool that draws with Board2D the convex hull, the closest-point Delaunay triangulation or the farthest-point Delaunay triangulation of a pattern.
+	- 3dCurvatureViewer: Now allow to draw principal curvature directions on objets.
+	- 3dCurvatureViewerNoise: Same as 3dCurvatureViewer, but allow to add some noise to objects.
 
 	====  Release 0.6 ====
 
