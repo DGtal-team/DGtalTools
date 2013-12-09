@@ -30,6 +30,8 @@ Actually the DGTal project is organized as follows:
 
  - [Converters](#converters)
 
+ - [Distance Transform] (#Distance Transform)
+
  - [Estimators](#estimators)
 
  - [ShapeGenerator](#shapeGenerator)
@@ -44,12 +46,28 @@ Converters
 
 Utilities to convert various simple file formats:
 
+  - convertVol: a simple generic volume image converters (can process actually pgm3d, vol, longvol, raw (for writing)).
+  - dicom2vol: convert dicom images into 3d volumic file.
   - freeman2sdp: convert freeman chain towards a Sequence of Discrete Points.
+  - HDF52vol: convert HDF5 to vol file format. 
+  - longvol2vol: convert longvol to vol file using different conversion policies.  
+  - ofs2off: convert OFS mesh format towards a OFF variant.
   - pgm2freeman: to extract a freeman chain contour from a grayscale image.
   - raw2vol and vol2raw: transform 3D volumes files from (resp. to) raw to vol.
-  - ofs2off: convert OFS mesh format towards a OFF variant.
+  - raw2HDF5: convert raw image to HDF5.
+  - slice2vol: tool to merge slices into one 3d volumic file.
+  - sdp2vol: a simple tool to create a 3d vol image from 3d digital points.
   - vol2sdp: a simple tools to extract digital points from 3d vol files.
   - vol2off: extract dual surface of a digital object (equiv. Marching Cubes)
+  - vol2obj: convert a volume file into OBJ format (all voxels belonging to threshold interval)   
+  - vol2slice: tool to extract all slices from 3d volumic images.
+  
+Distance Transform
+------------------
+  - LUTBasedNSDistanceTransform: Compute the 2D translated neighborhood-sequence distance transform of a binary image.
+  - CumulativeSequenceTest and RationalBeattySequenceTest: tests from LUTBasedNSDistanceTransform.
+
+
 
 Estimators
 ----------
@@ -91,9 +109,10 @@ ShapeGenerator
 Visualization
 -------------
   - 3dCurvatureViewer: permits to compute and visualize mean or gaussian curvature of binary shapes.
+  - 3dCurvatureViewerNoise: Same as 3dCurvatureViewer, but allow to add some noise to objects.
   - 3dCurveViewer: displays 3D curves with tangential cover and projections onto bounding box.
-  - 3dImageViewer: tools to display 3d slice images with QGLViewer.
-  - 3dVolViewer: volume file (.vol and .pgm3d) viewer with QGLViewer.
+  - 3dImageViewer: tools to display 3d slice images (.vol, .pgm3d and  dicom with ITK) with QGLViewer.
+  - 3dVolViewer: volume file (.vol, .pgm3d and dicom with ITK ) viewer with QGLViewer.
   - displayContours: display discrete contours from various format (.fc (freemanchain), .sdp).
   - meshViewer: display 3D mesh from OFS or OFF format.
   - patternTriangulation: a new tool that draws with Board2D the convex hull, the closest-point Delaunay triangulation or the farthest-point Delaunay triangulation of a pattern.
@@ -124,7 +143,10 @@ Volumetric
   - homotopicThinning3D: ultimate skeleton from vol file
   - volAddBorder: add a 1 voxel boundary with value 0 to a vol file.
   - volCComponentCounter: a simple program to count the number of connected components in a 3D image.
+  - volFlip: tool to flip all volume slice images according a given dimension.
   - volSubSample: sub sample a vol file (division by 2 in each direction).
+  - volImageMetrics: apply basic statistics on comparaison between two volumetric images (shape defined from thresholds): computes true/false -+, precision, recall f-mean RMSE, PSNR.
+  - volShapeMetrics: apply euclidean distance comparisons between two shapes  (shape defined from thresholds).
 
 
 

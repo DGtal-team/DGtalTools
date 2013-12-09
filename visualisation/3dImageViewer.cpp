@@ -31,17 +31,23 @@
 #include <QtGui/qapplication.h>
 
 #include "DGtal/base/Common.h"
+#include "DGtal/base/BasicFunctors.h"
 #include "DGtal/helpers/StdDefs.h"
 #include "DGtal/io/readers/VolReader.h"
 #include "DGtal/io/viewers/Viewer3D.h"
 #include "DGtal/io/DrawWithDisplay3DModifier.h"
 #include "DGtal/io/readers/PointListReader.h"
+#include "DGtal/io/readers/MeshReader.h"
 #include "DGtal/topology/helpers/Surfaces.h"
- #include "DGtal/topology/SurfelAdjacency.h"
+#include "DGtal/topology/SurfelAdjacency.h"
 
 #include "DGtal/io/Color.h"
 #include "DGtal/io/colormaps/GradientColorMap.h"
 #include "DGtal/io/readers/GenericReader.h"
+#ifdef WITH_ITK
+#include "DGtal/io/readers/DicomReader.h"
+#endif
+
 #include "DGtal/images/ImageSelector.h"
 
 
@@ -79,12 +85,19 @@ int main( int argc, char** argv )
     ("thresholdMin,m",  po::value<int>()->default_value(0), "threshold min to define binary shape" ) 
     ("thresholdMax,M",  po::value<int>()->default_value(255), "threshold max to define binary shape" )
     ("displaySDP,s", po::value<std::string>(), "display a set of discrete points (.sdp)" )
+    ("SDPindex", po::value<std::vector <unsigned int> >()->multitoken(), "specify the sdp index (by default 0,1,2).")
+    ("displayMesh", po::value<std::string>(), "display a Mesh given in OFF or OFS format. " )
     ("displayDigitalSurface", "display the digital surface instead of display all the set of voxels (used with thresholdImage or displaySDP options)" )
     ("colorizeCC", "colorize each Connected Components of the surface displayed by displayDigitalSurface option." )
     ("colorSDP,c", po::value<std::vector <int> >()->multitoken(), "set the color  discrete points: r g b a " )
+    ("colorMesh", po::value<std::vector <int> >()->multitoken(), "set the color of Mesh (given from displayMesh option) : r g b a " )
     ("scaleX,x",  po::value<float>()->default_value(1.0), "set the scale value in the X direction (default 1.0)" )
     ("scaleY,y",  po::value<float>()->default_value(1.0), "set the scale value in the Y direction (default 1.0)" )
-    ("scaleZ,z",  po::value<float>()->default_value(1.0), "set the scale value in the Z direction (default 1.0)")    
+    ("scaleZ,z",  po::value<float>()->default_value(1.0), "set the scale value in the Z direction (default 1.0)")
+#ifdef WITH_ITK
+    ("dicomMin", po::value<int>()->default_value(-1000), "set minimum density threshold on Hounsfield scale")
+    ("dicomMax", po::value<int>()->default_value(3000), "set maximum density threshold on Hounsfield scale")
+#endif    
     ("transparency,t",  po::value<uint>()->default_value(255), "transparency") ; 
   
   bool parseOK=true;
@@ -115,13 +128,17 @@ int main( int argc, char** argv )
   unsigned char transp = vm["transparency"].as<uint>();
  
   QApplication application(argc,argv);
- 
+
   float sx = vm["scaleX"].as<float>();
   float sy = vm["scaleY"].as<float>();
   float sz = vm["scaleZ"].as<float>();
 
   string extension = inputFilename.substr(inputFilename.find_last_of(".") + 1);
-  if(extension!="vol" && extension != "p3d" && extension != "pgm3D" && extension != "pgm3d" && extension != "sdp" && extension != "pgm" ){
+  if(extension!="vol" && extension != "p3d" && extension != "pgm3D" && extension != "pgm3d" && extension != "sdp" && extension != "pgm"
+#ifdef WITH_ITK
+     && extension !="dcm"
+#endif
+     ){
     trace.info() << "File extension not recognized: "<< extension << std::endl;
     return 0;
   }
@@ -140,8 +157,19 @@ int main( int argc, char** argv )
   viewer.show();
   viewer.setGLScale(sx, sy, sz);  
   
-
+#ifdef WITH_ITK
+  int dicomMin = vm["dicomMin"].as<int>();
+  int dicomMax = vm["dicomMax"].as<int>();
+  typedef DGtal::RescalingFunctor<int ,unsigned char > RescalFCT;
+   
+  Image3D image = extension == "dcm" ? DicomReader< Image3D,  RescalFCT  >::importDicom( inputFilename, 
+                                                                                         RescalFCT(dicomMin,
+                                                                                                   dicomMax,
+                                                                                                   0, 255) ) : 
+    GenericReader<Image3D>::import( inputFilename );
+#else
   Image3D image = GenericReader<Image3D>::import( inputFilename );
+#endif
   Domain domain = image.domain();
   
   trace.info() << "Image loaded: "<<image<< std::endl;
@@ -164,9 +192,9 @@ int main( int argc, char** argv )
       Color c= gradient(val);
       if(val<=thresholdMax && val >=thresholdMin){
 	if(!vm.count("displayDigitalSurface")){
-	    viewer <<  CustomColors3D(Color((float)(c.red()), (float)(c.green()),(float)(c.blue()), transp),
-				      Color((float)(c.red()), (float)(c.green()),(float)(c.blue()), transp));     
-	    viewer << *it;     
+          viewer <<  CustomColors3D(Color((float)(c.red()), (float)(c.green()),(float)(c.blue()), transp),
+                                    Color((float)(c.red()), (float)(c.green()),(float)(c.blue()), transp));     
+          viewer << *it;     
 	}
       }else{
 	set3d.insert(*it);
@@ -177,17 +205,48 @@ int main( int argc, char** argv )
   if(vm.count("displaySDP")){
     if(vm.count("colorSDP")){
       std::vector<int> vcol= vm["colorSDP"].as<std::vector<int > >();
+      if(vcol.size()<4){
+        trace.error() << "Not enough parameter: color specification should contains four elements: red, green, blue and alpha values."  << std::endl;
+        return 0;
+      }
       Color c(vcol[0], vcol[1], vcol[2], vcol[3]);
       viewer << CustomColors3D(c, c);
     }
-    vector<Z3i::Point> vectVoxels = PointListReader<Z3i::Point>::getPointsFromFile(vm["displaySDP"].as<std::string>());
+    
+    vector<Z3i::Point> vectVoxels;
+    if(vm.count("SDPindex")) {
+      std::vector<unsigned int > vectIndex = vm["SDPindex"].as<std::vector<unsigned int > >();
+      if(vectIndex.size()!=3){
+        trace.error() << "you need to specify the three indexes of vertex." << std::endl; 
+        return 0;
+      }
+      vectVoxels = PointListReader<Z3i::Point>::getPointsFromFile(vm["displaySDP"].as<std::string>(), vectIndex);
+    }else{
+      vectVoxels = PointListReader<Z3i::Point>::getPointsFromFile(vm["displaySDP"].as<std::string>());
+    }
     for(int i=0;i< vectVoxels.size(); i++){
       if(!vm.count("displayDigitalSurface")){
-	viewer << vectVoxels.at(i);
+        viewer << vectVoxels.at(i);
       }else{
 	set3d.insert(vectVoxels.at(i));
       }
     }
+  }
+  
+  if(vm.count("displayMesh")){
+    if(vm.count("colorMesh")){
+      std::vector<int> vcol= vm["colorMesh"].as<std::vector<int > >();
+      if(vcol.size()<4){
+        trace.error() << "Not enough parameter: color specification should contains four elements: red, green, blue and alpha values." << std::endl;
+        return 0;
+      }
+      Color c(vcol[0], vcol[1], vcol[2], vcol[3]);
+      viewer.setFillColor(c);
+    }
+    
+    DGtal::Mesh<Z3i::RealPoint> aMesh;
+    MeshReader<Z3i::RealPoint>::importOFFFile(vm["displayMesh"].as<std::string>(), aMesh);
+    viewer << aMesh;
   }
   
   if(vm.count("displayDigitalSurface")){

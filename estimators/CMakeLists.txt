@@ -1,6 +1,5 @@
 SET(DGTAL_TOOLS_SRC
   2dLocalEstimators
-  3dLocalEstimators
   lengthEstimators
   vol2normalField
   curvatureBC
@@ -8,6 +7,15 @@ SET(DGTAL_TOOLS_SRC
   tangentBC
   statisticsEstimators
 )
+
+if (  WITH_CGAL )
+  SET(CGAL_TESTS_SRC
+    3dLocalEstimators )
+  FOREACH(FILE ${CGAL_TESTS_SRC})
+    add_executable(${FILE} ${FILE})
+    target_link_libraries (${FILE}  ${DGTAL_LIBRARIES} ${DGtalToolsLibDependencies})
+  ENDFOREACH(FILE)
+endif ( WITH_CGAL )
 
 FOREACH(FILE ${DGTAL_TOOLS_SRC})
   add_executable(${FILE} ${FILE})
