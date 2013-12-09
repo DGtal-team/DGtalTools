@@ -90,7 +90,6 @@ void missingParam( std::string param )
 {
   trace.error() << " Parameter: " << param << " is required.";
   trace.info() << std::endl;
-  exit( 1 );
 }
 
 namespace po = boost::program_options;
@@ -100,11 +99,11 @@ int main( int argc, char** argv )
   // parse command line ----------------------------------------------
   po::options_description general_opt("Allowed options are");
   general_opt.add_options()
-      ("help,h", "display this message")
-      ("file,f", po::value< std::string >(), ".vol file")
-      ("radius,r",  po::value< double >(), "Kernel radius for IntegralInvariant" )
-      ("noise,n",  po::value< double >(), "Level of Kanungo noise ]0;1[" )
-      ("properties,p", po::value< std::string >(), "type of output : mean, gaussian, prindir1 or prindir2");
+    ("help,h", "display this message")
+    ("input-file,i", po::value< std::string >(), ".vol file")
+    ("radius,r",  po::value< double >(), "Kernel radius for IntegralInvariant" )
+    ("noise,n",  po::value< double >()->default_value(0.1), "Level of Kanungo noise ]0;1[" )
+    ("properties,p", po::value< std::string >()->default_value("mean"), "type of output : mean, gaussian, prindir1 or prindir2 (default mean)");
 
   bool parseOK = true;
   po::variables_map vm;
@@ -118,13 +117,23 @@ int main( int argc, char** argv )
     trace.info() << "Error checking program options: " << ex.what() << std::endl;
   }
   po::notify( vm );
-
-  if (!(vm.count("file"))) missingParam("--file");
-  if (!(vm.count("radius"))) missingParam("--radius");
-  if (!(vm.count("noise"))) missingParam("--noise");
-  if (!(vm.count("properties"))) missingParam("--properties");
+  bool neededArgsGiven=true;
+  
+  if (!(vm.count("input-file"))){
+    missingParam("--input-file");
+    neededArgsGiven=false;
+  }
+  if (!(vm.count("radius"))){
+    missingParam("--radius");
+    neededArgsGiven=false;
+  }
+  if (!(vm.count("noise"))){ 
+    missingParam("--noise");
+    neededArgsGiven=false;
+  }
+  
   double h = 1.0;
-  double re_convolution_kernel = vm["radius"].as< double >();
+ 
 
   bool somethingWrong = false;
   std::string mode = vm["properties"].as< std::string >();
@@ -136,12 +145,14 @@ int main( int argc, char** argv )
   double noiseLevel = vm["noise"].as< double >();
   if( noiseLevel < 0.0 || noiseLevel > 1.0 )
   {
+    trace.error()<< "Noise level should be in the interval: ]0, 1["<< std::endl;
     somethingWrong = true;
   }
 
-  if( somethingWrong || !parseOK || vm.count("help") || argc <= 1 )
+  if( !neededArgsGiven ||  somethingWrong || !parseOK || vm.count("help") || argc <= 1 )
   {
     trace.info()<< "Visualisation of 3d curvature from .vol file using curvature from Integral Invariant" <<std::endl
+                << general_opt << "\n"
                 << "Basic usage: "<<std::endl
                 << "\t3dCurvatureViewer --file <file.vol> --radius <radius> --noise <noise> --properties <\"mean\">"<<std::endl
                 << std::endl
@@ -154,6 +165,7 @@ int main( int argc, char** argv )
     return 0;
   }
 
+  double re_convolution_kernel = vm["radius"].as< double >();
 
   // Construction of the shape from vol file
   typedef Z3i::Space::RealPoint RealPoint;
@@ -161,14 +173,14 @@ int main( int argc, char** argv )
   typedef ImageSelector< Z3i::Domain, bool>::Type Image;
   typedef SimpleThresholdForegroundPredicate< Image > ImagePredicate;
   typedef Z3i::KSpace KSpace;
-  typedef typename KSpace::SCell SCell;
-  typedef typename KSpace::Cell Cell;
-  typedef typename KSpace::Surfel Surfel;
+  typedef KSpace::SCell SCell;
+  typedef KSpace::Cell Cell;
+  typedef KSpace::Surfel Surfel;
   typedef KanungoNoise< ImagePredicate, Z3i::Domain > KanungoPredicate;
   typedef LightImplicitDigitalSurface< Z3i::KSpace, KanungoPredicate > MyLightImplicitDigitalSurface;
   typedef DigitalSurface< MyLightImplicitDigitalSurface > MyDigitalSurface;
 
-  std::string filename = vm["file"].as< std::string >();
+  std::string filename = vm["input-file"].as< std::string >();
   Image image = VolReader<Image>::importVol( filename );
   ImagePredicate predicate = ImagePredicate( image, 0 );
 

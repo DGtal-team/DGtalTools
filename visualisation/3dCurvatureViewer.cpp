@@ -88,7 +88,6 @@ void missingParam( std::string param )
 {
   trace.error() << " Parameter: " << param << " is required.";
   trace.info() << std::endl;
-  exit( 1 );
 }
 
 namespace po = boost::program_options;
@@ -98,14 +97,14 @@ int main( int argc, char** argv )
   // parse command line ----------------------------------------------
   po::options_description general_opt("Allowed options are");
   general_opt.add_options()
-      ("help,h", "display this message")
-      ("file,f", po::value< std::string >(), ".vol file")
-      ("radius,r",  po::value< double >(), "Kernel radius for IntegralInvariant" )
-      ("properties,p", po::value< std::string >(), "type of output : mean, gaussian, prindir1 or prindir2");
+    ("help,h", "display this message")
+    ("input-file,i", po::value< std::string >(), ".vol file")
+    ("radius,r",  po::value< double >(), "Kernel radius for IntegralInvariant" )
+    ("properties,p", po::value< std::string >()->default_value("mean"), "type of output : mean, gaussian, prindir1 or prindir2 (default mean)");
 
   bool parseOK = true;
   po::variables_map vm;
-  try
+  try 
   {
     po::store( po::parse_command_line( argc, argv, general_opt ), vm );
   }
@@ -115,13 +114,16 @@ int main( int argc, char** argv )
     trace.info() << "Error checking program options: " << ex.what() << std::endl;
   }
   po::notify( vm );
-
-  if (!(vm.count("file"))) missingParam("--file");
-  if (!(vm.count("radius"))) missingParam("--radius");
-  if (!(vm.count("properties"))) missingParam("--properties");
-
+  bool neededArgsGiven=true;
+  if (!(vm.count("input-file"))){ 
+    missingParam("--input-file");
+    neededArgsGiven=false;
+  }
+  if (!(vm.count("radius"))){ 
+    missingParam("--radius");
+    neededArgsGiven=false;
+  }  
   double h = 1.0;
-  double re_convolution_kernel = vm["radius"].as< double >();
 
   bool wrongMode = false;
   std::string mode = vm["properties"].as< std::string >();
@@ -130,11 +132,12 @@ int main( int argc, char** argv )
     wrongMode = true;
   }
 
-  if( wrongMode || !parseOK || vm.count("help") || argc <= 1 )
+  if(!neededArgsGiven ||  wrongMode || !parseOK || vm.count("help") || argc <= 1 )
   {
     trace.info()<< "Visualisation of 3d curvature from .vol file using curvature from Integral Invariant" <<std::endl
+                << general_opt << "\n"
                 << "Basic usage: "<<std::endl
-                << "\t3dCurvatureViewer --file <file.vol> --radius <radius> --properties <\"mean\">"<<std::endl
+                << "\t3dCurvatureViewer -i <file.vol> --radius <radius> --properties <\"mean\">"<<std::endl
                 << std::endl
                 << "Below are the different available properties: " << std::endl
                 << "\t - \"mean\" for the mean curvature" << std::endl
@@ -144,20 +147,21 @@ int main( int argc, char** argv )
                 << std::endl;
     return 0;
   }
-
+  double re_convolution_kernel = vm["radius"].as< double >();
+  
   // Construction of the shape from vol file
   typedef Z3i::Space::RealPoint RealPoint;
   typedef Z3i::Point Point;
   typedef ImageSelector< Z3i::Domain, bool>::Type Image;
   typedef SimpleThresholdForegroundPredicate< Image > ImagePredicate;
   typedef Z3i::KSpace KSpace;
-  typedef typename KSpace::SCell SCell;
-  typedef typename KSpace::Cell Cell;
-  typedef typename KSpace::Surfel Surfel;
+  typedef KSpace::SCell SCell;
+  typedef KSpace::Cell Cell;
+  typedef KSpace::Surfel Surfel;
   typedef LightImplicitDigitalSurface< Z3i::KSpace, ImagePredicate > MyLightImplicitDigitalSurface;
   typedef DigitalSurface< MyLightImplicitDigitalSurface > MyDigitalSurface;
 
-  std::string filename = vm["file"].as< std::string >();
+  std::string filename = vm["input-file"].as< std::string >();
   Image image = VolReader<Image>::importVol( filename );
   ImagePredicate predicate = ImagePredicate( image, 0 );
 
