@@ -30,7 +30,7 @@ Actually the DGTal project is organized as follows:
 
  - [Converters](#converters)
 
- - [Distance Transform] (#DistanceTransform)
+ - [DistanceTransform] (#DistanceTransform)
 
  - [Estimators](#estimators)
 
@@ -62,7 +62,7 @@ Utilities to convert various simple file formats:
   - vol2obj: convert a volume file into OBJ format (all voxels belonging to threshold interval)   
   - vol2slice: tool to extract all slices from 3d volumic images.
   
-Distance%20Transform
+DistanceTransform
 ------------------
 
   - LUTBasedNSDistanceTransform: Compute the 2D translated neighborhood-sequence distance transform of a binary image.
