@@ -30,7 +30,7 @@ Actually the DGTal project is organized as follows:
 
  - [Converters](#converters)
 
- - [Distance Transform] (#distanceTransform)
+ - [Distance Transform] (#Distance Transform)
 
  - [Estimators](#estimators)
 
