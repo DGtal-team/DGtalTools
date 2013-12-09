@@ -53,9 +53,9 @@ if ( Boost_FOUND )
 endif( Boost_FOUND )
 
 #------Tools subdirectories ------
-
 add_subdirectory(volumetric)
 add_subdirectory(shapeGenerator)
 add_subdirectory(estimators)
 add_subdirectory(converters)
 add_subdirectory(visualisation)
+add_subdirectory(distanceTransform)
