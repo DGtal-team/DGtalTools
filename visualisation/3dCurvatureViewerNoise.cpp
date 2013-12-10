@@ -165,8 +165,8 @@ int main( int argc, char** argv )
   typedef typename KSpace::Cell Cell;
   typedef typename KSpace::Surfel Surfel;
   typedef KanungoNoise< ImagePredicate, Z3i::Domain > KanungoPredicate;
-  typedef LightImplicitDigitalSurface< Z3i::KSpace, KanungoPredicate > MyLightImplicitDigitalSurface;
-  typedef DigitalSurface< MyLightImplicitDigitalSurface > MyDigitalSurface;
+  typedef LightImplicitDigitalSurface< Z3i::KSpace, KanungoPredicate > Boundary;
+  typedef DigitalSurface< Boundary > MyDigitalSurface;
 
   std::string filename = vm["file"].as< std::string >();
   Image image = VolReader<Image>::importVol( filename );
@@ -188,8 +188,25 @@ int main( int argc, char** argv )
   SurfelAdjacency< Z3i::KSpace::dimension > SAdj( true );
   KanungoPredicate * noisifiedObject = new KanungoPredicate( predicate, domain, noiseLevel );
   Surfel bel = Surfaces< Z3i::KSpace >::findABel( K, *noisifiedObject, 100000 );
-  MyLightImplicitDigitalSurface LightImplDigSurf( K, *noisifiedObject, SAdj, bel );
-  MyDigitalSurface digSurf( LightImplDigSurf );
+  Boundary * boundary = new Boundary( K, *noisifiedObject, SAdj, bel );
+  MyDigitalSurface digSurf( *boundary );
+
+  double minsize = domain.myUpperBound[0] - domain.myLowerBound[0];
+  unsigned int tries = 0;
+  while( digSurf.size() < 2 * minsize || tries > 150 )
+  {
+      delete boundary;
+      bel = Surfaces< KSpace >::findABel( K, *noisifiedObject, 10000 );
+      boundary = new Boundary( K, *noisifiedObject, SurfelAdjacency< KSpace::dimension >( true ), bel );
+      digSurf = MyDigitalSurface( *boundary );
+      ++tries;
+  }
+
+  if( tries > 150 )
+  {
+      std::cerr << "Can't found a proper bel. So .... I ... just ... kill myself." << std::endl;
+      return false;
+  }
 
   typedef DepthFirstVisitor<MyDigitalSurface> Visitor;
   typedef GraphVisitorRange< Visitor > VisitorRange;
@@ -362,6 +379,8 @@ int main( int argc, char** argv )
   }
 
   viewer << Viewer3D<>::updateDisplay;
+
+  delete boundary;
   return application.exec();
 }
 
