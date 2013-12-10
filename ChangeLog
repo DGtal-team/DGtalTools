@@ -1,3 +1,7 @@
+	====  Release 0.8 ====
+
+
+	
 	====  Release 0.7 ====
 
 * converters/:
@@ -38,6 +42,11 @@
 	- patternTriangulation: a new tool that draws with Board2D the convex hull, the closest-point Delaunay triangulation or the farthest-point Delaunay triangulation of a pattern.
 	- 3dCurvatureViewer: Now allow to draw principal curvature directions on objets.
 	- 3dCurvatureViewerNoise: Same as 3dCurvatureViewer, but allow to add some noise to objects.
+
+
+* distanceTransform
+	- LUTBasedNSDistanceTransform: Compute the 2D translated neighborhood-sequence distance transform of a binary image.
+	- CumulativeSequenceTest and RationalBeattySequenceTest: tests from LUTBasedNSDistanceTransform.
 
 	====  Release 0.6 ====
 

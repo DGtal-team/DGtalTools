@@ -7,7 +7,7 @@ PROJECT(DGtalTools)
 cmake_minimum_required (VERSION 2.6) 
 
 
-FIND_PACKAGE(DGtal 0.6 REQUIRED)
+FIND_PACKAGE(DGtal 0.7 REQUIRED)
 INCLUDE_DIRECTORIES(${DGTAL_INCLUDE_DIRS})
 LINK_DIRECTORIES(${DGTAL_LIBRARY_DIRS})
 
@@ -32,8 +32,8 @@ LINK_DIRECTORIES(${DGTAL_LIBRARY_DIRS})
 # -----------------------------------------------------------------------------
 SET(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
 SET(DGtalTools_VERSION_MAJOR 0)
-SET(DGtalTools_VERSION_MINOR 6)
-SET(DGtalTools_VERSION_PATCH 0)
+SET(DGtalTools_VERSION_MINOR 8)
+SET(DGtalTools_VERSION_PATCH beta)
 SET(DGTALTOOLS_VERSION "${DGtalTools_VERSION_MAJOR}.${DGtalTools_VERSION_MINOR}.${DGtalTools_VERSION_PATCH}")
 SET(PROJECT_VERSION "${DGtalTools_VERSION_MAJOR}.${DGtalTools_VERSION_MINOR}.${DGtalTools_VERSION_PATCH}")
 SET(VERSION ${DGtalTools_VERSION_MAJOR}.${DGtalTools_VERSION_MINOR}.${DGtalTools_VERSION_PATCH})
@@ -53,9 +53,9 @@ if ( Boost_FOUND )
 endif( Boost_FOUND )
 
 #------Tools subdirectories ------
-
 add_subdirectory(volumetric)
 add_subdirectory(shapeGenerator)
 add_subdirectory(estimators)
 add_subdirectory(converters)
 add_subdirectory(visualisation)
+add_subdirectory(distanceTransform)
