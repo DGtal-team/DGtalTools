@@ -11,7 +11,8 @@ SET(DGTAL_TOOLS_SRC
   vol2slice
   vol2off
   vol2obj
-  longvol2vol)
+  longvol2vol
+  sdp2vol)
 
 if( WITH_HDF5 )
 SET(DGTAL_TOOLS_SRC ${DGTAL_TOOLS_SRC} 
