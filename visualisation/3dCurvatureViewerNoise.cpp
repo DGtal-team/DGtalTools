@@ -103,7 +103,8 @@ int main( int argc, char** argv )
     ("input-file,i", po::value< std::string >(), ".vol file")
     ("radius,r",  po::value< double >(), "Kernel radius for IntegralInvariant" )
     ("noise,n",  po::value< double >()->default_value(0.1), "Level of Kanungo noise ]0;1[" )
-    ("properties,p", po::value< std::string >()->default_value("mean"), "type of output : mean, gaussian, prindir1 or prindir2 (default mean)");
+    ("try,t",  po::value< unsigned int >()->default_value(150), "Max number of tries to find a proper bel" )
+    ("mode,m", po::value< std::string >()->default_value("mean"), "type of output : mean, gaussian, prindir1 or prindir2 (default mean)");
 
   bool parseOK = true;
   po::variables_map vm;
@@ -136,7 +137,7 @@ int main( int argc, char** argv )
  
 
   bool somethingWrong = false;
-  std::string mode = vm["properties"].as< std::string >();
+  std::string mode = vm["mode"].as< std::string >();
   if (( mode.compare("gaussian") != 0 ) && ( mode.compare("mean") != 0 ) && ( mode.compare("prindir1") != 0 ) && ( mode.compare("prindir2") != 0 ))
   {
     somethingWrong = true;
@@ -154,9 +155,9 @@ int main( int argc, char** argv )
     trace.info()<< "Visualisation of 3d curvature from .vol file using curvature from Integral Invariant" <<std::endl
                 << general_opt << "\n"
                 << "Basic usage: "<<std::endl
-                << "\t3dCurvatureViewer --file <file.vol> --radius <radius> --noise <noise> --properties <\"mean\">"<<std::endl
+                << "\t3dCurvatureViewer -i <file.vol> --radius <radius> --noise <noise> --mode <\"mean\">"<<std::endl
                 << std::endl
-                << "Below are the different available properties: " << std::endl
+                << "Below are the different available modes: " << std::endl
                 << "\t - \"mean\" for the mean curvature" << std::endl
                 << "\t - \"gaussian\" for the Gaussian curvature" << std::endl
                 << "\t - \"prindir1\" for the first principal curvature direction" << std::endl
@@ -205,7 +206,8 @@ int main( int argc, char** argv )
 
   double minsize = domain.myUpperBound[0] - domain.myLowerBound[0];
   unsigned int tries = 0;
-  while( digSurf.size() < 2 * minsize || tries > 150 )
+  unsigned int maxTries = vm["try"].as< unsigned int >();
+  while( digSurf.size() < 2 * minsize || tries > maxTries )
   {
       delete boundary;
       bel = Surfaces< KSpace >::findABel( K, *noisifiedObject, 10000 );
