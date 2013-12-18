@@ -102,21 +102,26 @@ int main( int argc, char** argv )
   trace.info() << "Reading input SDP file: " << inputSDP  ; 
   std::vector<Z3i::Point> vectPoints=  PointListReader<Z3i::Point>::getPointsFromFile(inputSDP, vPos); 
   trace.info() << " [done] " << std::endl ; 
-  
+
   Image3D imageResult(imageDomain); 
   for(Image3D::Domain::ConstIterator iter = imageResult.domain().begin(); iter!= imageResult.domain().end();
       iter++){
     imageResult.setValue(*iter, backgroundVal);
   }    
+  
   for(int i=0; i<vectPoints.size(); i++){
     if(vm.count("invertY")){
       vectPoints[i][1]=ptUpper[1]-vectPoints[i][1];
     }
-    imageResult.setValue(vectPoints[i], foregroundVal);
+    if(imageResult.domain().isInside(vectPoints[i])){
+      imageResult.setValue(vectPoints[i], foregroundVal);
+    }else{
+      trace.warning() << "point " << vectPoints[i] << " outside the domain (ignored in the resulting volumic image)" << std::endl;  
+    }
   }
-  
+  trace.info()<< "Exporting resulting volumic image ... ";
   GenericWriter<Image3D>::exportFile(outputFilename, imageResult);
-
+  trace.info() << " [done]"<<std::endl;
   return 0;
   
 }
