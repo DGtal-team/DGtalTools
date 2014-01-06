@@ -159,3 +159,7 @@ How to build the tools
   
 
 [![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/DGtal-team/dgtaltools/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
+
+
+[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/DGtal-team/dgtaltools/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
+
