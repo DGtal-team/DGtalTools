@@ -39,6 +39,7 @@
 #include "DGtal/kernel/domains/HyperRectDomain.h"
 #include "DGtal/images/ImageSelector.h"
 #include "DGtal/images/imagesSetsUtils/SetFromImage.h"
+#include "DGtal/images/imagesSetsUtils/IntervalForegroundPredicate.h"
 #include "DGtal/topology/KhalimskySpaceND.h"
 #include "DGtal/topology/DigitalSurface.h"
 #include "DGtal/topology/SetOfSurfels.h"
@@ -92,8 +93,8 @@ int main( int argc, char** argv )
   po::notify(vm);    
   if( !parseOK || vm.count("help")||argc<=1)
     {
-      std::cout << "Usage: " << argv[0] << " [input-file]\n"
-                << "Display the boundary of a volume file by using QGLviewer"<< endl
+      std::cout << "Usage: " << argv[0] << " -i [input-file]\n"
+                << "Display the boundary of a volume file by using QGLviewer. The mode specifies if you wish to see surface elements (BDRY), the inner voxels (INNER) or the outer voxels (OUTER) that touch the boundary."<< endl
                 << general_opt << "\n";
       return 0;
     }
@@ -125,6 +126,7 @@ int main( int argc, char** argv )
      || extension =="dcm"
 #endif
      ){
+    trace.beginBlock( "Loading image into memory." );
 #ifdef WITH_ITK
     int dicomMin = vm["dicomMin"].as<int>();
     int dicomMax = vm["dicomMax"].as<int>();
@@ -137,11 +139,12 @@ int main( int argc, char** argv )
 #else
     Image image = GenericReader<Image>::import (inputFilename );
 #endif
-    
     trace.info() << "Image loaded: "<<image<< std::endl;
-    Domain domain = image.domain();
+    trace.endBlock();
+
     //! [3dVolBoundaryViewer-KSpace]
     trace.beginBlock( "Construct the Khalimsky space from the image domain." );
+    Domain domain = image.domain();
     KSpace ks;
     bool space_ok = ks.init( domain.lowerBound(), domain.upperBound(), true );
     if (!space_ok)
@@ -153,9 +156,9 @@ int main( int argc, char** argv )
     //! [3dVolBoundaryViewer-KSpace]
     
     //! [3dVolBoundaryViewer-Set3D]
-    trace.beginBlock( "Making digital set. " );
-    DigitalSet set3d ( domain );
-    SetFromImage<DigitalSet>::append<Image>(set3d, image, thresholdMin, thresholdMax );
+    trace.beginBlock( "Wrapping a digital set around image. " );
+    typedef IntervalForegroundPredicate<Image> ThresholdedImage;
+    ThresholdedImage thresholdedImage( image, thresholdMin, thresholdMax );
     trace.endBlock();
     //! [3dVolBoundaryViewer-Set3D]
 
@@ -167,7 +170,7 @@ int main( int argc, char** argv )
     MySurfelAdjacency surfAdj( true ); // interior in all directions.
     MySetOfSurfels theSetOfSurfels( ks, surfAdj );
     Surfaces<KSpace>::sMakeBoundary( theSetOfSurfels.surfelSet(),
-				     ks, set3d,
+				     ks, thresholdedImage,
 				     domain.lowerBound(),
 				     domain.upperBound() );
     MyDigitalSurface digSurf( theSetOfSurfels );
@@ -177,6 +180,7 @@ int main( int argc, char** argv )
     //! [3dVolBoundaryViewer-ExtractingSurface]
 
     //! [3dVolBoundaryViewer-ViewingSurface]
+    trace.beginBlock( "Displaying everything. " );
     Viewer3D<> viewer;
     viewer.setWindowTitle("Simple boundary of volume Viewer");
     viewer.show();
@@ -190,8 +194,8 @@ int main( int argc, char** argv )
     else if ( mode == "OUTER" )
       for ( ConstIterator it = digSurf.begin(), itE = digSurf.end(); it != itE; ++it )
 	viewer << ks.sCoords( ks.sIndirectIncident( *it, ks.sOrthDir( *it ) ) );
-
     viewer << Viewer3D<>::updateDisplay;
+    trace.endBlock();
     return application.exec();
   }
   return 0;
