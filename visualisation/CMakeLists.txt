@@ -18,6 +18,7 @@ if (  WITH_VISU3D_QGLVIEWER )
     3dVolViewer
     3dVolBoundaryViewer
     3dCurvatureViewer
+    3dCurvatureViewerNoise
     3dCurveViewer
     meshViewer)
   FOREACH(FILE ${DGTAL_EXAMPLES_QGL_SRC}) 

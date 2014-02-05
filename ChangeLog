@@ -1,6 +1,11 @@
+	====  Release 0.8 ====
+
+
+	
 	====  Release 0.7 ====
 
 * converters/:
+	- convertVol: a simple generic volume image converters (can process actually pgm3d, vol, longvol, raw (for writing)).
 	- vol2sdp: a simple tools to extract digital points from 3d vol files.
 	- vol2off: extract dual surface of a digital object (equiv. Marching Cubes)
 	- vol2obj: convert a volume file into OBJ format (all voxels belonging to threshold interval)
@@ -10,15 +15,22 @@
 	- longvol2vol: convert longvol to vol file using different conversion policies.
 	- dicom2vol: convert dicom images into 3d volumic file (need itk option in DGtal).
 	- pgm2freeman: add new possibility to set automatically a threshold from the otsu algorithm.
+	- HDF52vol: convert HDF5 to vol file format.
+	- raw2HDF5: convert raw image to HDF5.
 
 * volumetric:
-	- convertVol: a simple generic volume image converters (can process actually pgm3d, vol, longvol, raw (for writing)).
 	- homotopicThinning3D exploits now the GenericReader class and is no more limited to vol format.
 	- volFlip: tool to flip all volume slice images according a given dimension.
 	- volImageMetrics: apply basic measures from two volumetric images:  RMSE and PSNR.
 	- volShapeMetrics: Apply shape measures for comparing two volumetric images A and B (shape defined from thresholds): 
 		* Measures from voxel partition (true/false+-, precision recall, f-measure) 
 		* Measures bases on euclidean distance between the two Shape A and B.
+
+* estimators:
+	- 2dLocalEstimators: Improvement of 2dLocalEstimators + possibility to compare with noised data.
+	- 3dLocalEstimators: Adding possibility to compare curvature (mean, gaussian and principal curvatures)
+	  with Integral Invariant and Monge via Jet Fitting + possibility to compare with noised data.
+
 
 * volumetric/volTools:
 	volTools directory moved into volumetric.
@@ -28,6 +40,13 @@
 	- 3dVolViewer: new option to limit the number of displayed voxels (can open dicom format if WITH_ITK is set to true).
 	- 3dImageViewer: new tool to display slice image with interactive translatations or rotations (can open dicom format  if WITH_ITK is set to true).
 	- patternTriangulation: a new tool that draws with Board2D the convex hull, the closest-point Delaunay triangulation or the farthest-point Delaunay triangulation of a pattern.
+	- 3dCurvatureViewer: Now allow to draw principal curvature directions on objets.
+	- 3dCurvatureViewerNoise: Same as 3dCurvatureViewer, but allow to add some noise to objects.
+
+
+* distanceTransform
+	- LUTBasedNSDistanceTransform: Compute the 2D translated neighborhood-sequence distance transform of a binary image.
+	- CumulativeSequenceTest and RationalBeattySequenceTest: tests from LUTBasedNSDistanceTransform.
 
 	====  Release 0.6 ====
 

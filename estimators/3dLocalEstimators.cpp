@@ -30,337 +30,1099 @@
 ///////////////////////////////////////////////////////////////////////////////
 #include <iostream>
 #include <iomanip>
-#include <vector>
 #include <string>
 
 #include "DGtal/base/Common.h"
 #include "DGtal/base/Clock.h"
+#include "DGtal/helpers/StdDefs.h"
+
+#include <boost/program_options/options_description.hpp>
+#include <boost/program_options/parsers.hpp>
+#include <boost/program_options/variables_map.hpp>
 
 //shapes
-#include "DGtal/shapes/ShapeFactory.h"
-#include "DGtal/shapes/Shapes.h"
-#include "DGtal/helpers/StdDefs.h"
-#include "DGtal/topology/helpers/Surfaces.h"
-
-#include "DGtal/topology/SetOfSurfels.h"
-#include "DGtal/topology/DigitalSurface.h"
-#include "DGtal/kernel/sets/SetPredicate.h"
-
-//Digitizer
-#include "DGtal/shapes/GaussDigitizer.h"
-#include "DGtal/geometry/curves/GridCurve.h"
-#include "DGtal/graph/DepthFirstVisitor.h"
-#include "DGtal/graph/GraphVisitorRange.h"
-
-
-//Estimators
-#include "DGtal/geometry/curves/estimation/TrueLocalEstimatorOnPoints.h"
-
-#include "DGtal/geometry/surfaces/estimation/IntegralInvariantMeanCurvatureEstimator.h"
-#include "DGtal/geometry/surfaces/estimation/IntegralInvariantGaussianCurvatureEstimator.h"
-#include "DGtal/geometry/surfaces/FunctorOnCells.h"
-
-#include "DGtal/topology/LightImplicitDigitalSurface.h"
-#include "DGtal/images/imagesSetsUtils/SimpleThresholdForegroundPredicate.h"
+#include "DGtal/shapes/implicit/ImplicitBall.h"
 #include "DGtal/math/MPolynomial.h"
 #include "DGtal/io/readers/MPolynomialReader.h"
 #include "DGtal/shapes/implicit/ImplicitPolynomial3Shape.h"
 
+//Digitizer
+#include "DGtal/shapes/GaussDigitizer.h"
+#include "DGtal/topology/LightImplicitDigitalSurface.h"
+#include "DGtal/topology/DigitalSurface.h"
+#include "DGtal/graph/DepthFirstVisitor.h"
+#include "DGtal/geometry/volumes/KanungoNoise.h"
+#include "DGtal/topology/CanonicSCellEmbedder.h"
 
-//Vol Export
-#include "DGtal/io/colormaps/GradientColorMap.h"
-#include "DGtal/io/colormaps/GrayscaleColorMap.h"
-#include "DGtal/io/writers/VolWriter.h"
-#include "DGtal/images/ImageHelper.h"
+
+
+//Estimators
+#include "DGtal/kernel/BasicPointFunctors.h"
+#include "DGtal/geometry/surfaces/FunctorOnCells.h"
+
+#include "DGtal/geometry/curves/estimation/TrueLocalEstimatorOnPoints.h"
+#include "DGtal/geometry/surfaces/estimation/IntegralInvariantMeanCurvatureEstimator.h"
+#include "DGtal/geometry/surfaces/estimation/IntegralInvariantGaussianCurvatureEstimator.h"
+#include "DGtal/geometry/surfaces/estimation/IntegralInvariantMeanCurvatureEstimator.h"
+#include "DGtal/geometry/surfaces/estimation/IntegralInvariantGaussianCurvatureEstimator.h"
+
+#include "DGtal/geometry/surfaces/estimation/LocalEstimatorFromSurfelFunctorAdapter.h"
+#include "DGtal/geometry/surfaces/estimation/estimationFunctors/MongeJetFittingMeanCurvatureEstimator.h"
+#include "DGtal/geometry/surfaces/estimation/estimationFunctors/MongeJetFittingGaussianCurvatureEstimator.h"
+#include "DGtal/geometry/surfaces/estimation/estimationFunctors/MongeJetFittingPrincipalCurvaturesEstimator.h"
 
 using namespace DGtal;
 
-template <typename Shape, typename KSpace, typename ConstIterator>
-std::vector<double>
-estimateTrueMeanCurvatureQuantity( Shape aShape, KSpace K, double h, ConstIterator it, ConstIterator it_end )
+template < typename Shape, typename KSpace, typename ConstIterator, typename OutputIterator >
+void
+estimateTrueMeanCurvatureQuantity( const ConstIterator & it_begin,
+                                   const ConstIterator & it_end,
+                                   OutputIterator & output,
+                                   const KSpace & K,
+                                   const double & h,
+                                   Shape * aShape )
 {
-  typedef typename Shape::RealPoint RealPoint;
-  SCellToMidPoint<KSpace> midpoint(K);
+    typedef typename KSpace::Space::RealPoint RealPoint;
+    typedef CanonicSCellEmbedder< KSpace > Embedder;
 
-  std::vector<double> values;
-  for ( ; it != it_end; ++it )
-  {
-    RealPoint A = midpoint( *it ) * h;
-    A = aShape.nearestPoint( A, 0.01, 200, 0.1 * h );
-    values.push_back( aShape.meanCurvature( A ));
-  }
-  return values;
+    Embedder embedder( K );
+    RealPoint currentRealPoint;
+
+    for ( ConstIterator it = it_begin; it != it_end; ++it )
+    {
+        currentRealPoint = embedder( *it_begin ) * h;
+        output = aShape->meanCurvature( currentRealPoint );
+        ++output;
+    }
 }
 
-template <typename Shape, typename KSpace, typename ConstIterator>
-std::vector<double>
-estimateTrueGaussianCurvatureQuantity( Shape aShape, KSpace K, double h, ConstIterator it, ConstIterator it_end )
+template < typename Shape, typename KSpace, typename ConstIterator, typename OutputIterator >
+void
+estimateTrueGaussianCurvatureQuantity( const ConstIterator & it_begin,
+                                       const ConstIterator & it_end,
+                                       OutputIterator & output,
+                                       const KSpace & K,
+                                       const double & h,
+                                       Shape * aShape )
 {
-  typedef typename Shape::RealPoint RealPoint;
-  SCellToMidPoint<KSpace> midpoint(K);
+    typedef typename KSpace::Space::RealPoint RealPoint;
+    typedef CanonicSCellEmbedder< KSpace > Embedder;
 
-  std::vector<double> values;
-  for ( ; it != it_end; ++it )
-  {
-    RealPoint A = midpoint( *it ) * h;
-    A = aShape.nearestPoint( A, 0.01, 200, 0.1 * h );
-    values.push_back( aShape.gaussianCurvature( A ));
-  }
-  return values;
+    Embedder embedder( K );
+    RealPoint currentRealPoint;
+
+    for ( ConstIterator it = it_begin; it != it_end; ++it )
+    {
+        currentRealPoint = embedder( *it_begin ) * h;
+        output = aShape->gaussianCurvature( currentRealPoint );
+        ++output;
+    }
 }
 
-template <typename Estimator, typename ConstIterator>
-std::vector<typename Estimator::Quantity>
-estimateQuantity( Estimator & estimator, 
-      ConstIterator it, ConstIterator it_end )
+template < typename Shape, typename KSpace, typename ConstIterator, typename OutputIterator >
+void
+estimateTruePrincipalCurvaturesQuantity( const ConstIterator & it_begin,
+                                                  const ConstIterator & it_end,
+                                                  OutputIterator & output,
+                                                  const KSpace & K,
+                                                  const double & h,
+                                                  Shape * aShape )
 {
-  std::vector<typename Estimator::Quantity> values;
+    typedef typename KSpace::Space::RealPoint RealPoint;
+    typedef CanonicSCellEmbedder< KSpace > Embedder;
 
-  std::back_insert_iterator< std::vector< typename Estimator::Quantity > > valuesIterator( values );
-  estimator.eval ( it, it_end, valuesIterator );
+    Embedder embedder( K );
+    RealPoint currentRealPoint;
 
-  return values;
+    for ( ConstIterator it = it_begin; it != it_end; ++it )
+    {
+        currentRealPoint = embedder( *it_begin ) * h;
+        double k1, k2;
+        aShape->principalCurvatures( currentRealPoint, k1, k2 );
+        CurvatureInformations result;
+        result.k1 = k1;
+        result.k2 = k2;
+        output = result;
+        ++output;
+    }
 }
 
 template <typename Space, typename Shape>
 bool
-compareShapeEstimators( const std::string & name,
-                        Shape & aShape,
-                        double border_min[],
-                        double border_max[],
-                        double h,
-                        double radius_kernel,
-                        const bool export_vol,
-                        const std::string & pathToSaveVolFile = "",
-                        const std::string & nameVolFile = "" )
+compareShapeEstimators( const std::string & filename,
+                        const Shape * aShape,
+                        const typename Space::RealPoint & border_min,
+                        const typename Space::RealPoint & border_max,
+                        const double & h,
+                        const double & radius_kernel,
+                        const double & alpha,
+                        const std::string & options,
+                        const std::string & properties,
+                        const bool & lambda_optimized,
+                        double noiseLevel = 0.0 )
 {
-  typedef typename Space::RealPoint RealPoint;
-  typedef typename Space::Integer Integer;
-  typedef GaussDigitizer< Space, Shape > Digitizer;
-  typedef KhalimskySpaceND< Space::dimension, Integer > KSpace;
-  typedef LightImplicitDigitalSurface< KSpace, Digitizer > LightImplicitDigSurface;
-  typedef HyperRectDomain< Space > Domain;
+    typedef typename Space::RealPoint RealPoint;
+    typedef GaussDigitizer< Z3i::Space, Shape > DigitalShape;
+    typedef Z3i::KSpace KSpace;
+    typedef typename KSpace::SCell SCell;
+    typedef typename KSpace::Surfel Surfel;
 
-  typedef DigitalSurface< LightImplicitDigSurface > MyDigitalSurface;
-  typedef typename MyDigitalSurface::ConstIterator ConstIterator;
-  typedef typename KSpace::Surfel Surfel;
+    bool withNoise = ( noiseLevel <= 0.0 ) ? false : true;
 
-  typedef DepthFirstVisitor< MyDigitalSurface > Visitor;
-  typedef GraphVisitorRange< Visitor > VisitorRange;
-  typedef typename VisitorRange::ConstIterator SurfelConstIterator;
+    ASSERT (( noiseLevel < 1.0 ));
+    // Digitizer
+    DigitalShape* dshape = new DigitalShape();
+    dshape->attach( *aShape );
+    dshape->init( border_min, border_max, h );
 
-  Digitizer dig;
-  dig.attach( aShape );
-  dig.init( RealPoint( border_min ), RealPoint( border_max ), h );
-  Domain domain = dig.getDomain();
-
-  typedef typename ImageSelector< Domain, unsigned int >::Type Image;
-  Image image( domain );
-  DGtal::imageFromRangeAndValue( domain.begin(), domain.end(), image );
-
-  KSpace K;
-  bool ok = K.init( domain.lowerBound(), domain.upperBound(), true );
-  if ( ! ok )
-  {
-    std::cerr << "[compareShapeEstimators]" << " error in creating KSpace." << std::endl;
-    return false;
-  }
-
-  try
-  {
-    // Extracts shape boundary
-    SurfelAdjacency< KSpace::dimension > SAdj ( true );
-    Surfel bel = Surfaces<KSpace>::findABel ( K, dig, 10000 );
-
-    LightImplicitDigSurface LightImplDigSurf ( K, dig, SAdj, bel );
-    MyDigitalSurface surf ( LightImplDigSurf );
-
-
-    std::cout << "# range size = " << surf.size() << std::endl;
-    std::cout << "# h = " << h << std::endl;
-
-    // Estimations
-    // True values
-    std::cout << "# True values computation" << std::endl;
-
-    VisitorRange range( new Visitor( surf, *surf.begin() ) );
-    SurfelConstIterator abegin = range.begin();
-    SurfelConstIterator aend = range.end();
-
-    std::vector<double> trueMeanCurvatures =
-      estimateTrueMeanCurvatureQuantity ( aShape, K, h, abegin, aend );
-
-    VisitorRange range2( new Visitor( surf, *surf.begin() ) );
-    abegin = range2.begin();
-    aend = range2.end();
-
-    std::vector<double> trueGaussianCurvatures =
-      estimateTrueGaussianCurvatureQuantity ( aShape, K, h, abegin, aend );
-
-    typedef ImageToConstantFunctor< Image, Digitizer > MyPointFunctor;
-    MyPointFunctor pointFunctor( &image, &dig, 1, true );
-
-    // Integral Invariant Mean Curvature
-    std::cout << "# Mean Curvature estimation from the Integral Invariant viewpoint" << std::endl;
-    typedef FunctorOnCells< MyPointFunctor, KSpace > MyCellFunctor;
-
-    MyCellFunctor functor ( pointFunctor, K );
-    IntegralInvariantMeanCurvatureEstimator< KSpace, MyCellFunctor > IIMeanCurvatureEstimator ( K, functor );
-
-    double re_convolution_kernel = radius_kernel * std::pow( h, 1.0/3.0 ); // to obtains convergence results, re must follow the rule re=kh^(1/3)
-    std::cout << "# computed kernel radius = " << re_convolution_kernel << std::endl;
-
-    Clock c;
-    c.startClock();
-    IIMeanCurvatureEstimator.init ( h, re_convolution_kernel );
-
-    VisitorRange range3( new Visitor( surf, *surf.begin() ) );
-    abegin = range3.begin();
-    aend = range3.end();
-
-    std::vector<double> IIMeanCurvatures =
-      estimateQuantity( IIMeanCurvatureEstimator, abegin, aend );
-    double TIIMeanCurv = c.stopClock();
-
-    // Integral Invariant Gaussian Curvature
-    std::cout << "# Gaussian Curvature estimation from the Integral Invariant viewpoint" << std::endl;
-
-    IntegralInvariantGaussianCurvatureEstimator< KSpace, MyCellFunctor > IIGaussianCurvatureEstimator ( K, functor );
-    std::cout << "# computed kernel radius = " << re_convolution_kernel << std::endl;
-
-    c.startClock();
-    IIGaussianCurvatureEstimator.init( h, re_convolution_kernel );
-
-    VisitorRange range4( new Visitor( surf, *surf.begin() ) );
-    abegin = range4.begin();
-    aend = range4.end();
-
-    std::vector<double> IIGaussianCurvatures =
-      estimateQuantity( IIGaussianCurvatureEstimator, abegin, aend );
-    double TIIGaussCurv = c.stopClock();
-
-    // Output
-    std::cout << "# Shape = " << name << std::endl
-              << "# Time-IIMeanCurvature = " << TIIMeanCurv << std::endl
-              << "# Time-IIGaussianCurvature = " << TIIGaussCurv << std::endl
-              << "# id x y z TrueMeanCurvature TrueGaussianCurvature"
-              << " IIMeanCurvature IIGaussianCurvature"
-              << std::endl;
-
-    VisitorRange range5( new Visitor( surf, *surf.begin() ) );
-    abegin = range5.begin();
-    aend = range5.end();
-
-    Z3i::DigitalSet set3d( domain );
-
-    for ( int i = 0; abegin != aend; ++abegin, ++i )
+    KSpace K;
+    if ( ! K.init( dshape->getLowerBound(), dshape->getUpperBound(), true ) )
     {
-      Surfel p = *abegin;
-      std::cout << i << std::setprecision( 15 )
-                << " " << p.myCoordinates[ 0 ] << " " << p.myCoordinates[ 1 ] << " " << p.myCoordinates[ 2 ]
-                << " " << trueMeanCurvatures[ i ]
-                << " " << trueGaussianCurvatures[ i ]
-                << " " << IIMeanCurvatures[ i ]
-                << " " << IIGaussianCurvatures[ i ]
-                << std::endl;
-      set3d.insert ( K.sCoords ( p ));
+        std::cerr << "[3dLocalEstimators] error in creating KSpace." << std::endl;
+        return false;
     }
 
-    if ( export_vol )
+    try
     {
-      typedef typename ImageSelector < Domain, unsigned char>::Type Image;
-      Image mImage = ImageFromSet< Image >::create( set3d, 128, true);
+        if ( withNoise )
+        {
+            typedef KanungoNoise< DigitalShape, Z3i::Domain > KanungoPredicate;
+            typedef LightImplicitDigitalSurface< KSpace, KanungoPredicate > Boundary;
+            typedef DigitalSurface< Boundary > MyDigitalSurface;
+            typedef typename MyDigitalSurface::ConstIterator ConstIterator;
 
-      for ( typename Image::Range::Iterator it = mImage.begin(), itend = mImage.end();
-            it != itend;
-            ++it )
-      {
-        (*it) += 128;
-      }
+            typedef DepthFirstVisitor< MyDigitalSurface > Visitor;
+            typedef GraphVisitorRange< Visitor > VisitorRange;
+            typedef typename VisitorRange::ConstIterator VisitorConstIterator;
 
-      std::stringstream sstm;
-      sstm << pathToSaveVolFile << nameVolFile << "_h_" << h << ".vol";
-      VolWriter< Image >::exportVol(sstm.str(), mImage );
+            typedef PointFunctorFromPointPredicateAndDomain< KanungoPredicate, Z3i::Domain, unsigned int > MyPointFunctor;
+            typedef FunctorOnCells< MyPointFunctor, KSpace > MySpelFunctor;
+
+            // Extracts shape boundary
+            KanungoPredicate * noisifiedObject = new KanungoPredicate( *dshape, dshape->getDomain(), noiseLevel );
+            SCell bel = Surfaces< KSpace >::findABel( K, *noisifiedObject, 10000 );
+            Boundary * boundary = new Boundary( K, *noisifiedObject, SurfelAdjacency< KSpace::dimension >( true ), bel );
+            MyDigitalSurface surf ( *boundary );
+
+            double minsize = dshape->getUpperBound()[0] - dshape->getLowerBound()[0];
+            unsigned int tries = 0;
+            while( surf.size() < 2 * minsize || tries > 150 )
+            {
+                delete boundary;
+                bel = Surfaces< KSpace >::findABel( K, *noisifiedObject, 10000 );
+                boundary = new Boundary( K, *noisifiedObject, SurfelAdjacency< KSpace::dimension >( true ), bel );
+                surf = MyDigitalSurface( *boundary );
+                ++tries;
+            }
+
+            if( tries > 150 )
+            {
+                std::cerr << "Can't found a proper bel. So .... I ... just ... kill myself." << std::endl;
+                return false;
+            }
+
+            VisitorRange * range;
+            VisitorConstIterator ibegin;
+            VisitorConstIterator iend;
+
+            // Estimations
+            Clock c;
+
+            // True
+            if( options.at( 0 ) != '0' )
+            {
+                // True Mean Curvature
+                if( properties.at( 0 ) != '0' )
+                {
+                    trace.beginBlock( "True mean curvature" );
+
+                    char full_filename[360];
+                    sprintf( full_filename, "%s%s", filename.c_str(), "_True_mean.dat" );
+                    std::ofstream file( full_filename );
+                    file << "# h = " << h << std::endl;
+                    file << "# True Mean Curvature estimation" << std::endl;
+
+                    std::ostream_iterator< double > out_it_true_mean( file, "\n" );
+
+                    range = new VisitorRange( new Visitor( surf, *surf.begin() ));
+                    ibegin = range->begin();
+                    iend = range->end();
+
+                    c.startClock();
+
+                    estimateTrueMeanCurvatureQuantity( ibegin,
+                                                       iend,
+                                                       out_it_true_mean,
+                                                       K,
+                                                       h,
+                                                       aShape );
+
+                    double TTrueMeanCurv = c.stopClock();
+                    file << "# time = " << TTrueMeanCurv << std::endl;
+
+                    file.close();
+                    delete range;
+
+                    trace.endBlock();
+                }
+
+                // True Gaussian Curvature
+                if( properties.at( 1 ) != '0' )
+                {
+                    trace.beginBlock( "True Gausian curvature" );
+
+                    char full_filename[360];
+                    sprintf( full_filename, "%s%s", filename.c_str(), "_True_gaussian.dat" );
+                    std::ofstream file( full_filename );
+                    file << "# h = " << h << std::endl;
+                    file << "# True Gaussian Curvature estimation" << std::endl;
+
+                    std::ostream_iterator< double > out_it_true_gaussian( file, "\n" );
+
+                    range = new VisitorRange( new Visitor( surf, *surf.begin() ));
+                    ibegin = range->begin();
+                    iend = range->end();
+
+                    c.startClock();
+
+                    estimateTrueGaussianCurvatureQuantity( ibegin,
+                                                           iend,
+                                                           out_it_true_gaussian,
+                                                           K,
+                                                           h,
+                                                           aShape );
+
+                    double TTrueGaussianCurv = c.stopClock();
+                    file << "# time = " << TTrueGaussianCurv << std::endl;
+
+                    file.close();
+                    delete range;
+
+                    trace.endBlock();
+                }
+
+                // True Principal Curvatures
+                if( properties.at( 2 ) != '0' )
+                {
+                    trace.beginBlock( "True principal curvatures" );
+
+                    char full_filename[360];
+                    sprintf( full_filename, "%s%s", filename.c_str(), "_True_principal.dat" );
+                    std::ofstream file( full_filename );
+                    file << "# h = " << h << std::endl;
+                    file << "# True Gaussian Curvature estimation" << std::endl;
+
+                    std::ostream_iterator< CurvatureInformations > out_it_true_pc( file, "\n" );
+
+                    range = new VisitorRange( new Visitor( surf, *surf.begin() ));
+                    ibegin = range->begin();
+                    iend = range->end();
+
+                    c.startClock();
+
+                    estimateTruePrincipalCurvaturesQuantity( ibegin,
+                                                           iend,
+                                                           out_it_true_pc,
+                                                           K,
+                                                           h,
+                                                           aShape );
+
+                    double TTruePrincCurv = c.stopClock();
+                    file << "# time = " << TTruePrincCurv << std::endl;
+
+                    file.close();
+
+                    delete range;
+
+                    trace.endBlock();
+                }
+            }
+
+            double re_convolution_kernel = radius_kernel * std::pow( h, alpha ); // to obtains convergence results, re must follow the rule re=kh^(1/3)
+
+            // II
+            if( options.at( 1 ) != '0' )
+            {
+                MyPointFunctor * pointFunctor = new MyPointFunctor( noisifiedObject, dshape->getDomain(), 1, 0 );
+                MySpelFunctor * functor = new MySpelFunctor( *pointFunctor, K );
+
+                // Integral Invariant Mean Curvature
+                if( properties.at( 0 ) != '0' )
+                {
+                    trace.beginBlock( "II mean curvature" );
+
+                    IntegralInvariantMeanCurvatureEstimator< KSpace, MySpelFunctor > * IIMeanCurvatureEstimator = new IntegralInvariantMeanCurvatureEstimator< KSpace, MySpelFunctor >( K, *functor );
+
+                    c.startClock();
+                    IIMeanCurvatureEstimator->init ( h, re_convolution_kernel );
+
+                    char full_filename[360];
+                    sprintf( full_filename, "%s%s", filename.c_str(), "_II_mean.dat" );
+                    std::ofstream file( full_filename );
+                    file << "# h = " << h << std::endl;
+                    file << "# Mean Curvature estimation from the Integral Invariant" << std::endl;
+                    file << "# computed kernel radius = " << re_convolution_kernel << std::endl;
+
+                    range = new VisitorRange( new Visitor( surf, *surf.begin() ));
+                    ibegin = range->begin();
+                    iend = range->end();
+
+                    std::ostream_iterator< double > out_it_ii_mean( file, "\n" );
+                    IIMeanCurvatureEstimator->eval( ibegin, iend, out_it_ii_mean );
+
+                    double TIIMeanCurv = c.stopClock();
+                    file << "# time = " << TIIMeanCurv << std::endl;
+                    file.close();
+
+                    delete range;
+                    delete IIMeanCurvatureEstimator;
+
+                    trace.endBlock();
+                }
+
+                // Integral Invariant Gaussian Curvature
+                if( properties.at( 1 ) != '0' )
+                {
+                    trace.beginBlock( "II Gaussian curvature" );
+
+                    IntegralInvariantGaussianCurvatureEstimator< KSpace, MySpelFunctor > * IIGaussianCurvatureEstimator = new IntegralInvariantGaussianCurvatureEstimator< KSpace, MySpelFunctor >( K, *functor );
+
+                    c.startClock();
+                    IIGaussianCurvatureEstimator->init( h, re_convolution_kernel );
+
+                    char full_filename[360];
+                    sprintf( full_filename, "%s%s", filename.c_str(), "_II_gaussian.dat" );
+                    std::ofstream file( full_filename );
+                    file << "# h = " << h << std::endl;
+                    file << "# Gaussian Curvature estimation from the Integral Invariant" << std::endl;
+                    file << "# computed kernel radius = " << re_convolution_kernel << std::endl;
+
+                    std::ostream_iterator< double > out_it_ii_gaussian( file, "\n" );
+
+                    range = new VisitorRange( new Visitor( surf, *surf.begin() ));
+                    ibegin = range->begin();
+                    iend = range->end();
+
+                    IIGaussianCurvatureEstimator->eval ( ibegin, iend, out_it_ii_gaussian );
+
+                    double TIIGaussCurv = c.stopClock();
+                    file << "# time = " << TIIGaussCurv << std::endl;
+                    file.close();
+
+                    delete range;
+                    delete IIGaussianCurvatureEstimator;
+
+                    trace.endBlock();
+                }
+
+                // Integral Invariant Principal Curvatures
+                if( properties.at( 2 ) != '0' )
+                {
+                    trace.beginBlock( "II Principal curvatures" );
+
+                    IntegralInvariantGaussianCurvatureEstimator< KSpace, MySpelFunctor > * IIGaussianCurvatureEstimator = new IntegralInvariantGaussianCurvatureEstimator< KSpace, MySpelFunctor >( K, *functor );
+
+                    c.startClock();
+                    IIGaussianCurvatureEstimator->init( h, re_convolution_kernel );
+
+                    char full_filename[360];
+                    sprintf( full_filename, "%s%s", filename.c_str(), "_II_principal.dat" );
+                    std::ofstream file( full_filename );
+                    file << "# h = " << h << std::endl;
+                    file << "# Gaussian Curvature estimation from the Integral Invariant" << std::endl;
+                    file << "# computed kernel radius = " << re_convolution_kernel << std::endl;
+
+                    std::ostream_iterator< CurvatureInformations > out_it_ii_principal( file, "\n" );
+
+                    range = new VisitorRange( new Visitor( surf, *surf.begin() ));
+                    ibegin = range->begin();
+                    iend = range->end();
+
+                    IIGaussianCurvatureEstimator->evalPrincipalCurvatures ( ibegin, iend, out_it_ii_principal );
+
+                    double TIIGaussCurv = c.stopClock();
+                    file << "# time = " << TIIGaussCurv << std::endl;
+                    file.close();
+
+                    delete range;
+                    delete IIGaussianCurvatureEstimator;
+
+                    trace.endBlock();
+                }
+                //delete noisifiedObject;
+                delete boundary;
+                delete pointFunctor;
+                delete functor;
+            }
+
+            // Monge
+            if( options.at( 2 ) != '0' )
+            {
+                // Monge Mean Curvature
+                if( properties.at( 0 ) != '0' )
+                {
+                    trace.beginBlock( "Monge mean curvature" );
+
+                    typedef MongeJetFittingMeanCurvatureEstimator<Surfel, CanonicSCellEmbedder<KSpace> > FunctorMean;
+                    typedef ConstValueFunctor< double > ConvFunctor;
+                    typedef LocalEstimatorFromSurfelFunctorAdapter<typename MyDigitalSurface::DigitalSurfaceContainer, Z3i::L2Metric, FunctorMean, ConvFunctor> ReporterH;
+                    CanonicSCellEmbedder<KSpace> embedder( K );
+                    FunctorMean estimatorH( embedder, h );
+                    ConvFunctor convFunc(1.0);
+                    ReporterH reporterH( surf.container(), Z3i::l2Metric, estimatorH, convFunc);
+                    c.startClock();
+                    reporterH.init( h , re_convolution_kernel / h  );
+
+                    char full_filename[360];
+                    sprintf( full_filename, "%s%s", filename.c_str(), "_MongeJetFitting_mean.dat" );
+                    std::ofstream file( full_filename );
+                    file << "# h = " << h << std::endl;
+                    file << "# Mean Curvature estimation from CGAL Monge from and Jet Fitting" << std::endl;
+                    file << "# computed kernel radius = " << re_convolution_kernel << std::endl;
+                    std::ostream_iterator< double > out_it_monge_mean( file, "\n" );
+
+                    range = new VisitorRange( new Visitor( surf, *surf.begin() ));
+                    ibegin = range->begin();
+                    iend = range->end();
+                    //typename ReporterH::SurfelConstIterator aabegin = surf.begin();
+                    //typename ReporterH::SurfelConstIterator aaend = surf.end();
+                    reporterH.eval(ibegin, iend, out_it_monge_mean);
+                    double TMongeMeanCurv = c.stopClock();
+                    file << "# time = " << TMongeMeanCurv << std::endl;
+                    file.close();
+                    delete range;
+
+
+                    trace.endBlock();
+                }
+
+                // Monge Gaussian Curvature
+                if( properties.at( 1 ) != '0' )
+                {
+                    trace.beginBlock( "Monge Gaussian curvature" );
+
+                    typedef MongeJetFittingGaussianCurvatureEstimator<Surfel, CanonicSCellEmbedder<KSpace> > FunctorGaussian;
+                    typedef ConstValueFunctor< double > ConvFunctor;
+                    typedef LocalEstimatorFromSurfelFunctorAdapter<typename MyDigitalSurface::DigitalSurfaceContainer, Z3i::L2Metric, FunctorGaussian, ConvFunctor> ReporterK;
+                    CanonicSCellEmbedder<KSpace> embedder( K );
+                    FunctorGaussian estimatorK( embedder, h );
+                    ConvFunctor convFunc(1.0);
+                    ReporterK reporterK(surf.container(), Z3i::l2Metric, estimatorK, convFunc);
+                    c.startClock();
+                    reporterK.init( h , re_convolution_kernel / h  );
+
+                    //typename ReporterK::SurfelConstIterator aaabegin = surf.begin();
+                    //typename ReporterK::SurfelConstIterator aaaend = surf.end();
+
+                    range = new VisitorRange( new Visitor( surf, *surf.begin() ));
+                    ibegin = range->begin();
+                    iend = range->end();
+
+                    char full_filename[360];
+                    sprintf( full_filename, "%s%s", filename.c_str(), "_MongeJetFitting_gaussian.dat" );
+                    std::ofstream file( full_filename );
+                    file << "# h = " << h << std::endl;
+                    file << "# Gaussian Curvature estimation from CGAL Monge from and Jet Fitting" << std::endl;
+                    file << "# computed kernel radius = " << re_convolution_kernel << std::endl;
+                    std::ostream_iterator< double > out_it_monge_gaussian( file, "\n" );
+                    reporterK.eval(ibegin, iend , out_it_monge_gaussian);
+                    double TMongeGaussCurv = c.stopClock();
+                    file << "# time = " << TMongeGaussCurv << std::endl;
+                    file.close();
+                    delete range;
+
+
+                    trace.endBlock();
+                }
+
+                // Monge Principal Curvatures
+                if( properties.at( 2 ) != '0' )
+                {
+                    trace.beginBlock( "Monge Principal Curvature" );
+
+                    typedef MongeJetFittingPrincipalCurvaturesEstimator<Surfel, CanonicSCellEmbedder<KSpace> > FunctorPrincCurv;
+                    typedef ConstValueFunctor< double > ConvFunctor;
+                    typedef LocalEstimatorFromSurfelFunctorAdapter<typename MyDigitalSurface::DigitalSurfaceContainer, Z3i::L2Metric, FunctorPrincCurv, ConvFunctor> ReporterK;
+                    CanonicSCellEmbedder<KSpace> embedder( K );
+                    FunctorPrincCurv estimatorK( embedder, h );
+                    ConvFunctor convFunc(1.0);
+                    ReporterK reporterK(surf.container(), Z3i::l2Metric, estimatorK, convFunc);
+                    c.startClock();
+                    reporterK.init( h , re_convolution_kernel / h  );
+
+                    range = new VisitorRange( new Visitor( surf, *surf.begin() ));
+                    ibegin = range->begin();
+                    iend = range->end();
+
+                    char full_filename[360];
+                    sprintf( full_filename, "%s%s", filename.c_str(), "_MongeJetFitting_principal.dat" );
+                    std::ofstream file( full_filename );
+                    file << "# h = " << h << std::endl;
+                    file << "# Gaussian Curvature estimation from CGAL Monge from and Jet Fitting" << std::endl;
+                    file << "# computed kernel radius = " << re_convolution_kernel << std::endl;
+                    std::ostream_iterator< CurvatureInformations > out_it_monge_gaussian( file, "\n" );
+                    reporterK.eval(ibegin, iend , out_it_monge_gaussian);
+                    double TMongeGaussCurv = c.stopClock();
+                    file << "# time = " << TMongeGaussCurv << std::endl;
+                    file.close();
+                    delete range;
+
+
+                    trace.endBlock();
+                }
+            }
+        }
+        else
+        {
+            typedef LightImplicitDigitalSurface< KSpace, DigitalShape > Boundary;
+            typedef DigitalSurface< Boundary > MyDigitalSurface;
+            typedef typename MyDigitalSurface::ConstIterator ConstIterator;
+
+            typedef DepthFirstVisitor< MyDigitalSurface > Visitor;
+            typedef GraphVisitorRange< Visitor > VisitorRange;
+            typedef typename VisitorRange::ConstIterator VisitorConstIterator;
+
+            typedef PointFunctorFromPointPredicateAndDomain< DigitalShape, Z3i::Domain, unsigned int > MyPointFunctor;
+            typedef FunctorOnCells< MyPointFunctor, KSpace > MySpelFunctor;
+
+            // Extracts shape boundary
+            SCell bel = Surfaces<KSpace>::findABel ( K, *dshape, 10000 );
+            Boundary boundary( K, *dshape, SurfelAdjacency< KSpace::dimension >( true ), bel );
+            MyDigitalSurface surf ( boundary );
+
+            VisitorRange * range;
+            VisitorConstIterator ibegin;
+            VisitorConstIterator iend;
+
+            unsigned int cntIn = 0;
+            for( auto it = dshape->getDomain().begin(), ite = dshape->getDomain().end(); it != ite; ++it )
+            {
+                if( dshape->operator ()(*it))
+                {
+                    ++cntIn;
+                }
+            }
+
+            std::cout << "boundary:" << surf.size() << std::endl;
+            std::cout << "full:" << cntIn << std::endl;
+
+            // Estimations
+            Clock c;
+
+            // True
+            if( options.at( 0 ) != '0' )
+            {
+                // True Mean Curvature
+                if( properties.at( 0 ) != '0' )
+                {
+                    trace.beginBlock( "True mean curvature" );
+
+                    char full_filename[360];
+                    sprintf( full_filename, "%s%s", filename.c_str(), "_True_mean.dat" );
+                    std::ofstream file( full_filename );
+                    file << "# h = " << h << std::endl;
+                    file << "# True Mean Curvature estimation" << std::endl;
+
+                    std::ostream_iterator< double > out_it_true_mean( file, "\n" );
+
+                    range = new VisitorRange( new Visitor( surf, *surf.begin() ));
+                    ibegin = range->begin();
+                    iend = range->end();
+
+                    c.startClock();
+
+                    estimateTrueMeanCurvatureQuantity( ibegin,
+                                                       iend,
+                                                       out_it_true_mean,
+                                                       K,
+                                                       h,
+                                                       aShape );
+
+                    double TTrueMeanCurv = c.stopClock();
+                    file << "# time = " << TTrueMeanCurv << std::endl;
+
+                    file.close();
+                    delete range;
+
+                    trace.endBlock();
+                }
+
+                // True Gaussian Curvature
+                if( properties.at( 1 ) != '0' )
+                {
+                    trace.beginBlock( "True Gaussian curvature" );
+
+                    char full_filename[360];
+                    sprintf( full_filename, "%s%s", filename.c_str(), "_True_gaussian.dat" );
+                    std::ofstream file( full_filename );
+                    file << "# h = " << h << std::endl;
+                    file << "# True Gaussian Curvature estimation" << std::endl;
+
+                    std::ostream_iterator< double > out_it_true_gaussian( file, "\n" );
+
+                    range = new VisitorRange( new Visitor( surf, *surf.begin() ));
+                    ibegin = range->begin();
+                    iend = range->end();
+
+                    c.startClock();
+
+                    estimateTrueGaussianCurvatureQuantity( ibegin,
+                                                           iend,
+                                                           out_it_true_gaussian,
+                                                           K,
+                                                           h,
+                                                           aShape );
+
+                    double TTrueGaussianCurv = c.stopClock();
+                    file << "# time = " << TTrueGaussianCurv << std::endl;
+
+                    file.close();
+
+                    delete range;
+
+                    trace.endBlock();
+                }
+
+                // True Principal Curvatures
+                if( properties.at( 2 ) != '0' )
+                {
+                    trace.beginBlock( "True principal curvatures" );
+
+                    char full_filename[360];
+                    sprintf( full_filename, "%s%s", filename.c_str(), "_True_principal.dat" );
+                    std::ofstream file( full_filename );
+                    file << "# h = " << h << std::endl;
+                    file << "# True Gaussian Curvature estimation" << std::endl;
+
+                    std::ostream_iterator< CurvatureInformations > out_it_true_pc( file, "\n" );
+
+                    range = new VisitorRange( new Visitor( surf, *surf.begin() ));
+                    ibegin = range->begin();
+                    iend = range->end();
+
+                    c.startClock();
+
+                    estimateTruePrincipalCurvaturesQuantity( ibegin,
+                                                           iend,
+                                                           out_it_true_pc,
+                                                           K,
+                                                           h,
+                                                           aShape );
+
+                    double TTruePrincCurv = c.stopClock();
+                    file << "# time = " << TTruePrincCurv << std::endl;
+
+                    file.close();
+
+                    delete range;
+
+                    trace.endBlock();
+                }
+            }
+
+            double re_convolution_kernel = radius_kernel * std::pow( h, alpha ); // to obtains convergence results, re must follow the rule re=kh^(1/3)
+
+            // II
+            if( options.at( 1 ) != '0' )
+            {
+                MyPointFunctor * pointFunctor = new MyPointFunctor( dshape, dshape->getDomain(), 1, 0 );
+                MySpelFunctor * functor = new MySpelFunctor( *pointFunctor, K );
+
+                // Integral Invariant Mean Curvature
+                if( properties.at( 0 ) != '0' )
+                {
+                    trace.beginBlock( "II mean curvature" );
+
+                    IntegralInvariantMeanCurvatureEstimator< KSpace, MySpelFunctor > * IIMeanCurvatureEstimator = new IntegralInvariantMeanCurvatureEstimator< KSpace, MySpelFunctor >( K, *functor );
+
+                    c.startClock();
+                    IIMeanCurvatureEstimator->init ( h, re_convolution_kernel );
+
+                    char full_filename[360];
+                    sprintf( full_filename, "%s%s", filename.c_str(), "_II_mean.dat" );
+                    std::ofstream file( full_filename );
+                    file << "# h = " << h << std::endl;
+                    file << "# Mean Curvature estimation from the Integral Invariant" << std::endl;
+                    file << "# computed kernel radius = " << re_convolution_kernel << std::endl;
+
+                    range = new VisitorRange( new Visitor( surf, *surf.begin() ));
+                    ibegin = range->begin();
+                    iend = range->end();
+
+                    std::ostream_iterator< double > out_it_ii_mean( file, "\n" );
+
+                    IIMeanCurvatureEstimator->eval( ibegin, iend, out_it_ii_mean );
+
+                    double TIIMeanCurv = c.stopClock();
+                    file << "# time = " << TIIMeanCurv << std::endl;
+                    file.close();
+
+                    delete range;
+                    delete IIMeanCurvatureEstimator;
+
+                    trace.endBlock();
+                }
+
+                // Integral Invariant Gaussian Curvature
+                if( properties.at( 1 ) != '0' )
+                {
+                    trace.beginBlock( "II Gaussian curvature" );
+
+                    IntegralInvariantGaussianCurvatureEstimator< KSpace, MySpelFunctor > * IIGaussianCurvatureEstimator = new IntegralInvariantGaussianCurvatureEstimator< KSpace, MySpelFunctor >( K, *functor );
+
+                    c.startClock();
+                    IIGaussianCurvatureEstimator->init( h, re_convolution_kernel );
+
+                    char full_filename[360];
+                    sprintf( full_filename, "%s%s", filename.c_str(), "_II_gaussian.dat" );
+                    std::ofstream file( full_filename );
+                    file << "# h = " << h << std::endl;
+                    file << "# Gaussian Curvature estimation from the Integral Invariant" << std::endl;
+                    file << "# computed kernel radius = " << re_convolution_kernel << std::endl;
+
+                    std::ostream_iterator< double > out_it_ii_gaussian( file, "\n" );
+
+                    range = new VisitorRange( new Visitor( surf, *surf.begin() ));
+                    ibegin = range->begin();
+                    iend = range->end();
+
+                    IIGaussianCurvatureEstimator->eval ( ibegin, iend, out_it_ii_gaussian );
+
+                    double TIIGaussCurv = c.stopClock();
+                    file << "# time = " << TIIGaussCurv << std::endl;
+                    file.close();
+
+                    delete range;
+                    delete IIGaussianCurvatureEstimator;
+
+                    trace.endBlock();
+                }
+
+                // Integral Invariant Principal Curvatures
+                if( properties.at( 2 ) != '0' )
+                {
+                    trace.beginBlock( "II Principal curvatures" );
+
+                    IntegralInvariantGaussianCurvatureEstimator< KSpace, MySpelFunctor > * IIGaussianCurvatureEstimator = new IntegralInvariantGaussianCurvatureEstimator< KSpace, MySpelFunctor >( K, *functor );
+
+                    c.startClock();
+                    IIGaussianCurvatureEstimator->init( h, re_convolution_kernel );
+
+                    char full_filename[360];
+                    sprintf( full_filename, "%s%s", filename.c_str(), "_II_principal.dat" );
+                    std::ofstream file( full_filename );
+                    file << "# h = " << h << std::endl;
+                    file << "# Gaussian Curvature estimation from the Integral Invariant" << std::endl;
+                    file << "# computed kernel radius = " << re_convolution_kernel << std::endl;
+
+                    std::ostream_iterator< CurvatureInformations > out_it_ii_principal( file, "\n" );
+
+                    range = new VisitorRange( new Visitor( surf, *surf.begin() ));
+                    ibegin = range->begin();
+                    iend = range->end();
+
+                    IIGaussianCurvatureEstimator->evalPrincipalCurvatures ( ibegin, iend, out_it_ii_principal );
+
+                    double TIIGaussCurv = c.stopClock();
+                    file << "# time = " << TIIGaussCurv << std::endl;
+                    file.close();
+
+                    delete range;
+                    delete IIGaussianCurvatureEstimator;
+
+                    trace.endBlock();
+                }
+
+                delete pointFunctor;
+                delete functor;
+            }
+
+            // Monge
+            if( options.at( 2 ) != '0' )
+            {
+                // Monge Mean Curvature
+                if( properties.at( 0 ) != '0' )
+                {
+                    trace.beginBlock( "Monge mean curvature" );
+
+                    typedef MongeJetFittingMeanCurvatureEstimator<Surfel, CanonicSCellEmbedder<KSpace> > FunctorMean;
+                    typedef ConstValueFunctor< double > ConvFunctor;
+                    typedef LocalEstimatorFromSurfelFunctorAdapter<typename MyDigitalSurface::DigitalSurfaceContainer, Z3i::L2Metric, FunctorMean, ConvFunctor> ReporterH;
+                    CanonicSCellEmbedder<KSpace> embedder( K );
+                    FunctorMean estimatorH( embedder, h );
+                    ConvFunctor convFunc(1.0);
+                    ReporterH reporterH(surf.container(), Z3i::l2Metric, estimatorH, convFunc);
+                    c.startClock();
+                    reporterH.init( h , re_convolution_kernel / h  );
+
+                    char full_filename[360];
+                    sprintf( full_filename, "%s%s", filename.c_str(), "_MongeJetFitting_mean.dat" );
+                    std::ofstream file( full_filename );
+                    file << "# h = " << h << std::endl;
+                    file << "# Mean Curvature estimation from CGAL Monge from and Jet Fitting" << std::endl;
+                    file << "# computed kernel radius = " << re_convolution_kernel << std::endl;
+                    std::ostream_iterator< double > out_it_monge_mean( file, "\n" );
+
+                    range = new VisitorRange( new Visitor( surf, *surf.begin() ));
+                    ibegin = range->begin();
+                    iend = range->end();
+
+                    reporterH.eval(ibegin, iend , out_it_monge_mean);
+                    double TMongeMeanCurv = c.stopClock();
+                    file << "# time = " << TMongeMeanCurv << std::endl;
+                    file.close();
+                    delete range;
+
+
+                    trace.endBlock();
+                }
+
+                // Monge Gaussian Curvature
+                if( properties.at( 1 ) != '0' )
+                {
+                    trace.beginBlock( "Monge Gaussian curvature" );
+
+                    typedef MongeJetFittingGaussianCurvatureEstimator<Surfel, CanonicSCellEmbedder<KSpace> > FunctorGaussian;
+                    typedef ConstValueFunctor< double > ConvFunctor;
+                    typedef LocalEstimatorFromSurfelFunctorAdapter<typename MyDigitalSurface::DigitalSurfaceContainer, Z3i::L2Metric, FunctorGaussian, ConvFunctor> ReporterK;
+                    CanonicSCellEmbedder<KSpace> embedder( K );
+                    FunctorGaussian estimatorK( embedder, h );
+                    ConvFunctor convFunc(1.0);
+                    ReporterK reporterK(surf.container(), Z3i::l2Metric, estimatorK, convFunc);
+                    c.startClock();
+                    reporterK.init( h , re_convolution_kernel / h  );
+
+                    range = new VisitorRange( new Visitor( surf, *surf.begin() ));
+                    ibegin = range->begin();
+                    iend = range->end();
+
+                    char full_filename[360];
+                    sprintf( full_filename, "%s%s", filename.c_str(), "_MongeJetFitting_gaussian.dat" );
+                    std::ofstream file( full_filename );
+                    file << "# h = " << h << std::endl;
+                    file << "# Gaussian Curvature estimation from CGAL Monge from and Jet Fitting" << std::endl;
+                    file << "# computed kernel radius = " << re_convolution_kernel << std::endl;
+                    std::ostream_iterator< double > out_it_monge_gaussian( file, "\n" );
+                    reporterK.eval(ibegin, iend , out_it_monge_gaussian);
+                    double TMongeGaussCurv = c.stopClock();
+                    file << "# time = " << TMongeGaussCurv << std::endl;
+                    file.close();
+                    delete range;
+
+
+                    trace.endBlock();
+                }
+
+                // Monge Principal Curvatures
+                if( properties.at( 2 ) != '0' )
+                {
+                    trace.beginBlock( "Monge Principal Curvature" );
+
+                    typedef MongeJetFittingPrincipalCurvaturesEstimator<Surfel, CanonicSCellEmbedder<KSpace> > FunctorPrincCurv;
+                    typedef ConstValueFunctor< double > ConvFunctor;
+                    typedef LocalEstimatorFromSurfelFunctorAdapter<typename MyDigitalSurface::DigitalSurfaceContainer, Z3i::L2Metric, FunctorPrincCurv, ConvFunctor> ReporterK;
+                    CanonicSCellEmbedder<KSpace> embedder( K );
+                    FunctorPrincCurv estimatorK( embedder, h );
+                    ConvFunctor convFunc(1.0);
+                    ReporterK reporterK(surf.container(), Z3i::l2Metric, estimatorK, convFunc);
+                    c.startClock();
+                    reporterK.init( h , re_convolution_kernel / h  );
+
+                    range = new VisitorRange( new Visitor( surf, *surf.begin() ));
+                    ibegin = range->begin();
+                    iend = range->end();
+
+                    char full_filename[360];
+                    sprintf( full_filename, "%s%s", filename.c_str(), "_MongeJetFitting_principal.dat" );
+                    std::ofstream file( full_filename );
+                    file << "# h = " << h << std::endl;
+                    file << "# Gaussian Curvature estimation from CGAL Monge from and Jet Fitting" << std::endl;
+                    file << "# computed kernel radius = " << re_convolution_kernel << std::endl;
+                    std::ostream_iterator< CurvatureInformations > out_it_monge_gaussian( file, "\n" );
+                    reporterK.eval(ibegin, iend , out_it_monge_gaussian);
+                    double TMongeGaussCurv = c.stopClock();
+                    file << "# time = " << TMongeGaussCurv << std::endl;
+                    file.close();
+                    delete range;
+
+
+                    trace.endBlock();
+                }
+
+            }
+        }
     }
-  }
-  catch ( InputException e )
-  {
-    std::cerr << "[estimatorCurvatureComparator3D]"
-              << " error."
-              << e.what() << std::endl;
-    return false;
-  }
-  return true;
+    catch ( InputException e )
+    {
+        std::cerr << "[estimatorCurvatureComparator3D]"
+                  << " error."
+                  << e.what()
+                  << " "
+                  << filename << " "
+                  << border_min[0] << " "
+                  << border_max[0] << " "
+                  << h << " "
+                  << radius_kernel << " "
+                  << lambda_optimized << " "
+                  << options << " "
+                  << alpha << " "
+                  << std::endl;
+        return false;
+    }
+
+    delete dshape;
+
+    return true;
 }
 
-void usage( int /*argc*/, char** argv )
+/**
+ * Missing parameter error message.
+ *
+ * @param param
+ */
+void missingParam( std::string param )
 {
-  std::cerr << "Usage: " << argv[ 0 ] << " <Polynomial> <Px> <Py> <Pz> <Qx> <Qy> <Qz> <step> <radius> (<path_to_save>) (<name_of_vol_file>)" << std::endl;
-  std::cerr << "\t - displays the boundary of a shape defined implicitly by a 3-polynomial <Polynomial>." << std::endl;
-  std::cerr << "\t - P and Q defines the bounding box." << std::endl;
-  std::cerr << "\t - step is the grid step." << std::endl;
-  std::cerr << "\t - radius is the kernel support k radius." << std::endl;
-  std::cerr << "\t - path is optional. It's the path where you want to generate a .vol file of the polynomial shape (for external computation). If no path was set, we don't export as a .vol file." << std::endl;
-  std::cerr << "\t - name is optional. It's the name of your .vol file you want to generate (for external computation). If no name was set, we don't export as a .vol file." << std::endl;
+    trace.error() << " Parameter: " << param << " is required.";
+    trace.info() << std::endl;
+    exit( 1 );
 }
+
+namespace po = boost::program_options;
 
 int main( int argc, char** argv )
 {
-  if ( argc < 10 )
-  {
-    usage( argc, argv );
-    return 1;
-  }
-  double border_min[ 3 ];
-  double border_max[ 3 ];
-  for ( unsigned int i = 0; i < 3; ++i )
-  {
-    border_min[ i ] = atof( argv[ 2+i ] );
-    border_max[ i ] = atof( argv[ 5+i ] );
-  }
-  double h = atof( argv[ 8 ] );
-  double radius = atof( argv[ 9 ] );
-
-  typedef Z3i::Space::RealPoint RealPoint;
-  typedef Z3i::Space::RealPoint::Coordinate Ring;
-  typedef MPolynomial< 3, Ring > Polynomial3;
-  typedef MPolynomialReader<3, Ring> Polynomial3Reader;
-  typedef ImplicitPolynomial3Shape<Z3i::Space> ImplicitShape;
-
-  /// Construction of the polynomial shape
-  Polynomial3 poly;
-  Polynomial3Reader reader;
-  std::string poly_str = argv[ 1 ];
-  std::string::const_iterator iter = reader.read( poly, poly_str.begin(), poly_str.end() );
-  if ( iter != poly_str.end() )
-  {
-    std::cerr << "ERROR: I read only <"
-              << poly_str.substr( 0, iter - poly_str.begin() )
-              << ">, and I built P=" << poly << std::endl;
-    return 1;
-  }
 
 
-  bool export_vol = false;
-  std::string pathToSaveVolFile = "";
-  std::string nameVolFile = "";
-  if( argc >= 12 )
-  {
-    export_vol = true;
-    pathToSaveVolFile = argv[ 10 ];
-    nameVolFile = argv[ 11 ];
-  }
+#ifndef WITH_CGAL
+#error You need to have activated CGAL (WITH_CGAL) to include this file.
+#endif
+#ifndef WITH_EIGEN
+#error You need to have activated EIGEN (WITH_EIGEN) to include this file.
+#endif
 
-  ImplicitShape shape( poly );
+    // parse command line ----------------------------------------------
+    po::options_description general_opt("Allowed options are");
+    general_opt.add_options()
+            ("help,h", "display this message")
+            ("shape,s", po::value< std::string >(), "Shape")
+            ("output,o", po::value< std::string >(), "Output file")
+            ("radius,r",  po::value< double >(), "Kernel radius for IntegralInvariant" )
+            ("alpha",  po::value<double>()->default_value(1.0/3.0), "Alpha parameter for Integral Invariant computation" )
+            ("h",  po::value< double >(), "Grid step" )
+            ("minAABB,a",  po::value< double >()->default_value( -10.0 ), "Min value of the AABB bounding box (domain)" )
+            ("maxAABB,A",  po::value< double >()->default_value( 10.0 ), "Max value of the AABB bounding box (domain)" )
+            ("noise,n",  po::value<double>()->default_value(0.0), "Level of noise to perturb the shape" )
+            ("lambda,l",  po::value< bool >()->default_value( false ), "Use the shape to get a better approximation of the surface (optional)" )
+            ("properties",  po::value<std::string>()->default_value("110"), "the i-th property is disabled iff there is a 0 at position i" )
+            ("estimators,e",  po::value< std::string >()->default_value("110"), "the i-th estimator is disabled iff there is a 0 at position i" );
 
-  /// Computation of 3D curvature estimators (mean & Gaussian) on the implicit shape
-  compareShapeEstimators< Z3i::Space, ImplicitShape >
-      (
-        poly_str,
-        shape,
-        border_min, border_max,
-        h,
-        radius,
-        export_vol, pathToSaveVolFile, nameVolFile
-      );
+
+    bool parseOK = true;
+    po::variables_map vm;
+    try
+    {
+        po::store( po::parse_command_line( argc, argv, general_opt ), vm );
+    }
+    catch( const std::exception & ex )
+    {
+        parseOK = false;
+        trace.info() << "Error checking program options: " << ex.what() << std::endl;
+    }
+    po::notify( vm );
+    if( !parseOK || vm.count("help") || argc <= 1 )
+    {
+        trace.info()<< "Compare local estimators on implicit shapes using DGtal library" <<std::endl
+                    << "Basic usage: "<<std::endl
+                    << "\t3dlocalEstimators --shape <shape> --h <h> --radius <radius> --estimators <binaryWord> --output <output>"<<std::endl
+                    << std::endl
+                    << "Below are the different available families of estimators: " << std::endl
+                    << "\t - Integral Invariant Mean" << std::endl
+                    << "\t - Integral Invariant Gaussian" << std::endl
+                    << "\t - Monge Jet Fitting Mean" << std::endl
+                    << "\t - Monge Jet Fitting Gaussian" << std::endl
+                    << std::endl
+                    << "The i-th family of estimators is enabled if the i-th character of the binary word is not 0. "
+                    << "The default binary word is '1100'. This means that the first family of estimators, "
+                    << "ie. Integral Invariant, is enabled, whereas the next ones are disabled. "
+                    << "Below are the different available properties: " << std::endl
+                    << "\t - Mean Curvature" << std::endl
+                    << "\t - Gaussian Curvature" << std::endl
+                    << "\t - k1/k2" << std::endl
+                    << std::endl;
+        return 0;
+    }
+
+    if (!(vm.count("output"))) missingParam("--output");
+    if (!(vm.count("shape"))) missingParam("--shape");
+    if (!(vm.count("h"))) missingParam("--h");
+    if (!(vm.count("radius"))) missingParam("--radius");
+
+
+    std::string file_export = vm["output"].as< std::string >();
+    int nb = 3;
+    std::string options = vm["estimators"].as< std::string >();
+    if (options.size() < nb)
+    {
+        trace.error() << " At least " << nb
+                      << " characters are required "
+                      << " with option --estimators.";
+        trace.info() << std::endl;
+        exit(1);
+    }
+    double h = vm["h"].as< double >();
+    double radius = vm["radius"].as< double >();
+    double alpha = vm["alpha"].as< double >();
+    std::string poly_str = vm["shape"].as< std::string >();
+    bool lambda_optimized = vm["lambda"].as< bool >();
+    double noiseLevel = vm["noise"].as<double>();
+
+    nb = 3; //number of available properties
+    std::string properties = vm["properties"].as<std::string>();
+    if (properties.size() < nb)
+    {
+        trace.error() << " At least " << nb
+                      << " characters are required "
+                      << " with option --properties.";
+        trace.info() << std::endl;
+        exit(1);
+    }
+
+    typedef Z3i::Space::RealPoint RealPoint;
+    typedef Z3i::Space::RealPoint::Coordinate Ring;
+
+    RealPoint border_min( vm["minAABB"].as< double >(), vm["minAABB"].as< double >(), vm["minAABB"].as< double >() );
+    RealPoint border_max( vm["maxAABB"].as< double >(), vm["maxAABB"].as< double >(), vm["maxAABB"].as< double >() );
+
+    /// Construction of the polynomial shape
+
+    typedef MPolynomial< 3, Ring > Polynomial3;
+    typedef MPolynomialReader<3, Ring> Polynomial3Reader;
+    typedef ImplicitPolynomial3Shape<Z3i::Space> ImplicitShape;
+
+    Polynomial3 poly;
+    Polynomial3Reader reader;
+    std::string::const_iterator iter = reader.read( poly, poly_str.begin(), poly_str.end() );
+    if ( iter != poly_str.end() )
+    {
+        std::cerr << "ERROR: I read only <"
+                  << poly_str.substr( 0, iter - poly_str.begin() )
+                  << ">, and I built P=" << poly << std::endl;
+        return 1;
+    }
+
+    ImplicitShape* shape = new ImplicitShape( poly );
+
+    compareShapeEstimators< Z3i::Space, ImplicitShape > (
+                file_export,
+                shape,
+                border_min, border_max,
+                h,
+                radius,
+                alpha,
+                options,
+                properties,
+                lambda_optimized,
+                noiseLevel );
+
+    delete shape;
 }
