@@ -38,7 +38,6 @@
 #include "DGtal/kernel/SpaceND.h"
 #include "DGtal/kernel/domains/HyperRectDomain.h"
 #include "DGtal/images/ImageSelector.h"
-#include "DGtal/images/imagesSetsUtils/SetFromImage.h"
 #include "DGtal/images/imagesSetsUtils/IntervalForegroundPredicate.h"
 #include "DGtal/topology/KhalimskySpaceND.h"
 #include "DGtal/topology/DigitalSurface.h"
