@@ -469,7 +469,7 @@ compareShapeEstimators( const std::string & filename,
                     CanonicSCellEmbedder<KSpace> embedder( K );
                     FunctorMean estimatorH( embedder, h );
                     ConvFunctor convFunc(1.0);
-                    ReporterH reporterH( surf.container(), Z3i::l2Metric, estimatorH, convFunc);
+                    ReporterH reporterH( surf, Z3i::l2Metric, estimatorH, convFunc);
                     c.startClock();
                     reporterH.init( h , re_convolution_kernel / h  );
 
@@ -507,7 +507,7 @@ compareShapeEstimators( const std::string & filename,
                     CanonicSCellEmbedder<KSpace> embedder( K );
                     FunctorGaussian estimatorK( embedder, h );
                     ConvFunctor convFunc(1.0);
-                    ReporterK reporterK(surf.container(), Z3i::l2Metric, estimatorK, convFunc);
+                    ReporterK reporterK(surf, Z3i::l2Metric, estimatorK, convFunc);
                     c.startClock();
                     reporterK.init( h , re_convolution_kernel / h  );
 
@@ -546,7 +546,7 @@ compareShapeEstimators( const std::string & filename,
                     CanonicSCellEmbedder<KSpace> embedder( K );
                     FunctorPrincCurv estimatorK( embedder, h );
                     ConvFunctor convFunc(1.0);
-                    ReporterK reporterK(surf.container(), Z3i::l2Metric, estimatorK, convFunc);
+                    ReporterK reporterK(surf, Z3i::l2Metric, estimatorK, convFunc);
                     c.startClock();
                     reporterK.init( h , re_convolution_kernel / h  );
 
@@ -851,7 +851,7 @@ compareShapeEstimators( const std::string & filename,
                     CanonicSCellEmbedder<KSpace> embedder( K );
                     FunctorMean estimatorH( embedder, h );
                     ConvFunctor convFunc(1.0);
-                    ReporterH reporterH(surf.container(), Z3i::l2Metric, estimatorH, convFunc);
+                    ReporterH reporterH(surf, Z3i::l2Metric, estimatorH, convFunc);
                     c.startClock();
                     reporterH.init( h , re_convolution_kernel / h  );
 
@@ -888,7 +888,7 @@ compareShapeEstimators( const std::string & filename,
                     CanonicSCellEmbedder<KSpace> embedder( K );
                     FunctorGaussian estimatorK( embedder, h );
                     ConvFunctor convFunc(1.0);
-                    ReporterK reporterK(surf.container(), Z3i::l2Metric, estimatorK, convFunc);
+                    ReporterK reporterK(surf, Z3i::l2Metric, estimatorK, convFunc);
                     c.startClock();
                     reporterK.init( h , re_convolution_kernel / h  );
 
@@ -924,7 +924,7 @@ compareShapeEstimators( const std::string & filename,
                     CanonicSCellEmbedder<KSpace> embedder( K );
                     FunctorPrincCurv estimatorK( embedder, h );
                     ConvFunctor convFunc(1.0);
-                    ReporterK reporterK(surf.container(), Z3i::l2Metric, estimatorK, convFunc);
+                    ReporterK reporterK(surf, Z3i::l2Metric, estimatorK, convFunc);
                     c.startClock();
                     reporterK.init( h , re_convolution_kernel / h  );
 
