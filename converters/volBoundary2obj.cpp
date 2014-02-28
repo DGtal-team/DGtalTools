@@ -181,6 +181,8 @@ int main( int argc, char** argv )
     trace.beginBlock( "Displaying everything. " );
     Board3D<> board;
 
+    board << SetMode3D(  ks.unsigns( *digSurf.begin() ).className(), "Basic" );
+
     typedef MyDigitalSurface::ConstIterator ConstIterator;
     if ( mode == "BDRY" )
       for ( ConstIterator it = digSurf.begin(), itE = digSurf.end(); it != itE; ++it )
