@@ -64,6 +64,7 @@
 #include "DGtal/geometry/surfaces/estimation/IntegralInvariantGaussianCurvatureEstimator.h"
 
 // Drawing
+#include "DGtal/io/boards/Board3D.h"
 #include "DGtal/io/viewers/Viewer3D.h"
 #include "DGtal/io/colormaps/GradientColorMap.h"
 #include <QtGui/QApplication>
@@ -104,7 +105,7 @@ int main( int argc, char** argv )
 
   bool parseOK = true;
   po::variables_map vm;
-  try 
+  try
   {
     po::store( po::parse_command_line( argc, argv, general_opt ), vm );
   }
@@ -115,14 +116,14 @@ int main( int argc, char** argv )
   }
   po::notify( vm );
   bool neededArgsGiven=true;
-  if (!(vm.count("input-file"))){ 
+  if (!(vm.count("input-file"))){
     missingParam("--input-file");
     neededArgsGiven=false;
   }
-  if (!(vm.count("radius"))){ 
+  if (!(vm.count("radius"))){
     missingParam("--radius");
     neededArgsGiven=false;
-  }  
+  }
   double h = 1.0;
 
   bool wrongMode = false;
@@ -148,7 +149,7 @@ int main( int argc, char** argv )
     return 0;
   }
   double re_convolution_kernel = vm["radius"].as< double >();
-  
+
   // Construction of the shape from vol file
   typedef Z3i::Space::RealPoint RealPoint;
   typedef Z3i::Point Point;
@@ -201,11 +202,15 @@ int main( int argc, char** argv )
   QApplication application( argc, argv );
   typedef Viewer3D<Z3i::Space, Z3i::KSpace> Viewer;
   Viewer viewer( K );
+  typedef Board3D<Z3i::Space, Z3i::KSpace> Board;
+  Board board( K );
   viewer.show();
   //    viewer << SetMode3D(image.domain().className(), "BoundingBox") << image.domain();
 
   VisitorRange range2( new Visitor( digSurf, *digSurf.begin() ) );
   SurfelConstIterator abegin2 = range2.begin();
+
+  board << SetMode3D(  K.unsigns( *abegin2 ).className(), "Basic" );
 
   trace.beginBlock("curvature computation");
   if( ( mode.compare("gaussian") == 0 ) || ( mode.compare("mean") == 0 ) )
@@ -265,6 +270,10 @@ int main( int argc, char** argv )
     {
       viewer << CustomColors3D( Color::Black, cmap_grad( results[ i ] ))
              << *abegin2;
+
+      board << CustomColors3D( Color::Black, cmap_grad( results[ i ] ))
+            << K.unsigns(*abegin2);
+
       ++abegin2;
     }
   }
@@ -306,6 +315,10 @@ int main( int argc, char** argv )
       viewer << CustomColors3D( DGtal::Color(255,255,255,255),
                                 DGtal::Color(255,255,255,255))
              << unsignedSurfel;
+      board << CustomColors3D( DGtal::Color(255,255,255,255),
+                               DGtal::Color(255,255,255,255))
+            << unsignedSurfel;
+
 
 
       //ColumnVector normal = current.vectors.column(0).getNormalized(); // don't show the normal
@@ -361,6 +374,7 @@ int main( int argc, char** argv )
     }
     trace.endBlock();
   }
+  board.saveOBJ("export.obj");
 
   viewer << Viewer3D<>::updateDisplay;
   return application.exec();
