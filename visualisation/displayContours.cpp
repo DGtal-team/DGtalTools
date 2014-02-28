@@ -29,6 +29,15 @@
 ///////////////////////////////////////////////////////////////////////////////
 #include <iostream>
 
+//boost
+#include <boost/program_options/options_description.hpp>
+#include <boost/program_options/parsers.hpp>
+#include <boost/program_options/variables_map.hpp>
+
+//STL
+#include <vector>
+#include <string>
+
 #include "DGtal/base/Common.h"
 #include "DGtal/helpers/StdDefs.h"
 
@@ -42,7 +51,6 @@
 #include "DGtal/images/ImageContainerBySTLVector.h"
 #include "DGtal/images/ImageSelector.h"
 #include "DGtal/io/readers/PointListReader.h"
-#include "DGtal/io/boards/Board2D.h"
 #include "DGtal/io/Color.h"
 
  #include "DGtal/io/readers/GenericReader.h"
@@ -56,16 +64,12 @@
 #include "DGtal/geometry/curves/GreedySegmentation.h"
 #include "DGtal/geometry/curves/SaturatedSegmentation.h"
 #include "DGtal/geometry/curves/FP.h"
+#include "DGtal/geometry/curves/StabbingCircleComputer.h"
+#include "DGtal/geometry/curves/SaturatedSegmentation.h"
+#include "DGtal/geometry/curves/SegmentComputerUtils.h"
 
-//boost
-#include <boost/program_options/options_description.hpp>
-#include <boost/program_options/parsers.hpp>
-#include <boost/program_options/variables_map.hpp>
-
-//STL
-#include <vector>
-#include <string>
-
+#include "DGtal/io/boards/Board2D.h"
+#include "DGtal/io/boards/CDrawableWithBoard2D.h"
 
 using namespace DGtal;
 
@@ -267,8 +271,32 @@ int main( int argc, char** argv )
           aBoard.setPenColor(DGtal::Color::Black);
 	  aBoard.drawPolyline(polyline);
 	  	  
+	} else if (processingName == "MDCA") {
+	  typedef KhalimskySpaceND<2,int> KSpace; 
+	  typedef GridCurve<KSpace> Curve;
+	  Curve curve; //grid curve
+	  curve.initFromPointsVector( vPts );
+	  typedef Curve::IncidentPointsRange Range; //range
+	  Range r = curve.getIncidentPointsRange(); //range
+	  typedef typename Range::ConstCirculator ConstCirculator; //iterator
+	  typedef StabbingCircleComputer<ConstCirculator> SegmentComputer; //segment computer
+	  //typedef GeometricalDCA<ConstIterator> SegmentComputer; //segment computer
+ 	  typedef SaturatedSegmentation<SegmentComputer> Segmentation;
+	  //Segmentation theSegmentation( r.begin(), r.end(), SegmentComputer() );
+	  Segmentation theSegmentation( r.c(), r.c(), SegmentComputer() );
+	  theSegmentation.setMode("Last"); 
+	  // board << curve; 
+	  typename Segmentation::SegmentComputerIterator it = theSegmentation.begin();
+	  typename Segmentation::SegmentComputerIterator itEnd = theSegmentation.end();
+	  Board2D otherBoard;
+          otherBoard.setPenColor(DGtal::Color::Black);
+	  otherBoard << curve;
+	  for ( ; it != itEnd; ++it ) {
+	    aBoard << SetMode(SegmentComputer().className(), "") << (*it); 
+	    otherBoard << SetMode(SegmentComputer().className(), "") << (*it); 
+	  }
+	  otherBoard.saveSVG("mdca.svg", Board2D::BoundingBox, 5000 ); 
 	}
-
       }
 
     }
