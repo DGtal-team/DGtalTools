@@ -101,7 +101,8 @@ int main( int argc, char** argv )
     ("help,h", "display this message")
     ("input-file,i", po::value< std::string >(), ".vol file")
     ("radius,r",  po::value< double >(), "Kernel radius for IntegralInvariant" )
-    ("properties,p", po::value< std::string >()->default_value("mean"), "type of output : mean, gaussian, prindir1 or prindir2 (default mean)");
+    ("properties,p", po::value< std::string >()->default_value("mean"), "type of output : mean, gaussian, prindir1 or prindir2 (default mean)")
+    ("epxort,e",  po::value< bool >()->default_value(false), "Export the scene to OBJ export.obj file." );
 
   bool parseOK = true;
   po::variables_map vm;
@@ -125,6 +126,8 @@ int main( int argc, char** argv )
     neededArgsGiven=false;
   }
   double h = 1.0;
+  bool myexport = vm["export"].as<bool>();
+
 
   bool wrongMode = false;
   std::string mode = vm["properties"].as< std::string >();
@@ -202,15 +205,20 @@ int main( int argc, char** argv )
   QApplication application( argc, argv );
   typedef Viewer3D<Z3i::Space, Z3i::KSpace> Viewer;
   Viewer viewer( K );
-  typedef Board3D<Z3i::Space, Z3i::KSpace> Board;
-  Board board( K );
   viewer.show();
   //    viewer << SetMode3D(image.domain().className(), "BoundingBox") << image.domain();
 
   VisitorRange range2( new Visitor( digSurf, *digSurf.begin() ) );
   SurfelConstIterator abegin2 = range2.begin();
 
-  board << SetMode3D(  K.unsigns( *abegin2 ).className(), "Basic" );
+  typedef Board3D<Z3i::Space, Z3i::KSpace> Board;
+  Board board( K );
+
+  if (myexport)
+    {
+      board << SetMode3D(  K.unsigns( *abegin2 ).className(), "Basic" );
+    }
+
 
   trace.beginBlock("curvature computation");
   if( ( mode.compare("gaussian") == 0 ) || ( mode.compare("mean") == 0 ) )
@@ -271,9 +279,11 @@ int main( int argc, char** argv )
       viewer << CustomColors3D( Color::Black, cmap_grad( results[ i ] ))
              << *abegin2;
 
-      board << CustomColors3D( Color::Black, cmap_grad( results[ i ] ))
-            << K.unsigns(*abegin2);
-
+      if (myexport)
+        {
+          board << CustomColors3D( Color::Black, cmap_grad( results[ i ] ))
+                << K.unsigns(*abegin2);
+        }
       ++abegin2;
     }
   }
@@ -315,10 +325,12 @@ int main( int argc, char** argv )
       viewer << CustomColors3D( DGtal::Color(255,255,255,255),
                                 DGtal::Color(255,255,255,255))
              << unsignedSurfel;
-      board << CustomColors3D( DGtal::Color(255,255,255,255),
-                               DGtal::Color(255,255,255,255))
-            << unsignedSurfel;
-
+      if (myexport)
+        {
+          board << CustomColors3D( DGtal::Color(255,255,255,255),
+                                   DGtal::Color(255,255,255,255))
+                << unsignedSurfel;
+        }
 
 
       //ColumnVector normal = current.vectors.column(0).getNormalized(); // don't show the normal
@@ -373,8 +385,12 @@ int main( int argc, char** argv )
       ++abegin2;
     }
     trace.endBlock();
+
+    if (myexport)
+      board.saveOBJ("export.obj");
+
   }
-  board.saveOBJ("export.obj");
+
 
   viewer << Viewer3D<>::updateDisplay;
   return application.exec();
