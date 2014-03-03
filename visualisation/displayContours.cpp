@@ -278,7 +278,7 @@ int main( int argc, char** argv )
 	  curve.initFromPointsVector( vPts );
 	  typedef Curve::IncidentPointsRange Range; //range
 	  Range r = curve.getIncidentPointsRange(); //range
-	  typedef typename Range::ConstCirculator ConstCirculator; //iterator
+	  typedef Range::ConstCirculator ConstCirculator; //iterator
 	  typedef StabbingCircleComputer<ConstCirculator> SegmentComputer; //segment computer
 	  //typedef GeometricalDCA<ConstIterator> SegmentComputer; //segment computer
  	  typedef SaturatedSegmentation<SegmentComputer> Segmentation;
@@ -286,8 +286,8 @@ int main( int argc, char** argv )
 	  Segmentation theSegmentation( r.c(), r.c(), SegmentComputer() );
 	  theSegmentation.setMode("Last"); 
 	  // board << curve; 
-	  typename Segmentation::SegmentComputerIterator it = theSegmentation.begin();
-	  typename Segmentation::SegmentComputerIterator itEnd = theSegmentation.end();
+	  Segmentation::SegmentComputerIterator it = theSegmentation.begin();
+          Segmentation::SegmentComputerIterator itEnd = theSegmentation.end();
 	  Board2D otherBoard;
           otherBoard.setPenColor(DGtal::Color::Black);
 	  otherBoard << curve;
