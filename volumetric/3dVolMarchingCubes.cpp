@@ -21,7 +21,7 @@
 #include <DGtal/kernel/sets/SetPredicate.h>
 #include <DGtal/io/readers/VolReader.h>
 #include <DGtal/images/ImageSelector.h>
-#include <DGtal/images/imagesSetsUtils/SetFromImage.h>
+#include <DGtal/images/imagesSetsUtils/SimpleThresholdForegroundPredicate.h>
 #include <DGtal/images/ImageLinearCellEmbedder.h>
 #include <DGtal/shapes/Shapes.h>
 #include <DGtal/kernel/CanonicEmbedder.h>
@@ -82,9 +82,12 @@ int main( int argc, char** argv )
   trace.beginBlock( "Reading vol file into an image." );
   typedef ImageSelector < Domain, int>::Type Image;
   Image image = VolReader<Image>::importVol(inputFilename);
-  DigitalSet set3d (image.domain());
-  SetFromImage<DigitalSet>::append<Image>(set3d, image,
-                                          threshold, 255 );
+
+  typedef SimpleThresholdForegroundPredicate<Image> ThresholdedImage;
+  ThresholdedImage thresholdedImage( image, threshold );
+  // DigitalSet set3d (image.domain());
+  // SetFromImage<DigitalSet>::append<Image>(set3d, image,
+  //                                         threshold, 255 );
   trace.endBlock();
   //! [3dVolMarchingCubes-readVol]
 
@@ -113,7 +116,7 @@ int main( int argc, char** argv )
   typedef DigitalSurface< MySetOfSurfels > MyDigitalSurface;
   MySetOfSurfels theSetOfSurfels( ks, surfAdj );
   Surfaces<KSpace>::sMakeBoundary( theSetOfSurfels.surfelSet(),
-                                   ks, set3d,
+                                   ks, thresholdedImage,
                                    image.domain().lowerBound(),
                                    image.domain().upperBound() );
   MyDigitalSurface digSurf( theSetOfSurfels );
@@ -124,9 +127,10 @@ int main( int argc, char** argv )
 
   //! [3dVolMarchingCubes-makingOFF]
   trace.beginBlock( "Making OFF surface. " );
-  typedef CanonicEmbedder< Space > MyEmbedder;
-  typedef
-    ImageLinearCellEmbedder< KSpace, Image, MyEmbedder > CellEmbedder;
+  // Describes how voxels are embedded into Euclidean space.
+  typedef CanonicEmbedder< Space > MyEmbedder; 
+  // Describes how the centroid surface elements is placed in-between embedded voxels.
+  typedef ImageLinearCellEmbedder< KSpace, Image, MyEmbedder > CellEmbedder;
   CellEmbedder cellEmbedder;
   MyEmbedder trivialEmbedder;
   cellEmbedder.init( ks, image, trivialEmbedder, threshold );
