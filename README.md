@@ -157,5 +157,3 @@ How to build the tools
   - DGtal must be installed in your system. Concerning DGtal dependencies (boost, Qt,...), all the dependencies used to compile your DGtal library must be present to build the DGtalTools.
   
   
-
-[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/DGtal-team/dgtaltools/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
