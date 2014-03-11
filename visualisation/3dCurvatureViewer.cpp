@@ -100,7 +100,8 @@ int main( int argc, char** argv )
     ("help,h", "display this message")
     ("input-file,i", po::value< std::string >(), ".vol file")
     ("radius,r",  po::value< double >(), "Kernel radius for IntegralInvariant" )
-    ("properties,p", po::value< std::string >()->default_value("mean"), "type of output : mean, gaussian, prindir1 or prindir2 (default mean)");
+    ("try,t",  po::value< unsigned int >()->default_value(150), "Max number of tries to find a proper bel" )
+    ("mode,m", po::value< std::string >()->default_value("mean"), "type of output : mean, gaussian, prindir1 or prindir2 (default mean)");
 
   bool parseOK = true;
   po::variables_map vm;
@@ -126,7 +127,7 @@ int main( int argc, char** argv )
   double h = 1.0;
 
   bool wrongMode = false;
-  std::string mode = vm["properties"].as< std::string >();
+  std::string mode = vm["mode"].as< std::string >();
   if (( mode.compare("gaussian") != 0 ) && ( mode.compare("mean") != 0 ) && ( mode.compare("prindir1") != 0 ) && ( mode.compare("prindir2") != 0 ))
   {
     wrongMode = true;
@@ -137,9 +138,9 @@ int main( int argc, char** argv )
     trace.info()<< "Visualisation of 3d curvature from .vol file using curvature from Integral Invariant" <<std::endl
                 << general_opt << "\n"
                 << "Basic usage: "<<std::endl
-                << "\t3dCurvatureViewer -i <file.vol> --radius <radius> --properties <\"mean\">"<<std::endl
+                << "\t3dCurvatureViewer -i <file.vol> --radius <radius> --mode <\"mean\">"<<std::endl
                 << std::endl
-                << "Below are the different available properties: " << std::endl
+                << "Below are the different available modes: " << std::endl
                 << "\t - \"mean\" for the mean curvature" << std::endl
                 << "\t - \"gaussian\" for the Gaussian curvature" << std::endl
                 << "\t - \"prindir1\" for the first principal curvature direction" << std::endl
@@ -158,8 +159,8 @@ int main( int argc, char** argv )
   typedef KSpace::SCell SCell;
   typedef KSpace::Cell Cell;
   typedef KSpace::Surfel Surfel;
-  typedef LightImplicitDigitalSurface< Z3i::KSpace, ImagePredicate > MyLightImplicitDigitalSurface;
-  typedef DigitalSurface< MyLightImplicitDigitalSurface > MyDigitalSurface;
+  typedef LightImplicitDigitalSurface< Z3i::KSpace, ImagePredicate > Boundary;
+  typedef DigitalSurface< Boundary > MyDigitalSurface;
 
   std::string filename = vm["input-file"].as< std::string >();
   Image image = VolReader<Image>::importVol( filename );
@@ -180,8 +181,26 @@ int main( int argc, char** argv )
 
   SurfelAdjacency< Z3i::KSpace::dimension > SAdj( true );
   Surfel bel = Surfaces< Z3i::KSpace >::findABel( K, predicate, 100000 );
-  MyLightImplicitDigitalSurface LightImplDigSurf( K, predicate, SAdj, bel );
-  MyDigitalSurface digSurf( LightImplDigSurf );
+  Boundary * boundary = new Boundary( K, predicate, SAdj, bel );
+  MyDigitalSurface digSurf( *boundary );
+
+  double minsize = domain.myUpperBound[0] - domain.myLowerBound[0];
+  unsigned int tries = 0;
+  unsigned int maxTries = vm["try"].as< unsigned int >();
+  while( digSurf.size() < 2 * minsize || tries > maxTries )
+  {
+      delete boundary;
+      bel = Surfaces< KSpace >::findABel( K, predicate, 10000 );
+      boundary = new Boundary( K, predicate, SurfelAdjacency< KSpace::dimension >( true ), bel );
+      digSurf = MyDigitalSurface( *boundary );
+      ++tries;
+  }
+
+  if( tries > 150 )
+  {
+      std::cerr << "Can't found a proper bel. So .... I ... just ... kill myself." << std::endl;
+      return false;
+  }
 
   typedef DepthFirstVisitor<MyDigitalSurface> Visitor;
   typedef GraphVisitorRange< Visitor > VisitorRange;
@@ -194,7 +213,6 @@ int main( int argc, char** argv )
   MyPointFunctor pointFunctor( image, predicate, 1 );
 
   // Integral Invariant stuff
-
   typedef FunctorOnCells< MyPointFunctor, Z3i::KSpace > MyCellFunctor;
   MyCellFunctor functor ( pointFunctor, K ); // Creation of a functor on Cells, returning true if the cell is inside the shape
 
@@ -202,7 +220,7 @@ int main( int argc, char** argv )
   typedef Viewer3D<Z3i::Space, Z3i::KSpace> Viewer;
   Viewer viewer( K );
   viewer.show();
-  //    viewer << SetMode3D(image.domain().className(), "BoundingBox") << image.domain();
+  
 
   VisitorRange range2( new Visitor( digSurf, *digSurf.begin() ) );
   SurfelConstIterator abegin2 = range2.begin();
@@ -260,7 +278,8 @@ int main( int argc, char** argv )
     cmap_grad.addColor( Color( 50, 50, 255 ) );
     cmap_grad.addColor( Color( 255, 0, 0 ) );
     cmap_grad.addColor( Color( 255, 255, 10 ) );
-
+    
+    viewer << SetMode3D((*abegin2).className(), "Basic" );
     for ( unsigned int i = 0; i < results.size(); ++i )
     {
       viewer << CustomColors3D( Color::Black, cmap_grad( results[ i ] ))
@@ -291,7 +310,7 @@ int main( int argc, char** argv )
     // Drawing results
     typedef  Matrix3x3::RowVector RowVector;
     typedef  Matrix3x3::ColumnVector ColumnVector;
-
+    viewer << SetMode3D(K.uCell( K.sKCoords(*abegin2) ).className(), "Basic" );
     for ( unsigned int i = 0; i < results.size(); ++i )
     {
       CurvInformation current = results[ i ];
@@ -306,23 +325,11 @@ int main( int argc, char** argv )
       viewer << CustomColors3D( DGtal::Color(255,255,255,255),
                                 DGtal::Color(255,255,255,255))
              << unsignedSurfel;
-
-
-      //ColumnVector normal = current.vectors.column(0).getNormalized(); // don't show the normal
       ColumnVector curv1 = current.vectors.column(1).getNormalized();
       ColumnVector curv2 = current.vectors.column(2).getNormalized();
 
       double eps = 0.01;
-      RealPoint center = embedder( outer );// + eps*embedder( *abegin2 );
-
-      //            viewer.addLine ( center[0] - 0.5 * normal[ 0],
-      //                             center[1] - 0.5 * normal[1],
-      //                             center[2] - 0.5* normal[2],
-      //                             center[0] +  0.5 * normal[0],
-      //                             center[1] +  0.5 * normal[1],
-      //                             center[2] +  0.5 * normal[2],
-      //                             DGtal::Color ( 0,0,0 ), 5.0 ); // don't show the normal
-
+      RealPoint center = embedder( outer );
 
       if( ( mode.compare("prindir1") == 0 ) )
       {
@@ -363,6 +370,8 @@ int main( int argc, char** argv )
   }
 
   viewer << Viewer3D<>::updateDisplay;
+
+  delete boundary;
   return application.exec();
 }
 
