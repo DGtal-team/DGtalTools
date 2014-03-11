@@ -213,7 +213,6 @@ int main( int argc, char** argv )
   MyPointFunctor pointFunctor( image, predicate, 1 );
 
   // Integral Invariant stuff
-
   typedef FunctorOnCells< MyPointFunctor, Z3i::KSpace > MyCellFunctor;
   MyCellFunctor functor ( pointFunctor, K ); // Creation of a functor on Cells, returning true if the cell is inside the shape
 
@@ -221,7 +220,7 @@ int main( int argc, char** argv )
   typedef Viewer3D<Z3i::Space, Z3i::KSpace> Viewer;
   Viewer viewer( K );
   viewer.show();
-  //    viewer << SetMode3D(image.domain().className(), "BoundingBox") << image.domain();
+  
 
   VisitorRange range2( new Visitor( digSurf, *digSurf.begin() ) );
   SurfelConstIterator abegin2 = range2.begin();
@@ -279,7 +278,8 @@ int main( int argc, char** argv )
     cmap_grad.addColor( Color( 50, 50, 255 ) );
     cmap_grad.addColor( Color( 255, 0, 0 ) );
     cmap_grad.addColor( Color( 255, 255, 10 ) );
-
+    
+    viewer << SetMode3D((*abegin2).className(), "Basic" );
     for ( unsigned int i = 0; i < results.size(); ++i )
     {
       viewer << CustomColors3D( Color::Black, cmap_grad( results[ i ] ))
@@ -310,7 +310,7 @@ int main( int argc, char** argv )
     // Drawing results
     typedef  Matrix3x3::RowVector RowVector;
     typedef  Matrix3x3::ColumnVector ColumnVector;
-
+    viewer << SetMode3D(K.uCell( K.sKCoords(*abegin2) ).className(), "Basic" );
     for ( unsigned int i = 0; i < results.size(); ++i )
     {
       CurvInformation current = results[ i ];
@@ -325,23 +325,11 @@ int main( int argc, char** argv )
       viewer << CustomColors3D( DGtal::Color(255,255,255,255),
                                 DGtal::Color(255,255,255,255))
              << unsignedSurfel;
-
-
-      //ColumnVector normal = current.vectors.column(0).getNormalized(); // don't show the normal
       ColumnVector curv1 = current.vectors.column(1).getNormalized();
       ColumnVector curv2 = current.vectors.column(2).getNormalized();
 
       double eps = 0.01;
-      RealPoint center = embedder( outer );// + eps*embedder( *abegin2 );
-
-      //            viewer.addLine ( center[0] - 0.5 * normal[ 0],
-      //                             center[1] - 0.5 * normal[1],
-      //                             center[2] - 0.5* normal[2],
-      //                             center[0] +  0.5 * normal[0],
-      //                             center[1] +  0.5 * normal[1],
-      //                             center[2] +  0.5 * normal[2],
-      //                             DGtal::Color ( 0,0,0 ), 5.0 ); // don't show the normal
-
+      RealPoint center = embedder( outer );
 
       if( ( mode.compare("prindir1") == 0 ) )
       {
