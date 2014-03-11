@@ -12,10 +12,11 @@ SET(DGTAL_TOOLS_SRC
   vol2off
   vol2obj
   longvol2vol
-  sdp2vol)
+  sdp2vol
+  volBoundary2obj)
 
 if( WITH_HDF5 )
-SET(DGTAL_TOOLS_SRC ${DGTAL_TOOLS_SRC} 
+SET(DGTAL_TOOLS_SRC ${DGTAL_TOOLS_SRC}
     raw2HDF5
     HDF52vol)
 endif( WITH_HDF5 )
