@@ -103,8 +103,7 @@ int main( int argc, char** argv )
     ("radius,r",  po::value< double >(), "Kernel radius for IntegralInvariant" )
     ("try,t",  po::value< unsigned int >()->default_value(150), "Max number of tries to find a proper bel" )
     ("mode,m", po::value< std::string >()->default_value("mean"), "type of output : mean, gaussian, prindir1 or prindir2 (default mean)")
-    ("properties,p", po::value< std::string >()->default_value("mean"), "type of output : mean, gaussian, prindir1 or prindir2 (default mean)")
-    ("epxort,e",  po::value< bool >()->default_value(false), "Export the scene to OBJ export.obj file." );
+    ("export,e",  po::value< bool >()->default_value(false), "Export the scene to OBJ export.obj file." );
 
   bool parseOK = true;
   po::variables_map vm;
@@ -233,10 +232,6 @@ int main( int argc, char** argv )
   typedef Board3D<Z3i::Space, Z3i::KSpace> Board;
   Board board( K );
 
-  if (myexport)
-    {
-      board << SetMode3D(  K.unsigns( *abegin2 ).className(), "Basic" );
-    }
 
 
   trace.beginBlock("curvature computation");
