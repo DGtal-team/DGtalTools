@@ -103,7 +103,7 @@ int main( int argc, char** argv )
     ("radius,r",  po::value< double >(), "Kernel radius for IntegralInvariant" )
     ("try,t",  po::value< unsigned int >()->default_value(150), "Max number of tries to find a proper bel" )
     ("mode,m", po::value< std::string >()->default_value("mean"), "type of output : mean, gaussian, prindir1 or prindir2 (default mean)")
-    ("export,e",  po::value< bool >()->default_value(false), "Export the scene to OBJ export.obj file." );
+    ("export,e", "Export the scene to OBJ export.obj file." );
 
   bool parseOK = true;
   po::variables_map vm;
@@ -127,8 +127,7 @@ int main( int argc, char** argv )
     neededArgsGiven=false;
   }
   double h = 1.0;
-  bool myexport = vm["export"].as<bool>();
-
+  bool myexport = vm.count("export")!=0;
 
   bool wrongMode = false;
   std::string mode = vm["mode"].as< std::string >();
@@ -392,14 +391,16 @@ int main( int argc, char** argv )
     }
     trace.endBlock();
 
-    if (myexport)
-      board.saveOBJ("export.obj");
-
+   
   }
-
-
   viewer << Viewer3D<>::updateDisplay;
 
+  if (myexport){
+    trace.info()<< "Exporting object: export.obj ..."
+    board.saveOBJ("export.obj");
+    trace.info() << "[done]" << std::endl;
+  }
+    
   delete boundary;
   return application.exec();
 }
