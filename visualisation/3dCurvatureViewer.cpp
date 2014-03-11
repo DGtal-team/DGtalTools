@@ -396,7 +396,7 @@ int main( int argc, char** argv )
   viewer << Viewer3D<>::updateDisplay;
 
   if (myexport){
-    trace.info()<< "Exporting object: export.obj ..."
+    trace.info()<< "Exporting object: export.obj ...";
     board.saveOBJ("export.obj");
     trace.info() << "[done]" << std::endl;
   }
