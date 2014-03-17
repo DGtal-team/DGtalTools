@@ -338,10 +338,10 @@ int main( int argc, char** argv )
     typedef  Matrix3x3::RowVector RowVector;
     typedef  Matrix3x3::ColumnVector ColumnVector;
     viewer << SetMode3D(K.uCell( K.sKCoords(*abegin2) ).className(), "Basic" );
-    board << SetMode3D(K.uCell( K.sKCoords(*abegin2) ).className(), "Basic" );
 
     if( myexport )
     {
+      board << SetMode3D(K.uCell( K.sKCoords(*abegin2) ).className(), "Basic" );
       trace.warning() << "Warning: Actually, only the object geometry will be exported in this mode." << std::endl;
     }
     for ( unsigned int i = 0; i < results.size(); ++i )
@@ -359,11 +359,11 @@ int main( int argc, char** argv )
                                 DGtal::Color(255,255,255,255))
              << unsignedSurfel;
       if (myexport)
-        {
-          board << CustomColors3D( DGtal::Color(255,255,255,255),
-                                   DGtal::Color(255,255,255,255))
-                << unsignedSurfel;
-        }
+      {
+        board << CustomColors3D( DGtal::Color(255,255,255,255),
+                                 DGtal::Color(255,255,255,255))
+              << unsignedSurfel;
+      }
 
 
       //ColumnVector normal = current.vectors.column(0).getNormalized(); // don't show the normal
