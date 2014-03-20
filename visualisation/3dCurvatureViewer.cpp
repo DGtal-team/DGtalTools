@@ -103,7 +103,7 @@ int main( int argc, char** argv )
     ("radius,r",  po::value< double >(), "Kernel radius for IntegralInvariant" )
     ("try,t",  po::value< unsigned int >()->default_value(150), "Max number of tries to find a proper bel" )
     ("mode,m", po::value< std::string >()->default_value("mean"), "type of output : mean, gaussian, prindir1 or prindir2 (default mean)")
-    ("export,e", "Export the scene to OBJ export.obj file." );
+    ("export,e", po::value< std::string >()->default_value(""),"Export the scene to specified OBJ filename." );
 
   bool parseOK = true;
   po::variables_map vm;
@@ -127,7 +127,6 @@ int main( int argc, char** argv )
     neededArgsGiven=false;
   }
   double h = 1.0;
-  bool myexport = vm.count("export")!=0;
 
   bool wrongMode = false;
   std::string mode = vm["mode"].as< std::string >();
@@ -136,6 +135,23 @@ int main( int argc, char** argv )
     wrongMode = true;
   }
 
+  std::string export_path = vm["export"].as< std::string >();
+  bool myexport = true;
+  if( export_path == "" )
+  {
+    myexport = false;
+  }
+  else
+  {
+    if( export_path.find(".obj") == std::string::npos )
+    {
+      std::ostringstream oss; 
+      oss << export_path << ".obj" << endl; 
+      export_path = oss.str();
+    }
+  }
+
+  
 
   if(!neededArgsGiven ||  wrongMode || !parseOK || vm.count("help") || argc <= 1 )
   {
@@ -406,8 +422,8 @@ int main( int argc, char** argv )
   viewer << Viewer3D<>::updateDisplay;
 
   if (myexport){
-    trace.info()<< "Exporting object: export.obj ...";
-    board.saveOBJ("export.obj");
+    trace.info()<< "Exporting object: " << export_path << " ...";
+    board.saveOBJ(export_path);
     trace.info() << "[done]" << std::endl;
   }
     
