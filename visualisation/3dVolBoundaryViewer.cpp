@@ -184,10 +184,11 @@ int main( int argc, char** argv )
     viewer.setWindowTitle("Simple boundary of volume Viewer");
     viewer.show();
     typedef MyDigitalSurface::ConstIterator ConstIterator;
-    if ( mode == "BDRY" )
+    if ( mode == "BDRY" ){
+      viewer << SetMode3D(ks.unsigns( *(digSurf.begin()) ).className(), "Basic");
       for ( ConstIterator it = digSurf.begin(), itE = digSurf.end(); it != itE; ++it )
 	viewer << ks.unsigns( *it );
-    else if ( mode == "INNER" )
+    }else if ( mode == "INNER" )
       for ( ConstIterator it = digSurf.begin(), itE = digSurf.end(); it != itE; ++it )
 	viewer << ks.sCoords( ks.sDirectIncident( *it, ks.sOrthDir( *it ) ) );
     else if ( mode == "OUTER" )
