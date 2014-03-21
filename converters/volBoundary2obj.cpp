@@ -179,7 +179,7 @@ int main( int argc, char** argv )
     trace.endBlock();
 
     trace.beginBlock( "Displaying everything. " );
-    Board3D<> board;
+    Board3D<Space,KSpace> board(ks);
 
     board << SetMode3D(  ks.unsigns( *digSurf.begin() ).className(), "Basic" );
 
