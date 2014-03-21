@@ -67,29 +67,29 @@ int main( int argc, char** argv )
   typedef ImageSelector<Domain, unsigned char>::Type Image;
   typedef DigitalSetSelector< Domain, BIG_DS+HIGH_BEL_DS >::Type DigitalSet;
   typedef SurfelAdjacency<KSpace::dimension> MySurfelAdjacency;
-  
+
   // parse command line ----------------------------------------------
   po::options_description general_opt("Allowed options are: ");
   general_opt.add_options()
     ("help,h", "display this message")
     ("input-file,i", po::value<std::string>(), "vol file (.vol) , pgm3d (.p3d or .pgm3d, pgm (with 3 dims)) file or sdp (sequence of discrete points)" )
-    ("thresholdMin,m",  po::value<int>()->default_value(0), "threshold min (excluded) to define binary shape" ) 
+    ("thresholdMin,m",  po::value<int>()->default_value(0), "threshold min (excluded) to define binary shape" )
     ("thresholdMax,M",  po::value<int>()->default_value(255), "threshold max (included) to define binary shape" )
 #ifdef WITH_ITK
     ("dicomMin", po::value<int>()->default_value(-1000), "set minimum density threshold on Hounsfield scale")
     ("dicomMax", po::value<int>()->default_value(3000), "set maximum density threshold on Hounsfield scale")
-#endif    
-    ("mode",  po::value<std::string>()->default_value("INNER"), "set mode for display: INNER: inner voxels, OUTER: outer voxels, BDRY: surfels") ; 
+#endif
+    ("mode",  po::value<std::string>()->default_value("INNER"), "set mode for display: INNER: inner voxels, OUTER: outer voxels, BDRY: surfels") ;
 
   bool parseOK=true;
   po::variables_map vm;
   try{
-    po::store(po::parse_command_line(argc, argv, general_opt), vm);  
+    po::store(po::parse_command_line(argc, argv, general_opt), vm);
   }catch(const std::exception& ex){
     parseOK=false;
     trace.info()<< "Error checking program options: "<< ex.what()<< endl;
   }
-  po::notify(vm);    
+  po::notify(vm);
   if( !parseOK || vm.count("help")||argc<=1)
     {
       std::cout << "Usage: " << argv[0] << " -i [input-file]\n"
@@ -97,21 +97,21 @@ int main( int argc, char** argv )
                 << general_opt << "\n";
       return 0;
     }
-  
+
   if(! vm.count("input-file"))
     {
-      trace.error() << " The file name was defined" << endl;      
+      trace.error() << " The file name was defined" << endl;
       return 0;
     }
   string inputFilename = vm["input-file"].as<std::string>();
   int thresholdMin = vm["thresholdMin"].as<int>();
   int thresholdMax = vm["thresholdMax"].as<int>();
   string mode = vm["mode"].as<string>();
-    
+
   QApplication application(argc,argv);
- 
+
   string extension = inputFilename.substr(inputFilename.find_last_of(".") + 1);
-  if(extension!="vol" && extension != "p3d" && extension != "pgm3D" && extension != "pgm3d" && extension != "sdp" && extension != "pgm" 
+  if(extension!="vol" && extension != "p3d" && extension != "pgm3D" && extension != "pgm3d" && extension != "sdp" && extension != "pgm"
 #ifdef WITH_ITK
      && extension !="dcm"
 #endif
@@ -119,7 +119,7 @@ int main( int argc, char** argv )
     trace.info() << "File extension not recognized: "<< extension << std::endl;
     return 0;
   }
-  
+
   if(extension=="vol" || extension=="pgm3d" || extension=="pgm3D"
 #ifdef WITH_ITK
      || extension =="dcm"
@@ -130,10 +130,10 @@ int main( int argc, char** argv )
     int dicomMin = vm["dicomMin"].as<int>();
     int dicomMax = vm["dicomMax"].as<int>();
     typedef DGtal::RescalingFunctor<int ,unsigned char > RescalFCT;
-    Image image = extension == "dcm" ? DicomReader< Image,  RescalFCT  >::importDicom( inputFilename, 
+    Image image = extension == "dcm" ? DicomReader< Image,  RescalFCT  >::importDicom( inputFilename,
 										       RescalFCT(dicomMin,
 												 dicomMax,
-												 0, 255) ) : 
+												 0, 255) ) :
       GenericReader<Image>::import( inputFilename );
 #else
     Image image = GenericReader<Image>::import (inputFilename );
@@ -153,7 +153,7 @@ int main( int argc, char** argv )
       }
     trace.endBlock();
     //! [3dVolBoundaryViewer-KSpace]
-    
+
     //! [3dVolBoundaryViewer-Set3D]
     trace.beginBlock( "Wrapping a digital set around image. " );
     typedef IntervalForegroundPredicate<Image> ThresholdedImage;
@@ -180,7 +180,7 @@ int main( int argc, char** argv )
 
     //! [3dVolBoundaryViewer-ViewingSurface]
     trace.beginBlock( "Displaying everything. " );
-    Viewer3D<> viewer;
+    Viewer3D<Space,KSpace> viewer(ks);
     viewer.setWindowTitle("Simple boundary of volume Viewer");
     viewer.show();
     typedef MyDigitalSurface::ConstIterator ConstIterator;
