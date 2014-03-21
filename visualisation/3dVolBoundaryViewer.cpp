@@ -194,6 +194,10 @@ int main( int argc, char** argv )
     else if ( mode == "OUTER" )
       for ( ConstIterator it = digSurf.begin(), itE = digSurf.end(); it != itE; ++it )
 	viewer << ks.sCoords( ks.sIndirectIncident( *it, ks.sOrthDir( *it ) ) );
+    else{
+      trace.error() << "Warning display mode (" << mode << ") not implemented." << std::endl;
+      trace.error() << "The display will be empty." << std::endl;
+    }
     viewer << Viewer3D<>::updateDisplay;
     trace.endBlock();
     return application.exec();
