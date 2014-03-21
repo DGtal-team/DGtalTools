@@ -64,6 +64,7 @@
 #include "DGtal/geometry/surfaces/estimation/IntegralInvariantGaussianCurvatureEstimator.h"
 
 // Drawing
+#include "DGtal/io/boards/Board3D.h"
 #include "DGtal/io/viewers/Viewer3D.h"
 #include "DGtal/io/colormaps/GradientColorMap.h"
 #include <QtGui/QApplication>
@@ -101,11 +102,12 @@ int main( int argc, char** argv )
     ("input-file,i", po::value< std::string >(), ".vol file")
     ("radius,r",  po::value< double >(), "Kernel radius for IntegralInvariant" )
     ("try,t",  po::value< unsigned int >()->default_value(150), "Max number of tries to find a proper bel" )
-    ("mode,m", po::value< std::string >()->default_value("mean"), "type of output : mean, gaussian, prindir1 or prindir2 (default mean)");
+    ("mode,m", po::value< std::string >()->default_value("mean"), "type of output : mean, gaussian, prindir1 or prindir2 (default mean)")
+    ("export,e", po::value< std::string >()->default_value(""),"Export the scene to specified OBJ filename." );
 
   bool parseOK = true;
   po::variables_map vm;
-  try 
+  try
   {
     po::store( po::parse_command_line( argc, argv, general_opt ), vm );
   }
@@ -116,14 +118,14 @@ int main( int argc, char** argv )
   }
   po::notify( vm );
   bool neededArgsGiven=true;
-  if (!(vm.count("input-file"))){ 
+  if (!(vm.count("input-file"))){
     missingParam("--input-file");
     neededArgsGiven=false;
   }
-  if (!(vm.count("radius"))){ 
+  if (!(vm.count("radius"))){
     missingParam("--radius");
     neededArgsGiven=false;
-  }  
+  }
   double h = 1.0;
 
   bool wrongMode = false;
@@ -132,6 +134,24 @@ int main( int argc, char** argv )
   {
     wrongMode = true;
   }
+
+  std::string export_path = vm["export"].as< std::string >();
+  bool myexport = true;
+  if( export_path == "" )
+  {
+    myexport = false;
+  }
+  else
+  {
+    if( export_path.find(".obj") == std::string::npos )
+    {
+      std::ostringstream oss; 
+      oss << export_path << ".obj" << endl; 
+      export_path = oss.str();
+    }
+  }
+
+  
 
   if(!neededArgsGiven ||  wrongMode || !parseOK || vm.count("help") || argc <= 1 )
   {
@@ -149,7 +169,7 @@ int main( int argc, char** argv )
     return 0;
   }
   double re_convolution_kernel = vm["radius"].as< double >();
-  
+
   // Construction of the shape from vol file
   typedef Z3i::Space::RealPoint RealPoint;
   typedef Z3i::Point Point;
@@ -225,6 +245,9 @@ int main( int argc, char** argv )
   VisitorRange range2( new Visitor( digSurf, *digSurf.begin() ) );
   SurfelConstIterator abegin2 = range2.begin();
 
+  typedef Board3D<Z3i::Space, Z3i::KSpace> Board;
+  Board board( K );
+
   trace.beginBlock("curvature computation");
   if( ( mode.compare("gaussian") == 0 ) || ( mode.compare("mean") == 0 ) )
   {
@@ -280,10 +303,21 @@ int main( int argc, char** argv )
     cmap_grad.addColor( Color( 255, 255, 10 ) );
     
     viewer << SetMode3D((*abegin2).className(), "Basic" );
+    if( myexport )
+    {
+      board << SetMode3D((K.unsigns(*abegin2)).className(), "Basic" );
+    }
+
     for ( unsigned int i = 0; i < results.size(); ++i )
     {
       viewer << CustomColors3D( Color::Black, cmap_grad( results[ i ] ))
              << *abegin2;
+
+      if (myexport)
+        {
+          board << CustomColors3D( Color::Black, cmap_grad( results[ i ] ))
+                << K.unsigns(*abegin2);
+        }
       ++abegin2;
     }
   }
@@ -311,6 +345,12 @@ int main( int argc, char** argv )
     typedef  Matrix3x3::RowVector RowVector;
     typedef  Matrix3x3::ColumnVector ColumnVector;
     viewer << SetMode3D(K.uCell( K.sKCoords(*abegin2) ).className(), "Basic" );
+
+    if( myexport )
+    {
+      board << SetMode3D(K.uCell( K.sKCoords(*abegin2) ).className(), "Basic" );
+      trace.warning() << "Warning: Actually, only the object geometry will be exported in this mode." << std::endl;
+    }
     for ( unsigned int i = 0; i < results.size(); ++i )
     {
       CurvInformation current = results[ i ];
@@ -325,6 +365,15 @@ int main( int argc, char** argv )
       viewer << CustomColors3D( DGtal::Color(255,255,255,255),
                                 DGtal::Color(255,255,255,255))
              << unsignedSurfel;
+      if (myexport)
+      {
+        board << CustomColors3D( DGtal::Color(255,255,255,255),
+                                 DGtal::Color(255,255,255,255))
+              << unsignedSurfel;
+      }
+
+
+      //ColumnVector normal = current.vectors.column(0).getNormalized(); // don't show the normal
       ColumnVector curv1 = current.vectors.column(1).getNormalized();
       ColumnVector curv2 = current.vectors.column(2).getNormalized();
 
@@ -367,10 +416,17 @@ int main( int argc, char** argv )
       ++abegin2;
     }
     trace.endBlock();
-  }
 
+   
+  }
   viewer << Viewer3D<>::updateDisplay;
 
+  if (myexport){
+    trace.info()<< "Exporting object: " << export_path << " ...";
+    board.saveOBJ(export_path);
+    trace.info() << "[done]" << std::endl;
+  }
+    
   delete boundary;
   return application.exec();
 }

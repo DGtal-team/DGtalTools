@@ -18,10 +18,11 @@
  * @ingroup Tools
  * @author Jacques-Olivier Lachaud (\c jacques-olivier.lachaud@univ-savoie.fr )
  * Laboratory of Mathematics (CNRS, UMR 5127), University of Savoie, France
+ * @author David Coeurjolly (\c david.coeurjolly@liris.cnrs.fr )
  *
  * @date 2013/11/15
  *
- * A tool file named 3dVolBoundaryViewer.
+ * A tool file named volBoundary2obj.
  *
  * This file is part of the DGtal library.
  */
@@ -31,7 +32,6 @@
 #include <boost/program_options/options_description.hpp>
 #include <boost/program_options/parsers.hpp>
 #include <boost/program_options/variables_map.hpp>
-#include <QtGui/qapplication.h>
 
 #include "DGtal/base/Common.h"
 #include "DGtal/base/BasicFunctors.h"
@@ -42,7 +42,7 @@
 #include "DGtal/topology/KhalimskySpaceND.h"
 #include "DGtal/topology/DigitalSurface.h"
 #include "DGtal/topology/SetOfSurfels.h"
-#include "DGtal/io/viewers/Viewer3D.h"
+#include "DGtal/io/boards/Board3D.h"
 #include "DGtal/io/readers/PointListReader.h"
 #include "DGtal/io/readers/GenericReader.h"
 #ifdef WITH_ITK
@@ -73,6 +73,7 @@ int main( int argc, char** argv )
   general_opt.add_options()
     ("help,h", "display this message")
     ("input-file,i", po::value<std::string>(), "vol file (.vol) , pgm3d (.p3d or .pgm3d, pgm (with 3 dims)) file or sdp (sequence of discrete points)" )
+    ("output-file,o", po::value<std::string>(), "output obj file (.obj)" )
     ("thresholdMin,m",  po::value<int>()->default_value(0), "threshold min (excluded) to define binary shape" )
     ("thresholdMax,M",  po::value<int>()->default_value(255), "threshold max (included) to define binary shape" )
 #ifdef WITH_ITK
@@ -92,8 +93,8 @@ int main( int argc, char** argv )
   po::notify(vm);
   if( !parseOK || vm.count("help")||argc<=1)
     {
-      std::cout << "Usage: " << argv[0] << " -i [input-file]\n"
-                << "Display the boundary of a volume file by using QGLviewer. The mode specifies if you wish to see surface elements (BDRY), the inner voxels (INNER) or the outer voxels (OUTER) that touch the boundary."<< endl
+      std::cout << "Usage: " << argv[0] << " -i [input-file] -o [output-file]\n"
+                << "Export the boundary of a volume file to OBJ format. The mode specifies if you wish to see surface elements (BDRY), the inner voxels (INNER) or the outer voxels (OUTER) that touch the boundary."<< endl
                 << general_opt << "\n";
       return 0;
     }
@@ -103,12 +104,17 @@ int main( int argc, char** argv )
       trace.error() << " The file name was defined" << endl;
       return 0;
     }
+
+  if(! vm.count("output-file"))
+    {
+      trace.error() << " The output filename was defined" << endl;
+      return 0;
+    }
+
   string inputFilename = vm["input-file"].as<std::string>();
   int thresholdMin = vm["thresholdMin"].as<int>();
   int thresholdMax = vm["thresholdMax"].as<int>();
   string mode = vm["mode"].as<string>();
-
-  QApplication application(argc,argv);
 
   string extension = inputFilename.substr(inputFilename.find_last_of(".") + 1);
   if(extension!="vol" && extension != "p3d" && extension != "pgm3D" && extension != "pgm3d" && extension != "sdp" && extension != "pgm"
@@ -141,7 +147,6 @@ int main( int argc, char** argv )
     trace.info() << "Image loaded: "<<image<< std::endl;
     trace.endBlock();
 
-    //! [3dVolBoundaryViewer-KSpace]
     trace.beginBlock( "Construct the Khalimsky space from the image domain." );
     Domain domain = image.domain();
     KSpace ks;
@@ -152,16 +157,12 @@ int main( int argc, char** argv )
 	return 2;
       }
     trace.endBlock();
-    //! [3dVolBoundaryViewer-KSpace]
 
-    //! [3dVolBoundaryViewer-Set3D]
     trace.beginBlock( "Wrapping a digital set around image. " );
     typedef IntervalForegroundPredicate<Image> ThresholdedImage;
     ThresholdedImage thresholdedImage( image, thresholdMin, thresholdMax );
     trace.endBlock();
-    //! [3dVolBoundaryViewer-Set3D]
 
-    //! [3dVolBoundaryViewer-ExtractingSurface]
     trace.beginBlock( "Extracting boundary by scanning the space. " );
     typedef KSpace::SurfelSet SurfelSet;
     typedef SetOfSurfels< KSpace, SurfelSet > MySetOfSurfels;
@@ -176,31 +177,27 @@ int main( int argc, char** argv )
     trace.info() << "Digital surface has " << digSurf.size() << " surfels."
 		 << std::endl;
     trace.endBlock();
-    //! [3dVolBoundaryViewer-ExtractingSurface]
 
-    //! [3dVolBoundaryViewer-ViewingSurface]
     trace.beginBlock( "Displaying everything. " );
-    Viewer3D<Space,KSpace> viewer(ks);
-    viewer.setWindowTitle("Simple boundary of volume Viewer");
-    viewer.show();
+    Board3D<Space,KSpace> board(ks);
+
+    board << SetMode3D(  ks.unsigns( *digSurf.begin() ).className(), "Basic" );
+
     typedef MyDigitalSurface::ConstIterator ConstIterator;
-    if ( mode == "BDRY" ){
-      viewer << SetMode3D(ks.unsigns( *(digSurf.begin()) ).className(), "Basic");
+    if ( mode == "BDRY" )
       for ( ConstIterator it = digSurf.begin(), itE = digSurf.end(); it != itE; ++it )
-	viewer << ks.unsigns( *it );
-    }else if ( mode == "INNER" )
+	board << ks.unsigns( *it );
+    else if ( mode == "INNER" )
       for ( ConstIterator it = digSurf.begin(), itE = digSurf.end(); it != itE; ++it )
-	viewer << ks.sCoords( ks.sDirectIncident( *it, ks.sOrthDir( *it ) ) );
+	board << ks.sCoords( ks.sDirectIncident( *it, ks.sOrthDir( *it ) ) );
     else if ( mode == "OUTER" )
       for ( ConstIterator it = digSurf.begin(), itE = digSurf.end(); it != itE; ++it )
-	viewer << ks.sCoords( ks.sIndirectIncident( *it, ks.sOrthDir( *it ) ) );
-    else{
-      trace.error() << "Warning display mode (" << mode << ") not implemented." << std::endl;
-      trace.error() << "The display will be empty." << std::endl;
-    }
-    viewer << Viewer3D<>::updateDisplay;
+	board << ks.sCoords( ks.sIndirectIncident( *it, ks.sOrthDir( *it ) ) );
+
+    string outputFilename = vm["output-file"].as<std::string>();
+
+    board.saveOBJ(outputFilename);
     trace.endBlock();
-    return application.exec();
   }
   return 0;
 }

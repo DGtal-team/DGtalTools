@@ -1,9 +1,13 @@
 	====  Release 0.8 ====
 
+* visualisation/:
 	- 3dVolBoundaryViewer: a simple viewer of the boundary of an object defined by thresholding a vol file.
 	- 3dVolMarchingCubes: speed-up by factor 10 simply by replacing the set predicate used in computations.
 
-	
+* convertes/:
+	- volBoundary2obj: a simple tool to export the boundary of a an	object in a volumetric file to OBJ
+
+
 	====  Release 0.7 ====
 
 * converters/:
@@ -24,8 +28,8 @@
 	- homotopicThinning3D exploits now the GenericReader class and is no more limited to vol format.
 	- volFlip: tool to flip all volume slice images according a given dimension.
 	- volImageMetrics: apply basic measures from two volumetric images:  RMSE and PSNR.
-	- volShapeMetrics: Apply shape measures for comparing two volumetric images A and B (shape defined from thresholds): 
-		* Measures from voxel partition (true/false+-, precision recall, f-measure) 
+	- volShapeMetrics: Apply shape measures for comparing two volumetric images A and B (shape defined from thresholds):
+		* Measures from voxel partition (true/false+-, precision recall, f-measure)
 		* Measures bases on euclidean distance between the two Shape A and B.
 
 * estimators:
@@ -105,5 +109,3 @@ Various updates for 0.6 DGtal compatibility.
       volAddBorder: add a 1 voxel boundary with value 0 to a vol file.
       volCComponentCounter: a simple program to count the number of connected components in a 3D image.
       volSubSample: sub sample a vol file (division by 2 in each direction).
-
-
