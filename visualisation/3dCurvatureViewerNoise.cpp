@@ -120,15 +120,15 @@ int main( int argc, char** argv )
   po::notify( vm );
   bool neededArgsGiven=true;
   
-  if (!(vm.count("input-file"))){
+  if (parseOK && !(vm.count("input-file"))){
     missingParam("--input-file");
     neededArgsGiven=false;
   }
-  if (!(vm.count("radius"))){
+  if (parseOK && !(vm.count("radius"))){
     missingParam("--radius");
     neededArgsGiven=false;
   }
-  if (!(vm.count("noise"))){ 
+  if (parseOK && !(vm.count("noise"))){ 
     missingParam("--noise");
     neededArgsGiven=false;
   }

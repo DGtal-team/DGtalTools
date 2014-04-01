@@ -103,7 +103,7 @@ int main( int argc, char** argv )
     ("radius,r",  po::value< double >(), "Kernel radius for IntegralInvariant" )
     ("try,t",  po::value< unsigned int >()->default_value(150), "Max number of tries to find a proper bel" )
     ("mode,m", po::value< std::string >()->default_value("mean"), "type of output : mean, gaussian, prindir1 or prindir2 (default mean)")
-    ("export,e", po::value< std::string >()->default_value(""),"Export the scene to specified OBJ filename." );
+    ("export,e", po::value< std::string >(), "Export the scene to specified OBJ filename." );
 
   bool parseOK = true;
   po::variables_map vm;
@@ -146,22 +146,19 @@ int main( int argc, char** argv )
     wrongMode = true;
   }
 
-  std::string export_path = vm["export"].as< std::string >();
-  bool myexport = true;
-  if( export_path == "" )
-  {
-    myexport = false;
-  }
-  else
-  {
+  std::string export_path;
+  bool myexport = false;
+  if(vm.count("export")){
+    export_path = vm["export"].as< std::string >();
     if( export_path.find(".obj") == std::string::npos )
-    {
-      std::ostringstream oss; 
-      oss << export_path << ".obj" << endl; 
-      export_path = oss.str();
-    }
+      {
+        std::ostringstream oss; 
+        oss << export_path << ".obj" << endl; 
+        export_path = oss.str();
+      } 
+    myexport=true;
   }
-
+  
   
 
   if(!neededArgsGiven ||  wrongMode || !parseOK || vm.count("help") || argc <= 1 )
