@@ -114,7 +114,7 @@ int main( int argc, char** argv )
   catch( const std::exception & ex )
   {
     parseOK = false;
-    trace.info() << "Error checking program options: " << ex.what() << std::endl;
+    trace.error() << " Error checking program options: " << ex.what() << std::endl;
   }
   bool neededArgsGiven=true;
   
@@ -127,25 +127,39 @@ int main( int argc, char** argv )
     neededArgsGiven=false;
   }
   
-  if(! neededArgsGiven|| !parseOK || vm.count("help") || argc<=1 ||
-      !(vm.count("input-file")))
-    {
-      
-      std::cout << "Usage: " << argv[0] << " [input-file]\n"
-		<< "Display volume file as a voxel set by using QGLviewer"
-		<< general_opt << "\n";
-      return 0;
-    }
-  po::notify( vm );
-  double h = 1.0;
-
   bool wrongMode = false;
-  std::string mode = vm["mode"].as< std::string >();
-  if (( mode.compare("gaussian") != 0 ) && ( mode.compare("mean") != 0 ) && ( mode.compare("prindir1") != 0 ) && ( mode.compare("prindir2") != 0 ))
-  {
+  std::string mode;
+  if( parseOK )
+    mode =  vm["mode"].as< std::string >();
+  if ( parseOK && ( mode.compare("gaussian") != 0 ) && ( mode.compare("mean") != 0 ) &&
+       ( mode.compare("prindir1") != 0 ) && ( mode.compare("prindir2") != 0 ))
+    {
     wrongMode = true;
+    trace.error() << " The selected mode ("<<mode << ") is not defined."<<std::endl;
   }
 
+
+  if(!neededArgsGiven ||  wrongMode || !parseOK || vm.count("help") || argc <= 1 )
+  {
+    trace.info()<< "Visualisation of 3d curvature from .vol file using curvature from Integral Invariant" <<std::endl
+                << general_opt << "\n"
+                << "Basic usage: "<<std::endl
+                << "\t3dCurvatureViewer -i file.vol --radius 3 --mode mean"<<std::endl
+                << std::endl
+                << "Below are the different available modes: " << std::endl
+                << "\t - \"mean\" for the mean curvature" << std::endl
+                << "\t - \"gaussian\" for the Gaussian curvature" << std::endl
+                << "\t - \"prindir1\" for the first principal curvature direction" << std::endl
+                << "\t - \"prindir2\" for the second principal curvature direction" << std::endl
+                << std::endl;
+    return 0;
+  }
+
+  
+  
+  double h = 1.0;
+
+  
   std::string export_path;
   bool myexport = false;
   if(vm.count("export")){
@@ -160,22 +174,6 @@ int main( int argc, char** argv )
   }
   
   
-
-  if(!neededArgsGiven ||  wrongMode || !parseOK || vm.count("help") || argc <= 1 )
-  {
-    trace.info()<< "Visualisation of 3d curvature from .vol file using curvature from Integral Invariant" <<std::endl
-                << general_opt << "\n"
-                << "Basic usage: "<<std::endl
-                << "\t3dCurvatureViewer -i <file.vol> --radius <radius> --mode <\"mean\">"<<std::endl
-                << std::endl
-                << "Below are the different available modes: " << std::endl
-                << "\t - \"mean\" for the mean curvature" << std::endl
-                << "\t - \"gaussian\" for the Gaussian curvature" << std::endl
-                << "\t - \"prindir1\" for the first principal curvature direction" << std::endl
-                << "\t - \"prindir2\" for the second principal curvature direction" << std::endl
-                << std::endl;
-    return 0;
-  }
   double re_convolution_kernel = vm["radius"].as< double >();
 
   // Construction of the shape from vol file
