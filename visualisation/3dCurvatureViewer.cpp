@@ -116,16 +116,27 @@ int main( int argc, char** argv )
     parseOK = false;
     trace.info() << "Error checking program options: " << ex.what() << std::endl;
   }
-  po::notify( vm );
   bool neededArgsGiven=true;
-  if (!(vm.count("input-file"))){
+  
+  if (parseOK && !(vm.count("input-file"))){
     missingParam("--input-file");
     neededArgsGiven=false;
   }
-  if (!(vm.count("radius"))){
+  if (parseOK && !(vm.count("radius"))){
     missingParam("--radius");
     neededArgsGiven=false;
   }
+  
+  if(! neededArgsGiven|| !parseOK || vm.count("help") || argc<=1 ||
+      !(vm.count("input-file")))
+    {
+      
+      std::cout << "Usage: " << argv[0] << " [input-file]\n"
+		<< "Display volume file as a voxel set by using QGLviewer"
+		<< general_opt << "\n";
+      return 0;
+    }
+  po::notify( vm );
   double h = 1.0;
 
   bool wrongMode = false;
