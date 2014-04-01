@@ -20,6 +20,7 @@ if (  WITH_VISU3D_QGLVIEWER )
     3dCurvatureViewer
     3dCurvatureViewerNoise
     3dCurveViewer
+    3dSDPViewer
     meshViewer)
   FOREACH(FILE ${DGTAL_EXAMPLES_QGL_SRC}) 
     add_executable(${FILE} ${FILE})
