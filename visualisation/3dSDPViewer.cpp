@@ -64,7 +64,7 @@ int main( int argc, char** argv )
     ("help,h", "display this message")
     ("input-file,i", po::value<std::string>(), "input file: sdp (sequence of discrete points)" )
     ("SDPindex", po::value<std::vector <unsigned int> >()->multitoken(), "specify the sdp index (by default 0,1,2).")
-    ("colorSDP,c", po::value<std::vector <int> >()->multitoken(), "set the color  discrete points: r g b a " )
+    ("colorSDP,c", po::value<std::vector <int> >()->multitoken(), "set the color of discrete points: r g b a " )
     ("scaleX,x",  po::value<float>()->default_value(1.0), "set the scale value in the X direction (default 1.0)" )
     ("scaleY,y",  po::value<float>()->default_value(1.0), "set the scale value in the Y direction (default 1.0)" )
     ("scaleZ,z",  po::value<float>()->default_value(1.0), "set the scale value in the Z direction (default 1.0)");
