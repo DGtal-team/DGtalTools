@@ -15,14 +15,13 @@
  **/
 
 /**
- * @file qglViewer.cpp
- * @ingroup Examples
+ * @file homotopicThinning3D.cpp
  * @author Bertrand Kerautret (\c kerautre@loria.fr )
  * LORIA (CNRS, UMR 7503), University of Nancy, France
  *
  * @date 2011/01/04
  *
- * An example file named qglViewer.
+ * Apply an the homotopic thinning from a volumetric volume file.
  *
  * This file is part of the DGtal library.
  */
@@ -80,11 +79,13 @@ int main( int argc, char** argv )
   po::options_description general_opt ( "Allowed options are: " );
   general_opt.add_options()
     ( "help,h", "display this message." )
-    ( "input,i", po::value<std::string>(), "Input vol file." )
+    ( "input-file,i", po::value<std::string>(), "Input volumetric file (.vol, .pgm3d or p3d)" )
     ( "min,m", po::value<int>()->default_value( 0 ), "Minimum (excluded) value for threshold." )
     ( "max,M", po::value<int>()->default_value( 255 ), "Maximum (included) value for threshold." )
-    ;
-    bool parseOK=true;
+    ("fixedPoints", po::value<std::vector <int> >()->multitoken(), "defines the coordinates of points which should not be removed." );
+  
+  
+  bool parseOK=true;
   po::variables_map vm;
   try{
     po::store(po::parse_command_line(argc, argv, general_opt), vm);  
@@ -97,14 +98,20 @@ int main( int argc, char** argv )
     {
       trace.info() << "Illustration of homotopic thinning of a 3d image file (vol,longvol,pgm3d...) with 3D viewer."<<std::endl
                    << std::endl << "Basic usage: "<<std::endl
-                   << "\thomotopicThinning3d [options] --input <3dImageFileName>  {vol,longvol,pgm3d...} "<<std::endl
-                   << general_opt << "\n";
+                   << "\thomotopicThinning3d [options] --input-file <3dImageFileName>  {vol,longvol,pgm3d...} "<<std::endl
+                   << general_opt << "\n"
+                   << " Usage by forcing point to be left by the thinning: \n"
+                   << "homotopicThinning3D --input-file ${DGtal}/examples/samples/Al.100.vol  --fixedPoints 56 35 5  56 61 5  57 91 38  58 8 38  45 50 97 \n";
+      
+
+        
+
       return 0;
     }
 
   //Parse options
-  if ( ! ( vm.count ( "input" ) ) ) missingParam ( "--input" );
-  std::string filename = vm["input"].as<std::string>();
+  if ( ! ( vm.count ( "input-file" ) ) ) missingParam ( "--input" );
+  std::string filename = vm["input-file"].as<std::string>();
   
   
   typedef ImageSelector < Z3i::Domain, unsigned char>::Type Image;
@@ -119,18 +126,33 @@ int main( int argc, char** argv )
   trace.info() <<image<<std::endl;
 
   // Domain creation from two bounding points.
-  Point c( 0, 0, 0 );
-  Point p1( -50, -50, -50 );
-  Point p2( 50, 50, 50 );
-  Domain domain( p1, p2 );
   
   trace.beginBlock("Constructing Set");
-  DigitalSet shape_set( domain );
+  DigitalSet shape_set( image.domain() );
+  DigitalSet fixedSet( image.domain() );
+  
+  // Get the optional fixed points
+  if( vm.count("fixedPoints")){
+    std::vector<int> vectC = vm["fixedPoints"].as<std::vector<int> >();
+    if(vectC.size()%3==0){
+      for( unsigned int i=0; i < vectC.size()-2; i=i+3){
+        Z3i::Point pt(vectC.at(i), vectC.at(i+1), vectC.at(i+2));
+        fixedSet.insertNew(pt);
+      }
+    }else{
+      trace.error()<< " The coordinates should be 3d coordinates, ignoring fixedPoints option." << std::endl; 
+    }
+  }
+  
+
   SetFromImage<DigitalSet>::append<Image>(shape_set, image,
                                           vm[ "min" ].as<int>(), vm[ "max" ].as<int>() );
   trace.info() << shape_set<<std::endl;
   trace.endBlock();
-
+  
+  
+  
+  
   trace.beginBlock("Computing skeleton");
   // (6,18), (18,6), (26,6) seem ok.
   // (6,26) gives sometimes weird results (but perhaps ok !).
@@ -161,7 +183,7 @@ int main( int argc, char** argv )
         {
           DigitalSet::Iterator it = Q.front();
           Q.pop();
-          if ( shape.isSimple( *it ) )
+          if ( shape.isSimple( *it ) && fixedSet.find(*it) == fixedSet.end() )
             {
               S.erase( *it );
               ++nb_simple;
@@ -186,7 +208,8 @@ int main( int argc, char** argv )
   viewer << SetMode3D( shape_set.className(), "Paving" );
   viewer << CustomColors3D(Color(25,25,255, 255), Color(25,25,255, 255));
   viewer << S ; 
-
+  viewer << CustomColors3D(Color(255,25,255, 255), Color(255,25,255, 255));
+  viewer << fixedSet;
   viewer << SetMode3D( shape_set.className(), "PavingTransp" );
   viewer << CustomColors3D(Color(250, 0,0, 25), Color(250, 0,0, 5));
   viewer << shape_set;
