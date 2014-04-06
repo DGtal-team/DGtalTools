@@ -67,14 +67,6 @@ using namespace DGtal;
 
 
 
-struct BaseFct{
- inline
- DGtal::Color operator() (unsigned int aVal) const
-  {
-    return Color(aVal);
-  }
-};
-
 
 template< typename RealPoint >
 struct OptionsIntegralInvariant
@@ -135,7 +127,7 @@ int main( int argc, char** argv )
     ("curvatureCutOff,c", po::value<double>()->default_value(10.0), "set the curvature limits to better display");
   
 
-  typedef ImageContainerBySTLVector<Z2i::Domain, unsigned int > Image2D;
+  typedef ImageContainerBySTLVector<Z2i::Domain, double > Image2D;
 
  
   bool parseOK=true;
@@ -152,7 +144,7 @@ int main( int argc, char** argv )
       trace.info()<< "Generate the Curvature Scale Sapce image using a binomial convolver based estimator." <<std::endl
                   << "The x axis is associated to the contour point and the y axis to the scale. The color represent the curvature values included between the cutoff values (set to 10 by default)."
                   <<std::endl << "Basic usage: "<<std::endl
-      << "\t curvatureBC [options] --FreemanChain  <fileName> "<<std::endl
+      << "\t curvatureScaleSpace -f ${DGtal}/examples/samples/contourS.fc --gridStepInit 0.001 --gridStepIncrement  0.0005 --gridStepFinal 0.05 -o cssResu.ppm "<<std::endl
       << general_opt << "\n";
       return 0;
     }
@@ -188,14 +180,13 @@ int main( int argc, char** argv )
     Image2D cssImage(domain);    
     HueShadeColorMap<double>  gradCurvature (-curvatureCutOff, curvatureCutOff);
     
-    
+    trace.progressBar(0, height);
     unsigned int nbLine=0;
     for(double h= h_initial; h <= h_final; h=h+h_increment){
       // Binomial estimator
-      std::cout << "# Curvature estimation from binomial convolution" << std::endl;
+      trace.progressBar(nbLine, height);
+      
       typedef BinomialConvolver<ConstIteratorOnPoints, double> MyBinomialConvolver;
-      std::cout << "# mask size = " << 
-        MyBinomialConvolver::suggestedSize( h, vectPts.begin(), vectPts.end() ) << std::endl;
       typedef CurvatureFromBinomialConvolverFunctor< MyBinomialConvolver, double >   CurvatureBCFct;
       BinomialConvolverEstimator< MyBinomialConvolver, CurvatureBCFct> BCCurvatureEstimator;
       
@@ -203,21 +194,22 @@ int main( int argc, char** argv )
       std::vector <double> curvatures( vectPts.size() ); 
       BCCurvatureEstimator.eval( vectPts.begin(), vectPts.end(), curvatures.begin() ); 
       
-      
       // Output
-      std::cout << "# id curvature" << std::endl;  
       unsigned int j = 0;
       for ( ConstIteratorOnPoints it = vectPts.begin(), it_end = vectPts.end();
             it != it_end; ++it, ++j ) {
         double c = curvatures[j];
         c = c<-curvatureCutOff? -curvatureCutOff: c;
         c = c>curvatureCutOff? curvatureCutOff: c;
-        cssImage.setValue(Z2i::Point(j,nbLine), gradCurvature(c).getRGB()); 
+        cssImage.setValue(Z2i::Point(j,nbLine), c); 
       }
       nbLine++;
     }
-
-    PPMWriter<Image2D, BaseFct  >::exportPPM(vm["output"].as<std::string>(), cssImage, BaseFct() );   
+    
+    trace.progressBar(height, height);
+    trace.info() <<std::endl;
+    
+    DGtal::GenericWriter<Image2D, 2, double, HueShadeColorMap<double> >::exportFile(vm["output"].as<std::string>(), cssImage, gradCurvature );       
   }
  
   return 0;
