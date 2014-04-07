@@ -163,7 +163,7 @@ int main( int argc, char** argv )
     typedef FreemanChain<Integer> FreemanChain; 
     typedef std::vector< Point > Storage;
     typedef Storage::const_iterator ConstIteratorOnPoints; 
-     typedef HueShadeColorMap<unsigned char> Hue;
+    typedef HueShadeColorMap<unsigned char> Hue;
 
     std::vector< FreemanChain > vectFcs =  PointListReader< Point >:: getFreemanChainsFromFile<Integer> (fileName); 
     
