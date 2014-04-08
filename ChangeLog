@@ -6,7 +6,7 @@
 
 * convertes/:
 	- volBoundary2obj: a simple tool to export the boundary of a an	object in a volumetric file to OBJ
-
+	- freeman2pgm: transform a freeman chain into a pgm file.
 
 	====  Release 0.7 ====
 

@@ -1,6 +1,7 @@
 
 SET(DGTAL_TOOLS_SRC
   pgm2freeman
+  freeman2pgm
   freeman2sdp
   vol2raw
   raw2vol
