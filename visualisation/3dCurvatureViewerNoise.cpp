@@ -141,7 +141,9 @@ int main( int argc, char** argv )
   bool somethingWrong = false;
   std::string mode;
   if( parseOK )
+  {
     mode =  vm["mode"].as< std::string >();
+  }
   
   if (parseOK && ( mode.compare("gaussian") != 0 ) && ( mode.compare("mean") != 0 ) 
       && ( mode.compare("prindir1") != 0 ) && ( mode.compare("prindir2") != 0 ))
@@ -149,7 +151,12 @@ int main( int argc, char** argv )
       somethingWrong = true;
     }
 
- 
+    double noiseLevel = vm["noise"].as< double >();
+    if( noiseLevel < 0.0 || noiseLevel > 1.0 )
+    {
+      trace.error() << "Noise level should be in the interval: ]0, 1["<< std::endl;
+      somethingWrong = true;
+    }
   
   if( !neededArgsGiven ||  somethingWrong || !parseOK || vm.count("help") || argc <= 1 )
     {
@@ -165,18 +172,12 @@ int main( int argc, char** argv )
                   << "\t - \"prindir2\" for the second principal curvature direction" << std::endl
                   << std::endl;
       return 0;
-    }
-  double noiseLevel = vm["noise"].as< double >();
-  if( noiseLevel < 0.0 || noiseLevel > 1.0 )
-    {
-      trace.error()<< "Noise level should be in the interval: ]0, 1["<< std::endl;
-      somethingWrong = true;
-    }
-  
+    } 
 
   std::string export_path;
   bool myexport = false;
-  if(vm.count("export")){
+  if(vm.count("export"))
+  {
     export_path = vm["export"].as< std::string >();
     if( export_path.find(".obj") == std::string::npos )
       {
@@ -386,7 +387,6 @@ int main( int argc, char** argv )
           ColumnVector curv1 = current.vectors.column(1).getNormalized();
           ColumnVector curv2 = current.vectors.column(2).getNormalized();
 
-          double eps = 0.01;
           RealPoint center = embedder( outer );
 
           if( ( mode.compare("prindir1") == 0 ) )

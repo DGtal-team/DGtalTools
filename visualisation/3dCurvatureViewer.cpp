@@ -379,11 +379,10 @@ int main( int argc, char** argv )
       }
 
 
-      //ColumnVector normal = current.vectors.column(0).getNormalized(); // don't show the normal
+      //ColumnVector normal = current.vectors.column(0).getNormalized();
       ColumnVector curv1 = current.vectors.column(1).getNormalized();
       ColumnVector curv2 = current.vectors.column(2).getNormalized();
 
-      double eps = 0.01;
       RealPoint center = embedder( outer );
 
       if( ( mode.compare("prindir1") == 0 ) )
