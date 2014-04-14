@@ -87,7 +87,7 @@ getImageFromFC(double scaleMax, const FreemanChain<Z2i::Integer> &fc,
   Surfaces<Z2i::KSpace>::uComputeInterior(aKSpace, boundarySCell, interiorCell, false);  
   ImageContainerBySTLVector<Z2i::Domain, unsigned char> imageResult (Z2i::Domain(Z2i::Point(minx, miny), Z2i::Point(maxx, maxy))); 
   for(std::set<Z2i::KSpace::Cell>::const_iterator it = interiorCell.begin(); it!=interiorCell.end(); it++){
-    imageResult.setValue(aKSpace.uCoords(*it), 1);
+    imageResult.setValue(aKSpace.uCoords(*it), 128);
   }
   return imageResult; 
 }
