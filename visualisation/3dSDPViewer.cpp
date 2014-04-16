@@ -64,30 +64,71 @@ int main( int argc, char** argv )
     ("help,h", "display this message")
     ("input-file,i", po::value<std::string>(), "input file: sdp (sequence of discrete points)" )
     ("SDPindex", po::value<std::vector <unsigned int> >()->multitoken(), "specify the sdp index (by default 0,1,2).")
-    ("colorSDP,c", po::value<std::vector <int> >()->multitoken(), "set the color of discrete points: r g b a " )
+    ("pointColor,c", po::value<std::vector <int> >()->multitoken(), "set the color of  points: r g b a " )
+    ("lineColor,l",po::value<std::vector <int> >()->multitoken(), "set the color of line: r g b a " ) 
+    ("noPointDisplay", "usefull for instance to only display the lines between points.")
+    ("drawLines", "draw the line between discrete points." ) 
     ("scaleX,x",  po::value<float>()->default_value(1.0), "set the scale value in the X direction (default 1.0)" )
     ("scaleY,y",  po::value<float>()->default_value(1.0), "set the scale value in the Y direction (default 1.0)" )
-    ("scaleZ,z",  po::value<float>()->default_value(1.0), "set the scale value in the Z direction (default 1.0)");
+    ("scaleZ,z",  po::value<float>()->default_value(1.0), "set the scale value in the Z direction (default 1.0)")
+    ("sphereRadius,s",  po::value<double>()->default_value(0.2), "defines the sphere radius (used when the primitive is set to the sphere). (default value 0.2)")
+    ("lineSize",  po::value<double>()->default_value(0.2), "defines the line size (used when the drawLines option is selected). (default value 0.2))")
+    ("primitive,p", po::value<std::string>()->default_value("sphere"), "set the primitive to display the set of points (can be sphere or voxel (default)") ;
      
   bool parseOK=true;
+  bool cannotStart= false;
+  
   po::variables_map vm;
   try{
     po::store(po::parse_command_line(argc, argv, general_opt), vm);  
   }catch(const std::exception& ex){
     parseOK=false;
-    trace.info()<< "Error checking program options: "<< ex.what()<< endl;
+    trace.error()<< "Error checking program options: "<< ex.what()<< endl;
   }
   po::notify(vm);    
-  if(! vm.count("input-file"))
+  if(parseOK && ! vm.count("input-file"))
     {
       trace.error() << " The input file name was not defined" << endl;      
-      return 0;
+      cannotStart = true;
     }
+  std::string typePrimitive;
+  double sphereRadius = 0.2;
+  double lineSize =0.2;
+  Color lineColor(100, 100, 250);
+  Color pointColor(250, 250, 250);
+  if(parseOK){
+    typePrimitive = vm["primitive"].as<std::string>();
+    sphereRadius = vm["sphereRadius"].as<double>();
+    lineSize = vm["lineSize"].as<double>();
+  }  
   
-  if( !parseOK || vm.count("help")||argc<=1)
+  if (parseOK && typePrimitive !="voxel" && typePrimitive  != "sphere" ){  
+    trace.error() << " The primitive should be sphere or voxel (primitive: " 
+                  << typePrimitive << " not implemented)" << std::endl;
+    cannotStart = true;
+  } 
+  
+  if(parseOK && vm.count("lineColor")){
+    std::vector<int> vcol= vm["lineColor"].as<std::vector<int > >();
+    if(vcol.size()<4){
+      trace.error() << " Not enough parameter: color specification should contains four elements: red, green, blue and alpha values "  
+                    << "(Option --lineColor ignored). "  << std::endl;
+    }
+    lineColor.setRGBi(vcol[0], vcol[1], vcol[2], vcol[3]);
+  }
+  if(parseOK && vm.count("pointColor")){
+    std::vector<int> vcol= vm["pointColor"].as<std::vector<int > >();
+    if(vcol.size()<4){
+      trace.error() << " Not enough parameter: color specification should contains four elements: red, green, blue and alpha values "
+                    << "(Option --pointColor ignored)."  << std::endl;
+    }
+    pointColor.setRGBi(vcol[0], vcol[1], vcol[2], vcol[3]);
+  }
+  
+  if( !parseOK || cannotStart ||  vm.count("help")||argc<=1)
     {
-      std::cout << "Usage: " << argv[0] << " [input-file]\n"
-		<< "Display sequence of 3d discrete points by using QGLviewer"
+      trace.info() << "Usage: " << argv[0] << " [input-file]\n"
+		<< "Display sequence of 3d discrete points by using QGLviewer."
 		<< general_opt << "\n";
       return 0;
     }
@@ -109,32 +150,39 @@ int main( int argc, char** argv )
   viewer.show();
   viewer.setGLScale(sx, sy, sz);  
   
-
-  if(vm.count("colorSDP")){
-    std::vector<int> vcol= vm["colorSDP"].as<std::vector<int > >();
-    if(vcol.size()<4){
-      trace.error() << "Not enough parameter: color specification should contains four elements: red, green, blue and alpha values."  << std::endl;
-      return 0;
-    }
-    Color c(vcol[0], vcol[1], vcol[2], vcol[3]);
-    viewer << CustomColors3D(c, c);
-  }
-
-  vector<Z3i::Point> vectVoxels;
+  viewer << CustomColors3D(pointColor, pointColor);
+  
+  vector<Z3i::RealPoint> vectVoxels;
   if(vm.count("SDPindex")) {
     std::vector<unsigned int > vectIndex = vm["SDPindex"].as<std::vector<unsigned int > >();
     if(vectIndex.size()!=3){
       trace.error() << "you need to specify the three indexes of vertex." << std::endl; 
       return 0;
     }
-    vectVoxels = PointListReader<Z3i::Point>::getPointsFromFile(inputFilename, vectIndex);
+    vectVoxels = PointListReader<Z3i::RealPoint>::getPointsFromFile(inputFilename, vectIndex);
   }else{
-    vectVoxels = PointListReader<Z3i::Point>::getPointsFromFile(inputFilename);
+    vectVoxels = PointListReader<Z3i::RealPoint>::getPointsFromFile(inputFilename);
   }
-  for(int i=0;i< vectVoxels.size(); i++){
-    viewer << vectVoxels.at(i); 
-  }  
-
+  
+  if(!vm.count("noPointDisplay")){
+    for(int i=0;i< vectVoxels.size(); i++){
+      if(typePrimitive=="voxel"){
+        viewer << Z3i::Point((int)vectVoxels.at(i)[0],
+                             (int)vectVoxels.at(i)[1],
+                             (int)vectVoxels.at(i)[2]); 
+      }else{
+        viewer.addBall(vectVoxels.at(i), sphereRadius);    
+      }
+    }  
+  }
+  
+  viewer << CustomColors3D(lineColor, lineColor);
+  if(vm.count("drawLines")){
+    for(int i=1;i< vectVoxels.size(); i++){
+      viewer.addLine(vectVoxels.at(i-1), vectVoxels.at(i), lineSize); 
+    }  
+  }
+  
   viewer << Viewer3D<>::updateDisplay;
   return application.exec();
 }
