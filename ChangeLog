@@ -5,7 +5,7 @@
 	- 3dVolMarchingCubes: speed-up by factor 10 simply by replacing the set predicate used in computations.
 	- 3dSDPViewer: basic display of a sequence of 3d discrete points (as voxel) by using QGLviewer.
 
-* convertes/:
+* converters/:
 	- volBoundary2obj: a simple tool to export the boundary of a an	object in a volumetric file to OBJ
 
 
