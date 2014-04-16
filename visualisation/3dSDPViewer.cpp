@@ -62,7 +62,7 @@ int main( int argc, char** argv )
   po::options_description general_opt("Allowed options are: ");
   general_opt.add_options()
     ("help,h", "display this message")
-    ("input-file,i", po::value<std::string>(), "input file: sdp (sequence of discrete points)" )
+    ("input,i", po::value<std::string>(), "input file: sdp (sequence of discrete points)" )
     ("SDPindex", po::value<std::vector <unsigned int> >()->multitoken(), "specify the sdp index (by default 0,1,2).")
     ("pointColor,c", po::value<std::vector <int> >()->multitoken(), "set the color of  points: r g b a " )
     ("lineColor,l",po::value<std::vector <int> >()->multitoken(), "set the color of line: r g b a " ) 
@@ -86,7 +86,7 @@ int main( int argc, char** argv )
     trace.error()<< "Error checking program options: "<< ex.what()<< endl;
   }
   po::notify(vm);    
-  if(parseOK && ! vm.count("input-file"))
+  if(parseOK && ! vm.count("input"))
     {
       trace.error() << " The input file name was not defined" << endl;      
       cannotStart = true;
@@ -127,13 +127,13 @@ int main( int argc, char** argv )
   
   if( !parseOK || cannotStart ||  vm.count("help")||argc<=1)
     {
-      trace.info() << "Usage: " << argv[0] << " [input-file]\n"
+      trace.info() << "Usage: " << argv[0] << " [input]\n"
 		<< "Display sequence of 3d discrete points by using QGLviewer."
 		<< general_opt << "\n";
       return 0;
     }
   
-  string inputFilename = vm["input-file"].as<std::string>();
+  string inputFilename = vm["input"].as<std::string>();
 
  
   QApplication application(argc,argv);
