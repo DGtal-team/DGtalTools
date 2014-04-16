@@ -16,7 +16,9 @@
 
 #include <vector>
 #include <string>
+#include <climits>
 
+ 
 using namespace DGtal;
 
 
@@ -32,7 +34,7 @@ typedef ImageSelector < Z2i::Domain, unsigned char>::Type Image;
 
 std::vector<unsigned int> getHistoFromImage(const Image &image){
   const Image::Domain &imgDom = image.domain();
-  std::vector<unsigned int> vectHisto(imgDom.size());
+  std::vector<unsigned int> vectHisto(UCHAR_MAX);
   for(Image::Domain::ConstIterator it=imgDom.begin(); it!= imgDom.end(); ++it){
     vectHisto[image(*it)]++;
   }
