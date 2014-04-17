@@ -12,7 +12,6 @@ FOREACH(FILE ${DGTAL_TOOLS_SRC})
         ARCHIVE DESTINATION lib)
 ENDFOREACH(FILE)
 
-
 if (  WITH_VISU3D_QGLVIEWER )
   SET(DGTAL_EXAMPLES_QGL_SRC
     3dVolViewer
@@ -20,6 +19,7 @@ if (  WITH_VISU3D_QGLVIEWER )
     3dCurvatureViewer
     3dCurvatureViewerNoise
     3dCurveViewer
+    3dSDPViewer
     meshViewer)
   FOREACH(FILE ${DGTAL_EXAMPLES_QGL_SRC}) 
     add_executable(${FILE} ${FILE})
