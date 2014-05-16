@@ -6,6 +6,7 @@ SET(DGTAL_TOOLS_SRC
   curvatureMCMS
   tangentBC
   statisticsEstimators
+  generic3dNormalEstimators
 )
 
 if (  WITH_CGAL )
