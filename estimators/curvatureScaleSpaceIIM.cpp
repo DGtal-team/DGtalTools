@@ -82,7 +82,7 @@ getImageFromFC(double scaleMax, const FreemanChain<Z2i::Integer> &fc,
   Z2i::KSpace aKSpace;
   aKSpace.init(Z2i::Point(minx, miny), Z2i::Point(maxx, maxy), false);
   
-  FreemanChain<Z2i::Integer>::getContourSCell(aKSpace, fc, boundarySCell, true); 
+  FreemanChain<Z2i::Integer>::getInterPixelLinels(aKSpace, fc, boundarySCell, true); 
   std::set<Z2i::KSpace::Cell> interiorCell;
   Surfaces<Z2i::KSpace>::uComputeInterior(aKSpace, boundarySCell, interiorCell, false);  
   ImageContainerBySTLVector<Z2i::Domain, unsigned char> imageResult (Z2i::Domain(Z2i::Point(minx, miny), Z2i::Point(maxx, maxy))); 
