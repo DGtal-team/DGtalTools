@@ -83,9 +83,18 @@ Estimators
   - tangentBC: tangent estimator using the Binomial convolver.
   - curvatureBC: curvature estimator using the Binomial convolver.
   - curvatureMCMS: curvature estimator using the maximal segments cover  (to be updated for current DGtal version).
+  - curvatureScaleSpaceBCC: a tool to display the curvature scale space of a given contour with the Binomial Convolver Curvature Estimator
   - estimatorComparator: program to perform comparison of local quantity estimators (to be updated for current DGtal version).
   - vol2normalField: compute the normal vector field of a given vol file .
+<table>
+<tr>
+<td><img height=130 src="https://cloud.githubusercontent.com/assets/772865/2646108/f515b0a2-bf39-11e3-96f8-c7606173f43b.png"></td>
+</tr>
+<tr>
+<td>Illustration of curvatureScaleSpaceBCC </td>
+</tr>
 
+</table>
 
 ShapeGenerator
 --------------
