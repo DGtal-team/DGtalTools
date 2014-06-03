@@ -63,8 +63,6 @@
 #include "DGtal/geometry/curves/estimation/TrueLocalEstimatorOnPoints.h"
 #include "DGtal/geometry/surfaces/estimation/IntegralInvariantMeanCurvatureEstimator.h"
 #include "DGtal/geometry/surfaces/estimation/IntegralInvariantGaussianCurvatureEstimator.h"
-#include "DGtal/geometry/surfaces/estimation/IntegralInvariantMeanCurvatureEstimator.h"
-#include "DGtal/geometry/surfaces/estimation/IntegralInvariantGaussianCurvatureEstimator.h"
 
 #include "DGtal/geometry/surfaces/estimation/LocalEstimatorFromSurfelFunctorAdapter.h"
 #include "DGtal/geometry/surfaces/estimation/estimationFunctors/MongeJetFittingMeanCurvatureEstimator.h"
@@ -91,7 +89,7 @@ estimateTrueMeanCurvatureQuantity( const ConstIterator & it_begin,
     for ( ConstIterator it = it_begin; it != it_end; ++it )
     {
         currentRealPoint = embedder( *it_begin ) * h;
-        output = aShape->meanCurvature( currentRealPoint );
+        *output = aShape->meanCurvature( currentRealPoint );
         ++output;
     }
 }
@@ -114,7 +112,7 @@ estimateTrueGaussianCurvatureQuantity( const ConstIterator & it_begin,
     for ( ConstIterator it = it_begin; it != it_end; ++it )
     {
         currentRealPoint = embedder( *it_begin ) * h;
-        output = aShape->gaussianCurvature( currentRealPoint );
+        *output = aShape->gaussianCurvature( currentRealPoint );
         ++output;
     }
 }
@@ -139,10 +137,10 @@ estimateTruePrincipalCurvaturesQuantity( const ConstIterator & it_begin,
         currentRealPoint = embedder( *it_begin ) * h;
         double k1, k2;
         aShape->principalCurvatures( currentRealPoint, k1, k2 );
-        CurvatureInformations result;
+        deprecated::CurvatureInformations result;
         result.k1 = k1;
         result.k2 = k2;
-        output = result;
+        *output = result;
         ++output;
     }
 }
@@ -312,8 +310,10 @@ compareShapeEstimators( const std::string & filename,
                     file << "# h = " << h << std::endl;
                     file << "# True Gaussian Curvature estimation" << std::endl;
 
-                    std::ostream_iterator< CurvatureInformations > out_it_true_pc( file, "\n" );
+                    std::ostream_iterator< std::string > out_it_true_pc( file, "\n" );
 
+                    std::vector<deprecated::CurvatureInformations> v_results;
+                    std::back_insert_iterator< std::vector<deprecated::CurvatureInformations> > bkIt(v_results);
                     range = new VisitorRange( new Visitor( surf, *surf.begin() ));
                     ibegin = range->begin();
                     iend = range->end();
@@ -322,11 +322,18 @@ compareShapeEstimators( const std::string & filename,
 
                     estimateTruePrincipalCurvaturesQuantity( ibegin,
                                                            iend,
-                                                           out_it_true_pc,
+                                                           bkIt,//out_it_true_pc,
                                                            K,
                                                            h,
                                                            aShape );
 
+                    for(unsigned int ii = 0; ii < v_results.size(); ++ii )
+                    {
+                        std::stringstream ss;
+                        ss << v_results[ii].k1 << " " << v_results[ii].k2;
+                        *out_it_true_pc = ss.str();
+                        ++out_it_true_pc;
+                    }
                     double TTruePrincCurv = c.stopClock();
                     file << "# time = " << TTruePrincCurv << std::endl;
 
@@ -351,7 +358,7 @@ compareShapeEstimators( const std::string & filename,
                 {
                     trace.beginBlock( "II mean curvature" );
 
-                    IntegralInvariantMeanCurvatureEstimator< KSpace, MySpelFunctor > * IIMeanCurvatureEstimator = new IntegralInvariantMeanCurvatureEstimator< KSpace, MySpelFunctor >( K, *functor );
+                    deprecated::IntegralInvariantMeanCurvatureEstimator< KSpace, MySpelFunctor > * IIMeanCurvatureEstimator = new deprecated::IntegralInvariantMeanCurvatureEstimator< KSpace, MySpelFunctor >( K, *functor );
 
                     c.startClock();
                     IIMeanCurvatureEstimator->init ( h, re_convolution_kernel );
@@ -385,7 +392,7 @@ compareShapeEstimators( const std::string & filename,
                 {
                     trace.beginBlock( "II Gaussian curvature" );
 
-                    IntegralInvariantGaussianCurvatureEstimator< KSpace, MySpelFunctor > * IIGaussianCurvatureEstimator = new IntegralInvariantGaussianCurvatureEstimator< KSpace, MySpelFunctor >( K, *functor );
+                    deprecated::IntegralInvariantGaussianCurvatureEstimator< KSpace, MySpelFunctor > * IIGaussianCurvatureEstimator = new deprecated::IntegralInvariantGaussianCurvatureEstimator< KSpace, MySpelFunctor >( K, *functor );
 
                     c.startClock();
                     IIGaussianCurvatureEstimator->init( h, re_convolution_kernel );
@@ -420,7 +427,7 @@ compareShapeEstimators( const std::string & filename,
                 {
                     trace.beginBlock( "II Principal curvatures" );
 
-                    IntegralInvariantGaussianCurvatureEstimator< KSpace, MySpelFunctor > * IIGaussianCurvatureEstimator = new IntegralInvariantGaussianCurvatureEstimator< KSpace, MySpelFunctor >( K, *functor );
+                    deprecated::IntegralInvariantGaussianCurvatureEstimator< KSpace, MySpelFunctor > * IIGaussianCurvatureEstimator = new deprecated::IntegralInvariantGaussianCurvatureEstimator< KSpace, MySpelFunctor >( K, *functor );
 
                     c.startClock();
                     IIGaussianCurvatureEstimator->init( h, re_convolution_kernel );
@@ -432,13 +439,24 @@ compareShapeEstimators( const std::string & filename,
                     file << "# Gaussian Curvature estimation from the Integral Invariant" << std::endl;
                     file << "# computed kernel radius = " << re_convolution_kernel << std::endl;
 
-                    std::ostream_iterator< CurvatureInformations > out_it_ii_principal( file, "\n" );
+                    std::ostream_iterator< std::string > out_it_ii_principal( file, "\n" );
+
+                    std::vector<deprecated::CurvatureInformations> v_results;
+                    std::back_insert_iterator< std::vector<deprecated::CurvatureInformations> > bkIt(v_results);
 
                     range = new VisitorRange( new Visitor( surf, *surf.begin() ));
                     ibegin = range->begin();
                     iend = range->end();
 
-                    IIGaussianCurvatureEstimator->evalPrincipalCurvatures ( ibegin, iend, out_it_ii_principal );
+                    IIGaussianCurvatureEstimator->evalPrincipalCurvatures ( ibegin, iend, bkIt );//out_it_ii_principal );
+
+                    for(unsigned int ii = 0; ii < v_results.size(); ++ii )
+                    {
+                        std::stringstream ss;
+                        ss << v_results[ii].k1 << " " << v_results[ii].k2;
+                        *out_it_ii_principal = ss.str();
+                        ++out_it_ii_principal;
+                    }
 
                     double TIIGaussCurv = c.stopClock();
                     file << "# time = " << TIIGaussCurv << std::endl;
@@ -560,8 +578,21 @@ compareShapeEstimators( const std::string & filename,
                     file << "# h = " << h << std::endl;
                     file << "# Gaussian Curvature estimation from CGAL Monge from and Jet Fitting" << std::endl;
                     file << "# computed kernel radius = " << re_convolution_kernel << std::endl;
-                    std::ostream_iterator< CurvatureInformations > out_it_monge_gaussian( file, "\n" );
-                    reporterK.eval(ibegin, iend , out_it_monge_gaussian);
+                    std::ostream_iterator< std::string > out_it_monge_principal( file, "\n" );
+
+                    std::vector<deprecated::CurvatureInformations> v_results;
+                    std::back_insert_iterator< std::vector<deprecated::CurvatureInformations> > bkIt(v_results);
+
+                    reporterK.eval(ibegin, iend , bkIt);//out_it_monge_principal);
+
+                    for(unsigned int ii = 0; ii < v_results.size(); ++ii )
+                    {
+                        std::stringstream ss;
+                        ss << v_results[ii].k1 << " " << v_results[ii].k2;
+                        *out_it_monge_principal = ss.str();
+                        ++out_it_monge_principal;
+                    }
+
                     double TMongeGaussCurv = c.stopClock();
                     file << "# time = " << TMongeGaussCurv << std::endl;
                     file.close();
@@ -694,7 +725,10 @@ compareShapeEstimators( const std::string & filename,
                     file << "# h = " << h << std::endl;
                     file << "# True Gaussian Curvature estimation" << std::endl;
 
-                    std::ostream_iterator< CurvatureInformations > out_it_true_pc( file, "\n" );
+                    std::ostream_iterator< std::string > out_it_true_pc( file, "\n" );
+
+                    std::vector<deprecated::CurvatureInformations> v_results;
+                    std::back_insert_iterator< std::vector<deprecated::CurvatureInformations> > bkIt(v_results);
 
                     range = new VisitorRange( new Visitor( surf, *surf.begin() ));
                     ibegin = range->begin();
@@ -704,10 +738,19 @@ compareShapeEstimators( const std::string & filename,
 
                     estimateTruePrincipalCurvaturesQuantity( ibegin,
                                                            iend,
-                                                           out_it_true_pc,
+                                                           bkIt,// out_it_true_pc,
                                                            K,
                                                            h,
                                                            aShape );
+
+
+                    for(unsigned int ii = 0; ii < v_results.size(); ++ii )
+                    {
+                        std::stringstream ss;
+                        ss << v_results[ii].k1 << " " << v_results[ii].k2;
+                        *out_it_true_pc = ss.str();
+                        ++out_it_true_pc;
+                    }
 
                     double TTruePrincCurv = c.stopClock();
                     file << "# time = " << TTruePrincCurv << std::endl;
@@ -733,7 +776,7 @@ compareShapeEstimators( const std::string & filename,
                 {
                     trace.beginBlock( "II mean curvature" );
 
-                    IntegralInvariantMeanCurvatureEstimator< KSpace, MySpelFunctor > * IIMeanCurvatureEstimator = new IntegralInvariantMeanCurvatureEstimator< KSpace, MySpelFunctor >( K, *functor );
+                    deprecated::IntegralInvariantMeanCurvatureEstimator< KSpace, MySpelFunctor > * IIMeanCurvatureEstimator = new deprecated::IntegralInvariantMeanCurvatureEstimator< KSpace, MySpelFunctor >( K, *functor );
 
                     c.startClock();
                     IIMeanCurvatureEstimator->init ( h, re_convolution_kernel );
@@ -768,7 +811,7 @@ compareShapeEstimators( const std::string & filename,
                 {
                     trace.beginBlock( "II Gaussian curvature" );
 
-                    IntegralInvariantGaussianCurvatureEstimator< KSpace, MySpelFunctor > * IIGaussianCurvatureEstimator = new IntegralInvariantGaussianCurvatureEstimator< KSpace, MySpelFunctor >( K, *functor );
+                    deprecated::IntegralInvariantGaussianCurvatureEstimator< KSpace, MySpelFunctor > * IIGaussianCurvatureEstimator = new deprecated::IntegralInvariantGaussianCurvatureEstimator< KSpace, MySpelFunctor >( K, *functor );
 
                     c.startClock();
                     IIGaussianCurvatureEstimator->init( h, re_convolution_kernel );
@@ -803,7 +846,7 @@ compareShapeEstimators( const std::string & filename,
                 {
                     trace.beginBlock( "II Principal curvatures" );
 
-                    IntegralInvariantGaussianCurvatureEstimator< KSpace, MySpelFunctor > * IIGaussianCurvatureEstimator = new IntegralInvariantGaussianCurvatureEstimator< KSpace, MySpelFunctor >( K, *functor );
+                    deprecated::IntegralInvariantGaussianCurvatureEstimator< KSpace, MySpelFunctor > * IIGaussianCurvatureEstimator = new deprecated::IntegralInvariantGaussianCurvatureEstimator< KSpace, MySpelFunctor >( K, *functor );
 
                     c.startClock();
                     IIGaussianCurvatureEstimator->init( h, re_convolution_kernel );
@@ -815,13 +858,24 @@ compareShapeEstimators( const std::string & filename,
                     file << "# Gaussian Curvature estimation from the Integral Invariant" << std::endl;
                     file << "# computed kernel radius = " << re_convolution_kernel << std::endl;
 
-                    std::ostream_iterator< CurvatureInformations > out_it_ii_principal( file, "\n" );
+                    std::ostream_iterator< std::string > out_it_ii_principal( file, "\n" );
+
+                    std::vector<deprecated::CurvatureInformations> v_results;
+                    std::back_insert_iterator< std::vector<deprecated::CurvatureInformations> > bkIt(v_results);
 
                     range = new VisitorRange( new Visitor( surf, *surf.begin() ));
                     ibegin = range->begin();
                     iend = range->end();
 
-                    IIGaussianCurvatureEstimator->evalPrincipalCurvatures ( ibegin, iend, out_it_ii_principal );
+                    IIGaussianCurvatureEstimator->evalPrincipalCurvatures ( ibegin, iend, bkIt );// out_it_ii_principal );
+
+                    for(unsigned int ii = 0; ii < v_results.size(); ++ii )
+                    {
+                        std::stringstream ss;
+                        ss << v_results[ii].k1 << " " << v_results[ii].k2;
+                        *out_it_ii_principal = ss.str();
+                        ++out_it_ii_principal;
+                    }
 
                     double TIIGaussCurv = c.stopClock();
                     file << "# time = " << TIIGaussCurv << std::endl;
@@ -938,8 +992,21 @@ compareShapeEstimators( const std::string & filename,
                     file << "# h = " << h << std::endl;
                     file << "# Gaussian Curvature estimation from CGAL Monge from and Jet Fitting" << std::endl;
                     file << "# computed kernel radius = " << re_convolution_kernel << std::endl;
-                    std::ostream_iterator< CurvatureInformations > out_it_monge_gaussian( file, "\n" );
-                    reporterK.eval(ibegin, iend , out_it_monge_gaussian);
+                    std::ostream_iterator< std::string > out_it_monge_principal( file, "\n" );
+
+                    std::vector<deprecated::CurvatureInformations> v_results;
+                    std::back_insert_iterator< std::vector<deprecated::CurvatureInformations> > bkIt(v_results);
+
+                    reporterK.eval(ibegin, iend , bkIt);//out_it_monge_principal);
+
+                    for(unsigned int ii = 0; ii < v_results.size(); ++ii )
+                    {
+                        std::stringstream ss;
+                        ss << v_results[ii].k1 << " " << v_results[ii].k2;
+                        *out_it_monge_principal = ss.str();
+                        ++out_it_monge_principal;
+                    }
+
                     double TMongeGaussCurv = c.stopClock();
                     file << "# time = " << TMongeGaussCurv << std::endl;
                     file.close();

@@ -263,7 +263,7 @@ int main( int argc, char** argv )
 
     if ( ( mode.compare("mean") == 0 ) )
     {
-      typedef IntegralInvariantMeanCurvatureEstimator< Z3i::KSpace, MyCellFunctor > MyIIMeanEstimator;
+      typedef deprecated::IntegralInvariantMeanCurvatureEstimator< Z3i::KSpace, MyCellFunctor > MyIIMeanEstimator;
 
       MyIIMeanEstimator estimator ( K, functor );
       estimator.init( h, re_convolution_kernel ); // Initialisation for a given Euclidean radius of the convolution kernel
@@ -271,8 +271,8 @@ int main( int argc, char** argv )
     }
     else if ( ( mode.compare("gaussian") == 0 ) )
     {
-      typedef IntegralInvariantGaussianCurvatureEstimator< Z3i::KSpace, MyCellFunctor > MyIIGaussianEstimator;
-      typedef CurvatureInformations CurvInformation;
+      typedef deprecated::IntegralInvariantGaussianCurvatureEstimator< Z3i::KSpace, MyCellFunctor > MyIIGaussianEstimator;
+      typedef deprecated::CurvatureInformations CurvInformation;
       std::vector< CurvInformation > results2;
       back_insert_iterator< std::vector< CurvInformation > > resultsIterator2( results2 );
 
@@ -332,12 +332,12 @@ int main( int argc, char** argv )
     typedef double Quantity;
     typedef EigenValues3D< Quantity >::Matrix33 Matrix3x3;
     typedef EigenValues3D< Quantity >::Vector3 Vector3;
-    typedef CurvatureInformations CurvInformation;
+    typedef deprecated::CurvatureInformations CurvInformation;
 
     std::vector< CurvInformation > results;
     back_insert_iterator< std::vector< CurvInformation > > resultsIterator( results ); // output iterator for results of Integral Invariante curvature computation
 
-    typedef IntegralInvariantGaussianCurvatureEstimator< Z3i::KSpace, MyCellFunctor > MyIIGaussianEstimator;
+    typedef deprecated::IntegralInvariantGaussianCurvatureEstimator< Z3i::KSpace, MyCellFunctor > MyIIGaussianEstimator;
 
     MyIIGaussianEstimator estimator ( K, functor );
     estimator.init ( h, re_convolution_kernel ); // Initialisation for a given Euclidean radius of the convolution kernel
