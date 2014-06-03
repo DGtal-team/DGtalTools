@@ -73,7 +73,9 @@ int main( int argc, char** argv )
     ("scaleZ,z",  po::value<float>()->default_value(1.0), "set the scale value in the Z direction (default 1.0)")
     ("sphereRadius,s",  po::value<double>()->default_value(0.2), "defines the sphere radius (used when the primitive is set to the sphere). (default value 0.2)")
     ("lineSize",  po::value<double>()->default_value(0.2), "defines the line size (used when the drawLines option is selected). (default value 0.2))")
-    ("primitive,p", po::value<std::string>()->default_value("sphere"), "set the primitive to display the set of points (can be sphere or voxel (default)") ;
+    ("primitive,p", po::value<std::string>()->default_value("sphere"), "set the primitive to display the set of points (can be sphere or voxel (default)")
+    ("drawVectors,v", po::value<std::string>(), "SDP vector file: draw a set of vectors from the given file (each vector are determined by two consecutive point given, each point represented by its coordinates on a single line.") ;
+
      
   bool parseOK=true;
   bool cannotStart= false;
@@ -181,6 +183,20 @@ int main( int argc, char** argv )
     for(int i=1;i< vectVoxels.size(); i++){
       viewer.addLine(vectVoxels.at(i-1), vectVoxels.at(i), lineSize); 
     }  
+  }
+
+  
+  if(vm.count("drawVectors")){
+    std::string vectorsFileName = vm["drawVectors"].as<std::string>(); 
+    std::vector<Z3i::RealPoint> vectorsPt = PointListReader<Z3i::RealPoint>::getPointsFromFile(vectorsFileName);
+    if (vectorsPt.size()%2==1){
+      trace.info()<<"Warning the two set of points doesn't contains the same number of points, some vectors will be skipped." << std::endl;
+    }
+    for(unsigned int i =0; i<vectorsPt.size()-1; i=i+2){
+      viewer.addLine(vectorsPt.at(i),vectorsPt.at(i+1));      
+    } 
+ 
+    
   }
   
   viewer << Viewer3D<>::updateDisplay;
