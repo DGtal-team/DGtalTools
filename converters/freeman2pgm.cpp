@@ -85,7 +85,7 @@ else the space is automatically defined from the freemanchain bounding boxes.");
   po::notify(vm);    
   if(!parseOK||vm.count("help")||argc<=1 || (!(vm.count("FreemanChain")) ) )
     {
-      trace.info()<< "Transform a freeman chain into a pgm file." <<std::endl << "Basic usage: "<<std::endl
+      trace.info()<< "Transform a freeman chain into a pgm file by filling its interior area." <<std::endl << "Basic usage: "<<std::endl
 		  << "\t freeman2pgm [options] --FreemanChain  <fileName>  "<<std::endl
 		  << general_opt << "\n";
       return 0;
@@ -123,7 +123,7 @@ else the space is automatically defined from the freemanchain bounding boxes.");
     std::set<Cell> interiorCell;
     for(std::vector< FreemanChain >::const_iterator it = vectFcs.begin(); it!= vectFcs.end(); it++){
       FreemanChain fc = *it;
-      FreemanChain::getContourSCell(aKSpace, fc, boundarySCell, true); 
+      FreemanChain::getInterPixelLinels(aKSpace, fc, boundarySCell, true); 
     }
     
     Surfaces<KSpace>::uComputeInterior(aKSpace, boundarySCell, interiorCell, false);  
