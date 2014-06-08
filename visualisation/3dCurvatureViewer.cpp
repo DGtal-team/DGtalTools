@@ -406,19 +406,14 @@ int main( int argc, char** argv )
             AXIS_LINESIZE );
         if( myexport )
           {
-            board.setLineColor(AXIS_COLOR_BLUE);
-            board.addLine (
-                           RealPoint(
-                                     center[0] -  0.5 * curv1[0],
-                                     center[1] -  0.5 * curv1[1],
-                                     center[2] -  0.5 * curv1[2]
-                                     ),
-                           RealPoint(
-                                     center[0] +  0.5 * curv1[0],
-                                     center[1] +  0.5 * curv1[1],
-                                     center[2] +  0.5 * curv1[2]
-                                     ),
-                           AXIS_LINESIZE );
+            board.setFillColor(AXIS_COLOR_BLUE);
+            board.addCylinder (RealPoint(center[0] -  0.5 * curv1[0],
+                                         center[1] -  0.5 * curv1[1],
+                                         center[2] -  0.5 * curv1[2]),
+                               RealPoint(center[0] +  0.5 * curv1[0],
+                                         center[1] +  0.5 * curv1[1],
+                                         center[2] +  0.5 * curv1[2]),
+                               0.2 );
           }
       }
       else
@@ -438,22 +433,17 @@ int main( int argc, char** argv )
                           AXIS_LINESIZE );
           if (myexport)
             {
-              board.setLineColor(AXIS_COLOR_RED);
-              board.addLine (
-                             RealPoint(
-                                       center[0] -  0.5 * curv2[0],
-                                       center[1] -  0.5 * curv2[1],
-                                       center[2] -  0.5 * curv2[2]
-                                      ),
-                             RealPoint(
-                                       center[0] +  0.5 * curv2[0],
-                                       center[1] +  0.5 * curv2[1],
-                                       center[2] +  0.5 * curv2[2]
-                                       ),
-                             AXIS_LINESIZE ); 
+              board.setFillColor(AXIS_COLOR_RED);
+              board.addCylinder (RealPoint(center[0] -  0.5 * curv1[0],
+                                           center[1] -  0.5 * curv1[1],
+                                           center[2] -  0.5 * curv1[2]),
+                                 RealPoint(center[0] +  0.5 * curv1[0],
+                                           center[1] +  0.5 * curv1[1],
+                                           center[2] +  0.5 * curv1[2]),
+                                 0.2);
             }
         }
-    
+      
 
       ++abegin2;
     }
