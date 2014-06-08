@@ -84,9 +84,18 @@ Estimators
   - tangentBC: tangent estimator using the Binomial convolver.
   - curvatureBC: curvature estimator using the Binomial convolver.
   - curvatureMCMS: curvature estimator using the maximal segments cover  (to be updated for current DGtal version).
+  - curvatureScaleSpaceBCC: a tool to display the curvature scale space of a given contour with the Binomial Convolver Curvature Estimator
   - estimatorComparator: program to perform comparison of local quantity estimators (to be updated for current DGtal version).
   - vol2normalField: compute the normal vector field of a given vol file .
+<table>
+<tr>
+<td><img height=130 src="https://cloud.githubusercontent.com/assets/772865/2646108/f515b0a2-bf39-11e3-96f8-c7606173f43b.png"></td>
+</tr>
+<tr>
+<td>Illustration of curvatureScaleSpaceBCC </td>
+</tr>
 
+</table>
 
 ShapeGenerator
 --------------
@@ -114,6 +123,7 @@ Visualization
   - 3dCurvatureViewerNoise: Same as 3dCurvatureViewer, but allow to add some noise to objects.
   - 3dCurveViewer: displays 3D curves with tangential cover and projections onto bounding box.
   - 3dImageViewer: tools to display 3d slice images (.vol, .pgm3d and  dicom with ITK) with QGLViewer.
+  - 3dSDPViewer: basic display of a sequence of 3d points (as voxel or sphere) and vectors by using QGLviewer.
   - 3dVolViewer: volume file (.vol, .pgm3d and dicom with ITK ) viewer with QGLViewer.
   - displayContours: display discrete contours from various format (.fc (freemanchain), .sdp).
   - meshViewer: display 3D mesh from OFS or OFF format.
@@ -129,14 +139,26 @@ Here are some illustrations of such a tools:
 <td><img height=130 src="https://f.cloud.github.com/assets/772865/684569/59a2f6fa-d9fe-11e2-84ba-a48842f4aafb.png" ></td>
 <td><img height=130 src="https://f.cloud.github.com/assets/772865/684590/778bea9a-d9ff-11e2-8e04-6e3e8a39ae3c.png"></td>
 <td><img height=130 src="https://f.cloud.github.com/assets/772865/684598/c3adcf4c-d9ff-11e2-8c3f-e67c8abd0c76.png"></td>
-<td><img height=130 src="https://f.cloud.github.com/assets/772865/684622/d698405a-da00-11e2-8aa0-19212a58ce23.png"></td>
 </tr>
+<tr>
 <td>3dCurvatureViewer</td>
 <td>3dCurveViewer </td>
 <td>3dImageViewer</td>
 <td>3dVolViewer</td>
 <td>displayContours</td>
+</tr>
+<tr>
+<td><img height=130 src="https://f.cloud.github.com/assets/772865/684622/d698405a-da00-11e2-8aa0-19212a58ce23.png"></td>
+<td><img height=130 src="https://cloud.githubusercontent.com/assets/772865/2720141/6c42a0e0-c56b-11e3-8328-a6d88242f21e.png"> </td>
+</tr>
+<tr>
 <td>meshViewer</td>
+<td>3dSDPViewer</td>
+
+</tr>
+
+
+
 </table>
 </center>
 Volumetric

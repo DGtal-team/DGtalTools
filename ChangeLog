@@ -1,12 +1,17 @@
 	====  Release 0.8 ====
-
+ 
 * visualisation/:
 	- 3dVolBoundaryViewer: a simple viewer of the boundary of an object defined by thresholding a vol file.
 	- 3dVolMarchingCubes: speed-up by factor 10 simply by replacing the set predicate used in computations.
+	- 3dSDPViewer: basic display of a sequence of 3d points (as voxel or sphere) and vectors by using QGLviewer.
 
-* convertes/:
+* converters/:
 	- volBoundary2obj: a simple tool to export the boundary of a an	object in a volumetric file to OBJ
 	- freeman2pgm: transform a freeman chain into a pgm file.
+
+* estimators/:
+	- curvatureScaleSpaceBCC: a tool to display the curvature scale space of a given contour with the Binomial Convolver Curvature Estimator 
+
 
 	====  Release 0.7 ====
 

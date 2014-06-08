@@ -6,6 +6,7 @@ SET(DGTAL_TOOLS_SRC
   curvatureMCMS
   tangentBC
   statisticsEstimators
+  curvatureScaleSpaceBCC
 )
 
 if (  WITH_CGAL )

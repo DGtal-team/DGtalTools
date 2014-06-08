@@ -103,7 +103,7 @@ int main( int argc, char** argv )
     ("radius,r",  po::value< double >(), "Kernel radius for IntegralInvariant" )
     ("try,t",  po::value< unsigned int >()->default_value(150), "Max number of tries to find a proper bel" )
     ("mode,m", po::value< std::string >()->default_value("mean"), "type of output : mean, gaussian, prindir1 or prindir2 (default mean)")
-    ("export,e", po::value< std::string >()->default_value(""),"Export the scene to specified OBJ filename." );
+    ("export,e", po::value< std::string >(), "Export the scene to specified OBJ filename." );
 
   bool parseOK = true;
   po::variables_map vm;
@@ -114,51 +114,37 @@ int main( int argc, char** argv )
   catch( const std::exception & ex )
   {
     parseOK = false;
-    trace.info() << "Error checking program options: " << ex.what() << std::endl;
+    trace.error() << " Error checking program options: " << ex.what() << std::endl;
   }
-  po::notify( vm );
   bool neededArgsGiven=true;
-  if (!(vm.count("input-file"))){
+  
+  if (parseOK && !(vm.count("input-file"))){
     missingParam("--input-file");
     neededArgsGiven=false;
   }
-  if (!(vm.count("radius"))){
+  if (parseOK && !(vm.count("radius"))){
     missingParam("--radius");
     neededArgsGiven=false;
   }
-  double h = 1.0;
-
-  bool wrongMode = false;
-  std::string mode = vm["mode"].as< std::string >();
-  if (( mode.compare("gaussian") != 0 ) && ( mode.compare("mean") != 0 ) && ( mode.compare("prindir1") != 0 ) && ( mode.compare("prindir2") != 0 ))
-  {
-    wrongMode = true;
-  }
-
-  std::string export_path = vm["export"].as< std::string >();
-  bool myexport = true;
-  if( export_path == "" )
-  {
-    myexport = false;
-  }
-  else
-  {
-    if( export_path.find(".obj") == std::string::npos )
-    {
-      std::ostringstream oss; 
-      oss << export_path << ".obj" << endl; 
-      export_path = oss.str();
-    }
-  }
-
   
+  bool wrongMode = false;
+  std::string mode;
+  if( parseOK )
+    mode =  vm["mode"].as< std::string >();
+  if ( parseOK && ( mode.compare("gaussian") != 0 ) && ( mode.compare("mean") != 0 ) &&
+       ( mode.compare("prindir1") != 0 ) && ( mode.compare("prindir2") != 0 ))
+    {
+    wrongMode = true;
+    trace.error() << " The selected mode ("<<mode << ") is not defined."<<std::endl;
+  }
+
 
   if(!neededArgsGiven ||  wrongMode || !parseOK || vm.count("help") || argc <= 1 )
   {
     trace.info()<< "Visualisation of 3d curvature from .vol file using curvature from Integral Invariant" <<std::endl
                 << general_opt << "\n"
                 << "Basic usage: "<<std::endl
-                << "\t3dCurvatureViewer -i <file.vol> --radius <radius> --mode <\"mean\">"<<std::endl
+                << "\t3dCurvatureViewer -i file.vol --radius 3 --mode mean"<<std::endl
                 << std::endl
                 << "Below are the different available modes: " << std::endl
                 << "\t - \"mean\" for the mean curvature" << std::endl
@@ -168,6 +154,26 @@ int main( int argc, char** argv )
                 << std::endl;
     return 0;
   }
+
+  
+  
+  double h = 1.0;
+
+  
+  std::string export_path;
+  bool myexport = false;
+  if(vm.count("export")){
+    export_path = vm["export"].as< std::string >();
+    if( export_path.find(".obj") == std::string::npos )
+      {
+        std::ostringstream oss; 
+        oss << export_path << ".obj" << endl; 
+        export_path = oss.str();
+      } 
+    myexport=true;
+  }
+  
+  
   double re_convolution_kernel = vm["radius"].as< double >();
 
   // Construction of the shape from vol file
@@ -373,11 +379,10 @@ int main( int argc, char** argv )
       }
 
 
-      //ColumnVector normal = current.vectors.column(0).getNormalized(); // don't show the normal
+      //ColumnVector normal = current.vectors.column(0).getNormalized();
       ColumnVector curv1 = current.vectors.column(1).getNormalized();
       ColumnVector curv2 = current.vectors.column(2).getNormalized();
 
-      double eps = 0.01;
       RealPoint center = embedder( outer );
 
       if( ( mode.compare("prindir1") == 0 ) )
