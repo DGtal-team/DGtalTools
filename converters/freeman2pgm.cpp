@@ -83,10 +83,16 @@ else the space is automatically defined from the freemanchain bounding boxes.");
   
  
   po::notify(vm);    
-  if(!parseOK||vm.count("help")||argc<=1 || (!(vm.count("FreemanChain")) ) )
+  if(!parseOK||vm.count("help")||argc<=1 || (!(vm.count("FreemanChain")||vm.count("f")   ) ) )
     {
-      trace.info()<< "Transform a freeman chain into a pgm file by filling its interior area." <<std::endl << "Basic usage: "<<std::endl
-		  << "\t freeman2pgm [options] --FreemanChain  <fileName>  "<<std::endl
+      if(!parseOK){
+        trace.info() <<" Error parsing options\n" <<std::endl;
+          }
+      trace.info()<< "Transform one or several freeman chains into a pgm file by filling its interior areas." << std::endl
+                  << "The transformation can fill shapes with hole by using the freemanchain orientation."
+                  <<" The interior is considered on the right according to a freeman chain move, i.e. a counterclockwise oriented contour represent a hole in the shape." <<std::endl
+                  << "Basic usage: "<<std::endl
+                  << "\t freeman2pgm [options] --FreemanChain  <fileName>  "<<std::endl
 		  << general_opt << "\n";
       return 0;
     }  
@@ -126,7 +132,7 @@ else the space is automatically defined from the freemanchain bounding boxes.");
       FreemanChain::getInterPixelLinels(aKSpace, fc, boundarySCell, true); 
     }
     
-    Surfaces<KSpace>::uComputeInterior(aKSpace, boundarySCell, interiorCell, false);  
+    Surfaces<KSpace>::uComputeInterior(aKSpace, boundarySCell, interiorCell, false );  
     Image2D imageResult (Z2i::Domain(Z2i::Point(minx, miny), Z2i::Point(maxx, maxy))); 
     for(std::set<Cell>::const_iterator it = interiorCell.begin(); it!=interiorCell.end(); it++){
       imageResult.setValue(aKSpace.uCoords(*it), 255);
