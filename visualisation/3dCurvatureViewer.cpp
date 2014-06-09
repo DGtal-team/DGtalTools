@@ -103,7 +103,8 @@ int main( int argc, char** argv )
     ("radius,r",  po::value< double >(), "Kernel radius for IntegralInvariant" )
     ("try,t",  po::value< unsigned int >()->default_value(150), "Max number of tries to find a proper bel" )
     ("mode,m", po::value< std::string >()->default_value("mean"), "type of output : mean, gaussian, prindir1 or prindir2 (default mean)")
-    ("export,e", po::value< std::string >(), "Export the scene to specified OBJ filename." );
+    ("export,e", po::value< std::string >(), "Export the scene to specified OBJ filename." )
+    ("normalization,n", "When exporting to OBG, performs a normalization so that the geometry fits in [-1/2,1/2]^3") ;
 
   bool parseOK = true;
   po::variables_map vm;
@@ -126,6 +127,10 @@ int main( int argc, char** argv )
     missingParam("--radius");
     neededArgsGiven=false;
   }
+ 
+  bool normalization = false;
+  if  (vm.count("normalization"))
+    normalization = true;
   
   bool wrongMode = false;
   std::string mode;
@@ -355,7 +360,6 @@ int main( int argc, char** argv )
     if( myexport )
     {
       board << SetMode3D(K.uCell( K.sKCoords(*abegin2) ).className(), "Basic" );
-      trace.warning() << "Warning: Actually, only the object geometry will be exported in this mode." << std::endl;
     }
     for ( unsigned int i = 0; i < results.size(); ++i )
     {
@@ -400,23 +404,46 @@ int main( int argc, char** argv )
             center[2] +  0.5 * curv1[2]
             ),
             AXIS_LINESIZE );
+        if( myexport )
+          {
+            board.setFillColor(AXIS_COLOR_BLUE);
+            board.addCylinder (RealPoint(center[0] -  0.5 * curv1[0],
+                                         center[1] -  0.5 * curv1[1],
+                                         center[2] -  0.5 * curv1[2]),
+                               RealPoint(center[0] +  0.5 * curv1[0],
+                                         center[1] +  0.5 * curv1[1],
+                                         center[2] +  0.5 * curv1[2]),
+                               0.2 );
+          }
       }
       else
-      {
-        viewer.setLineColor(AXIS_COLOR_RED);
-        viewer.addLine (
-              RealPoint(
-                center[0] -  0.5 * curv2[0],
-            center[1] -  0.5 * curv2[1],
-            center[2] -  0.5 * curv2[2]
-            ),
-            RealPoint(
-              center[0] +  0.5 * curv2[0],
-            center[1] +  0.5 * curv2[1],
-            center[2] +  0.5 * curv2[2]
-            ),
-            AXIS_LINESIZE );
-      }
+        {
+          viewer.setLineColor(AXIS_COLOR_RED);
+          viewer.addLine (
+                          RealPoint(
+                                    center[0] -  0.5 * curv2[0],
+                                    center[1] -  0.5 * curv2[1],
+                                    center[2] -  0.5 * curv2[2]
+                                    ),
+                          RealPoint(
+                                    center[0] +  0.5 * curv2[0],
+                                    center[1] +  0.5 * curv2[1],
+                                    center[2] +  0.5 * curv2[2]
+                                    ),
+                          AXIS_LINESIZE );
+          if (myexport)
+            {
+              board.setFillColor(AXIS_COLOR_RED);
+              board.addCylinder (RealPoint(center[0] -  0.5 * curv1[0],
+                                           center[1] -  0.5 * curv1[1],
+                                           center[2] -  0.5 * curv1[2]),
+                                 RealPoint(center[0] +  0.5 * curv1[0],
+                                           center[1] +  0.5 * curv1[1],
+                                           center[2] +  0.5 * curv1[2]),
+                                 0.2);
+            }
+        }
+      
 
       ++abegin2;
     }
@@ -428,7 +455,7 @@ int main( int argc, char** argv )
 
   if (myexport){
     trace.info()<< "Exporting object: " << export_path << " ...";
-    board.saveOBJ(export_path);
+    board.saveOBJ(export_path,normalization);
     trace.info() << "[done]" << std::endl;
   }
     
