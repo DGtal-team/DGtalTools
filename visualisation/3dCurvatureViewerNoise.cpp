@@ -107,7 +107,7 @@ int main( int argc, char** argv )
     ("try,t",  po::value< unsigned int >()->default_value(150), "Max number of tries to find a proper bel" )
     ("mode,m", po::value< std::string >()->default_value("mean"), "type of output : mean, gaussian, prindir1 or prindir2 (default mean)")
     ("export,e", po::value< std::string >(), "Export the scene to specified OBJ filename." )
-    ("normalization", "When exporting to OBG, performs a normalization so that the geometry fits in [-1/2,1/2]^3") ;
+    ("normalization", "When exporting to OBJ, performs a normalization so that the geometry fits in [-1/2,1/2]^3") ;
 
 
   bool parseOK = true;
