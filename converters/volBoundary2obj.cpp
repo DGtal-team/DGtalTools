@@ -80,7 +80,8 @@ int main( int argc, char** argv )
     ("dicomMin", po::value<int>()->default_value(-1000), "set minimum density threshold on Hounsfield scale")
     ("dicomMax", po::value<int>()->default_value(3000), "set maximum density threshold on Hounsfield scale")
 #endif
-    ("mode",  po::value<std::string>()->default_value("INNER"), "set mode for display: INNER: inner voxels, OUTER: outer voxels, BDRY: surfels") ;
+    ("mode",  po::value<std::string>()->default_value("INNER"), "set mode for display: INNER: inner voxels, OUTER: outer voxels, BDRY: surfels") 
+   ("normalization,n", "Normalization so that the geometry fits in [-1/2,1/2]^3") ;
 
   bool parseOK=true;
   po::variables_map vm;
@@ -115,7 +116,10 @@ int main( int argc, char** argv )
   int thresholdMin = vm["thresholdMin"].as<int>();
   int thresholdMax = vm["thresholdMax"].as<int>();
   string mode = vm["mode"].as<string>();
-
+  bool normalization = false;
+  if  (vm.count("normalization"))
+    normalization = true;
+  
   string extension = inputFilename.substr(inputFilename.find_last_of(".") + 1);
   if(extension!="vol" && extension != "p3d" && extension != "pgm3D" && extension != "pgm3d" && extension != "sdp" && extension != "pgm"
 #ifdef WITH_ITK
@@ -196,7 +200,7 @@ int main( int argc, char** argv )
 
     string outputFilename = vm["output-file"].as<std::string>();
 
-    board.saveOBJ(outputFilename);
+    board.saveOBJ(outputFilename, normalization);
     trace.endBlock();
   }
   return 0;
