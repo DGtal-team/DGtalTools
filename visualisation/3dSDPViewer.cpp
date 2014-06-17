@@ -66,6 +66,7 @@ int main( int argc, char** argv )
     ("SDPindex", po::value<std::vector <unsigned int> >()->multitoken(), "specify the sdp index (by default 0,1,2).")
     ("pointColor,c", po::value<std::vector <int> >()->multitoken(), "set the color of  points: r g b a " )
     ("lineColor,l",po::value<std::vector <int> >()->multitoken(), "set the color of line: r g b a " ) 
+    ("filter,f",po::value<double>()->default_value(100.0), "filter input file in order to display only the [arg] pourcent of the input 3D points (uniformly selected)." ) 
     ("noPointDisplay", "usefull for instance to only display the lines between points.")
     ("drawLines", "draw the line between discrete points." ) 
     ("scaleX,x",  po::value<float>()->default_value(1.0), "set the scale value in the X direction (default 1.0)" )
@@ -167,7 +168,9 @@ int main( int argc, char** argv )
   }
   
   if(!vm.count("noPointDisplay")){
-    for(int i=0;i< vectVoxels.size(); i++){
+    double percent = vm["filter"].as<double>();
+    int step = max(1, (int) (100/percent));
+    for(int i=0;i< vectVoxels.size(); i=i+step){
       if(typePrimitive=="voxel"){
         viewer << Z3i::Point((int)vectVoxels.at(i)[0],
                              (int)vectVoxels.at(i)[1],
