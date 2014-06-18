@@ -1,4 +1,5 @@
 	====  Release 0.8 ====
+
  
 * visualisation/:
 	- 3dVolBoundaryViewer: a simple viewer of the boundary of an object defined by thresholding a vol file.
@@ -10,7 +11,8 @@
 	- freeman2pgm: transform one or several freeman chains into a pgm file by filling their interior areas.
 
 * estimators/:
-	- curvatureScaleSpaceBCC: a tool to display the curvature scale space of a given contour with the Binomial Convolver Curvature Estimator 
+	- curvatureScaleSpaceBCC: a tool to display the curvature scale space of a given contour with the Binomial Convolver Curvature Estimator.
+	- generic3dNormalEstimators: Computes a normal vector field over a digitized 3D implicit surface for several estimators (II|VCM|Trivial|True).
 
 
 	====  Release 0.7 ====
