@@ -72,7 +72,7 @@ DistanceTransform
 
 Estimators
 ----------
-
+  - generic3dNormalEstimators: Computes a normal vector field over a digitized 3D implicit surface for several estimators (II|VCM|Trivial|True).
   - 2dLocalEstimators: program to compare local curvature/tangent estimators on implicit shapes
     - Maximal DSS based estimators
     - Maximal DCA based estimators
