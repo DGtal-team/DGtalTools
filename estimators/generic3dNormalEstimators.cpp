@@ -242,6 +242,7 @@ void computeEstimation
       export_sstr << fname << "-" << nameEstimator << "-cells-" 
                   << estimator.h() << ".txt"; 
       std::ofstream export_output( export_sstr.str().c_str() );
+      export_output << "# ImaGene viewer (viewSetOfSurfels) file format for displaying cells." << std::endl;
       bool adev =  vm[ "export" ].as<string>() == "AngleDeviation";
       unsigned int i = 0;
       range = CountedPtr<VisitorRange>( new VisitorRange( new Visitor( surface, *(surface.begin()) )) );
@@ -584,17 +585,20 @@ int main( int argc, char** argv )
     po::store(po::parse_command_line(argc, argv, general_opt), vm);  
   }catch(const exception& ex){
     parseOK=false;
-    trace.info()<< "Error checking program options: "<< ex.what()<< endl;
+    cerr << "Error checking program options: "<< ex.what()<< endl;
   }
   po::notify(vm);    
-  if( !parseOK || vm.count("help") )
+  if( ! parseOK || vm.count("help") || ! vm.count( "polynomial" ) )
     {
-      cout << "Usage: " << argv[0] << " -p <polynomial> [options]\n"
+      if ( ! vm.count( "polynomial" ) ) 
+        cerr << "Need parameter --polynomial / -p" << endl;
+
+      cerr << "Usage: " << argv[0] << " -p <polynomial> [options]\n"
 		<< "Computes a normal vector field over a digitized 3D implicit surface for several estimators (II|VCM|Trivial|True), specified with -e. You may add Kanungo noise with option -N. These estimators are compared with ground truth. You may then: 1) visualize the normals or the angle deviations with -V (if WITH_QGL_VIEWER is enabled), 2) outputs them as a list of cells/estimations with -n, 3) outputs them as a ImaGene file with -O, 4) outputs them as a NOFF file with -O, 5) computes estimation statistics with option -S." 
                 << endl
 		<< general_opt << "\n";
-      cout << "Example:\n"
-           << "./genericNormalEstimator -p \"90-3*x^2-2*y^2-z^2\" -o VCM-ellipse -a -10 -A 10 -e VCM -R 3 -r 3 -t 2 -E 0 -x Normals" << endl
+      cerr << "Example:\n"
+           << "./generic3dNormalEstimator -p \"90-3*x^2-2*y^2-z^2\" -o VCM-ellipse -a -10 -A 10 -e VCM -R 3 -r 3 -t 2 -E 0 -x Normals" << endl
            << " - ellipse  : 90-3*x^2-2*y^2-z^2 " << endl
            << " - torus    : -1*(x^2+y^2+z^2+6*6-2*2)^2+4*6*6*(x^2+y^2) " << endl
            << " - rcube    : 6561-x^4-y^4-z^4" << endl
@@ -604,21 +608,16 @@ int main( int argc, char** argv )
            << " - diabolo  : x^2-(y^2+z^2)^2" << endl
            << " - heart    : -1*(x^2+2.25*y^2+z^2-1)^3+x^2*z^3+0.1125*y^2*z^3" << endl
            << " - crixxi   : -0.9*(y^2+z^2-1)^2-(x^2+y^2-1)^3" << endl << endl;
-      cout << "Estimators (specified by -e):" << endl
+      cerr << "Estimators (specified by -e):" << endl
            << " - True     : supposed to be the ground truth for computations. Of course, it is only approximations." << endl
            << " - VCM      : normal estimator by digital Voronoi Covariance Matrix. Radii parameters are given by -R, -r." << endl
            << " - II       : normal estimator by Integral Invariants. Radius parameter is given by -r." << endl
            << " - Trivial  : the normal obtained by average trivial surfel normals in a ball neighborhood. Radius parameter is given by -r." << endl
            << endl;
-      cout << "Note:" << endl
+      cerr << "Note:" << endl
            << "     - This is a normal *direction* evaluator more than a normal vector evaluator. Orientations of normals are deduced from ground truth. This is due to the fact that II and VCM only estimates normal directions." << endl
            << "     - This tool only analyses one surface component, and one that contains at least as many surfels as the width of the digital bounding box. This is required when analysing noisy data, where a lot of the small components are spurious. The drawback is that you cannot analyse the normals on a surface with several components." << endl;
       return 0;
-    }
-  if ( ! vm.count( "polynomial" ) ) 
-    {
-      cerr << "Need parameter --polynomial / -p" << endl;
-      return 1;
     }
 
   trace.beginBlock( "Make implicit shape..." );
