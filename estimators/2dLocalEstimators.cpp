@@ -760,7 +760,7 @@ computeLocalEstimations( const std::string & filename,
             typedef FunctorOnCells< KanungoFunctor, KSpace > CurvatureIIFct;
             CurvatureIIFct * functor = new CurvatureIIFct( *noisifiedFunctor, K );
 
-            IntegralInvariantMeanCurvatureEstimator< KSpace, CurvatureIIFct> * IICurvatureEstimator = new IntegralInvariantMeanCurvatureEstimator< KSpace, CurvatureIIFct>( K, *functor );
+            deprecated::IntegralInvariantMeanCurvatureEstimator< KSpace, CurvatureIIFct> * IICurvatureEstimator = new deprecated::IntegralInvariantMeanCurvatureEstimator< KSpace, CurvatureIIFct>( K, *functor );
 
             typedef DepthFirstVisitor< DigSurface > Visitor;
             typedef GraphVisitorRange< Visitor > VisitorRange;
@@ -791,7 +791,7 @@ computeLocalEstimations( const std::string & filename,
             typedef FunctorOnCells< MyPointFunctor, KSpace > CurvatureIIFct;
             CurvatureIIFct * functor = new CurvatureIIFct( *pointFunctor, K );
 
-            IntegralInvariantMeanCurvatureEstimator< KSpace, CurvatureIIFct> * IICurvatureEstimator = new IntegralInvariantMeanCurvatureEstimator< KSpace, CurvatureIIFct>( K, *functor );
+            deprecated::IntegralInvariantMeanCurvatureEstimator< KSpace, CurvatureIIFct> * IICurvatureEstimator = new deprecated::IntegralInvariantMeanCurvatureEstimator< KSpace, CurvatureIIFct>( K, *functor );
 
             typedef DepthFirstVisitor< DigSurface > Visitor;
             typedef GraphVisitorRange< Visitor > VisitorRange;

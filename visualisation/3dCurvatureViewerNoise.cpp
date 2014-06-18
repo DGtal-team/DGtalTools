@@ -106,7 +106,9 @@ int main( int argc, char** argv )
     ("noise,n",  po::value< double >()->default_value(0.1), "Level of Kanungo noise ]0;1[" )
     ("try,t",  po::value< unsigned int >()->default_value(150), "Max number of tries to find a proper bel" )
     ("mode,m", po::value< std::string >()->default_value("mean"), "type of output : mean, gaussian, prindir1 or prindir2 (default mean)")
-    ("export,e", po::value< std::string >(), "Export the scene to specified OBJ filename." );
+    ("export,e", po::value< std::string >(), "Export the scene to specified OBJ filename." )
+    ("normalization", "When exporting to OBJ, performs a normalization so that the geometry fits in [-1/2,1/2]^3") ;
+
 
   bool parseOK = true;
   po::variables_map vm;
@@ -134,6 +136,10 @@ int main( int argc, char** argv )
     missingParam("--noise");
     neededArgsGiven=false;
   }
+
+  bool normalization = false;
+  if  (vm.count("normalization"))
+    normalization = true;
   
   double h = 1.0;
 
@@ -281,7 +287,7 @@ int main( int argc, char** argv )
 
       if ( ( mode.compare("mean") == 0 ) )
         {
-          typedef IntegralInvariantMeanCurvatureEstimator< Z3i::KSpace, MyCellFunctor > MyIIMeanEstimator;
+          typedef deprecated::IntegralInvariantMeanCurvatureEstimator< Z3i::KSpace, MyCellFunctor > MyIIMeanEstimator;
 
           MyIIMeanEstimator estimator ( K, functor );
           estimator.init( h, re_convolution_kernel ); // Initialisation for a given Euclidean radius of the convolution kernel
@@ -289,7 +295,7 @@ int main( int argc, char** argv )
         }
       else if ( ( mode.compare("gaussian") == 0 ) )
         {
-          typedef IntegralInvariantGaussianCurvatureEstimator< Z3i::KSpace, MyCellFunctor > MyIIGaussianEstimator;
+          typedef deprecated::IntegralInvariantGaussianCurvatureEstimator< Z3i::KSpace, MyCellFunctor > MyIIGaussianEstimator;
 
           MyIIGaussianEstimator estimator ( K, functor );
           estimator.init( h, re_convolution_kernel ); // Initialisation for a given Euclidean radius of the convolution kernel
@@ -341,12 +347,12 @@ int main( int argc, char** argv )
       typedef double Quantity;
       typedef EigenValues3D< Quantity >::Matrix33 Matrix3x3;
       typedef EigenValues3D< Quantity >::Vector3 Vector3;
-      typedef CurvatureInformations CurvInformation;
+      typedef deprecated::CurvatureInformations CurvInformation;
 
       std::vector< CurvInformation > results;
       back_insert_iterator< std::vector< CurvInformation > > resultsIterator( results ); // output iterator for results of Integral Invariante curvature computation
 
-      typedef IntegralInvariantGaussianCurvatureEstimator< Z3i::KSpace, MyCellFunctor > MyIIGaussianEstimator;
+      typedef deprecated::IntegralInvariantGaussianCurvatureEstimator< Z3i::KSpace, MyCellFunctor > MyIIGaussianEstimator;
 
       MyIIGaussianEstimator estimator ( K, functor );
       estimator.init ( h, re_convolution_kernel ); // Initialisation for a given Euclidean radius of the convolution kernel
@@ -431,7 +437,7 @@ int main( int argc, char** argv )
 
   if (myexport){
     trace.info()<< "Exporting object: " << export_path << " ...";
-    board.saveOBJ(export_path);
+    board.saveOBJ(export_path, normalization);
     trace.info() << "[done]" << std::endl;
   }
 

@@ -72,7 +72,7 @@ DistanceTransform
 
 Estimators
 ----------
-
+  - generic3dNormalEstimators: Computes a normal vector field over a digitized 3D implicit surface for several estimators (II|VCM|Trivial|True).
   - 2dLocalEstimators: program to compare local curvature/tangent estimators on implicit shapes
     - Maximal DSS based estimators
     - Maximal DCA based estimators
@@ -122,7 +122,7 @@ Visualization
   - 3dCurvatureViewerNoise: Same as 3dCurvatureViewer, but allow to add some noise to objects.
   - 3dCurveViewer: displays 3D curves with tangential cover and projections onto bounding box.
   - 3dImageViewer: tools to display 3d slice images (.vol, .pgm3d and  dicom with ITK) with QGLViewer.
-  - 3dSDPViewer: basic display of a sequence of 3d points (as voxel or sphere) by using QGLviewer.
+  - 3dSDPViewer: basic display of a sequence of 3d points (as voxel or sphere) and vectors by using QGLviewer.
   - 3dVolViewer: volume file (.vol, .pgm3d and dicom with ITK ) viewer with QGLViewer.
   - displayContours: display discrete contours from various format (.fc (freemanchain), .sdp).
   - meshViewer: display 3D mesh from OFS or OFF format.
