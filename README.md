@@ -98,7 +98,7 @@ Estimators
 <td align=center ><img height=130 src="https://cloud.githubusercontent.com/assets/772865/3311642/03f29044-f6c7-11e3-8981-120369b3e8bd.png"> </td>
 </tr>
 <tr>
-<td colspan="2"> Illustration of generic3dNormalEstimators on VCM estimator applied on smooth and noisy shapes.<td>
+<td colspan="2"> Illustration of generic3dNormalEstimators on VCM estimator applied on smooth and noisy shapes.</td>
 </tr>
 
 </table>
