@@ -8,6 +8,7 @@ SET(DGTAL_TOOLS_SRC
   statisticsEstimators
   generic3dNormalEstimators
   curvatureScaleSpaceBCC
+  eulerCharacteristic
 )
 
 if (  WITH_CGAL )
