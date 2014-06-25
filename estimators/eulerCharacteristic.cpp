@@ -109,9 +109,7 @@ int main(int argc, char**argv)
       trace.error() << "Error in the Khamisky space construction."<<std::endl;
       return 2;
     }
-
-  IntervalForegroundPredicate<MyImageC> interval(imageC, thresholdMin,thresholdMax);
-  
+  IntervalForegroundPredicate<MyImageC> interval(imageC, thresholdMin,thresholdMax);  
   for(MyImageC::Domain::ConstIterator it =imageC.domain().begin(), itend= imageC.domain().end();
       it != itend; ++it)
     {
@@ -121,13 +119,12 @@ int main(int argc, char**argv)
           for(Domain::ConstIterator itdom = dom.begin(), itdomend = dom.end(); itdom != itdomend; ++itdom)
             myCellSet.insert( ks.uCell( *itdom) );
         }
-      
     }
   trace.info() << "Got "<< myCellSet.size()<< " cells"<<std::endl;
   trace.endBlock();
 
   trace.beginBlock("Computing the characteristics");
-  std::vector<int> cells(4);
+  std::vector<int> cells(4,0);
   
   for(KSpace::CellSet::const_iterator it = myCellSet.begin(), itend = myCellSet.end(); it !=itend; ++it)
     cells[ ks.uDim(*it) ] ++; 
@@ -135,7 +132,7 @@ int main(int argc, char**argv)
   trace.info() << "Got "<< cells[0]<< " pointels "<<cells[1]<<" linels  "<< cells[2]<<" surfels and "<<cells[3]<<"  bells"<<std::endl;
   trace.endBlock();
 
-  trace.info() << "Euler Characteristic = "<<cells[0] - cells[1] + cells[2] - cells[3]<<std::endl;
+  trace.info() << "Volumetric Euler Characteristic = "<<cells[0] - cells[1] + cells[2] - cells[3]<<std::endl;
 
   return 0;
 }
