@@ -53,7 +53,7 @@ int main( int argc, char** argv )
 {
   typedef ImageContainerBySTLVector < Z3i::Domain, unsigned char > Image3D;
   typedef ImageContainerBySTLVector < Z2i::Domain, unsigned char > Image2D;
-  typedef DGtal::ConstImageAdapter<Image3D, Image2D::Domain, DGtal::Projector< DGtal::Z3i::Space>,
+  typedef DGtal::ConstImageAdapter<Image3D, Image2D::Domain, DGtal::functors::Projector< DGtal::Z3i::Space>,
 				   Image3D::Value,  DGtal::DefaultFunctor >  SliceImageAdapter;
 
 
@@ -112,10 +112,10 @@ int main( int argc, char** argv )
 #pragma omp parallel for schedule(dynamic)
   for( unsigned int i=0; i <= input3dImage.domain().upperBound()[sliceOrientation]; i++){
     trace.info() << "Exporting slice image "<< i ;
-    DGtal::Projector<DGtal::Z2i::Space>  invFunctor; invFunctor.initRemoveOneDim(sliceOrientation);
+    DGtal::functors::Projector<DGtal::Z2i::Space>  invFunctor; invFunctor.initRemoveOneDim(sliceOrientation);
     DGtal::Z2i::Domain domain2D(invFunctor(input3dImage.domain().lowerBound()),
   				invFunctor(input3dImage.domain().upperBound()));
-    DGtal::Projector<DGtal::Z3i::Space> aSliceFunctor(i); aSliceFunctor.initAddOneDim(sliceOrientation);
+    DGtal::functors::Projector<DGtal::Z3i::Space> aSliceFunctor(i); aSliceFunctor.initAddOneDim(sliceOrientation);
     SliceImageAdapter sliceImage(input3dImage, domain2D, aSliceFunctor, DGtal::DefaultFunctor());
     stringstream outName; outName << outputBasename << "_" <<  boost::format("%|05|")% i <<"."<< outputExt ;
     trace.info() << ": "<< outName.str() ;

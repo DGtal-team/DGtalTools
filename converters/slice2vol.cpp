@@ -53,7 +53,7 @@ int main( int argc, char** argv )
   typedef ImageContainerBySTLVector < Z3i::Domain, unsigned char > Image3D;
   typedef ImageContainerBySTLVector < Z2i::Domain, unsigned char > Image2D;
   
-
+  
   // parse command line ----------------------------------------------
   po::options_description general_opt("Allowed options are: ");
   general_opt.add_options()
@@ -107,8 +107,8 @@ int main( int argc, char** argv )
   }
   
   Image2D::Domain domImage2D =  vectImages2D.at(0).domain();
-  DGtal::Projector<DGtal::Z3i::Space> projIn3Dlower(0); 
-  DGtal::Projector<DGtal::Z3i::Space> projIn3Dupper(vectImages2D.size()-1); 
+  DGtal::functors::Projector<DGtal::Z3i::Space> projIn3Dlower(0); 
+  DGtal::functors::Projector<DGtal::Z3i::Space> projIn3Dupper(vectImages2D.size()-1); 
   projIn3Dlower.initAddOneDim(sliceOrientation);
   projIn3Dupper.initAddOneDim(sliceOrientation);
   Image3D::Domain domImage3D (projIn3Dlower(vectImages2D.at(0).domain().lowerBound()),
@@ -117,7 +117,7 @@ int main( int argc, char** argv )
   Image3D imageResult (domImage3D);
   for( unsigned int i=0; i<vectImages2D.size();  i++){
     Image2D sliceImage = vectImages2D.at(i);
-    DGtal::Projector<DGtal::Z3i::Space> projIn3D(i); 
+    DGtal::functors::Projector<DGtal::Z3i::Space> projIn3D(i); 
     projIn3D.initAddOneDim(sliceOrientation);
     for(Image2D::Domain::ConstIterator it = sliceImage.domain().begin();  
          it!= sliceImage.domain().end(); it++){
