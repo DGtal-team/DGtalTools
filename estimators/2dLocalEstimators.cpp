@@ -754,7 +754,7 @@ computeLocalEstimations( const std::string & filename,
             LightImplicitDigSurface LightImplDigSurf( K, *noisifiedObject, SAdj, bel );
             DigSurface surf( LightImplDigSurf );
 
-            typedef PointFunctorFromPointPredicateAndDomain< KanungoPredicate, Domain, unsigned int > KanungoFunctor;
+            typedef functors::PointFunctorFromPointPredicateAndDomain< KanungoPredicate, Domain, unsigned int > KanungoFunctor;
             KanungoFunctor * noisifiedFunctor = new KanungoFunctor( noisifiedObject, domain, 1, 0 );
 
             typedef FunctorOnCells< KanungoFunctor, KSpace > CurvatureIIFct;
@@ -785,7 +785,7 @@ computeLocalEstimations( const std::string & filename,
             LightImplicitDigSurface LightImplDigSurf( K, *dig, SAdj, bel );
             DigSurface surf( LightImplDigSurf );
 
-            typedef PointFunctorFromPointPredicateAndDomain< Digitizer, Domain, unsigned int > MyPointFunctor;
+            typedef functors::PointFunctorFromPointPredicateAndDomain< Digitizer, Domain, unsigned int > MyPointFunctor;
             MyPointFunctor * pointFunctor = new MyPointFunctor( dig, domain, 1, 0 );
 
             typedef FunctorOnCells< MyPointFunctor, KSpace > CurvatureIIFct;
