@@ -20,7 +20,9 @@ if (  WITH_VISU3D_QGLVIEWER )
     3dCurvatureViewerNoise
     3dCurveViewer
     3dSDPViewer
-    meshViewer)
+    meshViewer
+    3dHeightMapViewer)
+
   FOREACH(FILE ${DGTAL_EXAMPLES_QGL_SRC}) 
     add_executable(${FILE} ${FILE})
     target_link_libraries ( ${FILE} ${DGTAL_LIBRARIES} ${DGtalToolsLibDependencies})   
