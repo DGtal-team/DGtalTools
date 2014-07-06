@@ -196,7 +196,7 @@ int main( int argc, char** argv )
       std::cout << "Usage: " << argv[0] << " [input-file]\n"
                 << "Display a 2D image as heightmap by using QGLviewer"<< endl
                 << general_opt << "\n" << 
-                << "Exemple of use:  visualisation/3dHeightMapViewer -i ${DGtal}/examples/samples/church.pgm -s 0.2" << std::endl;
+                "Exemple of use:  visualisation/3dHeightMapViewer -i ${DGtal}/examples/samples/church.pgm -s 0.2" << std::endl;
 
       return 0;
     }
