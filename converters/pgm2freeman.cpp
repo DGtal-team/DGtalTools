@@ -158,7 +158,7 @@ int main( int argc, char** argv )
   Z2i::Point selectCenter;
   unsigned int selectDistanceMax = 0; 
  
-  typedef IntervalThresholder<Image::Value> Binarizer; 
+  typedef functors::IntervalThresholder<Image::Value> Binarizer; 
   std::string imageFileName = vm["image"].as<std::string>();
 
   Image image = GenericReader<Image>::import( imageFileName ); 

@@ -93,7 +93,7 @@ int main( int argc, char** argv )
   string outputFilename = vm["output-file"].as<std::string>();
   int dicomMin = vm["dicomMin"].as<int>();
   int dicomMax = vm["dicomMax"].as<int>();
-  typedef DGtal::RescalingFunctor<int ,unsigned char > RescalFCT;
+  typedef DGtal::functors::RescalingFunctor<int ,unsigned char > RescalFCT;
   
   trace.info() << "Reading input dicom file " << inputFilename ; 
   Image3D inputImage = DicomReader< Image3D,  RescalFCT  >::importDicom(inputFilename, 

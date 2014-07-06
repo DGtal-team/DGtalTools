@@ -114,9 +114,9 @@ int main(int argc, char**argv)
   trace.beginBlock("Loading file");
   typedef ImageContainerBySTLVector<Z3i::Domain, unsigned char>  MyImageC;
   MyImageC  imageC = VolReader< MyImageC >::importVol ( filename );
-  DefaultFunctor df;  
+  functors::Identity df;  
   
-  typedef ConstImageAdapter<MyImageC, Domain, DefaultFunctor, MyImageC::Value, DefaultFunctor > ConstImageAdapterForSubImage;
+  typedef ConstImageAdapter<MyImageC, Domain, functors::Identity, MyImageC::Value, functors::Identity > ConstImageAdapterForSubImage;
   Domain subDomain(ptLow, ptMax);
   ConstImageAdapterForSubImage subImage(imageC, subDomain, df, df);
   trace.endBlock();
