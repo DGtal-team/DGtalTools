@@ -291,7 +291,7 @@ int main( int argc, char** argv )
      GenericReader<Image3D>::import( inputFilename );
    trace.info() << "Imported ITK..."<< std::endl;
 #else
-   Image image = GenericReader<Image3D>::import (inputFilename );
+   Image3D image = GenericReader<Image3D>::import (inputFilename );
    trace.info() << "Imported..."<< std::endl;
 #endif
 
