@@ -54,7 +54,7 @@ int main( int argc, char** argv )
   typedef ImageContainerBySTLVector < Z3i::Domain, unsigned char > Image3D;
   typedef ImageContainerBySTLVector < Z2i::Domain, unsigned char > Image2D;
   typedef DGtal::ConstImageAdapter<Image3D, Image2D::Domain, DGtal::functors::Projector< DGtal::Z3i::Space>,
-				   Image3D::Value,  DGtal::DefaultFunctor >  SliceImageAdapter;
+				   Image3D::Value,  DGtal::functors::Identity >  SliceImageAdapter;
 
 
   // parse command line ----------------------------------------------
@@ -116,7 +116,7 @@ int main( int argc, char** argv )
     DGtal::Z2i::Domain domain2D(invFunctor(input3dImage.domain().lowerBound()),
   				invFunctor(input3dImage.domain().upperBound()));
     DGtal::functors::Projector<DGtal::Z3i::Space> aSliceFunctor(i); aSliceFunctor.initAddOneDim(sliceOrientation);
-    SliceImageAdapter sliceImage(input3dImage, domain2D, aSliceFunctor, DGtal::DefaultFunctor());
+    SliceImageAdapter sliceImage(input3dImage, domain2D, aSliceFunctor, DGtal::functors::Identity());
     stringstream outName; outName << outputBasename << "_" <<  boost::format("%|05|")% i <<"."<< outputExt ;
     trace.info() << ": "<< outName.str() ;
     GenericWriter<SliceImageAdapter>::exportFile(outName.str(), sliceImage);

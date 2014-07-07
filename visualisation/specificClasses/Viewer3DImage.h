@@ -27,10 +27,10 @@ class Viewer3DImage: public DGtal::Viewer3D <Space, KSpace>
   typedef DGtal::ImageContainerBySTLVector<DGtal::Z2i::Domain, unsigned char> Image2D;
  
   typedef DGtal::ConstImageAdapter<Image3D, Image2D::Domain, DGtal::functors::Projector< DGtal::Z3i::Space>,
-				  Image3D::Value,  DGtal::DefaultFunctor >  SliceImageAdapter;
+                                   Image3D::Value,  DGtal::functors::Identity >  SliceImageAdapter;
 
   typedef DGtal::ConstImageAdapter<Image3D, DGtal::Z2i::Domain, DGtal::functors::SliceRotator2D< DGtal::Z3i::Domain >,
-				   Image3D::Value,  DGtal::DefaultFunctor >  MyRotatorSliceImageAdapter;
+				   Image3D::Value,  DGtal::functors::Identity >  MyRotatorSliceImageAdapter;
 
 
 
