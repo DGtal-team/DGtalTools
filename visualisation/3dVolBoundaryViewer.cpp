@@ -129,7 +129,7 @@ int main( int argc, char** argv )
 #ifdef WITH_ITK
     int dicomMin = vm["dicomMin"].as<int>();
     int dicomMax = vm["dicomMax"].as<int>();
-    typedef DGtal::functors::RescalingFunctor<int ,unsigned char > RescalFCT;
+    typedef DGtal::functors::Rescaling<int ,unsigned char > RescalFCT;
     Image image = extension == "dcm" ? DicomReader< Image,  RescalFCT  >::importDicom( inputFilename,
 										       RescalFCT(dicomMin,
 												 dicomMax,
