@@ -134,7 +134,7 @@ int main(int argc, char**argv)
   bool res = false;
   
   if (mode == 0)
-    res =  VolWriter< MyImageC, CastFunctor<unsigned char> >::exportVol(outputFileName, imageC);
+    res =  VolWriter< MyImageC, functors::Cast<unsigned char> >::exportVol(outputFileName, imageC);
   else
     if (mode == 1)
     {

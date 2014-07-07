@@ -968,7 +968,7 @@ int main( int argc, char** argv )
     double radius = vm["radius"].as<double>();
 
     Ball2D<Space> * ball = new Ball2D<Space>( center, radius);
-    computeLocalEstimations<Space>( filename, ball, h, optII, options, properties, noiseLevel );
+    bool toto = computeLocalEstimations<Space>( filename, ball, h, optII, options, properties, noiseLevel );
     delete ball;
   }
   else if (id ==1)
@@ -1004,7 +1004,7 @@ int main( int argc, char** argv )
     double phi = vm["phi"].as<double>();
 
     Flower2D<Space> * flower = new Flower2D<Space>( center, radius, varsmallradius, k, phi );
-    computeLocalEstimations<Space>( filename, flower, h, optII, options, properties, noiseLevel );
+    bool toto = computeLocalEstimations<Space>( filename, flower, h, optII, options, properties, noiseLevel );
     delete flower;
   }
   else if (id ==4)
@@ -1018,7 +1018,7 @@ int main( int argc, char** argv )
     double phi = vm["phi"].as<double>();
 
     NGon2D<Space> * object = new NGon2D<Space>( center, radius, k, phi );
-    computeLocalEstimations<Space>( filename, object, h, optII, options, properties, noiseLevel );
+    bool toto = computeLocalEstimations<Space>( filename, object, h, optII, options, properties, noiseLevel );
     delete object;
   }
   else if (id ==5)
@@ -1034,7 +1034,7 @@ int main( int argc, char** argv )
     double phi = vm["phi"].as<double>();
 
     AccFlower2D<Space> * accflower = new AccFlower2D<Space>( center, radius, varsmallradius, k, phi );
-    computeLocalEstimations<Space>( filename, accflower, h, optII, options, properties, noiseLevel );
+    bool toto = computeLocalEstimations<Space>( filename, accflower, h, optII, options, properties, noiseLevel );
     delete accflower;
   }
   else if (id ==6)
@@ -1048,7 +1048,7 @@ int main( int argc, char** argv )
     double phi = vm["phi"].as<double>();
 
     Ellipse2D<Space> * ellipse = new Ellipse2D<Space>( center, a1, a2, phi );
-    computeLocalEstimations<Space>( filename, ellipse, h, optII, options, properties, noiseLevel );
+    bool toto = computeLocalEstimations<Space>( filename, ellipse, h, optII, options, properties, noiseLevel );
     delete ellipse;
   }
 }
