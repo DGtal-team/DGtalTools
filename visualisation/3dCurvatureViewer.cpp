@@ -162,8 +162,7 @@ int main( int argc, char** argv )
       return 0;
     }
 
-  
-  
+    
   double h = 1.0;
 
   
