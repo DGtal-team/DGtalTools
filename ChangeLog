@@ -7,6 +7,7 @@
 	- 3dSDPViewer: basic display of a sequence of 3d points (as voxel or sphere) and vectors by using QGLviewer.
 	- 3dCurvatureViewer: can now display curvature on multiple connected components.
 
+
 * converters/:
 	- volBoundary2obj: a simple tool to export the boundary of a an	object in a volumetric file to OBJ
 	- freeman2pgm: transform one or several freeman chains into a pgm file by filling their interior areas.
