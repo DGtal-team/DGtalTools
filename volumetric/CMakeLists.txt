@@ -8,6 +8,7 @@ SET(DGTAL_TOOLS_SRC
   volImageMetrics
   volShapeMetrics
   volFlip
+  volReSample
 )
 
 

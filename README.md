@@ -178,7 +178,7 @@ Volumetric
   - volSubSample: sub sample a vol file (division by 2 in each direction).
   - volImageMetrics: apply basic statistics on comparaison between two volumetric images (shape defined from thresholds): computes true/false -+, precision, recall f-mean RMSE, PSNR.
   - volShapeMetrics: apply euclidean distance comparisons between two shapes  (shape defined from thresholds).
-
+  - volReSample: apply a basic  re sampling of a 3D volumetric image (.vol, .longvol, .pgm3d)  with a given grid size.
 
 
 How to build the tools
