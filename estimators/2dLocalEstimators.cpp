@@ -78,8 +78,8 @@
 #include "DGtal/geometry/curves/StabbingCircleComputer.h"
 
 #include "DGtal/images/ImageHelper.h"
-#include "DGtal/geometry/surfaces/FunctorOnCells.h"
-#include "DGtal/geometry/surfaces/estimation/IntegralInvariantMeanCurvatureEstimator.h"
+#include "DGtal/geometry/surfaces/estimation/IIGeometricFunctors.h"
+#include "DGtal/geometry/surfaces/estimation/IntegralInvariantVolumeEstimator.h"
 
 #include "DGtal/kernel/BasicPointFunctors.h"
 
@@ -740,9 +740,9 @@ computeLocalEstimations( const std::string & filename,
             optionsII.radius = suggestedSizeIntegralInvariant( h, dig->round( optionsII.center ), pointsRange.begin(), pointsRange.end() );
             file << "# Estimated radius: " << optionsII.radius << std::endl;
           }
-          double re_convolution_kernel = optionsII.radius * std::pow( h, optionsII.alpha );
+          double re = optionsII.radius * std::pow( h, optionsII.alpha );
           file << "# full kernel (digital) size (with alpha = " << optionsII.alpha << ") = " <<
-                  re_convolution_kernel / h << std::endl;
+                  re / h << std::endl;
 
           std::ostream_iterator< double > out_it( file, "\n" );
 
@@ -754,28 +754,26 @@ computeLocalEstimations( const std::string & filename,
             LightImplicitDigSurface LightImplDigSurf( K, *noisifiedObject, SAdj, bel );
             DigSurface surf( LightImplDigSurf );
 
-            typedef functors::PointFunctorFromPointPredicateAndDomain< KanungoPredicate, Domain, unsigned int > KanungoFunctor;
-            KanungoFunctor * noisifiedFunctor = new KanungoFunctor( noisifiedObject, domain, 1, 0 );
-
-            typedef FunctorOnCells< KanungoFunctor, KSpace > CurvatureIIFct;
-            CurvatureIIFct * functor = new CurvatureIIFct( *noisifiedFunctor, K );
-
-            deprecated::IntegralInvariantMeanCurvatureEstimator< KSpace, CurvatureIIFct> * IICurvatureEstimator = new deprecated::IntegralInvariantMeanCurvatureEstimator< KSpace, CurvatureIIFct>( K, *functor );
-
             typedef DepthFirstVisitor< DigSurface > Visitor;
             typedef GraphVisitorRange< Visitor > VisitorRange;
-            typedef typename VisitorRange::ConstIterator I;
+            typedef typename VisitorRange::ConstIterator VisitorConstIterator;
 
-            VisitorRange range( new Visitor( surf, *surf.begin() ) );
-            I ibegin = range.begin();
-            I iend = range.end();
+            VisitorRange range( new Visitor( surf, *surf.begin() ));
+            VisitorConstIterator ibegin = range.begin();
+            VisitorConstIterator iend = range.end();
 
-            IICurvatureEstimator->init( h, re_convolution_kernel );
-            IICurvatureEstimator->eval( points.begin(), points.end(), out_it );
+            typedef functors::IIGeometricFunctors::IICurvatureFunctor<Z2i::Space> MyIICurvatureFunctor;
+            typedef IntegralInvariantVolumeEstimator< KSpace, KanungoPredicate, MyIICurvatureFunctor > MyIICurvatureEstimator;
+            
+            MyIICurvatureFunctor curvatureFunctor;
+            curvatureFunctor.init( h, re );
 
-            delete functor;
-            delete noisifiedFunctor;
-            delete IICurvatureEstimator;
+            MyIICurvatureEstimator curvatureEstimator( curvatureFunctor );
+            curvatureEstimator.attach( K, *noisifiedObject );
+            curvatureEstimator.setParams( re/h );
+            curvatureEstimator.init( h, ibegin, iend );
+
+            curvatureEstimator.eval( ibegin, iend, out_it );
           }
           else
           {
@@ -785,28 +783,26 @@ computeLocalEstimations( const std::string & filename,
             LightImplicitDigSurface LightImplDigSurf( K, *dig, SAdj, bel );
             DigSurface surf( LightImplDigSurf );
 
-            typedef functors::PointFunctorFromPointPredicateAndDomain< Digitizer, Domain, unsigned int > MyPointFunctor;
-            MyPointFunctor * pointFunctor = new MyPointFunctor( dig, domain, 1, 0 );
-
-            typedef FunctorOnCells< MyPointFunctor, KSpace > CurvatureIIFct;
-            CurvatureIIFct * functor = new CurvatureIIFct( *pointFunctor, K );
-
-            deprecated::IntegralInvariantMeanCurvatureEstimator< KSpace, CurvatureIIFct> * IICurvatureEstimator = new deprecated::IntegralInvariantMeanCurvatureEstimator< KSpace, CurvatureIIFct>( K, *functor );
-
             typedef DepthFirstVisitor< DigSurface > Visitor;
             typedef GraphVisitorRange< Visitor > VisitorRange;
-            typedef typename VisitorRange::ConstIterator I;
+            typedef typename VisitorRange::ConstIterator VisitorConstIterator;
 
-            VisitorRange range( new Visitor( surf, *surf.begin() ) );
-            I ibegin = range.begin();
-            I iend = range.end();
+            VisitorRange range( new Visitor( surf, *surf.begin() ));
+            VisitorConstIterator ibegin = range.begin();
+            VisitorConstIterator iend = range.end();
 
-            IICurvatureEstimator->init( h, re_convolution_kernel );
-            IICurvatureEstimator->eval( ibegin, iend, out_it );
+            typedef functors::IIGeometricFunctors::IICurvatureFunctor<Z2i::Space> MyIICurvatureFunctor;
+            typedef IntegralInvariantVolumeEstimator< KSpace, Digitizer, MyIICurvatureFunctor > MyIICurvatureEstimator;
+            
+            MyIICurvatureFunctor curvatureFunctor;
+            curvatureFunctor.init( h, re );
 
-            delete functor;
-            delete pointFunctor;
-            delete IICurvatureEstimator;
+            MyIICurvatureEstimator curvatureEstimator( curvatureFunctor );
+            curvatureEstimator.attach( K, *dig );
+            curvatureEstimator.setParams( re/h );
+            curvatureEstimator.init( h, ibegin, iend );
+
+            curvatureEstimator.eval( ibegin, iend, out_it );
           }
 
           double time = c.stopClock();
@@ -882,7 +878,7 @@ int main( int argc, char** argv )
   {
     trace.info()<< "Compare local estimators on implicit shapes using DGtal library" <<std::endl
                 << "Basic usage: "<<std::endl
-                << "\tlocalEstimators --output <output> --shape <shapeName> [required parameters] --estimators <binaryWord> --properties <binaryWord>"<<std::endl
+                << "\t2dlocalEstimators --output <output> --shape <shapeName> [required parameters] --estimators <binaryWord> --properties <binaryWord>"<<std::endl
                 << std::endl
                 << "Below are the different available families of estimators: " << std::endl
                 << "\t - True estimators" << std::endl
@@ -898,6 +894,9 @@ int main( int argc, char** argv )
                 << "Below are the different available properties: " << std::endl
                 << "\t - Tangeant" << std::endl
                 << "\t - Curvature" << std::endl
+                << std::endl
+                << "Example: "<<std::endl
+                << "\t2dlocalEstimators --output curvature --shape ellipse --axis1 20 --axis2 7 --gridstep 0.1 --K 5 --estimators 10001 --properties 01"<<std::endl
                 << std::endl
                 << general_opt << std::endl;
     return 0;
