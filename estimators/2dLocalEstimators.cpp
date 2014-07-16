@@ -896,7 +896,7 @@ int main( int argc, char** argv )
                 << "\t - Curvature" << std::endl
                 << std::endl
                 << "Example: "<<std::endl
-                << "\t2dlocalEstimators --output curvature --shape ellipse --axis1 20 --axis2 7 --gridstep 0.1 --K 5 --estimators 10001 --properties 01"<<std::endl
+                << "\t2dlocalEstimators --output curvature --shape ellipse --axis1 20 --axis2 7 --gridstep 0.1 --kernelradius 5 --estimators 10001 --properties 01"<<std::endl
                 << std::endl
                 << general_opt << std::endl;
     return 0;
