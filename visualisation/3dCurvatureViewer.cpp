@@ -132,8 +132,7 @@ int main( int argc, char** argv )
   bool normalization = false;
   if  (vm.count("normalization"))
     normalization = true;
-  
-  bool wrongMode = false;
+
   std::string mode;
   if( parseOK )
     mode =  vm["mode"].as< std::string >();
@@ -141,18 +140,18 @@ int main( int argc, char** argv )
                   ( mode.compare("k1") != 0 ) && ( mode.compare("k2") != 0 ) &&
                   ( mode.compare("prindir1") != 0 ) && ( mode.compare("prindir2") != 0 ))
   {
-    wrongMode = true;
+    parseOK = false;
     trace.error() << " The selected mode ("<<mode << ") is not defined."<<std::endl;
   }
 
   unsigned int threshold = vm["threshold"].as< unsigned int >();
 
-  if(!neededArgsGiven ||  wrongMode || !parseOK || vm.count("help") || argc <= 1 )
+  if(!neededArgsGiven || !parseOK || vm.count("help") || argc <= 1 )
   {
     trace.info()<< "Visualisation of 3d curvature from .vol file using curvature from Integral Invariant" <<std::endl
     << general_opt << "\n"
     << "Basic usage: "<<std::endl
-    << "\t3dCurvatureViewer -i file.vol --radius 3 --mode mean"<<std::endl
+    << "\t3dCurvatureViewer -i file.vol --radius 5 --mode mean"<<std::endl
     << std::endl
     << "Below are the different available modes: " << std::endl
     << "\t - \"mean\" for the mean curvature" << std::endl
