@@ -188,7 +188,7 @@ int main( int argc, char** argv )
   std::vector<  double > aGridSizeReSample;
   if(vm.count("imageScale")){
     std::vector< double> vectScale = vm["imageScale"].as<std::vector<double > >();
-    if(aGridSizeReSample.size()!=3){
+    if(vectScale.size()!=3){
       trace.error() << "The grid size should contains 3 elements" << std::endl;
       return 0;
     }else{
@@ -207,12 +207,16 @@ int main( int argc, char** argv )
   // Construction of the shape from vol file
   typedef Z3i::Space::RealPoint RealPoint;
   typedef Z3i::Point Point;
-  typedef ImageSelector< Z3i::Domain, bool>::Type Image;
-  typedef DGtal::functors::BasicDomainSubSampler< HyperRectDomain<SpaceND<3, int> >,  
+  typedef ImageContainerBySTLVector < Z3i::Domain, unsigned char > Image;
+
+  typedef DGtal::functors::BasicDomainSubSampler< Image::Domain,  
                                                   DGtal::int32_t, double >   ReSampler; 
   typedef DGtal::ConstImageAdapter<Image, Image::Domain, ReSampler,
-				   Image::Value,  DGtal::functors::Identity >  SamplerImageAdapter;
-  typedef SimpleThresholdForegroundPredicate< SamplerImageAdapter > ImagePredicate;
+                                   Image::Value,  DGtal::functors::Identity >  SamplerImageAdapter;
+  //  typedef SimpleThresholdForegroundPredicate< SamplerImageAdapter > ImagePredicate;
+  DGtal::functors::Thresholder<Image::Value> t( 0 );
+  typedef ConstImageAdapter<SamplerImageAdapter, Image::Domain, functors::Identity, bool, DGtal::functors::Thresholder<Image::Value> > ImagePredicate;
+
   typedef Z3i::KSpace KSpace;
   typedef KSpace::SCell SCell;
   typedef KSpace::Cell Cell;
@@ -221,13 +225,13 @@ int main( int argc, char** argv )
   std::string filename = vm["input-file"].as< std::string >();
   Image image = GenericReader<Image>::import( filename );
   PointVector<3,int> shiftVector3D(0 ,0, 0);      
-  DGtal::functors::BasicDomainSubSampler< HyperRectDomain<SpaceND<3, int> >,  
+  DGtal::functors::BasicDomainSubSampler< Image::Domain,  
                                           DGtal::int32_t, double > reSampler(image.domain(),
                                                                              aGridSizeReSample,  shiftVector3D);  
-  SamplerImageAdapter sampledImage (input3dImage,reSampler.getSubSampledDomain(), reSampler, functors::Identity());
+  SamplerImageAdapter sampledImage (image, reSampler.getSubSampledDomain(), reSampler, functors::Identity());
 
 
-  ImagePredicate predicate = ImagePredicate( sampledImage, 0 );
+  ImagePredicate predicate (sampledImage, sampledImage.domain(), functors::Identity(), t );
   Z3i::Domain domain = sampledImage.domain();
   Z3i::KSpace K;
   bool space_ok = K.init( domain.lowerBound(), domain.upperBound(), true );
