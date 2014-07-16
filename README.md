@@ -86,6 +86,7 @@ Estimators
   - curvatureMCMS: curvature estimator using the maximal segments cover  (to be updated for current DGtal version).
   - curvatureScaleSpaceBCC: a tool to display the curvature scale space of a given contour with the Binomial Convolver Curvature Estimator
   - estimatorComparator: program to perform comparison of local quantity estimators (to be updated for current DGtal version).
+  - eulerCharacteristic: bruteforce tool to extract (volumetric) Euler characteristic from volumetric binary object.
   - vol2normalField: compute the normal vector field of a given vol file .
 <table>
 <tr>
