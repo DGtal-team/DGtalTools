@@ -46,7 +46,7 @@
 #include <boost/program_options/variables_map.hpp>
 
 // Shape constructors
-#include "DGtal/io/readers/VolReader.h"
+#include "DGtal/io/readers/GenericReader.h"
 #include "DGtal/images/ImageSelector.h"
 #include "DGtal/images/imagesSetsUtils/SetFromImage.h"
 #include "DGtal/images/imagesSetsUtils/SimpleThresholdForegroundPredicate.h"
@@ -54,6 +54,8 @@
 #include "DGtal/topology/helpers/Surfaces.h"
 #include "DGtal/topology/LightImplicitDigitalSurface.h"
 #include <DGtal/topology/SetOfSurfels.h>
+
+#include "DGtal/kernel/BasicPointFunctors.h"
 
 #include "DGtal/images/ImageHelper.h"
 #include "DGtal/topology/DigitalSurface.h"
@@ -105,6 +107,7 @@ int main( int argc, char** argv )
   ("threshold,t",  po::value< unsigned int >()->default_value(8), "Min size of SCell boundary of an object" )
   ("mode,m", po::value< std::string >()->default_value("mean"), "type of output : mean, gaussian, prindir1 or prindir2 (default mean)")
   ("export,e", po::value< std::string >(), "Export the scene to specified OBJ filename." )
+  ("imageScale,s", po::value<std::vector<double> >()->multitoken(), "scaleX, scaleY, scaleZ: re sample the source image according with a grid of size 1.0/scale (usefull to compute curvature on image defined on anisotropic grid). Set by default to 1.0 for the three axis.  ")
   ("normalization,n", "When exporting to OBJ, performs a normalization so that the geometry fits in [-1/2,1/2]^3") ;
 
   bool parseOK = true;
@@ -179,20 +182,53 @@ int main( int argc, char** argv )
   
   double re_convolution_kernel = vm["radius"].as< double >();
 
+
+
+
+  std::vector<  double > aGridSizeReSample;
+  if(vm.count("imageScale")){
+    std::vector< double> vectScale = vm["imageScale"].as<std::vector<double > >();
+    if(aGridSizeReSample.size()!=3){
+      trace.error() << "The grid size should contains 3 elements" << std::endl;
+      return 0;
+    }else{
+      aGridSizeReSample.push_back(1.0/vectScale.at(0));
+      aGridSizeReSample.push_back(1.0/vectScale.at(1));
+      aGridSizeReSample.push_back(1.0/vectScale.at(2));
+    }
+  }else{
+    aGridSizeReSample.push_back(1.0);
+    aGridSizeReSample.push_back(1.0);
+    aGridSizeReSample.push_back(1.0);
+  }
+
+  
+  
   // Construction of the shape from vol file
   typedef Z3i::Space::RealPoint RealPoint;
   typedef Z3i::Point Point;
   typedef ImageSelector< Z3i::Domain, bool>::Type Image;
-  typedef SimpleThresholdForegroundPredicate< Image > ImagePredicate;
+  typedef DGtal::functors::BasicDomainSubSampler< HyperRectDomain<SpaceND<3, int> >,  
+                                                  DGtal::int32_t, double >   ReSampler; 
+  typedef DGtal::ConstImageAdapter<Image, Image::Domain, ReSampler,
+				   Image::Value,  DGtal::functors::Identity >  SamplerImageAdapter;
+  typedef SimpleThresholdForegroundPredicate< SamplerImageAdapter > ImagePredicate;
   typedef Z3i::KSpace KSpace;
   typedef KSpace::SCell SCell;
   typedef KSpace::Cell Cell;
   typedef KSpace::Surfel Surfel;
 
   std::string filename = vm["input-file"].as< std::string >();
-  Image image = VolReader<Image>::importVol( filename );
-  ImagePredicate predicate = ImagePredicate( image, 0 );
-  Z3i::Domain domain = image.domain();
+  Image image = GenericReader<Image>::import( filename );
+  PointVector<3,int> shiftVector3D(0 ,0, 0);      
+  DGtal::functors::BasicDomainSubSampler< HyperRectDomain<SpaceND<3, int> >,  
+                                          DGtal::int32_t, double > reSampler(image.domain(),
+                                                                             aGridSizeReSample,  shiftVector3D);  
+  SamplerImageAdapter sampledImage (input3dImage,reSampler.getSubSampledDomain(), reSampler, functors::Identity());
+
+
+  ImagePredicate predicate = ImagePredicate( sampledImage, 0 );
+  Z3i::Domain domain = sampledImage.domain();
   Z3i::KSpace K;
   bool space_ok = K.init( domain.lowerBound(), domain.upperBound(), true );
   if (!space_ok)
