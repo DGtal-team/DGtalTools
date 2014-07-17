@@ -46,7 +46,7 @@
 
 #include "DGtal/io/readers/VolReader.h"
 #include "DGtal/images/imagesSetsUtils/SetFromImage.h"
-#include "DGtal/images/imagesSetsUtils/SimpleThresholdForegroundPredicate.h"
+#include "DGtal/images/SimpleThresholdForegroundPredicate.h"
 #include "DGtal/images/ImageSelector.h"
 #include "DGtal/shapes/Shapes.h"
 #include "DGtal/helpers/StdDefs.h"

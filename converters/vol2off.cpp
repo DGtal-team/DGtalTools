@@ -38,7 +38,7 @@
 #include "DGtal/images/ImageSelector.h"
 #include "DGtal/images/imagesSetsUtils/SetFromImage.h"
 #include "DGtal/images/ImageSelector.h"
-#include "DGtal/images/imagesSetsUtils/IntervalForegroundPredicate.h"
+#include "DGtal/images/IntervalForegroundPredicate.h"
 #include "DGtal/topology/LightImplicitDigitalSurface.h"
 
 #include <boost/program_options/options_description.hpp>
