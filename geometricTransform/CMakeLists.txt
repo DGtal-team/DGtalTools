@@ -1,6 +1,7 @@
 
 SET(DGTAL_TOOLS_SRC
  rigidTransform2D
+ rigidTransform3D
 )
 
 

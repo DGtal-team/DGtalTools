@@ -16,7 +16,7 @@
  **/
 
 /**
- * @file rigidTransform2D.cpp
+ * @file rigidTransforma3D.cpp
  * @author Kacper Pluta (\c kacper.pluta@esiee.fr )
  * Laboratoire d'Informatique Gaspard-Monge - LIGM, France
  *
@@ -33,7 +33,7 @@
 #include <DGtal/images/Image.h>
 #include <DGtal/images/ImageSelector.h>
 #include <DGtal/images/ConstImageAdapter.h>
-#include <DGtal/images/RigidTransformation2D.h>
+#include <DGtal/images/RigidTransformation3D.h>
 
 #include <boost/program_options/options_description.hpp>
 #include <boost/program_options/parsers.hpp>
@@ -41,7 +41,7 @@
 
 using namespace std;
 using namespace DGtal;
-using namespace Z2i;
+using namespace Z3i;
 using namespace functors;
 
 namespace po = boost::program_options;
@@ -73,8 +73,13 @@ int main(int argc, char**argv)
     ( "angle,a", po::value<double>(),"Rotation angle in radians." )
     ( "ox", po::value<double>(),"X coordinate of origin." )
     ( "oy", po::value<double>(),"Y coordinate of origin." )
+    ( "oz", po::value<double>(),"Z coordinate of origin." )
+    ( "ax", po::value<double>(),"X component of rotation axis." )
+    ( "ay", po::value<double>(),"Y component of rotation axis." )
+    ( "az", po::value<double>(),"Z component of rotation axis." )
     ( "tx", po::value<double>(),"X component of translation vector." )
-    ( "ty", po::value<double>(),"Y component of translation vector." );
+    ( "ty", po::value<double>(),"Y component of translation vector." )
+    ( "tz", po::value<double>(),"Z component of translation vector." );
 
   bool parseOK=true;
   po::variables_map vm;
@@ -90,7 +95,7 @@ int main(int argc, char**argv)
     {
       trace.info() << "Rotate 2D image."<<std::endl
                    << std::endl << "Basic usage: "<<std::endl
-                   << "rigidTrans2D --ox 1.0 --oy 1.0 -a 1.2 --tx 1 --ty 0 --m <forward|backward> --input <RawFileName> --output <VolOutputFileName> "<<std::endl
+                   << "rigidTrans2D --ox 1.0 --oy 1.0 --oz 1 -a 1.2 --ax 1 --ay 1 --az 0 --tx 1 --ty 0 --tz 0 --m <forward|backward> --input <RawFileName> --output <VolOutputFileName> "<<std::endl
                    << general_opt << "\n";
       return 0;
     }
@@ -108,21 +113,31 @@ int main(int argc, char**argv)
   double ox =  vm["ox"].as<double>();
   if ( ! ( vm.count ( "oy" ) ) ) missingParam ( "--oy" );
   double oy =  vm["oy"].as<double>();
+  if ( ! ( vm.count ( "oz" ) ) ) missingParam ( "--oz" );
+  double oz =  vm["oz"].as<double>();
+  if ( ! ( vm.count ( "ax" ) ) ) missingParam ( "--ax" );
+  double ax =  vm["ax"].as<double>();
+  if ( ! ( vm.count ( "ay" ) ) ) missingParam ( "--ay" );
+  double ay =  vm["ay"].as<double>();
+  if ( ! ( vm.count ( "az" ) ) ) missingParam ( "--az" );
+  double az =  vm["az"].as<double>();
   if ( ! ( vm.count ( "tx" ) ) ) missingParam ( "--tx" );
   double tx =  vm["tx"].as<double>();
   if ( ! ( vm.count ( "ty" ) ) ) missingParam ( "--ty" );
   double ty =  vm["ty"].as<double>();
+  if ( ! ( vm.count ( "tz" ) ) ) missingParam ( "--tz" );
+  double tz =  vm["tz"].as<double>();
 
   typedef ImageSelector<Domain, unsigned char >::Type Image;
-  typedef ForwardRigidTransformation2D < Space > ForwardTrans;
-  typedef BackwardRigidTransformation2D < Space > BackwardTrans;
+  typedef ForwardRigidTransformation3D < Space > ForwardTrans;
+  typedef BackwardRigidTransformation3D < Space > BackwardTrans;
   typedef ConstImageAdapter<Image, Domain, BackwardTrans, Image::Value, Identity > MyImageBackwardAdapter;
-  typedef DomainRigidTransformation2D < Domain, ForwardTrans > MyTransformedDomain;
+  typedef DomainRigidTransformation3D < Domain, ForwardTrans > MyTransformedDomain;
   typedef MyTransformedDomain::Bounds Bounds;
 
-  Image image = GenericReader <Image, 2>::import(filename);
-  ForwardTrans forwardTrans( RealPoint ( ox, oy ), angle, RealVector( tx, ty ) );
-  BackwardTrans backwardTrans( RealPoint ( ox, oy ), angle, RealVector( tx, ty ) );
+  Image image = GenericReader <Image, 3>::import(filename);
+  ForwardTrans forwardTrans( RealPoint ( ox, oy, oz ), RealPoint ( ax, ay, az ), angle, RealVector( tx, ty, tz ) );
+  BackwardTrans backwardTrans( RealPoint ( ox, oy, tz ), RealPoint ( ax, ay, az ), angle, RealVector( tx, ty, tz ) );
   MyTransformedDomain domainForwardTrans ( forwardTrans );
   Bounds bounds = domainForwardTrans ( image.domain() );
   Domain transformedDomain ( bounds.first, bounds.second );
@@ -135,12 +150,12 @@ int main(int argc, char**argv)
       {
           forwardTransformedImage.setValue ( forwardTrans ( *it ), image ( *it ) );
       }
-      GenericWriter<Image, 2, unsigned char, Identity>::exportFile(outputFileName, forwardTransformedImage, idD);
+      GenericWriter<Image, 3, unsigned char, Identity>::exportFile(outputFileName, forwardTransformedImage," ", idD);
   }
   else
   {
       MyImageBackwardAdapter backwardImageAdapter ( image, transformedDomain , backwardTrans, idD );
-      GenericWriter<MyImageBackwardAdapter, 2, unsigned char, Identity>::exportFile(outputFileName, backwardImageAdapter, idD);
+      GenericWriter<MyImageBackwardAdapter, 3, unsigned char, Identity>::exportFile(outputFileName, backwardImageAdapter, " ", idD);
   }
   return 0;
 }
