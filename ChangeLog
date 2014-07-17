@@ -5,7 +5,7 @@
 	- 3dVolBoundaryViewer: a simple viewer of the boundary of an object defined by thresholding a vol file.
 	- 3dVolMarchingCubes: speed-up by factor 10 simply by replacing the set predicate used in computations.
 	- 3dSDPViewer: basic display of a sequence of 3d points (as voxel or sphere) and vectors by using QGLviewer.
-	- 3dCurvatureViewer: can now display curvature on multiple connected components.
+	- 3dCurvatureViewer: can now display curvature on multiple connected components and can apply image re sampling for anisotropic grid.
 
 * converters/:
 	- volBoundary2obj: a simple tool to export the boundary of a an	object in a volumetric file to OBJ
