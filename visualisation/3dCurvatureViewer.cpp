@@ -49,7 +49,7 @@
 #include "DGtal/io/readers/VolReader.h"
 #include "DGtal/images/ImageSelector.h"
 #include "DGtal/images/imagesSetsUtils/SetFromImage.h"
-#include "DGtal/images/imagesSetsUtils/SimpleThresholdForegroundPredicate.h"
+#include "DGtal/images/SimpleThresholdForegroundPredicate.h"
 #include "DGtal/topology/SurfelAdjacency.h"
 #include "DGtal/topology/helpers/Surfaces.h"
 #include "DGtal/topology/LightImplicitDigitalSurface.h"
@@ -103,7 +103,7 @@ int main( int argc, char** argv )
   ("input-file,i", po::value< std::string >(), ".vol file")
   ("radius,r",  po::value< double >(), "Kernel radius for IntegralInvariant" )
   ("threshold,t",  po::value< unsigned int >()->default_value(8), "Min size of SCell boundary of an object" )
-  ("mode,m", po::value< std::string >()->default_value("mean"), "type of output : mean, gaussian, prindir1 or prindir2 (default mean)")
+  ("mode,m", po::value< std::string >()->default_value("mean"), "type of output : mean, gaussian, k1, k2, prindir1 or prindir2 (default mean)")
   ("export,e", po::value< std::string >(), "Export the scene to specified OBJ filename." )
   ("normalization,n", "When exporting to OBJ, performs a normalization so that the geometry fits in [-1/2,1/2]^3") ;
 
@@ -132,30 +132,32 @@ int main( int argc, char** argv )
   bool normalization = false;
   if  (vm.count("normalization"))
     normalization = true;
-  
-  bool wrongMode = false;
+
   std::string mode;
   if( parseOK )
     mode =  vm["mode"].as< std::string >();
   if ( parseOK && ( mode.compare("gaussian") != 0 ) && ( mode.compare("mean") != 0 ) &&
-   ( mode.compare("prindir1") != 0 ) && ( mode.compare("prindir2") != 0 ))
+                  ( mode.compare("k1") != 0 ) && ( mode.compare("k2") != 0 ) &&
+                  ( mode.compare("prindir1") != 0 ) && ( mode.compare("prindir2") != 0 ))
   {
-    wrongMode = true;
+    parseOK = false;
     trace.error() << " The selected mode ("<<mode << ") is not defined."<<std::endl;
   }
 
   unsigned int threshold = vm["threshold"].as< unsigned int >();
 
-  if(!neededArgsGiven ||  wrongMode || !parseOK || vm.count("help") || argc <= 1 )
+  if(!neededArgsGiven || !parseOK || vm.count("help") || argc <= 1 )
   {
     trace.info()<< "Visualisation of 3d curvature from .vol file using curvature from Integral Invariant" <<std::endl
     << general_opt << "\n"
     << "Basic usage: "<<std::endl
-    << "\t3dCurvatureViewer -i file.vol --radius 3 --mode mean"<<std::endl
+    << "\t3dCurvatureViewer -i file.vol --radius 5 --mode mean"<<std::endl
     << std::endl
     << "Below are the different available modes: " << std::endl
     << "\t - \"mean\" for the mean curvature" << std::endl
     << "\t - \"gaussian\" for the Gaussian curvature" << std::endl
+    << "\t - \"k1\" for the first principal curvature" << std::endl
+    << "\t - \"k2\" for the second principal curvature" << std::endl
     << "\t - \"prindir1\" for the first principal curvature direction" << std::endl
     << "\t - \"prindir2\" for the second principal curvature direction" << std::endl
     << std::endl;
@@ -247,21 +249,21 @@ int main( int argc, char** argv )
     SurfelConstIterator abegin2 = range2.begin();
 
     trace.beginBlock("curvature computation");
-    if( ( mode.compare("gaussian") == 0 ) || ( mode.compare("mean") == 0 ) )
+    if( ( mode.compare("gaussian") == 0 ) || ( mode.compare("mean") == 0 ) || ( mode.compare("k1") == 0 ) || ( mode.compare("k2") == 0 ))
     {
       typedef double Quantity;
       std::vector< Quantity > results;
-      back_insert_iterator< std::vector< Quantity > > resultsIterator( results ); // output iterator for results of Integral Invariante curvature computation
+      back_insert_iterator< std::vector< Quantity > > resultsIterator( results );
 
       if ( ( mode.compare("mean") == 0 ) )
       {
-        typedef functors::IIGeometricFunctors::IIMeanCurvature3DFunctor<Z3i::Space> MyIIMeanCurvatureFunctor;
-        typedef IntegralInvariantVolumeEstimator<Z3i::KSpace, ImagePredicate, MyIIMeanCurvatureFunctor> MyIIMeanEstimator;
+        typedef functors::IIGeometricFunctors::IIMeanCurvature3DFunctor<Z3i::Space> MyIICurvatureFunctor;
+        typedef IntegralInvariantVolumeEstimator<Z3i::KSpace, ImagePredicate, MyIICurvatureFunctor> MyIIEstimator;
 
-        MyIIMeanCurvatureFunctor functor;
+        MyIICurvatureFunctor functor;
         functor.init( h, re_convolution_kernel );
 
-        MyIIMeanEstimator estimator( functor );
+        MyIIEstimator estimator( functor );
         estimator.attach( K, predicate );
         estimator.setParams( re_convolution_kernel/h );
         estimator.init( h, abegin, aend );
@@ -270,13 +272,43 @@ int main( int argc, char** argv )
       }
       else if ( ( mode.compare("gaussian") == 0 ) )
       {
-        typedef functors::IIGeometricFunctors::IIGaussianCurvature3DFunctor<Z3i::Space> MyIIGaussianCurvatureFunctor;
-        typedef IntegralInvariantCovarianceEstimator<Z3i::KSpace, ImagePredicate, MyIIGaussianCurvatureFunctor> MyIIGaussianEstimator;
+        typedef functors::IIGeometricFunctors::IIGaussianCurvature3DFunctor<Z3i::Space> MyIICurvatureFunctor;
+        typedef IntegralInvariantCovarianceEstimator<Z3i::KSpace, ImagePredicate, MyIICurvatureFunctor> MyIIEstimator;
 
-        MyIIGaussianCurvatureFunctor functor;
+        MyIICurvatureFunctor functor;
         functor.init( h, re_convolution_kernel );
 
-        MyIIGaussianEstimator estimator( functor );
+        MyIIEstimator estimator( functor );
+        estimator.attach( K, predicate );
+        estimator.setParams( re_convolution_kernel/h );
+        estimator.init( h, abegin, aend );
+
+        estimator.eval( abegin, aend, resultsIterator );
+      }
+      else if ( ( mode.compare("k1") == 0 ) )
+      {
+        typedef functors::IIGeometricFunctors::IIFirstPrincipalCurvature3DFunctor<Z3i::Space> MyIICurvatureFunctor;
+        typedef IntegralInvariantCovarianceEstimator<Z3i::KSpace, ImagePredicate, MyIICurvatureFunctor> MyIIEstimator;
+
+        MyIICurvatureFunctor functor;
+        functor.init( h, re_convolution_kernel );
+
+        MyIIEstimator estimator( functor );
+        estimator.attach( K, predicate );
+        estimator.setParams( re_convolution_kernel/h );
+        estimator.init( h, abegin, aend );
+
+        estimator.eval( abegin, aend, resultsIterator );
+      }
+      else if ( ( mode.compare("k2") == 0 ) )
+      {
+        typedef functors::IIGeometricFunctors::IISecondPrincipalCurvature3DFunctor<Z3i::Space> MyIICurvatureFunctor;
+        typedef IntegralInvariantCovarianceEstimator<Z3i::KSpace, ImagePredicate, MyIICurvatureFunctor> MyIIEstimator;
+
+        MyIICurvatureFunctor functor;
+        functor.init( h, re_convolution_kernel );
+
+        MyIIEstimator estimator( functor );
         estimator.attach( K, predicate );
         estimator.setParams( re_convolution_kernel/h );
         estimator.init( h, abegin, aend );
@@ -315,8 +347,8 @@ int main( int argc, char** argv )
 
       for ( unsigned int i = 0; i < results.size(); ++i )
       {
-        viewer << CustomColors3D( Color::Black, cmap_grad( results[ i ] ))
-        << *abegin2;
+        viewer.setFillColor(cmap_grad( results[ i ] ));
+        viewer << *abegin2;
 
         if (myexport)
         {
@@ -330,7 +362,7 @@ int main( int argc, char** argv )
     {
       typedef Z3i::Space::RealVector Quantity;
       std::vector< Quantity > results;
-      back_insert_iterator< std::vector< Quantity > > resultsIterator( results ); // output iterator for results of Integral Invariante curvature computation
+      back_insert_iterator< std::vector< Quantity > > resultsIterator( results );
 
       if( mode.compare("prindir1") == 0 )
       {
@@ -379,9 +411,8 @@ int main( int argc, char** argv )
         }
 
         Cell unsignedSurfel = K.uCell( K.sKCoords(*abegin2) );
-        viewer << CustomColors3D( DGtal::Color(255,255,255,255),
-          DGtal::Color(255,255,255,255))
-        << unsignedSurfel;
+        viewer.setFillColor(DGtal::Color(255,255,255,255));
+        viewer << unsignedSurfel;
         if (myexport)
         {
           board << CustomColors3D( DGtal::Color(255,255,255,255),

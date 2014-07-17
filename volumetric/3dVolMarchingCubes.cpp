@@ -21,7 +21,7 @@
 #include <DGtal/kernel/sets/SetPredicate.h>
 #include <DGtal/io/readers/VolReader.h>
 #include <DGtal/images/ImageSelector.h>
-#include <DGtal/images/imagesSetsUtils/SimpleThresholdForegroundPredicate.h>
+#include <DGtal/images/SimpleThresholdForegroundPredicate.h>
 #include <DGtal/images/ImageLinearCellEmbedder.h>
 #include <DGtal/shapes/Shapes.h>
 #include <DGtal/kernel/CanonicEmbedder.h>
