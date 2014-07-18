@@ -105,6 +105,7 @@ int main( int argc, char** argv )
   ("threshold,t",  po::value< unsigned int >()->default_value(8), "Min size of SCell boundary of an object" )
   ("mode,m", po::value< std::string >()->default_value("mean"), "type of output : mean, gaussian, k1, k2, prindir1 or prindir2 (default mean)")
   ("export,e", po::value< std::string >(), "Export the scene to specified OBJ filename." )
+  ("imageScale,s", po::value<std::vector<double> >()->multitoken(), "scaleX, scaleY, scaleZ: re sample the source image according with a grid of size 1.0/scale (usefull to compute curvature on image defined on anisotropic grid). Set by default to 1.0 for the three axis.  ")
   ("normalization,n", "When exporting to OBJ, performs a normalization so that the geometry fits in [-1/2,1/2]^3") ;
 
   bool parseOK = true;
@@ -181,11 +182,36 @@ int main( int argc, char** argv )
   
   double re_convolution_kernel = vm["radius"].as< double >();
 
+
+  std::vector<  double > aGridSizeReSample;
+  if(vm.count("imageScale")){
+    std::vector< double> vectScale = vm["imageScale"].as<std::vector<double > >();
+    if(vectScale.size()!=3){
+      trace.error() << "The grid size should contains 3 elements" << std::endl;
+      return 0;
+    }else{
+      aGridSizeReSample.push_back(1.0/vectScale.at(0));
+      aGridSizeReSample.push_back(1.0/vectScale.at(1));
+      aGridSizeReSample.push_back(1.0/vectScale.at(2));
+    }
+  }else{
+    aGridSizeReSample.push_back(1.0);
+    aGridSizeReSample.push_back(1.0);
+    aGridSizeReSample.push_back(1.0);
+  }
+
+
+
   // Construction of the shape from vol file
   typedef Z3i::Space::RealPoint RealPoint;
   typedef Z3i::Point Point;
   typedef ImageSelector< Z3i::Domain, bool>::Type Image;
-  typedef SimpleThresholdForegroundPredicate< Image > ImagePredicate;
+  typedef DGtal::functors::BasicDomainSubSampler< HyperRectDomain<SpaceND<3, int> >,  
+                                                  DGtal::int32_t, double >   ReSampler; 
+  typedef DGtal::ConstImageAdapter<Image, Image::Domain, ReSampler,
+				   Image::Value,  DGtal::functors::Identity >  SamplerImageAdapter;
+  typedef SimpleThresholdForegroundPredicate< SamplerImageAdapter > ImagePredicate;
+  typedef BinaryPointPredicate<DomainPredicate<Image::Domain>, ImagePredicate, DGtal::AndBoolFct2  > Predicate;
   typedef Z3i::KSpace KSpace;
   typedef KSpace::SCell SCell;
   typedef KSpace::Cell Cell;
@@ -193,10 +219,24 @@ int main( int argc, char** argv )
 
   std::string filename = vm["input-file"].as< std::string >();
   Image image = VolReader<Image>::importVol( filename );
-  ImagePredicate predicate = ImagePredicate( image, 0 );
-  Z3i::Domain domain = image.domain();
+  
+  PointVector<3,int> shiftVector3D(0 ,0, 0);      
+  DGtal::functors::BasicDomainSubSampler< HyperRectDomain<SpaceND<3, int> >,  
+                                          DGtal::int32_t, double > reSampler(image.domain(),
+                                                                             aGridSizeReSample,  shiftVector3D);  
+  SamplerImageAdapter sampledImage (image, reSampler.getSubSampledDomain(), reSampler, functors::Identity());
+  ImagePredicate predicateIMG = ImagePredicate( sampledImage, 0 );
+  DomainPredicate<Z3i::Domain> domainPredicate( sampledImage.domain() );
+  DGtal::AndBoolFct2 andF;
+  //BoolFunction2 boolFct = AndBoolFct2();
+  
+  Predicate predicate(domainPredicate, predicateIMG, andF  ); 
+
+
+  Z3i::Domain domain =  sampledImage.domain();
   Z3i::KSpace K;
-  bool space_ok = K.init( domain.lowerBound(), domain.upperBound(), true );
+  bool space_ok = K.init( domain.lowerBound()-Z3i::Domain::Point::diagonal(),
+                          domain.upperBound()+Z3i::Domain::Point::diagonal(), true );
   if (!space_ok)
   {
     trace.error() << "Error in the Khalimsky space construction."<<std::endl;
@@ -258,7 +298,7 @@ int main( int argc, char** argv )
       if ( ( mode.compare("mean") == 0 ) )
       {
         typedef functors::IIGeometricFunctors::IIMeanCurvature3DFunctor<Z3i::Space> MyIICurvatureFunctor;
-        typedef IntegralInvariantVolumeEstimator<Z3i::KSpace, ImagePredicate, MyIICurvatureFunctor> MyIIEstimator;
+        typedef IntegralInvariantVolumeEstimator<Z3i::KSpace, Predicate, MyIICurvatureFunctor> MyIIEstimator;
 
         MyIICurvatureFunctor functor;
         functor.init( h, re_convolution_kernel );
@@ -273,7 +313,7 @@ int main( int argc, char** argv )
       else if ( ( mode.compare("gaussian") == 0 ) )
       {
         typedef functors::IIGeometricFunctors::IIGaussianCurvature3DFunctor<Z3i::Space> MyIICurvatureFunctor;
-        typedef IntegralInvariantCovarianceEstimator<Z3i::KSpace, ImagePredicate, MyIICurvatureFunctor> MyIIEstimator;
+        typedef IntegralInvariantCovarianceEstimator<Z3i::KSpace, Predicate, MyIICurvatureFunctor> MyIIEstimator;
 
         MyIICurvatureFunctor functor;
         functor.init( h, re_convolution_kernel );
@@ -288,7 +328,7 @@ int main( int argc, char** argv )
       else if ( ( mode.compare("k1") == 0 ) )
       {
         typedef functors::IIGeometricFunctors::IIFirstPrincipalCurvature3DFunctor<Z3i::Space> MyIICurvatureFunctor;
-        typedef IntegralInvariantCovarianceEstimator<Z3i::KSpace, ImagePredicate, MyIICurvatureFunctor> MyIIEstimator;
+        typedef IntegralInvariantCovarianceEstimator<Z3i::KSpace, Predicate, MyIICurvatureFunctor> MyIIEstimator;
 
         MyIICurvatureFunctor functor;
         functor.init( h, re_convolution_kernel );
@@ -303,7 +343,7 @@ int main( int argc, char** argv )
       else if ( ( mode.compare("k2") == 0 ) )
       {
         typedef functors::IIGeometricFunctors::IISecondPrincipalCurvature3DFunctor<Z3i::Space> MyIICurvatureFunctor;
-        typedef IntegralInvariantCovarianceEstimator<Z3i::KSpace, ImagePredicate, MyIICurvatureFunctor> MyIIEstimator;
+        typedef IntegralInvariantCovarianceEstimator<Z3i::KSpace, Predicate, MyIICurvatureFunctor> MyIIEstimator;
 
         MyIICurvatureFunctor functor;
         functor.init( h, re_convolution_kernel );
@@ -367,7 +407,7 @@ int main( int argc, char** argv )
       if( mode.compare("prindir1") == 0 )
       {
         typedef functors::IIGeometricFunctors::IIFirstPrincipalDirectionFunctor<Z3i::Space> MyIICurvatureFunctor;
-        typedef IntegralInvariantCovarianceEstimator<Z3i::KSpace, ImagePredicate, MyIICurvatureFunctor> MyIIEstimator;
+        typedef IntegralInvariantCovarianceEstimator<Z3i::KSpace, Predicate, MyIICurvatureFunctor> MyIIEstimator;
 
         MyIICurvatureFunctor functor;
         functor.init( h, re_convolution_kernel );
@@ -382,7 +422,7 @@ int main( int argc, char** argv )
       else if( mode.compare("prindir2") == 0 )
       {
         typedef functors::IIGeometricFunctors::IISecondPrincipalDirectionFunctor<Z3i::Space> MyIICurvatureFunctor;
-        typedef IntegralInvariantCovarianceEstimator<Z3i::KSpace, ImagePredicate, MyIICurvatureFunctor> MyIIEstimator;
+        typedef IntegralInvariantCovarianceEstimator<Z3i::KSpace, Predicate, MyIICurvatureFunctor> MyIIEstimator;
 
         MyIICurvatureFunctor functor;
         functor.init( h, re_convolution_kernel );
