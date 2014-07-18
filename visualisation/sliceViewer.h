@@ -14,7 +14,7 @@
  *
  **/
 /**
- * @file 2d3dImageViewer.h
+ * @file sliceViewer.h
  * @author Bertrand Kerautret (\c kerautre@loria.fr )
  * LORIA (CNRS, UMR 7503), University of Nancy, France
  *

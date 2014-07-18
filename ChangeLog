@@ -6,6 +6,7 @@
 	- 3dVolMarchingCubes: speed-up by factor 10 simply by replacing the set predicate used in computations.
 	- 3dSDPViewer: basic display of a sequence of 3d points (as voxel or sphere) and vectors by using QGLviewer.
 	- 3dCurvatureViewer: can now display curvature on multiple connected components.
+	- sliceViewer: a new 2D and 3D slice viewer from 3D volumic files ( pgm3d, vol, longvol, and DICOM with ITK).
 
 * converters/:
 	- volBoundary2obj: a simple tool to export the boundary of a an	object in a volumetric file to OBJ

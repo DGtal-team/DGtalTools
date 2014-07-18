@@ -14,7 +14,7 @@
  *
  **/
 /**
- * @file 2d3dImageViewer.cpp
+ * @file sliceViewer.cpp
  * @author Bertrand Kerautret (\c kerautre@loria.fr )
  * LORIA (CNRS, UMR 7503), University of Nancy, France
  *
@@ -42,8 +42,8 @@
 
 #include "DGtal/io/Color.h"
 #include "DGtal/io/colormaps/GradientColorMap.h"
-#include "2d3dImageViewer.h"
-#include "ui_2d3dImageViewer.h"
+#include "sliceViewer.h"
+#include "ui_sliceViewer.h"
 
 
 #include <boost/program_options/options_description.hpp>
