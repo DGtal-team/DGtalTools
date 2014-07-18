@@ -302,7 +302,7 @@ int main( int argc, char** argv )
   QApplication application(argc,argv);
   Viewer3D<> *viewer = new Viewer3D<>();
   MainWindow w(viewer, &image, 0,0);
-  w.setWindowTitle ( QString("2d3DImageViewer"));
+  w.setWindowTitle ( QString("sliceViewer"));
   w.updateSliceImageX(0, true);
   w.updateSliceImageY(0, true);
   w.updateSliceImageZ(0, true);
