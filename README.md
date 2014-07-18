@@ -157,7 +157,7 @@ Here are some illustrations of such a tools:
 <tr>
 <td><img height=130 src="https://f.cloud.github.com/assets/772865/684622/d698405a-da00-11e2-8aa0-19212a58ce23.png"></td>
 <td><img height=130 src="https://cloud.githubusercontent.com/assets/772865/2720141/6c42a0e0-c56b-11e3-8328-a6d88242f21e.png"> </td>
-<td><img height=130 src="https://cloud.githubusercontent.com/assets/772865/3623729/f022a524-0e52-11e4-96cb-f619f26f83e0.png"></td>
+<td><img height=130 height=200 src="https://cloud.githubusercontent.com/assets/772865/3623729/f022a524-0e52-11e4-96cb-f619f26f83e0.png"></td>
 </tr>
 <tr>
 <td>meshViewer</td>
