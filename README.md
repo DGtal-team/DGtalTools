@@ -146,7 +146,6 @@ Here are some illustrations of such a tools:
 <td><img height=130 src="https://f.cloud.github.com/assets/772865/684569/59a2f6fa-d9fe-11e2-84ba-a48842f4aafb.png" ></td>
 <td><img height=130 src="https://f.cloud.github.com/assets/772865/684590/778bea9a-d9ff-11e2-8e04-6e3e8a39ae3c.png"></td>
 <td><img height=130 src="https://f.cloud.github.com/assets/772865/684598/c3adcf4c-d9ff-11e2-8c3f-e67c8abd0c76.png"></td>
-<td><img height=130 src="https://cloud.githubusercontent.com/assets/772865/3623729/f022a524-0e52-11e4-96cb-f619f26f83e0.png"></td>
 </tr>
 <tr>
 <td>3dCurvatureViewer</td>
@@ -154,16 +153,16 @@ Here are some illustrations of such a tools:
 <td>3dImageViewer</td>
 <td>3dVolViewer</td>
 <td>displayContours</td>
-<td>sliceViewer</td>
 </tr>
 <tr>
 <td><img height=130 src="https://f.cloud.github.com/assets/772865/684622/d698405a-da00-11e2-8aa0-19212a58ce23.png"></td>
 <td><img height=130 src="https://cloud.githubusercontent.com/assets/772865/2720141/6c42a0e0-c56b-11e3-8328-a6d88242f21e.png"> </td>
+<td><img height=130 src="https://cloud.githubusercontent.com/assets/772865/3623729/f022a524-0e52-11e4-96cb-f619f26f83e0.png"></td>
 </tr>
 <tr>
 <td>meshViewer</td>
 <td>3dSDPViewer</td>
-
+<td>sliceViewer</td>
 </tr>
 
 
