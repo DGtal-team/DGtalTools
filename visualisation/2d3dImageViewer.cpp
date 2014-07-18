@@ -90,7 +90,8 @@ MainWindow::MainWindow(DGtal::Viewer3D<> *aViewer,
 {
 
     ui->setupUi(this);
-    ui->gridLayout->addWidget(aViewer);
+    ui->verticalLayout_5->addWidget(aViewer);
+
     QObject::connect(ui->_horizontalSliderX, SIGNAL(valueChanged(int)), this, SLOT(updateSliceImageX()));
     QObject::connect(ui->_horizontalSliderY, SIGNAL(valueChanged(int)), this, SLOT(updateSliceImageY()));
     QObject::connect(ui->_horizontalSliderZ, SIGNAL(valueChanged(int)), this, SLOT(updateSliceImageZ()));
@@ -103,6 +104,7 @@ MainWindow::MainWindow(DGtal::Viewer3D<> *aViewer,
 
     ui->_horizontalSliderX->setMinimum(0);
     ui->_horizontalSliderX->setMaximum(anImage->domain().upperBound()[0]);
+    
 }
 
 MainWindow::~MainWindow()
