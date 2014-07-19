@@ -61,7 +61,7 @@ int main( int argc, char** argv )
   po::options_description general_opt("Allowed options are: ");
   general_opt.add_options()
     ("help,h", "display this message")  
-    ("FreemanChain,f", po::value<std::string>(), "FreemanChain file name")
+    ("input,i", po::value<std::string>(), "the input FreemanChain file name")
     ("output,o", po::value<std::string>()->default_value("result.pgm"), " the output filename")
     ("space,s", po::value<std::vector <int> >()->multitoken(), "Define the space from its bounding box (lower and upper coordinates) \
 else the space is automatically defined from the freemanchain bounding boxes.");
@@ -98,7 +98,7 @@ else the space is automatically defined from the freemanchain bounding boxes.");
     }  
   
   if( vm.count("FreemanChain") ){
-    std::string fileName = vm["FreemanChain"].as<std::string>();
+    std::string fileName = vm["input"].as<std::string>();
     std::vector< FreemanChain > vectFcs =  PointListReader< Z2i::Point >::getFreemanChainsFromFile<Z2i::Integer> (fileName);    
     int minx, miny, maxx, maxy;
     if(!vm.count("space")){

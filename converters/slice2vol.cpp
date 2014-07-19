@@ -59,7 +59,7 @@ int main( int argc, char** argv )
   general_opt.add_options()
     ("help,h", "display this message")
     ("sliceOrientation,s", po::value<unsigned int>()->default_value(2), "specify the slice orientation for which the slice are considered (by default =2 (Z direction))" )
-    ("input-files,i", po::value<std::vector <std::string> >()->multitoken(), "input 2D files (.pgm) " )
+    ("input,i", po::value<std::vector <std::string> >()->multitoken(), "input 2D files (.pgm) " )
     ("output,o", po::value<std::string>(), "volumetric file (.vol, .longvol .pgm3d) " );
   
   
@@ -95,7 +95,7 @@ int main( int argc, char** argv )
 
 
   std::string outputFileName = vm["output"].as<std::string>();
-  std::vector<string> vectImage2DNames = vm["input-files"].as<std::vector<std::string> >();
+  std::vector<string> vectImage2DNames = vm["input"].as<std::vector<std::string> >();
   unsigned int sliceOrientation = vm["sliceOrientation"].as<unsigned int>();
   std::vector<Image2D> vectImages2D; 
   // Reading all images

@@ -53,7 +53,7 @@ int main( int argc, char** argv )
   po::options_description general_opt("Allowed options are: ");
   general_opt.add_options()
     ("help,h", "display this message")
-    ("sdp,s", po::value<std::string>(), "Sequence of 3d Discrete points (.sdp) " )
+    ("input,i", po::value<std::string>(), "Sequence of 3d Discrete points (.sdp) " )
     ("output,o", po::value<std::string>(), "Vol file  (.vol, .longvol, .pgm3d) " )
     ("foregroundVal,f", po::value<int>()->default_value(128), "value which will represent the foreground object in the resulting image (default 128)")
     ("invertY", "Invert the Y axis (image flip in the y direction)")
@@ -89,7 +89,7 @@ int main( int argc, char** argv )
   Z3i::Point ptUpper(domainCoords[3],domainCoords[4], domainCoords[5]);
   Image3D::Domain imageDomain(ptLower, ptUpper);
   
-  string inputSDP = vm["sdp"].as<std::string>();
+  string inputSDP = vm["input"].as<std::string>();
   string outputFilename = vm["output"].as<std::string>();
   int foregroundVal = vm["foregroundVal"].as<int>();
   int backgroundVal = vm["backgroundVal"].as<int>();
