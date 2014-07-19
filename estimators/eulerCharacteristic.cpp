@@ -33,7 +33,7 @@
 #include <boost/program_options/parsers.hpp>
 #include <boost/program_options/variables_map.hpp>
 #include <DGtal/images/ImageContainerBySTLVector.h>
-#include <DGtal/images/imagesSetsUtils/IntervalForegroundPredicate.h>
+#include <DGtal/images/IntervalForegroundPredicate.h>
 
 using namespace std;
 using namespace DGtal;

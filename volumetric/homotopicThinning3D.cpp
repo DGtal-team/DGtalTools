@@ -39,7 +39,7 @@
 
 #include "DGtal/io/readers/GenericReader.h"
 #include "DGtal/images/imagesSetsUtils/SetFromImage.h"
-#include "DGtal/images/imagesSetsUtils/SimpleThresholdForegroundPredicate.h"
+#include "DGtal/images/SimpleThresholdForegroundPredicate.h"
 #include "DGtal/images/ImageSelector.h"
 
 #include <boost/program_options/options_description.hpp>

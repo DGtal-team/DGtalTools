@@ -60,7 +60,7 @@
 #include "DGtal/shapes/ShapeGeometricFunctors.h"
 #include "DGtal/shapes/implicit/ImplicitPolynomial3Shape.h"
 #include "DGtal/images/ImageContainerBySTLVector.h"
-#include "DGtal/images/imagesSetsUtils/SimpleThresholdForegroundPredicate.h"
+#include "DGtal/images/SimpleThresholdForegroundPredicate.h"
 #include "DGtal/io/readers/MPolynomialReader.h"
 #include "DGtal/io/colormaps/GradientColorMap.h"
 #ifdef WITH_VISU3D_QGLVIEWER
@@ -395,7 +395,7 @@ void chooseEstimator
       typedef ExactPredicateLpSeparableMetric<Space,2> Metric;
       typedef VoronoiCovarianceMeasureOnDigitalSurface<SurfaceContainer,Metric,
                                                        KernelFunction> VCMOnSurface;
-      typedef VCMGeometricFunctors::VCMNormalVectorFunctor<VCMOnSurface> NormalFunctor;
+      typedef functors::VCMGeometricFunctors::VCMNormalVectorFunctor<VCMOnSurface> NormalFunctor;
       typedef VCMDigitalSurfaceLocalEstimator<SurfaceContainer,Metric,
                                               KernelFunction, NormalFunctor> VCMNormalEstimator;
       int embedding = vm["embedding"].as<int>();
@@ -423,7 +423,7 @@ void chooseEstimator
       typedef ImageContainerBySTLVector< Domain, bool> Image;
       typedef typename Domain::ConstIterator DomainConstIterator;
       typedef SimpleThresholdForegroundPredicate<Image> ThresholdedImage;
-      typedef IIGeometricFunctors::IINormalDirectionFunctor<Space> IINormalFunctor;
+      typedef functors::IIGeometricFunctors::IINormalDirectionFunctor<Space> IINormalFunctor;
       typedef IntegralInvariantCovarianceEstimator<KSpace, ThresholdedImage, IINormalFunctor> IINormalEstimator;
       double r = vm["r-radius"].as<double>();
       double alpha = vm["alpha"].as<double>();

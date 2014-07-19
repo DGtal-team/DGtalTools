@@ -61,8 +61,9 @@
 #include "DGtal/geometry/surfaces/FunctorOnCells.h"
 
 #include "DGtal/geometry/curves/estimation/TrueLocalEstimatorOnPoints.h"
-#include "DGtal/geometry/surfaces/estimation/IntegralInvariantMeanCurvatureEstimator.h"
-#include "DGtal/geometry/surfaces/estimation/IntegralInvariantGaussianCurvatureEstimator.h"
+#include "DGtal/geometry/surfaces/estimation/IIGeometricFunctors.h"
+#include "DGtal/geometry/surfaces/estimation/IntegralInvariantVolumeEstimator.h"
+#include "DGtal/geometry/surfaces/estimation/IntegralInvariantCovarianceEstimator.h"
 
 #include "DGtal/geometry/surfaces/estimation/LocalEstimatorFromSurfelFunctorAdapter.h"
 #include "DGtal/geometry/surfaces/estimation/estimationFunctors/MongeJetFittingMeanCurvatureEstimator.h"
@@ -193,8 +194,8 @@ compareShapeEstimators( const std::string & filename,
             typedef GraphVisitorRange< Visitor > VisitorRange;
             typedef typename VisitorRange::ConstIterator VisitorConstIterator;
 
-            typedef PointFunctorFromPointPredicateAndDomain< KanungoPredicate, Z3i::Domain, unsigned int > MyPointFunctor;
-            typedef FunctorOnCells< MyPointFunctor, KSpace > MySpelFunctor;
+            // typedef PointFunctorFromPointPredicateAndDomain< KanungoPredicate, Z3i::Domain, unsigned int > MyPointFunctor;
+            // typedef FunctorOnCells< MyPointFunctor, KSpace > MySpelFunctor;
 
             // Extracts shape boundary
             KanungoPredicate * noisifiedObject = new KanungoPredicate( *dshape, dshape->getDomain(), noiseLevel );
@@ -345,44 +346,48 @@ compareShapeEstimators( const std::string & filename,
                 }
             }
 
-            double re_convolution_kernel = radius_kernel * std::pow( h, alpha ); // to obtains convergence results, re must follow the rule re=kh^(1/3)
+            double re = radius_kernel * std::pow( h, alpha ); // to obtains convergence results, re must follow the rule re=kh^(1/3)
 
             // II
             if( options.at( 1 ) != '0' )
             {
-                MyPointFunctor * pointFunctor = new MyPointFunctor( noisifiedObject, dshape->getDomain(), 1, 0 );
-                MySpelFunctor * functor = new MySpelFunctor( *pointFunctor, K );
-
                 // Integral Invariant Mean Curvature
                 if( properties.at( 0 ) != '0' )
                 {
                     trace.beginBlock( "II mean curvature" );
-
-                    deprecated::IntegralInvariantMeanCurvatureEstimator< KSpace, MySpelFunctor > * IIMeanCurvatureEstimator = new deprecated::IntegralInvariantMeanCurvatureEstimator< KSpace, MySpelFunctor >( K, *functor );
-
-                    c.startClock();
-                    IIMeanCurvatureEstimator->init ( h, re_convolution_kernel );
 
                     char full_filename[360];
                     sprintf( full_filename, "%s%s", filename.c_str(), "_II_mean.dat" );
                     std::ofstream file( full_filename );
                     file << "# h = " << h << std::endl;
                     file << "# Mean Curvature estimation from the Integral Invariant" << std::endl;
-                    file << "# computed kernel radius = " << re_convolution_kernel << std::endl;
+                    file << "# computed kernel radius = " << re << std::endl;
 
                     range = new VisitorRange( new Visitor( surf, *surf.begin() ));
                     ibegin = range->begin();
                     iend = range->end();
 
+                    c.startClock();
+
+                    typedef functors::IIGeometricFunctors::IIMeanCurvature3DFunctor<Z3i::Space> MyIICurvatureFunctor;
+                    typedef IntegralInvariantVolumeEstimator< KSpace, KanungoPredicate, MyIICurvatureFunctor > MyIICurvatureEstimator;
+
+                    MyIICurvatureFunctor curvatureFunctor;
+                    curvatureFunctor.init( h, re );
+
+                    MyIICurvatureEstimator curvatureEstimator( curvatureFunctor );
+                    curvatureEstimator.attach( K, *noisifiedObject );
+                    curvatureEstimator.setParams( re/h );
+                    curvatureEstimator.init( h, ibegin, iend );
+
                     std::ostream_iterator< double > out_it_ii_mean( file, "\n" );
-                    IIMeanCurvatureEstimator->eval( ibegin, iend, out_it_ii_mean );
+                    curvatureEstimator.eval( ibegin, iend, out_it_ii_mean );
 
                     double TIIMeanCurv = c.stopClock();
                     file << "# time = " << TIIMeanCurv << std::endl;
                     file.close();
-
+                    
                     delete range;
-                    delete IIMeanCurvatureEstimator;
 
                     trace.endBlock();
                 }
@@ -392,32 +397,38 @@ compareShapeEstimators( const std::string & filename,
                 {
                     trace.beginBlock( "II Gaussian curvature" );
 
-                    deprecated::IntegralInvariantGaussianCurvatureEstimator< KSpace, MySpelFunctor > * IIGaussianCurvatureEstimator = new deprecated::IntegralInvariantGaussianCurvatureEstimator< KSpace, MySpelFunctor >( K, *functor );
-
-                    c.startClock();
-                    IIGaussianCurvatureEstimator->init( h, re_convolution_kernel );
-
                     char full_filename[360];
                     sprintf( full_filename, "%s%s", filename.c_str(), "_II_gaussian.dat" );
                     std::ofstream file( full_filename );
                     file << "# h = " << h << std::endl;
                     file << "# Gaussian Curvature estimation from the Integral Invariant" << std::endl;
-                    file << "# computed kernel radius = " << re_convolution_kernel << std::endl;
-
-                    std::ostream_iterator< double > out_it_ii_gaussian( file, "\n" );
+                    file << "# computed kernel radius = " << re << std::endl;
 
                     range = new VisitorRange( new Visitor( surf, *surf.begin() ));
                     ibegin = range->begin();
                     iend = range->end();
 
-                    IIGaussianCurvatureEstimator->eval ( ibegin, iend, out_it_ii_gaussian );
+                    c.startClock();
+
+                    typedef functors::IIGeometricFunctors::IIGaussianCurvature3DFunctor<Z3i::Space> MyIICurvatureFunctor;
+                    typedef IntegralInvariantCovarianceEstimator< KSpace, KanungoPredicate, MyIICurvatureFunctor > MyIICurvatureEstimator;
+
+                    MyIICurvatureFunctor curvatureFunctor;
+                    curvatureFunctor.init( h, re );
+
+                    MyIICurvatureEstimator curvatureEstimator( curvatureFunctor );
+                    curvatureEstimator.attach( K, *noisifiedObject );
+                    curvatureEstimator.setParams( re/h );
+                    curvatureEstimator.init( h, ibegin, iend );
+
+                    std::ostream_iterator< double > out_it_ii_gaussian( file, "\n" );
+                    curvatureEstimator.eval( ibegin, iend, out_it_ii_gaussian );
 
                     double TIIGaussCurv = c.stopClock();
                     file << "# time = " << TIIGaussCurv << std::endl;
                     file.close();
 
                     delete range;
-                    delete IIGaussianCurvatureEstimator;
 
                     trace.endBlock();
                 }
@@ -427,33 +438,40 @@ compareShapeEstimators( const std::string & filename,
                 {
                     trace.beginBlock( "II Principal curvatures" );
 
-                    deprecated::IntegralInvariantGaussianCurvatureEstimator< KSpace, MySpelFunctor > * IIGaussianCurvatureEstimator = new deprecated::IntegralInvariantGaussianCurvatureEstimator< KSpace, MySpelFunctor >( K, *functor );
-
-                    c.startClock();
-                    IIGaussianCurvatureEstimator->init( h, re_convolution_kernel );
-
                     char full_filename[360];
                     sprintf( full_filename, "%s%s", filename.c_str(), "_II_principal.dat" );
                     std::ofstream file( full_filename );
                     file << "# h = " << h << std::endl;
                     file << "# Gaussian Curvature estimation from the Integral Invariant" << std::endl;
-                    file << "# computed kernel radius = " << re_convolution_kernel << std::endl;
-
-                    std::ostream_iterator< std::string > out_it_ii_principal( file, "\n" );
-
-                    std::vector<deprecated::CurvatureInformations> v_results;
-                    std::back_insert_iterator< std::vector<deprecated::CurvatureInformations> > bkIt(v_results);
+                    file << "# computed kernel radius = " << re << std::endl;
 
                     range = new VisitorRange( new Visitor( surf, *surf.begin() ));
                     ibegin = range->begin();
                     iend = range->end();
 
-                    IIGaussianCurvatureEstimator->evalPrincipalCurvatures ( ibegin, iend, bkIt );//out_it_ii_principal );
+                    c.startClock();
 
-                    for(unsigned int ii = 0; ii < v_results.size(); ++ii )
+                    typedef functors::IIGeometricFunctors::IIPrincipalCurvatures3DFunctor<Z3i::Space> MyIICurvatureFunctor;
+                    typedef IntegralInvariantCovarianceEstimator< KSpace, KanungoPredicate, MyIICurvatureFunctor > MyIICurvatureEstimator;
+
+                    MyIICurvatureFunctor curvatureFunctor;
+                    curvatureFunctor.init( h, re );
+
+                    MyIICurvatureEstimator curvatureEstimator( curvatureFunctor );
+                    curvatureEstimator.attach( K, *noisifiedObject );
+                    curvatureEstimator.setParams( re/h );
+                    curvatureEstimator.init( h, ibegin, iend );
+
+                    std::vector<std::pair<double,double> > v_results;
+                    std::back_insert_iterator< std::vector<std::pair<double,double> > > bkIt(v_results);
+
+                    curvatureEstimator.eval( ibegin, iend, bkIt );
+
+                    std::ostream_iterator< std::string > out_it_ii_principal( file, "\n" );
+                    for( unsigned int ii = 0; ii < v_results.size(); ++ii )
                     {
                         std::stringstream ss;
-                        ss << v_results[ii].k1 << " " << v_results[ii].k2;
+                        ss << v_results[ii].first << " " << v_results[ii].second;
                         *out_it_ii_principal = ss.str();
                         ++out_it_ii_principal;
                     }
@@ -463,14 +481,9 @@ compareShapeEstimators( const std::string & filename,
                     file.close();
 
                     delete range;
-                    delete IIGaussianCurvatureEstimator;
 
                     trace.endBlock();
                 }
-                //delete noisifiedObject;
-                delete boundary;
-                delete pointFunctor;
-                delete functor;
             }
 
             // Monge
@@ -482,21 +495,21 @@ compareShapeEstimators( const std::string & filename,
                     trace.beginBlock( "Monge mean curvature" );
 
                     typedef MongeJetFittingMeanCurvatureEstimator<Surfel, CanonicSCellEmbedder<KSpace> > FunctorMean;
-                    typedef ConstValueFunctor< double > ConvFunctor;
+                    typedef functors::ConstValue< double > ConvFunctor;
                     typedef LocalEstimatorFromSurfelFunctorAdapter<typename MyDigitalSurface::DigitalSurfaceContainer, Z3i::L2Metric, FunctorMean, ConvFunctor> ReporterH;
                     CanonicSCellEmbedder<KSpace> embedder( K );
                     FunctorMean estimatorH( embedder, h );
                     ConvFunctor convFunc(1.0);
                     ReporterH reporterH( surf, Z3i::l2Metric, estimatorH, convFunc);
                     c.startClock();
-                    reporterH.init( h , re_convolution_kernel / h  );
+                    reporterH.init( h , re / h  );
 
                     char full_filename[360];
                     sprintf( full_filename, "%s%s", filename.c_str(), "_MongeJetFitting_mean.dat" );
                     std::ofstream file( full_filename );
                     file << "# h = " << h << std::endl;
                     file << "# Mean Curvature estimation from CGAL Monge from and Jet Fitting" << std::endl;
-                    file << "# computed kernel radius = " << re_convolution_kernel << std::endl;
+                    file << "# computed kernel radius = " << re << std::endl;
                     std::ostream_iterator< double > out_it_monge_mean( file, "\n" );
 
                     range = new VisitorRange( new Visitor( surf, *surf.begin() ));
@@ -520,14 +533,14 @@ compareShapeEstimators( const std::string & filename,
                     trace.beginBlock( "Monge Gaussian curvature" );
 
                     typedef MongeJetFittingGaussianCurvatureEstimator<Surfel, CanonicSCellEmbedder<KSpace> > FunctorGaussian;
-                    typedef ConstValueFunctor< double > ConvFunctor;
+                    typedef functors::ConstValue< double > ConvFunctor;
                     typedef LocalEstimatorFromSurfelFunctorAdapter<typename MyDigitalSurface::DigitalSurfaceContainer, Z3i::L2Metric, FunctorGaussian, ConvFunctor> ReporterK;
                     CanonicSCellEmbedder<KSpace> embedder( K );
                     FunctorGaussian estimatorK( embedder, h );
                     ConvFunctor convFunc(1.0);
                     ReporterK reporterK(surf, Z3i::l2Metric, estimatorK, convFunc);
                     c.startClock();
-                    reporterK.init( h , re_convolution_kernel / h  );
+                    reporterK.init( h , re / h  );
 
                     //typename ReporterK::SurfelConstIterator aaabegin = surf.begin();
                     //typename ReporterK::SurfelConstIterator aaaend = surf.end();
@@ -541,7 +554,7 @@ compareShapeEstimators( const std::string & filename,
                     std::ofstream file( full_filename );
                     file << "# h = " << h << std::endl;
                     file << "# Gaussian Curvature estimation from CGAL Monge from and Jet Fitting" << std::endl;
-                    file << "# computed kernel radius = " << re_convolution_kernel << std::endl;
+                    file << "# computed kernel radius = " << re << std::endl;
                     std::ostream_iterator< double > out_it_monge_gaussian( file, "\n" );
                     reporterK.eval(ibegin, iend , out_it_monge_gaussian);
                     double TMongeGaussCurv = c.stopClock();
@@ -559,14 +572,14 @@ compareShapeEstimators( const std::string & filename,
                     trace.beginBlock( "Monge Principal Curvature" );
 
                     typedef MongeJetFittingPrincipalCurvaturesEstimator<Surfel, CanonicSCellEmbedder<KSpace> > FunctorPrincCurv;
-                    typedef ConstValueFunctor< double > ConvFunctor;
+                    typedef functors::ConstValue< double > ConvFunctor;
                     typedef LocalEstimatorFromSurfelFunctorAdapter<typename MyDigitalSurface::DigitalSurfaceContainer, Z3i::L2Metric, FunctorPrincCurv, ConvFunctor> ReporterK;
                     CanonicSCellEmbedder<KSpace> embedder( K );
                     FunctorPrincCurv estimatorK( embedder, h );
                     ConvFunctor convFunc(1.0);
                     ReporterK reporterK(surf, Z3i::l2Metric, estimatorK, convFunc);
                     c.startClock();
-                    reporterK.init( h , re_convolution_kernel / h  );
+                    reporterK.init( h , re / h  );
 
                     range = new VisitorRange( new Visitor( surf, *surf.begin() ));
                     ibegin = range->begin();
@@ -577,7 +590,7 @@ compareShapeEstimators( const std::string & filename,
                     std::ofstream file( full_filename );
                     file << "# h = " << h << std::endl;
                     file << "# Gaussian Curvature estimation from CGAL Monge from and Jet Fitting" << std::endl;
-                    file << "# computed kernel radius = " << re_convolution_kernel << std::endl;
+                    file << "# computed kernel radius = " << re << std::endl;
                     std::ostream_iterator< std::string > out_it_monge_principal( file, "\n" );
 
                     std::vector<deprecated::CurvatureInformations> v_results;
@@ -603,7 +616,7 @@ compareShapeEstimators( const std::string & filename,
                 }
             }
         }
-        else
+        else // no noise
         {
             typedef LightImplicitDigitalSurface< KSpace, DigitalShape > Boundary;
             typedef DigitalSurface< Boundary > MyDigitalSurface;
@@ -613,8 +626,8 @@ compareShapeEstimators( const std::string & filename,
             typedef GraphVisitorRange< Visitor > VisitorRange;
             typedef typename VisitorRange::ConstIterator VisitorConstIterator;
 
-            typedef PointFunctorFromPointPredicateAndDomain< DigitalShape, Z3i::Domain, unsigned int > MyPointFunctor;
-            typedef FunctorOnCells< MyPointFunctor, KSpace > MySpelFunctor;
+            // typedef PointFunctorFromPointPredicateAndDomain< DigitalShape, Z3i::Domain, unsigned int > MyPointFunctor;
+            // typedef FunctorOnCells< MyPointFunctor, KSpace > MySpelFunctor;
 
             // Extracts shape boundary
             SCell bel = Surfaces<KSpace>::findABel ( K, *dshape, 10000 );
@@ -763,45 +776,48 @@ compareShapeEstimators( const std::string & filename,
                 }
             }
 
-            double re_convolution_kernel = radius_kernel * std::pow( h, alpha ); // to obtains convergence results, re must follow the rule re=kh^(1/3)
+            double re = radius_kernel * std::pow( h, alpha ); // to obtains convergence results, re must follow the rule re=kh^(1/3)
 
             // II
             if( options.at( 1 ) != '0' )
             {
-                MyPointFunctor * pointFunctor = new MyPointFunctor( dshape, dshape->getDomain(), 1, 0 );
-                MySpelFunctor * functor = new MySpelFunctor( *pointFunctor, K );
-
                 // Integral Invariant Mean Curvature
                 if( properties.at( 0 ) != '0' )
                 {
                     trace.beginBlock( "II mean curvature" );
-
-                    deprecated::IntegralInvariantMeanCurvatureEstimator< KSpace, MySpelFunctor > * IIMeanCurvatureEstimator = new deprecated::IntegralInvariantMeanCurvatureEstimator< KSpace, MySpelFunctor >( K, *functor );
-
-                    c.startClock();
-                    IIMeanCurvatureEstimator->init ( h, re_convolution_kernel );
 
                     char full_filename[360];
                     sprintf( full_filename, "%s%s", filename.c_str(), "_II_mean.dat" );
                     std::ofstream file( full_filename );
                     file << "# h = " << h << std::endl;
                     file << "# Mean Curvature estimation from the Integral Invariant" << std::endl;
-                    file << "# computed kernel radius = " << re_convolution_kernel << std::endl;
+                    file << "# computed kernel radius = " << re << std::endl;
 
                     range = new VisitorRange( new Visitor( surf, *surf.begin() ));
                     ibegin = range->begin();
                     iend = range->end();
 
-                    std::ostream_iterator< double > out_it_ii_mean( file, "\n" );
+                    c.startClock();
 
-                    IIMeanCurvatureEstimator->eval( ibegin, iend, out_it_ii_mean );
+                    typedef functors::IIGeometricFunctors::IIMeanCurvature3DFunctor<Z3i::Space> MyIICurvatureFunctor;
+                    typedef IntegralInvariantVolumeEstimator< KSpace, DigitalShape, MyIICurvatureFunctor > MyIICurvatureEstimator;
+
+                    MyIICurvatureFunctor curvatureFunctor;
+                    curvatureFunctor.init( h, re );
+
+                    MyIICurvatureEstimator curvatureEstimator( curvatureFunctor );
+                    curvatureEstimator.attach( K, *dshape );
+                    curvatureEstimator.setParams( re/h );
+                    curvatureEstimator.init( h, ibegin, iend );
+
+                    std::ostream_iterator< double > out_it_ii_mean( file, "\n" );
+                    curvatureEstimator.eval( ibegin, iend, out_it_ii_mean );
 
                     double TIIMeanCurv = c.stopClock();
                     file << "# time = " << TIIMeanCurv << std::endl;
                     file.close();
-
+                    
                     delete range;
-                    delete IIMeanCurvatureEstimator;
 
                     trace.endBlock();
                 }
@@ -811,32 +827,38 @@ compareShapeEstimators( const std::string & filename,
                 {
                     trace.beginBlock( "II Gaussian curvature" );
 
-                    deprecated::IntegralInvariantGaussianCurvatureEstimator< KSpace, MySpelFunctor > * IIGaussianCurvatureEstimator = new deprecated::IntegralInvariantGaussianCurvatureEstimator< KSpace, MySpelFunctor >( K, *functor );
-
-                    c.startClock();
-                    IIGaussianCurvatureEstimator->init( h, re_convolution_kernel );
-
                     char full_filename[360];
                     sprintf( full_filename, "%s%s", filename.c_str(), "_II_gaussian.dat" );
                     std::ofstream file( full_filename );
                     file << "# h = " << h << std::endl;
                     file << "# Gaussian Curvature estimation from the Integral Invariant" << std::endl;
-                    file << "# computed kernel radius = " << re_convolution_kernel << std::endl;
-
-                    std::ostream_iterator< double > out_it_ii_gaussian( file, "\n" );
+                    file << "# computed kernel radius = " << re << std::endl;
 
                     range = new VisitorRange( new Visitor( surf, *surf.begin() ));
                     ibegin = range->begin();
                     iend = range->end();
 
-                    IIGaussianCurvatureEstimator->eval ( ibegin, iend, out_it_ii_gaussian );
+                    c.startClock();
+
+                    typedef functors::IIGeometricFunctors::IIGaussianCurvature3DFunctor<Z3i::Space> MyIICurvatureFunctor;
+                    typedef IntegralInvariantCovarianceEstimator< KSpace, DigitalShape, MyIICurvatureFunctor > MyIICurvatureEstimator;
+
+                    MyIICurvatureFunctor curvatureFunctor;
+                    curvatureFunctor.init( h, re );
+
+                    MyIICurvatureEstimator curvatureEstimator( curvatureFunctor );
+                    curvatureEstimator.attach( K, *dshape );
+                    curvatureEstimator.setParams( re/h );
+                    curvatureEstimator.init( h, ibegin, iend );
+
+                    std::ostream_iterator< double > out_it_ii_gaussian( file, "\n" );
+                    curvatureEstimator.eval( ibegin, iend, out_it_ii_gaussian );
 
                     double TIIGaussCurv = c.stopClock();
                     file << "# time = " << TIIGaussCurv << std::endl;
                     file.close();
 
                     delete range;
-                    delete IIGaussianCurvatureEstimator;
 
                     trace.endBlock();
                 }
@@ -846,33 +868,40 @@ compareShapeEstimators( const std::string & filename,
                 {
                     trace.beginBlock( "II Principal curvatures" );
 
-                    deprecated::IntegralInvariantGaussianCurvatureEstimator< KSpace, MySpelFunctor > * IIGaussianCurvatureEstimator = new deprecated::IntegralInvariantGaussianCurvatureEstimator< KSpace, MySpelFunctor >( K, *functor );
-
-                    c.startClock();
-                    IIGaussianCurvatureEstimator->init( h, re_convolution_kernel );
-
                     char full_filename[360];
                     sprintf( full_filename, "%s%s", filename.c_str(), "_II_principal.dat" );
                     std::ofstream file( full_filename );
                     file << "# h = " << h << std::endl;
                     file << "# Gaussian Curvature estimation from the Integral Invariant" << std::endl;
-                    file << "# computed kernel radius = " << re_convolution_kernel << std::endl;
-
-                    std::ostream_iterator< std::string > out_it_ii_principal( file, "\n" );
-
-                    std::vector<deprecated::CurvatureInformations> v_results;
-                    std::back_insert_iterator< std::vector<deprecated::CurvatureInformations> > bkIt(v_results);
+                    file << "# computed kernel radius = " << re << std::endl;
 
                     range = new VisitorRange( new Visitor( surf, *surf.begin() ));
                     ibegin = range->begin();
                     iend = range->end();
 
-                    IIGaussianCurvatureEstimator->evalPrincipalCurvatures ( ibegin, iend, bkIt );// out_it_ii_principal );
+                    c.startClock();
 
-                    for(unsigned int ii = 0; ii < v_results.size(); ++ii )
+                    typedef functors::IIGeometricFunctors::IIPrincipalCurvatures3DFunctor<Z3i::Space> MyIICurvatureFunctor;
+                    typedef IntegralInvariantCovarianceEstimator< KSpace, DigitalShape, MyIICurvatureFunctor > MyIICurvatureEstimator;
+
+                    MyIICurvatureFunctor curvatureFunctor;
+                    curvatureFunctor.init( h, re );
+
+                    MyIICurvatureEstimator curvatureEstimator( curvatureFunctor );
+                    curvatureEstimator.attach( K, *dshape );
+                    curvatureEstimator.setParams( re/h );
+                    curvatureEstimator.init( h, ibegin, iend );
+
+                    std::vector<std::pair<double,double> > v_results;
+                    std::back_insert_iterator< std::vector<std::pair<double,double> > > bkIt(v_results);
+
+                    curvatureEstimator.eval( ibegin, iend, bkIt );
+
+                    std::ostream_iterator< std::string > out_it_ii_principal( file, "\n" );
+                    for( unsigned int ii = 0; ii < v_results.size(); ++ii )
                     {
                         std::stringstream ss;
-                        ss << v_results[ii].k1 << " " << v_results[ii].k2;
+                        ss << v_results[ii].first << " " << v_results[ii].second;
                         *out_it_ii_principal = ss.str();
                         ++out_it_ii_principal;
                     }
@@ -882,13 +911,9 @@ compareShapeEstimators( const std::string & filename,
                     file.close();
 
                     delete range;
-                    delete IIGaussianCurvatureEstimator;
 
                     trace.endBlock();
                 }
-
-                delete pointFunctor;
-                delete functor;
             }
 
             // Monge
@@ -900,21 +925,21 @@ compareShapeEstimators( const std::string & filename,
                     trace.beginBlock( "Monge mean curvature" );
 
                     typedef MongeJetFittingMeanCurvatureEstimator<Surfel, CanonicSCellEmbedder<KSpace> > FunctorMean;
-                    typedef ConstValueFunctor< double > ConvFunctor;
+                    typedef functors::ConstValue< double > ConvFunctor;
                     typedef LocalEstimatorFromSurfelFunctorAdapter<typename MyDigitalSurface::DigitalSurfaceContainer, Z3i::L2Metric, FunctorMean, ConvFunctor> ReporterH;
                     CanonicSCellEmbedder<KSpace> embedder( K );
                     FunctorMean estimatorH( embedder, h );
                     ConvFunctor convFunc(1.0);
                     ReporterH reporterH(surf, Z3i::l2Metric, estimatorH, convFunc);
                     c.startClock();
-                    reporterH.init( h , re_convolution_kernel / h  );
+                    reporterH.init( h , re / h  );
 
                     char full_filename[360];
                     sprintf( full_filename, "%s%s", filename.c_str(), "_MongeJetFitting_mean.dat" );
                     std::ofstream file( full_filename );
                     file << "# h = " << h << std::endl;
                     file << "# Mean Curvature estimation from CGAL Monge from and Jet Fitting" << std::endl;
-                    file << "# computed kernel radius = " << re_convolution_kernel << std::endl;
+                    file << "# computed kernel radius = " << re << std::endl;
                     std::ostream_iterator< double > out_it_monge_mean( file, "\n" );
 
                     range = new VisitorRange( new Visitor( surf, *surf.begin() ));
@@ -937,14 +962,14 @@ compareShapeEstimators( const std::string & filename,
                     trace.beginBlock( "Monge Gaussian curvature" );
 
                     typedef MongeJetFittingGaussianCurvatureEstimator<Surfel, CanonicSCellEmbedder<KSpace> > FunctorGaussian;
-                    typedef ConstValueFunctor< double > ConvFunctor;
+                    typedef functors::ConstValue< double > ConvFunctor;
                     typedef LocalEstimatorFromSurfelFunctorAdapter<typename MyDigitalSurface::DigitalSurfaceContainer, Z3i::L2Metric, FunctorGaussian, ConvFunctor> ReporterK;
                     CanonicSCellEmbedder<KSpace> embedder( K );
                     FunctorGaussian estimatorK( embedder, h );
                     ConvFunctor convFunc(1.0);
                     ReporterK reporterK(surf, Z3i::l2Metric, estimatorK, convFunc);
                     c.startClock();
-                    reporterK.init( h , re_convolution_kernel / h  );
+                    reporterK.init( h , re / h  );
 
                     range = new VisitorRange( new Visitor( surf, *surf.begin() ));
                     ibegin = range->begin();
@@ -955,7 +980,7 @@ compareShapeEstimators( const std::string & filename,
                     std::ofstream file( full_filename );
                     file << "# h = " << h << std::endl;
                     file << "# Gaussian Curvature estimation from CGAL Monge from and Jet Fitting" << std::endl;
-                    file << "# computed kernel radius = " << re_convolution_kernel << std::endl;
+                    file << "# computed kernel radius = " << re << std::endl;
                     std::ostream_iterator< double > out_it_monge_gaussian( file, "\n" );
                     reporterK.eval(ibegin, iend , out_it_monge_gaussian);
                     double TMongeGaussCurv = c.stopClock();
@@ -973,14 +998,14 @@ compareShapeEstimators( const std::string & filename,
                     trace.beginBlock( "Monge Principal Curvature" );
 
                     typedef MongeJetFittingPrincipalCurvaturesEstimator<Surfel, CanonicSCellEmbedder<KSpace> > FunctorPrincCurv;
-                    typedef ConstValueFunctor< double > ConvFunctor;
+                    typedef functors::ConstValue< double > ConvFunctor;
                     typedef LocalEstimatorFromSurfelFunctorAdapter<typename MyDigitalSurface::DigitalSurfaceContainer, Z3i::L2Metric, FunctorPrincCurv, ConvFunctor> ReporterK;
                     CanonicSCellEmbedder<KSpace> embedder( K );
                     FunctorPrincCurv estimatorK( embedder, h );
                     ConvFunctor convFunc(1.0);
                     ReporterK reporterK(surf, Z3i::l2Metric, estimatorK, convFunc);
                     c.startClock();
-                    reporterK.init( h , re_convolution_kernel / h  );
+                    reporterK.init( h , re / h  );
 
                     range = new VisitorRange( new Visitor( surf, *surf.begin() ));
                     ibegin = range->begin();
@@ -991,7 +1016,7 @@ compareShapeEstimators( const std::string & filename,
                     std::ofstream file( full_filename );
                     file << "# h = " << h << std::endl;
                     file << "# Gaussian Curvature estimation from CGAL Monge from and Jet Fitting" << std::endl;
-                    file << "# computed kernel radius = " << re_convolution_kernel << std::endl;
+                    file << "# computed kernel radius = " << re << std::endl;
                     std::ostream_iterator< std::string > out_it_monge_principal( file, "\n" );
 
                     std::vector<deprecated::CurvatureInformations> v_results;
