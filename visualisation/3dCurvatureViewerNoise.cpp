@@ -101,7 +101,7 @@ int main( int argc, char** argv )
   po::options_description general_opt("Allowed options are");
   general_opt.add_options()
   ("help,h", "display this message")
-  ("input-file,i", po::value< std::string >(), ".vol file")
+  ("input,i", po::value< std::string >(), ".vol file")
   ("radius,r",  po::value< double >(), "Kernel radius for IntegralInvariant" )
   ("noise,k",  po::value< double >()->default_value(0.5), "Level of Kanungo noise ]0;1[" )
   ("threshold,t",  po::value< unsigned int >()->default_value(150), "Min size of SCell boundary of an object" )
@@ -122,8 +122,8 @@ int main( int argc, char** argv )
   }
   bool neededArgsGiven=true;
   
-  if (parseOK && !(vm.count("input-file"))){
-    missingParam("--input-file");
+  if (parseOK && !(vm.count("input"))){
+    missingParam("--input");
     neededArgsGiven=false;
   }
   if (parseOK && !(vm.count("radius"))){
@@ -201,7 +201,7 @@ int main( int argc, char** argv )
   typedef KSpace::Cell Cell;
   typedef KSpace::Surfel Surfel;
 
-  std::string filename = vm["input-file"].as< std::string >();
+  std::string filename = vm["input"].as< std::string >();
   Image image = VolReader<Image>::importVol( filename );
   Z3i::Domain domain = image.domain();
   ImagePredicate predicate = ImagePredicate( image, 0 );

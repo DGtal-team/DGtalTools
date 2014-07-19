@@ -52,7 +52,7 @@ int main( int argc, char** argv )
   po::options_description general_opt("Allowed options are: ");
   general_opt.add_options()
     ("help,h", "display this message")
-    ("input-file,i", po::value<std::string>(), "ofs file (.ofs) " )
+    ("input,i", po::value<std::string>(), "ofs file (.ofs) " )
     ("output-file,o", po::value<std::string>(), "ofs file (.off) " );
 
 
@@ -67,20 +67,20 @@ int main( int argc, char** argv )
   po::notify(vm);
   if( !parseOK || vm.count("help")||argc<=1)
     {
-      std::cout << "Usage: " << argv[0] << " [input-file] [output-file]\n"
+      std::cout << "Usage: " << argv[0] << " [input] [output-file]\n"
 		<< "Convert OFS file into OFF mesh format"
 		<< general_opt << "\n";
       return 0;
     }
 
-  if(! vm.count("input-file")||! vm.count("output-file"))
+  if(! vm.count("input")||! vm.count("output-file"))
     {
       trace.error() << " Input and output filename are needed to be defined" << endl;
       return 0;
     }
 
 
-  string inputFilename = vm["input-file"].as<std::string>();
+  string inputFilename = vm["input"].as<std::string>();
   string outputFilename = vm["output-file"].as<std::string>();
 
   // We store the colors

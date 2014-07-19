@@ -230,7 +230,7 @@ int main( int argc, char** argv )
  po::options_description general_opt("Allowed options are: ");
   general_opt.add_options()
     ("help,h", "display this message")
-    ("input-file,i", po::value<std::string>(), "vol file (.vol) , pgm3d (.p3d or .pgm3d, pgm (with 3 dims)) file or sdp (sequence of discrete points)" )
+    ("input,i", po::value<std::string>(), "vol file (.vol) , pgm3d (.p3d or .pgm3d, pgm (with 3 dims)) file or sdp (sequence of discrete points)" )
 #ifdef WITH_ITK
     ("dicomMin", po::value<int>()->default_value(-1000), "set minimum density threshold on Hounsfield scale")
     ("dicomMax", po::value<int>()->default_value(3000), "set maximum density threshold on Hounsfield scale")
@@ -248,18 +248,18 @@ int main( int argc, char** argv )
   po::notify(vm);    
   if( !parseOK || vm.count("help")||argc<=1)
     {
-      std::cout << "Usage: " << argv[0] << " [input-file]\n"
+      std::cout << "Usage: " << argv[0] << " [input]\n"
                 << "Display volume file as a voxel set by using QGLviewer"<< endl
                 << general_opt << "\n";
       return 0;
     }
   
-  if(! vm.count("input-file"))
+  if(! vm.count("input"))
     {
       trace.error() << " The file name was defined" << endl;      
       return 0;
     }
-  string inputFilename = vm["input-file"].as<std::string>();
+  string inputFilename = vm["input"].as<std::string>();
   
 
   typedef ImageContainerBySTLVector < Z3i::Domain, unsigned char > Image3D;

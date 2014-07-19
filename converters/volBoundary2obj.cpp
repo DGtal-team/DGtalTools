@@ -72,7 +72,7 @@ int main( int argc, char** argv )
   po::options_description general_opt("Allowed options are: ");
   general_opt.add_options()
     ("help,h", "display this message")
-    ("input-file,i", po::value<std::string>(), "vol file (.vol) , pgm3d (.p3d or .pgm3d, pgm (with 3 dims)) file or sdp (sequence of discrete points)" )
+    ("input,i", po::value<std::string>(), "vol file (.vol) , pgm3d (.p3d or .pgm3d, pgm (with 3 dims)) file or sdp (sequence of discrete points)" )
     ("output-file,o", po::value<std::string>(), "output obj file (.obj)" )
     ("thresholdMin,m",  po::value<int>()->default_value(0), "threshold min (excluded) to define binary shape" )
     ("thresholdMax,M",  po::value<int>()->default_value(255), "threshold max (included) to define binary shape" )
@@ -94,13 +94,13 @@ int main( int argc, char** argv )
   po::notify(vm);
   if( !parseOK || vm.count("help")||argc<=1)
     {
-      std::cout << "Usage: " << argv[0] << " -i [input-file] -o [output-file]\n"
+      std::cout << "Usage: " << argv[0] << " -i [input] -o [output-file]\n"
                 << "Export the boundary of a volume file to OBJ format. The mode specifies if you wish to see surface elements (BDRY), the inner voxels (INNER) or the outer voxels (OUTER) that touch the boundary."<< endl
                 << general_opt << "\n";
       return 0;
     }
 
-  if(! vm.count("input-file"))
+  if(! vm.count("input"))
     {
       trace.error() << " The file name was defined" << endl;
       return 0;
@@ -112,7 +112,7 @@ int main( int argc, char** argv )
       return 0;
     }
 
-  string inputFilename = vm["input-file"].as<std::string>();
+  string inputFilename = vm["input"].as<std::string>();
   int thresholdMin = vm["thresholdMin"].as<int>();
   int thresholdMax = vm["thresholdMax"].as<int>();
   string mode = vm["mode"].as<string>();
