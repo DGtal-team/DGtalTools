@@ -33,7 +33,7 @@
 #include <DGtal/images/Image.h>
 #include <DGtal/images/ImageSelector.h>
 #include <DGtal/images/ConstImageAdapter.h>
-#include </home/kacper/Projects/DGtal/src/DGtal/images/RigidTransformation3D.h>
+#include <DGtal/images/RigidTransformation3D.h>
 
 #include <boost/program_options/options_description.hpp>
 #include <boost/program_options/parsers.hpp>
