@@ -178,8 +178,8 @@ int main( int argc, char** argv )
   general_opt.add_options()
     ("help,h", "display this message")
     ("scale,s", po::value<double>(), "set the scale of the maximal level. (default 1.0)")
-    ("colorMap,c", "define the heightmap color as colormap")
-    ("colorTextureImage,t",po::value<std::string>(),  "define the heightmap texture from a given color image (32 bits image).")
+    ("colorMap,c", "define the heightmap color with a pre-defined colormap (HueShadeColorMap)")
+    ("colorTextureImage,t",po::value<std::string>(),  "define the heightmap color from a given color image (32 bits image).")
     ("input-file,i", po::value<std::string>(), "2d input image representing the height map (given as grayscape image cast into 8 bits)." );
   
   bool parseOK=true;
