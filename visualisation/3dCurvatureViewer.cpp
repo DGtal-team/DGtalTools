@@ -46,10 +46,10 @@
 #include <boost/program_options/variables_map.hpp>
 
 // Shape constructors
-#include "DGtal/io/readers/VolReader.h"
+#include "DGtal/io/readers/GenericReader.h"
 #include "DGtal/images/ImageSelector.h"
 #include "DGtal/images/imagesSetsUtils/SetFromImage.h"
-#include "DGtal/images/SimpleThresholdForegroundPredicate.h"
+#include "DGtal/images/IntervalForegroundPredicate.h"
 #include "DGtal/topology/SurfelAdjacency.h"
 #include "DGtal/topology/helpers/Surfaces.h"
 #include "DGtal/topology/LightImplicitDigitalSurface.h"
@@ -103,7 +103,9 @@ int main( int argc, char** argv )
   ("input-file,i", po::value< std::string >(), ".vol file")
   ("radius,r",  po::value< double >(), "Kernel radius for IntegralInvariant" )
   ("threshold,t",  po::value< unsigned int >()->default_value(8), "Min size of SCell boundary of an object" )
-  ("mode,m", po::value< std::string >()->default_value("mean"), "type of output : mean, gaussian, k1, k2, prindir1 or prindir2 (default mean)")
+  ("minImageThreshold,l",  po::value<  int >()->default_value(0), "set the minimal image threshold to define the image object (object defined by the voxel with intensity belonging to ]minImageThreshold, maxImageThreshold ] )." )
+  ("maxImageThreshold,u",  po::value<  int >()->default_value(1), "set the minimal image threshold to define the image object (object defined by the voxel with intensity belonging to ]minImageThreshold, maxImageThreshold] )." )  
+("mode,m", po::value< std::string >()->default_value("mean"), "type of output : mean, gaussian, k1, k2, prindir1 or prindir2 (default mean)")
   ("export,e", po::value< std::string >(), "Export the scene to specified OBJ filename." )
   ("imageScale,s", po::value<std::vector<double> >()->multitoken(), "scaleX, scaleY, scaleZ: re sample the source image according with a grid of size 1.0/scale (usefull to compute curvature on image defined on anisotropic grid). Set by default to 1.0 for the three axis.  ")
   ("normalization,n", "When exporting to OBJ, performs a normalization so that the geometry fits in [-1/2,1/2]^3") ;
@@ -131,7 +133,7 @@ int main( int argc, char** argv )
   }
 
   bool normalization = false;
-  if  (vm.count("normalization"))
+  if (parseOK && vm.count("normalization"))
     normalization = true;
 
   std::string mode;
@@ -145,7 +147,6 @@ int main( int argc, char** argv )
     trace.error() << " The selected mode ("<<mode << ") is not defined."<<std::endl;
   }
 
-  unsigned int threshold = vm["threshold"].as< unsigned int >();
 
   if(!neededArgsGiven || !parseOK || vm.count("help") || argc <= 1 )
   {
@@ -164,6 +165,9 @@ int main( int argc, char** argv )
     << std::endl;
     return 0;
   }
+  unsigned int threshold = vm["threshold"].as< unsigned int >();
+  int minImageThreshold =  vm["minImageThreshold"].as<  int >();
+  int maxImageThreshold =  vm["maxImageThreshold"].as<  int >();
 
   double h = 1.0;
 
@@ -205,12 +209,12 @@ int main( int argc, char** argv )
   // Construction of the shape from vol file
   typedef Z3i::Space::RealPoint RealPoint;
   typedef Z3i::Point Point;
-  typedef ImageSelector< Z3i::Domain, bool>::Type Image;
+  typedef ImageSelector< Z3i::Domain,  int>::Type Image;
   typedef DGtal::functors::BasicDomainSubSampler< HyperRectDomain<SpaceND<3, int> >,  
                                                   DGtal::int32_t, double >   ReSampler; 
   typedef DGtal::ConstImageAdapter<Image, Image::Domain, ReSampler,
 				   Image::Value,  DGtal::functors::Identity >  SamplerImageAdapter;
-  typedef SimpleThresholdForegroundPredicate< SamplerImageAdapter > ImagePredicate;
+  typedef IntervalForegroundPredicate< SamplerImageAdapter > ImagePredicate;
   typedef BinaryPointPredicate<DomainPredicate<Image::Domain>, ImagePredicate, DGtal::AndBoolFct2  > Predicate;
   typedef Z3i::KSpace KSpace;
   typedef KSpace::SCell SCell;
@@ -218,18 +222,16 @@ int main( int argc, char** argv )
   typedef KSpace::Surfel Surfel;
 
   std::string filename = vm["input-file"].as< std::string >();
-  Image image = VolReader<Image>::importVol( filename );
+  Image image = GenericReader<Image>::import( filename );
   
   PointVector<3,int> shiftVector3D(0 ,0, 0);      
   DGtal::functors::BasicDomainSubSampler< HyperRectDomain<SpaceND<3, int> >,  
                                           DGtal::int32_t, double > reSampler(image.domain(),
                                                                              aGridSizeReSample,  shiftVector3D);  
   SamplerImageAdapter sampledImage (image, reSampler.getSubSampledDomain(), reSampler, functors::Identity());
-  ImagePredicate predicateIMG = ImagePredicate( sampledImage, 0 );
+  ImagePredicate predicateIMG = ImagePredicate( sampledImage,  minImageThreshold, maxImageThreshold );
   DomainPredicate<Z3i::Domain> domainPredicate( sampledImage.domain() );
   DGtal::AndBoolFct2 andF;
-  //BoolFunction2 boolFct = AndBoolFct2();
-  
   Predicate predicate(domainPredicate, predicateIMG, andF  ); 
 
 
