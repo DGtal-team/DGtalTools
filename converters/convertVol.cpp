@@ -55,7 +55,7 @@ int main( int argc, char** argv )
   general_opt.add_options()
     ("help,h", "display this message")
     ("input,i", po::value<std::string>(), "volumetric file (.pgm3d, .vol, .longvol) " )
-    ("output-file,o", po::value<std::string>(), "volumetric file (.pgm3d, .vol, .longvol) " );
+    ("output,o", po::value<std::string>(), "volumetric file (.pgm3d, .vol, .longvol) " );
     
   
   bool parseOK=true;
@@ -69,7 +69,7 @@ int main( int argc, char** argv )
   po::notify(vm);    
   if( !parseOK || vm.count("help")||argc<=1)
     {
-      std::cout << "Usage: " << argv[0] << " [input] [output-file]\n"
+      std::cout << "Usage: " << argv[0] << " [input] [output]\n"
 		<< "Convert volumetric  file into volumetric file from different formats (pgm3d, vol, longvol) "
 		<< general_opt << "\n";
       std::cout << "Example:\n"
@@ -77,7 +77,7 @@ int main( int argc, char** argv )
       return 0;
     }
   
-  if(! vm.count("input")||! vm.count("output-file"))
+  if(! vm.count("input")||! vm.count("output"))
     {
       trace.error() << " Input and output filename are needed to be defined" << endl;      
       return 0;
@@ -85,7 +85,7 @@ int main( int argc, char** argv )
 
   
   string inputFilename = vm["input"].as<std::string>();
-  string outputFilename = vm["output-file"].as<std::string>();
+  string outputFilename = vm["output"].as<std::string>();
   
   trace.info() << "Reading input file " << inputFilename ; 
   Image3D inputImage = DGtal::GenericReader<Image3D>::import(inputFilename);

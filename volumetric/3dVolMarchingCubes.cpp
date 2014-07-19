@@ -49,7 +49,7 @@ int main( int argc, char** argv )
     ("input,i", po::value<std::string>(), "the volume file (.vol)" )
     ("threshold,t",  po::value<unsigned int>()->default_value(1), "the value that defines the isosurface in the image (an integer between 0 and 255)." )
     ("adjacency,a",  po::value<unsigned int>()->default_value(0), "0: interior adjacency, 1: exterior adjacency")
-    ("output-file,o",  po::value<std::string>()->default_value( "marching-cubes.off" ), "the output OFF file that represents the geometry of the isosurface") ;
+    ("output,o",  po::value<std::string>()->default_value( "marching-cubes.off" ), "the output OFF file that represents the geometry of the isosurface") ;
   bool parseOK=true;
   po::variables_map vm;
   try{
@@ -75,7 +75,7 @@ int main( int argc, char** argv )
   std::string inputFilename = vm["input"].as<std::string>();
   unsigned int threshold = vm["threshold"].as<unsigned int>();
   bool intAdjacency = ( vm["adjacency"].as<unsigned int>() == 0 );
-  std::string outputFilename = vm["output-file"].as<std::string>();
+  std::string outputFilename = vm["output"].as<std::string>();
   //! [3dVolMarchingCubes-parseCommandLine]
 
   //! [3dVolMarchingCubes-readVol]

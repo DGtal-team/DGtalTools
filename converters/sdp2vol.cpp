@@ -54,7 +54,7 @@ int main( int argc, char** argv )
   general_opt.add_options()
     ("help,h", "display this message")
     ("sdp,s", po::value<std::string>(), "Sequence of 3d Discrete points (.sdp) " )
-    ("output-file,o", po::value<std::string>(), "Vol file  (.vol, .longvol, .pgm3d) " )
+    ("output,o", po::value<std::string>(), "Vol file  (.vol, .longvol, .pgm3d) " )
     ("foregroundVal,f", po::value<int>()->default_value(128), "value which will represent the foreground object in the resulting image (default 128)")
     ("invertY", "Invert the Y axis (image flip in the y direction)")
     ("backgroundVal,b", po::value<int>()->default_value(0), "value which will represent the background outside the  object in the resulting image (default 0)")
@@ -71,14 +71,14 @@ int main( int argc, char** argv )
   po::notify(vm);    
   if( !parseOK || vm.count("help"))
     {
-      std::cout << "Usage: " << argv[0] << " [input-file] [output-file]\n"
+      std::cout << "Usage: " << argv[0] << " [input-file] [output]\n"
 		<< "Convert volumetric  file into a digital set of points from a given threshold."
 		<< general_opt << "\n";
       std::cout << "Example:\n"
 		<< "vol2sdp -i ${DGtal}/examples/samples/lobster.vol -o volumeList.p3d \n";
       return 0;
     }
-  if(! vm.count("sdp") ||! vm.count("output-file") || !vm.count("domain") )
+  if(! vm.count("sdp") ||! vm.count("output") || !vm.count("domain") )
     {
       trace.error() << " Input/ output filename and domain are needed to be defined" << endl;      
       return 0;
@@ -90,7 +90,7 @@ int main( int argc, char** argv )
   Image3D::Domain imageDomain(ptLower, ptUpper);
   
   string inputSDP = vm["sdp"].as<std::string>();
-  string outputFilename = vm["output-file"].as<std::string>();
+  string outputFilename = vm["output"].as<std::string>();
   int foregroundVal = vm["foregroundVal"].as<int>();
   int backgroundVal = vm["backgroundVal"].as<int>();
   

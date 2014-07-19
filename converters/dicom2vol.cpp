@@ -57,7 +57,7 @@ int main( int argc, char** argv )
   general_opt.add_options()
     ("help,h", "display this message")
     ("input,i", po::value<std::string>(), "dicom image  (.dcm) " )
-    ("output-file,o", po::value<std::string>(), "volumetric file (.vol, .longvol .pgm3d) " )
+    ("output,o", po::value<std::string>(), "volumetric file (.vol, .longvol .pgm3d) " )
     ("dicomMin", po::value<int>()->default_value(-1000), "set minimum density threshold on Hounsfield scale")
     ("dicomMax", po::value<int>()->default_value(3000), "set maximum density threshold on Hounsfield scale");
 
@@ -74,7 +74,7 @@ int main( int argc, char** argv )
   po::notify(vm);    
   if( !parseOK || vm.count("help")||argc<=1)
     {
-      std::cout << "Usage: " << argv[0] << " [input] [output-file]\n"
+      std::cout << "Usage: " << argv[0] << " [input] [output]\n"
 		<< "Convert dicom file into a volumetric file (.vol, .longvol .pgm3d) ."
 		<< general_opt << "\n";
       std::cout << "Example:\n"
@@ -82,7 +82,7 @@ int main( int argc, char** argv )
       return 0;
     }
   
-  if(! vm.count("input") ||! vm.count("output-file"))
+  if(! vm.count("input") ||! vm.count("output"))
     {
       trace.error() << " Input and output filename are needed to be defined" << endl;      
       return 0;
@@ -90,7 +90,7 @@ int main( int argc, char** argv )
 
   
   string inputFilename = vm["input"].as<std::string>();
-  string outputFilename = vm["output-file"].as<std::string>();
+  string outputFilename = vm["output"].as<std::string>();
   int dicomMin = vm["dicomMin"].as<int>();
   int dicomMax = vm["dicomMax"].as<int>();
   typedef DGtal::functors::Rescaling<int ,unsigned char > RescalFCT;
