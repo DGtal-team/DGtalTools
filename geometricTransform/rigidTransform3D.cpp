@@ -33,7 +33,7 @@
 #include <DGtal/images/Image.h>
 #include <DGtal/images/ImageSelector.h>
 #include <DGtal/images/ConstImageAdapter.h>
-#include <DGtal/images/RigidTransformation3D.h>
+#include </home/kacper/Projects/DGtal/src/DGtal/images/RigidTransformation3D.h>
 
 #include <boost/program_options/options_description.hpp>
 #include <boost/program_options/parsers.hpp>
@@ -137,7 +137,7 @@ int main(int argc, char**argv)
 
   Image image = GenericReader <Image, 3>::import(filename);
   ForwardTrans forwardTrans( RealPoint ( ox, oy, oz ), RealPoint ( ax, ay, az ), angle, RealVector( tx, ty, tz ) );
-  BackwardTrans backwardTrans( RealPoint ( ox, oy, tz ), RealPoint ( ax, ay, az ), angle, RealVector( tx, ty, tz ) );
+  BackwardTrans backwardTrans( RealPoint ( ox, oy, oz ), RealPoint ( ax, ay, az ), angle, RealVector( tx, ty, tz ) );
   MyTransformedDomain domainForwardTrans ( forwardTrans );
   Bounds bounds = domainForwardTrans ( image.domain() );
   Domain transformedDomain ( bounds.first, bounds.second );
