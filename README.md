@@ -157,13 +157,15 @@ Here are some illustrations of such a tools:
 </tr>
 <tr>
 <td><img height=130 src="https://f.cloud.github.com/assets/772865/684622/d698405a-da00-11e2-8aa0-19212a58ce23.png"></td>
-<td><img height=130 src="https://cloud.githubusercontent.com/assets/772865/2720141/6c42a0e0-c56b-11e3-8328-a6d88242f21e.png"> </td>
-<td><img height=130 width=200 src="https://cloud.githubusercontent.com/assets/772865/3623729/f022a524-0e52-11e4-96cb-f619f26f83e0.png"></td>
+<td><img width=300 src="https://cloud.githubusercontent.com/assets/772865/2720141/6c42a0e0-c56b-11e3-8328-a6d88242f21e.png"> </td>
+<td><img  width=300 src="https://cloud.githubusercontent.com/assets/772865/3623729/f022a524-0e52-11e4-96cb-f619f26f83e0.png"></td>
+<td><img  width=300 src="https://cloud.githubusercontent.com/assets/772865/3486505/6edb2144-043e-11e4-81c4-2c20f272a119.png" </td>
 </tr>
 <tr>
 <td>meshViewer</td>
 <td>3dSDPViewer</td>
 <td>sliceViewer</td>
+<td>3dHeightMapViewer</td>
 </tr>
 
 
