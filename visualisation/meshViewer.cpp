@@ -56,7 +56,7 @@ int main( int argc, char** argv )
   po::options_description general_opt("Allowed options are: ");
   general_opt.add_options()
     ("help,h", "display this message")
-    ("input-file,i", po::value<std::string>(), "off file (.off), or OFS file (.ofs) " )
+    ("input,i", po::value<std::string>(), "off file (.off), or OFS file (.ofs) " )
     ("scaleX,x",  po::value<float>()->default_value(1.0), "set the scale value in the X direction (default 1.0)" )
     ("scaleY,y",  po::value<float>()->default_value(1.0), "set the scale value in the Y direction (default 1.0)" )
     ("scaleZ,z",  po::value<float>()->default_value(1.0), "set the scale value in the Z direction (default 1.0)")
@@ -74,13 +74,13 @@ int main( int argc, char** argv )
   po::notify(vm);
   if( !parseOK || vm.count("help")||argc<=1)
     {
-      std::cout << "Usage: " << argv[0] << " [input-file]\n"
+      std::cout << "Usage: " << argv[0] << " [input]\n"
 		<< "Display OFF mesh file by using QGLviewer"
     << general_opt << "\n";
       return 0;
     }
 
-  if(! vm.count("input-file"))
+  if(! vm.count("input"))
     {
       trace.error() << " The file name was defined" << endl;
       return 0;
@@ -88,7 +88,7 @@ int main( int argc, char** argv )
 
 
 
-  string inputFilename = vm["input-file"].as<std::string>();
+  string inputFilename = vm["input"].as<std::string>();
   float sx = vm["scaleX"].as<float>();
   float sy = vm["scaleY"].as<float>();
   float sz = vm["scaleZ"].as<float>();

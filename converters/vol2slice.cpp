@@ -61,8 +61,8 @@ int main( int argc, char** argv )
   po::options_description general_opt("Allowed options are: ");
   general_opt.add_options()
     ("help,h", "display this message")
-    ("input-file,i", po::value<std::string >(), "input volumetric file (.vol, .longvol, .pgm3d) " )
-    ("output-files,o", po::value<std::string>(), "base_name.extension:  extracted 2D slice volumetric files (will result n files base_name_xxx.extension) " )
+    ("input,i", po::value<std::string >(), "input volumetric file (.vol, .longvol, .pgm3d) " )
+    ("output,o", po::value<std::string>(), "base_name.extension:  extracted 2D slice volumetric files (will result n files base_name_xxx.extension) " )
     ("sliceOrientation,s", po::value<unsigned int>()->default_value(2), "specify the slice orientation for which the slice are defined (by default =2 (Z direction))" );
 
 
@@ -79,7 +79,7 @@ int main( int argc, char** argv )
 
   if( !parseOK || vm.count("help"))
     {
-      std::cout << "Usage: " << argv[0] << " [input-files] [output-file]\n"
+      std::cout << "Usage: " << argv[0] << " [inputs] [output]\n"
 		<< "Convert a volumetric file (.vol, .longvol, .pgm3d) into a set of 2D slice  images."
 		<< general_opt << "\n";
       std::cout << "Example: to extract all slices defined in Y plane (y=cst): \n"
@@ -88,7 +88,7 @@ int main( int argc, char** argv )
       return 0;
     }
 
-  if(! vm.count("input-file")||! vm.count("output-files"))
+  if(! vm.count("input")||! vm.count("output"))
     {
       trace.error() << " Input and output filename are needed to be defined" << endl;
       return 0;
@@ -97,8 +97,8 @@ int main( int argc, char** argv )
 
 
 
-  std::string inputFileName = vm["input-file"].as<std::string>();
-  std::string outputFileName = vm["output-files"].as<std::string>();
+  std::string inputFileName = vm["input"].as<std::string>();
+  std::string outputFileName = vm["output"].as<std::string>();
   std::string outputExt = outputFileName.substr(outputFileName.find_last_of(".")+1);
   std::string outputBasename = outputFileName.substr(0, outputFileName.find_last_of("."));
   unsigned int sliceOrientation = vm["sliceOrientation"].as<unsigned int>();
