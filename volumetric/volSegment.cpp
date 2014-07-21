@@ -56,9 +56,62 @@ using namespace DGtal;
 ///////////////////////////////////////////////////////////////////////////////
 namespace po = boost::program_options;
 
+
+typedef ImageContainerBySTLVector < Z3i::Domain, unsigned char > Image3D;
+
+std::vector<unsigned int> getHistoFromImage(const Image3D &image){
+  const Image3D::Domain &imgDom = image.domain();
+  std::vector<unsigned int> vectHisto(UCHAR_MAX);
+  for(Image3D::Domain::ConstIterator it=imgDom.begin(); it!= imgDom.end(); ++it){
+    vectHisto[image(*it)]++;
+  }
+  return vectHisto;
+}
+
+
+
+unsigned int 
+getOtsuThreshold(const Image3D &image){
+  std::vector<unsigned int> histo = getHistoFromImage(image);
+  unsigned int imageSize = image.domain().size();
+  unsigned int sumA = 0;
+  unsigned int sumB = imageSize;
+  unsigned int muA=0;
+  unsigned int muB=0;
+  unsigned int sumMuAll= 0;
+  for( unsigned int t=0; t< histo.size();t++){
+    sumMuAll+=histo[t]*t;
+  }
+  
+  unsigned int thresholdRes=0;
+  double valMax=0.0;
+  for( unsigned int t=0; t< histo.size(); t++){
+    sumA+=histo[t];
+    if(sumA==0)
+      continue; 
+    sumB=imageSize-sumA;
+    if(sumB==0){
+      break;
+    }
+    
+    muA+=histo[t]*t;
+    muB=sumMuAll-muA;
+    double muAr=muA/(double)sumA;
+    double muBr=muB/(double)sumB;
+    double sigma=  (double)sumA*(double)sumB*(muAr-muBr)*(muAr-muBr);
+    if(valMax<=sigma){
+      valMax=sigma;
+      thresholdRes=t;
+    }
+  }
+  return thresholdRes;
+}
+
+
+
 int main( int argc, char** argv )
 {
-  typedef ImageContainerBySTLVector < Z3i::Domain, unsigned char > Image3D;
+  
   typedef Z3i::KSpace::SurfelSet SurfelSet;
   typedef SetOfSurfels< Z3i::KSpace, SurfelSet > MySetOfSurfels;
   typedef DigitalSurface< MySetOfSurfels > MyDigitalSurface;
@@ -70,8 +123,8 @@ int main( int argc, char** argv )
     ("input,i", po::value<std::string>(), "volumetric input file (.vol, .pgm, .pgm3d, .longvol) " )
     ("output,o", po::value<std::string>(), "volumetric output file (.vol, .pgm, .pgm3d, .longvol) " )
     ("segmentHole", "option to define a label to regions associated to hole. ")
-    ("thresholdMin,m", po::value<int>(), "min threshold (default 128)" )
-    ("thresholdMax,M", po::value<int>(), "max threshold (default 255)" );
+    ("thresholdMin,m", po::value<int>()->default_value(0), "min threshold (default 0)." )
+    ("thresholdMax,M", po::value<int>(), "max threshold (if not given the max threshold is computed with Otsu algorithm)?" );
   
   
   bool parseOK=true;
@@ -86,7 +139,7 @@ int main( int argc, char** argv )
   if( !parseOK || vm.count("help")||argc<=1)
     {
       std::cout << "Usage: " << argv[0] << " [input] [output]\n"
-		<< "Segment volumetric  file from a simple threshold which can be set automaticlly from the otsu estimation.\n"
+		<< "Segment volumetric file from a simple threshold which can be set automaticlly from the otsu estimation.\n"
                 << "The segmentation result is given by an integer label given in the resulting image."
 		<< general_opt << "\n";
       std::cout << "Example:\n"
@@ -113,9 +166,15 @@ int main( int argc, char** argv )
   std::ofstream outStream;
   outStream.open(outputFilename.c_str());
   int minTh = vm["thresholdMin"].as<int>();
-  int maxTh = vm["thresholdMax"].as<int>();
+  int maxTh = 128;
+  if(!vm.count("thresholdMax")){
+    maxTh = getOtsuThreshold(inputImage);
+    trace.info() << "maximal threshold value not specified, using Otsu value: "  << maxTh << std::endl;
+  }else{
+   maxTh =  vm["thresholdMax"].as<int>();
+  }
   
-  trace.info() << "Processing image to output file " << outputFilename ; 
+  trace.info() << "Processing image to output file " << outputFilename << std::endl; 
 
   IntervalForegroundPredicate<Image3D> simplePredicate ( inputImage, minTh, maxTh );
   SurfelAdjacency< Z3i::KSpace::dimension > SAdj ( true );
@@ -126,6 +185,7 @@ int main( int argc, char** argv )
     
   std::vector< std::vector<Z3i::SCell > > vectConnectedSCell;
   Surfaces<Z3i::KSpace>::extractAllConnectedSCell(vectConnectedSCell,K, SAdj, simplePredicate, false);
+  trace.progressBar(0, vectConnectedSCell.size());
   for(unsigned int i = 0; i<vectConnectedSCell.size(); i++)
     {
       trace.progressBar(i, vectConnectedSCell.size());
@@ -166,10 +226,11 @@ int main( int argc, char** argv )
        }else if (vm.count("segmentHole")){
          DGtal::Surfaces<Z3i::KSpace>::uFillExterior( kRestr,  aSet.surfelPredicate(), 
                                                       imageResuSegmentation,
-                                                      i, false, false);
+                                                      i+1, false, false);
        }
     }
   trace.progressBar(vectConnectedSCell.size(), vectConnectedSCell.size());
+  trace.info() << std::endl;
   GenericWriter<Image3D>::exportFile(outputFilename, imageResuSegmentation);   
   return 0;
 }
