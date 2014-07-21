@@ -11,7 +11,9 @@
 
 * converters/:
 	- volBoundary2obj: a simple tool to export the boundary of a an	object in a volumetric file to OBJ
-	- freeman2pgm: transform one or several freeman chains into a pgm file by filling their interior areas.
+	- freeman2pgm: transform one or several freeman chains into a pgm file by filling their interior areas and renamed into freeman2img.
+	- pgm2freeman: renamed into pgm2img.
+
 
 * estimators/:
 	- curvatureScaleSpaceBCC: a tool to display the curvature scale space of a given contour with the Binomial Convolver Curvature Estimator.
