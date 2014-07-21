@@ -139,7 +139,7 @@ int main( int argc, char** argv )
   if( !parseOK || vm.count("help")||argc<=1)
     {
       std::cout << "Usage: " << argv[0] << " [input] [output]\n"
-		<< "Segment volumetric file from a simple threshold which can be set automaticlly from the otsu estimation.\n"
+		<< "Segment volumetric file from a simple threshold which can be set automatically from the otsu estimation.\n"
                 << "The segmentation result is given by an integer label given in the resulting image."
 		<< general_opt << "\n";
       std::cout << "Example:\n"
