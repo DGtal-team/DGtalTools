@@ -107,6 +107,7 @@ int main( int argc, char** argv )
   ("maxImageThreshold,u",  po::value<  int >()->default_value(1), "set the minimal image threshold to define the image object (object defined by the voxel with intensity belonging to ]minImageThreshold, maxImageThreshold] )." )  
 ("mode,m", po::value< std::string >()->default_value("mean"), "type of output : mean, gaussian, k1, k2, prindir1 or prindir2 (default mean)")
   ("export,e", po::value< std::string >(), "Export the scene to specified OBJ filename." )
+  ("exportDat,E", po::value<std::string>(), "Export resulting curvature (for mean, gaussian, k1 or k2 mode) in a simple data file each line representing a surfel. ")
   ("imageScale,s", po::value<std::vector<double> >()->multitoken(), "scaleX, scaleY, scaleZ: re sample the source image according with a grid of size 1.0/scale (usefull to compute curvature on image defined on anisotropic grid). Set by default to 1.0 for the three axis.  ")
   ("normalization,n", "When exporting to OBJ, performs a normalization so that the geometry fits in [-1/2,1/2]^3") ;
 
@@ -170,9 +171,13 @@ int main( int argc, char** argv )
   int maxImageThreshold =  vm["maxImageThreshold"].as<  int >();
 
   double h = 1.0;
+ 
 
   std::string export_path;
   bool myexport = false;
+  bool myexportDat = false;
+  string exportDatFilename;
+
   if(vm.count("export")){
     export_path = vm["export"].as< std::string >();
     if( export_path.find(".obj") == std::string::npos )
@@ -183,7 +188,13 @@ int main( int argc, char** argv )
     } 
     myexport=true;
   }
-  
+
+
+  if(vm.count("exportDat")){
+    exportDatFilename = vm["exportDat"].as<std::string>();
+    myexportDat = true;
+  }
+ 
   double re_convolution_kernel = vm["radius"].as< double >();
 
 
@@ -221,7 +232,7 @@ int main( int argc, char** argv )
   typedef KSpace::Cell Cell;
   typedef KSpace::Surfel Surfel;
 
-  std::string filename = vm["input-file"].as< std::string >();
+  std::string filename = vm["input"].as< std::string >();
   Image image = GenericReader<Image>::import( filename );
   
   PointVector<3,int> shiftVector3D(0 ,0, 0);      
@@ -265,12 +276,22 @@ int main( int argc, char** argv )
 
   std::vector< std::vector<SCell > > vectConnectedSCell;
   Surfaces<KSpace>::extractAllConnectedSCell(vectConnectedSCell,K, Sadj, predicate, false);
+  std::ofstream outDat;
+  if(myexportDat){
+    trace.info() << "Exporting curvature as dat file: "<< exportDatFilename <<std::endl;
+    outDat.open(exportDatFilename.c_str());
+    outDat << "# data exported from 3dCurvatureViewer implementing the II curvature estimator (Coeurjolly, D.; Lachaud, J.O; Levallois, J., (2013). Integral based Curvature"
+           << "  Estimators in Digital Geometry. DGCI 2013.) " << std::endl;
+    outDat << "# format: surfel coordinates (in Khalimsky space) curvature: "<< mode <<  std::endl;
+  }
+  
   for(unsigned int i = 0; i<vectConnectedSCell.size(); i++)
   {
     if( vectConnectedSCell[i].size() <= threshold )
     {
       continue;
     }
+    
     MySetOfSurfels  aSet(K, Sadj);
 
     for(std::vector<SCell>::const_iterator it= vectConnectedSCell.at(i).begin(); it != vectConnectedSCell.at(i).end(); ++it)
@@ -382,10 +403,11 @@ int main( int argc, char** argv )
       cmap_grad.addColor( Color( 255, 255, 10 ) );
 
       viewer << SetMode3D((*abegin2).className(), "Basic" );
-      if( myexport )
+      if( myexportDat )
       {
         board << SetMode3D((K.unsigns(*abegin2)).className(), "Basic" );
       }
+      
 
       for ( unsigned int i = 0; i < results.size(); ++i )
       {
@@ -396,6 +418,10 @@ int main( int argc, char** argv )
         {
           board << CustomColors3D( Color::Black, cmap_grad( results[ i ] ))
           << K.unsigns(*abegin2);
+        }
+        if(myexportDat){
+          Point kCoords = K.uKCoords(K.unsigns(*abegin2));
+          outDat << kCoords[0] << " " << kCoords[1] << " " << kCoords[2] <<  " " <<  results[i] << std::endl;
         }
         ++abegin2;
       }
@@ -513,7 +539,9 @@ int main( int argc, char** argv )
     board.saveOBJ(export_path,normalization);
     trace.info() << "[done]" << std::endl;
   }
-    
+  if(myexportDat){
+      outDat.close();
+  }
   return application.exec();
 }
 
