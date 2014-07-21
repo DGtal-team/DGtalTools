@@ -69,6 +69,7 @@ int main( int argc, char** argv )
     ("help,h", "display this message")
     ("input,i", po::value<std::string>(), "volumetric input file (.vol, .pgm, .pgm3d, .longvol) " )
     ("output,o", po::value<std::string>(), "volumetric output file (.vol, .pgm, .pgm3d, .longvol) " )
+    ("segmentHole", "option to define a label to regions associated to hole. ")
     ("thresholdMin,m", po::value<int>(), "min threshold (default 128)" )
     ("thresholdMax,M", po::value<int>(), "max threshold (default 255)" );
   
@@ -129,14 +130,44 @@ int main( int argc, char** argv )
     {
       trace.progressBar(i, vectConnectedSCell.size());
       MySetOfSurfels  aSet(K, SAdj);
+      Z3i::Point lowerPoint, upperPoint;
+      Z3i::Point p1;
+      Z3i::Point p2;
       for(std::vector<Z3i::SCell>::const_iterator it= vectConnectedSCell.at(i).begin(); it != vectConnectedSCell.at(i).end(); ++it)
         {
           aSet.surfelSet().insert(aSet.surfelSet().begin(),  *it);
+          unsigned int orth_dir = K.sOrthDir( *it );                                                     
+          p1 =  K.sCoords( K.sIncident( *it, orth_dir, true ) );               
+          p2 =  K.sCoords( K.sIncident( *it, orth_dir, false ) );
+          if(p1[0] < lowerPoint[0]) lowerPoint[0]= p1[0];
+          if(p1[1] < lowerPoint[1]) lowerPoint[1]= p1[1];
+          if(p1[2] < lowerPoint[2]) lowerPoint[2]= p1[2];
+
+          if(p1[0] > upperPoint[0]) upperPoint[0]= p1[0];
+          if(p1[1] > upperPoint[1]) upperPoint[1]= p1[1];
+          if(p1[2] > upperPoint[2]) upperPoint[2]= p1[2];
+
+          if(p2[0] < lowerPoint[0]) lowerPoint[0]= p2[0];
+          if(p2[1] < lowerPoint[1]) lowerPoint[1]= p2[1];
+          if(p2[2] < lowerPoint[2]) lowerPoint[2]= p2[2];
+
+          if(p2[0] > upperPoint[0]) upperPoint[0]= p2[0];
+          if(p2[1] > upperPoint[1]) upperPoint[1]= p2[1];
+          if(p2[2] > upperPoint[2]) upperPoint[2]= p2[2];
+          
         }    
-      DGtal::Surfaces<Z3i::KSpace>::uFillInterior( K,  aSet.surfelPredicate(), 
-                                                   imageResuSegmentation,
-                                                   i, false, false);
-      
+       
+       Z3i::KSpace kRestr ;
+       bool space_ok = kRestr.init( lowerPoint, upperPoint, false );
+       if(simplePredicate(p2)){
+         DGtal::Surfaces<Z3i::KSpace>::uFillInterior( kRestr,  aSet.surfelPredicate(), 
+                                                      imageResuSegmentation,
+                                                      i, false, false);
+       }else if (vm.count("segmentHole")){
+         DGtal::Surfaces<Z3i::KSpace>::uFillExterior( kRestr,  aSet.surfelPredicate(), 
+                                                      imageResuSegmentation,
+                                                      i, false, false);
+       }
     }
   trace.progressBar(vectConnectedSCell.size(), vectConnectedSCell.size());
   GenericWriter<Image3D>::exportFile(outputFilename, imageResuSegmentation);   
