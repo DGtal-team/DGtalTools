@@ -59,8 +59,8 @@ int main( int argc, char** argv )
   general_opt.add_options()
     ("help,h", "display this message")
     ("sliceOrientation,s", po::value<unsigned int>()->default_value(2), "specify the slice orientation for which the slice are considered (by default =2 (Z direction))" )
-    ("input-files,i", po::value<std::vector <std::string> >()->multitoken(), "input 2D files (.pgm) " )
-    ("output-file,o", po::value<std::string>(), "volumetric file (.vol, .longvol .pgm3d) " );
+    ("input,i", po::value<std::vector <std::string> >()->multitoken(), "input 2D files (.pgm) " )
+    ("output,o", po::value<std::string>(), "volumetric file (.vol, .longvol .pgm3d) " );
   
   
   bool parseOK=true;
@@ -76,7 +76,7 @@ int main( int argc, char** argv )
 
   if( !parseOK || vm.count("help"))
     {
-      std::cout << "Usage: " << argv[0] << " [input-files] [output-file]\n"
+      std::cout << "Usage: " << argv[0] << " [input-files] [output]\n"
 		<< "Convert set of 2D images into volumetric file  (pgm3d, vol, longvol) "
 		<< general_opt << "\n";
       std::cout << "Example:\n"
@@ -86,7 +86,7 @@ int main( int argc, char** argv )
       return 0;
     }
   
-  if(! vm.count("input-files")||! vm.count("output-file"))
+  if(! vm.count("input-files")||! vm.count("output"))
     {
       trace.error() << " Input and output filename are needed to be defined" << endl;      
       return 0;
@@ -94,8 +94,8 @@ int main( int argc, char** argv )
 
 
 
-  std::string outputFileName = vm["output-file"].as<std::string>();
-  std::vector<string> vectImage2DNames = vm["input-files"].as<std::vector<std::string> >();
+  std::string outputFileName = vm["output"].as<std::string>();
+  std::vector<string> vectImage2DNames = vm["input"].as<std::vector<std::string> >();
   unsigned int sliceOrientation = vm["sliceOrientation"].as<unsigned int>();
   std::vector<Image2D> vectImages2D; 
   // Reading all images

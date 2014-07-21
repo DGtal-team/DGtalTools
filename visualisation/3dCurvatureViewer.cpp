@@ -100,7 +100,7 @@ int main( int argc, char** argv )
   po::options_description general_opt("Allowed options are");
   general_opt.add_options()
   ("help,h", "display this message")
-  ("input-file,i", po::value< std::string >(), ".vol file")
+  ("input,i", po::value< std::string >(), ".vol file")
   ("radius,r",  po::value< double >(), "Kernel radius for IntegralInvariant" )
   ("threshold,t",  po::value< unsigned int >()->default_value(8), "Min size of SCell boundary of an object" )
   ("minImageThreshold,l",  po::value<  int >()->default_value(0), "set the minimal image threshold to define the image object (object defined by the voxel with intensity belonging to ]minImageThreshold, maxImageThreshold ] )." )
@@ -123,8 +123,8 @@ int main( int argc, char** argv )
   }
   bool neededArgsGiven=true;
   
-  if (parseOK && !(vm.count("input-file"))){
-    missingParam("--input-file");
+  if (parseOK && !(vm.count("input"))){
+    missingParam("--input");
     neededArgsGiven=false;
   }
   if (parseOK && !(vm.count("radius"))){

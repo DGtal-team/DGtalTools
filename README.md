@@ -132,6 +132,7 @@ Visualization
   - 3dImageViewer: tools to display 3d slice images (.vol, .pgm3d and  dicom with ITK) with QGLViewer.
   - 3dSDPViewer: basic display of a sequence of 3d points (as voxel or sphere) and vectors by using QGLviewer.
   - 3dVolViewer: volume file (.vol, .pgm3d and dicom with ITK ) viewer with QGLViewer.
+  - 3dHeightMapViewer: display a 2D image as heightmap by using QGLviewer
   - displayContours: display discrete contours from various format (.fc (freemanchain), .sdp).
   - meshViewer: display 3D mesh from OFS or OFF format.
   - patternTriangulation: a new tool that draws with Board2D the convex hull, the closest-point Delaunay triangulation or the farthest-point Delaunay triangulation of a pattern.
@@ -156,13 +157,15 @@ Here are some illustrations of such a tools:
 </tr>
 <tr>
 <td><img height=130 src="https://f.cloud.github.com/assets/772865/684622/d698405a-da00-11e2-8aa0-19212a58ce23.png"></td>
-<td><img height=130 src="https://cloud.githubusercontent.com/assets/772865/2720141/6c42a0e0-c56b-11e3-8328-a6d88242f21e.png"> </td>
-<td><img height=130 width=200 src="https://cloud.githubusercontent.com/assets/772865/3623729/f022a524-0e52-11e4-96cb-f619f26f83e0.png"></td>
+<td><img width=300 src="https://cloud.githubusercontent.com/assets/772865/2720141/6c42a0e0-c56b-11e3-8328-a6d88242f21e.png"> </td>
+<td><img  width=300 src="https://cloud.githubusercontent.com/assets/772865/3623729/f022a524-0e52-11e4-96cb-f619f26f83e0.png"></td>
+<td><img  width=300 src="https://cloud.githubusercontent.com/assets/772865/3486505/6edb2144-043e-11e4-81c4-2c20f272a119.png" </td>
 </tr>
 <tr>
 <td>meshViewer</td>
 <td>3dSDPViewer</td>
 <td>sliceViewer</td>
+<td>3dHeightMapViewer</td>
 </tr>
 
 
