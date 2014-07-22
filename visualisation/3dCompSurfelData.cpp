@@ -37,6 +37,7 @@
 #include "DGtal/io/readers/MeshReader.h"
 #include "DGtal/topology/helpers/Surfaces.h"
 #include "DGtal/topology/SurfelAdjacency.h"
+#include "DGtal/topology/CanonicCellEmbedder.h"
 
 #include "DGtal/io/Color.h"
 #include "DGtal/io/colormaps/GradientColorMap.h"
@@ -46,6 +47,7 @@
 #include <boost/program_options/parsers.hpp>
 #include <boost/program_options/variables_map.hpp>
 
+#include <limits> 
 
 using namespace std;
 using namespace DGtal;
@@ -78,6 +80,7 @@ getBoundingUpperAndLowerPoint(const std::vector<Point> &vectorPt, Point &ptLower
     }
   }
 }
+
 
 int main( int argc, char** argv )
 {
@@ -167,9 +170,35 @@ int main( int argc, char** argv )
   }
   
   
+  // Brut force association of each surfel of the input to the reference with the minimal distance.
+  // For each surfel of the input we associate an index to the nearest surfel of the reference.
+  CanonicCellEmbedder<KSpace> embeder(K);
+  std::vector<unsigned int> vectIndexMinToReference;
+  
+  trace.info() << "Associating each input surfel to reference:" << std::endl;
+  trace.progressBar(0, surfelAndScalarInput.size());
+  for(unsigned int i=0;i <vectSurfelsInput.size(); i++){
+    trace.progressBar(i, vectSurfelsInput.size());
+    Z3i::RealPoint ptCenterInput = embeder(vectSurfelsInput.at(i));
+    unsigned int indexDistanceMin = 0;
+    double distanceMin = std::numeric_limits<int>::max() ;
+    for(unsigned int j=0; j <vectSurfelsReference.size(); j++){
+      Z3i::RealPoint ptCenterRef = embeder(vectSurfelsReference.at(j));
+      double distance = (ptCenterRef - ptCenterInput).norm();
+      if(distance < distanceMin){
+        distanceMin = distance;
+        indexDistanceMin = j;
+      }
+    }
+    vectIndexMinToReference.push_back(indexDistanceMin);
+    
+  }
+  
+  
+  
   
 
-  
+  //-------------------------
   // Displaying input
   
   QApplication application(argc,argv);
@@ -182,10 +211,17 @@ int main( int argc, char** argv )
   viewer.setWindowTitle("3dCompSurfel Viewer");
   viewer.show();
 
-  
+
+
+  viewer << SetMode3D(vectSurfelsInput.at(0).className(), "Basic");
   for(unsigned int i=0;i <surfelAndScalarInput.size(); i++){
     viewer << vectSurfelsInput.at(i);
+    
+    viewer.addLine(embeder(vectSurfelsInput.at(i)),embeder(vectSurfelsReference.at(vectIndexMinToReference.at(i))));
+    
   }
+  
+
   
   // vector<Z3i::Cell> vectSurfelInput;
   // if(vm.count("SDPindex")) {
