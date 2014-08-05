@@ -93,7 +93,10 @@ int main(int argc, char**argv)
   typedef ImageContainerBySTLVector<Z3i::Domain, unsigned char>  MyImageC;
 
   MyImageC  imageC = VolReader< MyImageC >::importVol ( filename );
-  
   bool res =  RawWriter< MyImageC >::exportRaw8(outputFileName, imageC);
+  trace.info() << "Raw export done, image dimensions: "  << imageC.domain().upperBound()[0]-imageC.domain().lowerBound()[0]+1
+               << " " << imageC.domain().upperBound()[1]-imageC.domain().lowerBound()[1]+1
+               << " " << imageC.domain().upperBound()[2]-imageC.domain().lowerBound()[2]+1 << std::endl;
+    
   if (res) return 0; else return 1;
 }
