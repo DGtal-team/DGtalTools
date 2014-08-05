@@ -35,9 +35,12 @@
 #include "DGtal/io/DrawWithDisplay3DModifier.h"
 #include "DGtal/io/readers/PointListReader.h"
 #include "DGtal/io/readers/MeshReader.h"
+#include "DGtal/io/colormaps/GradientColorMap.h"
+
 #include "DGtal/topology/helpers/Surfaces.h"
 #include "DGtal/topology/SurfelAdjacency.h"
 #include "DGtal/topology/CanonicCellEmbedder.h"
+#include "DGtal/math/Statistic.h"
 
 #include "DGtal/io/Color.h"
 #include "DGtal/io/colormaps/GradientColorMap.h"
@@ -205,19 +208,39 @@ int main( int argc, char** argv )
   typedef Viewer3D<Z3i::Space, Z3i::KSpace> Viewer;
    
 
-  typedef Viewer3D<Z3i::Space, Z3i::KSpace> Viewer;
-  
   Viewer viewer( K );
   viewer.setWindowTitle("3dCompSurfel Viewer");
   viewer.show();
+  
+
+  double maxSqError=0;
+  for(unsigned int i=0;i <surfelAndScalarInput.size(); i++){
+    double curvatureInput = surfelAndScalarInput.at(i)[3];
+    double curvatureRef = surfelAndScalarReference.at(vectIndexMinToReference.at(i))[3];
+    double sqError = (curvatureRef-curvatureInput)*(curvatureRef-curvatureInput);
+    if(sqError> maxSqError){
+      maxSqError =sqError;
+    }
+  }
+  GradientColorMap<double> gradientColorMap( 0, maxSqError );
+  gradientColorMap.addColor( Color(255,255,255,100 ));
+  gradientColorMap.addColor( Color(255,0,0,100 ) );
+  gradientColorMap.addColor( Color(0,0,255,100 ) );
 
 
-
+  
   viewer << SetMode3D(vectSurfelsInput.at(0).className(), "Basic");
   for(unsigned int i=0;i <surfelAndScalarInput.size(); i++){
+
+    double curvatureInput = surfelAndScalarInput.at(i)[3];
+    double curvatureRef = surfelAndScalarReference.at(vectIndexMinToReference.at(i))[3];
+    double sqError = (curvatureRef-curvatureInput)*(curvatureRef-curvatureInput);
+
+    viewer.setFillColor(gradientColorMap(sqError));
+    
     viewer << vectSurfelsInput.at(i);
     
-    viewer.addLine(embeder(vectSurfelsInput.at(i)),embeder(vectSurfelsReference.at(vectIndexMinToReference.at(i))));
+    //viewer.addLine(embeder(vectSurfelsInput.at(i)),embeder(vectSurfelsReference.at(vectIndexMinToReference.at(i))));
     
   }
   
