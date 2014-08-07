@@ -108,6 +108,7 @@ int main( int argc, char** argv )
 ("mode,m", po::value< std::string >()->default_value("mean"), "type of output : mean, gaussian, k1, k2, prindir1 or prindir2 (default mean)")
   ("export,e", po::value< std::string >(), "Export the scene to specified OBJ filename." )
   ("exportDat,E", po::value<std::string>(), "Export resulting curvature (for mean, gaussian, k1 or k2 mode) in a simple data file each line representing a surfel. ")
+  ("exportOnly", "Used to only export the result without the 3d Visualisation (usefull for scripts)." )
   ("imageScale,s", po::value<std::vector<double> >()->multitoken(), "scaleX, scaleY, scaleZ: re sample the source image according with a grid of size 1.0/scale (usefull to compute curvature on image defined on anisotropic grid). Set by default to 1.0 for the three axis.  ")
   ("normalization,n", "When exporting to OBJ, performs a normalization so that the geometry fits in [-1/2,1/2]^3") ;
 
@@ -169,6 +170,8 @@ int main( int argc, char** argv )
   unsigned int threshold = vm["threshold"].as< unsigned int >();
   int minImageThreshold =  vm["minImageThreshold"].as<  int >();
   int maxImageThreshold =  vm["maxImageThreshold"].as<  int >();
+
+  bool exportOnly = vm.count("exportOnly");
 
   double h = 1.0;
  
@@ -259,11 +262,14 @@ int main( int argc, char** argv )
   SurfelAdjacency< Z3i::KSpace::dimension > Sadj( true );
 
   // Viewer settings
+
   QApplication application( argc, argv );
   typedef Viewer3D<Z3i::Space, Z3i::KSpace> Viewer;
-  Viewer viewer( K );
-  viewer.show();
 
+  Viewer viewer( K );
+  if(!exportOnly){
+    viewer.show();
+  }
   // Extraction of components
   typedef KSpace::SurfelSet SurfelSet;
   typedef SetOfSurfels< KSpace, SurfelSet > MySetOfSurfels;
@@ -542,7 +548,13 @@ int main( int argc, char** argv )
   if(myexportDat){
       outDat.close();
   }
-  return application.exec();
+
+  if(!exportOnly){
+    return application.exec();
+  }else{
+    return 0;
+  
+  }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
