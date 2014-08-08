@@ -1,11 +1,10 @@
 	====  Release 0.8 ====
 
-
 * visualisation/:
 	- 3dVolBoundaryViewer: a simple viewer of the boundary of an object defined by thresholding a vol file.
 	- 3dVolMarchingCubes: speed-up by factor 10 simply by replacing the set predicate used in computations.
 	- 3dSDPViewer: basic display of a sequence of 3d points (as voxel or sphere) and vectors by using QGLviewer.
-	- 3dCurvatureViewer: can now display curvature on multiple connected components.
+	- 3dCurvatureViewer: can now display curvature on multiple connected components and can apply image re sampling for anisotropic grid.
 	- sliceViewer: a new 2D and 3D slice viewer from 3D volumic files ( pgm3d, vol, longvol, and DICOM with ITK).
 	- 3dHeightMapViewer: display a 2D image as heightmap by using QGLviewer.
 
