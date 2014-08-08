@@ -98,6 +98,8 @@ int main( int argc, char** argv )
     ("input,i", po::value<std::string>(), "input file: sdpa (sequence of discrete points with attribute)" )
     ("reference,r", po::value<std::string>(), "input reference file: sdpa (sequence of discrete points with attribute)" )
     ("compAccordingLabels,l", "apply the comparisos only on points with same labels (by default fifth colomn)" )
+    ("drawSurfelAssociations,a", "Draw the surfel association." )
+    ("fixMaxColorValue", po::value<double>(), "fix the maximal color value for the scale error display (else the scale is set from the maximal value)" ) 
     ("labelIndex", po::value<unsigned int>(), "set the index of the label (by default set to 4)  " ) 
     ("SDPindex", po::value<std::vector <unsigned int> >()->multitoken(), "specify the sdp index (by default 0,1,2,3).");
 
@@ -194,6 +196,9 @@ int main( int argc, char** argv )
   
   // Brut force association of each surfel of the input to the reference with the minimal distance.
   // For each surfel of the input we associate an index to the nearest surfel of the reference.
+  // if the option --compAccordingLabels is selected then we search only surfel of same label (more precise comparisons in some cases)
+  
+  
   CanonicCellEmbedder<KSpace> embeder(K);
   std::vector<unsigned int> vectIndexMinToReference;
   
@@ -206,6 +211,9 @@ int main( int argc, char** argv )
     unsigned int indexDistanceMin = 0;
     double distanceMin = std::numeric_limits<int>::max() ;
     for(unsigned int j=0; j <vectSurfelsReference.size(); j++){
+      if(useLabels && vectLabelsReference.at(j) != vectLabelsInput.at(i)){
+        continue;
+      }
       Z3i::RealPoint ptCenterRef = embeder(vectSurfelsReference.at(j));
       double distance = (ptCenterRef - ptCenterInput).norm();
       if(distance < distanceMin){
@@ -242,12 +250,15 @@ int main( int argc, char** argv )
       maxSqError =sqError;
     }
   }
+  double maxVal = vm.count("fixMaxColorValue")? vm["fixMaxColorValue"].as<double>():  maxSqError;
   
-  GradientColorMap<double> gradientColorMap( 0, maxSqError );
+  GradientColorMap<double> gradientColorMap( 0, maxVal );
   gradientColorMap.addColor( Color(255,255,255,100 ));
   gradientColorMap.addColor( Color(255,0,0,100 ) );
   gradientColorMap.addColor( Color(0,0,255,100 ) );
 
+  
+  trace.info() << "Maximal error:" << maxSqError << std::endl;
   // Hack waiting issue #899 if maxSqError =0, don't use gradientColorMap
   bool useGrad = maxSqError!=0.0;
 
@@ -262,58 +273,11 @@ int main( int argc, char** argv )
       viewer.setFillColor(Color::White);
     }
     viewer << vectSurfelsInput.at(i);
-    //viewer.addLine(embeder(vectSurfelsInput.at(i)),embeder(vectSurfelsReference.at(vectIndexMinToReference.at(i))));
-    
+    if(vm.count("drawSurfelAssociations")){
+      viewer.addLine(embeder(vectSurfelsInput.at(i)),embeder(vectSurfelsReference.at(vectIndexMinToReference.at(i))));
+    } 
   }
-
-
   
-  // vector<Z3i::Cell> vectSurfelInput;
-  // if(vm.count("SDPindex")) {
-  //   std::vector<unsigned int > vectIndex = vm["SDPindex"].as<std::vector<unsigned int > >();
-  //   if(vectIndex.size()!=3){
-  //     trace.error() << "you need to specify the three indexes of vertex." << std::endl; 
-  //     return 0;
-  //   }
-  //   vectVoxels = PointListReader<Z3i::RealPoint>::getPointsFromFile(inputFilename, vectIndex);
-  // }else{
-  //   vectVoxels = PointListReader<Z3i::RealPoint>::getPointsFromFile(inputFilename);
-  // }
-  
-  // if(!vm.count("noPointDisplay")){
-  //   double percent = vm["filter"].as<double>();
-  //   int step = max(1, (int) (100/percent));
-  //   for(int i=0;i< vectVoxels.size(); i=i+step){
-  //     if(typePrimitive=="voxel"){
-  //       viewer << Z3i::Point((int)vectVoxels.at(i)[0],
-  //                            (int)vectVoxels.at(i)[1],
-  //                            (int)vectVoxels.at(i)[2]); 
-  //     }else{
-  //       viewer.addBall(vectVoxels.at(i), sphereRadius);    
-  //     }
-  //   }  
-  // }
-  
-  // viewer << CustomColors3D(lineColor, lineColor);
-  // if(vm.count("drawLines")){
-  //   for(int i=1;i< vectVoxels.size(); i++){
-  //     viewer.addLine(vectVoxels.at(i-1), vectVoxels.at(i), lineSize); 
-  //   }  
-  // }
-
-  
-  // if(vm.count("drawVectors")){
-  //   std::string vectorsFileName = vm["drawVectors"].as<std::string>(); 
-  //   std::vector<Z3i::RealPoint> vectorsPt = PointListReader<Z3i::RealPoint>::getPointsFromFile(vectorsFileName);
-  //   if (vectorsPt.size()%2==1){
-  //     trace.info()<<"Warning the two set of points doesn't contains the same number of points, some vectors will be skipped." << std::endl;
-  //   }
-  //   for(unsigned int i =0; i<vectorsPt.size()-1; i=i+2){
-  //     viewer.addLine(vectorsPt.at(i),vectorsPt.at(i+1));      
-  //   } 
- 
-    
-  // }
   
   
   viewer << Viewer3D<>::updateDisplay;
