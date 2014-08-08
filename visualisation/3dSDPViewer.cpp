@@ -178,7 +178,7 @@ int main( int argc, char** argv )
   }
   
   
-  GradientColorMap< int > gradientColorMap( 1, 10);
+  GradientColorMap< int > gradientColorMap( 1, * std::max_element(vectLabels.begin(), vectLabels.end()));
   gradientColorMap.addColor( Color(255,100,100 ) );
   gradientColorMap.addColor( Color(1,100, 255 ) );
   
