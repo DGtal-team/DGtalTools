@@ -89,6 +89,7 @@ int main( int argc, char** argv )
 {
 
   typedef PointVector<4, double> Point4D;
+  typedef PointVector<1, int> Point1D;
     
   // parse command line ----------------------------------------------
   po::options_description general_opt("Allowed options are: ");
@@ -96,14 +97,16 @@ int main( int argc, char** argv )
     ("help,h", "display this message")
     ("input,i", po::value<std::string>(), "input file: sdpa (sequence of discrete points with attribute)" )
     ("reference,r", po::value<std::string>(), "input reference file: sdpa (sequence of discrete points with attribute)" )
+    ("compAccordingLabels,l", "apply the comparisos only on points with same labels (by default fifth colomn)" )
+    ("labelIndex", po::value<unsigned int>(), "set the index of the label (by default set to 4)  " ) 
     ("SDPindex", po::value<std::vector <unsigned int> >()->multitoken(), "specify the sdp index (by default 0,1,2,3).");
 
 
   bool parseOK=true;
   bool cannotStart= false;
-  Z3i::KSpace K;
-
   po::variables_map vm;
+
+
   try{
     po::store(po::parse_command_line(argc, argv, general_opt), vm);  
   }catch(const std::exception& ex){
@@ -125,17 +128,33 @@ int main( int argc, char** argv )
 		<< general_opt << "\n";
       return 0;
     }
-
+  Z3i::KSpace K;
   string inputFilename = vm["input"].as<std::string>();
   string referenceFilename = vm["reference"].as<std::string>();
 
   std::vector<Point4D> surfelAndScalarInput;
   std::vector<Point4D> surfelAndScalarReference;
+  std::vector<Point1D> vectLabelsInput;
+  std::vector<Point1D> vectLabelsReference;
+  bool useLabels = vm.count("compAccordingLabels");
+  
+  if(useLabels){
+    if(vm.count("labelIndex")){
+      std::vector<unsigned int > vectIndex;
+      vectIndex.push_back(vm["lSDPindex"].as<unsigned int >());
+      vectLabelsInput = PointListReader<Point1D>::getPointsFromFile(inputFilename, vectIndex);
+      vectLabelsReference = PointListReader<Point1D>::getPointsFromFile(referenceFilename, vectIndex);
+    }else{
+      vectLabelsInput = PointListReader<Point1D>::getPointsFromFile(inputFilename);
+      vectLabelsReference = PointListReader<Point1D>::getPointsFromFile(referenceFilename);
+    }
+  }    
+  
 
   
   if(vm.count("SDPindex")) {
     std::vector<unsigned int > vectIndex = vm["SDPindex"].as<std::vector<unsigned int > >();
-    if(vectIndex.size()!=3){
+    if(vectIndex.size()!=4){
       trace.error() << "you need to specify the three indexes of vertex." << std::endl; 
       return 0;
     }
@@ -180,6 +199,7 @@ int main( int argc, char** argv )
   
   trace.info() << "Associating each input surfel to reference:" << std::endl;
   trace.progressBar(0, surfelAndScalarInput.size());
+
   for(unsigned int i=0;i <vectSurfelsInput.size(); i++){
     trace.progressBar(i, vectSurfelsInput.size());
     Z3i::RealPoint ptCenterInput = embeder(vectSurfelsInput.at(i));
@@ -196,8 +216,8 @@ int main( int argc, char** argv )
     vectIndexMinToReference.push_back(indexDistanceMin);
     
   }
-  
-  
+  trace.progressBar(surfelAndScalarInput.size(), surfelAndScalarInput.size());
+  trace.info() << std::endl;
   
   
 
@@ -222,28 +242,30 @@ int main( int argc, char** argv )
       maxSqError =sqError;
     }
   }
+  
   GradientColorMap<double> gradientColorMap( 0, maxSqError );
   gradientColorMap.addColor( Color(255,255,255,100 ));
   gradientColorMap.addColor( Color(255,0,0,100 ) );
   gradientColorMap.addColor( Color(0,0,255,100 ) );
 
+  // Hack waiting issue #899 if maxSqError =0, don't use gradientColorMap
+  bool useGrad = maxSqError!=0.0;
 
-  
   viewer << SetMode3D(vectSurfelsInput.at(0).className(), "Basic");
-  for(unsigned int i=0;i <surfelAndScalarInput.size(); i++){
-
+  for(unsigned int i=0; i <surfelAndScalarInput.size(); i++){
     double curvatureInput = surfelAndScalarInput.at(i)[3];
     double curvatureRef = surfelAndScalarReference.at(vectIndexMinToReference.at(i))[3];
     double sqError = (curvatureRef-curvatureInput)*(curvatureRef-curvatureInput);
-
-    viewer.setFillColor(gradientColorMap(sqError));
-    
+    if(useGrad){
+      viewer.setFillColor(gradientColorMap(sqError));
+    }else{
+      viewer.setFillColor(Color::White);
+    }
     viewer << vectSurfelsInput.at(i);
-    
     //viewer.addLine(embeder(vectSurfelsInput.at(i)),embeder(vectSurfelsReference.at(vectIndexMinToReference.at(i))));
     
   }
-  
+
 
   
   // vector<Z3i::Cell> vectSurfelInput;
