@@ -230,7 +230,8 @@ int main( int argc, char** argv )
   
 
   //-------------------------
-  // Displaying input
+  // Displaying input with error and computing statistics
+
   
   QApplication application(argc,argv);
   typedef Viewer3D<Z3i::Space, Z3i::KSpace> Viewer;
@@ -240,12 +241,16 @@ int main( int argc, char** argv )
   viewer.setWindowTitle("3dCompSurfel Viewer");
   viewer.show();
   
+  Statistic<double> statErrors(true);
+  
 
+  
   double maxSqError=0;
   for(unsigned int i=0;i <surfelAndScalarInput.size(); i++){
     double curvatureInput = surfelAndScalarInput.at(i)[3];
     double curvatureRef = surfelAndScalarReference.at(vectIndexMinToReference.at(i))[3];
     double sqError = (curvatureRef-curvatureInput)*(curvatureRef-curvatureInput);
+    statErrors.addValue(sqError);
     if(sqError> maxSqError){
       maxSqError =sqError;
     }
@@ -258,7 +263,7 @@ int main( int argc, char** argv )
   gradientColorMap.addColor( Color(0,0,255,100 ) );
 
   
-  trace.info() << "Maximal error:" << maxSqError << std::endl;
+  //trace.info() << "Maximal error:" << maxSqError << std::endl;
   // Hack waiting issue #899 if maxSqError =0, don't use gradientColorMap
   bool useGrad = maxSqError!=0.0;
 
@@ -278,7 +283,9 @@ int main( int argc, char** argv )
     } 
   }
   
-  
+  statErrors.terminate();
+  trace.info()  << statErrors;
+  //  trace.info() << "Median error " << statErrors.median() << std::endl;
   
   viewer << Viewer3D<>::updateDisplay;
   return application.exec();
