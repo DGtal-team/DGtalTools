@@ -149,6 +149,7 @@ int main( int argc, char** argv )
   float sx = vm["scaleX"].as<float>();
   float sy = vm["scaleY"].as<float>();
   float sz = vm["scaleZ"].as<float>();
+
   bool colorFromLabels = vm.count("colorFromLabels");
   
   
@@ -178,10 +179,11 @@ int main( int argc, char** argv )
   }
   
   
-  GradientColorMap< int > gradientColorMap( 1, * std::max_element(vectLabels.begin(), vectLabels.end()));
-  gradientColorMap.addColor( Color(255,100,100 ) );
-  gradientColorMap.addColor( Color(1,100, 255 ) );
-  
+  GradientColorMap< int > gradientColorMap( 1, (!colorFromLabels)? 1:  * std::max_element(vectLabels.begin(), vectLabels.end()));
+  if(colorFromLabels){
+    gradientColorMap.addColor( Color(255,100,100 ) );
+    gradientColorMap.addColor( Color(1,100, 255 ) );
+  }
   vector<Z3i::RealPoint> vectVoxels;
   if(vm.count("SDPindex")) {
     std::vector<unsigned int > vectIndex = vm["SDPindex"].as<std::vector<unsigned int > >();
