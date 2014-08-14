@@ -401,8 +401,6 @@ int main( int argc, char** argv )
       }
 
       ASSERT( min <= max );
-      trace.info() << "min " << min<< " max " << max<< std::endl;
-
       typedef GradientColorMap< Quantity > Gradient;
       Gradient cmap_grad( min, (max==min)? max+1: max );
       cmap_grad.addColor( Color( 50, 50, 255 ) );
