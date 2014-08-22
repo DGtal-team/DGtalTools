@@ -15,8 +15,8 @@
  *
  **/
 /**
- * @file volCrop.cpp
- * @ingroup volumetric/volTrValues
+ * @file volTrValues.cpp
+ * @ingroup volumetric/
  * @author Bertrand Kerautret (\c kerautre@loria.fr )
  * LORIA (CNRS, UMR 7503), University of Nancy, France
  *
@@ -86,8 +86,8 @@ int main(int argc, char**argv)
     {
       trace.info() << "Apply basic vol image transform from the input values to output values."<<std::endl
                    << std::endl << "Basic usage: "<<std::endl
-                   << "\t volTrValues --input <volFileName> --o <volOutputFileName> -s 1 100 -r 100 200  "<<std::endl
-                   << "\t => all voxel of values 1 (resp. 100) will be 100 (resp. 200) in the resulting image.   "<<std::endl
+                   << "\t volTrValues --input <volFileName> --o <volOutputFileName> -s 1 99 -r 100 200  "<<std::endl
+                   << "\t => all voxel of values 1 (resp. 99) will be 100 (resp. 200) in the resulting image.   "<<std::endl
                    << general_opt << "\n";
       if( !vm.count("inputVals")){
         missingParam("inputVals");
@@ -117,14 +117,14 @@ int main(int argc, char**argv)
   std::vector<unsigned int>  outputVals = vm["outputVals"].as<std::vector<unsigned int > >();
 
   if(inputVals.size()!=outputVals.size()){
-    trace.error()<< "Transformation not possible the two set of input/output values should be of same size." << std::endl;
+    trace.error()<< "Transformation not possible the two sets of input/output values should have the same size." << std::endl;
     exit(1);
   }
   
   trace.beginBlock("Loading file");
   typedef ImageContainerBySTLVector<Z3i::Domain, unsigned char>  MyImageC;
-  trace.endBlock();  
   MyImageC  image = GenericReader< MyImageC >::import( filename );
+  trace.endBlock();  
   unsigned int val;
   for(MyImageC::Domain::ConstIterator it = image.domain().begin(),
         itend = image.domain().end(); it != itend; ++it)

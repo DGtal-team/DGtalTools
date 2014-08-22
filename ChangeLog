@@ -20,7 +20,7 @@
 
 
 * volumetric/:
-	- volTrValues: a basic tool to transform the voxel intensity values from an input/output set.
+	- volTrValues: a basic tool to transform the voxel values from an input/output set.
 
 
 
