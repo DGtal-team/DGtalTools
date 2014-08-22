@@ -72,6 +72,8 @@
 
 using namespace DGtal;
 
+typedef std::pair<double,double> PrincipalCurvatures;
+
 template < typename Shape, typename KSpace, typename ConstIterator, typename OutputIterator >
 void
 estimateTrueMeanCurvatureQuantity( const ConstIterator & it_begin,
@@ -138,9 +140,9 @@ estimateTruePrincipalCurvaturesQuantity( const ConstIterator & it_begin,
         currentRealPoint = embedder( *it_begin ) * h;
         double k1, k2;
         aShape->principalCurvatures( currentRealPoint, k1, k2 );
-        deprecated::CurvatureInformations result;
-        result.k1 = k1;
-        result.k2 = k2;
+        PrincipalCurvatures result;
+        result.first = k1;
+        result.second = k2;
         *output = result;
         ++output;
     }
@@ -313,8 +315,8 @@ compareShapeEstimators( const std::string & filename,
 
                     std::ostream_iterator< std::string > out_it_true_pc( file, "\n" );
 
-                    std::vector<deprecated::CurvatureInformations> v_results;
-                    std::back_insert_iterator< std::vector<deprecated::CurvatureInformations> > bkIt(v_results);
+                    std::vector<PrincipalCurvatures> v_results;
+                    std::back_insert_iterator< std::vector<PrincipalCurvatures> > bkIt(v_results);
                     range = new VisitorRange( new Visitor( surf, *surf.begin() ));
                     ibegin = range->begin();
                     iend = range->end();
@@ -331,7 +333,7 @@ compareShapeEstimators( const std::string & filename,
                     for(unsigned int ii = 0; ii < v_results.size(); ++ii )
                     {
                         std::stringstream ss;
-                        ss << v_results[ii].k1 << " " << v_results[ii].k2;
+                        ss << v_results[ii].first << " " << v_results[ii].second;
                         *out_it_true_pc = ss.str();
                         ++out_it_true_pc;
                     }
@@ -462,8 +464,8 @@ compareShapeEstimators( const std::string & filename,
                     curvatureEstimator.setParams( re/h );
                     curvatureEstimator.init( h, ibegin, iend );
 
-                    std::vector<std::pair<double,double> > v_results;
-                    std::back_insert_iterator< std::vector<std::pair<double,double> > > bkIt(v_results);
+                    std::vector<PrincipalCurvatures> v_results;
+                    std::back_insert_iterator< std::vector<PrincipalCurvatures> > bkIt(v_results);
 
                     curvatureEstimator.eval( ibegin, iend, bkIt );
 
@@ -593,15 +595,15 @@ compareShapeEstimators( const std::string & filename,
                     file << "# computed kernel radius = " << re << std::endl;
                     std::ostream_iterator< std::string > out_it_monge_principal( file, "\n" );
 
-                    std::vector<deprecated::CurvatureInformations> v_results;
-                    std::back_insert_iterator< std::vector<deprecated::CurvatureInformations> > bkIt(v_results);
+                    std::vector<PrincipalCurvatures> v_results;
+                    std::back_insert_iterator< std::vector<PrincipalCurvatures> > bkIt(v_results);
 
                     reporterK.eval(ibegin, iend , bkIt);//out_it_monge_principal);
 
                     for(unsigned int ii = 0; ii < v_results.size(); ++ii )
                     {
                         std::stringstream ss;
-                        ss << v_results[ii].k1 << " " << v_results[ii].k2;
+                        ss << v_results[ii].first << " " << v_results[ii].second;
                         *out_it_monge_principal = ss.str();
                         ++out_it_monge_principal;
                     }
@@ -740,8 +742,8 @@ compareShapeEstimators( const std::string & filename,
 
                     std::ostream_iterator< std::string > out_it_true_pc( file, "\n" );
 
-                    std::vector<deprecated::CurvatureInformations> v_results;
-                    std::back_insert_iterator< std::vector<deprecated::CurvatureInformations> > bkIt(v_results);
+                    std::vector<PrincipalCurvatures> v_results;
+                    std::back_insert_iterator< std::vector<PrincipalCurvatures> > bkIt(v_results);
 
                     range = new VisitorRange( new Visitor( surf, *surf.begin() ));
                     ibegin = range->begin();
@@ -760,7 +762,7 @@ compareShapeEstimators( const std::string & filename,
                     for(unsigned int ii = 0; ii < v_results.size(); ++ii )
                     {
                         std::stringstream ss;
-                        ss << v_results[ii].k1 << " " << v_results[ii].k2;
+                        ss << v_results[ii].first << " " << v_results[ii].second;
                         *out_it_true_pc = ss.str();
                         ++out_it_true_pc;
                     }
@@ -892,8 +894,8 @@ compareShapeEstimators( const std::string & filename,
                     curvatureEstimator.setParams( re/h );
                     curvatureEstimator.init( h, ibegin, iend );
 
-                    std::vector<std::pair<double,double> > v_results;
-                    std::back_insert_iterator< std::vector<std::pair<double,double> > > bkIt(v_results);
+                    std::vector<PrincipalCurvatures> v_results;
+                    std::back_insert_iterator< std::vector<PrincipalCurvatures> > bkIt(v_results);
 
                     curvatureEstimator.eval( ibegin, iend, bkIt );
 
@@ -1019,15 +1021,15 @@ compareShapeEstimators( const std::string & filename,
                     file << "# computed kernel radius = " << re << std::endl;
                     std::ostream_iterator< std::string > out_it_monge_principal( file, "\n" );
 
-                    std::vector<deprecated::CurvatureInformations> v_results;
-                    std::back_insert_iterator< std::vector<deprecated::CurvatureInformations> > bkIt(v_results);
+                    std::vector<PrincipalCurvatures> v_results;
+                    std::back_insert_iterator< std::vector<PrincipalCurvatures> > bkIt(v_results);
 
                     reporterK.eval(ibegin, iend , bkIt);//out_it_monge_principal);
 
                     for(unsigned int ii = 0; ii < v_results.size(); ++ii )
                     {
                         std::stringstream ss;
-                        ss << v_results[ii].k1 << " " << v_results[ii].k2;
+                        ss << v_results[ii].first << " " << v_results[ii].second;
                         *out_it_monge_principal = ss.str();
                         ++out_it_monge_principal;
                     }
