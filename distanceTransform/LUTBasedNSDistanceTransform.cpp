@@ -156,7 +156,6 @@ int main( int argc, char** argv )
     }
 
     //sourceOfDT source = undefined;
-    char *myName = argv[0];
     NeighborhoodSequenceDistance *dist = NULL;
 
     // Distance selection ----------------------------------------------------//
@@ -167,7 +166,7 @@ int main( int argc, char** argv )
 	dist = NeighborhoodSequenceDistance::newD8Instance();
     }
     else if (vm.count("ratio")) {
-	int num, den;
+	int den;
 	boost::rational<int> ratio;
 	std::istringstream iss(vm["ratio"].as<std::string>());
 	iss >> ratio;
