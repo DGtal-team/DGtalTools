@@ -166,8 +166,7 @@ int main( int argc, char** argv )
 	dist = NeighborhoodSequenceDistance::newD8Instance();
     }
     else if (vm.count("ratio")) {
-	int den;
-	boost::rational<int> ratio;
+      	boost::rational<int> ratio;
 	std::istringstream iss(vm["ratio"].as<std::string>());
 	iss >> ratio;
 	//trace.info() << ratio << std::endl;
