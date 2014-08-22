@@ -14,8 +14,8 @@
  *
  **/
 /**
- * @file visuDistanceTransform.cpp
- * @ingroup surfaceTools
+ * @file meshViewer.cpp
+ * @ingroup visualisation
  * @author Bertrand Kerautret (\c kerautre@loria.fr )
  * LORIA (CNRS, UMR 7503), University of Nancy, France
  *
@@ -60,6 +60,7 @@ int main( int argc, char** argv )
     ("scaleX,x",  po::value<float>()->default_value(1.0), "set the scale value in the X direction (default 1.0)" )
     ("scaleY,y",  po::value<float>()->default_value(1.0), "set the scale value in the Y direction (default 1.0)" )
     ("scaleZ,z",  po::value<float>()->default_value(1.0), "set the scale value in the Z direction (default 1.0)")
+    ("displaySDP,s", po::value<std::string>(), "Add the display of a set of discrete points as ball of radius 0.5.")
     ("invertNormal,n", "threshold min to define binary shape" )
     ("drawVertex,v", "draw the vertex of the mesh" );
 
@@ -124,7 +125,15 @@ int main( int argc, char** argv )
       viewer << pt;
     }
   }
-
+  if(vm.count("displaySDP")){
+    std::string filenameSDP = vm["displaySDP"].as<std::string>();
+    vector<Z3i::RealPoint> vectPoints;
+    vectPoints = PointListReader<Z3i::RealPoint>::getPointsFromFile(filenameSDP);
+    for(int i=0;i< vectPoints.size(); i++){
+      viewer.addBall(vectPoints.at(i), 0.5);    
+    }
+  }
+  
   viewer << Viewer3D<>::updateDisplay;
   return application.exec();
 }
