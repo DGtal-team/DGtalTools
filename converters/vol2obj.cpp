@@ -119,7 +119,7 @@ int main( int argc, char** argv )
     if(extension=="sdp")
       {
         vector<Z3i::Point> vectVoxels = PointListReader<Z3i::Point>::getPointsFromFile(inputFilename);
-        for(int i=0;i< vectVoxels.size(); i++){
+        for(unsigned int i=0;i< vectVoxels.size(); i++){
           board << vectVoxels.at(i);
         }
       }
