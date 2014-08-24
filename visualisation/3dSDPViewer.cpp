@@ -199,7 +199,7 @@ int main( int argc, char** argv )
   if(!vm.count("noPointDisplay")){
     double percent = vm["filter"].as<double>();
     int step = max(1, (int) (100/percent));
-    for(int i=0;i< vectVoxels.size(); i=i+step){
+    for(unsigned int i=0;i< vectVoxels.size(); i=i+step){
       if(colorFromLabels){
         Color col = gradientColorMap((int) vectLabels.at(i));
         viewer.setFillColor(col);
@@ -217,7 +217,7 @@ int main( int argc, char** argv )
   
   viewer << CustomColors3D(lineColor, lineColor);
   if(vm.count("drawLines")){
-    for(int i=1;i< vectVoxels.size(); i++){
+    for(unsigned int i=1;i< vectVoxels.size(); i++){
       viewer.addLine(vectVoxels.at(i-1), vectVoxels.at(i), lineSize); 
     }  
   }
