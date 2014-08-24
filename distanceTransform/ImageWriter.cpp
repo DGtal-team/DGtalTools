@@ -49,7 +49,7 @@ ImageConsumer<GrayscalePixelType> *createImageWriter(std::string filename, std::
 
     // Format wasn't specified in arguments, check if there is a prefix for it.
     if (format == "") {
-	int n = filename.find(':');
+	unsigned int n = filename.find(':');
 	if (n != std::string::npos) {
 	    format = filename.substr(0, n);
 	    filename = filename.substr(n+1);
@@ -59,7 +59,7 @@ ImageConsumer<GrayscalePixelType> *createImageWriter(std::string filename, std::
     // Format wasn't specified in arguments nor in the filename prefix, check if
     // there the file has an extension
     if (format == "") {
-	int n = filename.rfind('.');
+	unsigned int n = filename.rfind('.');
 	if (n != std::string::npos)
 	    format = filename.substr(n+1);
     }

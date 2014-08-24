@@ -66,7 +66,9 @@ int main( int argc, char** argv )
     ("SDPindex", po::value<std::vector <unsigned int> >()->multitoken(), "specify the sdp index (by default 0,1,2).")
     ("pointColor,c", po::value<std::vector <int> >()->multitoken(), "set the color of  points: r g b a " )
     ("lineColor,l",po::value<std::vector <int> >()->multitoken(), "set the color of line: r g b a " ) 
-    ("filter,f",po::value<double>()->default_value(100.0), "filter input file in order to display only the [arg] pourcent of the input 3D points (uniformly selected)." ) 
+    ("colorFromLabels", "use the color indexed from labels in the file.")
+    ("labelsIndex", po::value<unsigned int>(), "define the index of the label in the source file (used by --LabelsIndex) ")
+    ("filter,f",po::value<double>()->default_value(100.0), "filter input file in order to display only the [arg] pourcent of the input 3D points (uniformly selected)." )
     ("noPointDisplay", "usefull for instance to only display the lines between points.")
     ("drawLines", "draw the line between discrete points." ) 
     ("scaleX,x",  po::value<float>()->default_value(1.0), "set the scale value in the X direction (default 1.0)" )
@@ -80,6 +82,8 @@ int main( int argc, char** argv )
      
   bool parseOK=true;
   bool cannotStart= false;
+  typedef PointVector<1, int> Point1D;
+
   
   po::variables_map vm;
   try{
@@ -146,15 +150,40 @@ int main( int argc, char** argv )
   float sy = vm["scaleY"].as<float>();
   float sz = vm["scaleZ"].as<float>();
 
+  bool colorFromLabels = vm.count("colorFromLabels");
+  
+  
   typedef Viewer3D<Z3i::Space, Z3i::KSpace> Viewer;
   Z3i::KSpace K;
   Viewer viewer( K );
   viewer.setWindowTitle("3dSPD Viewer");
   viewer.show();
   viewer.setGLScale(sx, sy, sz);  
-  
   viewer << CustomColors3D(pointColor, pointColor);
+
+
+  // Get vector of labels if exists.
+  std::vector<unsigned int> vectLabels;
+  if(colorFromLabels){
+    std::vector<Point1D> vectVal;
+    std::vector<unsigned int> vectIndex;
+    if(vm.count("labelsIndex")){
+      vectIndex.push_back(vm["labelsIndex"].as<unsigned int>());
+    }else{
+      vectIndex.push_back(3);
+    }
+    vectVal = PointListReader<Point1D>::getPointsFromFile(inputFilename, vectIndex); 
+    for(std::vector<Point1D>::iterator it= vectVal.begin(); it!=vectVal.end(); it++){
+      vectLabels.push_back((unsigned int)(*it)[0]);
+    }
+  }
   
+  
+  GradientColorMap< int > gradientColorMap( 1, (!colorFromLabels)? 1:  * std::max_element(vectLabels.begin(), vectLabels.end()));
+  if(colorFromLabels){
+    gradientColorMap.addColor( Color(255,100,100 ) );
+    gradientColorMap.addColor( Color(1,100, 255 ) );
+  }
   vector<Z3i::RealPoint> vectVoxels;
   if(vm.count("SDPindex")) {
     std::vector<unsigned int > vectIndex = vm["SDPindex"].as<std::vector<unsigned int > >();
@@ -170,7 +199,12 @@ int main( int argc, char** argv )
   if(!vm.count("noPointDisplay")){
     double percent = vm["filter"].as<double>();
     int step = max(1, (int) (100/percent));
-    for(int i=0;i< vectVoxels.size(); i=i+step){
+    for(unsigned int i=0;i< vectVoxels.size(); i=i+step){
+      if(colorFromLabels){
+        Color col = gradientColorMap((int) vectLabels.at(i));
+        viewer.setFillColor(col);
+      }
+      
       if(typePrimitive=="voxel"){
         viewer << Z3i::Point((int)vectVoxels.at(i)[0],
                              (int)vectVoxels.at(i)[1],
@@ -183,7 +217,7 @@ int main( int argc, char** argv )
   
   viewer << CustomColors3D(lineColor, lineColor);
   if(vm.count("drawLines")){
-    for(int i=1;i< vectVoxels.size(); i++){
+    for(unsigned int i=1;i< vectVoxels.size(); i++){
       viewer.addLine(vectVoxels.at(i-1), vectVoxels.at(i), lineSize); 
     }  
   }

@@ -55,8 +55,9 @@ int main( int argc, char** argv )
     ("help,h", "display this message")
     ("input,i", po::value<std::string>(), "volumetric file (.vol) " )
     ("output,o", po::value<std::string>(), "sequence of discrete point file (.sdp) " )
-    ("thresholdMin,m", po::value<int>(), "min threshold (default 128)" )
-    ("thresholdMax,M", po::value<int>(), "max threshold (default 255)" );
+    ("exportImageValues,e","option to export also the image value of the voxel in a fourth field.")
+    ("thresholdMin,m", po::value<int>()->default_value(128), "min threshold (default 128)" )
+    ("thresholdMax,M", po::value<int>()->default_value(255), "max threshold (default 255)" );
   
   
   bool parseOK=true;
@@ -98,9 +99,22 @@ int main( int argc, char** argv )
 
   trace.info() << "Processing image to output file " << outputFilename ; 
   //Processing all points
+  outStream << "# sdp file generate by vol2sdp with source vol:" << inputFilename << " and threshold min: " <<  minTh << " max:" << maxTh << std::endl;
+  outStream << "# format: x y z ";
+  if(vm.count("exportImageValues")){
+    outStream << " image_value";
+  }
+  outStream << std::endl;
+  
+  
   for(Image3D::Domain::ConstIterator it=inputImage.domain().begin(); it != inputImage.domain().end(); ++it){
     if(inputImage(*it) >= minTh && inputImage(*it) <= maxTh ){
-      outStream << (*it)[0] << " " << (*it)[1] << " " << (*it)[2] << std::endl;
+      outStream << (*it)[0] << " " << (*it)[1] << " " << (*it)[2];
+      if(vm.count("exportImageValues")){
+        outStream << " " << (unsigned int) inputImage(*it);
+      }
+      
+      outStream << std::endl;
     }
   }
  outStream.close();
