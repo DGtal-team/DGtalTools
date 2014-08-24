@@ -63,7 +63,7 @@ namespace po = boost::program_options;
 
 static const int MIN_ZOOM_FACTOR = 10.0;
 static const int MAX_ZOOM_FACTOR = 40.0;
-static const int INIT_ZOOM_FACTOR = 20.0;
+static const int INIT_SCALE1_ZOOM_FACTOR = 20.0;
 
 
 
@@ -119,6 +119,10 @@ MainWindow::MainWindow(DGtal::Viewer3D<> *aViewer,
     QObject::connect(ui->_zoomYSlider, SIGNAL(valueChanged(int)), this, SLOT(updateZoomImageY()));
     QObject::connect(ui->_zoomZSlider, SIGNAL(valueChanged(int)), this, SLOT(updateZoomImageZ()));
 
+    QObject::connect(ui->_scale1ButtonX, SIGNAL(clicked()), this, SLOT(setScale1_1_ImageX()));
+    QObject::connect(ui->_scale1ButtonY, SIGNAL(clicked()), this, SLOT(setScale1_1_ImageY()));
+    QObject::connect(ui->_scale1ButtonZ, SIGNAL(clicked()), this, SLOT(setScale1_1_ImageZ()));
+
     ui->_horizontalSliderZ->setMinimum(0);
     ui->_horizontalSliderZ->setMaximum(anImage->domain().upperBound()[2]);
 
@@ -130,15 +134,15 @@ MainWindow::MainWindow(DGtal::Viewer3D<> *aViewer,
 
     ui->_zoomXSlider->setMinimum( MIN_ZOOM_FACTOR);
     ui->_zoomXSlider->setMaximum( MAX_ZOOM_FACTOR);
-    ui->_zoomXSlider->setValue(INIT_ZOOM_FACTOR);
+    ui->_zoomXSlider->setValue(INIT_SCALE1_ZOOM_FACTOR);
     
     ui->_zoomYSlider->setMinimum(MIN_ZOOM_FACTOR);
     ui->_zoomYSlider->setMaximum(MAX_ZOOM_FACTOR);
-    ui->_zoomYSlider->setValue(INIT_ZOOM_FACTOR);
+    ui->_zoomYSlider->setValue(INIT_SCALE1_ZOOM_FACTOR);
 
     ui->_zoomZSlider->setMinimum(MIN_ZOOM_FACTOR);
     ui->_zoomZSlider->setMaximum(MAX_ZOOM_FACTOR);
-    ui->_zoomZSlider->setValue(INIT_ZOOM_FACTOR);
+    ui->_zoomZSlider->setValue(INIT_SCALE1_ZOOM_FACTOR);
 
 
     
@@ -173,18 +177,48 @@ void MainWindow::updateSliceImageZ(){
 }
 
 
+void MainWindow::setScale1_1_ImageX(){
+  ui->_zoomXSlider->setValue(INIT_SCALE1_ZOOM_FACTOR);
+  updateZoomImageX();
+}
+
+void MainWindow::setScale1_1_ImageY(){
+  ui->_zoomYSlider->setValue(INIT_SCALE1_ZOOM_FACTOR);
+  updateZoomImageY();
+}
+
+void MainWindow::setScale1_1_ImageZ(){
+  ui->_zoomZSlider->setValue(INIT_SCALE1_ZOOM_FACTOR);
+  updateZoomImageZ();
+}
+
+
 
 void MainWindow::updateZoomImageX(){
-  double gridSize = (double)INIT_ZOOM_FACTOR/ui->_zoomXSlider->value();
+  double gridSize = (double)INIT_SCALE1_ZOOM_FACTOR/ui->_zoomXSlider->value();
   updateZoomImageX(ui->_horizontalSliderX->value(), gridSize );
+  QString gridStr = QString::number(gridSize, 'f', 3);
+  QString scaleStr = QString::number(1.0/gridSize, 'f', 3);
+  ui->_groupBoxX->setTitle(QString("Slice View X: sampling grid size: ").append(gridStr).
+                           append(QString(" (zoom x "). append(scaleStr).append(QString(")") )));
 }
 void MainWindow::updateZoomImageY(){
-  double gridSize = (double)INIT_ZOOM_FACTOR/ui->_zoomYSlider->value();
+  double gridSize = (double)INIT_SCALE1_ZOOM_FACTOR/ui->_zoomYSlider->value();
   updateZoomImageY(ui->_horizontalSliderY->value(), gridSize );
+  QString gridStr = QString::number(gridSize, 'f', 3);
+  QString scaleStr = QString::number(1.0/gridSize, 'f', 3);
+  ui->_groupBoxY->setTitle(QString("Slice View Y: sampling grid size: ").append(gridStr).
+                           append(QString(" (zoom x "). append(scaleStr).append(QString(")") )));
+
 }
 void MainWindow::updateZoomImageZ(){
-  double gridSize = (double)INIT_ZOOM_FACTOR/ui->_zoomZSlider->value();
+  double gridSize = (double)INIT_SCALE1_ZOOM_FACTOR/ui->_zoomZSlider->value();
   updateZoomImageZ(ui->_horizontalSliderZ->value(), gridSize );
+  QString gridStr = QString::number(gridSize, 'f', 3);
+  QString scaleStr = QString::number(1.0/gridSize, 'f', 3);
+  ui->_groupBoxZ->setTitle(QString("Slice View Z: sampling grid size: ").append(gridStr).
+                           append(QString(" (zoom x "). append(scaleStr).append(QString(")") )));
+
 }
 
 
@@ -228,7 +262,7 @@ void MainWindow::updateSliceImageX(unsigned int sliceNumber, bool init){
   DGtal::functors::Projector<DGtal::Z3i::Space> aSliceFunctor(sliceNumber); aSliceFunctor.initAddOneDim(0);
   SliceImageAdapter sliceImage (*myImage3D, domain2D, aSliceFunctor, functors::Identity());
   
-  double gridSize = ((double)INIT_ZOOM_FACTOR)/ui->_zoomXSlider->value();
+  double gridSize = ((double)INIT_SCALE1_ZOOM_FACTOR)/ui->_zoomXSlider->value();
   QImage anImage = getImage(sliceImage, gridSize); 
   setImageProjX(QPixmap::fromImage(anImage));
   if(init){
@@ -254,7 +288,7 @@ void MainWindow::updateSliceImageY(unsigned int sliceNumber, bool init){
   DGtal::functors::Projector<DGtal::Z3i::Space> aSliceFunctor(sliceNumber); aSliceFunctor.initAddOneDim(1);
   SliceImageAdapter sliceImage(*myImage3D, domain2D, aSliceFunctor, functors::Identity());
   
-  double gridSize = ((double)INIT_ZOOM_FACTOR)/ui->_zoomYSlider->value();
+  double gridSize = ((double)INIT_SCALE1_ZOOM_FACTOR)/ui->_zoomYSlider->value();
   QImage anImage = getImage(sliceImage, gridSize); 
   setImageProjY(QPixmap::fromImage(anImage));
   if(init){
@@ -280,7 +314,7 @@ void MainWindow::updateSliceImageZ(unsigned int sliceNumber, bool init){
                               invFunctor(myImage3D->domain().upperBound()));
   DGtal::functors::Projector<DGtal::Z3i::Space> aSliceFunctor(sliceNumber); aSliceFunctor.initAddOneDim(2);
   SliceImageAdapter sliceImage(*myImage3D, domain2D, aSliceFunctor, functors::Identity());
-  double gridSize = (double)INIT_ZOOM_FACTOR/ui->_zoomZSlider->value();
+  double gridSize = (double)INIT_SCALE1_ZOOM_FACTOR/ui->_zoomZSlider->value();
   QImage anImage = getImage(sliceImage, gridSize); 
   setImageProjZ(QPixmap::fromImage(anImage));
  if(init){

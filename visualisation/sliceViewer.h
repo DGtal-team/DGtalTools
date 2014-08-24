@@ -77,6 +77,11 @@ public slots:
   void updateZoomImageX();
   void updateZoomImageY();
   void updateZoomImageZ();
+
+  void setScale1_1_ImageX();
+  void setScale1_1_ImageY();
+  void setScale1_1_ImageZ();
+
   
 private:
   Ui::MainWindow *ui;
