@@ -39,6 +39,7 @@
 #include "DGtal/io/viewers/Viewer3D.h"
 #include "DGtal/io/DrawWithDisplay3DModifier.h"
 #include "DGtal/io/readers/PointListReader.h"
+#include "DGtal/images/ConstImageAdapter.h"
 
 #include "DGtal/io/Color.h"
 #include "DGtal/io/colormaps/GradientColorMap.h"
@@ -63,16 +64,30 @@ namespace po = boost::program_options;
 
 template <typename TImage>
 static QImage 
-getImage(const TImage &anImage ){
-  unsigned int height = anImage.domain().upperBound()[1]+1;
-  unsigned int width = anImage.domain().upperBound()[0]+1;
+getImage(const TImage &anImage, double gridSize=1.0 ){
+  typedef ConstImageAdapter<TImage, typename TImage::Domain, 
+                            functors::BasicDomainSubSampler<typename TImage::Domain, int, double>,  
+                            typename TImage::Value,
+                            functors::Identity > ConstImageAdapterForSubSampling;
+  
+  std::vector<double> scales;
+  scales.push_back(gridSize);
+  scales.push_back(gridSize);
+  
+  functors::BasicDomainSubSampler<typename TImage::Domain, int, double> subSampler (anImage.domain(), scales, Z2i::Point(0,0)); 
+  typename TImage::Domain newDomain = subSampler.getSubSampledDomain();
+  functors::Identity id;
+  ConstImageAdapterForSubSampling  scaledImage (anImage, newDomain, subSampler, id ); 
+  
+  unsigned int height = scaledImage.domain().upperBound()[1]+1;
+  unsigned int width = scaledImage.domain().upperBound()[0]+1;
   uchar * data = new uchar [height*width*4];
   for(unsigned int i=0; i<height; i++){
     for(unsigned int j=0; j<width; j++){
-      data[(j+width*i)*4]=anImage(Z2i::Point(j,i));
-      data[(j+width*i)*4+1]=anImage(Z2i::Point(j,i));
-      data[(j+width*i)*4+2]=anImage(Z2i::Point(j,i));
-      data[(j+width*i)*4+3]=anImage(Z2i::Point(j,i));
+      data[(j+width*i)*4]=scaledImage(Z2i::Point(j,i));
+      data[(j+width*i)*4+1]=scaledImage(Z2i::Point(j,i));
+      data[(j+width*i)*4+2]=scaledImage(Z2i::Point(j,i));
+      data[(j+width*i)*4+3]=scaledImage(Z2i::Point(j,i));
     }
   }
    QImage result(  data, width,  height, QImage::Format_RGB32 );
