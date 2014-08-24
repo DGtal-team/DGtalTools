@@ -29,8 +29,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 #include <iostream>
 #include <fstream>
-#include <unordered_set>
-
 
 #include "DGtal/base/Common.h"
 #include "DGtal/helpers/StdDefs.h"
