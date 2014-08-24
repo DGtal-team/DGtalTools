@@ -59,6 +59,11 @@ using namespace Z3i;
 namespace po = boost::program_options;
 
 
+// Set to define slider int value and grid size
+
+static const int MIN_ZOOM_FACTOR = 10.0;
+static const int MAX_ZOOM_FACTOR = 40.0;
+static const int INIT_ZOOM_FACTOR = 20.0;
 
 
 
@@ -110,6 +115,9 @@ MainWindow::MainWindow(DGtal::Viewer3D<> *aViewer,
     QObject::connect(ui->_horizontalSliderX, SIGNAL(valueChanged(int)), this, SLOT(updateSliceImageX()));
     QObject::connect(ui->_horizontalSliderY, SIGNAL(valueChanged(int)), this, SLOT(updateSliceImageY()));
     QObject::connect(ui->_horizontalSliderZ, SIGNAL(valueChanged(int)), this, SLOT(updateSliceImageZ()));
+    QObject::connect(ui->_zoomXSlider, SIGNAL(valueChanged(int)), this, SLOT(updateZoomImageX()));
+    QObject::connect(ui->_zoomYSlider, SIGNAL(valueChanged(int)), this, SLOT(updateZoomImageY()));
+    QObject::connect(ui->_zoomZSlider, SIGNAL(valueChanged(int)), this, SLOT(updateZoomImageZ()));
 
     ui->_horizontalSliderZ->setMinimum(0);
     ui->_horizontalSliderZ->setMaximum(anImage->domain().upperBound()[2]);
@@ -119,6 +127,20 @@ MainWindow::MainWindow(DGtal::Viewer3D<> *aViewer,
 
     ui->_horizontalSliderX->setMinimum(0);
     ui->_horizontalSliderX->setMaximum(anImage->domain().upperBound()[0]);
+
+    ui->_zoomXSlider->setMinimum( MIN_ZOOM_FACTOR);
+    ui->_zoomXSlider->setMaximum( MAX_ZOOM_FACTOR);
+    ui->_zoomXSlider->setValue(INIT_ZOOM_FACTOR);
+    
+    ui->_zoomYSlider->setMinimum(MIN_ZOOM_FACTOR);
+    ui->_zoomYSlider->setMaximum(MAX_ZOOM_FACTOR);
+    ui->_zoomYSlider->setValue(INIT_ZOOM_FACTOR);
+
+    ui->_zoomZSlider->setMinimum(MIN_ZOOM_FACTOR);
+    ui->_zoomZSlider->setMaximum(MAX_ZOOM_FACTOR);
+    ui->_zoomZSlider->setValue(INIT_ZOOM_FACTOR);
+
+
     
 }
 
@@ -143,7 +165,7 @@ void MainWindow::updateSliceImageX(){
 }
 
 void MainWindow::updateSliceImageY(){
-  updateSliceImageY(ui->_horizontalSliderY->value(), false);
+    updateSliceImageY(ui->_horizontalSliderY->value(), false);
 }
 
 void MainWindow::updateSliceImageZ(){
@@ -151,19 +173,63 @@ void MainWindow::updateSliceImageZ(){
 }
 
 
-void MainWindow::updateSliceImageX(unsigned int sliceNumber, bool init){
-  typedef ImageContainerBySTLVector < Z3i::Domain, unsigned char > Image3D;
-  typedef ImageContainerBySTLVector < Z2i::Domain, unsigned char > Image2D;
 
-  typedef DGtal::ConstImageAdapter<Image3D, Image2D::Domain, DGtal::functors::Projector< DGtal::Z3i::Space>,
-				   Image3D::Value,  functors::Identity >  SliceImageAdapter;
+void MainWindow::updateZoomImageX(){
+  double gridSize = (double)INIT_ZOOM_FACTOR/ui->_zoomXSlider->value();
+  updateZoomImageX(ui->_horizontalSliderX->value(), gridSize );
+}
+void MainWindow::updateZoomImageY(){
+  double gridSize = (double)INIT_ZOOM_FACTOR/ui->_zoomYSlider->value();
+  updateZoomImageY(ui->_horizontalSliderY->value(), gridSize );
+}
+void MainWindow::updateZoomImageZ(){
+  double gridSize = (double)INIT_ZOOM_FACTOR/ui->_zoomZSlider->value();
+  updateZoomImageZ(ui->_horizontalSliderZ->value(), gridSize );
+}
 
+
+void MainWindow::updateZoomImageX(unsigned int sliceNumber, double gridSize){
   DGtal::functors::Projector<DGtal::Z2i::Space>  invFunctor; invFunctor.initRemoveOneDim(0);
   DGtal::Z2i::Domain domain2D(invFunctor(myImage3D->domain().lowerBound()),
                               invFunctor(myImage3D->domain().upperBound()));
   DGtal::functors::Projector<DGtal::Z3i::Space> aSliceFunctor(sliceNumber); aSliceFunctor.initAddOneDim(0);
   SliceImageAdapter sliceImage(*myImage3D, domain2D, aSliceFunctor, functors::Identity());
-  QImage anImage = getImage(sliceImage); 
+  QImage anImage = getImage(sliceImage, gridSize); 
+  setImageProjX(QPixmap::fromImage(anImage));
+}
+
+void MainWindow::updateZoomImageY(unsigned int sliceNumber, double gridSize){
+  DGtal::functors::Projector<DGtal::Z2i::Space>  invFunctor; invFunctor.initRemoveOneDim(1);
+  DGtal::Z2i::Domain domain2D(invFunctor(myImage3D->domain().lowerBound()),
+                              invFunctor(myImage3D->domain().upperBound()));
+  DGtal::functors::Projector<DGtal::Z3i::Space> aSliceFunctor(sliceNumber); aSliceFunctor.initAddOneDim(1);
+  SliceImageAdapter sliceImage(*myImage3D, domain2D, aSliceFunctor, functors::Identity());
+  
+  QImage anImage = getImage(sliceImage, gridSize); 
+  setImageProjY(QPixmap::fromImage(anImage));
+}
+
+
+void MainWindow::updateZoomImageZ(unsigned int sliceNumber, double gridSize){
+  DGtal::functors::Projector<DGtal::Z2i::Space>  invFunctor; invFunctor.initRemoveOneDim(2);
+  DGtal::Z2i::Domain domain2D(invFunctor(myImage3D->domain().lowerBound()),
+                              invFunctor(myImage3D->domain().upperBound()));
+  DGtal::functors::Projector<DGtal::Z3i::Space> aSliceFunctor(sliceNumber); aSliceFunctor.initAddOneDim(2);
+  SliceImageAdapter sliceImage(*myImage3D, domain2D, aSliceFunctor, functors::Identity());
+  QImage anImage = getImage(sliceImage, gridSize); 
+  setImageProjZ(QPixmap::fromImage(anImage));
+}
+
+
+void MainWindow::updateSliceImageX(unsigned int sliceNumber, bool init){
+  DGtal::functors::Projector<DGtal::Z2i::Space>  invFunctor; invFunctor.initRemoveOneDim(0);
+  DGtal::Z2i::Domain domain2D(invFunctor(myImage3D->domain().lowerBound()),
+                              invFunctor(myImage3D->domain().upperBound()));
+  DGtal::functors::Projector<DGtal::Z3i::Space> aSliceFunctor(sliceNumber); aSliceFunctor.initAddOneDim(0);
+  SliceImageAdapter sliceImage (*myImage3D, domain2D, aSliceFunctor, functors::Identity());
+  
+  double gridSize = ((double)INIT_ZOOM_FACTOR)/ui->_zoomXSlider->value();
+  QImage anImage = getImage(sliceImage, gridSize); 
   setImageProjX(QPixmap::fromImage(anImage));
   if(init){
     (*myViewer) << sliceImage;
@@ -181,18 +247,15 @@ void MainWindow::updateSliceImageX(unsigned int sliceNumber, bool init){
 
 
 void MainWindow::updateSliceImageY(unsigned int sliceNumber, bool init){
-  typedef ImageContainerBySTLVector < Z3i::Domain, unsigned char > Image3D;
-  typedef ImageContainerBySTLVector < Z2i::Domain, unsigned char > Image2D;
-
-  typedef DGtal::ConstImageAdapter<Image3D, Image2D::Domain, DGtal::functors::Projector< DGtal::Z3i::Space>,
-				   Image3D::Value,  functors::Identity >  SliceImageAdapter;
 
   DGtal::functors::Projector<DGtal::Z2i::Space>  invFunctor; invFunctor.initRemoveOneDim(1);
   DGtal::Z2i::Domain domain2D(invFunctor(myImage3D->domain().lowerBound()),
                               invFunctor(myImage3D->domain().upperBound()));
   DGtal::functors::Projector<DGtal::Z3i::Space> aSliceFunctor(sliceNumber); aSliceFunctor.initAddOneDim(1);
   SliceImageAdapter sliceImage(*myImage3D, domain2D, aSliceFunctor, functors::Identity());
-  QImage anImage = getImage(sliceImage); 
+  
+  double gridSize = ((double)INIT_ZOOM_FACTOR)/ui->_zoomYSlider->value();
+  QImage anImage = getImage(sliceImage, gridSize); 
   setImageProjY(QPixmap::fromImage(anImage));
   if(init){
     (*myViewer) << sliceImage;
@@ -211,18 +274,14 @@ void MainWindow::updateSliceImageY(unsigned int sliceNumber, bool init){
 
 
 void MainWindow::updateSliceImageZ(unsigned int sliceNumber, bool init){
-  typedef ImageContainerBySTLVector < Z3i::Domain, unsigned char > Image3D;
-  typedef ImageContainerBySTLVector < Z2i::Domain, unsigned char > Image2D;
-
-  typedef DGtal::ConstImageAdapter<Image3D, Image2D::Domain, DGtal::functors::Projector< DGtal::Z3i::Space>,
-				   Image3D::Value,  functors::Identity >  SliceImageAdapter;
 
   DGtal::functors::Projector<DGtal::Z2i::Space>  invFunctor; invFunctor.initRemoveOneDim(2);
   DGtal::Z2i::Domain domain2D(invFunctor(myImage3D->domain().lowerBound()),
                               invFunctor(myImage3D->domain().upperBound()));
   DGtal::functors::Projector<DGtal::Z3i::Space> aSliceFunctor(sliceNumber); aSliceFunctor.initAddOneDim(2);
   SliceImageAdapter sliceImage(*myImage3D, domain2D, aSliceFunctor, functors::Identity());
-  QImage anImage = getImage(sliceImage); 
+  double gridSize = (double)INIT_ZOOM_FACTOR/ui->_zoomZSlider->value();
+  QImage anImage = getImage(sliceImage, gridSize); 
   setImageProjZ(QPixmap::fromImage(anImage));
  if(init){
     (*myViewer) << sliceImage;

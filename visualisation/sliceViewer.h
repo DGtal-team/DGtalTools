@@ -32,6 +32,7 @@
    #include "DGtal/io/viewers/Viewer3D.h"
    #include <DGtal/images/ImageContainerBySTLVector.h>
    #include "DGtal/helpers/StdDefs.h"
+   #include "DGtal/images/ConstImageAdapter.h"
 #endif 
 
 #include <QMainWindow>
@@ -43,8 +44,12 @@ class MainWindow;
 
 class MainWindow : public QMainWindow
 {
-    Q_OBJECT
-
+  Q_OBJECT
+typedef DGtal::ImageContainerBySTLVector < DGtal::Z3i::Domain, unsigned char > Image3D;
+typedef DGtal::ImageContainerBySTLVector < DGtal::Z2i::Domain, unsigned char > Image2D;
+typedef DGtal::ConstImageAdapter<Image3D, Image2D::Domain, DGtal::functors::Projector< DGtal::Z3i::Space>,
+                                 Image3D::Value,  DGtal::functors::Identity >  SliceImageAdapter;
+  
 public:
 explicit MainWindow(DGtal::Viewer3D<> *viewer,  DGtal::ImageContainerBySTLVector < DGtal::Z3i::Domain, unsigned char > *myImage3D,
                       QWidget *parent = 0, Qt::WindowFlags flags=0);
@@ -54,20 +59,29 @@ explicit MainWindow(DGtal::Viewer3D<> *viewer,  DGtal::ImageContainerBySTLVector
   void setImageProjZ(const QPixmap &aPixMap);
 
 
-void updateSliceImageX(unsigned int sliceNumber, bool init);
-void updateSliceImageY(unsigned int sliceNumber, bool init);
-void updateSliceImageZ(unsigned int sliceNumber, bool init);
+  void updateSliceImageX(unsigned int sliceNumber, bool init);
+  void updateSliceImageY(unsigned int sliceNumber, bool init);
+  void updateSliceImageZ(unsigned int sliceNumber, bool init);
+
+  void updateZoomImageX(unsigned int sliceNumber, double gridSize);
+  void updateZoomImageY(unsigned int sliceNumber, double gridSize);
+  void updateZoomImageZ(unsigned int sliceNumber, double gridSize);
+
+
 
 public slots:
   void updateSliceImageX();
   void updateSliceImageY();
   void updateSliceImageZ();
 
-
+  void updateZoomImageX();
+  void updateZoomImageY();
+  void updateZoomImageZ();
+  
 private:
   Ui::MainWindow *ui;
-  DGtal::Viewer3D<> *myViewer;
-  DGtal::ImageContainerBySTLVector < DGtal::Z3i::Domain, unsigned char > *myImage3D;
+  DGtal::Viewer3D<> *myViewer;  
+  Image3D *myImage3D;
 };
 
 #endif // MAINWINDOW_H
