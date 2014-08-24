@@ -114,7 +114,7 @@ int ComputeStatistics ( const std::string & inputdata1,
     {
         while ( s1[ 0 ] == '#' )
         {
-            int p = s1.find( "# h = " );
+            unsigned int p = s1.find( "# h = " );
             if ( p != std::string::npos )
             {
                 h = atof((s1.erase( p, 5 )).c_str());
