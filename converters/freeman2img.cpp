@@ -39,6 +39,8 @@
 //contour
 #include "DGtal/geometry/curves/FreemanChain.h"
 #include "DGtal/topology/helpers/Surfaces.h"
+#include "DGtal/topology/SurfelSetPredicate.h"
+
 
 //boost
 #include <boost/program_options/options_description.hpp>
@@ -132,11 +134,8 @@ else the space is automatically defined from the freemanchain bounding boxes.");
       FreemanChain::getInterPixelLinels(aKSpace, fc, boundarySCell, true); 
     }
     
-    Surfaces<KSpace>::uComputeInterior(aKSpace, boundarySCell, interiorCell, false );  
     Image2D imageResult (Z2i::Domain(Z2i::Point(minx, miny), Z2i::Point(maxx, maxy))); 
-    for(std::set<Cell>::const_iterator it = interiorCell.begin(); it!=interiorCell.end(); it++){
-      imageResult.setValue(aKSpace.uCoords(*it), 255);
-    }
+    Surfaces<KSpace>::uFillInterior(aKSpace, SurfelSetPredicate<std::set<SCell>,SCell>(boundarySCell), imageResult, 255, false, false );  
     imageResult >> vm["output"].as<std::string>();
   }
 

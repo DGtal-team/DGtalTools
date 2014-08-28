@@ -59,7 +59,6 @@ Utilities to convert various simple file formats:
   - slice2vol: tool to merge slices into one 3d volumic file.
   - sdp2vol: a simple tool to create a 3d vol image from 3d digital points.
   - vol2sdp: a simple tools to extract digital points from 3d vol files.
-  - vol2off: extract dual surface of a digital object (equiv. Marching Cubes)
   - vol2obj: convert a volume file into OBJ format (all voxels belonging to threshold interval)   
   - vol2slice: tool to extract all slices from 3d volumic images.
   
@@ -174,8 +173,8 @@ Here are some illustrations of such a tools:
 </center>
 Volumetric
 ----------
-  - 3dVolMarchingCubes: marching cubes form a Vol file
-  - homotopicThinning3D: ultimate skeleton from vol file
+  - 3dVolMarchingCubes: marching cubes form a Vol file.
+  - homotopicThinning3D: ultimate skeleton from vol file.
   - volAddBorder: add a 1 voxel boundary with value 0 to a vol file.
   - volCComponentCounter: a simple program to count the number of connected components in a 3D image.
   - volFlip: tool to flip all volume slice images according a given dimension.
