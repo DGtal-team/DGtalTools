@@ -26,8 +26,11 @@
  */
 
 ///////////////////////////////////////////////////////////////////////////////
+
 #include <iostream>
 #include <QtGui/qapplication.h>
+#include <QGLViewer/qglviewer.h>
+#include <stdio.h>
 
 #include "DGtal/base/Common.h"
 #include "DGtal/helpers/StdDefs.h"
@@ -58,6 +61,24 @@ using namespace Z3i;
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace po = boost::program_options;
+
+template < typename Space = DGtal::Z3i::Space, typename KSpace = DGtal::Z3i::KSpace>
+struct ViewerSnap: DGtal::Viewer3D <Space, KSpace> 
+{
+  
+  ViewerSnap(const KSpace &KSEmb, bool saveSnap): Viewer3D<Space, KSpace>(KSEmb), mySaveSnap(saveSnap){
+  };
+   
+  virtual  void
+  init(){
+    DGtal::Viewer3D<>::init();
+    if(mySaveSnap){
+      QObject::connect(this, SIGNAL(drawFinished(bool)), this, SLOT(saveSnapshot(bool)));
+    }
+  };
+  bool mySaveSnap;
+};
+
 
 template < typename Point>
 void
@@ -99,7 +120,10 @@ int main( int argc, char** argv )
     ("reference,r", po::value<std::string>(), "input reference file: sdpa (sequence of discrete points with attribute)" )
     ("compAccordingLabels,l", "apply the comparisos only on points with same labels (by default fifth colomn)" )
     ("drawSurfelAssociations,a", "Draw the surfel association." )
-    ("fixMaxColorValue", po::value<double>(), "fix the maximal color value for the scale error display (else the scale is set from the maximal value)" ) 
+    ("fileMeasureOutput,o", po::value<std::string>(), "specify the output file to store (append) the error stats else the result is given to std output. " )
+    ("noWindows,n", "Don't display Viewer windows." )
+    ("doSnapShotAndExit,d", po::value<std::string>(), "save display snapshot into file." )
+    ("fixMaxColorValue", po::value<double>(), "fix the maximal color value for the scale error display (else the scale is set from the maximal value)" )
     ("labelIndex", po::value<unsigned int>(), "set the index of the label (by default set to 4)  " ) 
     ("SDPindex", po::value<std::vector <unsigned int> >()->multitoken(), "specify the sdp index (by default 0,1,2,3).");
 
@@ -126,10 +150,18 @@ int main( int argc, char** argv )
   if( !parseOK || cannotStart ||  vm.count("help")||argc<=1)
     {
       trace.info() << "Usage: " << argv[0] << " [input]\n"
-		<< "Display sequence of 3d discrete points by using QGLviewer."
-		<< general_opt << "\n";
+                   << "It computes generic scalar surfel data comparisons (squared error) ( given from an input data file and from a reference one. \n \n"
+                   << "Each surfels are associated to the nearest one of the reference surfels (computed by a 'brut force' search) "
+                   << "This association can also be limited to surfel of same label (if available in the data and by using the --compAccordingLabels option  )." 
+                   << "The comparison and surfel association can be displayed and result statistics are saved on output file (--fileMeasureOutput)."
+                   << "You can also remove the interactive 3d view by just doing a snapshot and exit with option --doSnapShotAndExit. \n \n"
+                   << "Example of use: \n \n"
+                   << "3dCompSurfelData -i surfelCurvatureInput.dat -r surfelCurvatureRef.dat  --fixMaxColorValue 0.8 -d visuSEcurvature.png -o  statMeasures.dat \n \n " 
+                   << "=> From the two compared files you should obtain the result of the comparison (statMeasures.dat) with the associated visualisation (visuSEcurvature.png). \n \n \n "
+                   << general_opt << "\n";
       return 0;
     }
+  
   Z3i::KSpace K;
   string inputFilename = vm["input"].as<std::string>();
   string referenceFilename = vm["reference"].as<std::string>();
@@ -234,22 +266,30 @@ int main( int argc, char** argv )
 
   
   QApplication application(argc,argv);
-  typedef Viewer3D<Z3i::Space, Z3i::KSpace> Viewer;
+  typedef ViewerSnap<> Viewer;
    
 
-  Viewer viewer( K );
+  Viewer viewer(K, vm.count("doSnapShotAndExit"));
+  if(vm.count("doSnapShotAndExit")){
+    viewer.setSnapshotFileName(QString(vm["doSnapShotAndExit"].as<std::string>().c_str()));
+  }
   viewer.setWindowTitle("3dCompSurfel Viewer");
   viewer.show();
+  viewer.restoreStateFromFile();
   
   Statistic<double> statErrors(true);
-  
+  std::ofstream outputStatStream; 
+  if(vm.count("fileMeasureOutput")){
+    outputStatStream.open(vm["fileMeasureOutput"].as<std::string>().c_str(), ios::app );
+  }
+
 
   
   double maxSqError=0;
   for(unsigned int i=0;i <surfelAndScalarInput.size(); i++){
-    double curvatureInput = surfelAndScalarInput.at(i)[3];
-    double curvatureRef = surfelAndScalarReference.at(vectIndexMinToReference.at(i))[3];
-    double sqError = (curvatureRef-curvatureInput)*(curvatureRef-curvatureInput);
+    double scalarInput = surfelAndScalarInput.at(i)[3];
+    double scalarRef = surfelAndScalarReference.at(vectIndexMinToReference.at(i))[3];
+    double sqError = (scalarRef-scalarInput)*(scalarRef-scalarInput);
     statErrors.addValue(sqError);
     if(sqError> maxSqError){
       maxSqError =sqError;
@@ -269,9 +309,9 @@ int main( int argc, char** argv )
 
   viewer << SetMode3D(vectSurfelsInput.at(0).className(), "Basic");
   for(unsigned int i=0; i <surfelAndScalarInput.size(); i++){
-    double curvatureInput = surfelAndScalarInput.at(i)[3];
-    double curvatureRef = surfelAndScalarReference.at(vectIndexMinToReference.at(i))[3];
-    double sqError = (curvatureRef-curvatureInput)*(curvatureRef-curvatureInput);
+    double scalarInput = surfelAndScalarInput.at(i)[3];
+    double scalarRef = surfelAndScalarReference.at(vectIndexMinToReference.at(i))[3];
+    double sqError = (scalarRef-scalarInput)*(scalarRef-scalarInput);
     if(useGrad){
       viewer.setFillColor(gradientColorMap(sqError));
     }else{
@@ -284,10 +324,33 @@ int main( int argc, char** argv )
   }
   
   statErrors.terminate();
-  trace.info()  << statErrors;
-  //  trace.info() << "Median error " << statErrors.median() << std::endl;
+  if(vm.count("fileMeasureOutput")){
+    outputStatStream << "input= " <<  inputFilename << " reference=" << referenceFilename << " " ; 
+    outputStatStream << statErrors << std::endl;
+  }else{
+    trace.info()  << statErrors;
+  }
+  viewer << Viewer::updateDisplay;
+  if(vm.count("doSnapShotAndExit")){
+    // Appy cleaning just save the last snap
+    std::string name = vm["doSnapShotAndExit"].as<std::string>();
+    std::string extension = name.substr(name.find_last_of(".") + 1);
+    std::string basename = name.substr(0, name.find_last_of("."));
+    for(unsigned int i=0; i< viewer.snapshotCounter()-1; i++){
+      std::stringstream s; 
+      s << basename << "-"<< setfill('0') << setw(4)<<  i << "." << extension; 
+      trace.info() << "erase temp file: " << s.str() << std::endl;
+      remove(s.str().c_str());
+    }
+    std::stringstream s; 
+    s << basename << "-"<< setfill('0') << setw(4)<<  viewer.snapshotCounter()-1 << "." << extension;
+    rename(s.str().c_str(), name.c_str()); 
+    return 0;
+  }
   
-  viewer << Viewer3D<>::updateDisplay;
-  return application.exec();
-
+  if(vm.count("noWindows")){
+    return 0;
+  }else{
+    return application.exec();
+  }
 }
