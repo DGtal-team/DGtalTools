@@ -76,7 +76,7 @@ getImage(const TImage &anImage ){
     }
   }
    QImage result(  data, width,  height, QImage::Format_RGB32 );
-  return result;
+   return result;
 }
 
 
@@ -280,7 +280,6 @@ int main( int argc, char** argv )
     || extension =="dcm"
 #endif
 ){
-    unsigned int numDisplayed=0;
     
 #ifdef WITH_ITK
    int dicomMin = vm["dicomMin"].as<int>();

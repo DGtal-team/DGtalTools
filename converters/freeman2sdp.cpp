@@ -94,7 +94,7 @@ int main( int argc, char** argv )
     std::string fileName = vm["FreemanChain"].as<std::string>();
     std::vector< FreemanChain > vectFcs =  PointListReader< Z2i::Point >:: getFreemanChainsFromFile<Z2i::Integer> (fileName); 
     
-    for(int i=0; i< vectFcs.size(); i++){
+    for(unsigned int i=0; i< vectFcs.size(); i++){
       bool isClosed = vectFcs.at(i).isClosed(); 
       std::cout << "# grid curve " << i+1 << "/" << vectFcs.size()
                 << ( (isClosed)?" closed":" open" ) << std::endl;
@@ -103,7 +103,7 @@ int main( int argc, char** argv )
                   << "# size=" << vectFcs.at(i).size() << std::endl;
       std::vector<Z2i::Point> vectPts; 
       FreemanChain::getContourPoints( vectFcs.at(i), vectPts ); 
-      for(int k=0; k < vectPts.size(); k++){
+      for(unsigned int k=0; k < vectPts.size(); k++){
         std::cout << vectPts.at(k)[0] << " "<< vectPts.at(k)[1];
 	if(!oneline){
           std::cout << std::endl;

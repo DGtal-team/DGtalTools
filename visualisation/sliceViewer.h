@@ -48,7 +48,7 @@ class MainWindow : public QMainWindow
 public:
 explicit MainWindow(DGtal::Viewer3D<> *viewer,  DGtal::ImageContainerBySTLVector < DGtal::Z3i::Domain, unsigned char > *myImage3D,
                       QWidget *parent = 0, Qt::WindowFlags flags=0);
-    ~MainWindow();
+  ~MainWindow();
   void setImageProjX(const QPixmap &aPixMap);
   void setImageProjY(const QPixmap &aPixMap);
   void setImageProjZ(const QPixmap &aPixMap);
@@ -65,9 +65,9 @@ public slots:
 
 
 private:
-    Ui::MainWindow *ui;
-    DGtal::Viewer3D<> *myViewer;
-    DGtal::ImageContainerBySTLVector < DGtal::Z3i::Domain, unsigned char > *myImage3D;
+  Ui::MainWindow *ui;
+  DGtal::Viewer3D<> *myViewer;
+  DGtal::ImageContainerBySTLVector < DGtal::Z3i::Domain, unsigned char > *myImage3D;
 };
 
 #endif // MAINWINDOW_H
