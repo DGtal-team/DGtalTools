@@ -10,7 +10,6 @@ SET(DGTAL_TOOLS_SRC
   vol2sdp
   slice2vol
   vol2slice
-  vol2off
   vol2obj
   longvol2vol
   sdp2vol

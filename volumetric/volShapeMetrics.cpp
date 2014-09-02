@@ -226,7 +226,7 @@ int main(int argc, char**argv)
   }
   po::notify(vm);    
   
-  if ( vm.count ( "help" ) || ! vm.count("volA")||! vm.count("volB") )
+  if ( !parseOK || vm.count ( "help" ) || ! vm.count("volA")||! vm.count("volB") )
     {
       trace.info() << "Apply shape measures for comparing two volumetric images A and B (shape defined from thresholds) " << std::endl
 		   << "      - voxel count from voxel partition (number of voxel from (B-A), (A-B) ...). Usefull to determine classical statistics like false positive related stats."<<std::endl

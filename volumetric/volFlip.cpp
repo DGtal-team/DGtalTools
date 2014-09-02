@@ -118,7 +118,7 @@ int main(int argc, char**argv)
   Image3D  imageSRC =  GenericReader<Image3D>::import ( inputFilename );
   trace.endBlock();
   Image3D  imageRes(imageSRC.domain());
-  for( unsigned int i=0; i <= imageSRC.domain().upperBound()[normalImgDim]; i++){
+  for(int i=0; i <= imageSRC.domain().upperBound()[normalImgDim]; i++){
     Point startPoint(0,0, 0);
     startPoint[normalImgDim]=i;
     for( Domain::ConstSubRange::ConstIterator 
