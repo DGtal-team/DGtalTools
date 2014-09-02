@@ -14,13 +14,13 @@
  *
  **/
 /**
- * @file 3dSDPViewer.cpp
+ * @file 3dCompSurfelData.cpp
  * @author Bertrand Kerautret (\c kerautre@loria.fr )
  * LORIA (CNRS, UMR 7503), University of Nancy, France
  *
- * @date 2014/04/01
+ * @date 2014/08/01
  *
- * An simple viewer to display 3d SDP files (sequence of discrete points).
+ * A tool to compare generic surfel data informations given from two data files.
  *
  * This file is part of the DGtal library.
  */
