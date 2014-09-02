@@ -14,13 +14,13 @@
  *
  **/
 /**
- * @file 3dDisplaySurfel.cpp
+ * @file 3dDisplaySurfelData.cpp
  * @author Bertrand Kerautret (\c kerautre@loria.fr )
  * LORIA (CNRS, UMR 7503), University of Nancy, France
  *
  * @date 2014/08/16
  *
- * Display surfel from SDP file with color attributes given as scalar interpreted as color.
+ * Display surfel data from SDP file with color attributes given as scalar interpreted as color.
  *
  * This file is part of the DGtal library.
  */
@@ -147,7 +147,7 @@ int main( int argc, char** argv )
   if( !parseOK || cannotStart ||  vm.count("help")||argc<=1)
     {
       trace.info() << "Usage: " << argv[0] << " [input]\n"
-		<< "Display surfel from SDP file with color attributes given as scalar interpreted as color."
+		<< "Display surfel data from SDP file with color attributes given as scalar interpreted as color."
 		<< general_opt << "\n";
       return 0;
     }
@@ -189,17 +189,11 @@ int main( int argc, char** argv )
     vectSurfelsInput.push_back(c);
   }
   
-  
-  // Brut force association of each surfel of the input to the reference with the minimal distance.
-  // For each surfel of the input we associate an index to the nearest surfel of the reference.
-  // if the option --compAccordingLabels is selected then we search only surfel of same label (more precise comparisons in some cases)
-  
-  
+    
   CanonicCellEmbedder<KSpace> embeder(K);
   std::vector<unsigned int> vectIndexMinToReference;
   
   
-
   //-------------------------
   // Displaying input with color given from scalar values
   
@@ -213,14 +207,10 @@ int main( int argc, char** argv )
   viewer.setWindowTitle("3dCompSurfel Viewer");
   viewer.show();
   viewer.restoreStateFromFile();
-  
- 
-
-  
+    
   double minScalarVal=surfelAndScalarInput.at(0)[3];
   double maxScalarVal=surfelAndScalarInput.at(0)[3];
 
-  
   for(unsigned int i=1; i <surfelAndScalarInput.size(); i++){
     double scalVal = surfelAndScalarInput.at(i)[3];
     if(scalVal < minScalarVal){
@@ -235,14 +225,12 @@ int main( int argc, char** argv )
   }
   if(vm.count("fixMinColorValue")){
     minScalarVal = vm["fixMinColorValue"].as<double>();
-  }
-  
+  }  
   
   GradientColorMap<double> gradientColorMap( minScalarVal, maxScalarVal );
   gradientColorMap.addColor( Color(255,0,0,100 ) );
   gradientColorMap.addColor( Color(0,255,0,100 ) );
   gradientColorMap.addColor( Color(0,0,255,100 ) );
-
 
   bool useGrad = minScalarVal!=maxScalarVal;
 
@@ -254,8 +242,7 @@ int main( int argc, char** argv )
     }else{
       viewer.setFillColor(Color::White);
     }
-    viewer << vectSurfelsInput.at(i);
-     
+    viewer << vectSurfelsInput.at(i);     
   }
   
   
@@ -284,4 +271,3 @@ int main( int argc, char** argv )
     return application.exec();
   }
 }
-'
