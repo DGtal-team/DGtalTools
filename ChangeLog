@@ -25,6 +25,7 @@
 
 * volumetric/:
 	- volTrValues: a basic tool to transform the voxel values from an input/output set.
+	- volSegment: Segment volumetric file from a simple threshold which can be set automatically from the Otsu's variance based estimation.
 
 
 

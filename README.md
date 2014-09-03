@@ -181,7 +181,7 @@ Volumetric
   - volSubSample: sub sample a vol file (division by 2 in each direction).
   - volImageMetrics: apply basic statistics on comparaison between two volumetric images (shape defined from thresholds): computes true/false -+, precision, recall f-mean RMSE, PSNR.
   - volShapeMetrics: apply euclidean distance comparisons between two shapes  (shape defined from thresholds).
-
+  - volSegment: Segment volumetric file from a simple threshold which can be set automatically from the otsu estimation.
 
 
 How to build the tools
