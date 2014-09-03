@@ -167,8 +167,8 @@ Here are some illustrations of such a tools:
 </tr>
 
 <tr>
-<td><img width=300 src="https://cloud.githubusercontent.com/assets/772865/4118303/5f53f61c-329f-11e4-9629-23c53afd9eff.png" </td>
 <td><img  width=300 src="https://cloud.githubusercontent.com/assets/772865/3486505/6edb2144-043e-11e4-81c4-2c20f272a119.png" </td>
+<td><img width=300 src="https://cloud.githubusercontent.com/assets/772865/4118303/5f53f61c-329f-11e4-9629-23c53afd9eff.png" </td>
 </tr>
 <tr>
 <td>3dHeightMapViewer</td>
