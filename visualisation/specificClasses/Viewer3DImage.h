@@ -37,7 +37,7 @@ class Viewer3DImage: public DGtal::Viewer3D <Space, KSpace>
 public:
   enum ModeVisu { BoundingBox, InterGrid, Grid, Empty};
   
-  Viewer3DImage(ModeVisu aMode=BoundingBox) : DGtal::Viewer3D<Space, KSpace>(){
+  Viewer3DImage(ModeVisu aMode=BoundingBox) : DGtal::Viewer3D<Space, KSpace>(), myImageOrigin(DGtal::Z3i::Point(0,0,0)){
     mySliceXPos=0;
     mySliceYPos=0;
     mySliceZPos=0;
@@ -76,7 +76,7 @@ protected:
   double myTotalAngleRotationX;
   double myTotalAngleRotationY;
   double myTotalAngleRotationZ;
-  
+  DGtal::Z3i::Point myImageOrigin; 
   ModeVisu myMode;
 };
 

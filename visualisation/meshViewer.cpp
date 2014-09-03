@@ -14,8 +14,8 @@
  *
  **/
 /**
- * @file visuDistanceTransform.cpp
- * @ingroup surfaceTools
+ * @file meshViewer.cpp
+ * @ingroup visualisation
  * @author Bertrand Kerautret (\c kerautre@loria.fr )
  * LORIA (CNRS, UMR 7503), University of Nancy, France
  *
@@ -56,10 +56,13 @@ int main( int argc, char** argv )
   po::options_description general_opt("Allowed options are: ");
   general_opt.add_options()
     ("help,h", "display this message")
-    ("input-file,i", po::value<std::string>(), "off file (.off), or OFS file (.ofs) " )
+    ("input,i", po::value<std::string>(), "off file (.off), or OFS file (.ofs) " )
     ("scaleX,x",  po::value<float>()->default_value(1.0), "set the scale value in the X direction (default 1.0)" )
     ("scaleY,y",  po::value<float>()->default_value(1.0), "set the scale value in the Y direction (default 1.0)" )
-    ("scaleZ,z",  po::value<float>()->default_value(1.0), "set the scale value in the Z direction (default 1.0)")
+    ("scaleZ,z",  po:: value<float>()->default_value(1.0), "set the scale value in the Z direction (default 1.0)")
+    ("customColorMesh",po::value<std::vector<unsigned int> >()->multitoken(), "set the R, G, B, A components of the colors of the mesh view" )
+    ("customColorSDP",po::value<std::vector<unsigned int> >()->multitoken(), "set the R, G, B, A components of the colors of the sdp view" )
+    ("displaySDP,s", po::value<std::string>(), "Add the display of a set of discrete points as ball of radius 0.5.")
     ("invertNormal,n", "threshold min to define binary shape" )
     ("drawVertex,v", "draw the vertex of the mesh" );
 
@@ -74,24 +77,59 @@ int main( int argc, char** argv )
   po::notify(vm);
   if( !parseOK || vm.count("help")||argc<=1)
     {
-      std::cout << "Usage: " << argv[0] << " [input-file]\n"
+      std::cout << "Usage: " << argv[0] << " [input]\n"
 		<< "Display OFF mesh file by using QGLviewer"
     << general_opt << "\n";
       return 0;
     }
 
-  if(! vm.count("input-file"))
+  if(! vm.count("input"))
     {
       trace.error() << " The file name was defined" << endl;
       return 0;
     }
 
 
-
-  string inputFilename = vm["input-file"].as<std::string>();
+  
+  string inputFilename = vm["input"].as<std::string>();
   float sx = vm["scaleX"].as<float>();
   float sy = vm["scaleY"].as<float>();
   float sz = vm["scaleZ"].as<float>();
+  
+  unsigned int  meshColorR = 240;
+  unsigned int  meshColorG = 240;
+  unsigned int  meshColorB = 240;
+  unsigned int  meshColorA = 255;
+
+
+  unsigned int  sdpColorR = 240;
+  unsigned int  sdpColorG = 240;
+  unsigned int  sdpColorB = 240;
+  unsigned int  sdpColorA = 255;
+    
+  
+  if(vm.count("customColorMesh")){
+    std::vector<unsigned int > vectCol = vm["customColorMesh"].as<std::vector<unsigned int> >();
+    if(vectCol.size()!=4){
+      trace.error() << "colors specification should contain R,G,B and Alpha values"<< std::endl;
+    }
+    meshColorR = vectCol[0];
+    meshColorG = vectCol[1];
+    meshColorB = vectCol[2];
+    meshColorA = vectCol[3];
+  }
+  if(vm.count("customColorSDP")){
+    std::vector<unsigned int > vectCol = vm["customColorSDP"].as<std::vector<unsigned int> >();
+    if(vectCol.size()!=4){
+      trace.error() << "colors specification should contain R,G,B and Alpha values"<< std::endl;
+    }
+    sdpColorR = vectCol[0];
+    sdpColorG = vectCol[1];
+    sdpColorB = vectCol[2];
+    sdpColorA = vectCol[3];
+  }
+
+
 
   QApplication application(argc,argv);
   Viewer3D<> viewer;
@@ -103,7 +141,7 @@ int main( int argc, char** argv )
 
 
   trace.info() << "Importing mesh... ";
-  Mesh<DGtal::Z3i::RealPoint> anImportedMesh(true);
+  Mesh<DGtal::Z3i::RealPoint> anImportedMesh(false);
   bool import = anImportedMesh << inputFilename;
   if(!import){
     trace.info() << "File import failed. " << std::endl;
@@ -111,9 +149,22 @@ int main( int argc, char** argv )
   }
 
   trace.info() << "[done]. "<< std::endl;
+  if(vm.count("displaySDP")){
+    std::string filenameSDP = vm["displaySDP"].as<std::string>();
+    vector<Z3i::RealPoint> vectPoints;
+    vectPoints = PointListReader<Z3i::RealPoint>::getPointsFromFile(filenameSDP);
+     viewer << CustomColors3D(Color(sdpColorR, sdpColorG, sdpColorB, sdpColorA), 
+                              Color(sdpColorR, sdpColorG, sdpColorB, sdpColorA)); 
+    for(int i=0;i< vectPoints.size(); i++){
+      viewer.addBall(vectPoints.at(i), 0.5);    
+    }
+  }
   if(invertNormal){
     anImportedMesh.invertVertexFaceOrder();
   }
+
+  viewer << CustomColors3D(Color(meshColorR, meshColorG, meshColorB, meshColorA), 
+                           Color(meshColorR, meshColorG, meshColorB, meshColorA));  
   viewer << anImportedMesh;
 
   if(vm.count("drawVertex")){
@@ -125,6 +176,7 @@ int main( int argc, char** argv )
     }
   }
 
+  
   viewer << Viewer3D<>::updateDisplay;
   return application.exec();
 }

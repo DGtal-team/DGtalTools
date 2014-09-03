@@ -79,7 +79,7 @@ int main( int argc, char** argv )
   po::options_description general_opt ( "Allowed options are: " );
   general_opt.add_options()
     ( "help,h", "display this message." )
-    ( "input-file,i", po::value<std::string>(), "Input volumetric file (.vol, .pgm3d or p3d)" )
+    ( "input,i", po::value<std::string>(), "Input volumetric file (.vol, .pgm3d or p3d)" )
     ( "min,m", po::value<int>()->default_value( 0 ), "Minimum (excluded) value for threshold." )
     ( "max,M", po::value<int>()->default_value( 255 ), "Maximum (included) value for threshold." )
     ("fixedPoints", po::value<std::vector <int> >()->multitoken(), "defines the coordinates of points which should not be removed." );
@@ -98,10 +98,10 @@ int main( int argc, char** argv )
     {
       trace.info() << "Illustration of homotopic thinning of a 3d image file (vol,longvol,pgm3d...) with 3D viewer."<<std::endl
                    << std::endl << "Basic usage: "<<std::endl
-                   << "\thomotopicThinning3d [options] --input-file <3dImageFileName>  {vol,longvol,pgm3d...} "<<std::endl
+                   << "\thomotopicThinning3d [options] --input <3dImageFileName>  {vol,longvol,pgm3d...} "<<std::endl
                    << general_opt << "\n"
                    << " Usage by forcing point to be left by the thinning: \n"
-                   << "homotopicThinning3D --input-file ${DGtal}/examples/samples/Al.100.vol  --fixedPoints 56 35 5  56 61 5  57 91 38  58 8 38  45 50 97 \n";
+                   << "homotopicThinning3D --input ${DGtal}/examples/samples/Al.100.vol  --fixedPoints 56 35 5  56 61 5  57 91 38  58 8 38  45 50 97 \n";
       
 
         
@@ -110,8 +110,8 @@ int main( int argc, char** argv )
     }
 
   //Parse options
-  if ( ! ( vm.count ( "input-file" ) ) ) missingParam ( "--input" );
-  std::string filename = vm["input-file"].as<std::string>();
+  if ( ! ( vm.count ( "input" ) ) ) missingParam ( "--input" );
+  std::string filename = vm["input"].as<std::string>();
   
   
   typedef ImageSelector < Z3i::Domain, unsigned char>::Type Image;

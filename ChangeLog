@@ -7,10 +7,15 @@
 	- 3dSDPViewer: basic display of a sequence of 3d points (as voxel or sphere) and vectors by using QGLviewer.
 	- 3dCurvatureViewer: can now display curvature on multiple connected components.
 	- sliceViewer: a new 2D and 3D slice viewer from 3D volumic files ( pgm3d, vol, longvol, and DICOM with ITK).
+	- 3dHeightMapViewer: display a 2D image as heightmap by using QGLviewer.
+	- 3dDisplaySurfelData: display surfel data from SDP file with color attributes given as scalar interpreted as color.
 
 * converters/:
 	- volBoundary2obj: a simple tool to export the boundary of a an	object in a volumetric file to OBJ
-	- freeman2pgm: transform one or several freeman chains into a pgm file by filling their interior areas.
+	- freeman2pgm: transform one or several freeman chains into a pgm file by filling their interior areas and renamed into freeman2img.	
+	- pgm2freeman: renamed to pgm2img.
+	- vol2off: tool removed, see 3dVolMarchingCubes for the same tool.
+
 
 * estimators/:
 	- curvatureScaleSpaceBCC: a tool to display the curvature scale space of a given contour with the Binomial Convolver Curvature Estimator.
@@ -19,6 +24,13 @@
 
 * volumetric/:
 	- volReSample: apply a basic  re sampling of a 3D volumetric image (.vol, .longvol, .pgm3d)  with a given grid size.
+
+
+
+* volumetric/:
+	- volTrValues: a basic tool to transform the voxel values from an input/output set.
+	- volSegment: Segment volumetric file from a simple threshold which can be set automatically from the Otsu's variance based estimation.
+
 
 
 	====  Release 0.7 ====

@@ -120,7 +120,7 @@ int main( int argc, char** argv )
   general_opt.add_options()
     ("help,h", "display this message")
     ("connectivity,c", po::value<unsigned int>()->default_value(6), "object connectivity (6,18,26)"    " (default: 6 )")
-    ("input-file,i", po::value<std::string>(), "volume file (Vol)"    " (default: standard input)");
+    ("input,i", po::value<std::string>(), "volume file (Vol)"    " (default: standard input)");
   bool parseOK=true;
   po::variables_map vm;
   try{
@@ -132,12 +132,12 @@ int main( int argc, char** argv )
   po::notify(vm);    
   if( parseOK || !vm.count("help")||argc<=1)
     {
-      std::cout << "Usage: " << argv[0] << " [input-file]\n"
+      std::cout << "Usage: " << argv[0] << " [input]\n"
     << "Count the number of connected component (same values) in a  volume (Vol) file image\n"
     << general_opt << "\n";
       return 0;
     }
- string inputFilename = vm["input-file"].as<std::string>();
+ string inputFilename = vm["input"].as<std::string>();
  unsigned int connectivity = vm["connectivity"].as<unsigned int>();
  
  if ((connectivity != 6) && (connectivity != 18) && (connectivity != 26))

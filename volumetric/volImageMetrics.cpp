@@ -90,7 +90,7 @@ int main(int argc, char**argv)
   }
   po::notify(vm);    
   
-  if ( vm.count ( "help" ) || ! vm.count("volA")||! vm.count("volB") )
+  if ( !parseOK || vm.count ( "help" ) || ! vm.count("volA")||! vm.count("volB")  )
     {
       trace.info() << "Apply basic image measures (RMSE, PSNR) between two volumetric images A and B."<<std::endl
 		   << std::endl << "Basic usage: "<<std::endl

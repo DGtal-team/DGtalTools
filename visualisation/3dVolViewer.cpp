@@ -62,7 +62,7 @@ int main( int argc, char** argv )
   po::options_description general_opt("Allowed options are: ");
   general_opt.add_options()
     ("help,h", "display this message")
-    ("input-file,i", po::value<std::string>(), "vol file (.vol) , pgm3d (.p3d or .pgm3d, pgm (with 3 dims)) file or sdp (sequence of discrete points)" )
+    ("input,i", po::value<std::string>(), "vol file (.vol) , pgm3d (.p3d or .pgm3d, pgm (with 3 dims)) file or sdp (sequence of discrete points)" )
     ("thresholdMin,m",  po::value<int>()->default_value(0), "threshold min to define binary shape" ) 
     ("thresholdMax,M",  po::value<int>()->default_value(255), "threshold max to define binary shape" )
     ("numMaxVoxel,n",  po::value<int>()->default_value(500000), "set the maximal voxel number to be displayed." )
@@ -83,18 +83,18 @@ int main( int argc, char** argv )
   po::notify(vm);    
   if( !parseOK || vm.count("help")||argc<=1)
     {
-      std::cout << "Usage: " << argv[0] << " [input-file]\n"
+      std::cout << "Usage: " << argv[0] << " [input]\n"
                 << "Display volume file as a voxel set by using QGLviewer"<< endl
                 << general_opt << "\n";
       return 0;
     }
   
-  if(! vm.count("input-file"))
+  if(! vm.count("input"))
     {
       trace.error() << " The file name was defined" << endl;      
       return 0;
     }
-  string inputFilename = vm["input-file"].as<std::string>();
+  string inputFilename = vm["input"].as<std::string>();
   int thresholdMin = vm["thresholdMin"].as<int>();
   int thresholdMax = vm["thresholdMax"].as<int>();
   unsigned char transp = vm["transparency"].as<uint>();
@@ -163,9 +163,8 @@ int main( int argc, char** argv )
     }
   }else if(extension=="sdp"){
     vector<Z3i::RealPoint> vectVoxels = PointListReader<Z3i::RealPoint>::getPointsFromFile(inputFilename);
-    for(int i=0;i< vectVoxels.size(); i++){
-      viewer << vectVoxels.at(i);//Z3i::Point((unsigned int)vectVoxels.at(i)[0],(unsigned int)vectVoxels.at(i)[1],
-      //(unsigned int )vectVoxels.at(i)[2]);
+    for(unsigned int i=0;i< vectVoxels.size(); i++){
+      viewer << vectVoxels.at(i);
     }
   }
   viewer << Viewer3D<>::updateDisplay;

@@ -100,7 +100,7 @@ int main( int argc, char** argv )
   po::options_description general_opt("Allowed options are");
   general_opt.add_options()
   ("help,h", "display this message")
-  ("input-file,i", po::value< std::string >(), ".vol file")
+  ("input,i", po::value< std::string >(), ".vol file")
   ("radius,r",  po::value< double >(), "Kernel radius for IntegralInvariant" )
   ("threshold,t",  po::value< unsigned int >()->default_value(8), "Min size of SCell boundary of an object" )
   ("mode,m", po::value< std::string >()->default_value("mean"), "type of output : mean, gaussian, k1, k2, prindir1 or prindir2 (default mean)")
@@ -120,8 +120,8 @@ int main( int argc, char** argv )
   }
   bool neededArgsGiven=true;
   
-  if (parseOK && !(vm.count("input-file"))){
-    missingParam("--input-file");
+  if (parseOK && !(vm.count("input"))){
+    missingParam("--input");
     neededArgsGiven=false;
   }
   if (parseOK && !(vm.count("radius"))){
@@ -191,7 +191,7 @@ int main( int argc, char** argv )
   typedef KSpace::Cell Cell;
   typedef KSpace::Surfel Surfel;
 
-  std::string filename = vm["input-file"].as< std::string >();
+  std::string filename = vm["input"].as< std::string >();
   Image image = VolReader<Image>::importVol( filename );
   ImagePredicate predicate = ImagePredicate( image, 0 );
   Z3i::Domain domain = image.domain();
@@ -257,7 +257,7 @@ int main( int argc, char** argv )
 
       if ( ( mode.compare("mean") == 0 ) )
       {
-        typedef functors::IIGeometricFunctors::IIMeanCurvature3DFunctor<Z3i::Space> MyIICurvatureFunctor;
+        typedef functors::IIMeanCurvature3DFunctor<Z3i::Space> MyIICurvatureFunctor;
         typedef IntegralInvariantVolumeEstimator<Z3i::KSpace, ImagePredicate, MyIICurvatureFunctor> MyIIEstimator;
 
         MyIICurvatureFunctor functor;
@@ -272,7 +272,7 @@ int main( int argc, char** argv )
       }
       else if ( ( mode.compare("gaussian") == 0 ) )
       {
-        typedef functors::IIGeometricFunctors::IIGaussianCurvature3DFunctor<Z3i::Space> MyIICurvatureFunctor;
+        typedef functors::IIGaussianCurvature3DFunctor<Z3i::Space> MyIICurvatureFunctor;
         typedef IntegralInvariantCovarianceEstimator<Z3i::KSpace, ImagePredicate, MyIICurvatureFunctor> MyIIEstimator;
 
         MyIICurvatureFunctor functor;
@@ -287,7 +287,7 @@ int main( int argc, char** argv )
       }
       else if ( ( mode.compare("k1") == 0 ) )
       {
-        typedef functors::IIGeometricFunctors::IIFirstPrincipalCurvature3DFunctor<Z3i::Space> MyIICurvatureFunctor;
+        typedef functors::IIFirstPrincipalCurvature3DFunctor<Z3i::Space> MyIICurvatureFunctor;
         typedef IntegralInvariantCovarianceEstimator<Z3i::KSpace, ImagePredicate, MyIICurvatureFunctor> MyIIEstimator;
 
         MyIICurvatureFunctor functor;
@@ -302,7 +302,7 @@ int main( int argc, char** argv )
       }
       else if ( ( mode.compare("k2") == 0 ) )
       {
-        typedef functors::IIGeometricFunctors::IISecondPrincipalCurvature3DFunctor<Z3i::Space> MyIICurvatureFunctor;
+        typedef functors::IISecondPrincipalCurvature3DFunctor<Z3i::Space> MyIICurvatureFunctor;
         typedef IntegralInvariantCovarianceEstimator<Z3i::KSpace, ImagePredicate, MyIICurvatureFunctor> MyIIEstimator;
 
         MyIICurvatureFunctor functor;
@@ -366,7 +366,7 @@ int main( int argc, char** argv )
 
       if( mode.compare("prindir1") == 0 )
       {
-        typedef functors::IIGeometricFunctors::IIFirstPrincipalDirectionFunctor<Z3i::Space> MyIICurvatureFunctor;
+        typedef functors::IIFirstPrincipalDirectionFunctor<Z3i::Space> MyIICurvatureFunctor;
         typedef IntegralInvariantCovarianceEstimator<Z3i::KSpace, ImagePredicate, MyIICurvatureFunctor> MyIIEstimator;
 
         MyIICurvatureFunctor functor;
@@ -381,7 +381,7 @@ int main( int argc, char** argv )
       }
       else if( mode.compare("prindir2") == 0 )
       {
-        typedef functors::IIGeometricFunctors::IISecondPrincipalDirectionFunctor<Z3i::Space> MyIICurvatureFunctor;
+        typedef functors::IISecondPrincipalDirectionFunctor<Z3i::Space> MyIICurvatureFunctor;
         typedef IntegralInvariantCovarianceEstimator<Z3i::KSpace, ImagePredicate, MyIICurvatureFunctor> MyIIEstimator;
 
         MyIICurvatureFunctor functor;

@@ -53,10 +53,11 @@ int main( int argc, char** argv )
   po::options_description general_opt("Allowed options are: ");
   general_opt.add_options()
     ("help,h", "display this message")
-    ("input-file,i", po::value<std::string>(), "volumetric file (.vol) " )
-    ("output-file,o", po::value<std::string>(), "sequence of discrete point file (.sdp) " )
-    ("thresholdMin,m", po::value<int>(), "min threshold (default 128)" )
-    ("thresholdMax,M", po::value<int>(), "max threshold (default 255)" );
+    ("input,i", po::value<std::string>(), "volumetric file (.vol) " )
+    ("output,o", po::value<std::string>(), "sequence of discrete point file (.sdp) " )
+    ("exportImageValues,e","option to export also the image value of the voxel in a fourth field.")
+    ("thresholdMin,m", po::value<int>()->default_value(128), "min threshold (default 128)" )
+    ("thresholdMax,M", po::value<int>()->default_value(255), "max threshold (default 255)" );
   
   
   bool parseOK=true;
@@ -70,7 +71,7 @@ int main( int argc, char** argv )
   po::notify(vm);    
   if( !parseOK || vm.count("help")||argc<=1)
     {
-      std::cout << "Usage: " << argv[0] << " [input-file] [output-file]\n"
+      std::cout << "Usage: " << argv[0] << " [input] [output]\n"
 		<< "Convert volumetric  file into a digital set of points from a given threshold."
 		<< general_opt << "\n";
       std::cout << "Example:\n"
@@ -78,15 +79,15 @@ int main( int argc, char** argv )
       return 0;
     }
   
-  if(! vm.count("input-file") ||! vm.count("output-file"))
+  if(! vm.count("input") ||! vm.count("output"))
     {
       trace.error() << " Input and output filename are needed to be defined" << endl;      
       return 0;
     }
 
   
-  string inputFilename = vm["input-file"].as<std::string>();
-  string outputFilename = vm["output-file"].as<std::string>();
+  string inputFilename = vm["input"].as<std::string>();
+  string outputFilename = vm["output"].as<std::string>();
   
   trace.info() << "Reading input file " << inputFilename ; 
   Image3D inputImage = DGtal::VolReader<Image3D>::importVol(inputFilename);
@@ -98,9 +99,22 @@ int main( int argc, char** argv )
 
   trace.info() << "Processing image to output file " << outputFilename ; 
   //Processing all points
+  outStream << "# sdp file generate by vol2sdp with source vol:" << inputFilename << " and threshold min: " <<  minTh << " max:" << maxTh << std::endl;
+  outStream << "# format: x y z ";
+  if(vm.count("exportImageValues")){
+    outStream << " image_value";
+  }
+  outStream << std::endl;
+  
+  
   for(Image3D::Domain::ConstIterator it=inputImage.domain().begin(); it != inputImage.domain().end(); ++it){
     if(inputImage(*it) >= minTh && inputImage(*it) <= maxTh ){
-      outStream << (*it)[0] << " " << (*it)[1] << " " << (*it)[2] << std::endl;
+      outStream << (*it)[0] << " " << (*it)[1] << " " << (*it)[2];
+      if(vm.count("exportImageValues")){
+        outStream << " " << (unsigned int) inputImage(*it);
+      }
+      
+      outStream << std::endl;
     }
   }
  outStream.close();

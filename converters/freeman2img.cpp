@@ -39,6 +39,8 @@
 //contour
 #include "DGtal/geometry/curves/FreemanChain.h"
 #include "DGtal/topology/helpers/Surfaces.h"
+#include "DGtal/topology/SurfelSetPredicate.h"
+
 
 //boost
 #include <boost/program_options/options_description.hpp>
@@ -61,7 +63,7 @@ int main( int argc, char** argv )
   po::options_description general_opt("Allowed options are: ");
   general_opt.add_options()
     ("help,h", "display this message")  
-    ("FreemanChain,f", po::value<std::string>(), "FreemanChain file name")
+    ("input,i", po::value<std::string>(), "the input FreemanChain file name")
     ("output,o", po::value<std::string>()->default_value("result.pgm"), " the output filename")
     ("space,s", po::value<std::vector <int> >()->multitoken(), "Define the space from its bounding box (lower and upper coordinates) \
 else the space is automatically defined from the freemanchain bounding boxes.");
@@ -88,17 +90,17 @@ else the space is automatically defined from the freemanchain bounding boxes.");
       if(!parseOK){
         trace.info() <<" Error parsing options\n" <<std::endl;
           }
-      trace.info()<< "Transform one or several freeman chains into a pgm file by filling its interior areas." << std::endl
+      trace.info()<< "Transform one or several freeman chains into an grayscale image file by filling its interior areas." << std::endl
                   << "The transformation can fill shapes with hole by using the freemanchain orientation."
                   <<" The interior is considered on the left according to a freeman chain move, i.e. a clockwise oriented contour represents a hole in the shape." <<std::endl
                   << "Basic usage: "<<std::endl
-                  << "\t freeman2pgm [options] --FreemanChain  <fileName>  "<<std::endl
+                  << "\t freeman2img [options] --FreemanChain  <fileName>  "<<std::endl
 		  << general_opt << "\n";
       return 0;
     }  
   
   if( vm.count("FreemanChain") ){
-    std::string fileName = vm["FreemanChain"].as<std::string>();
+    std::string fileName = vm["input"].as<std::string>();
     std::vector< FreemanChain > vectFcs =  PointListReader< Z2i::Point >::getFreemanChainsFromFile<Z2i::Integer> (fileName);    
     int minx, miny, maxx, maxy;
     if(!vm.count("space")){
@@ -132,11 +134,8 @@ else the space is automatically defined from the freemanchain bounding boxes.");
       FreemanChain::getInterPixelLinels(aKSpace, fc, boundarySCell, true); 
     }
     
-    Surfaces<KSpace>::uComputeInterior(aKSpace, boundarySCell, interiorCell, false );  
     Image2D imageResult (Z2i::Domain(Z2i::Point(minx, miny), Z2i::Point(maxx, maxy))); 
-    for(std::set<Cell>::const_iterator it = interiorCell.begin(); it!=interiorCell.end(); it++){
-      imageResult.setValue(aKSpace.uCoords(*it), 255);
-    }
+    Surfaces<KSpace>::uFillInterior(aKSpace, SurfelSetPredicate<std::set<SCell>,SCell>(boundarySCell), imageResult, 255, false, false );  
     imageResult >> vm["output"].as<std::string>();
   }
 
