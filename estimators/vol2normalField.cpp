@@ -168,7 +168,7 @@ int main ( int argc, char**argv )
     //Estimator definition
     typedef deprecated::LocalConvolutionNormalVectorEstimator  < MyDigitalSurface,
                                                      deprecated::GaussianConvolutionWeights< MyDigitalSurface::Size>  > MyGaussianEstimator;
-    BOOST_CONCEPT_ASSERT ( ( CNormalVectorEstimator< MyGaussianEstimator > ) );
+    BOOST_CONCEPT_ASSERT ( ( concepts::CNormalVectorEstimator< MyGaussianEstimator > ) );
     MyGaussianEstimator myNormalEstimatorG ( digSurf, Gkernel );
 
     // Embedder definition
