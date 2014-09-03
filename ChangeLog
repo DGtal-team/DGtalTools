@@ -8,6 +8,7 @@
 	- 3dCurvatureViewer: can now display curvature on multiple connected components.
 	- sliceViewer: a new 2D and 3D slice viewer from 3D volumic files ( pgm3d, vol, longvol, and DICOM with ITK).
 	- 3dHeightMapViewer: display a 2D image as heightmap by using QGLviewer.
+	- 3dDisplaySurfelData: display surfel data from SDP file with color attributes given as scalar interpreted as color.
 
 * converters/:
 	- volBoundary2obj: a simple tool to export the boundary of a an	object in a volumetric file to OBJ
