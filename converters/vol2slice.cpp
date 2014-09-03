@@ -110,7 +110,7 @@ int main( int argc, char** argv )
 
   //Processing each slice
 #pragma omp parallel for schedule(dynamic)
-  for( unsigned int i=0; i <= input3dImage.domain().upperBound()[sliceOrientation]; i++){
+  for( int i=0; i <= input3dImage.domain().upperBound()[sliceOrientation]; i++){
     trace.info() << "Exporting slice image "<< i ;
     DGtal::functors::Projector<DGtal::Z2i::Space>  invFunctor; invFunctor.initRemoveOneDim(sliceOrientation);
     DGtal::Z2i::Domain domain2D(invFunctor(input3dImage.domain().lowerBound()),

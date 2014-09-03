@@ -224,7 +224,7 @@ int main( int argc, char** argv )
     }else{
       vectVoxels = PointListReader<Z3i::Point>::getPointsFromFile(vm["displaySDP"].as<std::string>());
     }
-    for(int i=0;i< vectVoxels.size(); i++){
+    for(unsigned int i=0;i< vectVoxels.size(); i++){
       if(!vm.count("displayDigitalSurface")){
         viewer << vectVoxels.at(i);
       }else{
