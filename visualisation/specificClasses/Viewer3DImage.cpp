@@ -69,11 +69,14 @@ Viewer3DImage< Space, KSpace>::setVolImage(Image3D * an3DImage){
     break;
   }
 
-  
+  myImageOrigin = my3dImage->domain().lowerBound();
   (*this).updateList(false);
   (*this).update();
   
-    
+  mySliceXPos=myImageOrigin[0];
+  mySliceYPos=myImageOrigin[1];
+  mySliceZPos=myImageOrigin[2];
+
  // Adding X slice in the viewer.
   DGtal::functors::Projector<DGtal::Z2i::Space>  invFunctorX; invFunctorX.initRemoveOneDim(0);
   DGtal::Z2i::Domain domain2DX(invFunctorX(my3dImage->domain().lowerBound()), 
@@ -85,7 +88,7 @@ Viewer3DImage< Space, KSpace>::setVolImage(Image3D * an3DImage){
     
   std::cout << "image:" << sliceImageX.className();
   (*this) << sliceImageX;
-  (*this) << DGtal::UpdateImagePosition< Space, KSpace >(0, DGtal::Viewer3D<>::xDirection, mySliceXPos, 0.0, 0.0);
+  (*this) << DGtal::UpdateImagePosition< Space, KSpace >(0, DGtal::Viewer3D<>::xDirection, mySliceXPos,myImageOrigin[1], myImageOrigin[2]);
 
 
   // Adding Y slice in the viewer.
@@ -96,7 +99,7 @@ Viewer3DImage< Space, KSpace>::setVolImage(Image3D * an3DImage){
   DGtal::functors::Projector<DGtal::Z3i::Space> aSliceFunctorY(mySliceYPos); aSliceFunctorY.initAddOneDim(1);
   SliceImageAdapter sliceImageY(*my3dImage, domain2DY, aSliceFunctorY, DGtal::functors::Identity()); 
   (*this) << sliceImageY;
-  (*this) << DGtal::UpdateImagePosition< Space, KSpace >(1, DGtal::Viewer3D<>::yDirection, 0.0,mySliceYPos, 0.0);
+  (*this) << DGtal::UpdateImagePosition< Space, KSpace >(1, DGtal::Viewer3D<>::yDirection, myImageOrigin[0], mySliceYPos, myImageOrigin[2]);
 
 
 
@@ -112,7 +115,7 @@ Viewer3DImage< Space, KSpace>::setVolImage(Image3D * an3DImage){
   DGtal::functors::SliceRotator2D<DGtal::Z3i::Domain> aSliceFunctorZ(2, my3dImage->domain(), mySliceZPos, 2, myAngleRotation, centerZ );
   MyRotatorSliceImageAdapter sliceImageZ(*my3dImage, domain2DZ, aSliceFunctorZ, DGtal::functors::Identity()); 
   (*this) << sliceImageZ;
-  (*this) << DGtal::UpdateImagePosition< Space, KSpace > (2, DGtal::Viewer3D<>::zDirection, 0.0, 0.0, mySliceZPos);
+  (*this) << DGtal::UpdateImagePosition< Space, KSpace > (2, DGtal::Viewer3D<>::zDirection, myImageOrigin[0], myImageOrigin[1], mySliceZPos);
 
     
   (*this) << DGtal::Viewer3D<>::updateDisplay;
@@ -188,7 +191,7 @@ Viewer3DImage< Space, KSpace>::keyPressEvent ( QKeyEvent *e )
     bool stoped=false;
     if(myCurrentSliceDim==0){
       aSliceMax=my3dImage->domain().upperBound()[0]+1;
-      if(mySliceXPos+dirStep<aSliceMax&&mySliceXPos+dirStep>=0){
+      if(mySliceXPos+dirStep<aSliceMax&&mySliceXPos+dirStep>=myImageOrigin[0]){
 	 mySliceXPos+=dirStep;
       }else{
 	stoped=true;
@@ -196,7 +199,7 @@ Viewer3DImage< Space, KSpace>::keyPressEvent ( QKeyEvent *e )
       aSliceNum=mySliceXPos;
     }else if(myCurrentSliceDim==1){
       aSliceMax=my3dImage->domain().upperBound()[1]+1;
-      if(mySliceYPos+dirStep<aSliceMax&&mySliceYPos+dirStep>=0){
+      if(mySliceYPos+dirStep<aSliceMax&&mySliceYPos+dirStep>=myImageOrigin[1]){
 	 mySliceYPos+=dirStep;
       }else{
 	stoped=true;
@@ -204,7 +207,7 @@ Viewer3DImage< Space, KSpace>::keyPressEvent ( QKeyEvent *e )
       aSliceNum=mySliceYPos;
     }else if(myCurrentSliceDim==2){
       aSliceMax=my3dImage->domain().upperBound()[2]+1;
-       if(mySliceZPos+dirStep<aSliceMax&&mySliceZPos+dirStep>=0){
+       if(mySliceZPos+dirStep<aSliceMax&&mySliceZPos+dirStep>=myImageOrigin[2]){
 	 mySliceZPos+=dirStep;
        }else{
 	 stoped=true;
@@ -235,16 +238,15 @@ Viewer3DImage< Space, KSpace>::keyPressEvent ( QKeyEvent *e )
       MyRotatorSliceImageAdapter sliceImage(*my3dImage, domain2D, aSliceFunctor, DGtal::functors::Identity()); 
       
       (*this) << DGtal::UpdateImageData<MyRotatorSliceImageAdapter>(myCurrentSliceDim, sliceImage, 
-							   (myCurrentSliceDim==0)? dirStep: 0.0, 
-							   (myCurrentSliceDim==1)? dirStep: 0.0,
-							   (myCurrentSliceDim==2)? dirStep: 0.0, 
+                                                                   (myCurrentSliceDim==0)? dirStep: 0.0, 
+                                                                   (myCurrentSliceDim==1)? dirStep: 0.0,
+                                                                   (myCurrentSliceDim==2)? dirStep: 0.0, 
 							   myAngleRotation, DGtal::Viewer3D<>::zDirection);
       (*this).updateList(false);
       (*this).update();      
     }
     handled=true;
   }
-
    
   if ( !handled )
     DGtal::Viewer3D<>::keyPressEvent ( e );
