@@ -118,7 +118,7 @@ int main( int argc, char** argv )
   Image image = GenericReader<Image>::import ( filename );
 
   trace.beginBlock("DT Computation");
-  typedef IntervalForegroundPredicate<Image> Predicate;
+  typedef functors::IntervalForegroundPredicate<Image> Predicate;
   Predicate aPredicate(image, vm[ "min" ].as<int>(), vm[ "max" ].as<int>() );
 
   DistanceTransformation<Z3i::Space, Predicate , Z3i::L2Metric> dt(image.domain(),aPredicate, Z3i::L2Metric() );

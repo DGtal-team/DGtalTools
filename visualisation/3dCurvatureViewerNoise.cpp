@@ -194,7 +194,7 @@ int main( int argc, char** argv )
   typedef Z3i::Space::RealPoint RealPoint;
   typedef Z3i::Point Point;
   typedef ImageSelector< Z3i::Domain, bool>::Type Image;
-  typedef SimpleThresholdForegroundPredicate< Image > ImagePredicate;
+  typedef functors::SimpleThresholdForegroundPredicate< Image > ImagePredicate;
   typedef KanungoNoise< ImagePredicate, Z3i::Domain > KanungoPredicate;
   typedef Z3i::KSpace KSpace;
   typedef KSpace::SCell SCell;

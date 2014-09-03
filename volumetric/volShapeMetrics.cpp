@@ -71,7 +71,7 @@ getStatsFromDistanceMap(Statistic<double> & stats, const Image3D &imageA, int aM
   // Get the digital set from ref image by computing the surface (use -1 and +1 since the interval of append function are open)
   Z3i::DigitalSet set3dRef (imageA.domain()); 
   SetFromImage<Z3i::DigitalSet>::append<Image3D>(set3dRef, imageA, aMin-1,aMax);  
-  typedef NotPointPredicate<Z3i::DigitalSet> NegPredicate;
+  typedef functors::NotPointPredicate<Z3i::DigitalSet> NegPredicate;
   
 
   // Applying the distance transform on the digital surface of the set: 

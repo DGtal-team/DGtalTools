@@ -232,7 +232,7 @@ int main( int argc, char** argv )
   
   if (!thresholdRange){
     Binarizer b(min, max); 
-    PointFunctorPredicate<Image,Binarizer> predicate(image, b); 
+    functors::PointFunctorPredicate<Image,Binarizer> predicate(image, b); 
     trace.info() << "DGtal contour extraction from thresholds ["<<  min << "," << max << "]" ;
     SurfelAdjacency<2> sAdj( true );
     std::vector< std::vector< Z2i::Point >  >  vectContoursBdryPointels;
@@ -252,7 +252,7 @@ int main( int argc, char** argv )
 	max = (int)(maxThreshold-(i)*increment);
       }
       Binarizer b(min, max); 
-      PointFunctorPredicate<Image,Binarizer> predicate(image, b); 
+      functors::PointFunctorPredicate<Image,Binarizer> predicate(image, b); 
       
       trace.info() << "DGtal contour extraction from thresholds ["<<  min << "," << max << "]" ;
       SurfelAdjacency<2> sAdj( true );

@@ -83,7 +83,7 @@ int main( int argc, char** argv )
   typedef ImageSelector < Domain, int>::Type Image;
   Image image = VolReader<Image>::importVol(inputFilename);
 
-  typedef SimpleThresholdForegroundPredicate<Image> ThresholdedImage;
+  typedef functors::SimpleThresholdForegroundPredicate<Image> ThresholdedImage;
   ThresholdedImage thresholdedImage( image, threshold );
   // DigitalSet set3d (image.domain());
   // SetFromImage<DigitalSet>::append<Image>(set3d, image,
