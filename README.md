@@ -85,7 +85,6 @@ Estimators
   - curvatureMCMS: curvature estimator using the maximal segments cover  (to be updated for current DGtal version).
   - curvatureScaleSpaceBCC: a tool to display the curvature scale space of a given contour with the Binomial Convolver Curvature Estimator
   - estimatorComparator: program to perform comparison of local quantity estimators (to be updated for current DGtal version).
-  - eulerCharacteristic: bruteforce tool to extract (volumetric) Euler characteristic from volumetric binary object.
   - vol2normalField: compute the normal vector field of a given vol file .
 <table>
 <tr>
@@ -183,7 +182,6 @@ Volumetric
   - volImageMetrics: apply basic statistics on comparaison between two volumetric images (shape defined from thresholds): computes true/false -+, precision, recall f-mean RMSE, PSNR.
   - volShapeMetrics: apply euclidean distance comparisons between two shapes  (shape defined from thresholds).
   - volSegment: Segment volumetric file from a simple threshold which can be set automatically from the otsu estimation.
-  - volReSample: apply a basic  re sampling of a 3D volumetric image (.vol, .longvol, .pgm3d)  with a given grid size.
 
 
 <center>
