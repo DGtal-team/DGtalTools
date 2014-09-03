@@ -46,10 +46,10 @@
 #include <boost/program_options/variables_map.hpp>
 
 // Shape constructors
-#include "DGtal/io/readers/VolReader.h"
+#include "DGtal/io/readers/GenericReader.h"
 #include "DGtal/images/ImageSelector.h"
 #include "DGtal/images/imagesSetsUtils/SetFromImage.h"
-#include "DGtal/images/SimpleThresholdForegroundPredicate.h"
+#include "DGtal/images/IntervalForegroundPredicate.h"
 #include "DGtal/topology/SurfelAdjacency.h"
 #include "DGtal/topology/helpers/Surfaces.h"
 #include "DGtal/topology/LightImplicitDigitalSurface.h"
@@ -103,8 +103,13 @@ int main( int argc, char** argv )
   ("input,i", po::value< std::string >(), ".vol file")
   ("radius,r",  po::value< double >(), "Kernel radius for IntegralInvariant" )
   ("threshold,t",  po::value< unsigned int >()->default_value(8), "Min size of SCell boundary of an object" )
-  ("mode,m", po::value< std::string >()->default_value("mean"), "type of output : mean, gaussian, k1, k2, prindir1 or prindir2 (default mean)")
+  ("minImageThreshold,l",  po::value<  int >()->default_value(0), "set the minimal image threshold to define the image object (object defined by the voxel with intensity belonging to ]minImageThreshold, maxImageThreshold ] )." )
+  ("maxImageThreshold,u",  po::value<  int >()->default_value(1), "set the minimal image threshold to define the image object (object defined by the voxel with intensity belonging to ]minImageThreshold, maxImageThreshold] )." )  
+("mode,m", po::value< std::string >()->default_value("mean"), "type of output : mean, gaussian, k1, k2, prindir1 or prindir2 (default mean)")
   ("export,e", po::value< std::string >(), "Export the scene to specified OBJ filename." )
+  ("exportDat,E", po::value<std::string>(), "Export resulting curvature (for mean, gaussian, k1 or k2 mode) in a simple data file each line representing a surfel. ")
+  ("exportOnly", "Used to only export the result without the 3d Visualisation (usefull for scripts)." )
+  ("imageScale,s", po::value<std::vector<double> >()->multitoken(), "scaleX, scaleY, scaleZ: re sample the source image according with a grid of size 1.0/scale (usefull to compute curvature on image defined on anisotropic grid). Set by default to 1.0 for the three axis.  ")
   ("normalization,n", "When exporting to OBJ, performs a normalization so that the geometry fits in [-1/2,1/2]^3") ;
 
   bool parseOK = true;
@@ -130,7 +135,7 @@ int main( int argc, char** argv )
   }
 
   bool normalization = false;
-  if  (vm.count("normalization"))
+  if (parseOK && vm.count("normalization"))
     normalization = true;
 
   std::string mode;
@@ -144,7 +149,6 @@ int main( int argc, char** argv )
     trace.error() << " The selected mode ("<<mode << ") is not defined."<<std::endl;
   }
 
-  unsigned int threshold = vm["threshold"].as< unsigned int >();
 
   if(!neededArgsGiven || !parseOK || vm.count("help") || argc <= 1 )
   {
@@ -163,11 +167,20 @@ int main( int argc, char** argv )
     << std::endl;
     return 0;
   }
+  unsigned int threshold = vm["threshold"].as< unsigned int >();
+  int minImageThreshold =  vm["minImageThreshold"].as<  int >();
+  int maxImageThreshold =  vm["maxImageThreshold"].as<  int >();
+
+  bool exportOnly = vm.count("exportOnly");
 
   double h = 1.0;
+ 
 
   std::string export_path;
   bool myexport = false;
+  bool myexportDat = false;
+  string exportDatFilename;
+
   if(vm.count("export")){
     export_path = vm["export"].as< std::string >();
     if( export_path.find(".obj") == std::string::npos )
@@ -178,25 +191,68 @@ int main( int argc, char** argv )
     } 
     myexport=true;
   }
-  
+
+
+  if(vm.count("exportDat")){
+    exportDatFilename = vm["exportDat"].as<std::string>();
+    myexportDat = true;
+  }
+ 
   double re_convolution_kernel = vm["radius"].as< double >();
+
+
+  std::vector<  double > aGridSizeReSample;
+  if(vm.count("imageScale")){
+    std::vector< double> vectScale = vm["imageScale"].as<std::vector<double > >();
+    if(vectScale.size()!=3){
+      trace.error() << "The grid size should contains 3 elements" << std::endl;
+      return 0;
+    }else{
+      aGridSizeReSample.push_back(1.0/vectScale.at(0));
+      aGridSizeReSample.push_back(1.0/vectScale.at(1));
+      aGridSizeReSample.push_back(1.0/vectScale.at(2));
+    }
+  }else{
+    aGridSizeReSample.push_back(1.0);
+    aGridSizeReSample.push_back(1.0);
+    aGridSizeReSample.push_back(1.0);
+  }
+
+
 
   // Construction of the shape from vol file
   typedef Z3i::Space::RealPoint RealPoint;
   typedef Z3i::Point Point;
-  typedef ImageSelector< Z3i::Domain, bool>::Type Image;
-  typedef functors::SimpleThresholdForegroundPredicate< Image > ImagePredicate;
+  typedef ImageSelector< Z3i::Domain,  int>::Type Image;
+  typedef DGtal::functors::BasicDomainSubSampler< HyperRectDomain<SpaceND<3, int> >,  
+                                                  DGtal::int32_t, double >   ReSampler; 
+  typedef DGtal::ConstImageAdapter<Image, Image::Domain, ReSampler,
+				   Image::Value,  DGtal::functors::Identity >  SamplerImageAdapter;
+  typedef IntervalForegroundPredicate< SamplerImageAdapter > ImagePredicate;
+  typedef BinaryPointPredicate<DomainPredicate<Image::Domain>, ImagePredicate, DGtal::AndBoolFct2  > Predicate;
   typedef Z3i::KSpace KSpace;
   typedef KSpace::SCell SCell;
   typedef KSpace::Cell Cell;
   typedef KSpace::Surfel Surfel;
 
   std::string filename = vm["input"].as< std::string >();
-  Image image = VolReader<Image>::importVol( filename );
-  ImagePredicate predicate = ImagePredicate( image, 0 );
-  Z3i::Domain domain = image.domain();
+  Image image = GenericReader<Image>::import( filename );
+  
+  PointVector<3,int> shiftVector3D(0 ,0, 0);      
+  DGtal::functors::BasicDomainSubSampler< HyperRectDomain<SpaceND<3, int> >,  
+                                          DGtal::int32_t, double > reSampler(image.domain(),
+                                                                             aGridSizeReSample,  shiftVector3D);  
+  SamplerImageAdapter sampledImage (image, reSampler.getSubSampledDomain(), reSampler, functors::Identity());
+  ImagePredicate predicateIMG = ImagePredicate( sampledImage,  minImageThreshold, maxImageThreshold );
+  DomainPredicate<Z3i::Domain> domainPredicate( sampledImage.domain() );
+  DGtal::AndBoolFct2 andF;
+  Predicate predicate(domainPredicate, predicateIMG, andF  ); 
+
+
+  Z3i::Domain domain =  sampledImage.domain();
   Z3i::KSpace K;
-  bool space_ok = K.init( domain.lowerBound(), domain.upperBound(), true );
+  bool space_ok = K.init( domain.lowerBound()-Z3i::Domain::Point::diagonal(),
+                          domain.upperBound()+Z3i::Domain::Point::diagonal(), true );
   if (!space_ok)
   {
     trace.error() << "Error in the Khalimsky space construction."<<std::endl;
@@ -206,11 +262,14 @@ int main( int argc, char** argv )
   SurfelAdjacency< Z3i::KSpace::dimension > Sadj( true );
 
   // Viewer settings
+
   QApplication application( argc, argv );
   typedef Viewer3D<Z3i::Space, Z3i::KSpace> Viewer;
-  Viewer viewer( K );
-  viewer.show();
 
+  Viewer viewer( K );
+  if(!exportOnly){
+    viewer.show();
+  }
   // Extraction of components
   typedef KSpace::SurfelSet SurfelSet;
   typedef SetOfSurfels< KSpace, SurfelSet > MySetOfSurfels;
@@ -223,12 +282,22 @@ int main( int argc, char** argv )
 
   std::vector< std::vector<SCell > > vectConnectedSCell;
   Surfaces<KSpace>::extractAllConnectedSCell(vectConnectedSCell,K, Sadj, predicate, false);
+  std::ofstream outDat;
+  if(myexportDat){
+    trace.info() << "Exporting curvature as dat file: "<< exportDatFilename <<std::endl;
+    outDat.open(exportDatFilename.c_str());
+    outDat << "# data exported from 3dCurvatureViewer implementing the II curvature estimator (Coeurjolly, D.; Lachaud, J.O; Levallois, J., (2013). Integral based Curvature"
+           << "  Estimators in Digital Geometry. DGCI 2013.) " << std::endl;
+    outDat << "# format: surfel coordinates (in Khalimsky space) curvature: "<< mode <<  std::endl;
+  }
+  
   for(unsigned int i = 0; i<vectConnectedSCell.size(); i++)
   {
     if( vectConnectedSCell[i].size() <= threshold )
     {
       continue;
     }
+    
     MySetOfSurfels  aSet(K, Sadj);
 
     for(std::vector<SCell>::const_iterator it= vectConnectedSCell.at(i).begin(); it != vectConnectedSCell.at(i).end(); ++it)
@@ -258,7 +327,7 @@ int main( int argc, char** argv )
       if ( ( mode.compare("mean") == 0 ) )
       {
         typedef functors::IIMeanCurvature3DFunctor<Z3i::Space> MyIICurvatureFunctor;
-        typedef IntegralInvariantVolumeEstimator<Z3i::KSpace, ImagePredicate, MyIICurvatureFunctor> MyIIEstimator;
+        typedef IntegralInvariantVolumeEstimator<Z3i::KSpace, Predicate, MyIICurvatureFunctor> MyIIEstimator;
 
         MyIICurvatureFunctor functor;
         functor.init( h, re_convolution_kernel );
@@ -273,7 +342,7 @@ int main( int argc, char** argv )
       else if ( ( mode.compare("gaussian") == 0 ) )
       {
         typedef functors::IIGaussianCurvature3DFunctor<Z3i::Space> MyIICurvatureFunctor;
-        typedef IntegralInvariantCovarianceEstimator<Z3i::KSpace, ImagePredicate, MyIICurvatureFunctor> MyIIEstimator;
+        typedef IntegralInvariantCovarianceEstimator<Z3i::KSpace, Predicate, MyIICurvatureFunctor> MyIIEstimator;
 
         MyIICurvatureFunctor functor;
         functor.init( h, re_convolution_kernel );
@@ -288,7 +357,7 @@ int main( int argc, char** argv )
       else if ( ( mode.compare("k1") == 0 ) )
       {
         typedef functors::IIFirstPrincipalCurvature3DFunctor<Z3i::Space> MyIICurvatureFunctor;
-        typedef IntegralInvariantCovarianceEstimator<Z3i::KSpace, ImagePredicate, MyIICurvatureFunctor> MyIIEstimator;
+        typedef IntegralInvariantCovarianceEstimator<Z3i::KSpace, Predicate, MyIICurvatureFunctor> MyIIEstimator;
 
         MyIICurvatureFunctor functor;
         functor.init( h, re_convolution_kernel );
@@ -303,7 +372,7 @@ int main( int argc, char** argv )
       else if ( ( mode.compare("k2") == 0 ) )
       {
         typedef functors::IISecondPrincipalCurvature3DFunctor<Z3i::Space> MyIICurvatureFunctor;
-        typedef IntegralInvariantCovarianceEstimator<Z3i::KSpace, ImagePredicate, MyIICurvatureFunctor> MyIIEstimator;
+        typedef IntegralInvariantCovarianceEstimator<Z3i::KSpace, Predicate, MyIICurvatureFunctor> MyIIEstimator;
 
         MyIICurvatureFunctor functor;
         functor.init( h, re_convolution_kernel );
@@ -332,18 +401,18 @@ int main( int argc, char** argv )
       }
 
       ASSERT( min <= max );
-
       typedef GradientColorMap< Quantity > Gradient;
-      Gradient cmap_grad( min, max );
+      Gradient cmap_grad( min, (max==min)? max+1: max );
       cmap_grad.addColor( Color( 50, 50, 255 ) );
       cmap_grad.addColor( Color( 255, 0, 0 ) );
       cmap_grad.addColor( Color( 255, 255, 10 ) );
 
       viewer << SetMode3D((*abegin2).className(), "Basic" );
-      if( myexport )
+      if( myexportDat )
       {
         board << SetMode3D((K.unsigns(*abegin2)).className(), "Basic" );
       }
+      
 
       for ( unsigned int i = 0; i < results.size(); ++i )
       {
@@ -354,6 +423,10 @@ int main( int argc, char** argv )
         {
           board << CustomColors3D( Color::Black, cmap_grad( results[ i ] ))
           << K.unsigns(*abegin2);
+        }
+        if(myexportDat){
+          Point kCoords = K.uKCoords(K.unsigns(*abegin2));
+          outDat << kCoords[0] << " " << kCoords[1] << " " << kCoords[2] <<  " " <<  results[i] << std::endl;
         }
         ++abegin2;
       }
@@ -367,7 +440,7 @@ int main( int argc, char** argv )
       if( mode.compare("prindir1") == 0 )
       {
         typedef functors::IIFirstPrincipalDirectionFunctor<Z3i::Space> MyIICurvatureFunctor;
-        typedef IntegralInvariantCovarianceEstimator<Z3i::KSpace, ImagePredicate, MyIICurvatureFunctor> MyIIEstimator;
+        typedef IntegralInvariantCovarianceEstimator<Z3i::KSpace, Predicate, MyIICurvatureFunctor> MyIIEstimator;
 
         MyIICurvatureFunctor functor;
         functor.init( h, re_convolution_kernel );
@@ -382,7 +455,7 @@ int main( int argc, char** argv )
       else if( mode.compare("prindir2") == 0 )
       {
         typedef functors::IISecondPrincipalDirectionFunctor<Z3i::Space> MyIICurvatureFunctor;
-        typedef IntegralInvariantCovarianceEstimator<Z3i::KSpace, ImagePredicate, MyIICurvatureFunctor> MyIIEstimator;
+        typedef IntegralInvariantCovarianceEstimator<Z3i::KSpace, Predicate, MyIICurvatureFunctor> MyIIEstimator;
 
         MyIICurvatureFunctor functor;
         functor.init( h, re_convolution_kernel );
@@ -471,8 +544,16 @@ int main( int argc, char** argv )
     board.saveOBJ(export_path,normalization);
     trace.info() << "[done]" << std::endl;
   }
-    
-  return application.exec();
+  if(myexportDat){
+      outDat.close();
+  }
+
+  if(!exportOnly){
+    return application.exec();
+  }else{
+    return 0;
+  
+  }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
