@@ -52,14 +52,13 @@ Utilities to convert various simple file formats:
   - HDF52vol: convert HDF5 to vol file format. 
   - longvol2vol: convert longvol to vol file using different conversion policies.  
   - ofs2off: convert OFS mesh format towards a OFF variant.
-  - pgm2freeman: to extract a freeman chain contour from a grayscale image.
-  - freeman2pgm: transform one or several freeman chains into a pgm file by filling their interior areas.
+  - img2freeman: to extract a freeman chain contour from a grayscale image.
+  - freeman2img: transform one or several freeman chains into a pgm file by filling their interior areas.
   - raw2vol and vol2raw: transform 3D volumes files from (resp. to) raw to vol.
   - raw2HDF5: convert raw image to HDF5.
   - slice2vol: tool to merge slices into one 3d volumic file.
   - sdp2vol: a simple tool to create a 3d vol image from 3d digital points.
   - vol2sdp: a simple tools to extract digital points from 3d vol files.
-  - vol2off: extract dual surface of a digital object (equiv. Marching Cubes)
   - vol2obj: convert a volume file into OBJ format (all voxels belonging to threshold interval)   
   - vol2slice: tool to extract all slices from 3d volumic images.
   
@@ -158,7 +157,7 @@ Here are some illustrations of such a tools:
 <tr>
 <td><img height=130 src="https://f.cloud.github.com/assets/772865/684622/d698405a-da00-11e2-8aa0-19212a58ce23.png"></td>
 <td><img width=300 src="https://cloud.githubusercontent.com/assets/772865/2720141/6c42a0e0-c56b-11e3-8328-a6d88242f21e.png"> </td>
-<td><img  width=300 src="https://cloud.githubusercontent.com/assets/772865/3623729/f022a524-0e52-11e4-96cb-f619f26f83e0.png"></td>
+<td><img  width=300 src="https://cloud.githubusercontent.com/assets/772865/4023650/8fc2fe86-2b9e-11e4-98cf-7123c1a933fd.png"></td>
 <td><img  width=300 src="https://cloud.githubusercontent.com/assets/772865/3486505/6edb2144-043e-11e4-81c4-2c20f272a119.png" </td>
 </tr>
 <tr>
@@ -174,8 +173,8 @@ Here are some illustrations of such a tools:
 </center>
 Volumetric
 ----------
-  - 3dVolMarchingCubes: marching cubes form a Vol file
-  - homotopicThinning3D: ultimate skeleton from vol file
+  - 3dVolMarchingCubes: marching cubes form a Vol file.
+  - homotopicThinning3D: ultimate skeleton from vol file.
   - volAddBorder: add a 1 voxel boundary with value 0 to a vol file.
   - volCComponentCounter: a simple program to count the number of connected components in a 3D image.
   - volFlip: tool to flip all volume slice images according a given dimension.

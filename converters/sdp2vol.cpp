@@ -109,7 +109,7 @@ int main( int argc, char** argv )
     imageResult.setValue(*iter, backgroundVal);
   }    
   
-  for(int i=0; i<vectPoints.size(); i++){
+  for(unsigned int i=0; i<vectPoints.size(); i++){
     if(vm.count("invertY")){
       vectPoints[i][1]=ptUpper[1]-vectPoints[i][1];
     }

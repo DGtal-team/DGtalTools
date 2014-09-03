@@ -49,7 +49,7 @@ CumulativeOfPeriodicSequence CumulativeOfPeriodicSequence::invert() const {
     yy = mod(_offset, inv._sequence.size());
     //yy = CumulativeOfPeriodicSequenceValueAtIndex(seq, 1);
     //yy %= inv._sequence.size();
-    for (xx = 0; xx < _sequence.size(); xx++) {
+    for (xx = 0; xx < (int) _sequence.size(); xx++) {
 	//yy = CumulativeOfPeriodicSequenceValueAtIndex(seq, xx + 1);
 	//yy %= inv._sequence.size();
 	inv._sequence[yy]++;
@@ -57,7 +57,7 @@ CumulativeOfPeriodicSequence CumulativeOfPeriodicSequence::invert() const {
 	yy %= inv._sequence.size();
     }
 
-    for (xx = 1; xx < inv._sequence.size(); xx++) {
+    for (xx = 1; xx < (int) inv._sequence.size(); xx++) {
 	inv._sequence[xx] += inv._sequence[xx-1];
     }
     
@@ -95,8 +95,7 @@ int CumulativeOfPeriodicSequence::operator() (int i) const {
 }
 
 std::ostream &operator<<(std::ostream &out, const CumulativeOfPeriodicSequence &seq) {
-    int i;
-
+  
     out << '(';
 
     std::vector<int>::const_iterator it = seq._sequence.begin();
