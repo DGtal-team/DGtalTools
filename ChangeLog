@@ -18,7 +18,11 @@
 * estimators/:
 	- curvatureScaleSpaceBCC: a tool to display the curvature scale space of a given contour with the Binomial Convolver Curvature Estimator.
 	- generic3dNormalEstimators: Computes a normal vector field over a digitized 3D implicit surface for several estimators (II|VCM|Trivial|True).
-        - euleurCharacteristic: bruteforce tool to extract (volumetric) Euler characteristic from volumetric binary object
+        - eulerCharacteristic: bruteforce tool to extract (volumetric) Euler characteristic from volumetric binary object.
+
+* volumetric/:
+	- volReSample: apply a basic  re sampling of a 3D volumetric image (.vol, .longvol, .pgm3d)  with a given grid size.
+
 
 
 * volumetric/:
