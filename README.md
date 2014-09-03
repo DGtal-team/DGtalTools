@@ -182,7 +182,8 @@ Volumetric
   - volImageMetrics: apply basic statistics on comparaison between two volumetric images (shape defined from thresholds): computes true/false -+, precision, recall f-mean RMSE, PSNR.
   - volShapeMetrics: apply euclidean distance comparisons between two shapes  (shape defined from thresholds).
   - volSegment: Segment volumetric file from a simple threshold which can be set automatically from the otsu estimation.
-
+  - volTrValues: a basic tool to transform the voxel values from an input/output set.
+  - volCrop: crop an 3D vol image from points. 
 
 <center>
 <table>

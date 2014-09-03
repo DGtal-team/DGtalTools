@@ -2,7 +2,6 @@
 
 * visualisation/:
 	- 3dVolBoundaryViewer: a simple viewer of the boundary of an object defined by thresholding a vol file.
-	- 3dVolMarchingCubes: speed-up by factor 10 simply by replacing the set predicate used in computations.
 	- 3dSDPViewer: basic display of a sequence of 3d points (as voxel or sphere) and vectors by using QGLviewer.
 	- 3dCurvatureViewer: can now display curvature on multiple connected components and can apply image re sampling for anisotropic grid.
 	- sliceViewer: a new 2D and 3D slice viewer from 3D volumic files ( pgm3d, vol, longvol, and DICOM with ITK).
@@ -11,7 +10,7 @@
 
 * converters/:
 	- volBoundary2obj: a simple tool to export the boundary of a an	object in a volumetric file to OBJ
-	- freeman2pgm: transform one or several freeman chains into a pgm file by filling their interior areas and renamed into freeman2img.	
+	- freeman2pgm: transform one or several freeman chains into a pgm file by filling their interior areas and renamed into freeman2img.
 	- pgm2freeman: renamed to pgm2img.
 	- vol2off: tool removed, see 3dVolMarchingCubes for the same tool.
 
@@ -23,8 +22,10 @@
 
 
 * volumetric/:
+	- 3dVolMarchingCubes: speed-up by factor 10 simply by replacing the set predicate used in computations.
 	- volTrValues: a basic tool to transform the voxel values from an input/output set.
 	- volSegment: Segment volumetric file from a simple threshold which can be set automatically from the Otsu's variance based estimation.
+	- volCrop: crop an 3D vol image from points.
 
 
 
