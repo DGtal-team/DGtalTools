@@ -268,7 +268,7 @@ int main( int argc, char** argv )
 
       if ( ( mode.compare("mean") == 0 ) )
       {
-        typedef functors::IIGeometricFunctors::IIMeanCurvature3DFunctor<Z3i::Space> MyIICurvatureFunctor;
+        typedef functors::IIMeanCurvature3DFunctor<Z3i::Space> MyIICurvatureFunctor;
         typedef IntegralInvariantVolumeEstimator<Z3i::KSpace, ImagePredicate, MyIICurvatureFunctor> MyIIEstimator;
 
         MyIICurvatureFunctor functor;
@@ -283,7 +283,7 @@ int main( int argc, char** argv )
       }
       else if ( ( mode.compare("gaussian") == 0 ) )
       {
-        typedef functors::IIGeometricFunctors::IIGaussianCurvature3DFunctor<Z3i::Space> MyIICurvatureFunctor;
+        typedef functors::IIGaussianCurvature3DFunctor<Z3i::Space> MyIICurvatureFunctor;
         typedef IntegralInvariantCovarianceEstimator<Z3i::KSpace, ImagePredicate, MyIICurvatureFunctor> MyIIEstimator;
 
         MyIICurvatureFunctor functor;
@@ -298,7 +298,7 @@ int main( int argc, char** argv )
       }
       else if ( ( mode.compare("k1") == 0 ) )
       {
-        typedef functors::IIGeometricFunctors::IIFirstPrincipalCurvature3DFunctor<Z3i::Space> MyIICurvatureFunctor;
+        typedef functors::IIFirstPrincipalCurvature3DFunctor<Z3i::Space> MyIICurvatureFunctor;
         typedef IntegralInvariantCovarianceEstimator<Z3i::KSpace, ImagePredicate, MyIICurvatureFunctor> MyIIEstimator;
 
         MyIICurvatureFunctor functor;
@@ -313,7 +313,7 @@ int main( int argc, char** argv )
       }
       else if ( ( mode.compare("k2") == 0 ) )
       {
-        typedef functors::IIGeometricFunctors::IISecondPrincipalCurvature3DFunctor<Z3i::Space> MyIICurvatureFunctor;
+        typedef functors::IISecondPrincipalCurvature3DFunctor<Z3i::Space> MyIICurvatureFunctor;
         typedef IntegralInvariantCovarianceEstimator<Z3i::KSpace, ImagePredicate, MyIICurvatureFunctor> MyIIEstimator;
 
         MyIICurvatureFunctor functor;
@@ -377,7 +377,7 @@ int main( int argc, char** argv )
 
       if( mode.compare("prindir1") == 0 )
       {
-        typedef functors::IIGeometricFunctors::IIFirstPrincipalDirectionFunctor<Z3i::Space> MyIICurvatureFunctor;
+        typedef functors::IIFirstPrincipalDirectionFunctor<Z3i::Space> MyIICurvatureFunctor;
         typedef IntegralInvariantCovarianceEstimator<Z3i::KSpace, ImagePredicate, MyIICurvatureFunctor> MyIIEstimator;
 
         MyIICurvatureFunctor functor;
@@ -392,7 +392,7 @@ int main( int argc, char** argv )
       }
       else if( mode.compare("prindir2") == 0 )
       {
-        typedef functors::IIGeometricFunctors::IISecondPrincipalDirectionFunctor<Z3i::Space> MyIICurvatureFunctor;
+        typedef functors::IISecondPrincipalDirectionFunctor<Z3i::Space> MyIICurvatureFunctor;
         typedef IntegralInvariantCovarianceEstimator<Z3i::KSpace, ImagePredicate, MyIICurvatureFunctor> MyIIEstimator;
 
         MyIICurvatureFunctor functor;

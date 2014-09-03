@@ -762,7 +762,7 @@ computeLocalEstimations( const std::string & filename,
             VisitorConstIterator ibegin = range.begin();
             VisitorConstIterator iend = range.end();
 
-            typedef functors::IIGeometricFunctors::IICurvatureFunctor<Z2i::Space> MyIICurvatureFunctor;
+            typedef functors::IICurvatureFunctor<Z2i::Space> MyIICurvatureFunctor;
             typedef IntegralInvariantVolumeEstimator< KSpace, KanungoPredicate, MyIICurvatureFunctor > MyIICurvatureEstimator;
             
             MyIICurvatureFunctor curvatureFunctor;
@@ -791,7 +791,7 @@ computeLocalEstimations( const std::string & filename,
             VisitorConstIterator ibegin = range.begin();
             VisitorConstIterator iend = range.end();
 
-            typedef functors::IIGeometricFunctors::IICurvatureFunctor<Z2i::Space> MyIICurvatureFunctor;
+            typedef functors::IICurvatureFunctor<Z2i::Space> MyIICurvatureFunctor;
             typedef IntegralInvariantVolumeEstimator< KSpace, Digitizer, MyIICurvatureFunctor > MyIICurvatureEstimator;
             
             MyIICurvatureFunctor curvatureFunctor;
