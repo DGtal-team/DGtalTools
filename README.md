@@ -52,8 +52,8 @@ Utilities to convert various simple file formats:
   - HDF52vol: convert HDF5 to vol file format. 
   - longvol2vol: convert longvol to vol file using different conversion policies.  
   - ofs2off: convert OFS mesh format towards a OFF variant.
-  - pgm2freeman: to extract a freeman chain contour from a grayscale image.
-  - freeman2pgm: transform one or several freeman chains into a pgm file by filling their interior areas.
+  - img2freeman: to extract a freeman chain contour from a grayscale image.
+  - freeman2img: transform one or several freeman chains into a pgm file by filling their interior areas.
   - raw2vol and vol2raw: transform 3D volumes files from (resp. to) raw to vol.
   - raw2HDF5: convert raw image to HDF5.
   - slice2vol: tool to merge slices into one 3d volumic file.

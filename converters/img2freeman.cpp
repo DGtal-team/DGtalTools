@@ -119,7 +119,7 @@ int main( int argc, char** argv )
   po::options_description general_opt("Allowed options are: ");
   general_opt.add_options()
     ("help,h", "display this message")
-    ("image,i", po::value<std::string>(), "image file name")
+    ("input,i", po::value<std::string>(), "image file name")
     ("min,m", po::value<int>(), "min image threshold value (default 128)")
     ("max,M", po::value<int>(), "max image threshold value (default 255)")
     
@@ -143,7 +143,7 @@ int main( int argc, char** argv )
   if(vm.count("help")||argc<=1|| !parseOK)
     {
       trace.info()<< "Extract FreemanChains from thresholded image" <<std::endl << "Basic usage: "<<std::endl
-      << "\t image2freeman [options] --image <imageName> -min 128 -max 255 > contours.fc"<<std::endl
+      << "\t img2freeman [options] --input <imageName> -min 128 -max 255 > contours.fc"<<std::endl
       << "Note that if you don't specify any threshold a threshold threshold max is automatically defined from the Otsu algorithm with min=0. "<<std::endl
       << general_opt << "\n";
       return 0;
@@ -159,13 +159,13 @@ int main( int argc, char** argv )
   unsigned int selectDistanceMax = 0; 
  
   typedef functors::IntervalThresholder<Image::Value> Binarizer; 
-  std::string imageFileName = vm["image"].as<std::string>();
+  std::string imageFileName = vm["input"].as<std::string>();
 
   Image image = GenericReader<Image>::import( imageFileName ); 
   
 
   //Parse options
-  if (!(vm.count("image"))){
+  if (!(vm.count("input"))){
     trace.info() << "Image file name needed"<< std::endl;
     return 0;
   } 

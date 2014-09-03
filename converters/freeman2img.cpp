@@ -90,11 +90,11 @@ else the space is automatically defined from the freemanchain bounding boxes.");
       if(!parseOK){
         trace.info() <<" Error parsing options\n" <<std::endl;
           }
-      trace.info()<< "Transform one or several freeman chains into a pgm file by filling its interior areas." << std::endl
+      trace.info()<< "Transform one or several freeman chains into an grayscale image file by filling its interior areas." << std::endl
                   << "The transformation can fill shapes with hole by using the freemanchain orientation."
                   <<" The interior is considered on the left according to a freeman chain move, i.e. a clockwise oriented contour represents a hole in the shape." <<std::endl
                   << "Basic usage: "<<std::endl
-                  << "\t freeman2pgm [options] --FreemanChain  <fileName>  "<<std::endl
+                  << "\t freeman2img [options] --FreemanChain  <fileName>  "<<std::endl
 		  << general_opt << "\n";
       return 0;
     }  
