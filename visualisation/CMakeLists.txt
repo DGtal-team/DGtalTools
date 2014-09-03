@@ -23,7 +23,8 @@ if (  WITH_VISU3D_QGLVIEWER )
     3dSDPViewer
     meshViewer
     3dHeightMapViewer
-    3dCompSurfelData)
+    3dDisplaySurfelData
+	3dCompSurfelData)
 
   FOREACH(FILE ${DGTAL_EXAMPLES_QGL_SRC}) 
     add_executable(${FILE} ${FILE})

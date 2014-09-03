@@ -52,8 +52,8 @@ Utilities to convert various simple file formats:
   - HDF52vol: convert HDF5 to vol file format. 
   - longvol2vol: convert longvol to vol file using different conversion policies.  
   - ofs2off: convert OFS mesh format towards a OFF variant.
-  - pgm2freeman: to extract a freeman chain contour from a grayscale image.
-  - freeman2pgm: transform one or several freeman chains into a pgm file by filling their interior areas.
+  - img2freeman: to extract a freeman chain contour from a grayscale image.
+  - freeman2img: transform one or several freeman chains into a pgm file by filling their interior areas.
   - raw2vol and vol2raw: transform 3D volumes files from (resp. to) raw to vol.
   - raw2HDF5: convert raw image to HDF5.
   - slice2vol: tool to merge slices into one 3d volumic file.
@@ -157,7 +157,7 @@ Here are some illustrations of such a tools:
 <tr>
 <td><img height=130 src="https://f.cloud.github.com/assets/772865/684622/d698405a-da00-11e2-8aa0-19212a58ce23.png"></td>
 <td><img width=300 src="https://cloud.githubusercontent.com/assets/772865/2720141/6c42a0e0-c56b-11e3-8328-a6d88242f21e.png"> </td>
-<td><img  width=300 src="https://cloud.githubusercontent.com/assets/772865/3623729/f022a524-0e52-11e4-96cb-f619f26f83e0.png"></td>
+<td><img  width=300 src="https://cloud.githubusercontent.com/assets/772865/4023650/8fc2fe86-2b9e-11e4-98cf-7123c1a933fd.png"></td>
 <td><img  width=300 src="https://cloud.githubusercontent.com/assets/772865/3486505/6edb2144-043e-11e4-81c4-2c20f272a119.png" </td>
 </tr>
 <tr>

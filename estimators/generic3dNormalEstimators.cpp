@@ -395,7 +395,7 @@ void chooseEstimator
       typedef ExactPredicateLpSeparableMetric<Space,2> Metric;
       typedef VoronoiCovarianceMeasureOnDigitalSurface<SurfaceContainer,Metric,
                                                        KernelFunction> VCMOnSurface;
-      typedef functors::VCMGeometricFunctors::VCMNormalVectorFunctor<VCMOnSurface> NormalFunctor;
+      typedef functors::VCMNormalVectorFunctor<VCMOnSurface> NormalFunctor;
       typedef VCMDigitalSurfaceLocalEstimator<SurfaceContainer,Metric,
                                               KernelFunction, NormalFunctor> VCMNormalEstimator;
       int embedding = vm["embedding"].as<int>();
@@ -423,7 +423,7 @@ void chooseEstimator
       typedef ImageContainerBySTLVector< Domain, bool> Image;
       typedef typename Domain::ConstIterator DomainConstIterator;
       typedef SimpleThresholdForegroundPredicate<Image> ThresholdedImage;
-      typedef functors::IIGeometricFunctors::IINormalDirectionFunctor<Space> IINormalFunctor;
+      typedef functors::IINormalDirectionFunctor<Space> IINormalFunctor;
       typedef IntegralInvariantCovarianceEstimator<KSpace, ThresholdedImage, IINormalFunctor> IINormalEstimator;
       double r = vm["r-radius"].as<double>();
       double alpha = vm["alpha"].as<double>();
@@ -467,12 +467,12 @@ void chooseKernel
   if ( alpha != 0.0 ) r *= pow( h, alpha-1.0 );
   if ( kernel == "hat" ) {
     typedef typename KSpace::Point Point;
-    typedef HatPointFunction<Point,double> KernelFunction;
+    typedef functors::HatPointFunction<Point,double> KernelFunction;
     KernelFunction chi_r( 1.0, r );
     chooseEstimator( vm, K, shape, surface, chi_r, ptPred );
   } else if ( kernel == "ball" ) {
     typedef typename KSpace::Point Point;
-    typedef BallConstantPointFunction<Point,double> KernelFunction;
+    typedef functors::BallConstantPointFunction<Point,double> KernelFunction;
     KernelFunction chi_r( 1.0, r );
     chooseEstimator( vm, K, shape, surface, chi_r, ptPred );
   }
