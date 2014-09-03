@@ -120,7 +120,7 @@ int main( int argc, char** argv )
     ("help,h", "display this message")
     ("input,i", po::value<std::string>(), "volumetric input file (.vol, .pgm, .pgm3d, .longvol) " )
     ("output,o", po::value<std::string>(), "volumetric output file (.vol, .pgm, .pgm3d, .longvol) " )
-    ("segmentHole", "option to define a label to regions associated to hole. ")
+    ("labelBackground", "option to define a label to regions associated to object background. ")
     ("thresholdMin,m", po::value<int>()->default_value(0), "min threshold (default 0)." )
     ("thresholdMax,M", po::value<int>(), "max threshold (if not given the max threshold is computed with Otsu algorithm)?" );
   
@@ -221,7 +221,7 @@ int main( int argc, char** argv )
          DGtal::Surfaces<Z3i::KSpace>::uFillInterior( kRestr,  aSet.surfelPredicate(), 
                                                       imageResuSegmentation,
                                                       i, false, false);
-       }else if (vm.count("segmentHole")){
+       }else if (vm.count("labelBackground")){
          DGtal::Surfaces<Z3i::KSpace>::uFillExterior( kRestr,  aSet.surfelPredicate(), 
                                                       imageResuSegmentation,
                                                       i+1, false, false);
