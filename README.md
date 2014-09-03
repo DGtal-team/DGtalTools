@@ -159,12 +159,14 @@ Here are some illustrations of such a tools:
 <td><img width=300 src="https://cloud.githubusercontent.com/assets/772865/2720141/6c42a0e0-c56b-11e3-8328-a6d88242f21e.png"> </td>
 <td><img  width=300 src="https://cloud.githubusercontent.com/assets/772865/4023650/8fc2fe86-2b9e-11e4-98cf-7123c1a933fd.png"></td>
 <td><img  width=300 src="https://cloud.githubusercontent.com/assets/772865/3486505/6edb2144-043e-11e4-81c4-2c20f272a119.png" </td>
+<td><img width=300 src="https://cloud.githubusercontent.com/assets/772865/4118303/5f53f61c-329f-11e4-9629-23c53afd9eff.png" </td>
 </tr>
 <tr>
 <td>meshViewer</td>
 <td>3dSDPViewer</td>
 <td>sliceViewer</td>
 <td>3dHeightMapViewer</td>
+<td>3dCompSurfelData</td>
 </tr>
 
 
