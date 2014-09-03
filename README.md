@@ -184,6 +184,20 @@ Volumetric
   - volSegment: Segment volumetric file from a simple threshold which can be set automatically from the otsu estimation.
 
 
+<center>
+<table>
+<tr>
+<td> <img width=300 src="https://cloud.githubusercontent.com/assets/772865/4140989/2b115d34-33aa-11e4-9141-749d02335a4d.png"> </td>
+<td> <img width=300 src="https://cloud.githubusercontent.com/assets/772865/4140972/f13c7fe4-33a9-11e4-8114-74e4925f0628.png"> </td>
+</tr>
+<tr>
+<td>homotopicThinning3D</td>
+<td>volSubSample</td>
+</table>
+</center>
+
+
+
 How to build the tools
 ======================
   - use cmake tool to generate a build script (MakeFile, VS project,..) from the CMakeLists.txt

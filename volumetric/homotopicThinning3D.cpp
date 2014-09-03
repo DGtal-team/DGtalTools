@@ -202,7 +202,7 @@ int main( int argc, char** argv )
   // Display by using two different list to manage OpenGL transparency.
   QApplication application(argc,argv);
   Viewer3D<> viewer;
-  viewer.setWindowTitle("simpleExample3DViewer");
+  viewer.setWindowTitle("homotopicThinning3D");
   viewer.show();  
   
   viewer << SetMode3D( shape_set.className(), "Paving" );
