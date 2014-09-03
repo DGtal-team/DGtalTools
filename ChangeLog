@@ -21,6 +21,12 @@
 	- generic3dNormalEstimators: Computes a normal vector field over a digitized 3D implicit surface for several estimators (II|VCM|Trivial|True).
         - euleurCharacteristic: bruteforce tool to extract (volumetric) Euler characteristic from volumetric binary object
 
+
+* volumetric/:
+	- volTrValues: a basic tool to transform the voxel values from an input/output set.
+
+
+
 	====  Release 0.7 ====
 
 * converters/:
