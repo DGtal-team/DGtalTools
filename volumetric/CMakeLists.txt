@@ -9,6 +9,7 @@ SET(DGTAL_TOOLS_SRC
   volShapeMetrics
   volFlip
   volSegment
+  volTrValues
 )
 
 

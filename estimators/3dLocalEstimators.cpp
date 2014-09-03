@@ -496,7 +496,7 @@ compareShapeEstimators( const std::string & filename,
                 {
                     trace.beginBlock( "Monge mean curvature" );
 
-                    typedef MongeJetFittingMeanCurvatureEstimator<Surfel, CanonicSCellEmbedder<KSpace> > FunctorMean;
+                    typedef functors::MongeJetFittingMeanCurvatureEstimator<Surfel, CanonicSCellEmbedder<KSpace> > FunctorMean;
                     typedef functors::ConstValue< double > ConvFunctor;
                     typedef LocalEstimatorFromSurfelFunctorAdapter<typename MyDigitalSurface::DigitalSurfaceContainer, Z3i::L2Metric, FunctorMean, ConvFunctor> ReporterH;
                     CanonicSCellEmbedder<KSpace> embedder( K );
@@ -534,7 +534,7 @@ compareShapeEstimators( const std::string & filename,
                 {
                     trace.beginBlock( "Monge Gaussian curvature" );
 
-                    typedef MongeJetFittingGaussianCurvatureEstimator<Surfel, CanonicSCellEmbedder<KSpace> > FunctorGaussian;
+                    typedef functors::MongeJetFittingGaussianCurvatureEstimator<Surfel, CanonicSCellEmbedder<KSpace> > FunctorGaussian;
                     typedef functors::ConstValue< double > ConvFunctor;
                     typedef LocalEstimatorFromSurfelFunctorAdapter<typename MyDigitalSurface::DigitalSurfaceContainer, Z3i::L2Metric, FunctorGaussian, ConvFunctor> ReporterK;
                     CanonicSCellEmbedder<KSpace> embedder( K );
@@ -573,7 +573,7 @@ compareShapeEstimators( const std::string & filename,
                 {
                     trace.beginBlock( "Monge Principal Curvature" );
 
-                    typedef MongeJetFittingPrincipalCurvaturesEstimator<Surfel, CanonicSCellEmbedder<KSpace> > FunctorPrincCurv;
+                    typedef functors::MongeJetFittingPrincipalCurvaturesEstimator<Surfel, CanonicSCellEmbedder<KSpace> > FunctorPrincCurv;
                     typedef functors::ConstValue< double > ConvFunctor;
                     typedef LocalEstimatorFromSurfelFunctorAdapter<typename MyDigitalSurface::DigitalSurfaceContainer, Z3i::L2Metric, FunctorPrincCurv, ConvFunctor> ReporterK;
                     CanonicSCellEmbedder<KSpace> embedder( K );
@@ -926,7 +926,7 @@ compareShapeEstimators( const std::string & filename,
                 {
                     trace.beginBlock( "Monge mean curvature" );
 
-                    typedef MongeJetFittingMeanCurvatureEstimator<Surfel, CanonicSCellEmbedder<KSpace> > FunctorMean;
+                    typedef functors::MongeJetFittingMeanCurvatureEstimator<Surfel, CanonicSCellEmbedder<KSpace> > FunctorMean;
                     typedef functors::ConstValue< double > ConvFunctor;
                     typedef LocalEstimatorFromSurfelFunctorAdapter<typename MyDigitalSurface::DigitalSurfaceContainer, Z3i::L2Metric, FunctorMean, ConvFunctor> ReporterH;
                     CanonicSCellEmbedder<KSpace> embedder( K );
@@ -963,7 +963,7 @@ compareShapeEstimators( const std::string & filename,
                 {
                     trace.beginBlock( "Monge Gaussian curvature" );
 
-                    typedef MongeJetFittingGaussianCurvatureEstimator<Surfel, CanonicSCellEmbedder<KSpace> > FunctorGaussian;
+                    typedef functors::MongeJetFittingGaussianCurvatureEstimator<Surfel, CanonicSCellEmbedder<KSpace> > FunctorGaussian;
                     typedef functors::ConstValue< double > ConvFunctor;
                     typedef LocalEstimatorFromSurfelFunctorAdapter<typename MyDigitalSurface::DigitalSurfaceContainer, Z3i::L2Metric, FunctorGaussian, ConvFunctor> ReporterK;
                     CanonicSCellEmbedder<KSpace> embedder( K );
@@ -999,7 +999,7 @@ compareShapeEstimators( const std::string & filename,
                 {
                     trace.beginBlock( "Monge Principal Curvature" );
 
-                    typedef MongeJetFittingPrincipalCurvaturesEstimator<Surfel, CanonicSCellEmbedder<KSpace> > FunctorPrincCurv;
+                    typedef functors::MongeJetFittingPrincipalCurvaturesEstimator<Surfel, CanonicSCellEmbedder<KSpace> > FunctorPrincCurv;
                     typedef functors::ConstValue< double > ConvFunctor;
                     typedef LocalEstimatorFromSurfelFunctorAdapter<typename MyDigitalSurface::DigitalSurfaceContainer, Z3i::L2Metric, FunctorPrincCurv, ConvFunctor> ReporterK;
                     CanonicSCellEmbedder<KSpace> embedder( K );
