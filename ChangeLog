@@ -12,7 +12,7 @@
 * converters/:
 	- volBoundary2obj: a simple tool to export the boundary of a an	object in a volumetric file to OBJ
 	- freeman2pgm: transform one or several freeman chains into a pgm file by filling their interior areas and renamed into freeman2img.	
-	- pgm2freeman: renamed into pgm2img.
+	- pgm2freeman: renamed to pgm2img.
 	- vol2off: tool removed, see 3dVolMarchingCubes for the same tool.
 
 
