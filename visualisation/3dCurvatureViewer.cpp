@@ -71,7 +71,8 @@
 #include "DGtal/io/colormaps/GradientColorMap.h"
 #include <QtGui/QApplication>
 
- using namespace DGtal;
+using namespace DGtal;
+using namespace functors;
 
  const Color  AXIS_COLOR_RED( 200, 20, 20, 255 );
  const Color  AXIS_COLOR_GREEN( 20, 200, 20, 255 );
@@ -229,7 +230,7 @@ int main( int argc, char** argv )
   typedef DGtal::ConstImageAdapter<Image, Image::Domain, ReSampler,
 				   Image::Value,  DGtal::functors::Identity >  SamplerImageAdapter;
   typedef IntervalForegroundPredicate< SamplerImageAdapter > ImagePredicate;
-  typedef BinaryPointPredicate<DomainPredicate<Image::Domain>, ImagePredicate, DGtal::AndBoolFct2  > Predicate;
+  typedef BinaryPointPredicate<DomainPredicate<Image::Domain>, ImagePredicate, AndBoolFct2  > Predicate;
   typedef Z3i::KSpace KSpace;
   typedef KSpace::SCell SCell;
   typedef KSpace::Cell Cell;
@@ -245,7 +246,7 @@ int main( int argc, char** argv )
   SamplerImageAdapter sampledImage (image, reSampler.getSubSampledDomain(), reSampler, functors::Identity());
   ImagePredicate predicateIMG = ImagePredicate( sampledImage,  minImageThreshold, maxImageThreshold );
   DomainPredicate<Z3i::Domain> domainPredicate( sampledImage.domain() );
-  DGtal::AndBoolFct2 andF;
+  AndBoolFct2 andF;
   Predicate predicate(domainPredicate, predicateIMG, andF  ); 
 
 

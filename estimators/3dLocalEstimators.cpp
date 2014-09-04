@@ -372,7 +372,7 @@ compareShapeEstimators( const std::string & filename,
 
                     c.startClock();
 
-                    typedef functors::IIGeometricFunctors::IIMeanCurvature3DFunctor<Z3i::Space> MyIICurvatureFunctor;
+                    typedef functors::IIMeanCurvature3DFunctor<Z3i::Space> MyIICurvatureFunctor;
                     typedef IntegralInvariantVolumeEstimator< KSpace, KanungoPredicate, MyIICurvatureFunctor > MyIICurvatureEstimator;
 
                     MyIICurvatureFunctor curvatureFunctor;
@@ -413,7 +413,7 @@ compareShapeEstimators( const std::string & filename,
 
                     c.startClock();
 
-                    typedef functors::IIGeometricFunctors::IIGaussianCurvature3DFunctor<Z3i::Space> MyIICurvatureFunctor;
+                    typedef functors::IIGaussianCurvature3DFunctor<Z3i::Space> MyIICurvatureFunctor;
                     typedef IntegralInvariantCovarianceEstimator< KSpace, KanungoPredicate, MyIICurvatureFunctor > MyIICurvatureEstimator;
 
                     MyIICurvatureFunctor curvatureFunctor;
@@ -454,7 +454,7 @@ compareShapeEstimators( const std::string & filename,
 
                     c.startClock();
 
-                    typedef functors::IIGeometricFunctors::IIPrincipalCurvatures3DFunctor<Z3i::Space> MyIICurvatureFunctor;
+                    typedef functors::IIPrincipalCurvatures3DFunctor<Z3i::Space> MyIICurvatureFunctor;
                     typedef IntegralInvariantCovarianceEstimator< KSpace, KanungoPredicate, MyIICurvatureFunctor > MyIICurvatureEstimator;
 
                     MyIICurvatureFunctor curvatureFunctor;
@@ -802,7 +802,7 @@ compareShapeEstimators( const std::string & filename,
 
                     c.startClock();
 
-                    typedef functors::IIGeometricFunctors::IIMeanCurvature3DFunctor<Z3i::Space> MyIICurvatureFunctor;
+                    typedef functors::IIMeanCurvature3DFunctor<Z3i::Space> MyIICurvatureFunctor;
                     typedef IntegralInvariantVolumeEstimator< KSpace, DigitalShape, MyIICurvatureFunctor > MyIICurvatureEstimator;
 
                     MyIICurvatureFunctor curvatureFunctor;
@@ -843,7 +843,7 @@ compareShapeEstimators( const std::string & filename,
 
                     c.startClock();
 
-                    typedef functors::IIGeometricFunctors::IIGaussianCurvature3DFunctor<Z3i::Space> MyIICurvatureFunctor;
+                    typedef functors::IIGaussianCurvature3DFunctor<Z3i::Space> MyIICurvatureFunctor;
                     typedef IntegralInvariantCovarianceEstimator< KSpace, DigitalShape, MyIICurvatureFunctor > MyIICurvatureEstimator;
 
                     MyIICurvatureFunctor curvatureFunctor;
@@ -884,7 +884,7 @@ compareShapeEstimators( const std::string & filename,
 
                     c.startClock();
 
-                    typedef functors::IIGeometricFunctors::IIPrincipalCurvatures3DFunctor<Z3i::Space> MyIICurvatureFunctor;
+                    typedef functors::IIPrincipalCurvatures3DFunctor<Z3i::Space> MyIICurvatureFunctor;
                     typedef IntegralInvariantCovarianceEstimator< KSpace, DigitalShape, MyIICurvatureFunctor > MyIICurvatureEstimator;
 
                     MyIICurvatureFunctor curvatureFunctor;
