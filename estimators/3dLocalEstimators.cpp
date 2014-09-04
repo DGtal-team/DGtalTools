@@ -71,6 +71,7 @@
 #include "DGtal/geometry/surfaces/estimation/estimationFunctors/MongeJetFittingPrincipalCurvaturesEstimator.h"
 
 using namespace DGtal;
+using namespace functors;
 
 typedef std::pair<double,double> PrincipalCurvatures;
 
