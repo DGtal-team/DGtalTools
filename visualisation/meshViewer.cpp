@@ -155,7 +155,7 @@ int main( int argc, char** argv )
     vectPoints = PointListReader<Z3i::RealPoint>::getPointsFromFile(filenameSDP);
      viewer << CustomColors3D(Color(sdpColorR, sdpColorG, sdpColorB, sdpColorA), 
                               Color(sdpColorR, sdpColorG, sdpColorB, sdpColorA)); 
-    for(int i=0;i< vectPoints.size(); i++){
+    for(unsigned int i=0;i< vectPoints.size(); i++){
       viewer.addBall(vectPoints.at(i), 0.5);    
     }
   }

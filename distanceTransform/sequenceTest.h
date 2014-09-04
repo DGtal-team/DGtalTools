@@ -71,11 +71,11 @@ bool testLambekMoserInverseSequences(sequence &s1, sequence &s2, unsigned int N 
  */
 template<typename sequence>
 bool testComplementarySequences(sequence &s1, sequence &s2, unsigned int N = 10000) {
-    unsigned int i1 = 1;
-    unsigned int i2 = 1;
-    for (unsigned int n = 1; n <= N; n++) {
+    int i1 = 1;
+    int i2 = 1;
+    for (int n = 1; n <= N; n++) {
 	// Each positive integer n is expected to be found in one sequence.
-	if (s1(i1) == n)
+      if (s1(i1) == n)
 	    i1++;
 	else if (s2(i2) == n)
 	    i2++;
