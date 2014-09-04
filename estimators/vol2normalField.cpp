@@ -134,7 +134,7 @@ int main ( int argc, char**argv )
 
     trace.info() <<image<<std::endl;
 
-    SimpleThresholdForegroundPredicate<Image> simplePredicate ( image, level );
+    functors::SimpleThresholdForegroundPredicate<Image> simplePredicate ( image, level );
 
     KSpace ks;
     bool space_ok = ks.init ( image.domain().lowerBound(),
@@ -149,7 +149,7 @@ int main ( int argc, char**argv )
     MySurfelAdjacency surfAdj ( true ); // interior in all directions.
 
     //Set up digital surface.
-    typedef LightImplicitDigitalSurface<KSpace, SimpleThresholdForegroundPredicate<Image>  > MyDigitalSurfaceContainer;
+    typedef LightImplicitDigitalSurface<KSpace, functors::SimpleThresholdForegroundPredicate<Image>  > MyDigitalSurfaceContainer;
     typedef DigitalSurface<MyDigitalSurfaceContainer> MyDigitalSurface;
     SCell bel = Surfaces<KSpace>::findABel ( ks, simplePredicate );
 

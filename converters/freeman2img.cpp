@@ -135,7 +135,7 @@ else the space is automatically defined from the freemanchain bounding boxes.");
     }
     
     Image2D imageResult (Z2i::Domain(Z2i::Point(minx, miny), Z2i::Point(maxx, maxy))); 
-    Surfaces<KSpace>::uFillInterior(aKSpace, SurfelSetPredicate<std::set<SCell>,SCell>(boundarySCell), imageResult, 255, false, false );  
+    Surfaces<KSpace>::uFillInterior(aKSpace, functors::SurfelSetPredicate<std::set<SCell>,SCell>(boundarySCell), imageResult, 255, false, false );  
     imageResult >> vm["output"].as<std::string>();
   }
 

@@ -156,7 +156,7 @@ int main( int argc, char** argv )
 
     //! [3dVolBoundaryViewer-Set3D]
     trace.beginBlock( "Wrapping a digital set around image. " );
-    typedef IntervalForegroundPredicate<Image> ThresholdedImage;
+    typedef functors::IntervalForegroundPredicate<Image> ThresholdedImage;
     ThresholdedImage thresholdedImage( image, thresholdMin, thresholdMax );
     trace.endBlock();
     //! [3dVolBoundaryViewer-Set3D]

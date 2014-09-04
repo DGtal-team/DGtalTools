@@ -174,7 +174,7 @@ int main( int argc, char** argv )
   
   trace.info() << "Processing image to output file " << outputFilename << std::endl; 
 
-  IntervalForegroundPredicate<Image3D> simplePredicate ( inputImage, minTh, maxTh );
+  functors::IntervalForegroundPredicate<Image3D> simplePredicate ( inputImage, minTh, maxTh );
   SurfelAdjacency< Z3i::KSpace::dimension > SAdj ( true );
   Z3i::KSpace K;
   bool space_ok = K.init( inputImage.domain().lowerBound(), inputImage.domain().upperBound(), false );

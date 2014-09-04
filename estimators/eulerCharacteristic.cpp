@@ -109,7 +109,7 @@ int main(int argc, char**argv)
       trace.error() << "Error in the Khamisky space construction."<<std::endl;
       return 2;
     }
-  IntervalForegroundPredicate<MyImageC> interval(imageC, thresholdMin,thresholdMax);  
+  functors::IntervalForegroundPredicate<MyImageC> interval(imageC, thresholdMin,thresholdMax);  
   for(MyImageC::Domain::ConstIterator it =imageC.domain().begin(), itend= imageC.domain().end();
       it != itend; ++it)
     {

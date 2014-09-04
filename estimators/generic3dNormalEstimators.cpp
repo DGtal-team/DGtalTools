@@ -422,7 +422,7 @@ void chooseEstimator
       typedef HyperRectDomain<Space> Domain;
       typedef ImageContainerBySTLVector< Domain, bool> Image;
       typedef typename Domain::ConstIterator DomainConstIterator;
-      typedef SimpleThresholdForegroundPredicate<Image> ThresholdedImage;
+      typedef functors::SimpleThresholdForegroundPredicate<Image> ThresholdedImage;
       typedef functors::IINormalDirectionFunctor<Space> IINormalFunctor;
       typedef IntegralInvariantCovarianceEstimator<KSpace, ThresholdedImage, IINormalFunctor> IINormalEstimator;
       double r = vm["r-radius"].as<double>();
