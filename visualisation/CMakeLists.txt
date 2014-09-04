@@ -15,7 +15,6 @@ ENDFOREACH(FILE)
 if (  WITH_VISU3D_QGLVIEWER )
 
   SET(DGTAL_EXAMPLES_QGL_SRC
-
     3dVolViewer
     3dVolBoundaryViewer
     3dCurvatureViewer
@@ -24,7 +23,8 @@ if (  WITH_VISU3D_QGLVIEWER )
     3dSDPViewer
     meshViewer
     3dHeightMapViewer
-    3dDisplaySurfelData)
+    3dDisplaySurfelData
+	3dCompSurfelData)
 
   FOREACH(FILE ${DGTAL_EXAMPLES_QGL_SRC}) 
     add_executable(${FILE} ${FILE})
