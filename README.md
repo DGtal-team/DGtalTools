@@ -48,45 +48,51 @@ Utilities to convert various simple file formats:
 
   - convertVol: a simple generic volume image converters (can process actually pgm3d, vol, longvol, raw (for writing)).
   - dicom2vol: convert dicom images into 3d volumic file.
+  - freeman2img: transform one or several freeman chains into a pgm file by filling their interior areas.
   - freeman2sdp: convert freeman chain towards a Sequence of Discrete Points.
+  - img2freeman: to extract a freeman chain contour from a grayscale image.
   - HDF52vol: convert HDF5 to vol file format. 
   - longvol2vol: convert longvol to vol file using different conversion policies.  
   - ofs2off: convert OFS mesh format towards a OFF variant.
-  - img2freeman: to extract a freeman chain contour from a grayscale image.
-  - freeman2img: transform one or several freeman chains into a pgm file by filling their interior areas.
-  - raw2vol and vol2raw: transform 3D volumes files from (resp. to) raw to vol.
   - raw2HDF5: convert raw image to HDF5.
-  - slice2vol: tool to merge slices into one 3d volumic file.
+  - raw2vol and vol2raw: transform 3D volumes files from (resp. to) raw to vol.
   - sdp2vol: a simple tool to create a 3d vol image from 3d digital points.
-  - vol2sdp: a simple tools to extract digital points from 3d vol files.
+  - slice2vol: tool to merge slices into one 3d volumic file.
   - vol2obj: convert a volume file into OBJ format (all voxels belonging to threshold interval)   
+  - vol2raw: convert a vol to a 8-bit raw file.
+  - vol2sdp: a simple tools to extract digital points from 3d vol files.
   - vol2slice: tool to extract all slices from 3d volumic images.
-  
+  - volBoundary2obj: export the boundary of a volume file to OBJ format.
+
+
 DistanceTransform
 ------------------
 
   - LUTBasedNSDistanceTransform: Compute the 2D translated neighborhood-sequence distance transform of a binary image.
   - CumulativeSequenceTest and RationalBeattySequenceTest: tests from LUTBasedNSDistanceTransform.
-
+  
 
 
 Estimators
 ----------
-  - generic3dNormalEstimators: Computes a normal vector field over a digitized 3D implicit surface for several estimators (II|VCM|Trivial|True).
+
   - 2dLocalEstimators: program to compare local curvature/tangent estimators on implicit shapes
     - Maximal DSS based estimators
     - Maximal DCA based estimators
     - Binomial convolver based estimators
     - Integral Invariants based estimators
   - 3dLocalEstimators: program to compare  3D local curvature (mean or gaussian) estimators on 3D implicit shapes.
-  - lengthEstimator: program to generate multigrid analysis of length estimators.
-  - tangentBC: tangent estimator using the Binomial convolver.
   - curvatureBC: curvature estimator using the Binomial convolver.
   - curvatureMCMS: curvature estimator using the maximal segments cover  (to be updated for current DGtal version).
   - curvatureScaleSpaceBCC: a tool to display the curvature scale space of a given contour with the Binomial Convolver Curvature Estimator
-  - estimatorComparator: program to perform comparison of local quantity estimators (to be updated for current DGtal version).
+  - lengthEstimator: program to generate multigrid analysis of length estimators.
   - eulerCharacteristic: bruteforce tool to extract (volumetric) Euler characteristic from volumetric binary object.
-  - vol2normalField: compute the normal vector field of a given vol file .
+  - generic3dNormalEstimators: Computes a normal vector field over a digitized 3D implicit surface for several estimators (II|VCM|Trivial|True).
+  - lengthEstimators: Generate multigrid length estimations of paramteric shapes using DGtal library.
+  - statisticsEstimators: compute satistics (L1, L2, Loo) from results of two extimators.
+  - tangentBC: tangent estimator using the Binomial convolver.
+  - vol2normalField: compute the normal vector field of a given vol file.
+
 <table>
 <tr>
 <td colspan="2"><img height=130 src="https://cloud.githubusercontent.com/assets/772865/2646108/f515b0a2-bf39-11e3-96f8-c7606173f43b.png"></td>
@@ -106,8 +112,8 @@ Estimators
 
 ShapeGenerator
 --------------
-  - shapeGenerator: generate multigrid shape
-  - contourGenerator: generate multigrid shape contours
+  - contourGenerator: generate multigrid shape contours.
+  - shapeGenerator: generate multigrid shape.
  <center>
 <table>
 <tr>
@@ -126,13 +132,16 @@ ShapeGenerator
 
 Visualization
 -------------
+  - 3dCompSurfelData: it computes generic scalar surfel data comparisons with display with surfel association.
   - 3dCurvatureViewer: permits to compute and visualize mean or gaussian curvature of binary shapes.
   - 3dCurvatureViewerNoise: Same as 3dCurvatureViewer, but allow to add some noise to objects.
   - 3dCurveViewer: displays 3D curves with tangential cover and projections onto bounding box.
+  - 3dDisplaySurfelData: displays surfel data from SDP file with color attributes given as scalar interpreted as color.
+  - 3dHeightMapViewer: display a 2D image as heightmap by using QGLviewer.
   - 3dImageViewer: tools to display 3d slice images (.vol, .pgm3d and  dicom with ITK) with QGLViewer.
   - 3dSDPViewer: basic display of a sequence of 3d points (as voxel or sphere) and vectors by using QGLviewer.
+  - 3dVolBoundaryViewer: Display the boundary of a volume file by using QGLviewer. 
   - 3dVolViewer: volume file (.vol, .pgm3d and dicom with ITK ) viewer with QGLViewer.
-  - 3dHeightMapViewer: display a 2D image as heightmap by using QGLviewer
   - displayContours: display discrete contours from various format (.fc (freemanchain), .sdp).
   - meshViewer: display 3D mesh from OFS or OFF format.
   - patternTriangulation: a new tool that draws with Board2D the convex hull, the closest-point Delaunay triangulation or the farthest-point Delaunay triangulation of a pattern.
@@ -186,12 +195,17 @@ Volumetric
   - homotopicThinning3D: ultimate skeleton from vol file.
   - volAddBorder: add a 1 voxel boundary with value 0 to a vol file.
   - volCComponentCounter: a simple program to count the number of connected components in a 3D image.
+  - volCrop: Crop an 3D vol image from to points.
   - volFlip: tool to flip all volume slice images according a given dimension.
-  - volSubSample: sub sample a vol file (division by 2 in each direction).
-  - volImageMetrics: apply basic statistics on comparaison between two volumetric images (shape defined from thresholds): computes true/false -+, precision, recall f-mean RMSE, PSNR.
-  - volShapeMetrics: apply euclidean distance comparisons between two shapes  (shape defined from thresholds).
+  - volImageMetrics: apply basic statistics on comparaison between two volumetric images (shape defined from thresholds): computes true/false -+, precision, recall f-mean RMSE, PSNR. 
+  - volReSample: apply a basic  re sampling of a 3D volumetric image (.vol, .longvol, .pgm3d)  with a given grid size. 
   - volSegment: Segment volumetric file from a simple threshold which can be set automatically from the otsu estimation.
-  - volReSample: apply a basic  re sampling of a 3D volumetric image (.vol, .longvol, .pgm3d)  with a given grid size.
+  - volShapeMetrics: apply euclidean distance comparisons between two shapes  (shape defined from thresholds).
+  - volSubSample: sub sample a vol file (division by 2 in each direction).
+  - volTrValues: apply basic vol image transform from the input values to output values.
+
+
+ 
 
 
 <center>
