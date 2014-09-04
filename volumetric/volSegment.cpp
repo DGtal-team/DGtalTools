@@ -178,7 +178,7 @@ int main( int argc, char** argv )
   SurfelAdjacency< Z3i::KSpace::dimension > SAdj ( true );
   Z3i::KSpace K;
   bool space_ok = K.init( inputImage.domain().lowerBound(), inputImage.domain().upperBound(), false );
-  if!space_ok){
+  if(!space_ok){
      trace.error() << "problem initializing 3d space" << endl;
   }
 
