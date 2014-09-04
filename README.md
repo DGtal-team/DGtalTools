@@ -50,8 +50,8 @@ Utilities to convert various simple file formats:
   - dicom2vol: convert dicom images into 3d volumic file.
   - freeman2img: transform one or several freeman chains into a pgm file by filling their interior areas.
   - freeman2sdp: convert freeman chain towards a Sequence of Discrete Points.
-  - img2freeman: to extract a freeman chain contour from a grayscale image.
   - HDF52vol: convert HDF5 to vol file format. 
+  - img2freeman: to extract a freeman chain contour from a grayscale image.
   - longvol2vol: convert longvol to vol file using different conversion policies.  
   - ofs2off: convert OFS mesh format towards a OFF variant.
   - raw2HDF5: convert raw image to HDF5.
@@ -85,10 +85,9 @@ Estimators
   - curvatureBC: curvature estimator using the Binomial convolver.
   - curvatureMCMS: curvature estimator using the maximal segments cover  (to be updated for current DGtal version).
   - curvatureScaleSpaceBCC: a tool to display the curvature scale space of a given contour with the Binomial Convolver Curvature Estimator
-  - lengthEstimator: program to generate multigrid analysis of length estimators.
   - eulerCharacteristic: bruteforce tool to extract (volumetric) Euler characteristic from volumetric binary object.
-  - generic3dNormalEstimators: Computes a normal vector field over a digitized 3D implicit surface for several estimators (II|VCM|Trivial|True).
-  - lengthEstimators: Generate multigrid length estimations of paramteric shapes using DGtal library.
+  - generic3dNormalEstimators: computes a normal vector field over a digitized 3D implicit surface for several estimators (II|VCM|Trivial|True).
+  - lengthEstimators: generate multigrid length estimations of paramteric shapes using DGtal library.
   - statisticsEstimators: compute satistics (L1, L2, Loo) from results of two extimators.
   - tangentBC: tangent estimator using the Binomial convolver.
   - vol2normalField: compute the normal vector field of a given vol file.
@@ -203,10 +202,6 @@ Volumetric
   - volShapeMetrics: apply euclidean distance comparisons between two shapes  (shape defined from thresholds).
   - volSubSample: sub sample a vol file (division by 2 in each direction).
   - volTrValues: apply basic vol image transform from the input values to output values.
-
-
- 
-
 
 <center>
 <table>

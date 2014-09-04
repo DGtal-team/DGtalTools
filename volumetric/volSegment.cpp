@@ -178,7 +178,9 @@ int main( int argc, char** argv )
   SurfelAdjacency< Z3i::KSpace::dimension > SAdj ( true );
   Z3i::KSpace K;
   bool space_ok = K.init( inputImage.domain().lowerBound(), inputImage.domain().upperBound(), false );
-
+  if(!space_ok){
+     trace.error() << "problem initializing 3d space" << endl;
+  }
 
     
   std::vector< std::vector<Z3i::SCell > > vectConnectedSCell;
@@ -216,7 +218,7 @@ int main( int argc, char** argv )
         }    
        
        Z3i::KSpace kRestr ;
-       bool space_ok = kRestr.init( lowerPoint, upperPoint, false );
+       kRestr.init( lowerPoint, upperPoint, false );
        if(simplePredicate(p2)){
          DGtal::Surfaces<Z3i::KSpace>::uFillInterior( kRestr,  aSet.surfelPredicate(), 
                                                       imageResuSegmentation,

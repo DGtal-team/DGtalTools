@@ -253,7 +253,7 @@ int main( int argc, char** argv )
     std::string name = vm["doSnapShotAndExit"].as<std::string>();
     std::string extension = name.substr(name.find_last_of(".") + 1);
     std::string basename = name.substr(0, name.find_last_of("."));
-    for(unsigned int i=0; i< viewer.snapshotCounter()-1; i++){
+    for(int i=0; i< viewer.snapshotCounter()-1; i++){
       std::stringstream s; 
       s << basename << "-"<< setfill('0') << setw(4)<<  i << "." << extension; 
       trace.info() << "erase temp file: " << s.str() << std::endl;
