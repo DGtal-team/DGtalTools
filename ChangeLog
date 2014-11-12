@@ -1,3 +1,10 @@
+	====  Release 0.9 ====
+
+* visualisation/:
+	- meshViewer: fix to display mesh with colored faces (.off with colors).
+
+
+
 	====  Release 0.8 ====
 
 * visualisation/:
