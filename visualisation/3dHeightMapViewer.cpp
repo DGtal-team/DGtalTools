@@ -209,7 +209,10 @@ int main( int argc, char** argv )
 
 
   string inputFilename = vm["input-file"].as<std::string>();
-  double scale = vm["scale"].as<double>(); 
+  double scale = 1.0;
+  if (vm.count("scale")){
+    scale = vm["scale"].as<double>(); 
+  }
 
   typedef DGtal::ImageContainerBySTLVector<Z2i::Domain, unsigned char> Image2DG ; 
   typedef DGtal::ImageContainerBySTLVector<Z2i::Domain, unsigned int> Image2DCol ; 
