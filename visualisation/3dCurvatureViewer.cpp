@@ -423,7 +423,7 @@ int main( int argc, char** argv )
           cmap_grad.addColor( Color( 255, 255, 10 ) );
 
           viewer << SetMode3D((*abegin2).className(), "Basic" );
-          if( myexportDat )
+          if( myexport )
             {
               board << SetMode3D((K.unsigns(*abegin2)).className(), "Basic" );
             }
