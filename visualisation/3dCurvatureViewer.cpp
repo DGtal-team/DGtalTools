@@ -74,10 +74,10 @@
 using namespace DGtal;
 using namespace functors;
 
- const Color  AXIS_COLOR_RED( 200, 20, 20, 255 );
- const Color  AXIS_COLOR_GREEN( 20, 200, 20, 255 );
- const Color  AXIS_COLOR_BLUE( 20, 20, 200, 255 );
- const double AXIS_LINESIZE = 0.05;
+const Color  AXIS_COLOR_RED( 200, 20, 20, 255 );
+const Color  AXIS_COLOR_GREEN( 20, 200, 20, 255 );
+const Color  AXIS_COLOR_BLUE( 20, 20, 200, 255 );
+const double AXIS_LINESIZE = 0.05;
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -87,8 +87,8 @@ using namespace functors;
  *
  * @param param
  */
- void missingParam( std::string param )
- {
+void missingParam( std::string param )
+{
   trace.error() << " Parameter: " << param << " is required.";
   trace.info() << std::endl;
 }
@@ -100,30 +100,30 @@ int main( int argc, char** argv )
   // parse command line ----------------------------------------------
   po::options_description general_opt("Allowed options are");
   general_opt.add_options()
-  ("help,h", "display this message")
-  ("input,i", po::value< std::string >(), ".vol file")
-  ("radius,r",  po::value< double >(), "Kernel radius for IntegralInvariant" )
-  ("threshold,t",  po::value< unsigned int >()->default_value(8), "Min size of SCell boundary of an object" )
-  ("minImageThreshold,l",  po::value<  int >()->default_value(0), "set the minimal image threshold to define the image object (object defined by the voxel with intensity belonging to ]minImageThreshold, maxImageThreshold ] )." )
-  ("maxImageThreshold,u",  po::value<  int >()->default_value(1), "set the minimal image threshold to define the image object (object defined by the voxel with intensity belonging to ]minImageThreshold, maxImageThreshold] )." )  
-("mode,m", po::value< std::string >()->default_value("mean"), "type of output : mean, gaussian, k1, k2, prindir1 or prindir2 (default mean)")
-  ("export,e", po::value< std::string >(), "Export the scene to specified OBJ filename." )
-  ("exportDat,E", po::value<std::string>(), "Export resulting curvature (for mean, gaussian, k1 or k2 mode) in a simple data file each line representing a surfel. ")
-  ("exportOnly", "Used to only export the result without the 3d Visualisation (usefull for scripts)." )
-  ("imageScale,s", po::value<std::vector<double> >()->multitoken(), "scaleX, scaleY, scaleZ: re sample the source image according with a grid of size 1.0/scale (usefull to compute curvature on image defined on anisotropic grid). Set by default to 1.0 for the three axis.  ")
-  ("normalization,n", "When exporting to OBJ, performs a normalization so that the geometry fits in [-1/2,1/2]^3") ;
+    ("help,h", "display this message")
+    ("input,i", po::value< std::string >(), ".vol file")
+    ("radius,r",  po::value< double >(), "Kernel radius for IntegralInvariant" )
+    ("threshold,t",  po::value< unsigned int >()->default_value(8), "Min size of SCell boundary of an object" )
+    ("minImageThreshold,l",  po::value<  int >()->default_value(0), "set the minimal image threshold to define the image object (object defined by the voxel with intensity belonging to ]minImageThreshold, maxImageThreshold ] )." )
+    ("maxImageThreshold,u",  po::value<  int >()->default_value(1), "set the minimal image threshold to define the image object (object defined by the voxel with intensity belonging to ]minImageThreshold, maxImageThreshold] )." )  
+    ("mode,m", po::value< std::string >()->default_value("mean"), "type of output : mean, gaussian, k1, k2, prindir1 or prindir2 (default mean)")
+    ("export,e", po::value< std::string >(), "Export the scene to specified OBJ filename." )
+    ("exportDat,E", po::value<std::string>(), "Export resulting curvature (for mean, gaussian, k1 or k2 mode) in a simple data file each line representing a surfel. ")
+    ("exportOnly", "Used to only export the result without the 3d Visualisation (usefull for scripts)." )
+    ("imageScale,s", po::value<std::vector<double> >()->multitoken(), "scaleX, scaleY, scaleZ: re sample the source image according with a grid of size 1.0/scale (usefull to compute curvature on image defined on anisotropic grid). Set by default to 1.0 for the three axis.  ")
+    ("normalization,n", "When exporting to OBJ, performs a normalization so that the geometry fits in [-1/2,1/2]^3") ;
 
   bool parseOK = true;
   po::variables_map vm;
   try
-  {
-    po::store( po::parse_command_line( argc, argv, general_opt ), vm );
-  }
+    {
+      po::store( po::parse_command_line( argc, argv, general_opt ), vm );
+    }
   catch( const std::exception & ex )
-  {
-    parseOK = false;
-    trace.error() << " Error checking program options: " << ex.what() << std::endl;
-  }
+    {
+      parseOK = false;
+      trace.error() << " Error checking program options: " << ex.what() << std::endl;
+    }
   bool neededArgsGiven=true;
   
   if (parseOK && !(vm.count("input"))){
@@ -143,31 +143,31 @@ int main( int argc, char** argv )
   if( parseOK )
     mode =  vm["mode"].as< std::string >();
   if ( parseOK && ( mode.compare("gaussian") != 0 ) && ( mode.compare("mean") != 0 ) &&
-                  ( mode.compare("k1") != 0 ) && ( mode.compare("k2") != 0 ) &&
-                  ( mode.compare("prindir1") != 0 ) && ( mode.compare("prindir2") != 0 ))
-  {
-    parseOK = false;
-    trace.error() << " The selected mode ("<<mode << ") is not defined."<<std::endl;
-  }
+       ( mode.compare("k1") != 0 ) && ( mode.compare("k2") != 0 ) &&
+       ( mode.compare("prindir1") != 0 ) && ( mode.compare("prindir2") != 0 ))
+    {
+      parseOK = false;
+      trace.error() << " The selected mode ("<<mode << ") is not defined."<<std::endl;
+    }
 
 
   if(!neededArgsGiven || !parseOK || vm.count("help") || argc <= 1 )
-  {
-    trace.info()<< "Visualisation of 3d curvature from .vol file using curvature from Integral Invariant" <<std::endl
-    << general_opt << "\n"
-    << "Basic usage: "<<std::endl
-    << "\t3dCurvatureViewer -i file.vol --radius 5 --mode mean"<<std::endl
-    << std::endl
-    << "Below are the different available modes: " << std::endl
-    << "\t - \"mean\" for the mean curvature" << std::endl
-    << "\t - \"gaussian\" for the Gaussian curvature" << std::endl
-    << "\t - \"k1\" for the first principal curvature" << std::endl
-    << "\t - \"k2\" for the second principal curvature" << std::endl
-    << "\t - \"prindir1\" for the first principal curvature direction" << std::endl
-    << "\t - \"prindir2\" for the second principal curvature direction" << std::endl
-    << std::endl;
-    return 0;
-  }
+    {
+      trace.info()<< "Visualisation of 3d curvature from .vol file using curvature from Integral Invariant" <<std::endl
+                  << general_opt << "\n"
+                  << "Basic usage: "<<std::endl
+                  << "\t3dCurvatureViewer -i file.vol --radius 5 --mode mean"<<std::endl
+                  << std::endl
+                  << "Below are the different available modes: " << std::endl
+                  << "\t - \"mean\" for the mean curvature" << std::endl
+                  << "\t - \"gaussian\" for the Gaussian curvature" << std::endl
+                  << "\t - \"k1\" for the first principal curvature" << std::endl
+                  << "\t - \"k2\" for the second principal curvature" << std::endl
+                  << "\t - \"prindir1\" for the first principal curvature direction" << std::endl
+                  << "\t - \"prindir2\" for the second principal curvature direction" << std::endl
+                  << std::endl;
+      return 0;
+    }
   unsigned int threshold = vm["threshold"].as< unsigned int >();
   int minImageThreshold =  vm["minImageThreshold"].as<  int >();
   int maxImageThreshold =  vm["maxImageThreshold"].as<  int >();
@@ -185,11 +185,11 @@ int main( int argc, char** argv )
   if(vm.count("export")){
     export_path = vm["export"].as< std::string >();
     if( export_path.find(".obj") == std::string::npos )
-    {
-      std::ostringstream oss; 
-      oss << export_path << ".obj" << endl; 
-      export_path = oss.str();
-    } 
+      {
+        std::ostringstream oss; 
+        oss << export_path << ".obj" << endl; 
+        export_path = oss.str();
+      } 
     myexport=true;
   }
 
@@ -236,6 +236,7 @@ int main( int argc, char** argv )
   typedef KSpace::Cell Cell;
   typedef KSpace::Surfel Surfel;
 
+  trace.beginBlock("Loading the file");
   std::string filename = vm["input"].as< std::string >();
   Image image = GenericReader<Image>::import( filename );
   
@@ -255,32 +256,24 @@ int main( int argc, char** argv )
   bool space_ok = K.init( domain.lowerBound()-Z3i::Domain::Point::diagonal(),
                           domain.upperBound()+Z3i::Domain::Point::diagonal(), true );
   if (!space_ok)
-  {
-    trace.error() << "Error in the Khalimsky space construction."<<std::endl;
-    return 2;
-  }
+    {
+      trace.error() << "Error in the Khalimsky space construction."<<std::endl;
+      return 2;
+    }
   CanonicSCellEmbedder< KSpace > embedder( K );
   SurfelAdjacency< Z3i::KSpace::dimension > Sadj( true );
-
+  trace.endBlock();
   // Viewer settings
 
-  QApplication application( argc, argv );
-  typedef Viewer3D<Z3i::Space, Z3i::KSpace> Viewer;
-
-  Viewer viewer( K );
-  if(!exportOnly){
-    viewer.show();
-  }
+ 
   // Extraction of components
   typedef KSpace::SurfelSet SurfelSet;
   typedef SetOfSurfels< KSpace, SurfelSet > MySetOfSurfels;
   typedef DigitalSurface< MySetOfSurfels > MyDigitalSurface;
+ 
   
-  
-  typedef Board3D<Z3i::Space, Z3i::KSpace> Board;
-  Board board( K );
-
-
+ 
+  trace.beginBlock("Extracting surfaces");
   std::vector< std::vector<SCell > > vectConnectedSCell;
   Surfaces<KSpace>::extractAllConnectedSCell(vectConnectedSCell,K, Sadj, predicate, false);
   std::ofstream outDat;
@@ -291,262 +284,284 @@ int main( int argc, char** argv )
            << "  Estimators in Digital Geometry. DGCI 2013.) " << std::endl;
     outDat << "# format: surfel coordinates (in Khalimsky space) curvature: "<< mode <<  std::endl;
   }
-  
-  for(unsigned int i = 0; i<vectConnectedSCell.size(); i++)
-  {
-    if( vectConnectedSCell[i].size() <= threshold )
+
+  trace.info()<<"Number of components= "<<vectConnectedSCell.size()<<std::endl;
+  trace.endBlock();
+
+  if (vectConnectedSCell.size() == 0)
     {
-      continue;
+      trace.error()<< "No surface component exists. Please check the vol file threshold parameters.";
+      trace.info()<<std::endl;
+      exit(2);
     }
+
+  QApplication application( argc, argv );
+  typedef Viewer3D<Z3i::Space, Z3i::KSpace> Viewer;
+  
+  Viewer viewer( K );
+  viewer.show();
+  
+  typedef Board3D<Z3i::Space, Z3i::KSpace> Board;
+  Board board( K );
+  for(unsigned int i = 0; i<vectConnectedSCell.size(); i++)
+    {
+      if( vectConnectedSCell[i].size() <= threshold )
+        {
+          continue;
+        }
+      
+      MySetOfSurfels  aSet(K, Sadj);
+      
+      for(std::vector<SCell>::const_iterator it= vectConnectedSCell.at(i).begin(); it != vectConnectedSCell.at(i).end(); ++it)
+        {
+          aSet.surfelSet().insert( *it);
+        }    
+      
+      MyDigitalSurface digSurf( aSet );
+      
+      
+      typedef DepthFirstVisitor<MyDigitalSurface> Visitor;
+      typedef GraphVisitorRange< Visitor > VisitorRange;
+      typedef VisitorRange::ConstIterator SurfelConstIterator;
+      VisitorRange range( new Visitor( digSurf, *digSurf.begin() ) );
+      SurfelConstIterator abegin = range.begin();
+      SurfelConstIterator aend = range.end();
+
+      VisitorRange range2( new Visitor( digSurf, *digSurf.begin() ) );
+      SurfelConstIterator abegin2 = range2.begin();
+
+      trace.beginBlock("Curvature computation on a component");
+      if( ( mode.compare("gaussian") == 0 ) || ( mode.compare("mean") == 0 ) || ( mode.compare("k1") == 0 ) || ( mode.compare("k2") == 0 ))
+        {
+          typedef double Quantity;
+          std::vector< Quantity > results;
+          back_insert_iterator< std::vector< Quantity > > resultsIterator( results );
+          if ( ( mode.compare("mean") == 0 ) )
+            {
+              typedef functors::IIMeanCurvature3DFunctor<Z3i::Space> MyIICurvatureFunctor;
+              typedef IntegralInvariantVolumeEstimator<Z3i::KSpace, Predicate, MyIICurvatureFunctor> MyIIEstimator;
+
+              MyIICurvatureFunctor functor;
+              functor.init( h, re_convolution_kernel );
+
+              MyIIEstimator estimator( functor );
+              estimator.attach( K, predicate );
+              estimator.setParams( re_convolution_kernel/h );
+              estimator.init( h, abegin, aend );
+
+              estimator.eval( abegin, aend, resultsIterator );
+            }
+          else if ( ( mode.compare("gaussian") == 0 ) )
+            {
+              typedef functors::IIGaussianCurvature3DFunctor<Z3i::Space> MyIICurvatureFunctor;
+              typedef IntegralInvariantCovarianceEstimator<Z3i::KSpace, Predicate, MyIICurvatureFunctor> MyIIEstimator;
+
+              MyIICurvatureFunctor functor;
+              functor.init( h, re_convolution_kernel );
+
+              MyIIEstimator estimator( functor );
+              estimator.attach( K, predicate );
+              estimator.setParams( re_convolution_kernel/h );
+              estimator.init( h, abegin, aend );
+
+              estimator.eval( abegin, aend, resultsIterator );
+            }
+          else if ( ( mode.compare("k1") == 0 ) )
+            {
+              typedef functors::IIFirstPrincipalCurvature3DFunctor<Z3i::Space> MyIICurvatureFunctor;
+              typedef IntegralInvariantCovarianceEstimator<Z3i::KSpace, Predicate, MyIICurvatureFunctor> MyIIEstimator;
+
+              MyIICurvatureFunctor functor;
+              functor.init( h, re_convolution_kernel );
+
+              MyIIEstimator estimator( functor );
+              estimator.attach( K, predicate );
+              estimator.setParams( re_convolution_kernel/h );
+              estimator.init( h, abegin, aend );
+
+              estimator.eval( abegin, aend, resultsIterator );
+            }
+          else if ( ( mode.compare("k2") == 0 ) )
+            {
+              typedef functors::IISecondPrincipalCurvature3DFunctor<Z3i::Space> MyIICurvatureFunctor;
+              typedef IntegralInvariantCovarianceEstimator<Z3i::KSpace, Predicate, MyIICurvatureFunctor> MyIIEstimator;
+
+              MyIICurvatureFunctor functor;
+              functor.init( h, re_convolution_kernel );
+
+              MyIIEstimator estimator( functor );
+              estimator.attach( K, predicate );
+              estimator.setParams( re_convolution_kernel/h );
+              estimator.init( h, abegin, aend );
+
+              estimator.eval( abegin, aend, resultsIterator );
+            }
+          trace.endBlock();
+
     
-    MySetOfSurfels  aSet(K, Sadj);
+          // Drawing results
+          trace.beginBlock("Visulization");
+          Quantity min = results[ 0 ];
+          Quantity max = results[ 0 ];
+          for ( unsigned int i = 1; i < results.size(); ++i )
+            {
+              if ( results[ i ] < min )
+                {
+                  min = results[ i ];
+                }
+              else if ( results[ i ] > max )
+                {
+                  max = results[ i ];
+                }
+            }
+          trace.info() << "Max value= "<<max<<"  min value= "<<min<<std::endl;
+          ASSERT( min <= max );
+          typedef GradientColorMap< Quantity > Gradient;
+          Gradient cmap_grad( min, (max==min)? max+1: max );
+          cmap_grad.addColor( Color( 50, 50, 255 ) );
+          cmap_grad.addColor( Color( 255, 0, 0 ) );
+          cmap_grad.addColor( Color( 255, 255, 10 ) );
 
-    for(std::vector<SCell>::const_iterator it= vectConnectedSCell.at(i).begin(); it != vectConnectedSCell.at(i).end(); ++it)
-    {
-      aSet.surfelSet().insert( *it);
-    }    
-
-    MyDigitalSurface digSurf( aSet );
-
-    typedef DepthFirstVisitor<MyDigitalSurface> Visitor;
-    typedef GraphVisitorRange< Visitor > VisitorRange;
-    typedef VisitorRange::ConstIterator SurfelConstIterator;
-    VisitorRange range( new Visitor( digSurf, *digSurf.begin() ) );
-    SurfelConstIterator abegin = range.begin();
-    SurfelConstIterator aend = range.end();
-
-    VisitorRange range2( new Visitor( digSurf, *digSurf.begin() ) );
-    SurfelConstIterator abegin2 = range2.begin();
-
-    trace.beginBlock("curvature computation");
-    if( ( mode.compare("gaussian") == 0 ) || ( mode.compare("mean") == 0 ) || ( mode.compare("k1") == 0 ) || ( mode.compare("k2") == 0 ))
-    {
-      typedef double Quantity;
-      std::vector< Quantity > results;
-      back_insert_iterator< std::vector< Quantity > > resultsIterator( results );
-
-      if ( ( mode.compare("mean") == 0 ) )
-      {
-        typedef functors::IIMeanCurvature3DFunctor<Z3i::Space> MyIICurvatureFunctor;
-        typedef IntegralInvariantVolumeEstimator<Z3i::KSpace, Predicate, MyIICurvatureFunctor> MyIIEstimator;
-
-        MyIICurvatureFunctor functor;
-        functor.init( h, re_convolution_kernel );
-
-        MyIIEstimator estimator( functor );
-        estimator.attach( K, predicate );
-        estimator.setParams( re_convolution_kernel/h );
-        estimator.init( h, abegin, aend );
-
-        estimator.eval( abegin, aend, resultsIterator );
-      }
-      else if ( ( mode.compare("gaussian") == 0 ) )
-      {
-        typedef functors::IIGaussianCurvature3DFunctor<Z3i::Space> MyIICurvatureFunctor;
-        typedef IntegralInvariantCovarianceEstimator<Z3i::KSpace, Predicate, MyIICurvatureFunctor> MyIIEstimator;
-
-        MyIICurvatureFunctor functor;
-        functor.init( h, re_convolution_kernel );
-
-        MyIIEstimator estimator( functor );
-        estimator.attach( K, predicate );
-        estimator.setParams( re_convolution_kernel/h );
-        estimator.init( h, abegin, aend );
-
-        estimator.eval( abegin, aend, resultsIterator );
-      }
-      else if ( ( mode.compare("k1") == 0 ) )
-      {
-        typedef functors::IIFirstPrincipalCurvature3DFunctor<Z3i::Space> MyIICurvatureFunctor;
-        typedef IntegralInvariantCovarianceEstimator<Z3i::KSpace, Predicate, MyIICurvatureFunctor> MyIIEstimator;
-
-        MyIICurvatureFunctor functor;
-        functor.init( h, re_convolution_kernel );
-
-        MyIIEstimator estimator( functor );
-        estimator.attach( K, predicate );
-        estimator.setParams( re_convolution_kernel/h );
-        estimator.init( h, abegin, aend );
-
-        estimator.eval( abegin, aend, resultsIterator );
-      }
-      else if ( ( mode.compare("k2") == 0 ) )
-      {
-        typedef functors::IISecondPrincipalCurvature3DFunctor<Z3i::Space> MyIICurvatureFunctor;
-        typedef IntegralInvariantCovarianceEstimator<Z3i::KSpace, Predicate, MyIICurvatureFunctor> MyIIEstimator;
-
-        MyIICurvatureFunctor functor;
-        functor.init( h, re_convolution_kernel );
-
-        MyIIEstimator estimator( functor );
-        estimator.attach( K, predicate );
-        estimator.setParams( re_convolution_kernel/h );
-        estimator.init( h, abegin, aend );
-
-        estimator.eval( abegin, aend, resultsIterator );
-      }
-
-      // Drawing results
-      Quantity min = results[ 0 ];
-      Quantity max = results[ 0 ];
-      for ( unsigned int i = 1; i < results.size(); ++i )
-      {
-        if ( results[ i ] < min )
-        {
-          min = results[ i ];
-        }
-        else if ( results[ i ] > max )
-        {
-          max = results[ i ];
-        }
-      }
-
-      ASSERT( min <= max );
-      typedef GradientColorMap< Quantity > Gradient;
-      Gradient cmap_grad( min, (max==min)? max+1: max );
-      cmap_grad.addColor( Color( 50, 50, 255 ) );
-      cmap_grad.addColor( Color( 255, 0, 0 ) );
-      cmap_grad.addColor( Color( 255, 255, 10 ) );
-
-      viewer << SetMode3D((*abegin2).className(), "Basic" );
-      if( myexportDat )
-      {
-        board << SetMode3D((K.unsigns(*abegin2)).className(), "Basic" );
-      }
+          viewer << SetMode3D((*abegin2).className(), "Basic" );
+          if( myexport )
+            {
+              board << SetMode3D((K.unsigns(*abegin2)).className(), "Basic" );
+            }
       
 
-      for ( unsigned int i = 0; i < results.size(); ++i )
-      {
-        viewer.setFillColor(cmap_grad( results[ i ] ));
-        viewer << *abegin2;
+          for ( unsigned int i = 0; i < results.size(); ++i )
+            {
+              viewer.setFillColor(cmap_grad( results[ i ] ));
+              viewer << *abegin2;
 
-        if (myexport)
+              if (myexport)
+                {
+                  trace.info() <<  cmap_grad( results[ i ] )<<std::endl;
+                  board << CustomColors3D( Color::Black, cmap_grad( results[ i ] ));
+                  board      << K.unsigns(*abegin2);
+                }
+              if(myexportDat){
+                Point kCoords = K.uKCoords(K.unsigns(*abegin2));
+                outDat << kCoords[0] << " " << kCoords[1] << " " << kCoords[2] <<  " " <<  results[i] << std::endl;
+              }
+              ++abegin2;
+            }
+        }
+      else
         {
-          board << CustomColors3D( Color::Black, cmap_grad( results[ i ] ))
-          << K.unsigns(*abegin2);
+          typedef Z3i::Space::RealVector Quantity;
+          std::vector< Quantity > results;
+          back_insert_iterator< std::vector< Quantity > > resultsIterator( results );
+
+          if( mode.compare("prindir1") == 0 )
+            {
+              typedef functors::IIFirstPrincipalDirectionFunctor<Z3i::Space> MyIICurvatureFunctor;
+              typedef IntegralInvariantCovarianceEstimator<Z3i::KSpace, Predicate, MyIICurvatureFunctor> MyIIEstimator;
+
+              MyIICurvatureFunctor functor;
+              functor.init( h, re_convolution_kernel );
+
+              MyIIEstimator estimator( functor );
+              estimator.attach( K, predicate );
+              estimator.setParams( re_convolution_kernel/h );
+              estimator.init( h, abegin, aend );
+
+              estimator.eval( abegin, aend, resultsIterator );
+            }
+          else if( mode.compare("prindir2") == 0 )
+            {
+              typedef functors::IISecondPrincipalDirectionFunctor<Z3i::Space> MyIICurvatureFunctor;
+              typedef IntegralInvariantCovarianceEstimator<Z3i::KSpace, Predicate, MyIICurvatureFunctor> MyIIEstimator;
+
+              MyIICurvatureFunctor functor;
+              functor.init( h, re_convolution_kernel );
+
+              MyIIEstimator estimator( functor );
+              estimator.attach( K, predicate );
+              estimator.setParams( re_convolution_kernel/h );
+              estimator.init( h, abegin, aend );
+
+              estimator.eval( abegin, aend, resultsIterator );
+            }
+
+          viewer << SetMode3D(K.uCell( K.sKCoords(*abegin2) ).className(), "Basic" );
+
+          if( myexport )
+            {
+              board << SetMode3D(K.uCell( K.sKCoords(*abegin2) ).className(), "Basic" );
+            }
+          for ( unsigned int i = 0; i < results.size(); ++i )
+            {
+              DGtal::Dimension kDim = K.sOrthDir( *abegin2 );
+              SCell outer = K.sIndirectIncident( *abegin2, kDim);
+              if ( predicate(embedder(outer)) )
+                {
+                  outer = K.sDirectIncident( *abegin2, kDim);
+                }
+
+              Cell unsignedSurfel = K.uCell( K.sKCoords(*abegin2) );
+              viewer.setFillColor(DGtal::Color(255,255,255,255));
+              viewer << unsignedSurfel;
+              if (myexport)
+                {
+                  board << CustomColors3D( DGtal::Color(255,255,255,255),
+                                           DGtal::Color(255,255,255,255))
+                        << unsignedSurfel;
+                }
+
+              RealPoint center = embedder( outer );
+
+              if( mode.compare("prindir1") == 0 )
+                {
+                  viewer.setLineColor(AXIS_COLOR_BLUE);
+                }
+              else if( mode.compare("prindir2") == 0 )
+                {
+                  viewer.setLineColor(AXIS_COLOR_RED); 
+                }
+              viewer.addLine (
+                              RealPoint(
+                                        center[0] -  0.5 * results[i][0],
+                                        center[1] -  0.5 * results[i][1],
+                                        center[2] -  0.5 * results[i][2]
+                                        ),
+                              RealPoint(
+                                        center[0] +  0.5 * results[i][0],
+                                        center[1] +  0.5 * results[i][1],
+                                        center[2] +  0.5 * results[i][2]
+                                        ),
+                              AXIS_LINESIZE );
+              if( myexport )
+                {
+                  board.setFillColor(AXIS_COLOR_BLUE);
+                  board.addCylinder (
+                                     RealPoint(
+                                               center[0] -  0.5 * results[i][0],
+                                               center[1] -  0.5 * results[i][1],
+                                               center[2] -  0.5 * results[i][2]),
+                                     RealPoint(
+                                               center[0] +  0.5 * results[i][0],
+                                               center[1] +  0.5 * results[i][1],
+                                               center[2] +  0.5 * results[i][2]),
+                                     0.2 );
+                }
+
+              ++abegin2;
+            }
         }
-        if(myexportDat){
-          Point kCoords = K.uKCoords(K.unsigns(*abegin2));
-          outDat << kCoords[0] << " " << kCoords[1] << " " << kCoords[2] <<  " " <<  results[i] << std::endl;
-        }
-        ++abegin2;
-      }
+      trace.endBlock();
     }
-    else
-    {
-      typedef Z3i::Space::RealVector Quantity;
-      std::vector< Quantity > results;
-      back_insert_iterator< std::vector< Quantity > > resultsIterator( results );
-
-      if( mode.compare("prindir1") == 0 )
-      {
-        typedef functors::IIFirstPrincipalDirectionFunctor<Z3i::Space> MyIICurvatureFunctor;
-        typedef IntegralInvariantCovarianceEstimator<Z3i::KSpace, Predicate, MyIICurvatureFunctor> MyIIEstimator;
-
-        MyIICurvatureFunctor functor;
-        functor.init( h, re_convolution_kernel );
-
-        MyIIEstimator estimator( functor );
-        estimator.attach( K, predicate );
-        estimator.setParams( re_convolution_kernel/h );
-        estimator.init( h, abegin, aend );
-
-        estimator.eval( abegin, aend, resultsIterator );
-      }
-      else if( mode.compare("prindir2") == 0 )
-      {
-        typedef functors::IISecondPrincipalDirectionFunctor<Z3i::Space> MyIICurvatureFunctor;
-        typedef IntegralInvariantCovarianceEstimator<Z3i::KSpace, Predicate, MyIICurvatureFunctor> MyIIEstimator;
-
-        MyIICurvatureFunctor functor;
-        functor.init( h, re_convolution_kernel );
-
-        MyIIEstimator estimator( functor );
-        estimator.attach( K, predicate );
-        estimator.setParams( re_convolution_kernel/h );
-        estimator.init( h, abegin, aend );
-
-        estimator.eval( abegin, aend, resultsIterator );
-      }
-
-      viewer << SetMode3D(K.uCell( K.sKCoords(*abegin2) ).className(), "Basic" );
-
-      if( myexport )
-      {
-        board << SetMode3D(K.uCell( K.sKCoords(*abegin2) ).className(), "Basic" );
-      }
-      for ( unsigned int i = 0; i < results.size(); ++i )
-      {
-        DGtal::Dimension kDim = K.sOrthDir( *abegin2 );
-        SCell outer = K.sIndirectIncident( *abegin2, kDim);
-        if ( predicate(embedder(outer)) )
-        {
-          outer = K.sDirectIncident( *abegin2, kDim);
-        }
-
-        Cell unsignedSurfel = K.uCell( K.sKCoords(*abegin2) );
-        viewer.setFillColor(DGtal::Color(255,255,255,255));
-        viewer << unsignedSurfel;
-        if (myexport)
-        {
-          board << CustomColors3D( DGtal::Color(255,255,255,255),
-           DGtal::Color(255,255,255,255))
-          << unsignedSurfel;
-        }
-
-        RealPoint center = embedder( outer );
-
-        if( mode.compare("prindir1") == 0 )
-        {
-          viewer.setLineColor(AXIS_COLOR_BLUE);
-        }
-        else if( mode.compare("prindir2") == 0 )
-        {
-          viewer.setLineColor(AXIS_COLOR_RED); 
-        }
-        viewer.addLine (
-          RealPoint(
-            center[0] -  0.5 * results[i][0],
-            center[1] -  0.5 * results[i][1],
-            center[2] -  0.5 * results[i][2]
-          ),
-          RealPoint(
-            center[0] +  0.5 * results[i][0],
-            center[1] +  0.5 * results[i][1],
-            center[2] +  0.5 * results[i][2]
-          ),
-          AXIS_LINESIZE );
-        if( myexport )
-        {
-          board.setFillColor(AXIS_COLOR_BLUE);
-          board.addCylinder (
-            RealPoint(
-              center[0] -  0.5 * results[i][0],
-              center[1] -  0.5 * results[i][1],
-              center[2] -  0.5 * results[i][2]),
-            RealPoint(
-              center[0] +  0.5 * results[i][0],
-              center[1] +  0.5 * results[i][1],
-              center[2] +  0.5 * results[i][2]),
-            0.2 );
-        }
-
-        ++abegin2;
-      }
-    }
-    trace.endBlock();
-  }
 
   viewer << Viewer3D<>::updateDisplay;
 
   if (myexport)
-  {
-    trace.info()<< "Exporting object: " << export_path << " ...";
-    board.saveOBJ(export_path,normalization);
-    trace.info() << "[done]" << std::endl;
-  }
+    {
+      trace.info()<< "Exporting object: " << export_path << " ...";
+      board.saveOBJ(export_path,normalization);
+      trace.info() << "[done]" << std::endl;
+    }
   if(myexportDat){
-      outDat.close();
+    outDat.close();
   }
 
   if(!exportOnly){
