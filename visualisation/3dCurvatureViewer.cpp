@@ -437,8 +437,8 @@ int main( int argc, char** argv )
               if (myexport)
                 {
                   trace.info() <<  cmap_grad( results[ i ] )<<std::endl;
-                  board << CustomColors3D( Color::Black, cmap_grad( results[ i ] ))
-                        << K.unsigns(*abegin2);
+                  board << CustomColors3D( Color::Black, cmap_grad( results[ i ] ));
+                  board      << K.unsigns(*abegin2);
                 }
               if(myexportDat){
                 Point kCoords = K.uKCoords(K.unsigns(*abegin2));
