@@ -75,6 +75,7 @@ int main( int argc, char** argv )
     ("scaleY,y",  po::value<float>()->default_value(1.0), "set the scale value in the Y direction (default 1.0)" )
     ("scaleZ,z",  po::value<float>()->default_value(1.0), "set the scale value in the Z direction (default 1.0)")
     ("sphereRadius,s",  po::value<double>()->default_value(0.2), "defines the sphere radius (used when the primitive is set to the sphere). (default value 0.2)")
+    ("sphereResolution",  po::value<unsigned int>()->default_value(30), "defines the sphere resolution (used when the primitive is set to the sphere). (default resolution: 30)")
     ("lineSize",  po::value<double>()->default_value(0.2), "defines the line size (used when the drawLines option is selected). (default value 0.2))")
     ("primitive,p", po::value<std::string>()->default_value("sphere"), "set the primitive to display the set of points (can be sphere or voxel (default)")
     ("drawVectors,v", po::value<std::string>(), "SDP vector file: draw a set of vectors from the given file (each vector are determined by two consecutive point given, each point represented by its coordinates on a single line.") ;
@@ -100,6 +101,7 @@ int main( int argc, char** argv )
     }
   std::string typePrimitive;
   double sphereRadius = 0.2;
+  unsigned int sphereResolution = vm["sphereResolution"].as<unsigned int>();
   double lineSize =0.2;
   Color lineColor(100, 100, 250);
   Color pointColor(250, 250, 250);
@@ -210,7 +212,7 @@ int main( int argc, char** argv )
                              (int)vectVoxels.at(i)[1],
                              (int)vectVoxels.at(i)[2]); 
       }else{
-        viewer.addBall(vectVoxels.at(i), sphereRadius);    
+        viewer.addBall(vectVoxels.at(i), sphereRadius, sphereResolution);    
       }
     }  
   }
