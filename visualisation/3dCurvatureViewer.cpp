@@ -436,6 +436,7 @@ int main( int argc, char** argv )
 
               if (myexport)
                 {
+                  board.createNewQuadList();
                   trace.info() <<  cmap_grad( results[ i ] )<<std::endl;
                   board << CustomColors3D( Color::Black, cmap_grad( results[ i ] ));
                   board      << K.unsigns(*abegin2);
