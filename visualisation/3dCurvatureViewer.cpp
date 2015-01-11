@@ -300,7 +300,7 @@ int main( int argc, char** argv )
   
   Viewer viewer( K );
   viewer.show();
-  int name3D = 0;
+  
   typedef Board3D<Z3i::Space, Z3i::KSpace> Board;
   Board board( K );
   for(unsigned int i = 0; i<vectConnectedSCell.size(); i++)
@@ -436,9 +436,7 @@ int main( int argc, char** argv )
 
               if (myexport)
                 {
-                  int i = board.createNewQuadList();
-                  trace.info() <<  "index " << i <<std::endl;
-
+                  board.createNewQuadList();
                   trace.info() <<  cmap_grad( results[ i ] )<<std::endl;
                   board << CustomColors3D( Color::Black, cmap_grad( results[ i ] ));
                   board      << K.unsigns(*abegin2);
