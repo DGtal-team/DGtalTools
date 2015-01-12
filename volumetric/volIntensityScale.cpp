@@ -82,8 +82,8 @@ int main(int argc, char**argv)
     trace.info()<< "Error checking program options: "<< ex.what()<< endl;
   }
     //Parse options
-  if ( ! ( vm.count ( "input" ) ) ) {parseOK=false; missingParam ( "--input" );};
-  if ( ! ( vm.count ( "output" ) ) ) {parseOK=false; missingParam ( "--output" );};
+  if (parseOK &&  ! ( vm.count ( "input" ) ) ) {parseOK=false; missingParam ( "--input" );};
+  if (parseOK && ! ( vm.count ( "output" ) ) ) {parseOK=false; missingParam ( "--output" );};
   
 
   po::notify ( vm );
