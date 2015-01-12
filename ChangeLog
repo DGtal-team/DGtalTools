@@ -4,7 +4,7 @@
 	- meshViewer: fix to display mesh with colored faces (.off with colors).
 
 * volumetric/:
-	- volIntensityScale: a simple tool to scale image intensity of volumetric file.
+	- volIntensityScale: a simple tool to apply a linear scale of the intensity given in a volumetric file.
 
 
 	====  Release 0.8 ====

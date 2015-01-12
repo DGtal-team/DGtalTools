@@ -1,4 +1,3 @@
-
 /**
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Lesser General Public License as
@@ -89,7 +88,7 @@ int main(int argc, char**argv)
   po::notify ( vm );
   if (!parseOK || vm.count ( "help" ))
     {
-      trace.info() << "Scale the image intensity from an input intensity interval [InMin, InMax] into an output interval [OutMin, OutMax]." <<std::endl
+      trace.info() << "Apply a linear rescaling of the image intensity from an input intensity interval [InMin, InMax] into an output interval [OutMin, OutMax]." <<std::endl
                    << std::endl << "Basic usage: "<<std::endl
                    << "\t volIntensityScale --input <volFileName> --output <volOutputFileName>  (both files can be independently in vol, pgm3D, p3d format)"<<std::endl
                    << general_opt << "\n";
