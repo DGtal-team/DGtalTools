@@ -60,7 +60,7 @@ int main( int argc, char** argv )
     ("scaleX,x",  po::value<float>()->default_value(1.0), "set the scale value in the X direction (default 1.0)" )
     ("scaleY,y",  po::value<float>()->default_value(1.0), "set the scale value in the Y direction (default 1.0)" )
     ("scaleZ,z",  po:: value<float>()->default_value(1.0), "set the scale value in the Z direction (default 1.0)")
-    ("customColorMesh",po::value<std::vector<unsigned int> >()->multitoken(), "set the R, G, B, A components of the colors of the mesh view" )
+    ("customColorMesh",po::value<std::vector<unsigned int> >()->multitoken(), "set the R, G, B, A components of the colors of the mesh view and eventually the color R, G, B, A of the face edges (set by default to black). " )
     ("customColorSDP",po::value<std::vector<unsigned int> >()->multitoken(), "set the R, G, B, A components of the colors of the sdp view" )
     ("displaySDP,s", po::value<std::string>(), "Add the display of a set of discrete points as ball of radius 0.5.")
     ("invertNormal,n", "threshold min to define binary shape" )
@@ -101,22 +101,37 @@ int main( int argc, char** argv )
   unsigned int  meshColorB = 240;
   unsigned int  meshColorA = 255;
 
+  unsigned int  meshColorRLine = 0;
+  unsigned int  meshColorGLine = 0;
+  unsigned int  meshColorBLine = 0;
+  unsigned int  meshColorALine = 255;
+
 
   unsigned int  sdpColorR = 240;
   unsigned int  sdpColorG = 240;
   unsigned int  sdpColorB = 240;
   unsigned int  sdpColorA = 255;
     
-  
+
+
+
   if(vm.count("customColorMesh")){
     std::vector<unsigned int > vectCol = vm["customColorMesh"].as<std::vector<unsigned int> >();
-    if(vectCol.size()!=4){
+    if(vectCol.size()!=4 && vectCol.size()!=8 ){
       trace.error() << "colors specification should contain R,G,B and Alpha values"<< std::endl;
     }
     meshColorR = vectCol[0];
     meshColorG = vectCol[1];
     meshColorB = vectCol[2];
     meshColorA = vectCol[3];
+    if(vectCol.size() == 8){
+      meshColorRLine = vectCol[4];
+      meshColorGLine = vectCol[5];
+      meshColorBLine = vectCol[6];
+      meshColorALine = vectCol[7];
+      
+    }
+    
   }
   if(vm.count("customColorSDP")){
     std::vector<unsigned int > vectCol = vm["customColorSDP"].as<std::vector<unsigned int> >();
@@ -135,8 +150,10 @@ int main( int argc, char** argv )
   Viewer3D<> viewer;
   viewer.setWindowTitle("simple Volume Viewer");
   viewer.show();
+
   viewer.setGLScale(sx, sy, sz);  
   bool invertNormal= vm.count("invertNormal");
+
 
 
 
@@ -154,8 +171,8 @@ int main( int argc, char** argv )
     std::string filenameSDP = vm["displaySDP"].as<std::string>();
     vector<Z3i::RealPoint> vectPoints;
     vectPoints = PointListReader<Z3i::RealPoint>::getPointsFromFile(filenameSDP);
-     viewer << CustomColors3D(Color(sdpColorR, sdpColorG, sdpColorB, sdpColorA), 
-                              Color(sdpColorR, sdpColorG, sdpColorB, sdpColorA)); 
+    viewer << CustomColors3D(Color(sdpColorR, sdpColorG, sdpColorB, sdpColorA), 
+                             Color(sdpColorR, sdpColorG, sdpColorB, sdpColorA)); 
     for(unsigned int i=0;i< vectPoints.size(); i++){
       viewer.addBall(vectPoints.at(i), 0.5);    
     }
@@ -164,7 +181,7 @@ int main( int argc, char** argv )
     anImportedMesh.invertVertexFaceOrder();
   }
 
-  viewer << CustomColors3D(Color(meshColorR, meshColorG, meshColorB, meshColorA), 
+  viewer << CustomColors3D(Color(meshColorRLine, meshColorGLine, meshColorBLine, meshColorALine), 
                            Color(meshColorR, meshColorG, meshColorB, meshColorA));  
   viewer << anImportedMesh;
 
