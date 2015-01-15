@@ -24,7 +24,7 @@ own source code (in complement of DGtal tutorial http://libdgtal.org/doc/stable/
 
 
 * Release 0.8 DOI [![DOI](https://zenodo.org/badge/doi/10.5281/zenodo.11587.svg)](http://dx.doi.org/10.5281/zenodo.11587)
-* [![Build Status](https://api.travis-ci.org/DGtal-team/DGtalTools.svg?branch=master](https://travis-ci.org/DGtal-team/DGtalTools)
+* [![Build Status](https://api.travis-ci.org/DGtal-team/DGtalTools.svg?branch=master)](https://travis-ci.org/DGtal-team/DGtalTools)
 
 
 Organisation
