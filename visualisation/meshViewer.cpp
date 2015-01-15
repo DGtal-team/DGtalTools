@@ -60,6 +60,7 @@ int main( int argc, char** argv )
     ("scaleX,x",  po::value<float>()->default_value(1.0), "set the scale value in the X direction (default 1.0)" )
     ("scaleY,y",  po::value<float>()->default_value(1.0), "set the scale value in the Y direction (default 1.0)" )
     ("scaleZ,z",  po:: value<float>()->default_value(1.0), "set the scale value in the Z direction (default 1.0)")
+    ("minLineWidth,w",  po:: value<float>()->default_value(1.5), "set the min line width of the mesh faces (default 1.5)")
     ("customColorMesh",po::value<std::vector<unsigned int> >()->multitoken(), "set the R, G, B, A components of the colors of the mesh faces and eventually the color R, G, B, A of the mesh edge lines (set by default to black). " )
     ("customColorSDP",po::value<std::vector<unsigned int> >()->multitoken(), "set the R, G, B, A components of the colors of the sdp view" )
     ("displaySDP,s", po::value<std::string>(), "Add the display of a set of discrete points as ball of radius 0.5.")
@@ -111,10 +112,10 @@ int main( int argc, char** argv )
   unsigned int  sdpColorG = 240;
   unsigned int  sdpColorB = 240;
   unsigned int  sdpColorA = 255;
-    
+  
+  float lineWidth = vm["minLineWidth"].as<float>();
 
-
-
+  
   if(vm.count("customColorMesh")){
     std::vector<unsigned int > vectCol = vm["customColorMesh"].as<std::vector<unsigned int> >();
     if(vectCol.size()!=4 && vectCol.size()!=8 ){
@@ -150,7 +151,7 @@ int main( int argc, char** argv )
   Viewer3D<> viewer;
   viewer.setWindowTitle("simple Volume Viewer");
   viewer.show();
-
+  viewer.myGLLineMinWidth = lineWidth;
   viewer.setGLScale(sx, sy, sz);  
   bool invertNormal= vm.count("invertNormal");
 
