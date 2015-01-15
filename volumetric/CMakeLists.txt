@@ -11,6 +11,7 @@ SET(DGTAL_TOOLS_SRC
   volSegment
   volReSample
   volTrValues
+  volIntensityScale
 )
 
 
