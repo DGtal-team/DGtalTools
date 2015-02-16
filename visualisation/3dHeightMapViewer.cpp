@@ -36,7 +36,7 @@
 #include "DGtal/helpers/StdDefs.h"
 #include "DGtal/io/readers/GenericReader.h"
 #include "DGtal/io/viewers/Viewer3D.h"
-#include <DGtal/io/colormaps/HueShadeColorMap.h>
+#include <DGtal/io/colormaps/GradientColorMap.h>
 #include <DGtal/io/colormaps/GrayscaleColorMap.h>
 #include <DGtal/images/ImageContainerBySTLVector.h>
 
@@ -178,7 +178,7 @@ int main( int argc, char** argv )
   general_opt.add_options()
     ("help,h", "display this message")
     ("scale,s", po::value<double>()->default_value(1.0), "set the scale of the maximal level. (default 1.0)")
-    ("colorMap,c", "define the heightmap color with a pre-defined colormap (HueShadeColorMap)")
+    ("colorMap,c", "define the heightmap color with a pre-defined colormap (GradientColorMap)")
     ("colorTextureImage,t",po::value<std::string>(),  "define the heightmap color from a given color image (32 bits image).")
     ("input-file,i", po::value<std::string>(), "2d input image representing the height map (given as grayscape image cast into 8 bits)." );
   
@@ -246,7 +246,7 @@ int main( int argc, char** argv )
   trace.info() << "[done]"<< std::endl;
  
   viewer << SetMode3D((*(boundVect.begin())).className(), "Basic" );
-  HueShadeColorMap<Image2DG::Value>  hueShade(0,  std::numeric_limits<Image2DG::Value>::max());
+  GradientColorMap<Image2DG::Value,CMAP_JET>  gradientShade( 0, std::numeric_limits<Image2DG::Value>::max());
   GrayscaleColorMap<Image2DG::Value>  grayShade(0, std::numeric_limits<Image2DG::Value>::max());
  
  
@@ -256,15 +256,15 @@ int main( int argc, char** argv )
     functors::Projector<SpaceND<2,int> > proj;
     Image2DG::Value val = image(proj(pt));
     if(vm.count("colorMap")){
-      viewer.setFillColor(hueShade(val)); 
+      viewer.setFillColor(gradientShade(val)); 
     }else if (vm.count("colorTextureImage")) {
       viewer.setFillColor(Color(imageTexture(proj(pt))));   
     }else{
       viewer.setFillColor(grayShade(val)); 
     }
-    viewer << *it;
-  }  
- 
+	viewer << *it;
+  }
+
   viewer << Viewer3D<>::updateDisplay;
   return application.exec();
 }
