@@ -358,7 +358,7 @@ int main( int argc, char** argv )
 
       for ( unsigned int i = 0; i < results.size(); ++i )
       {
-        viewer.setFillColor(cmap_grad( results[ i ] ));
+        viewer << CustomColors3D( Color::Black, cmap_grad( results[ i ] ));
         viewer << *abegin2;
 
         if (myexport)
@@ -422,7 +422,8 @@ int main( int argc, char** argv )
         }
 
         Cell unsignedSurfel = K.uCell( K.sKCoords(*abegin2) );
-        viewer.setFillColor(DGtal::Color(255,255,255,255));
+        viewer << CustomColors3D( DGtal::Color(255,255,255,255),
+                                  DGtal::Color(255,255,255,255));
         viewer << unsignedSurfel;
         if (myexport)
         {
