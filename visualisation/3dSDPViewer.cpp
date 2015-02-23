@@ -76,7 +76,7 @@ int main( int argc, char** argv )
     ("scaleZ,z",  po::value<float>()->default_value(1.0), "set the scale value in the Z direction (default 1.0)")
     ("sphereRadius,s",  po::value<double>()->default_value(0.2), "defines the sphere radius (used when the primitive is set to the sphere). (default value 0.2)")
     ("sphereResolution",  po::value<unsigned int>()->default_value(30), "defines the sphere resolution (used when the primitive is set to the sphere). (default resolution: 30)")
-    ("lineSize",  po::value<double>()->default_value(0.2), "defines the line size (used when the drawLines option is selected). (default value 0.2))")
+    ("lineSize",  po::value<double>()->default_value(0.2), "defines the line size (used when the --drawLines or --drawVectors option is selected). (default value 0.2))")
     ("primitive,p", po::value<std::string>()->default_value("sphere"), "set the primitive to display the set of points (can be sphere or voxel (default)")
     ("drawVectors,v", po::value<std::string>(), "SDP vector file: draw a set of vectors from the given file (each vector are determined by two consecutive point given, each point represented by its coordinates on a single line.") ;
 
@@ -103,6 +103,7 @@ int main( int argc, char** argv )
   double sphereRadius = 0.2;
   unsigned int sphereResolution = vm["sphereResolution"].as<unsigned int>();
   double lineSize =0.2;
+
   Color lineColor(100, 100, 250);
   Color pointColor(250, 250, 250);
   if(parseOK){
@@ -144,7 +145,7 @@ int main( int argc, char** argv )
   
   string inputFilename = vm["input"].as<std::string>();
 
- 
+  
   QApplication application(argc,argv);
   typedef Viewer3D<Z3i::Space, Z3i::KSpace> Viewer;
   
@@ -161,6 +162,7 @@ int main( int argc, char** argv )
   viewer.setWindowTitle("3dSPD Viewer");
   viewer.show();
   viewer.setGLScale(sx, sy, sz);  
+  viewer.myGLLineMinWidth = lineSize;  
   viewer << CustomColors3D(pointColor, pointColor);
 
 
@@ -232,7 +234,7 @@ int main( int argc, char** argv )
       trace.info()<<"Warning the two set of points doesn't contains the same number of points, some vectors will be skipped." << std::endl;
     }
     for(unsigned int i =0; i<vectorsPt.size()-1; i=i+2){
-      viewer.addLine(vectorsPt.at(i),vectorsPt.at(i+1));      
+      viewer.addLine(vectorsPt.at(i),vectorsPt.at(i+1), lineSize);      
     } 
  
     
