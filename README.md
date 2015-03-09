@@ -34,13 +34,13 @@ Actually the DGTal project is organized as follows:
 
  - [Converters](#converters)
 
- - [DistanceTransform] (#DistanceTransform)
+ - [DistanceTransform](#distancetransform)
 
  - [Estimators](#estimators)
 
- - [ShapeGenerator](#shapeGenerator)
+ - [ShapeGenerator](#shapegenerator)
 
- - [Visualization](#visualizatoin)
+ - [Visualization](#visualization)
 
  - [Volumetric](#volumetric)
 
@@ -68,10 +68,8 @@ Utilities to convert various simple file formats:
   - vol2slice: tool to extract all slices from 3d volumic images.
   - volBoundary2obj: export the boundary of a volume file to OBJ format.
 
-
 DistanceTransform
-------------------
-
+-----------------
   - LUTBasedNSDistanceTransform: Compute the 2D translated neighborhood-sequence distance transform of a binary image.
   - CumulativeSequenceTest and RationalBeattySequenceTest: tests from LUTBasedNSDistanceTransform.
   
