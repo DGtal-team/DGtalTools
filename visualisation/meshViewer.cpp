@@ -60,6 +60,7 @@ int main( int argc, char** argv )
     ("scaleX,x",  po::value<float>()->default_value(1.0), "set the scale value in the X direction (default 1.0)" )
     ("scaleY,y",  po::value<float>()->default_value(1.0), "set the scale value in the Y direction (default 1.0)" )
     ("scaleZ,z",  po:: value<float>()->default_value(1.0), "set the scale value in the Z direction (default 1.0)")
+    ("useSourceMeshColor", "use the color defined in the mesh source file (in this case the --customColorMesh option will have no effect)." )
     ("customColorMesh",po::value<std::vector<unsigned int> >()->multitoken(), "set the R, G, B, A components of the colors of the mesh view" )
     ("customColorSDP",po::value<std::vector<unsigned int> >()->multitoken(), "set the R, G, B, A components of the colors of the sdp view" )
     ("displaySDP,s", po::value<std::string>(), "Add the display of a set of discrete points as ball of radius 0.5.")
@@ -138,8 +139,6 @@ int main( int argc, char** argv )
   viewer.setGLScale(sx, sy, sz);  
   bool invertNormal= vm.count("invertNormal");
 
-
-
   trace.info() << "Importing mesh... ";
 
   Mesh<DGtal::Z3i::RealPoint> anImportedMesh(!vm.count("customColorMesh"));
@@ -163,14 +162,15 @@ int main( int argc, char** argv )
   if(invertNormal){
     anImportedMesh.invertVertexFaceOrder();
   }
-
-  viewer << CustomColors3D(Color(meshColorR, meshColorG, meshColorB, meshColorA), 
-                           Color(meshColorR, meshColorG, meshColorB, meshColorA));  
+  if(vm.count("useSourceMeshColor")){
+    viewer << CustomColors3D(Color(meshColorR, meshColorG, meshColorB, meshColorA), 
+                             Color(meshColorR, meshColorG, meshColorB, meshColorA));  
+  }
   viewer << anImportedMesh;
 
   if(vm.count("drawVertex")){
-    for( Mesh<DGtal::Z3i::RealPoint>::VertexStorage::const_iterator it = anImportedMesh.cVertexBegin();
-  	 it!=anImportedMesh.cVertexEnd(); ++it){
+    for( Mesh<DGtal::Z3i::RealPoint>::VertexStorage::const_iterator it = anImportedMesh.vertexBegin();
+  	 it!=anImportedMesh.vertexEnd(); ++it){
       DGtal::Z3i::Point pt;
       pt[0]=(*it)[0]; pt[1]=(*it)[1]; pt[2]=(*it)[2];
       viewer << pt;
