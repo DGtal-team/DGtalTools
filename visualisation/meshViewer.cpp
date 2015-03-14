@@ -187,8 +187,8 @@ int main( int argc, char** argv )
   viewer << anImportedMesh;
 
   if(vm.count("drawVertex")){
-    for( Mesh<DGtal::Z3i::RealPoint>::VertexStorage::const_iterator it = anImportedMesh.cVertexBegin();
-  	 it!=anImportedMesh.cVertexEnd(); ++it){
+    for( Mesh<DGtal::Z3i::RealPoint>::VertexStorage::const_iterator it = anImportedMesh.vertexBegin();
+  	 it!=anImportedMesh.vertexEnd(); ++it){
       DGtal::Z3i::Point pt;
       pt[0]=(*it)[0]; pt[1]=(*it)[1]; pt[2]=(*it)[2];
       viewer << pt;
