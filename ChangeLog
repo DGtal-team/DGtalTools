@@ -7,6 +7,9 @@
 * volumetric/:
 	- volIntensityScale: a simple tool to apply a linear scale of the intensity given in a volumetric file.
 
+* converters/:
+	- vol2heightfield: a new tool to transform volumetric file into 2D heightmap.
+
 
 	====  Release 0.8 ====
 
