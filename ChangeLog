@@ -9,7 +9,7 @@
 
 * converters/:
 	- vol2heightfield: a new tool to transform volumetric file into 2D heightmap.
-
+	- heightfield2vol: a new tool to transform 2D heightmap into volumetric file.
 
 	====  Release 0.8 ====
 

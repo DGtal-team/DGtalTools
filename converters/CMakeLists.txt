@@ -14,7 +14,8 @@ SET(DGTAL_TOOLS_SRC
   longvol2vol
   sdp2vol
   volBoundary2obj
-  vol2heightfield)
+  vol2heightfield
+  heightfield2vol)
 
 if( WITH_HDF5 )
 SET(DGTAL_TOOLS_SRC ${DGTAL_TOOLS_SRC}
