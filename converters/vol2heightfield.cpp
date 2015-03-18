@@ -92,7 +92,7 @@ int main( int argc, char** argv )
 		<< "Convert volumetric  file into a projected 2D image given from a normal direction N and from a starting point P. The 3D volume is scanned in this normal direction N starting from P with a step 1. If the intensity of the 3d point is inside the given thresholds its 2D gray values are set to the current scan number."
 		<< general_opt << "\n";
       std::cout << "Example:\n"
-		<< "vol2heightfield -i ${DGtal}/examples/samples/lobster.vol -o volumeList.p3d -x \n";
+		<< "vol2heightfield -i ${DGtal}/examples/samples/lobster.vol -m 60 -M 500  --nx 0 --ny 0.7 --nz -1 -x 150 -y 0 -z 150 --width 300 --height 300 --heightFieldMaxScan 350  -o resultingHeightMap.pgm \n";
       return 0;
     }
   
@@ -119,6 +119,10 @@ int main( int argc, char** argv )
   unsigned int widthImageScan = vm["height"].as<unsigned int>();
   unsigned int heightImageScan = vm["width"].as<unsigned int>();
   unsigned int maxScan = vm["heightFieldMaxScan"].as<unsigned int>();
+  if(maxScan > std::numeric_limits<Image2D::Value>::max()){
+    maxScan = std::numeric_limits<Image2D::Value>::max();
+    trace.warning()<< "value --setBackgroundLastDepth outside mox value of image. Set to max value:" << maxScan << std::endl; 
+  }
   
   unsigned int centerX = vm["centerX"].as<unsigned int>();
   unsigned int centerY = vm["centerY"].as<unsigned int>();
@@ -134,14 +138,13 @@ int main( int argc, char** argv )
   Z3i::Point ptCenter (centerX, centerY, centerZ);
   Z3i::RealPoint normalDir (nx, ny, nz);
   Image2D resultingImage(aDomain2D);
-
-
+  
   for(Image2D::Domain::ConstIterator it = resultingImage.domain().begin(); 
       it != resultingImage.domain().end(); it++){
     resultingImage.setValue(*it, 0);
   }
   DGtal::functors::Identity idV;
-
+  
   unsigned int maxDepthFound = 0;
   for(unsigned int k=0; k < maxScan; k++){
     DGtal::functors::Point2DEmbedderIn3D<DGtal::Z3i::Domain >  embedder(inputImage.domain(), 
