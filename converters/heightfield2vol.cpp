@@ -104,10 +104,10 @@ int main( int argc, char** argv )
     ("help,h", "display this message")
     ("input,i", po::value<std::string>(), "heightfield file." )
     ("output,o", po::value<std::string>(), "volumetric file ") 
-    ("scale,s", po::value<double>()->default_value(1.0), "set the scale of the maximal level. (default 1.0)")
-    ("volZ,z", po::value<double>()->default_value(255), "set the Z max value of domain.")    
+    ("scale,s", po::value<double>()->default_value(1.0), "set the scale factor on height values. (default 1.0)")
+    ("volZ,z", po::value<uint32_t>()->default_value(255), "set the Z max value of domain.")    
     ("foregroundValue,f", po::value<unsigned int>()->default_value(128), "specify the foreground value of the resulting voxel." )
-    ("backgroundValue,b", po::value<unsigned int>()->default_value(0), "change the default background (black with the last filled intensity).");
+    ("backgroundValue,b", po::value<unsigned int>()->default_value(0), "specify the background value of the resulting volumetric file.");
   
   bool parseOK=true;
   po::variables_map vm;
@@ -136,17 +136,18 @@ int main( int argc, char** argv )
   
   string inputFilename = vm["input"].as<std::string>();
   string outputFilename = vm["output"].as<std::string>();
-  
+
   trace.info() << "Reading input file " << inputFilename ; 
   Image2D inputImage = DGtal::GenericReader<Image2D>::import(inputFilename);  
   double scale = vm["scale"].as<double>(); 
+  uint32_t maxZ = vm["volZ"].as<uint32_t>();
   trace.info() << " [done] " << std::endl ; 
   
   unsigned int foregroundValue = vm["foregroundValue"].as<unsigned int>();
   unsigned int backgroundValue = vm["backgroundValue"].as<unsigned int>();
   
   typedef Image3DPredicatFrom2DImage<Image2D, Z3i::Point> HeightMapVol;
-  Image3DPredicatFrom2DImage<Image2D, Z3i::Point> image3Dpredicate(inputImage, scale, 255, foregroundValue, backgroundValue);  
+  Image3DPredicatFrom2DImage<Image2D, Z3i::Point> image3Dpredicate(inputImage, scale, maxZ, foregroundValue, backgroundValue);  
   trace.info() << "Processing image to output file " << outputFilename ; 
     
   VolWriter<HeightMapVol>::exportVol(outputFilename, image3Dpredicate);
