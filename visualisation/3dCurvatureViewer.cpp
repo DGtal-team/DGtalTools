@@ -150,6 +150,16 @@ int main( int argc, char** argv )
       trace.error() << " The selected mode ("<<mode << ") is not defined."<<std::endl;
     }
 
+  bool exportOnly = vm.count("exportOnly");
+
+  if( exportOnly )
+  {
+    if( !vm.count("exportDat") && ! vm.count("export") )
+    {
+      trace.error() << "You should specify what you want to export with --export and/or --exportDat." << std::endl;
+      neededArgsGiven = false;
+    }
+  }
 
   if(!neededArgsGiven || !parseOK || vm.count("help") || argc <= 1 )
     {
@@ -172,7 +182,7 @@ int main( int argc, char** argv )
   int minImageThreshold =  vm["minImageThreshold"].as<  int >();
   int maxImageThreshold =  vm["maxImageThreshold"].as<  int >();
 
-  bool exportOnly = vm.count("exportOnly");
+
 
   double h = 1.0;
  
