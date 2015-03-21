@@ -55,7 +55,7 @@ Utilities to convert various simple file formats:
   - freeman2img: transform one or several freeman chains into a pgm file by filling their interior areas.
   - freeman2sdp: convert freeman chain towards a Sequence of Discrete Points.
   - HDF52vol: convert HDF5 to vol file format. 
-	- heightfield2vol: a new tool to transform 2D heightmap into volumetric file.
+  - heightfield2vol: a new tool to transform 2D heightmap into volumetric file.
   - img2freeman: to extract a freeman chain contour from a grayscale image.
   - longvol2vol: convert longvol to vol file using different conversion policies.  
   - ofs2off: convert OFS mesh format towards a OFF variant.
