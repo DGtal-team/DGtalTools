@@ -31,7 +31,7 @@
 #include "DGtal/images/ImageContainerBySTLVector.h"
 #include "DGtal/images/ImageSelector.h"
 #include <DGtal/geometry/volumes/KanungoNoise.h>
-#include <DGTal/images/IntervalForegroundPredicate.h>
+#include <DGtal/images/IntervalForegroundPredicate.h>
 #include <boost/program_options/options_description.hpp>
 #include <boost/program_options/parsers.hpp>
 #include <boost/program_options/variables_map.hpp>
