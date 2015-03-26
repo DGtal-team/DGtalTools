@@ -70,7 +70,11 @@
 #include "DGtal/io/boards/Board3D.h"
 #include "DGtal/io/viewers/Viewer3D.h"
 #include "DGtal/io/colormaps/GradientColorMap.h"
-#include <QtGui/QApplication>
+#ifdef WITH_QT5
+  #include <QApplication>
+#else
+  #include <QtGui/qapplication.h>
+#endif
 
  using namespace DGtal;
 
@@ -121,7 +125,7 @@ int main( int argc, char** argv )
     trace.error() << " Error checking program options: " << ex.what() << std::endl;
   }
   bool neededArgsGiven=true;
-  
+
   if (parseOK && !(vm.count("input"))){
     missingParam("--input");
     neededArgsGiven=false;
@@ -134,7 +138,7 @@ int main( int argc, char** argv )
   bool normalization = false;
   if  (vm.count("normalization"))
     normalization = true;
-  
+
   std::string mode;
   if( parseOK )
     mode =  vm["mode"].as< std::string >();
@@ -181,13 +185,13 @@ int main( int argc, char** argv )
     export_path = vm["export"].as< std::string >();
     if( export_path.find(".obj") == std::string::npos )
     {
-      std::ostringstream oss; 
-      oss << export_path << ".obj" << endl; 
+      std::ostringstream oss;
+      oss << export_path << ".obj" << endl;
       export_path = oss.str();
-    } 
+    }
     myexport=true;
   }
-  
+
   double re_convolution_kernel = vm["radius"].as< double >();
 
   // Construction of the shape from vol file
@@ -226,8 +230,8 @@ int main( int argc, char** argv )
   typedef KSpace::SurfelSet SurfelSet;
   typedef SetOfSurfels< KSpace, SurfelSet > MySetOfSurfels;
   typedef DigitalSurface< MySetOfSurfels > MyDigitalSurface;
-  
-  
+
+
   typedef Board3D<Z3i::Space, Z3i::KSpace> Board;
   Board board( K );
 
@@ -245,7 +249,7 @@ int main( int argc, char** argv )
     for(std::vector<SCell>::const_iterator it= vectConnectedSCell.at(i).begin(); it != vectConnectedSCell.at(i).end(); ++it)
     {
       aSet.surfelSet().insert( *it);
-    }    
+    }
 
     MyDigitalSurface digSurf( aSet );
 
@@ -440,7 +444,7 @@ int main( int argc, char** argv )
         }
         else if( mode.compare("prindir2") == 0 )
         {
-          viewer.setLineColor(AXIS_COLOR_RED); 
+          viewer.setLineColor(AXIS_COLOR_RED);
         }
         viewer.addLine (
           RealPoint(
@@ -483,7 +487,7 @@ int main( int argc, char** argv )
     board.saveOBJ(export_path,normalization);
     trace.info() << "[done]" << std::endl;
   }
-    
+
   return application.exec();
 }
 

@@ -30,7 +30,11 @@
 #include <iostream>
 #include <queue>
 #include <QImageReader>
-#include <QtGui/qapplication.h>
+#ifdef WITH_QT5
+  #include <QApplication>
+#else
+  #include <QtGui/qapplication.h>
+#endif
 #include "DGtal/io/viewers/Viewer3D.h"
 #include "DGtal/io/DrawWithDisplay3DModifier.h"
 #include "DGtal/io/Color.h"
@@ -83,12 +87,12 @@ int main( int argc, char** argv )
     ( "min,m", po::value<int>()->default_value( 0 ), "Minimum (excluded) value for threshold." )
     ( "max,M", po::value<int>()->default_value( 255 ), "Maximum (included) value for threshold." )
     ("fixedPoints", po::value<std::vector <int> >()->multitoken(), "defines the coordinates of points which should not be removed." );
-  
-  
+
+
   bool parseOK=true;
   po::variables_map vm;
   try{
-    po::store(po::parse_command_line(argc, argv, general_opt), vm);  
+    po::store(po::parse_command_line(argc, argv, general_opt), vm);
   }catch(const std::exception& ex){
     parseOK=false;
     trace.info()<< "Error checking program options: "<< ex.what()<< endl;
@@ -102,9 +106,9 @@ int main( int argc, char** argv )
                    << general_opt << "\n"
                    << " Usage by forcing point to be left by the thinning: \n"
                    << "homotopicThinning3D --input ${DGtal}/examples/samples/Al.100.vol  --fixedPoints 56 35 5  56 61 5  57 91 38  58 8 38  45 50 97 \n";
-      
 
-        
+
+
 
       return 0;
     }
@@ -112,8 +116,8 @@ int main( int argc, char** argv )
   //Parse options
   if ( ! ( vm.count ( "input" ) ) ) missingParam ( "--input" );
   std::string filename = vm["input"].as<std::string>();
-  
-  
+
+
   typedef ImageSelector < Z3i::Domain, unsigned char>::Type Image;
   Image image = GenericReader<Image>::import ( filename );
 
@@ -126,11 +130,11 @@ int main( int argc, char** argv )
   trace.info() <<image<<std::endl;
 
   // Domain creation from two bounding points.
-  
+
   trace.beginBlock("Constructing Set");
   DigitalSet shape_set( image.domain() );
   DigitalSet fixedSet( image.domain() );
-  
+
   // Get the optional fixed points
   if( vm.count("fixedPoints")){
     std::vector<int> vectC = vm["fixedPoints"].as<std::vector<int> >();
@@ -140,43 +144,43 @@ int main( int argc, char** argv )
         fixedSet.insertNew(pt);
       }
     }else{
-      trace.error()<< " The coordinates should be 3d coordinates, ignoring fixedPoints option." << std::endl; 
+      trace.error()<< " The coordinates should be 3d coordinates, ignoring fixedPoints option." << std::endl;
     }
   }
-  
+
 
   SetFromImage<DigitalSet>::append<Image>(shape_set, image,
                                           vm[ "min" ].as<int>(), vm[ "max" ].as<int>() );
   trace.info() << shape_set<<std::endl;
   trace.endBlock();
-  
-  
-  
-  
+
+
+
+
   trace.beginBlock("Computing skeleton");
   // (6,18), (18,6), (26,6) seem ok.
   // (6,26) gives sometimes weird results (but perhaps ok !).
   Object26_6 shape( dt26_6, shape_set );
-  int nb_simple=0; 
+  int nb_simple=0;
   int layer = 1;
   std::queue<DigitalSet::Iterator> Q;
-  do 
+  do
     {
       trace.info() << "Layer: "<< layer << std::endl;
       int nb=0;
       DigitalSet & S = shape.pointSet();
- 
+
       trace.progressBar(0, (double)S.size());
       for ( DigitalSet::Iterator it = S.begin(); it != S.end(); ++it )
         {
-	  if ( nb % 100 == 0 ) trace.progressBar((double)nb, (double)S.size()); 
+    if ( nb % 100 == 0 ) trace.progressBar((double)nb, (double)S.size());
           nb++;
-	  if (dt( *it ) <= layer)
-	    {
-	      if ( shape.isSimple( *it ) )
-		Q.push( it );
-	    }
-	}
+    if (dt( *it ) <= layer)
+      {
+        if ( shape.isSimple( *it ) )
+    Q.push( it );
+      }
+  }
       trace.progressBar( (double)S.size(), (double)S.size() );
       nb_simple = 0;
       while ( ! Q.empty() )
@@ -194,7 +198,7 @@ int main( int argc, char** argv )
      }
   while ( nb_simple != 0 );
   trace.endBlock();
-  
+
   DigitalSet & S = shape.pointSet();
 
   trace.info() << "Skeleton--> "<<S<<std::endl;
@@ -203,11 +207,11 @@ int main( int argc, char** argv )
   QApplication application(argc,argv);
   Viewer3D<> viewer;
   viewer.setWindowTitle("homotopicThinning3D");
-  viewer.show();  
-  
+  viewer.show();
+
   viewer << SetMode3D( shape_set.className(), "Paving" );
   viewer << CustomColors3D(Color(25,25,255, 255), Color(25,25,255, 255));
-  viewer << S ; 
+  viewer << S ;
   viewer << CustomColors3D(Color(255,25,255, 255), Color(255,25,255, 255));
   viewer << fixedSet;
   viewer << SetMode3D( shape_set.className(), "PavingTransp" );
@@ -215,7 +219,7 @@ int main( int argc, char** argv )
   viewer << shape_set;
 
   viewer<< Viewer3D<>::updateDisplay;
-   
+
   return application.exec();
 
 }

@@ -27,7 +27,11 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 #include <iostream>
-#include <QtGui/qapplication.h>
+#ifdef WITH_QT5
+  #include <QApplication>
+#else
+  #include <QtGui/qapplication.h>
+#endif
 
 #include "DGtal/base/Common.h"
 #include "DGtal/base/BasicFunctors.h"
@@ -68,22 +72,22 @@ static const int INIT_SCALE1_ZOOM_FACTOR = 20.0;
 
 
 template <typename TImage>
-static QImage 
+static QImage
 getImage(const TImage &anImage, double gridSize=1.0 ){
-  typedef ConstImageAdapter<TImage, typename TImage::Domain, 
-                            functors::BasicDomainSubSampler<typename TImage::Domain, int, double>,  
+  typedef ConstImageAdapter<TImage, typename TImage::Domain,
+                            functors::BasicDomainSubSampler<typename TImage::Domain, int, double>,
                             typename TImage::Value,
                             functors::Identity > ConstImageAdapterForSubSampling;
-  
+
   std::vector<double> scales;
   scales.push_back(gridSize);
   scales.push_back(gridSize);
-  
-  functors::BasicDomainSubSampler<typename TImage::Domain, int, double> subSampler (anImage.domain(), scales, Z2i::Point(0,0)); 
+
+  functors::BasicDomainSubSampler<typename TImage::Domain, int, double> subSampler (anImage.domain(), scales, Z2i::Point(0,0));
   typename TImage::Domain newDomain = subSampler.getSubSampledDomain();
   functors::Identity id;
-  ConstImageAdapterForSubSampling  scaledImage (anImage, newDomain, subSampler, id ); 
-  
+  ConstImageAdapterForSubSampling  scaledImage (anImage, newDomain, subSampler, id );
+
   unsigned int height = scaledImage.domain().upperBound()[1]+1;
   unsigned int width = scaledImage.domain().upperBound()[0]+1;
   uchar * data = new uchar [height*width*4];
@@ -100,7 +104,7 @@ getImage(const TImage &anImage, double gridSize=1.0 ){
 }
 
 
-MainWindow::MainWindow(DGtal::Viewer3D<> *aViewer,       
+MainWindow::MainWindow(DGtal::Viewer3D<> *aViewer,
                        DGtal::ImageContainerBySTLVector < DGtal::Z3i::Domain, unsigned char > *anImage,
                        QWidget *parent, Qt::WindowFlags flags) :
     myViewer(aViewer),
@@ -135,7 +139,7 @@ MainWindow::MainWindow(DGtal::Viewer3D<> *aViewer,
     ui->_zoomXSlider->setMinimum( MIN_ZOOM_FACTOR);
     ui->_zoomXSlider->setMaximum( MAX_ZOOM_FACTOR);
     ui->_zoomXSlider->setValue(INIT_SCALE1_ZOOM_FACTOR);
-    
+
     ui->_zoomYSlider->setMinimum(MIN_ZOOM_FACTOR);
     ui->_zoomYSlider->setMaximum(MAX_ZOOM_FACTOR);
     ui->_zoomYSlider->setValue(INIT_SCALE1_ZOOM_FACTOR);
@@ -145,7 +149,7 @@ MainWindow::MainWindow(DGtal::Viewer3D<> *aViewer,
     ui->_zoomZSlider->setValue(INIT_SCALE1_ZOOM_FACTOR);
 
 
-    
+
 }
 
 MainWindow::~MainWindow()
@@ -154,13 +158,13 @@ MainWindow::~MainWindow()
 }
 
 void MainWindow::setImageProjX(const QPixmap &aPixMap){
-  ui->ImageProjX->setPixmap(aPixMap);  
+  ui->ImageProjX->setPixmap(aPixMap);
 }
 void MainWindow::setImageProjY(const QPixmap &aPixMap){
-  ui->ImageProjY->setPixmap(aPixMap);  
+  ui->ImageProjY->setPixmap(aPixMap);
 }
 void MainWindow::setImageProjZ(const QPixmap &aPixMap){
-  ui->ImageProjZ->setPixmap(aPixMap);  
+  ui->ImageProjZ->setPixmap(aPixMap);
 }
 
 
@@ -228,7 +232,7 @@ void MainWindow::updateZoomImageX(unsigned int sliceNumber, double gridSize){
                               invFunctor(myImage3D->domain().upperBound()));
   DGtal::functors::Projector<DGtal::Z3i::Space> aSliceFunctor(sliceNumber); aSliceFunctor.initAddOneDim(0);
   SliceImageAdapter sliceImage(*myImage3D, domain2D, aSliceFunctor, functors::Identity());
-  QImage anImage = getImage(sliceImage, gridSize); 
+  QImage anImage = getImage(sliceImage, gridSize);
   setImageProjX(QPixmap::fromImage(anImage));
 }
 
@@ -238,8 +242,8 @@ void MainWindow::updateZoomImageY(unsigned int sliceNumber, double gridSize){
                               invFunctor(myImage3D->domain().upperBound()));
   DGtal::functors::Projector<DGtal::Z3i::Space> aSliceFunctor(sliceNumber); aSliceFunctor.initAddOneDim(1);
   SliceImageAdapter sliceImage(*myImage3D, domain2D, aSliceFunctor, functors::Identity());
-  
-  QImage anImage = getImage(sliceImage, gridSize); 
+
+  QImage anImage = getImage(sliceImage, gridSize);
   setImageProjY(QPixmap::fromImage(anImage));
 }
 
@@ -250,7 +254,7 @@ void MainWindow::updateZoomImageZ(unsigned int sliceNumber, double gridSize){
                               invFunctor(myImage3D->domain().upperBound()));
   DGtal::functors::Projector<DGtal::Z3i::Space> aSliceFunctor(sliceNumber); aSliceFunctor.initAddOneDim(2);
   SliceImageAdapter sliceImage(*myImage3D, domain2D, aSliceFunctor, functors::Identity());
-  QImage anImage = getImage(sliceImage, gridSize); 
+  QImage anImage = getImage(sliceImage, gridSize);
   setImageProjZ(QPixmap::fromImage(anImage));
 }
 
@@ -261,9 +265,9 @@ void MainWindow::updateSliceImageX(unsigned int sliceNumber, bool init){
                               invFunctor(myImage3D->domain().upperBound()));
   DGtal::functors::Projector<DGtal::Z3i::Space> aSliceFunctor(sliceNumber); aSliceFunctor.initAddOneDim(0);
   SliceImageAdapter sliceImage (*myImage3D, domain2D, aSliceFunctor, functors::Identity());
-  
+
   double gridSize = ((double)INIT_SCALE1_ZOOM_FACTOR)/ui->_zoomXSlider->value();
-  QImage anImage = getImage(sliceImage, gridSize); 
+  QImage anImage = getImage(sliceImage, gridSize);
   setImageProjX(QPixmap::fromImage(anImage));
   if(init){
     (*myViewer) << sliceImage;
@@ -273,9 +277,9 @@ void MainWindow::updateSliceImageX(unsigned int sliceNumber, bool init){
     (*myViewer) << DGtal::UpdateImageData< SliceImageAdapter > (0, sliceImage, 0,0, 0,0,  DGtal::Viewer3D<>::xDirection);
     (*myViewer) << DGtal::UpdateImagePosition< Space, KSpace >(0, DGtal::Viewer3D<>::xDirection, sliceNumber, 0.0, 0.0);
     (*myViewer).updateList(init);
-    (*myViewer).update();      
+    (*myViewer).update();
   }
-  
+
 
 }
 
@@ -287,9 +291,9 @@ void MainWindow::updateSliceImageY(unsigned int sliceNumber, bool init){
                               invFunctor(myImage3D->domain().upperBound()));
   DGtal::functors::Projector<DGtal::Z3i::Space> aSliceFunctor(sliceNumber); aSliceFunctor.initAddOneDim(1);
   SliceImageAdapter sliceImage(*myImage3D, domain2D, aSliceFunctor, functors::Identity());
-  
+
   double gridSize = ((double)INIT_SCALE1_ZOOM_FACTOR)/ui->_zoomYSlider->value();
-  QImage anImage = getImage(sliceImage, gridSize); 
+  QImage anImage = getImage(sliceImage, gridSize);
   setImageProjY(QPixmap::fromImage(anImage));
   if(init){
     (*myViewer) << sliceImage;
@@ -299,7 +303,7 @@ void MainWindow::updateSliceImageY(unsigned int sliceNumber, bool init){
     (*myViewer) << DGtal::UpdateImageData< SliceImageAdapter > (1, sliceImage, 0,0, 0, 0,  DGtal::Viewer3D<>::yDirection);
     (*myViewer) << DGtal::UpdateImagePosition< Space, KSpace >(1, DGtal::Viewer3D<>::yDirection, 0.0, sliceNumber, 0.0);
     (*myViewer).updateList(init);
-    (*myViewer).update();      
+    (*myViewer).update();
   }
 
 
@@ -315,7 +319,7 @@ void MainWindow::updateSliceImageZ(unsigned int sliceNumber, bool init){
   DGtal::functors::Projector<DGtal::Z3i::Space> aSliceFunctor(sliceNumber); aSliceFunctor.initAddOneDim(2);
   SliceImageAdapter sliceImage(*myImage3D, domain2D, aSliceFunctor, functors::Identity());
   double gridSize = (double)INIT_SCALE1_ZOOM_FACTOR/ui->_zoomZSlider->value();
-  QImage anImage = getImage(sliceImage, gridSize); 
+  QImage anImage = getImage(sliceImage, gridSize);
   setImageProjZ(QPixmap::fromImage(anImage));
  if(init){
     (*myViewer) << sliceImage;
@@ -325,9 +329,9 @@ void MainWindow::updateSliceImageZ(unsigned int sliceNumber, bool init){
     (*myViewer) << DGtal::UpdateImageData< SliceImageAdapter > (2, sliceImage, 0,0, 0, 0,  DGtal::Viewer3D<>::zDirection);
     (*myViewer) << DGtal::UpdateImagePosition< Space, KSpace >(2, DGtal::Viewer3D<>::zDirection, 0.0,  0.0, sliceNumber);
     (*myViewer).updateList(init);
-    (*myViewer).update();      
+    (*myViewer).update();
  }
-  
+
 }
 
 
@@ -342,18 +346,18 @@ int main( int argc, char** argv )
 #ifdef WITH_ITK
     ("dicomMin", po::value<int>()->default_value(-1000), "set minimum density threshold on Hounsfield scale")
     ("dicomMax", po::value<int>()->default_value(3000), "set maximum density threshold on Hounsfield scale")
-#endif    
+#endif
     ;
 
   bool parseOK=true;
   po::variables_map vm;
   try{
-    po::store(po::parse_command_line(argc, argv, general_opt), vm);  
+    po::store(po::parse_command_line(argc, argv, general_opt), vm);
   }catch(const std::exception& ex){
     parseOK=false;
     trace.info()<< "Error checking program options: "<< ex.what()<< endl;
   }
-  po::notify(vm);    
+  po::notify(vm);
   if( !parseOK || vm.count("help")||argc<=1)
     {
       std::cout << "Usage: " << argv[0] << " [input]\n"
@@ -361,20 +365,20 @@ int main( int argc, char** argv )
                 << general_opt << "\n";
       return 0;
     }
-  
+
   if(! vm.count("input"))
     {
-      trace.error() << " The file name was defined" << endl;      
+      trace.error() << " The file name was defined" << endl;
       return 0;
     }
   string inputFilename = vm["input"].as<std::string>();
-  
+
 
   typedef ImageContainerBySTLVector < Z3i::Domain, unsigned char > Image3D;
   typedef ImageContainerBySTLVector < Z2i::Domain, unsigned char > Image2D;
-  
+
     string extension = inputFilename.substr(inputFilename.find_last_of(".") + 1);
-  if(extension!="vol" && extension != "p3d" && extension != "pgm3D" && extension != "pgm3d" && extension != "sdp" && extension != "pgm" 
+  if(extension!="vol" && extension != "p3d" && extension != "pgm3D" && extension != "pgm3d" && extension != "sdp" && extension != "pgm"
  #ifdef WITH_ITK
     && extension !="dcm"
 #endif
@@ -382,21 +386,21 @@ int main( int argc, char** argv )
     trace.info() << "File extension not recognized: "<< extension << std::endl;
     return 0;
   }
-  
+
   if(extension=="vol" || extension=="pgm3d" || extension=="pgm3D"
 #ifdef WITH_ITK
     || extension =="dcm"
 #endif
 ){
-    
+
 #ifdef WITH_ITK
    int dicomMin = vm["dicomMin"].as<int>();
    int dicomMax = vm["dicomMax"].as<int>();
    typedef functors::Rescaling<int ,unsigned char > RescalFCT;
-   Image3D image = extension == "dcm" ? DicomReader< Image3D,  RescalFCT  >::importDicom( inputFilename, 
+   Image3D image = extension == "dcm" ? DicomReader< Image3D,  RescalFCT  >::importDicom( inputFilename,
                                                                                       RescalFCT(dicomMin,
                                                                                                 dicomMax,
-												    0, 255) ) : 
+                            0, 255) ) :
      GenericReader<Image3D>::import( inputFilename );
    trace.info() << "Imported ITK..."<< std::endl;
 #else
@@ -404,7 +408,7 @@ int main( int argc, char** argv )
    trace.info() << "Imported..."<< std::endl;
 #endif
 
-  
+
 
   QApplication application(argc,argv);
   Viewer3D<> *viewer = new Viewer3D<>();

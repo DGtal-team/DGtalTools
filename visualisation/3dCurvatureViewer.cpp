@@ -69,7 +69,11 @@
 #include "DGtal/io/boards/Board3D.h"
 #include "DGtal/io/viewers/Viewer3D.h"
 #include "DGtal/io/colormaps/GradientColorMap.h"
-#include <QtGui/QApplication>
+#ifdef WITH_QT5
+  #include <QApplication>
+#else
+  #include <QtGui/qapplication.h>
+#endif
 
 using namespace DGtal;
 using namespace functors;
@@ -105,7 +109,7 @@ int main( int argc, char** argv )
     ("radius,r",  po::value< double >(), "Kernel radius for IntegralInvariant" )
     ("threshold,t",  po::value< unsigned int >()->default_value(8), "Min size of SCell boundary of an object" )
     ("minImageThreshold,l",  po::value<  int >()->default_value(0), "set the minimal image threshold to define the image object (object defined by the voxel with intensity belonging to ]minImageThreshold, maxImageThreshold ] )." )
-    ("maxImageThreshold,u",  po::value<  int >()->default_value(1), "set the minimal image threshold to define the image object (object defined by the voxel with intensity belonging to ]minImageThreshold, maxImageThreshold] )." )  
+    ("maxImageThreshold,u",  po::value<  int >()->default_value(1), "set the minimal image threshold to define the image object (object defined by the voxel with intensity belonging to ]minImageThreshold, maxImageThreshold] )." )
     ("mode,m", po::value< std::string >()->default_value("mean"), "type of output : mean, gaussian, k1, k2, prindir1 or prindir2 (default mean)")
     ("export,e", po::value< std::string >(), "Export the scene to specified OBJ filename." )
     ("exportDat,E", po::value<std::string>(), "Export resulting curvature (for mean, gaussian, k1 or k2 mode) in a simple data file each line representing a surfel. ")
@@ -125,7 +129,7 @@ int main( int argc, char** argv )
       trace.error() << " Error checking program options: " << ex.what() << std::endl;
     }
   bool neededArgsGiven=true;
-  
+
   if (parseOK && !(vm.count("input"))){
     missingParam("--input");
     neededArgsGiven=false;
@@ -185,7 +189,7 @@ int main( int argc, char** argv )
 
 
   double h = 1.0;
- 
+
 
   std::string export_path;
   bool myexport = false;
@@ -196,10 +200,10 @@ int main( int argc, char** argv )
     export_path = vm["export"].as< std::string >();
     if( export_path.find(".obj") == std::string::npos )
       {
-        std::ostringstream oss; 
-        oss << export_path << ".obj" << endl; 
+        std::ostringstream oss;
+        oss << export_path << ".obj" << endl;
         export_path = oss.str();
-      } 
+      }
     myexport=true;
   }
 
@@ -208,7 +212,7 @@ int main( int argc, char** argv )
     exportDatFilename = vm["exportDat"].as<std::string>();
     myexportDat = true;
   }
- 
+
   double re_convolution_kernel = vm["radius"].as< double >();
 
 
@@ -235,10 +239,10 @@ int main( int argc, char** argv )
   typedef Z3i::Space::RealPoint RealPoint;
   typedef Z3i::Point Point;
   typedef ImageSelector< Z3i::Domain,  int>::Type Image;
-  typedef DGtal::functors::BasicDomainSubSampler< HyperRectDomain<SpaceND<3, int> >,  
-                                                  DGtal::int32_t, double >   ReSampler; 
+  typedef DGtal::functors::BasicDomainSubSampler< HyperRectDomain<SpaceND<3, int> >,
+                                                  DGtal::int32_t, double >   ReSampler;
   typedef DGtal::ConstImageAdapter<Image, Image::Domain, ReSampler,
-				   Image::Value,  DGtal::functors::Identity >  SamplerImageAdapter;
+           Image::Value,  DGtal::functors::Identity >  SamplerImageAdapter;
   typedef IntervalForegroundPredicate< SamplerImageAdapter > ImagePredicate;
   typedef BinaryPointPredicate<DomainPredicate<Image::Domain>, ImagePredicate, AndBoolFct2  > Predicate;
   typedef Z3i::KSpace KSpace;
@@ -249,16 +253,16 @@ int main( int argc, char** argv )
   trace.beginBlock("Loading the file");
   std::string filename = vm["input"].as< std::string >();
   Image image = GenericReader<Image>::import( filename );
-  
-  PointVector<3,int> shiftVector3D(0 ,0, 0);      
-  DGtal::functors::BasicDomainSubSampler< HyperRectDomain<SpaceND<3, int> >,  
+
+  PointVector<3,int> shiftVector3D(0 ,0, 0);
+  DGtal::functors::BasicDomainSubSampler< HyperRectDomain<SpaceND<3, int> >,
                                           DGtal::int32_t, double > reSampler(image.domain(),
-                                                                             aGridSizeReSample,  shiftVector3D);  
+                                                                             aGridSizeReSample,  shiftVector3D);
   SamplerImageAdapter sampledImage (image, reSampler.getSubSampledDomain(), reSampler, functors::Identity());
   ImagePredicate predicateIMG = ImagePredicate( sampledImage,  minImageThreshold, maxImageThreshold );
   DomainPredicate<Z3i::Domain> domainPredicate( sampledImage.domain() );
   AndBoolFct2 andF;
-  Predicate predicate(domainPredicate, predicateIMG, andF  ); 
+  Predicate predicate(domainPredicate, predicateIMG, andF  );
 
 
   Z3i::Domain domain =  sampledImage.domain();
@@ -275,14 +279,14 @@ int main( int argc, char** argv )
   trace.endBlock();
   // Viewer settings
 
- 
+
   // Extraction of components
   typedef KSpace::SurfelSet SurfelSet;
   typedef SetOfSurfels< KSpace, SurfelSet > MySetOfSurfels;
   typedef DigitalSurface< MySetOfSurfels > MyDigitalSurface;
- 
-  
- 
+
+
+
   trace.beginBlock("Extracting surfaces");
   std::vector< std::vector<SCell > > vectConnectedSCell;
   Surfaces<KSpace>::extractAllConnectedSCell(vectConnectedSCell,K, Sadj, predicate, false);
@@ -307,10 +311,10 @@ int main( int argc, char** argv )
 
   QApplication application( argc, argv );
   typedef Viewer3D<Z3i::Space, Z3i::KSpace> Viewer;
-  
+
   Viewer viewer( K );
   viewer.show();
-  
+
   typedef Board3D<Z3i::Space, Z3i::KSpace> Board;
   Board board( K );
   for(unsigned int i = 0; i<vectConnectedSCell.size(); i++)
@@ -319,17 +323,17 @@ int main( int argc, char** argv )
         {
           continue;
         }
-      
+
       MySetOfSurfels  aSet(K, Sadj);
-      
+
       for(std::vector<SCell>::const_iterator it= vectConnectedSCell.at(i).begin(); it != vectConnectedSCell.at(i).end(); ++it)
         {
           aSet.surfelSet().insert( *it);
-        }    
-      
+        }
+
       MyDigitalSurface digSurf( aSet );
-      
-      
+
+
       typedef DepthFirstVisitor<MyDigitalSurface> Visitor;
       typedef GraphVisitorRange< Visitor > VisitorRange;
       typedef VisitorRange::ConstIterator SurfelConstIterator;
@@ -408,7 +412,7 @@ int main( int argc, char** argv )
             }
           trace.endBlock();
 
-    
+
           // Drawing results
           trace.beginBlock("Visulization");
           Quantity min = results[ 0 ];
@@ -437,7 +441,7 @@ int main( int argc, char** argv )
             {
               board << SetMode3D((K.unsigns(*abegin2)).className(), "Basic" );
             }
-      
+
 
           for ( unsigned int i = 0; i < results.size(); ++i )
             {
@@ -528,7 +532,7 @@ int main( int argc, char** argv )
                 }
               else if( mode.compare("prindir2") == 0 )
                 {
-                  viewer.setLineColor(AXIS_COLOR_RED); 
+                  viewer.setLineColor(AXIS_COLOR_RED);
                 }
               viewer.addLine (
                               RealPoint(
@@ -579,7 +583,7 @@ int main( int argc, char** argv )
     return application.exec();
   }else{
     return 0;
-  
+
   }
 }
 

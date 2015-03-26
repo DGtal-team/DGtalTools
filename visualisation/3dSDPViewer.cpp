@@ -27,7 +27,11 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 #include <iostream>
-#include <QtGui/qapplication.h>
+#ifdef WITH_QT5
+  #include <QApplication>
+#else
+  #include <QtGui/qapplication.h>
+#endif
 
 #include "DGtal/base/Common.h"
 #include "DGtal/helpers/StdDefs.h"
@@ -57,7 +61,7 @@ namespace po = boost::program_options;
 int main( int argc, char** argv )
 {
 
-  
+
   // parse command line ----------------------------------------------
   po::options_description general_opt("Allowed options are: ");
   general_opt.add_options()
@@ -65,12 +69,12 @@ int main( int argc, char** argv )
     ("input,i", po::value<std::string>(), "input file: sdp (sequence of discrete points)" )
     ("SDPindex", po::value<std::vector <unsigned int> >()->multitoken(), "specify the sdp index (by default 0,1,2).")
     ("pointColor,c", po::value<std::vector <int> >()->multitoken(), "set the color of  points: r g b a " )
-    ("lineColor,l",po::value<std::vector <int> >()->multitoken(), "set the color of line: r g b a " ) 
+    ("lineColor,l",po::value<std::vector <int> >()->multitoken(), "set the color of line: r g b a " )
     ("colorFromLabels", "use the color indexed from labels in the file.")
     ("labelsIndex", po::value<unsigned int>(), "define the index of the label in the source file (used by --LabelsIndex) ")
     ("filter,f",po::value<double>()->default_value(100.0), "filter input file in order to display only the [arg] pourcent of the input 3D points (uniformly selected)." )
     ("noPointDisplay", "usefull for instance to only display the lines between points.")
-    ("drawLines", "draw the line between discrete points." ) 
+    ("drawLines", "draw the line between discrete points." )
     ("scaleX,x",  po::value<float>()->default_value(1.0), "set the scale value in the X direction (default 1.0)" )
     ("scaleY,y",  po::value<float>()->default_value(1.0), "set the scale value in the Y direction (default 1.0)" )
     ("scaleZ,z",  po::value<float>()->default_value(1.0), "set the scale value in the Z direction (default 1.0)")
@@ -80,23 +84,23 @@ int main( int argc, char** argv )
     ("primitive,p", po::value<std::string>()->default_value("sphere"), "set the primitive to display the set of points (can be sphere or voxel (default)")
     ("drawVectors,v", po::value<std::string>(), "SDP vector file: draw a set of vectors from the given file (each vector are determined by two consecutive point given, each point represented by its coordinates on a single line.") ;
 
-     
+
   bool parseOK=true;
   bool cannotStart= false;
   typedef PointVector<1, int> Point1D;
 
-  
+
   po::variables_map vm;
   try{
-    po::store(po::parse_command_line(argc, argv, general_opt), vm);  
+    po::store(po::parse_command_line(argc, argv, general_opt), vm);
   }catch(const std::exception& ex){
     parseOK=false;
     trace.error()<< "Error checking program options: "<< ex.what()<< endl;
   }
-  po::notify(vm);    
+  po::notify(vm);
   if(parseOK && ! vm.count("input"))
     {
-      trace.error() << " The input file name was not defined" << endl;      
+      trace.error() << " The input file name was not defined" << endl;
       cannotStart = true;
     }
   std::string typePrimitive;
@@ -110,18 +114,18 @@ int main( int argc, char** argv )
     typePrimitive = vm["primitive"].as<std::string>();
     sphereRadius = vm["sphereRadius"].as<double>();
     lineSize = vm["lineSize"].as<double>();
-  }  
-  
-  if (parseOK && typePrimitive !="voxel" && typePrimitive  != "sphere" ){  
-    trace.error() << " The primitive should be sphere or voxel (primitive: " 
+  }
+
+  if (parseOK && typePrimitive !="voxel" && typePrimitive  != "sphere" ){
+    trace.error() << " The primitive should be sphere or voxel (primitive: "
                   << typePrimitive << " not implemented)" << std::endl;
     cannotStart = true;
-  } 
-  
+  }
+
   if(parseOK && vm.count("lineColor")){
     std::vector<int> vcol= vm["lineColor"].as<std::vector<int > >();
     if(vcol.size()<4){
-      trace.error() << " Not enough parameter: color specification should contains four elements: red, green, blue and alpha values "  
+      trace.error() << " Not enough parameter: color specification should contains four elements: red, green, blue and alpha values "
                     << "(Option --lineColor ignored). "  << std::endl;
     }
     lineColor.setRGBi(vcol[0], vcol[1], vcol[2], vcol[3]);
@@ -134,35 +138,35 @@ int main( int argc, char** argv )
     }
     pointColor.setRGBi(vcol[0], vcol[1], vcol[2], vcol[3]);
   }
-  
+
   if( !parseOK || cannotStart ||  vm.count("help")||argc<=1)
     {
       trace.info() << "Usage: " << argv[0] << " [input]\n"
-		<< "Display sequence of 3d discrete points by using QGLviewer."
-		<< general_opt << "\n";
+    << "Display sequence of 3d discrete points by using QGLviewer."
+    << general_opt << "\n";
       return 0;
     }
-  
+
   string inputFilename = vm["input"].as<std::string>();
 
-  
+
   QApplication application(argc,argv);
   typedef Viewer3D<Z3i::Space, Z3i::KSpace> Viewer;
-  
+
   float sx = vm["scaleX"].as<float>();
   float sy = vm["scaleY"].as<float>();
   float sz = vm["scaleZ"].as<float>();
 
   bool colorFromLabels = vm.count("colorFromLabels");
-  
-  
+
+
   typedef Viewer3D<Z3i::Space, Z3i::KSpace> Viewer;
   Z3i::KSpace K;
   Viewer viewer( K );
   viewer.setWindowTitle("3dSPD Viewer");
   viewer.show();
-  viewer.setGLScale(sx, sy, sz);  
-  viewer.myGLLineMinWidth = lineSize;  
+  viewer.setGLScale(sx, sy, sz);
+  viewer.myGLLineMinWidth = lineSize;
   viewer << CustomColors3D(pointColor, pointColor);
 
 
@@ -176,13 +180,13 @@ int main( int argc, char** argv )
     }else{
       vectIndex.push_back(3);
     }
-    vectVal = PointListReader<Point1D>::getPointsFromFile(inputFilename, vectIndex); 
+    vectVal = PointListReader<Point1D>::getPointsFromFile(inputFilename, vectIndex);
     for(std::vector<Point1D>::iterator it= vectVal.begin(); it!=vectVal.end(); it++){
       vectLabels.push_back((unsigned int)(*it)[0]);
     }
   }
-  
-  
+
+
   GradientColorMap< int > gradientColorMap( 1, (!colorFromLabels)? 1:  * std::max_element(vectLabels.begin(), vectLabels.end()));
   if(colorFromLabels){
     gradientColorMap.addColor( Color(255,100,100 ) );
@@ -192,14 +196,14 @@ int main( int argc, char** argv )
   if(vm.count("SDPindex")) {
     std::vector<unsigned int > vectIndex = vm["SDPindex"].as<std::vector<unsigned int > >();
     if(vectIndex.size()!=3){
-      trace.error() << "you need to specify the three indexes of vertex." << std::endl; 
+      trace.error() << "you need to specify the three indexes of vertex." << std::endl;
       return 0;
     }
     vectVoxels = PointListReader<Z3i::RealPoint>::getPointsFromFile(inputFilename, vectIndex);
   }else{
     vectVoxels = PointListReader<Z3i::RealPoint>::getPointsFromFile(inputFilename);
   }
-  
+
   if(!vm.count("noPointDisplay")){
     double percent = vm["filter"].as<double>();
     int step = max(1, (int) (100/percent));
@@ -208,38 +212,38 @@ int main( int argc, char** argv )
         Color col = gradientColorMap((int) vectLabels.at(i));
         viewer.setFillColor(col);
       }
-      
+
       if(typePrimitive=="voxel"){
         viewer << Z3i::Point((int)vectVoxels.at(i)[0],
                              (int)vectVoxels.at(i)[1],
-                             (int)vectVoxels.at(i)[2]); 
+                             (int)vectVoxels.at(i)[2]);
       }else{
-        viewer.addBall(vectVoxels.at(i), sphereRadius, sphereResolution);    
+        viewer.addBall(vectVoxels.at(i), sphereRadius, sphereResolution);
       }
-    }  
+    }
   }
-  
+
   viewer << CustomColors3D(lineColor, lineColor);
   if(vm.count("drawLines")){
     for(unsigned int i=1;i< vectVoxels.size(); i++){
-      viewer.addLine(vectVoxels.at(i-1), vectVoxels.at(i), lineSize); 
-    }  
+      viewer.addLine(vectVoxels.at(i-1), vectVoxels.at(i), lineSize);
+    }
   }
 
-  
+
   if(vm.count("drawVectors")){
-    std::string vectorsFileName = vm["drawVectors"].as<std::string>(); 
+    std::string vectorsFileName = vm["drawVectors"].as<std::string>();
     std::vector<Z3i::RealPoint> vectorsPt = PointListReader<Z3i::RealPoint>::getPointsFromFile(vectorsFileName);
     if (vectorsPt.size()%2==1){
       trace.info()<<"Warning the two set of points doesn't contains the same number of points, some vectors will be skipped." << std::endl;
     }
     for(unsigned int i =0; i<vectorsPt.size()-1; i=i+2){
-      viewer.addLine(vectorsPt.at(i),vectorsPt.at(i+1), lineSize);      
-    } 
- 
-    
+      viewer.addLine(vectorsPt.at(i),vectorsPt.at(i+1), lineSize);
+    }
+
+
   }
-  
+
   viewer << Viewer3D<>::updateDisplay;
   return application.exec();
 }

@@ -29,7 +29,11 @@
 ///////////////////////////////////////////////////////////////////////////////
 #include <iostream>
 #include <climits>
-#include <QtGui/qapplication.h>
+#ifdef WITH_QT5
+  #include <QApplication>
+#else
+  #include <QtGui/qapplication.h>
+#endif
 
 #include "DGtal/base/Common.h"
 #include "DGtal/base/BasicFunctors.h"
@@ -77,7 +81,7 @@ init(){
    QGLViewer::setKeyDescription ( Qt::Key_Plus, "Increase the openGL scale by 0.25 " );
    QGLViewer::setKeyDescription ( Qt::Key_Minus, "Decrease the openGL scale by 0.25 " );
 };
-  
+
 
 protected:
   double myZScale;
@@ -126,14 +130,14 @@ protected:
     }
 
     if( e->key() == Qt::Key_Plus){
-      myZScale+=0.25; 
-      DGtal::Viewer3D<Space, KSpace>::setGLScale(1.0, 1.0, myZScale);  
+      myZScale+=0.25;
+      DGtal::Viewer3D<Space, KSpace>::setGLScale(1.0, 1.0, myZScale);
       DGtal::Viewer3D<Space, KSpace>::update();
       handled=true;
     }
     if( e->key() == Qt::Key_Minus){
-      myZScale-=0.25; 
-      DGtal::Viewer3D<Space, KSpace>::setGLScale(1.0, 1.0, myZScale);  
+      myZScale-=0.25;
+      DGtal::Viewer3D<Space, KSpace>::setGLScale(1.0, 1.0, myZScale);
       DGtal::Viewer3D<>::update();
       handled=true;
     }
@@ -145,23 +149,23 @@ protected:
 
 
 
-// Defining a Helper to get the 3D point functor from an 2DImage 
+// Defining a Helper to get the 3D point functor from an 2DImage
 template<typename TImage2D, typename TPoint3D >
 struct Image3DPredicatFrom2DImage{
-  typedef  TPoint3D Point3D;   
+  typedef  TPoint3D Point3D;
   /**
    *  Construct the predicat given a 2D Image
    **/
-  Image3DPredicatFrom2DImage(DGtal::ConstAlias<TImage2D> anImage, double aScale):myImageRef(anImage), 
-                                                                                 myScale(aScale){    
-  }   
+  Image3DPredicatFrom2DImage(DGtal::ConstAlias<TImage2D> anImage, double aScale):myImageRef(anImage),
+                                                                                 myScale(aScale){
+  }
   inline
   bool operator()(const Point3D &aPoint)  const {
     functors::Projector<SpaceND<2, typename TImage2D::Integer> > projXY;
-    return  (*myImageRef)(projXY(aPoint))*myScale >= aPoint[2];    
+    return  (*myImageRef)(projXY(aPoint))*myScale >= aPoint[2];
   }
   CountedConstPtrOrConstPtr<TImage2D> myImageRef;
-  double myScale;  
+  double myScale;
 };
 
 
@@ -181,39 +185,39 @@ int main( int argc, char** argv )
     ("colorMap,c", "define the heightmap color with a pre-defined colormap (GradientColorMap)")
     ("colorTextureImage,t",po::value<std::string>(),  "define the heightmap color from a given color image (32 bits image).")
     ("input-file,i", po::value<std::string>(), "2d input image representing the height map (given as grayscape image cast into 8 bits)." );
-  
+
   bool parseOK=true;
   po::variables_map vm;
   try{
-    po::store(po::parse_command_line(argc, argv, general_opt), vm);  
+    po::store(po::parse_command_line(argc, argv, general_opt), vm);
   }catch(const std::exception& ex){
     parseOK=false;
     trace.info()<< "Error checking program options: "<< ex.what()<< endl;
   }
-  po::notify(vm);    
+  po::notify(vm);
   if( !parseOK || vm.count("help")||argc<=1)
     {
       std::cout << "Usage: " << argv[0] << " [input-file]\n"
                 << "Display a 2D image as heightmap by using QGLviewer"<< endl
-                << general_opt << "\n" << 
+                << general_opt << "\n" <<
                 "Exemple of use:  visualisation/3dHeightMapViewer -i ${DGtal}/examples/samples/church.pgm -s 0.2" << std::endl;
 
       return 0;
     }
-  
+
   if(! vm.count("input-file"))
     {
-      trace.error() << " The file name was defined" << endl;      
+      trace.error() << " The file name was defined" << endl;
       return 0;
     }
 
 
-  string inputFilename = vm["input-file"].as<std::string>();  
-  double scale = vm["scale"].as<double>(); 
+  string inputFilename = vm["input-file"].as<std::string>();
+  double scale = vm["scale"].as<double>();
 
 
-  typedef DGtal::ImageContainerBySTLVector<Z2i::Domain, unsigned char> Image2DG ; 
-  typedef DGtal::ImageContainerBySTLVector<Z2i::Domain, unsigned int> Image2DCol ; 
+  typedef DGtal::ImageContainerBySTLVector<Z2i::Domain, unsigned char> Image2DG ;
+  typedef DGtal::ImageContainerBySTLVector<Z2i::Domain, unsigned int> Image2DCol ;
 
   Image2DG image = GenericReader<Image2DG>::import( inputFilename );
   Image2DCol imageTexture(image.domain());
@@ -223,14 +227,14 @@ int main( int argc, char** argv )
   if(vm.count("colorTextureImage")){
     imageTexture =  GenericReader<Image2DCol>::import( vm["colorTextureImage"].as<std::string>() );
   }
- 
+
   QApplication application(argc,argv);
-  RealPoint plow (image.domain().lowerBound()[0]-0.5, 
+  RealPoint plow (image.domain().lowerBound()[0]-0.5,
                   image.domain().lowerBound()[1]-0.5,
-                  image.domain().lowerBound()[2]-0.5); 
-  RealPoint pup (image.domain().upperBound()[0]+0.5, 
+                  image.domain().lowerBound()[2]-0.5);
+  RealPoint pup (image.domain().upperBound()[0]+0.5,
                  image.domain().upperBound()[1]+0.5,
-                 image.domain().upperBound()[2]+0.5); 
+                 image.domain().upperBound()[2]+0.5);
   Viewer3DImageSpec<> viewer(plow, pup) ;
   viewer.setWindowTitle("Height Map Viewer");
   viewer.show();
@@ -238,31 +242,31 @@ int main( int argc, char** argv )
 
   KSpace K;
   K.init(Z3i::Point(0,0,0),Z3i::Point(image.domain().upperBound()[0], image.domain().upperBound()[1], maxHeight+1), true);
-  std::set<KSpace::SCell> boundVect; 
+  std::set<KSpace::SCell> boundVect;
   Image3DPredicatFrom2DImage<Image2DG, Z3i::Point> image3Dpredicate(image, scale);
   trace.info() << "Constructing boundary... ";
   Surfaces<KSpace>::sMakeBoundary (boundVect, K, image3Dpredicate, Z3i::Point(0,0,0),
                                    Z3i::Point(image.domain().upperBound()[0], image.domain().upperBound()[1], maxHeight+1)  );
   trace.info() << "[done]"<< std::endl;
- 
+
   viewer << SetMode3D((*(boundVect.begin())).className(), "Basic" );
   GradientColorMap<Image2DG::Value,CMAP_JET>  gradientShade( 0, std::numeric_limits<Image2DG::Value>::max());
   GrayscaleColorMap<Image2DG::Value>  grayShade(0, std::numeric_limits<Image2DG::Value>::max());
- 
- 
-  for(std::set<KSpace::SCell>::const_iterator it = boundVect.begin(); 
+
+
+  for(std::set<KSpace::SCell>::const_iterator it = boundVect.begin();
       it!= boundVect.end(); it++){
     Z3i::Point pt = K.sCoords(K.sDirectIncident( *it, 2 ));
     functors::Projector<SpaceND<2,int> > proj;
     Image2DG::Value val = image(proj(pt));
     if(vm.count("colorMap")){
-      viewer.setFillColor(gradientShade(val)); 
+      viewer.setFillColor(gradientShade(val));
     }else if (vm.count("colorTextureImage")) {
-      viewer.setFillColor(Color(imageTexture(proj(pt))));   
+      viewer.setFillColor(Color(imageTexture(proj(pt))));
     }else{
-      viewer.setFillColor(grayShade(val)); 
+      viewer.setFillColor(grayShade(val));
     }
-	viewer << *it;
+  viewer << *it;
   }
 
   viewer << Viewer3D<>::updateDisplay;
