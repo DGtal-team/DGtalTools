@@ -55,6 +55,7 @@ Utilities to convert various simple file formats:
   - freeman2img: transform one or several freeman chains into a pgm file by filling their interior areas.
   - freeman2sdp: convert freeman chain towards a Sequence of Discrete Points.
   - HDF52vol: convert HDF5 to vol file format. 
+  - heightfield2vol: a new tool to transform 2D heightmap into volumetric file.
   - img2freeman: to extract a freeman chain contour from a grayscale image.
   - longvol2vol: convert longvol to vol file using different conversion policies.  
   - ofs2off: convert OFS mesh format towards a OFF variant.
@@ -67,6 +68,22 @@ Utilities to convert various simple file formats:
   - vol2sdp: a simple tools to extract digital points from 3d vol files.
   - vol2slice: tool to extract all slices from 3d volumic images.
   - volBoundary2obj: export the boundary of a volume file to OBJ format.
+  - vol2heightfield: a new tool to transform volumetric file into 2D heightmap.
+
+<center>
+<table>
+<tr>
+<td> <img height=200 src="https://cloud.githubusercontent.com/assets/772865/6706730/9bac9720-cd60-11e4-9819-81e536b21e97.gif"> </td>
+<td> <img height=200 src="https://cloud.githubusercontent.com/assets/772865/6706785/0ca0071e-cd61-11e4-9304-c6e168b1c6b2.png"> </td>
+</tr>
+<tr>
+<td>vol2heightmap</td>
+<td>heightmap2vol</td>
+</table>
+</center>
+
+
+
 
 DistanceTransform
 -----------------

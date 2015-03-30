@@ -7,7 +7,13 @@
 * volumetric/:
 	- volIntensityScale: a simple tool to apply a linear scale of the intensity given in a volumetric file.
 
+* converters/:
+	- vol2heightfield: a new tool to transform volumetric file into 2D heightmap.
+	- heightfield2vol: a new tool to transform 2D heightmap into volumetric file.
+	- imgAddNoise: a new tool to add noise (Kanungo's) to a binary 2D object
+	- volAddNoise: a new tool to add noise (Kanungo's) to a binary 3D object
 
+	
 	====  Release 0.8 ====
 
 * visualisation/:
