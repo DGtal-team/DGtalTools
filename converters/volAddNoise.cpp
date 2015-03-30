@@ -15,7 +15,7 @@
  **/
 /**
  * @file imgAddNoise
- * @ingroup Examples
+ * @ingroup converters
  * @author David Coeurjolly (\c david.coeurjolly@liris.cnrs.fr)
  *
  * @date 2015/03/24
@@ -82,7 +82,7 @@ int main( int argc, char** argv )
   po::notify(vm);    
   if(vm.count("help")||argc<=1|| !parseOK)
     {
-      trace.info()<< "Add Kanungo noise to a binary object with 0 values as background and a value >0 for the foreground." <<std::endl << "Basic usage: "<<std::endl
+      trace.info()<< "Add Kanungo noise to a binary object with 0 values as background points and values >0 for the foreground ones." <<std::endl << "Basic usage: "<<std::endl
       << "\t volAddNoi0se [options] --input <imageName> --output <outputImage> -noise 0.3"<<std::endl
       << general_opt << "\n";
       return 0;
