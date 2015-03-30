@@ -186,7 +186,7 @@ int main( int argc, char** argv )
     trace.info()<< "Visualisation of 3d curvature from .vol file using curvature from Integral Invariant" <<std::endl
                 << general_opt << "\n"
                 << "Basic usage: "<<std::endl
-                << "\t3dCurvatureViewer -i file.vol --radius 5 --mode mean"<<std::endl
+                << "\t3dCurvatureViewerNoise -i file.vol --radius 5 --mode mean --noise 0.5"<<std::endl
                 << std::endl
                 << "Below are the different available modes: " << std::endl
                 << "\t - \"mean\" for the mean curvature" << std::endl
