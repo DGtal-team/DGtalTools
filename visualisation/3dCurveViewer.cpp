@@ -44,11 +44,6 @@
 #include <boost/program_options/parsers.hpp>
 #include <boost/program_options/variables_map.hpp>
 
-#ifdef WITH_QT5
-  #include <QApplication>
-#else
-  #include <QtGui/qapplication.h>
-#endif
 #include "DGtal/base/Common.h"
 #include "DGtal/base/Exceptions.h"
 #include "DGtal/kernel/SpaceND.h"

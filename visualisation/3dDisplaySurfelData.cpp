@@ -28,11 +28,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #include <iostream>
-#ifdef WITH_QT5
-  #include <QApplication>
-#else
-  #include <QtGui/qapplication.h>
-#endif
 #include <QGLViewer/qglviewer.h>
 #include <stdio.h>
 
