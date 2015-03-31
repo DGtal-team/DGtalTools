@@ -3,6 +3,7 @@
 
 * visualisation/:
 	- meshViewer: fix to display mesh with colored faces (.off with colors).
+	- 3dCurvatureViewer/Noise: can now be used without QGLViewer if exporting data.
 
 * volumetric/:
 	- volIntensityScale: a simple tool to apply a linear scale of the intensity given in a volumetric file.

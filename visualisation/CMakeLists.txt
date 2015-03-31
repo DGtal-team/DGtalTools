@@ -1,6 +1,8 @@
 SET(DGTAL_TOOLS_SRC
 	displayContours
         patternTriangulation
+        3dCurvatureViewer
+        3dCurvatureViewerNoise
 )
 
 FOREACH(FILE ${DGTAL_TOOLS_SRC})
@@ -17,8 +19,6 @@ if (  WITH_VISU3D_QGLVIEWER )
   SET(DGTAL_EXAMPLES_QGL_SRC
     3dVolViewer
     3dVolBoundaryViewer
-    3dCurvatureViewer
-    3dCurvatureViewerNoise
     3dCurveViewer
     3dSDPViewer
     meshViewer
