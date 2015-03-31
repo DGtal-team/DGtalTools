@@ -57,12 +57,14 @@ Utilities to convert various simple file formats:
   - HDF52vol: convert HDF5 to vol file format. 
   - heightfield2vol: a new tool to transform 2D heightmap into volumetric file.
   - img2freeman: to extract a freeman chain contour from a grayscale image.
+  - imgAddNoise: a new tool to add noise (Kanungo's) to a binary 2D object.
   - longvol2vol: convert longvol to vol file using different conversion policies.  
   - ofs2off: convert OFS mesh format towards a OFF variant.
   - raw2HDF5: convert raw image to HDF5.
   - raw2vol and vol2raw: transform 3D volumes files from (resp. to) raw to vol.
   - sdp2vol: a simple tool to create a 3d vol image from 3d digital points.
   - slice2vol: tool to merge slices into one 3d volumic file.
+	- volAddNoise: a new tool to add noise (Kanungo's) to a binary 3D object.
   - vol2obj: convert a volume file into OBJ format (all voxels belonging to threshold interval)   
   - vol2raw: convert a vol to a 8-bit raw file.
   - vol2sdp: a simple tools to extract digital points from 3d vol files.
@@ -75,10 +77,14 @@ Utilities to convert various simple file formats:
 <tr>
 <td> <img height=200 src="https://cloud.githubusercontent.com/assets/772865/6706730/9bac9720-cd60-11e4-9819-81e536b21e97.gif"> </td>
 <td> <img height=200 src="https://cloud.githubusercontent.com/assets/772865/6706785/0ca0071e-cd61-11e4-9304-c6e168b1c6b2.png"> </td>
+<td> <img height=200 src="https://cloud.githubusercontent.com/assets/772865/6914017/ccf433e4-d786-11e4-997b-f513f07f56f3.gif"> </td>
+<td> <img height=200 src="https://cloud.githubusercontent.com/assets/772865/6914104/6d25be78-d787-11e4-9433-2a834fc4a0af.png"> </td>
 </tr>
 <tr>
 <td>vol2heightmap</td>
 <td>heightmap2vol</td>
+<td>imgAddNoise</td> 
+<td>volAddNoise</td>
 </table>
 </center>
 
