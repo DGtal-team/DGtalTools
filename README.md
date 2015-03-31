@@ -75,10 +75,10 @@ Utilities to convert various simple file formats:
 <center>
 <table>
 <tr>
-<td> <img height=200 src="https://cloud.githubusercontent.com/assets/772865/6706730/9bac9720-cd60-11e4-9819-81e536b21e97.gif"> </td>
-<td> <img height=200 src="https://cloud.githubusercontent.com/assets/772865/6706785/0ca0071e-cd61-11e4-9304-c6e168b1c6b2.png"> </td>
-<td> <img height=200 src="https://cloud.githubusercontent.com/assets/772865/6914017/ccf433e4-d786-11e4-997b-f513f07f56f3.gif"> </td>
-<td> <img height=200 src="https://cloud.githubusercontent.com/assets/772865/6914104/6d25be78-d787-11e4-9433-2a834fc4a0af.png"> </td>
+<td> <img height=175 src="https://cloud.githubusercontent.com/assets/772865/6706730/9bac9720-cd60-11e4-9819-81e536b21e97.gif"> </td>
+<td> <img height=175 src="https://cloud.githubusercontent.com/assets/772865/6706785/0ca0071e-cd61-11e4-9304-c6e168b1c6b2.png"> </td>
+<td> <img height=175 src="https://cloud.githubusercontent.com/assets/772865/6914017/ccf433e4-d786-11e4-997b-f513f07f56f3.gif"> </td>
+<td> <img height=175 src="https://cloud.githubusercontent.com/assets/772865/6914104/6d25be78-d787-11e4-9433-2a834fc4a0af.png"> </td>
 </tr>
 <tr>
 <td>vol2heightmap</td>
