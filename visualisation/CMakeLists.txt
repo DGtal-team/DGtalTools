@@ -1,27 +1,32 @@
-set(DGTAL_TOOLS_SRC displayContours
-                    patternTriangulation)
+SET(DGTAL_TOOLS_SRC
+	displayContours
+        patternTriangulation
+        3dCurvatureViewer
+        3dCurvatureViewerNoise
+)
 
 foreach (FILE ${DGTAL_TOOLS_SRC})
   add_executable(${FILE} ${FILE})
-  target_link_libraries(${FILE} ${DGTAL_LIBRARIES} ${DGtalToolsLibDependencies})
-  install(TARGETS ${FILE} RUNTIME DESTINATION bin
-                          LIBRARY DESTINATION lib
-                          ARCHIVE DESTINATION lib)
-endforeach (FILE)
+  target_link_libraries (${FILE} ${DGTAL_LIBRARIES} ${DGtalToolsLibDependencies})
+  install(TARGETS ${FILE}
+        RUNTIME DESTINATION bin
+        LIBRARY DESTINATION lib
+        ARCHIVE DESTINATION lib)
+ENDFOREACH(FILE)
 
-if (WITH_VISU3D_QGLVIEWER)
-  set(DGTAL_EXAMPLES_QGL_SRC 3dVolViewer
-                             3dVolBoundaryViewer
-                             3dCurvatureViewer
-                             3dCurvatureViewerNoise
-                             3dCurveViewer
-                             3dSDPViewer
-                             meshViewer
-                             3dHeightMapViewer
-                             3dDisplaySurfelData
-                             3dCompSurfelData)
+if (  WITH_VISU3D_QGLVIEWER )
 
-  foreach (FILE ${DGTAL_EXAMPLES_QGL_SRC})
+  SET(DGTAL_EXAMPLES_QGL_SRC
+    3dVolViewer
+    3dVolBoundaryViewer
+    3dCurveViewer
+    3dSDPViewer
+    meshViewer
+    3dHeightMapViewer
+    3dDisplaySurfelData
+	3dCompSurfelData)
+
+  FOREACH(FILE ${DGTAL_EXAMPLES_QGL_SRC})
     add_executable(${FILE} ${FILE})
     target_link_libraries ( ${FILE} ${DGTAL_LIBRARIES} ${DGtalToolsLibDependencies})
 
