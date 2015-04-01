@@ -47,6 +47,7 @@ public:
     myAngleRotation=0.0;
     myCurrentSliceDim=0;
     myMode=aMode;
+    myDisplayingInfo=true;
   }
   
   
@@ -76,6 +77,7 @@ protected:
   double myTotalAngleRotationX;
   double myTotalAngleRotationY;
   double myTotalAngleRotationZ;
+  bool myDisplayingInfo;
   DGtal::Z3i::Point myImageOrigin; 
   ModeVisu myMode;
 };
