@@ -127,7 +127,7 @@ int main( int argc, char** argv )
     trace.error() << " Error checking program options: " << ex.what() << std::endl;
   }
   bool neededArgsGiven=true;
-  
+
   if (parseOK && !(vm.count("input"))){
     missingParam("--input");
     neededArgsGiven=false;
@@ -246,7 +246,7 @@ int main( int argc, char** argv )
   typedef Z3i::Point Point;
   typedef ImageSelector< Z3i::Domain,  int>::Type Image;
   typedef DGtal::functors::BasicDomainSubSampler< HyperRectDomain<SpaceND<3, int> >,
-      DGtal::int32_t, double >   ReSampler;
+  DGtal::int32_t, double >   ReSampler;
   typedef DGtal::ConstImageAdapter<Image, Image::Domain, ReSampler,
       Image::Value,  DGtal::functors::Identity >  SamplerImageAdapter;
   typedef IntervalForegroundPredicate< SamplerImageAdapter > ImagePredicate;
@@ -259,7 +259,7 @@ int main( int argc, char** argv )
   trace.beginBlock("Loading the file");
   std::string filename = vm["input"].as< std::string >();
   Image image = GenericReader<Image>::import( filename );
-  
+
   PointVector<3,int> shiftVector3D( 0 ,0, 0 );
   DGtal::functors::BasicDomainSubSampler< HyperRectDomain< SpaceND< 3, int > >,
       DGtal::int32_t, double > reSampler(image.domain(),
@@ -291,8 +291,6 @@ int main( int argc, char** argv )
   typedef SetOfSurfels< KSpace, SurfelSet > MySetOfSurfels;
   typedef DigitalSurface< MySetOfSurfels > MyDigitalSurface;
 
-  
-
   trace.beginBlock("Extracting surfaces");
   std::vector< std::vector<SCell > > vectConnectedSCell;
   Surfaces<KSpace>::extractAllConnectedSCell(vectConnectedSCell,K, Sadj, predicate, false);
@@ -321,7 +319,7 @@ int main( int argc, char** argv )
   typedef Viewer3D<Z3i::Space, Z3i::KSpace> Viewer;
 #endif
   typedef Board3D<Z3i::Space, Z3i::KSpace> Board;
-  
+
 #ifdef WITH_VISU3D_QGLVIEWER
   Viewer viewer( K );
 #endif
@@ -333,7 +331,7 @@ int main( int argc, char** argv )
     viewer.show();
   }
 #endif
-  
+
   for( unsigned int i = 0; i<vectConnectedSCell.size(); ++i )
   {
     if( vectConnectedSCell[i].size() <= threshold )
@@ -465,7 +463,7 @@ int main( int argc, char** argv )
       {
         board << SetMode3D((K.unsigns(*abegin2)).className(), "Basic" );
       }
-      
+
 
       for ( unsigned int i = 0; i < results.size(); ++i )
       {

@@ -28,11 +28,9 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 #include <iostream>
-#include <QtGui/qapplication.h>
+
 #include "DGtal/base/Common.h"
 
-
-#include <QtGui/qapplication.h>
 #include "DGtal/io/Display3D.h"
 #include "DGtal/io/viewers/Viewer3D.h"
 #include "DGtal/io/readers/MeshReader.h"
@@ -79,7 +77,7 @@ int main( int argc, char** argv )
   if( !parseOK || vm.count("help")||argc<=1)
     {
       std::cout << "Usage: " << argv[0] << " [input]\n"
-		<< "Display OFF mesh file by using QGLviewer"
+    << "Display OFF mesh file by using QGLviewer"
     << general_opt << "\n";
       return 0;
     }
@@ -91,12 +89,12 @@ int main( int argc, char** argv )
     }
 
 
-  
+
   string inputFilename = vm["input"].as<std::string>();
   float sx = vm["scaleX"].as<float>();
   float sy = vm["scaleY"].as<float>();
   float sz = vm["scaleZ"].as<float>();
-  
+
   unsigned int  meshColorR = 240;
   unsigned int  meshColorG = 240;
   unsigned int  meshColorB = 240;
@@ -112,10 +110,10 @@ int main( int argc, char** argv )
   unsigned int  sdpColorG = 240;
   unsigned int  sdpColorB = 240;
   unsigned int  sdpColorA = 255;
-  
+
   float lineWidth = vm["minLineWidth"].as<float>();
 
-  
+
   if(vm.count("customColorMesh")){
     std::vector<unsigned int > vectCol = vm["customColorMesh"].as<std::vector<unsigned int> >();
     if(vectCol.size()!=4 && vectCol.size()!=8 ){
@@ -130,9 +128,9 @@ int main( int argc, char** argv )
       meshColorGLine = vectCol[5];
       meshColorBLine = vectCol[6];
       meshColorALine = vectCol[7];
-      
+
     }
-    
+
   }
   if(vm.count("customColorSDP")){
     std::vector<unsigned int > vectCol = vm["customColorSDP"].as<std::vector<unsigned int> >();
@@ -152,7 +150,7 @@ int main( int argc, char** argv )
   viewer.setWindowTitle("simple Volume Viewer");
   viewer.show();
   viewer.myGLLineMinWidth = lineWidth;
-  viewer.setGLScale(sx, sy, sz);  
+  viewer.setGLScale(sx, sy, sz);
   bool invertNormal= vm.count("invertNormal");
 
 
@@ -172,30 +170,30 @@ int main( int argc, char** argv )
     std::string filenameSDP = vm["displaySDP"].as<std::string>();
     vector<Z3i::RealPoint> vectPoints;
     vectPoints = PointListReader<Z3i::RealPoint>::getPointsFromFile(filenameSDP);
-    viewer << CustomColors3D(Color(sdpColorR, sdpColorG, sdpColorB, sdpColorA), 
-                             Color(sdpColorR, sdpColorG, sdpColorB, sdpColorA)); 
+    viewer << CustomColors3D(Color(sdpColorR, sdpColorG, sdpColorB, sdpColorA),
+                             Color(sdpColorR, sdpColorG, sdpColorB, sdpColorA));
     for(unsigned int i=0;i< vectPoints.size(); i++){
-      viewer.addBall(vectPoints.at(i), 0.5);    
+      viewer.addBall(vectPoints.at(i), 0.5);
     }
   }
   if(invertNormal){
     anImportedMesh.invertVertexFaceOrder();
   }
 
-  viewer << CustomColors3D(Color(meshColorRLine, meshColorGLine, meshColorBLine, meshColorALine), 
-                           Color(meshColorR, meshColorG, meshColorB, meshColorA));  
+  viewer << CustomColors3D(Color(meshColorRLine, meshColorGLine, meshColorBLine, meshColorALine),
+                           Color(meshColorR, meshColorG, meshColorB, meshColorA));
   viewer << anImportedMesh;
 
   if(vm.count("drawVertex")){
     for( Mesh<DGtal::Z3i::RealPoint>::VertexStorage::const_iterator it = anImportedMesh.vertexBegin();
-  	 it!=anImportedMesh.vertexEnd(); ++it){
+     it!=anImportedMesh.vertexEnd(); ++it){
       DGtal::Z3i::Point pt;
       pt[0]=(*it)[0]; pt[1]=(*it)[1]; pt[2]=(*it)[2];
       viewer << pt;
     }
   }
 
-  
+
   viewer << Viewer3D<>::updateDisplay;
   return application.exec();
 }

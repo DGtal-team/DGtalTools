@@ -36,10 +36,6 @@
 #include <boost/program_options/parsers.hpp>
 #include <boost/program_options/variables_map.hpp>
 
-#ifdef WITH_VISU3D_QGLVIEWER
-#include <QtGui/qapplication.h>
-#endif
-
 #include "DGtal/base/Common.h"
 #include "DGtal/base/CountedPtr.h"
 #include "DGtal/base/CountedConstPtrOrConstPtr.h"
@@ -103,11 +99,11 @@ struct SCellEmbedderWithNormal : public SCellEmbedder
   typedef std::map<SCell,RealVector> SCell2RealVectorMap;
   typedef GradientMapAdapter<SCell,RealVector> GradientMap;
 
-  SCellEmbedderWithNormal( ConstAlias<SCellEmbedder> embedder, 
+  SCellEmbedderWithNormal( ConstAlias<SCellEmbedder> embedder,
                            ConstAlias<SCell2RealVectorMap> map )
     : SCellEmbedder( embedder ), myMap( map )
   {}
-  
+
   GradientMap gradientMap() const
   {
     return GradientMap( myMap );
@@ -116,7 +112,7 @@ struct SCellEmbedderWithNormal : public SCellEmbedder
   CountedConstPtrOrConstPtr<SCell2RealVectorMap> myMap;
 };
 
-template <typename DigitalSurface, 
+template <typename DigitalSurface,
           typename Estimator>
 void exportNOFFSurface( const DigitalSurface& surface,
                         const Estimator& estimator,
@@ -164,7 +160,7 @@ void computeEstimation
   typedef DepthFirstVisitor< Surface > Visitor;
   typedef GraphVisitorRange< Visitor > VisitorRange;
   typedef typename VisitorRange::ConstIterator VisitorConstIterator;
-  
+
   std::string fname = vm[ "output" ].as<std::string>();
   string nameEstimator = vm[ "estimator" ].as<string>();
   trace.beginBlock( "Computing " + nameEstimator + "estimations." );
@@ -205,8 +201,8 @@ void computeEstimation
     {
       trace.beginBlock( "Computing angle deviation error stats." );
       std::ostringstream adev_sstr;
-      adev_sstr << fname << "-" << nameEstimator << "-angle-deviation-" 
-                << estimator.h() << ".txt"; 
+      adev_sstr << fname << "-" << nameEstimator << "-angle-deviation-"
+                << estimator.h() << ".txt";
       DGtal::Statistic<Scalar> adev_stat;
       unsigned int i = 0;
       range = CountedPtr<VisitorRange>( new VisitorRange( new Visitor( surface, *(surface.begin()) )) );
@@ -221,7 +217,7 @@ void computeEstimation
       std::ofstream adev_output( adev_sstr.str().c_str() );
       adev_output << "# Average error X of the absolute angle between two vector estimations." << std::endl;
       adev_output << "# h L1 L2 Loo E[X] Var[X] Min[X] Max[X] Nb[X]" << std::endl;
-      adev_output << estimator.h() 
+      adev_output << estimator.h()
                   << " " << adev_stat.mean() // L1
                   << " " << sqrt( adev_stat.unbiasedVariance()
                                   + adev_stat.mean()*adev_stat.mean() ) // L2
@@ -239,8 +235,8 @@ void computeEstimation
     {
       trace.beginBlock( "Exporting cell geometry." );
       std::ostringstream export_sstr;
-      export_sstr << fname << "-" << nameEstimator << "-cells-" 
-                  << estimator.h() << ".txt"; 
+      export_sstr << fname << "-" << nameEstimator << "-cells-"
+                  << estimator.h() << ".txt";
       std::ofstream export_output( export_sstr.str().c_str() );
       export_output << "# ImaGene viewer (viewSetOfSurfels) file format for displaying cells." << std::endl;
       bool adev =  vm[ "export" ].as<string>() == "AngleDeviation";
@@ -253,7 +249,7 @@ void computeEstimation
           Scalar angle_error = acos( n_est.dot( n_true_est ) )*180.0 / 3.14159625;
           Surfel s = *it;
           export_output
-            << "CellN" 
+            << "CellN"
             << " " << min( 1023, max( 512+K.sKCoord( s, 0 ), 0 ) )
             << " " << min( 1023, max( 512+K.sKCoord( s, 1 ), 0 ) )
             << " " << min( 1023, max( 512+K.sKCoord( s, 2 ), 0 ) )
@@ -263,7 +259,7 @@ void computeEstimation
           export_output << " " << ((double) c.red() / 255.0 )
                         << " " << ((double) c.green() / 255.0 )
                         << " " << ((double) c.blue() / 255.0 );
-          export_output << " " << n_est[ 0 ] << " " << n_est[ 1 ] 
+          export_output << " " << n_est[ 0 ] << " " << n_est[ 1 ]
                         << " " << n_est[ 2 ] << std::endl;
         }
       export_output.close();
@@ -273,8 +269,8 @@ void computeEstimation
     {
       trace.beginBlock( "Exporting cells normals." );
       std::ostringstream export_sstr;
-      export_sstr << fname << "-" << nameEstimator << "-normals-" 
-                  << estimator.h() << ".txt"; 
+      export_sstr << fname << "-" << nameEstimator << "-normals-"
+                  << estimator.h() << ".txt";
       std::ofstream export_output( export_sstr.str().c_str() );
       export_output << "# kx ky kz sign n_est[0] n_est[1] n_est[2] n_true[0] n_true[1] n_true[2]" << std::endl;
       unsigned int i = 0;
@@ -285,7 +281,7 @@ void computeEstimation
           Quantity n_true_est = n_true_estimations[ i ];
           Surfel s = *it;
           export_output
-            << K.sKCoord( s, 0 ) << " " << K.sKCoord( s, 1 ) << " " << K.sKCoord( s, 2 ) 
+            << K.sKCoord( s, 0 ) << " " << K.sKCoord( s, 1 ) << " " << K.sKCoord( s, 2 )
             << " " << K.sSign( s )
             << " " << n_est[ 0 ] << " " << n_est[ 1 ] << " " << n_est[ 2 ]
             << " " << n_true_est[ 0 ] << " " << n_true_est[ 1 ] << " " << n_true_est[ 2 ]
@@ -298,8 +294,8 @@ void computeEstimation
     {
       trace.beginBlock( "Exporting NOFF file." );
       std::ostringstream export_sstr;
-      export_sstr << fname << "-" << nameEstimator << "-noff-" 
-                  << estimator.h() << ".off"; 
+      export_sstr << fname << "-" << nameEstimator << "-noff-"
+                  << estimator.h() << ".off";
       std::ofstream export_output( export_sstr.str().c_str() );
       std::map<Surfel,Quantity> normals;
       unsigned int i = 0;
@@ -400,7 +396,7 @@ void chooseEstimator
                                               KernelFunction, NormalFunctor> VCMNormalEstimator;
       int embedding = vm["embedding"].as<int>();
       Surfel2PointEmbedding embType = embedding == 0 ? Pointels :
-                                      embedding == 1 ? InnerSpel : OuterSpel;     
+                                      embedding == 1 ? InnerSpel : OuterSpel;
       double R = vm["R-radius"].as<double>();
       double r = vm["r-radius"].as<double>();
       double t = vm["trivial-radius"].as<double>();
@@ -506,7 +502,7 @@ int chooseSurface
       }
       SurfaceContainer* surfaceContainer = new SurfaceContainer( K, dshape, surfAdj, bel );
       CountedPtr<Surface> ptrSurface( new Surface( surfaceContainer ) ); // acquired
-      trace.info() << "- surface component has " << ptrSurface->size() << " surfels." << std::endl; 
+      trace.info() << "- surface component has " << ptrSurface->size() << " surfels." << std::endl;
       trace.endBlock();
       chooseKernel( vm, K, shape, *ptrSurface, dshape );
     }
@@ -542,7 +538,7 @@ int chooseSurface
           trace.error() << "ERROR cannot find a proper bel in a big enough component." << std::endl;
           return 4;
         }
-      trace.info() << "- surface component has " << nb_surfels << " surfels." << std::endl; 
+      trace.info() << "- surface component has " << nb_surfels << " surfels." << std::endl;
       trace.endBlock();
       chooseKernel( vm, K, shape, *ptrSurface, *noisified_dshape );
     }
@@ -578,25 +574,25 @@ int main( int argc, char** argv )
 #ifdef WITH_VISU3D_QGLVIEWER
     ("view,V", po::value<string>()->default_value( "None" ),"view the digital surface with normals.  Parameter <arg> is None|Normals|AngleDeviation. The color depends on the angle deviation in degree: 0 metallic blue, 5 light cyan, 10 light green, 15 light yellow, 20 yellow, 25 orange, 30 red, 35, dark red, 40- grey." )
 #endif
-    ;  
+    ;
   bool parseOK=true;
   po::variables_map vm;
   try{
-    po::store(po::parse_command_line(argc, argv, general_opt), vm);  
+    po::store(po::parse_command_line(argc, argv, general_opt), vm);
   }catch(const exception& ex){
     parseOK=false;
     cerr << "Error checking program options: "<< ex.what()<< endl;
   }
-  po::notify(vm);    
+  po::notify(vm);
   if( ! parseOK || vm.count("help") || ! vm.count( "polynomial" ) )
     {
-      if ( ! vm.count( "polynomial" ) ) 
+      if ( ! vm.count( "polynomial" ) )
         cerr << "Need parameter --polynomial / -p" << endl;
 
       cerr << "Usage: " << argv[0] << " -p <polynomial> [options]\n"
-		<< "Computes a normal vector field over a digitized 3D implicit surface for several estimators (II|VCM|Trivial|True), specified with -e. You may add Kanungo noise with option -N. These estimators are compared with ground truth. You may then: 1) visualize the normals or the angle deviations with -V (if WITH_QGL_VIEWER is enabled), 2) outputs them as a list of cells/estimations with -n, 3) outputs them as a ImaGene file with -O, 4) outputs them as a NOFF file with -O, 5) computes estimation statistics with option -S." 
+    << "Computes a normal vector field over a digitized 3D implicit surface for several estimators (II|VCM|Trivial|True), specified with -e. You may add Kanungo noise with option -N. These estimators are compared with ground truth. You may then: 1) visualize the normals or the angle deviations with -V (if WITH_QGL_VIEWER is enabled), 2) outputs them as a list of cells/estimations with -n, 3) outputs them as a ImaGene file with -O, 4) outputs them as a NOFF file with -O, 5) computes estimation statistics with option -S."
                 << endl
-		<< general_opt << "\n";
+    << general_opt << "\n";
       cerr << "Example:\n"
            << "./generic3dNormalEstimator -p \"90-3*x^2-2*y^2-z^2\" -o VCM-ellipse -a -10 -A 10 -e VCM -R 3 -r 3 -t 2 -E 0 -x Normals" << endl
            << " - ellipse  : 90-3*x^2-2*y^2-z^2 " << endl
