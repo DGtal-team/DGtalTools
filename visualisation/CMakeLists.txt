@@ -44,8 +44,8 @@ if (  WITH_VISU3D_QGLVIEWER )
   include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
   if (WITH_QT4)
-    qt4_wrap_ui(ui_sliceViewer_FORMS_HEADERS sliceViewer.ui)
-    qt_wrap_cpp(sliceViewer_HEADERS_MOC sliceViewer.h OPTIONS -DBOOST_TT_HAS_OPERATOR_HPP_INCLUDED)
+    QT4_WRAP_UI(ui_sliceViewer_FORMS_HEADERS sliceViewer.ui)
+    QT4_WRAP_CPP(sliceViewer_HEADERS_MOC sliceViewer.h OPTIONS -DBOOST_TT_HAS_OPERATOR_HPP_INCLUDED)
 
     add_executable(sliceViewer sliceViewer.cpp ${sliceViewer_HEADERS_MOC}
                                                ${ui_sliceViewer_FORMS_HEADERS})
