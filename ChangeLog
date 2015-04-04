@@ -1,5 +1,7 @@
 	====  Release 0.9 ====
 
+* global/:
+  - Qt prog can now handle Qt5
 
 * visualisation/:
 	- meshViewer: fix to display mesh with colored faces (.off with colors).
@@ -14,7 +16,6 @@
 	- imgAddNoise: a new tool to add noise (Kanungo's) to a binary 2D object
 	- volAddNoise: a new tool to add noise (Kanungo's) to a binary 3D object
 
-	
 	====  Release 0.8 ====
 
 * visualisation/:
