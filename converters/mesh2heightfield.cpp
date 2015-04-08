@@ -61,6 +61,8 @@ int main( int argc, char** argv )
   general_opt.add_options()
     ("help,h", "display this message")
     ("input,i", po::value<std::string>(), "mesh file (.off) " )
+    ("meshScale,s", po::value<double>()->default_value(1.0),
+     "change the default mesh scale (each vertex multiplied by the scale) " )
     ("output,o", po::value<std::string>(), "sequence of discrete point file (.sdp) ") 
     ("nx", po::value<double>()->default_value(0), "set the x component of the projection direction." )
     ("ny", po::value<double>()->default_value(0), "set the y component of the projection direction." )
@@ -102,14 +104,14 @@ int main( int argc, char** argv )
   
   string inputFilename = vm["input"].as<std::string>();
   string outputFilename = vm["output"].as<std::string>();
-  
+  double meshScale = vm["meshScale"].as<double>();
   trace.info() << "Reading input file " << inputFilename ; 
   Mesh<Z3i::RealPoint> inputMesh(true);
   DGtal::MeshReader<Z3i::RealPoint>::importOFFFile(inputFilename, inputMesh);  
   trace.info() << " [done] " << std::endl ; 
   
   std::pair<Z3i::RealPoint, Z3i::RealPoint> bb = inputMesh.getBoundingBox();
-  Image3D::Domain meshDomain( bb.first, bb.second);
+  Image3D::Domain meshDomain( bb.first*meshScale, bb.second*meshScale);
   //  vol image filled from the mesh vertex.
   Image3D meshVolImage(meshDomain);
   for(Image3D::Domain::ConstIterator it = meshVolImage.domain().begin(); it != meshVolImage.domain().end(); it++){
@@ -117,7 +119,7 @@ int main( int argc, char** argv )
   }
   // Filling vol image 
   for(Mesh<Z3i::RealPoint>::VertexStorage::const_iterator it = inputMesh.vertexBegin(); it != inputMesh.vertexEnd(); it++){
-    meshVolImage.setValue(*it, 1);
+    meshVolImage.setValue((*it)*meshScale, 1);
   }
   
 
