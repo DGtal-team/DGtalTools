@@ -59,9 +59,9 @@ explicit MainWindow(DGtal::Viewer3D<> *viewer,  DGtal::ImageContainerBySTLVector
   void setImageProjZ(const QPixmap &aPixMap);
 
 
-  void updateSliceImageX(unsigned int sliceNumber, bool init);
-  void updateSliceImageY(unsigned int sliceNumber, bool init);
-  void updateSliceImageZ(unsigned int sliceNumber, bool init);
+  void updateSliceImageX( int sliceNumber, bool init);
+  void updateSliceImageY( int sliceNumber, bool init);
+  void updateSliceImageZ( int sliceNumber, bool init);
 
   void updateZoomImageX(unsigned int sliceNumber, double gridSize);
   void updateZoomImageY(unsigned int sliceNumber, double gridSize);
