@@ -109,7 +109,7 @@ int main( int argc, char** argv )
 		<< "Convert mesh  file into a projected 2D image given from a normal direction N and from a starting point P. The 3D mesh discretized and scanned in the normal direction N, starting from P with a step 1."
 		<< general_opt << "\n";
       std::cout << "Example:\n"
-		<< "mesh2heightfield -i ${DGtal}/examples/samples/lobster.vol -m 60 -M 500  --nx 0 --ny 0.7 --nz -1 -x 150 -y 0 -z 150 --width 300 --height 300 --heightFieldMaxScan 350  -o resultingHeightMap.pgm \n";
+		<< "mesh2heightfield -i ${DGtal}/examples/samples/tref.off -orientAutoFrontZ --width 25 --height 25 -o heighMap.pgm -s 10  \n";
       return 0;
     }
   
