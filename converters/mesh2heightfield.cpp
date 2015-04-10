@@ -34,9 +34,9 @@
 #include "DGtal/images/ImageContainerBySTLVector.h"
 #include "DGtal/io/writers/GenericWriter.h"
 #include "DGtal/io/readers/MeshReader.h"
+#include "DGtal/io/writers/MeshWriter.h"
 #include "DGtal/images/ConstImageAdapter.h"
 #include "DGtal/kernel/BasicPointFunctors.h"
-
 
 #include <boost/program_options/options_description.hpp>
 #include <boost/program_options/parsers.hpp>
@@ -48,6 +48,19 @@ using namespace DGtal;
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace po = boost::program_options;
+
+
+template<typename TImage, typename TPoint>
+void
+fillPointArea(TImage &anImage, const TPoint aPoint, unsigned int size, unsigned int value){
+  typename TImage::Domain aDom(aPoint-TPoint::diagonal(size), aPoint+TPoint::diagonal(size));
+  for(typename TImage::Domain::ConstIterator it= aDom.begin(); it != aDom.end(); it++){
+    if (anImage.domain().isInside(*it)){
+      anImage.setValue(*it, value);
+    }
+  }
+}
+
 
 int main( int argc, char** argv )
 {
@@ -64,6 +77,10 @@ int main( int argc, char** argv )
     ("meshScale,s", po::value<double>()->default_value(1.0),
      "change the default mesh scale (each vertex multiplied by the scale) " )
     ("output,o", po::value<std::string>(), "sequence of discrete point file (.sdp) ") 
+    ("orientAutoFrontX",  "automatically orients the camera in front according the x axis." )
+    ("orientAutoFrontY",  "automatically orients the camera in front according the y axis." )
+    ("orientAutoFrontZ",  "automatically orients the camera in front according the z axis." )
+    ("orientBack",  "change the camera direction to back instead front as given in  orientAutoFront{X,Y,Z} options." )
     ("nx", po::value<double>()->default_value(0), "set the x component of the projection direction." )
     ("ny", po::value<double>()->default_value(0), "set the y component of the projection direction." )
     ("nz", po::value<double>()->default_value(1), "set the z component of the projection direction." )
@@ -76,7 +93,7 @@ int main( int argc, char** argv )
     ("setBackgroundLastDepth", "change the default background (black with the last filled intensity).");
   
   
-  
+  double triangleAreaUnit = 0.5;
   bool parseOK=true;
   po::variables_map vm;
   try{
@@ -89,7 +106,7 @@ int main( int argc, char** argv )
   if( !parseOK || vm.count("help")||argc<=1)
     {
       std::cout << "Usage: " << argv[0] << " [input] [output]\n"
-		<< "Convert volumetric  file into a projected 2D image given from a normal direction N and from a starting point P. The 3D volume is scanned in this normal direction N starting from P with a step 1. If the intensity of the 3d point is inside the given thresholds its 2D gray values are set to the current scan number."
+		<< "Convert mesh  file into a projected 2D image given from a normal direction N and from a starting point P. The 3D mesh discretized and scanned in the normal direction N, starting from P with a step 1."
 		<< general_opt << "\n";
       std::cout << "Example:\n"
 		<< "mesh2heightfield -i ${DGtal}/examples/samples/lobster.vol -m 60 -M 500  --nx 0 --ny 0.7 --nz -1 -x 150 -y 0 -z 150 --width 300 --height 300 --heightFieldMaxScan 350  -o resultingHeightMap.pgm \n";
@@ -107,45 +124,102 @@ int main( int argc, char** argv )
   double meshScale = vm["meshScale"].as<double>();
   trace.info() << "Reading input file " << inputFilename ; 
   Mesh<Z3i::RealPoint> inputMesh(true);
-  DGtal::MeshReader<Z3i::RealPoint>::importOFFFile(inputFilename, inputMesh);  
-  trace.info() << " [done] " << std::endl ; 
   
-  std::pair<Z3i::RealPoint, Z3i::RealPoint> bb = inputMesh.getBoundingBox();
-  Image3D::Domain meshDomain( bb.first*meshScale, bb.second*meshScale);
-  //  vol image filled from the mesh vertex.
-  Image3D meshVolImage(meshDomain);
-  for(Image3D::Domain::ConstIterator it = meshVolImage.domain().begin(); it != meshVolImage.domain().end(); it++){
-    meshVolImage.setValue(*it, 0);
-  }
-  // Filling vol image 
-  for(Mesh<Z3i::RealPoint>::VertexStorage::const_iterator it = inputMesh.vertexBegin(); it != inputMesh.vertexEnd(); it++){
-    meshVolImage.setValue((*it)*meshScale, 1);
-  }
+  DGtal::MeshReader<Z3i::RealPoint>::importOFFFile(inputFilename, inputMesh);
+  inputMesh.quadToTriangularFaces();
+  inputMesh.changeScale(meshScale);  
+  trace.info() << " [done] " << std::endl ; 
+  double maxArea = triangleAreaUnit+1.0 ;
+  while(maxArea> triangleAreaUnit)
+    {
+      trace.info()<< "Iterating mesh subdivision ... "<< maxArea;
+      maxArea = inputMesh.subDivideTriangularFaces(triangleAreaUnit);
+      trace.info() << " [done]"<< std::endl;
+    }
   
 
+  std::pair<Z3i::RealPoint, Z3i::RealPoint> bb = inputMesh.getBoundingBox();
+  Image3D::Domain meshDomain( bb.first-Z3i::Point::diagonal(1), 
+                              bb.second+Z3i::Point::diagonal(1));
+  
+  //  vol image filled from the mesh vertex.
+  Image3D meshVolImage(meshDomain);
+  for(Image3D::Domain::ConstIterator it = meshVolImage.domain().begin(); 
+      it != meshVolImage.domain().end(); it++)
+    {
+      meshVolImage.setValue(*it, 0);
+    }
+  
+  // Filling vol image 
+  for(unsigned int i =0; i< inputMesh.nbFaces(); i++)
+    {
+      trace.progressBar(i, inputMesh.nbFaces());
+      typename Mesh<Z3i::RealPoint>::MeshFace aFace = inputMesh.getFace(i);
+      if(aFace.size()==3)
+        {
+          Z3i::RealPoint p1 = inputMesh.getVertex(aFace[0]);
+          Z3i::RealPoint p2 = inputMesh.getVertex(aFace[1]);
+          Z3i::RealPoint p3 = inputMesh.getVertex(aFace[2]);
+          Z3i::RealPoint c = (p1+p2+p3)/3.0;
+          fillPointArea(meshVolImage, p1, 1, 1);          
+          fillPointArea(meshVolImage, p2, 1, 1);          
+          fillPointArea(meshVolImage, p3, 1, 1);          
+          fillPointArea(meshVolImage, c, 1, 1);          
+        }
+    }
+    
   std::ofstream outStream;
   outStream.open(outputFilename.c_str());
   
+  unsigned int widthImageScan = vm["height"].as<unsigned int>()*meshScale;
+  unsigned int heightImageScan = vm["width"].as<unsigned int>()*meshScale;
+  int maxScan = vm["heightFieldMaxScan"].as<unsigned int>()*meshScale;
   
-  trace.info() << "Processing image to output file " << outputFilename ; 
+  int centerX = vm["centerX"].as<unsigned int>()*meshScale;
+  int centerY = vm["centerY"].as<unsigned int>()*meshScale;
+  int centerZ = vm["centerZ"].as<unsigned int>()*meshScale;
   
-  unsigned int widthImageScan = vm["height"].as<unsigned int>();
-  unsigned int heightImageScan = vm["width"].as<unsigned int>();
-  unsigned int maxScan = vm["heightFieldMaxScan"].as<unsigned int>();
-  if(maxScan > std::numeric_limits<Image2D::Value>::max()){
-    maxScan = std::numeric_limits<Image2D::Value>::max();
-    trace.warning()<< "value --setBackgroundLastDepth outside mox value of image. Set to max value:" << maxScan << std::endl; 
-  }
-  
-  unsigned int centerX = vm["centerX"].as<unsigned int>();
-  unsigned int centerY = vm["centerY"].as<unsigned int>();
-  unsigned int centerZ = vm["centerZ"].as<unsigned int>();
-
   double nx = vm["nx"].as<double>();
   double ny = vm["ny"].as<double>();
   double nz = vm["nz"].as<double>();
+
+  if(vm.count("orientAutoFrontX")|| vm.count("orientAutoFrontY") ||
+     vm.count("orientAutoFrontZ"))
+    {
+      Z3i::Point ptL = meshVolImage.domain().lowerBound();
+      Z3i::Point ptU = meshVolImage.domain().upperBound();     
+      Z3i::Point ptC = (ptL+ptU)/2;
+      centerX=ptC[0]; centerY=ptC[1]; centerZ=ptC[2];
+      nx=0; ny=0; nz=0;
+    }  
+  bool opp = vm.count("orientBack");
+  if(vm.count("orientAutoFrontX"))
+    {
+      nx=(opp?-1.0:1.0); 
+      maxScan = meshVolImage.domain().upperBound()[0]- meshVolImage.domain().lowerBound()[0];
+      centerX = centerX + (opp? maxScan/2: -maxScan/2) ;
+    }
+  if(vm.count("orientAutoFrontY"))
+    {
+      ny=(opp?-1.0:1.0); 
+      maxScan = meshVolImage.domain().upperBound()[1]- meshVolImage.domain().lowerBound()[1];
+      centerY = centerY + (opp? maxScan/2: -maxScan/2);
+    }
+  if(vm.count("orientAutoFrontZ"))
+    {
+      nz=(opp?-1.0:1.0); 
+      maxScan = meshVolImage.domain().upperBound()[2]-meshVolImage.domain().lowerBound()[2];
+      centerZ = centerZ + (opp? maxScan/2: -maxScan/2);
+    }
   
-  
+  functors::Rescaling<unsigned int, Image2D::Value> scaleFctDepth(0, maxScan, 0, 255);  
+  if(maxScan > std::numeric_limits<Image2D::Value>::max())
+    {
+      trace.info()<< "Max depth value outside image intensity range: " << maxScan 
+                  << " (use a rescaling functor which implies a loss of precision)"  << std::endl; 
+    }  
+  trace.info() << "Processing image to output file " << outputFilename; 
+    
   Image2D::Domain aDomain2D(DGtal::Z2i::Point(0,0), 
                             DGtal::Z2i::Point(widthImageScan, heightImageScan));
   Z3i::Point ptCenter (centerX, centerY, centerZ);
@@ -160,35 +234,37 @@ int main( int argc, char** argv )
   DGtal::functors::Identity idV;
   
   unsigned int maxDepthFound = 0;
-  for(unsigned int k=0; k < maxScan; k++){
-    DGtal::functors::Point2DEmbedderIn3D<DGtal::Z3i::Domain >  embedder(meshVolImage.domain(), 
-                                                                        ptCenter+normalDir*k,
-                                                                        normalDir,
-                                                                        widthImageScan);
-    ImageAdapterExtractor extractedImage(meshVolImage, aDomain2D, embedder, idV);
-    for(Image2D::Domain::ConstIterator it = extractedImage.domain().begin(); 
-        it != extractedImage.domain().end(); it++){
-      if( resultingImage(*it)== 0 &&  extractedImage(*it)!=0){
-        maxDepthFound = k;
-        resultingImage.setValue(*it, maxScan-k);
-      }
-    }    
-  }
-  if (vm.count("setBackgroundLastDepth")){
-    for(Image2D::Domain::ConstIterator it = resultingImage.domain().begin(); 
-        it != resultingImage.domain().end(); it++){
-      if( resultingImage(*it)== 0 ){
-        resultingImage.setValue(*it, maxScan-maxDepthFound);
-      }
+  for(unsigned int k=0; k < maxScan; k++)
+    {
+      trace.progressBar(k, maxScan);
+      DGtal::functors::Point2DEmbedderIn3D<DGtal::Z3i::Domain >  embedder(meshVolImage.domain(), 
+                                                                          ptCenter+normalDir*k,
+                                                                          normalDir,
+                                                                          widthImageScan);
+      ImageAdapterExtractor extractedImage(meshVolImage, aDomain2D, embedder, idV);
+      for(Image2D::Domain::ConstIterator it = extractedImage.domain().begin(); 
+        it != extractedImage.domain().end(); it++)
+        {
+          if(resultingImage(*it)== 0 &&  extractedImage(*it)!=0)
+            {
+              maxDepthFound = k;
+              resultingImage.setValue(*it, scaleFctDepth(maxScan-k));
+            }
+        }    
     }
-  }   
+  if (vm.count("setBackgroundLastDepth"))
+    {
+      for(Image2D::Domain::ConstIterator it = resultingImage.domain().begin(); 
+          it != resultingImage.domain().end(); it++){
+        if( resultingImage(*it)== 0 )
+          {
+            resultingImage.setValue(*it, scaleFctDepth(maxScan-maxDepthFound));
+          }
+      }
+    }  
   
   resultingImage >> outputFilename;
-
   trace.info() << " [done] " << std::endl ;   
   return 0;  
 }
-
-
-
 
