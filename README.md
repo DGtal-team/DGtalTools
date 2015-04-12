@@ -92,9 +92,6 @@ Utilities to convert various simple file formats:
 </tr>
 <tr>
 <td>mesh2heightfield</td>
-<td>heightmap2vol</td>
-<td>imgAddNoise</td> 
-<td>volAddNoise</td>
 </tr>
 
 <tr>
