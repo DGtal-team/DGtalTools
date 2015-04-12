@@ -37,6 +37,7 @@
 #include "DGtal/io/writers/MeshWriter.h"
 #include "DGtal/images/ConstImageAdapter.h"
 #include "DGtal/kernel/BasicPointFunctors.h"
+#include "DGtal/math/linalg/SimpleMatrix.h"
 
 #include <boost/program_options/options_description.hpp>
 #include <boost/program_options/parsers.hpp>
@@ -50,13 +51,38 @@ using namespace DGtal;
 namespace po = boost::program_options;
 
 
-template<typename TImage, typename TPoint>
+
+template<typename TPoint, typename TEmbeder>
+TPoint
+getNormal(const TPoint &vect, const TEmbeder &emb ){
+  Z3i::RealPoint p0 = emb(Z2i::RealPoint(0.0,0.0), false);
+  Z3i::RealPoint px = emb(Z2i::RealPoint(10.0,0.0), false);
+  Z3i::RealPoint py = emb(Z2i::RealPoint(0.0,10.0), false);
+  Z3i::RealPoint u = px-p0;  u /= u.norm();
+  Z3i::RealPoint v = py-p0; v /= v.norm();
+  Z3i::RealPoint w = -u.crossProduct(v); w /= w.norm();
+  SimpleMatrix<double, 3, 3> t;
+  t.setComponent(0,0, u[0]);  t.setComponent(0,1, u[1]); t.setComponent(0, 2, u[2]);
+  t.setComponent(1,0, v[0]);  t.setComponent(1,1, v[1]); t.setComponent(1, 2, v[2]);  
+  t.setComponent(2,0, w[0]);  t.setComponent(2,1, w[1]); t.setComponent(2, 2, w[2]);  
+
+  if( vect != TPoint(0,0,0)){
+    return (t*vect);
+  }else{
+    return TPoint(0,0,1);
+  }
+}
+
+
+template<typename TImage, typename TVectorField, typename TPoint>
 void
-fillPointArea(TImage &anImage, const TPoint aPoint, unsigned int size, unsigned int value){
+fillPointArea(TImage &anImage, TVectorField &imageVectorField, 
+              const TPoint aPoint, const unsigned int size, const unsigned int value, const Z3i::RealPoint &n){
   typename TImage::Domain aDom(aPoint-TPoint::diagonal(size), aPoint+TPoint::diagonal(size));
   for(typename TImage::Domain::ConstIterator it= aDom.begin(); it != aDom.end(); it++){
     if (anImage.domain().isInside(*it)){
       anImage.setValue(*it, value);
+      imageVectorField.setValue(*it, n);
     }
   }
 }
@@ -64,11 +90,13 @@ fillPointArea(TImage &anImage, const TPoint aPoint, unsigned int size, unsigned 
 
 int main( int argc, char** argv )
 {
+  typedef ImageContainerBySTLVector < Z3i::Domain, Z3i::RealPoint > VectorFieldImage3D;
+  typedef ImageContainerBySTLVector < Z2i::Domain, Z3i::RealPoint > VectorFieldImage2D;
   typedef ImageContainerBySTLVector < Z3i::Domain, unsigned char > Image3D;
   typedef ImageContainerBySTLVector < Z2i::Domain, unsigned char> Image2D;
   typedef DGtal::ConstImageAdapter<Image3D, Z2i::Domain, DGtal::functors::Point2DEmbedderIn3D<DGtal::Z3i::Domain>,
                                    Image3D::Value,  DGtal::functors::Identity >  ImageAdapterExtractor;
-
+  
   // parse command line ----------------------------------------------
   po::options_description general_opt("Allowed options are: ");
   general_opt.add_options()
@@ -90,6 +118,7 @@ int main( int argc, char** argv )
     ("width", po::value<unsigned int>()->default_value(100), "set the width of the resulting height Field image." )
     ("height", po::value<unsigned int>()->default_value(100), "set the height of the resulting height Field image." )
     ("heightFieldMaxScan", po::value<unsigned int>()->default_value(255), "set the maximal scan deep." )
+    ("exportNormals",  "export with mesh normals vectors." )
     ("setBackgroundLastDepth", "change the default background (black with the last filled intensity).");
   
   
@@ -124,9 +153,16 @@ int main( int argc, char** argv )
   double meshScale = vm["meshScale"].as<double>();
   trace.info() << "Reading input file " << inputFilename ; 
   Mesh<Z3i::RealPoint> inputMesh(true);
-  
+
+      
   DGtal::MeshReader<Z3i::RealPoint>::importOFFFile(inputFilename, inputMesh);
-  inputMesh.quadToTriangularFaces();
+ std::pair<Z3i::RealPoint, Z3i::RealPoint> b = inputMesh.getBoundingBox();
+  double diagDist = (b.first-b.second).norm();
+  if(diagDist<2.0*sqrt(2.0)){
+    inputMesh.changeScale(2.0*sqrt(2.0)/diagDist);  
+  }
+ 
+ inputMesh.quadToTriangularFaces();
   inputMesh.changeScale(meshScale);  
   trace.info() << " [done] " << std::endl ; 
   double maxArea = triangleAreaUnit+1.0 ;
@@ -136,20 +172,24 @@ int main( int argc, char** argv )
       maxArea = inputMesh.subDivideTriangularFaces(triangleAreaUnit);
       trace.info() << " [done]"<< std::endl;
     }
-  
 
   std::pair<Z3i::RealPoint, Z3i::RealPoint> bb = inputMesh.getBoundingBox();
   Image3D::Domain meshDomain( bb.first-Z3i::Point::diagonal(1), 
                               bb.second+Z3i::Point::diagonal(1));
+  std::ofstream ofsNormal;
+  ofsNormal.open("normalMesh.dat", std::ofstream::out);
   
   //  vol image filled from the mesh vertex.
   Image3D meshVolImage(meshDomain);
+  VectorFieldImage3D meshNormalImage(meshDomain);
+  Z3i::RealPoint z(0.0,0.0,0.0);
   for(Image3D::Domain::ConstIterator it = meshVolImage.domain().begin(); 
       it != meshVolImage.domain().end(); it++)
     {
       meshVolImage.setValue(*it, 0);
+      meshNormalImage.setValue(*it, z);
     }
-  
+  unsigned int nb =0;
   // Filling vol image 
   for(unsigned int i =0; i< inputMesh.nbFaces(); i++)
     {
@@ -160,11 +200,18 @@ int main( int argc, char** argv )
           Z3i::RealPoint p1 = inputMesh.getVertex(aFace[0]);
           Z3i::RealPoint p2 = inputMesh.getVertex(aFace[1]);
           Z3i::RealPoint p3 = inputMesh.getVertex(aFace[2]);
+          Z3i::RealPoint n = (p2-p1).crossProduct(p3-p1); 
+          n /= n.norm();
+          nb++;
+          if(nb%20==0){
+            ofsNormal << p1[0] << " " << p1[1] << " " << p1[2] << std::endl;
+            ofsNormal <<p1[0]+ n[0]*15 << " " << p1[1]+n[1]*15 << " " << p1[2]+n[2]*15 << std::endl;
+          }
           Z3i::RealPoint c = (p1+p2+p3)/3.0;
-          fillPointArea(meshVolImage, p1, 1, 1);          
-          fillPointArea(meshVolImage, p2, 1, 1);          
-          fillPointArea(meshVolImage, p3, 1, 1);          
-          fillPointArea(meshVolImage, c, 1, 1);          
+          fillPointArea(meshVolImage, meshNormalImage, p1, 1, 1, n);          
+          fillPointArea(meshVolImage, meshNormalImage, p2, 1, 1, n);          
+          fillPointArea(meshVolImage, meshNormalImage, p3, 1, 1, n);          
+          fillPointArea(meshVolImage, meshNormalImage, c, 1, 1, n);          
         }
     }
     
@@ -173,6 +220,7 @@ int main( int argc, char** argv )
   
   unsigned int widthImageScan = vm["height"].as<unsigned int>()*meshScale;
   unsigned int heightImageScan = vm["width"].as<unsigned int>()*meshScale;
+  unsigned int widthImage;
   int maxScan = vm["heightFieldMaxScan"].as<unsigned int>()*meshScale;
   
   int centerX = vm["centerX"].as<unsigned int>()*meshScale;
@@ -225,11 +273,13 @@ int main( int argc, char** argv )
   Z3i::Point ptCenter (centerX, centerY, centerZ);
   Z3i::RealPoint normalDir (nx, ny, nz);
   Image2D resultingImage(aDomain2D);
+  VectorFieldImage2D resultingVectorField(aDomain2D);
   
   
   for(Image2D::Domain::ConstIterator it = resultingImage.domain().begin(); 
       it != resultingImage.domain().end(); it++){
     resultingImage.setValue(*it, 0);
+    resultingVectorField.setValue(*it, z);
   }
   DGtal::functors::Identity idV;
   
@@ -249,6 +299,7 @@ int main( int argc, char** argv )
             {
               maxDepthFound = k;
               resultingImage.setValue(*it, scaleFctDepth(maxScan-k));
+              resultingVectorField.setValue(*it, getNormal(meshNormalImage(embedder(*it)), embedder));
             }
         }    
     }
@@ -261,7 +312,37 @@ int main( int argc, char** argv )
             resultingImage.setValue(*it, scaleFctDepth(maxScan-maxDepthFound));
           }
       }
-    }  
+    } 
+  
+  for(Image2D::Domain::ConstIterator it = resultingImage.domain().begin(); 
+      it != resultingImage.domain().end(); it++){
+    if(resultingVectorField(*it)==Z3i::RealPoint(0.0, 0.0, 0.0))      
+      {
+        resultingVectorField.setValue(*it,Z3i::RealPoint(0, 0, -1)); 
+        
+      }
+  }
+  
+  if(vm.count("exportNormals")){
+    std::stringstream ss;
+    ss << outputFilename << ".normals";
+    std::ofstream outN;
+    outN.open(ss.str().c_str(), std::ofstream::out);
+    for(Image2D::Domain::ConstIterator it = resultingImage.domain().begin(); 
+        it != resultingImage.domain().end(); it++){
+      outN << (*it)[0] << " " << (*it)[1] << " " <<  0 << std::endl;
+      outN <<(*it)[0]+ resultingVectorField(*it)[0]*10.0  << " "<<   (*it)[1]+resultingVectorField(*it)[1]*10.0 << " " << resultingVectorField(*it)[2]*10.0;
+      outN << std::endl;
+    }
+  }
+  
+
+  Image2D renderTest(resultingImage.domain());
+  for(Image2D::Domain::ConstIterator it = resultingImage.domain().begin(); 
+      it != resultingImage.domain().end(); it++){
+    renderTest.setValue(*it, abs((resultingVectorField(*it)/resultingVectorField(*it).norm()).dot(Z3i::RealPoint(0,0,1)/Z3i::RealPoint(0,0,1).norm()))*255);
+  }
+  renderTest >> "render.pgm";
   
   resultingImage >> outputFilename;
   trace.info() << " [done] " << std::endl ;   
