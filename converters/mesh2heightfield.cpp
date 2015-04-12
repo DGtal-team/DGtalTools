@@ -115,10 +115,10 @@ int main( int argc, char** argv )
     ("centerX,x", po::value<unsigned int>()->default_value(0), "choose x center of the projected image." )
     ("centerY,y", po::value<unsigned int>()->default_value(0), "choose y center of the projected image." )
     ("centerZ,z", po::value<unsigned int>()->default_value(1), "choose z center of the projected image." )
-    ("width", po::value<unsigned int>()->default_value(100), "set the width of the resulting height Field image." )
-    ("height", po::value<unsigned int>()->default_value(100), "set the height of the resulting height Field image." )
+    ("width", po::value<unsigned int>()->default_value(100), "set the width of the area to be extracted as an height field image." )
+    ("height", po::value<unsigned int>()->default_value(100), "set the height of the area to extracted  as an height field image." )
     ("heightFieldMaxScan", po::value<unsigned int>()->default_value(255), "set the maximal scan deep." )
-    ("exportNormals",  "export with mesh normals vectors." )
+    ("exportNormals",  "export mesh normal vectors (given in the image height field basis)." )
     ("setBackgroundLastDepth", "change the default background (black with the last filled intensity).");
   
   
@@ -135,10 +135,10 @@ int main( int argc, char** argv )
   if( !parseOK || vm.count("help")||argc<=1)
     {
       std::cout << "Usage: " << argv[0] << " [input] [output]\n"
-		<< "Convert mesh  file into a projected 2D image given from a normal direction N and from a starting point P. The 3D mesh discretized and scanned in the normal direction N, starting from P with a step 1."
+		<< "Convert a mesh file into a projected 2D image given from a normal direction N and from a starting point P. The 3D mesh discretized and scanned in the normal direction N, starting from P with a step 1."
 		<< general_opt << "\n";
       std::cout << "Example:\n"
-		<< "mesh2heightfield -i ${DGtal}/examples/samples/tref.off -orientAutoFrontZ --width 25 --height 25 -o heighMap.pgm -s 10  \n";
+		<< "mesh2heightfield -i ${DGtal}/examples/samples/tref.off --orientAutoFrontZ --width 25 --height 25 -o heighMap.pgm -s 10  \n";
       return 0;
     }
   
@@ -153,7 +153,6 @@ int main( int argc, char** argv )
   double meshScale = vm["meshScale"].as<double>();
   trace.info() << "Reading input file " << inputFilename ; 
   Mesh<Z3i::RealPoint> inputMesh(true);
-
       
   DGtal::MeshReader<Z3i::RealPoint>::importOFFFile(inputFilename, inputMesh);
   std::pair<Z3i::RealPoint, Z3i::RealPoint> b = inputMesh.getBoundingBox();
@@ -188,7 +187,7 @@ int main( int argc, char** argv )
       meshNormalImage.setValue(*it, z);
     }
 
-  // Filling vol image 
+  // Filling mesh faces in volume. 
   for(unsigned int i =0; i< inputMesh.nbFaces(); i++)
     {
       trace.progressBar(i, inputMesh.nbFaces());

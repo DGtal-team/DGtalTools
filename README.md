@@ -59,6 +59,7 @@ Utilities to convert various simple file formats:
   - img2freeman: to extract a freeman chain contour from a grayscale image.
   - imgAddNoise: a new tool to add noise (Kanungo's) to a binary 2D object.
   - longvol2vol: convert longvol to vol file using different conversion policies.  
+  - mesh2heightfield: a tool to convert a mesh file into a 2D heightmap (from a normal direction N and from a starting point P).
   - ofs2off: convert OFS mesh format towards a OFF variant.
   - raw2HDF5: convert raw image to HDF5.
   - raw2vol and vol2raw: transform 3D volumes files from (resp. to) raw to vol.
@@ -85,7 +86,21 @@ Utilities to convert various simple file formats:
 <td>heightmap2vol</td>
 <td>imgAddNoise</td> 
 <td>volAddNoise</td>
+</tr>
+<tr>
+<td> <img height=150 src="https://cloud.githubusercontent.com/assets/772865/7106643/c09cb8d4-e148-11e4-8653-2d5bac5dc3c5.png"> </td>
+</tr>
+<tr>
+<td>mesh2heightfield</td>
+<td>heightmap2vol</td>
+<td>imgAddNoise</td> 
+<td>volAddNoise</td>
+</tr>
+
+<tr>
+
 </table>
+
 </center>
 
 
