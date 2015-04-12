@@ -67,7 +67,7 @@ getNormal(const TPoint &vect, const TEmbeder &emb ){
   t.setComponent(2,0, w[0]);  t.setComponent(2,1, w[1]); t.setComponent(2, 2, w[2]);  
 
   if( vect != TPoint(0,0,0)){
-    return (t*vect);
+    return ((t.inverse())*vect);
   }else{
     return TPoint(0,0,1);
   }
@@ -156,13 +156,13 @@ int main( int argc, char** argv )
 
       
   DGtal::MeshReader<Z3i::RealPoint>::importOFFFile(inputFilename, inputMesh);
- std::pair<Z3i::RealPoint, Z3i::RealPoint> b = inputMesh.getBoundingBox();
+  std::pair<Z3i::RealPoint, Z3i::RealPoint> b = inputMesh.getBoundingBox();
   double diagDist = (b.first-b.second).norm();
   if(diagDist<2.0*sqrt(2.0)){
     inputMesh.changeScale(2.0*sqrt(2.0)/diagDist);  
   }
  
- inputMesh.quadToTriangularFaces();
+  inputMesh.quadToTriangularFaces();
   inputMesh.changeScale(meshScale);  
   trace.info() << " [done] " << std::endl ; 
   double maxArea = triangleAreaUnit+1.0 ;
@@ -176,8 +176,6 @@ int main( int argc, char** argv )
   std::pair<Z3i::RealPoint, Z3i::RealPoint> bb = inputMesh.getBoundingBox();
   Image3D::Domain meshDomain( bb.first-Z3i::Point::diagonal(1), 
                               bb.second+Z3i::Point::diagonal(1));
-  std::ofstream ofsNormal;
-  ofsNormal.open("normalMesh.dat", std::ofstream::out);
   
   //  vol image filled from the mesh vertex.
   Image3D meshVolImage(meshDomain);
@@ -189,7 +187,7 @@ int main( int argc, char** argv )
       meshVolImage.setValue(*it, 0);
       meshNormalImage.setValue(*it, z);
     }
-  unsigned int nb =0;
+
   // Filling vol image 
   for(unsigned int i =0; i< inputMesh.nbFaces(); i++)
     {
@@ -202,11 +200,6 @@ int main( int argc, char** argv )
           Z3i::RealPoint p3 = inputMesh.getVertex(aFace[2]);
           Z3i::RealPoint n = (p2-p1).crossProduct(p3-p1); 
           n /= n.norm();
-          nb++;
-          if(nb%20==0){
-            ofsNormal << p1[0] << " " << p1[1] << " " << p1[2] << std::endl;
-            ofsNormal <<p1[0]+ n[0]*15 << " " << p1[1]+n[1]*15 << " " << p1[2]+n[2]*15 << std::endl;
-          }
           Z3i::RealPoint c = (p1+p2+p3)/3.0;
           fillPointArea(meshVolImage, meshNormalImage, p1, 1, 1, n);          
           fillPointArea(meshVolImage, meshNormalImage, p2, 1, 1, n);          
@@ -215,14 +208,10 @@ int main( int argc, char** argv )
         }
     }
     
-  std::ofstream outStream;
-  outStream.open(outputFilename.c_str());
-  
   unsigned int widthImageScan = vm["height"].as<unsigned int>()*meshScale;
   unsigned int heightImageScan = vm["width"].as<unsigned int>()*meshScale;
-  unsigned int widthImage;
-  int maxScan = vm["heightFieldMaxScan"].as<unsigned int>()*meshScale;
-  
+
+  int maxScan = vm["heightFieldMaxScan"].as<unsigned int>()*meshScale;  
   int centerX = vm["centerX"].as<unsigned int>()*meshScale;
   int centerY = vm["centerY"].as<unsigned int>()*meshScale;
   int centerZ = vm["centerZ"].as<unsigned int>()*meshScale;
@@ -293,7 +282,7 @@ int main( int argc, char** argv )
                                                                           widthImageScan);
       ImageAdapterExtractor extractedImage(meshVolImage, aDomain2D, embedder, idV);
       for(Image2D::Domain::ConstIterator it = extractedImage.domain().begin(); 
-        it != extractedImage.domain().end(); it++)
+          it != extractedImage.domain().end(); it++)
         {
           if(resultingImage(*it)== 0 &&  extractedImage(*it)!=0)
             {
@@ -318,12 +307,11 @@ int main( int argc, char** argv )
       it != resultingImage.domain().end(); it++){
     if(resultingVectorField(*it)==Z3i::RealPoint(0.0, 0.0, 0.0))      
       {
-        resultingVectorField.setValue(*it,Z3i::RealPoint(0, 0, -1)); 
-        
+        resultingVectorField.setValue(*it,Z3i::RealPoint(0, 0, -1));         
       }
   }
-  
-  if(vm.count("exportNormals")){
+  resultingImage >> outputFilename;
+  if(vm.count("exportNormals")){ 
     std::stringstream ss;
     ss << outputFilename << ".normals";
     std::ofstream outN;
@@ -331,21 +319,13 @@ int main( int argc, char** argv )
     for(Image2D::Domain::ConstIterator it = resultingImage.domain().begin(); 
         it != resultingImage.domain().end(); it++){
       outN << (*it)[0] << " " << (*it)[1] << " " <<  0 << std::endl;
-      outN <<(*it)[0]+ resultingVectorField(*it)[0]*10.0  << " "<<   (*it)[1]+resultingVectorField(*it)[1]*10.0 << " " << resultingVectorField(*it)[2]*10.0;
+      outN <<(*it)[0]+ resultingVectorField(*it)[0] << " "
+           <<(*it)[1]+resultingVectorField(*it)[1] << " " 
+           << resultingVectorField(*it)[2];
       outN << std::endl;
     }
   }
-  
 
-  Image2D renderTest(resultingImage.domain());
-  for(Image2D::Domain::ConstIterator it = resultingImage.domain().begin(); 
-      it != resultingImage.domain().end(); it++){
-    renderTest.setValue(*it, abs((resultingVectorField(*it)/resultingVectorField(*it).norm()).dot(Z3i::RealPoint(0,0,1)/Z3i::RealPoint(0,0,1).norm()))*255);
-  }
-  renderTest >> "render.pgm";
-  
-  resultingImage >> outputFilename;
-  trace.info() << " [done] " << std::endl ;   
   return 0;  
 }
 
