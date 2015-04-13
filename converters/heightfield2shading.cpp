@@ -86,9 +86,6 @@ importNormals(std::string file, TImageVector &vectorField)
 // Basic Lambertian reflectance model. 
 template<typename TImage2D, typename TPoint3D >
 struct LambertianShadindFunctor{
-  /**
-   *  Construct the predicat given a normal vector
-   **/
   LambertianShadindFunctor(const TPoint3D &lightSourceDirection):
     myLightSourceDirection(lightSourceDirection/lightSourceDirection.norm()){}
   
@@ -106,9 +103,6 @@ struct LambertianShadindFunctor{
 // Specular reflectance from Nayar model.
 template<typename TImage2D, typename TPoint3D >
 struct SpecularNayarShadindFunctor{
-  /**
-   *  Construct the predicat given a normal vector
-   **/
   SpecularNayarShadindFunctor(const TPoint3D &lightSourceDirection, const double kld,
                               const double kls, const double sigma ):
     myLightSourceDirection(lightSourceDirection/lightSourceDirection.norm()),
@@ -117,7 +111,7 @@ struct SpecularNayarShadindFunctor{
   inline
   unsigned int operator()(const TPoint3D &aNormal)  const {
     double lambertianIntensity = std::max(aNormal.dot(myLightSourceDirection), 0.0);
-    double alpha = acos(Z3i::RealPoint(0,0,1.0).dot(aNormal/aNormal.norm()));
+    double alpha = acos(((myLightSourceDirection+Z3i::RealPoint(0,0,1.0))/2.0).dot(aNormal/aNormal.norm()));
     double specularIntensity =  exp(-alpha*alpha/(2.0*mySigma));
     double resu = myKld*lambertianIntensity+myKls*specularIntensity;
     
@@ -197,9 +191,13 @@ int main( int argc, char** argv )
         lSpecular.myKld = vectParam[0];
         lSpecular.myKls = vectParam[1];
         lSpecular.mySigma = vectParam[2];
+        if(vectParam[2]==0.0)      
+          {
+            trace.error()<< "a 0 value for sigma is not possible in the Nayar model, please change it. "<< std::endl;
+            exit(1);
+          }
       }   
   }
-
 
   
   trace.info() << "Reading input file " << inputFilename ; 
