@@ -60,18 +60,16 @@ getNormal(const TPoint &vect, const TEmbeder &emb ){
   Z3i::RealPoint py = emb(Z2i::RealPoint(0.0,10.0), false);
   Z3i::RealPoint u = px-p0;  u /= u.norm();
   Z3i::RealPoint v = py-p0; v /= v.norm();
-  Z3i::RealPoint w = -u.crossProduct(v); w /= w.norm();
+  Z3i::RealPoint w = u.crossProduct(v); w /= w.norm();
   SimpleMatrix<double, 3, 3> t;
-  t.setComponent(0,0, u[0]);  t.setComponent(0,1, u[1]); t.setComponent(0, 2, u[2]);
-  t.setComponent(1,0, v[0]);  t.setComponent(1,1, v[1]); t.setComponent(1, 2, v[2]);  
-  t.setComponent(2,0, w[0]);  t.setComponent(2,1, w[1]); t.setComponent(2, 2, w[2]);  
+  t.setComponent(0,0, u[0]);  t.setComponent(0,1, v[0]); t.setComponent(0, 2, w[0]);
+  t.setComponent(1,0, u[1]);  t.setComponent(1,1, v[1]); t.setComponent(1, 2, w[1]);  
+  t.setComponent(2,0, u[2]);  t.setComponent(2,1, v[2]); t.setComponent(2, 2, w[2]);  
 
-  if( vect != TPoint(0,0,0)){
-    return ((t.inverse())*vect);
-  }else{
-    return TPoint(0,0,1);
-  }
+  return ((t.inverse())*vect);
 }
+
+
 
 
 template<typename TImage, typename TVectorField, typename TPoint>
@@ -119,6 +117,8 @@ int main( int argc, char** argv )
     ("height", po::value<unsigned int>()->default_value(100), "set the height of the area to extracted  as an height field image." )
     ("heightFieldMaxScan", po::value<unsigned int>()->default_value(255), "set the maximal scan deep." )
     ("exportNormals",  "export mesh normal vectors (given in the image height field basis)." )
+    ("backgroundNormalBack",  "set the normals of background in camera opposite direction (to obtain a black background in rendering). " )
+  
     ("setBackgroundLastDepth", "change the default background (black with the last filled intensity).");
   
   
@@ -301,12 +301,12 @@ int main( int argc, char** argv )
           }
       }
     } 
-  
+  bool inverBgNormal = vm.count("backgroundNormalBack");
   for(Image2D::Domain::ConstIterator it = resultingImage.domain().begin(); 
       it != resultingImage.domain().end(); it++){
     if(resultingVectorField(*it)==Z3i::RealPoint(0.0, 0.0, 0.0))      
       {
-        resultingVectorField.setValue(*it,Z3i::RealPoint(0, 0, -1));         
+        resultingVectorField.setValue(*it,Z3i::RealPoint(0, 0, inverBgNormal?-1: 1));         
       }
   }
   resultingImage >> outputFilename;
