@@ -14,12 +14,12 @@
  *
  **/
 /**
- * @file heightfield2vol.cpp
+ * @file heightfield2shading.cpp
  * @ingroup converters
  * @author Bertrand Kerautret (\c kerautre@loria.fr )
  * LORIA (CNRS, UMR 7503), University of Nancy, France
  *
- * @date 2015/03/18
+ * @date 2015/04/11
  *
  * 
  *
@@ -83,26 +83,53 @@ importNormals(std::string file, TImageVector &vectorField)
 }
 
 
-// Defining an helper to get the 3D point functor from an 2DImage 
+// Basic Lambertian reflectance model. 
 template<typename TImage2D, typename TPoint3D >
 struct LambertianShadindFunctor{
-  typedef  TPoint3D Point3D;
-  typedef typename TImage2D::Value Value;
-  
   /**
    *  Construct the predicat given a normal vector
    **/
-  LambertianShadindFunctor(const Point3D &lightSourceDirection):
+  LambertianShadindFunctor(const TPoint3D &lightSourceDirection):
     myLightSourceDirection(lightSourceDirection/lightSourceDirection.norm()){}
   
   inline
-  unsigned int operator()(const Point3D &aNormal)  const {
+  unsigned int operator()(const TPoint3D &aNormal)  const {
     //
     int intensity = aNormal.dot(myLightSourceDirection)*std::numeric_limits<typename TImage2D::Value>::max();
     return intensity>0? intensity:0;
   }
+  TPoint3D  myLightSourceDirection;
+};
+
+
+
+// Specular reflectance from Nayar model.
+template<typename TImage2D, typename TPoint3D >
+struct SpecularNayarShadindFunctor{
+  /**
+   *  Construct the predicat given a normal vector
+   **/
+  SpecularNayarShadindFunctor(const TPoint3D &lightSourceDirection, const double kld,
+                              const double kls, const double sigma ):
+    myLightSourceDirection(lightSourceDirection/lightSourceDirection.norm()),
+    myKld(kld), myKls(kls), mySigma(sigma){}
   
-  Point3D  myLightSourceDirection;
+  inline
+  unsigned int operator()(const TPoint3D &aNormal)  const {
+    double lambertianIntensity = std::max(aNormal.dot(myLightSourceDirection), 0.0);
+    double alpha = acos(Z3i::RealPoint(0,0,1.0).dot(aNormal/aNormal.norm()));
+    double specularIntensity =  exp(-alpha*alpha/(2.0*mySigma));
+    double resu = myKld*lambertianIntensity+myKls*specularIntensity;
+    
+    resu = std::max(resu, 0.0);
+    resu = std::min(resu, 1.0);
+    return resu*std::numeric_limits<typename TImage2D::Value>::max();
+  }
+
+
+
+  TPoint3D  myLightSourceDirection;
+  double myKld, myKls, mySigma;
 };
 
 
@@ -119,6 +146,7 @@ int main( int argc, char** argv )
     ("input,i", po::value<std::string>(), "heightfield file." )
     ("output,o", po::value<std::string>(), "output image.") 
     ("importNormal", po::value<std::string>(), "import normals from file.") 
+    ("specularModel,s", po::value<std::vector<double> >()->multitoken(), "use specular Nayar model with 3 param Kdiff, Kspec, sigma .") 
     ("lx", po::value<double>(), "x light source direction.") 
     ("ly", po::value<double>(), "y light source direction." )
     ("lz", po::value<double>(), "z light source direction.");
@@ -139,7 +167,7 @@ int main( int argc, char** argv )
 		<< "Render a 2D heightfield image into a shading image."
 		<< general_opt << "\n";
       std::cout << "Example:\n"
-		<< "heightfield2shading -i ${DGtal}/examples/samples/church.pgm -o volResu.vol -s 0.3 -z 50  \n";
+		<< "heightfield2shading -i heightfield.pgm -o shading.pgm --lx 0.0 --ly 1.0 --lz 1.0 --importNormal heightfield.pgm.normals -s 0.2 0.8 \n";
       return 0;
     }
   
@@ -155,6 +183,24 @@ int main( int argc, char** argv )
   double ly = vm["ly"].as<double>();
   double lz = vm["lz"].as<double>();
   LambertianShadindFunctor<Image2D, Z3i::RealPoint> lShade (Z3i::RealPoint(lx,ly,lz));
+  SpecularNayarShadindFunctor<Image2D, Z3i::RealPoint> lSpecular (Z3i::RealPoint(lx,ly,lz), 0, 0, 0);  
+  bool useSpecular = false;
+  if(vm.count("specularModel")){
+    std::vector<double> vectParam = vm["specularModel"].as<std::vector<double> > ();
+    if(vectParam.size() != 3)
+      {
+        trace.warning() << "You have not specify all specular parameters... using lambertian model instead." << std::endl;
+      }
+    else
+      {
+        useSpecular = true;
+        lSpecular.myKld = vectParam[0];
+        lSpecular.myKls = vectParam[1];
+        lSpecular.mySigma = vectParam[2];
+      }   
+  }
+
+
   
   trace.info() << "Reading input file " << inputFilename ; 
   Image2D inputImage = DGtal::GenericReader<Image2D>::import(inputFilename);  
@@ -168,7 +214,7 @@ int main( int argc, char** argv )
   }
   for(typename Image2D::Domain::ConstIterator it = inputImage.domain().begin(); 
       it != inputImage.domain().end(); it++){
-    result.setValue(*it, lShade(vectNormals(*it))); 
+    result.setValue(*it, useSpecular? lSpecular(vectNormals(*it)):lShade(vectNormals(*it))); 
                     
   }
 
