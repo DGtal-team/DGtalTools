@@ -366,7 +366,7 @@ void chooseEstimator
 {
   string nameEstimator = vm[ "estimator" ].as<string>();
   double h = vm["gridstep"].as<double>();
-  typedef ShapeGeometricFunctors::ShapeNormalVectorFunctor<ImplicitShape> NormalFunctor;
+  typedef functors::ShapeGeometricFunctors::ShapeNormalVectorFunctor<ImplicitShape> NormalFunctor;
   typedef TrueDigitalSurfaceLocalEstimator<KSpace, ImplicitShape, NormalFunctor> TrueEstimator;
   TrueEstimator true_estimator;
   true_estimator.attach( shape );
