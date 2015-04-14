@@ -91,7 +91,6 @@ struct LambertianShadindFunctor{
   
   inline
   unsigned int operator()(const TPoint3D &aNormal)  const {
-    //
     int intensity = aNormal.dot(myLightSourceDirection)*std::numeric_limits<typename TImage2D::Value>::max();
     return intensity>0? intensity:0;
   }
@@ -119,8 +118,6 @@ struct SpecularNayarShadindFunctor{
     resu = std::min(resu, 1.0);
     return resu*std::numeric_limits<typename TImage2D::Value>::max();
   }
-
-
 
   TPoint3D  myLightSourceDirection;
   double myKld, myKls, mySigma;
