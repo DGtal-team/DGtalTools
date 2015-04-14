@@ -17,6 +17,7 @@
 	- imgAddNoise: a new tool to add noise (Kanungo's) to a binary 2D object
 	- volAddNoise: a new tool to add noise (Kanungo's) to a binary 3D object
 
+
 	====  Release 0.8 ====
 
 * visualisation/:
