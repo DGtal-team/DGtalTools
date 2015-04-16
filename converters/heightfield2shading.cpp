@@ -34,11 +34,12 @@
 #include "DGtal/images/ImageContainerBySTLVector.h"
 #include "DGtal/io/readers/GenericReader.h"
 #include "DGtal/io/writers/GenericWriter.h"
+#include "DGtal/io/writers/PPMWriter.h"
 #include "DGtal/io/readers/PointListReader.h"
 #include "DGtal/images/ConstImageAdapter.h"
 #include "DGtal/kernel/BasicPointFunctors.h"
 
-
+#include "DGtal/io/colormaps/GrayscaleColorMap.h"
 #include <boost/program_options/options_description.hpp>
 #include <boost/program_options/parsers.hpp>
 #include <boost/program_options/variables_map.hpp>
@@ -179,9 +180,40 @@ struct SpecularNayarShadindFunctorAllDirections{
 
 
 
+
+// Basic Lambertian reflectance model from one light source positiion emeting in all direction.
+template<typename TImage2D, typename TPoint3D >
+struct ImageMapReflectance{
+ 
+  ImageMapReflectance(const std::string  &filename): myImageMap (PPMReader<TImage2D>::importPPM(filename))
+  {
+   
+    myCenterPoint = (myImageMap.domain().upperBound()-myImageMap.domain().lowerBound())/2;
+    myImageRadius = min((myImageMap.domain().upperBound()-myImageMap.domain().lowerBound())[1], (myImageMap.domain().upperBound()-myImageMap.domain().lowerBound())[0])/2;
+  }
+  
+  inline
+  unsigned int operator()(const TPoint3D &aNormal)  const
+  {
+    Z2i::Point p(aNormal[0]*myImageRadius,aNormal[1]*myImageRadius ) ;
+    p += myCenterPoint;
+    if(myImageMap.domain().isInside(p)){
+      return myImageMap(p);
+    }else{
+      return myImageMap(Z2i::Point(0,0,0));
+    }
+  }
+  TImage2D  myImageMap;
+  Z2i::Point  myCenterPoint;
+  unsigned int myImageRadius;
+};
+
+
+
+
 int main( int argc, char** argv )
 {
-  typedef ImageContainerBySTLVector < Z2i::Domain, unsigned char> Image2D;
+  typedef ImageContainerBySTLVector < Z2i::Domain, unsigned int> Image2D;
   typedef ImageContainerBySTLVector < Z2i::Domain, Z3i::RealPoint> Image2DNormals;
   
   // parse command line ----------------------------------------------
@@ -197,7 +229,8 @@ int main( int argc, char** argv )
     ("lz", po::value<double>(), "z light source direction.")
     ("px", po::value<double>(), "x light source position.") 
     ("py", po::value<double>(), "y light source position." )
-    ("pz", po::value<double>(), "z light source position.");
+    ("pz", po::value<double>(), "z light source position.")
+    ("reflectanceMap,r", po::value<std::string>(), "specify a image as reflectance map.") ;
     
   
   bool parseOK=true;
@@ -212,7 +245,7 @@ int main( int argc, char** argv )
   if( !parseOK || vm.count("help")||argc<=1)
     {
       std::cout << "Usage: " << argv[0] << " [input] [output]\n"
-		<< "Render a 2D heightfield image into a shading image. You can choose between lambertian model (diffuse reflectance) and specular model (Nayar reflectance model). You can also choose between a single directional light source (using -l{x,y,z} options) or use light source which emits in all direction (by specifying the light source position with -p{x,y,z} option). "
+		<< "Render a 2D heightfield image into a shading image. You can choose between lambertian model (diffuse reflectance) and specular model (Nayar reflectance model). You can also choose between a single directional light source (using -l{x,y,z} options) or use light source which emits in all direction (by specifying the light source position with -p{x,y,z} option). Another rendering mode is given from a bitmap reflectance map which represents the rendering for a normal vector value (mapped according the x/y coordinates). "
 		<< general_opt << "\n";
       std::cout << "Example:\n"
 		<< "heightfield2shading -i heightfield.pgm -o shading.pgm --lx 0.0 --ly 1.0 --lz 1.0 --importNormal heightfield.pgm.normals -s 0.2 0.8 \n";
@@ -242,7 +275,7 @@ int main( int argc, char** argv )
       pz = vm["pz"].as<double>();  
       usingAllDirectionLightSource = true;
     }
-  else
+  else if (!vm.count("reflectanceMap"))
     {
       trace.error() << "You need to specify either the light source direction or position (if you use a all directions model)." << std::endl;
       exit(0);
@@ -252,6 +285,8 @@ int main( int argc, char** argv )
   LambertianShadindFunctorAllDirections<Image2D, Z3i::RealPoint> lShadePosD (Z3i::RealPoint(px ,py, pz));
   SpecularNayarShadindFunctor<Image2D, Z3i::RealPoint> lSpecular (Z3i::RealPoint(lx,ly,lz), 0, 0, 0);  
   SpecularNayarShadindFunctorAllDirections<Image2D, Z3i::RealPoint> lSpecularPosD (Z3i::RealPoint(px,py,pz), 0, 0, 0);  
+
+  
   bool useSpecular = false;
   if(vm.count("specularModel")){
     std::vector<double> vectParam = vm["specularModel"].as<std::vector<double> > ();
@@ -287,21 +322,46 @@ int main( int argc, char** argv )
   }else{
     computerBasicNormalsFromHeightField(inputImage, vectNormals);
   }
-  for(typename Image2D::Domain::ConstIterator it = inputImage.domain().begin(); 
-      it != inputImage.domain().end(); it++){
-    if(usingAllDirectionLightSource)
-      {
-        result.setValue(*it, useSpecular? lSpecularPosD(vectNormals(*it), *it, inputImage(*it)):
-                                          lShadePosD(vectNormals(*it), *it, inputImage(*it))); 
+  if(vm.count("reflectanceMap"))
+    {
+      ImageMapReflectance<Image2D, Z3i::RealPoint> lMap(vm["reflectanceMap"].as<std::string>());
+      for(typename Image2D::Domain::ConstIterator it = inputImage.domain().begin(); 
+          it != inputImage.domain().end(); it++){
+        if(vm.count("reflectanceMap"))
+          {
+            result.setValue(*it, lMap(vectNormals(*it)));
+            
+          }    
+          
       }
-    else
-      {
-        result.setValue(*it, useSpecular? lSpecular(vectNormals(*it)):lShade(vectNormals(*it))); 
-      }
-    
-  }
+        
+      struct IdColor{
+        Color operator()( const unsigned int & aValue ) const{
+          return DGtal::Color(aValue);
+        }
+      };
+      IdColor id;
+      PPMWriter<Image2D, IdColor  >::exportPPM(outputFilename, result, id);
+    }
 
-  result >> outputFilename;
+  else
+    {
+      for(typename Image2D::Domain::ConstIterator it = inputImage.domain().begin(); 
+          it != inputImage.domain().end(); it++){
+        if(usingAllDirectionLightSource)
+          {
+            result.setValue(*it, useSpecular? lSpecularPosD(vectNormals(*it), *it, inputImage(*it)):
+                            lShadePosD(vectNormals(*it), *it, inputImage(*it))); 
+          }
+        else
+          {
+            result.setValue(*it, useSpecular? lSpecular(vectNormals(*it)):lShade(vectNormals(*it))); 
+          }
+        
+      }
+      result >> outputFilename;
+   }
+  
   return 0;  
 }
 
