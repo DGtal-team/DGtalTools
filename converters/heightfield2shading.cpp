@@ -209,6 +209,12 @@ struct ImageMapReflectance{
 };
 
 
+struct IdColor{
+  Color operator()( const unsigned int & aValue ) const{
+    return DGtal::Color(aValue);
+  }
+};
+
 
 
 int main( int argc, char** argv )
@@ -335,11 +341,6 @@ int main( int argc, char** argv )
           
       }
         
-      struct IdColor{
-        Color operator()( const unsigned int & aValue ) const{
-          return DGtal::Color(aValue);
-        }
-      };
       IdColor id;
       PPMWriter<Image2D, IdColor  >::exportPPM(outputFilename, result, id);
     }
