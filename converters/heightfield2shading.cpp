@@ -82,20 +82,43 @@ importNormals(std::string file, TImageVector &vectorField)
    }
 }
 
-
-// Basic Lambertian reflectance model. 
+// Basic Lambertian reflectance model only based on light source direction. 
 template<typename TImage2D, typename TPoint3D >
 struct LambertianShadindFunctor{
-  LambertianShadindFunctor(const TPoint3D &lightSourceDirection):
-    myLightSourceDirection(lightSourceDirection/lightSourceDirection.norm()){}
+  LambertianShadindFunctor(const TPoint3D &aLightSourceDir ):
+    myLightSourceDirection(aLightSourceDir/aLightSourceDir.norm()){}
   
   inline
-  unsigned int operator()(const TPoint3D &aNormal)  const {
+  unsigned int operator()(const TPoint3D &aNormal)  const
+  {
     int intensity = aNormal.dot(myLightSourceDirection)*std::numeric_limits<typename TImage2D::Value>::max();
     return intensity>0? intensity:0;
-  }
+  } 
   TPoint3D  myLightSourceDirection;
 };
+
+
+// Basic Lambertian reflectance model from one light source positiion emeting in all direction.
+template<typename TImage2D, typename TPoint3D >
+struct LambertianShadindFunctorAllDirections{
+  LambertianShadindFunctorAllDirections(const TPoint3D &aLightSourcePosition ):
+    myLightSourcePosition(aLightSourcePosition){}
+  
+  inline
+  unsigned int operator()(const TPoint3D &aNormal, const Z2i::Point &aPoint, const double h)  const
+  {
+    TPoint3D l;
+    
+    Z3i::RealPoint posL (aPoint[0], aPoint[1], h);
+    l = -posL+myLightSourcePosition;
+    l /= l.norm();
+    int intensity = aNormal.dot(l)*std::numeric_limits<typename TImage2D::Value>::max();
+    return intensity>0? intensity:0;
+  }
+  TPoint3D  myLightSourcePosition;
+};
+
+
 
 
 
@@ -125,6 +148,37 @@ struct SpecularNayarShadindFunctor{
 
 
 
+// Specular reflectance from Nayar model.
+template<typename TImage2D, typename TPoint3D >
+struct SpecularNayarShadindFunctorAllDirections{
+  SpecularNayarShadindFunctorAllDirections(const TPoint3D &lightSourcePosition, const double kld,
+                                           const double kls, const double sigma ):
+    myLightSourcePosition(lightSourcePosition),
+    myKld(kld), myKls(kls), mySigma(sigma){}
+  
+  inline
+  unsigned int operator()(const TPoint3D &aNormal, const Z2i::Point &aPoint, const double h)  const {
+    TPoint3D l;
+    Z3i::RealPoint posL (aPoint[0], aPoint[1], h);
+    l = -posL+myLightSourcePosition;
+    l /= l.norm();
+  
+    double lambertianIntensity = std::max(aNormal.dot(l), 0.0);
+    double alpha = acos(((l+Z3i::RealPoint(0,0,1.0))/2.0).dot(aNormal/aNormal.norm()));
+    double specularIntensity =  exp(-alpha*alpha/(2.0*mySigma));
+    double resu = myKld*lambertianIntensity+myKls*specularIntensity;
+    
+    resu = std::max(resu, 0.0);
+    resu = std::min(resu, 1.0);
+    return resu*std::numeric_limits<typename TImage2D::Value>::max();
+  }
+
+  TPoint3D  myLightSourcePosition;
+  double myKld, myKls, mySigma;
+};
+
+
+
 int main( int argc, char** argv )
 {
   typedef ImageContainerBySTLVector < Z2i::Domain, unsigned char> Image2D;
@@ -140,7 +194,10 @@ int main( int argc, char** argv )
     ("specularModel,s", po::value<std::vector<double> >()->multitoken(), "use specular Nayar model with 3 param Kdiff, Kspec, sigma .") 
     ("lx", po::value<double>(), "x light source direction.") 
     ("ly", po::value<double>(), "y light source direction." )
-    ("lz", po::value<double>(), "z light source direction.");
+    ("lz", po::value<double>(), "z light source direction.")
+    ("px", po::value<double>(), "x light source position.") 
+    ("py", po::value<double>(), "y light source position." )
+    ("pz", po::value<double>(), "z light source position.");
     
   
   bool parseOK=true;
@@ -155,7 +212,7 @@ int main( int argc, char** argv )
   if( !parseOK || vm.count("help")||argc<=1)
     {
       std::cout << "Usage: " << argv[0] << " [input] [output]\n"
-		<< "Render a 2D heightfield image into a shading image."
+		<< "Render a 2D heightfield image into a shading image. You can choose between lambertian model (diffuse reflectance) and specular model (Nayar reflectance model). You can also choose between a single directional light source (using -l{x,y,z} options) or use light source which emits in all direction (by specifying the light source position with -p{x,y,z} option). "
 		<< general_opt << "\n";
       std::cout << "Example:\n"
 		<< "heightfield2shading -i heightfield.pgm -o shading.pgm --lx 0.0 --ly 1.0 --lz 1.0 --importNormal heightfield.pgm.normals -s 0.2 0.8 \n";
@@ -170,11 +227,31 @@ int main( int argc, char** argv )
   
   string inputFilename = vm["input"].as<std::string>();
   string outputFilename = vm["output"].as<std::string>();
-  double lx = vm["lx"].as<double>();
-  double ly = vm["ly"].as<double>();
-  double lz = vm["lz"].as<double>();
+  double lx, ly, lz, px, py, pz;
+  bool usingAllDirectionLightSource = false;
+  if(vm.count("lx") && vm.count("ly") && vm.count("lz"))
+    {
+      lx = vm["lx"].as<double>();
+      ly = vm["ly"].as<double>();
+      lz = vm["lz"].as<double>();
+    }
+  else if(vm.count("px") && vm.count("py") && vm.count("pz"))
+    {
+      px = vm["px"].as<double>();
+      py = vm["py"].as<double>();
+      pz = vm["pz"].as<double>();  
+      usingAllDirectionLightSource = true;
+    }
+  else
+    {
+      trace.error() << "You need to specify either the light source direction or position (if you use a all directions model)." << std::endl;
+      exit(0);
+    }
+
   LambertianShadindFunctor<Image2D, Z3i::RealPoint> lShade (Z3i::RealPoint(lx,ly,lz));
+  LambertianShadindFunctorAllDirections<Image2D, Z3i::RealPoint> lShadePosD (Z3i::RealPoint(px ,py, pz));
   SpecularNayarShadindFunctor<Image2D, Z3i::RealPoint> lSpecular (Z3i::RealPoint(lx,ly,lz), 0, 0, 0);  
+  SpecularNayarShadindFunctorAllDirections<Image2D, Z3i::RealPoint> lSpecularPosD (Z3i::RealPoint(px,py,pz), 0, 0, 0);  
   bool useSpecular = false;
   if(vm.count("specularModel")){
     std::vector<double> vectParam = vm["specularModel"].as<std::vector<double> > ();
@@ -188,6 +265,9 @@ int main( int argc, char** argv )
         lSpecular.myKld = vectParam[0];
         lSpecular.myKls = vectParam[1];
         lSpecular.mySigma = vectParam[2];
+        lSpecularPosD.myKld = vectParam[0];
+        lSpecularPosD.myKls = vectParam[1];
+        lSpecularPosD.mySigma = vectParam[2];
         if(vectParam[2]==0.0)      
           {
             trace.error()<< "a 0 value for sigma is not possible in the Nayar model, please change it. "<< std::endl;
@@ -209,8 +289,16 @@ int main( int argc, char** argv )
   }
   for(typename Image2D::Domain::ConstIterator it = inputImage.domain().begin(); 
       it != inputImage.domain().end(); it++){
-    result.setValue(*it, useSpecular? lSpecular(vectNormals(*it)):lShade(vectNormals(*it))); 
-                    
+    if(usingAllDirectionLightSource)
+      {
+        result.setValue(*it, useSpecular? lSpecularPosD(vectNormals(*it), *it, inputImage(*it)):
+                                          lShadePosD(vectNormals(*it), *it, inputImage(*it))); 
+      }
+    else
+      {
+        result.setValue(*it, useSpecular? lSpecular(vectNormals(*it)):lShade(vectNormals(*it))); 
+      }
+    
   }
 
   result >> outputFilename;
