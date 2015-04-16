@@ -6,6 +6,7 @@
 * visualisation/:
 	- meshViewer: fix to display mesh with colored faces (.off with colors).
 	- 3dCurvatureViewer/Noise: can now be used without QGLViewer if exporting data.
+	- sliceViewer: fix the bug when displaying vol with non 0 origin point.
 
 * volumetric/:
 	- volIntensityScale: a simple tool to apply a linear scale of the intensity given in a volumetric file.
@@ -16,6 +17,7 @@
 	- imgAddNoise: a new tool to add noise (Kanungo's) to a binary 2D object
 	- volAddNoise: a new tool to add noise (Kanungo's) to a binary 3D object
 	- heightfield2shading: a new tool to render a 2D heightfield image into a shading one.
+
 
 	====  Release 0.8 ====
 

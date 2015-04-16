@@ -83,15 +83,15 @@ getImage(const TImage &anImage, double gridSize=1.0 ){
   functors::Identity id;
   ConstImageAdapterForSubSampling  scaledImage (anImage, newDomain, subSampler, id );
 
-  unsigned int height = scaledImage.domain().upperBound()[1]+1;
-  unsigned int width = scaledImage.domain().upperBound()[0]+1;
+  unsigned int height = scaledImage.domain().upperBound()[1]+1-scaledImage.domain().lowerBound()[1];
+  unsigned int width = scaledImage.domain().upperBound()[0]+1-scaledImage.domain().lowerBound()[0];
   uchar * data = new uchar [height*width*4];
   for(unsigned int i=0; i<height; i++){
     for(unsigned int j=0; j<width; j++){
-      data[(j+width*i)*4]=scaledImage(Z2i::Point(j,i));
-      data[(j+width*i)*4+1]=scaledImage(Z2i::Point(j,i));
-      data[(j+width*i)*4+2]=scaledImage(Z2i::Point(j,i));
-      data[(j+width*i)*4+3]=scaledImage(Z2i::Point(j,i));
+      data[(j+width*i)*4]=scaledImage(Z2i::Point(j,i)+scaledImage.domain().lowerBound());
+      data[(j+width*i)*4+1]=scaledImage(Z2i::Point(j,i)+scaledImage.domain().lowerBound());
+      data[(j+width*i)*4+2]=scaledImage(Z2i::Point(j,i)+scaledImage.domain().lowerBound());
+      data[(j+width*i)*4+3]=scaledImage(Z2i::Point(j,i)+scaledImage.domain().lowerBound());
     }
   }
    QImage result(  data, width,  height, QImage::Format_RGB32 );
@@ -122,13 +122,13 @@ MainWindow::MainWindow(DGtal::Viewer3D<> *aViewer,
     QObject::connect(ui->_scale1ButtonY, SIGNAL(clicked()), this, SLOT(setScale1_1_ImageY()));
     QObject::connect(ui->_scale1ButtonZ, SIGNAL(clicked()), this, SLOT(setScale1_1_ImageZ()));
 
-    ui->_horizontalSliderZ->setMinimum(0);
+    ui->_horizontalSliderZ->setMinimum(anImage->domain().lowerBound()[2]);
     ui->_horizontalSliderZ->setMaximum(anImage->domain().upperBound()[2]);
 
-    ui->_horizontalSliderY->setMinimum(0);
+    ui->_horizontalSliderY->setMinimum(anImage->domain().lowerBound()[1]);
     ui->_horizontalSliderY->setMaximum(anImage->domain().upperBound()[1]);
 
-    ui->_horizontalSliderX->setMinimum(0);
+    ui->_horizontalSliderX->setMinimum(anImage->domain().lowerBound()[0]);
     ui->_horizontalSliderX->setMaximum(anImage->domain().upperBound()[0]);
 
     ui->_zoomXSlider->setMinimum( MIN_ZOOM_FACTOR);
@@ -254,7 +254,7 @@ void MainWindow::updateZoomImageZ(unsigned int sliceNumber, double gridSize){
 }
 
 
-void MainWindow::updateSliceImageX(unsigned int sliceNumber, bool init){
+void MainWindow::updateSliceImageX(int sliceNumber, bool init){
   DGtal::functors::Projector<DGtal::Z2i::Space>  invFunctor; invFunctor.initRemoveOneDim(0);
   DGtal::Z2i::Domain domain2D(invFunctor(myImage3D->domain().lowerBound()),
                               invFunctor(myImage3D->domain().upperBound()));
@@ -264,13 +264,17 @@ void MainWindow::updateSliceImageX(unsigned int sliceNumber, bool init){
   double gridSize = ((double)INIT_SCALE1_ZOOM_FACTOR)/ui->_zoomXSlider->value();
   QImage anImage = getImage(sliceImage, gridSize);
   setImageProjX(QPixmap::fromImage(anImage));
+  Z3i::Point imageOrigin = myImage3D->domain().lowerBound();
   if(init){
     (*myViewer) << sliceImage;
-    (*myViewer) << DGtal::UpdateImagePosition< Space, KSpace >(0, DGtal::Viewer3D<>::xDirection, sliceNumber, 0.0, 0.0);
+    (*myViewer) << DGtal::UpdateImagePosition< Space, KSpace >(0, DGtal::Viewer3D<>::xDirection, sliceNumber, 
+                                                               imageOrigin[1], imageOrigin[2]);
     (*myViewer) << Viewer3D<>::updateDisplay;
   }else{
-    (*myViewer) << DGtal::UpdateImageData< SliceImageAdapter > (0, sliceImage, 0,0, 0,0,  DGtal::Viewer3D<>::xDirection);
-    (*myViewer) << DGtal::UpdateImagePosition< Space, KSpace >(0, DGtal::Viewer3D<>::xDirection, sliceNumber, 0.0, 0.0);
+    (*myViewer) << DGtal::UpdateImageData< SliceImageAdapter > (0, sliceImage, 0, 0, 0 ,0,  DGtal::Viewer3D<>::xDirection);
+    (*myViewer) << DGtal::UpdateImagePosition< Space, KSpace >(0, DGtal::Viewer3D<>::xDirection, sliceNumber, imageOrigin[1],
+                                                               imageOrigin[2]);
+
     (*myViewer).updateList(init);
     (*myViewer).update();
   }
@@ -279,7 +283,7 @@ void MainWindow::updateSliceImageX(unsigned int sliceNumber, bool init){
 }
 
 
-void MainWindow::updateSliceImageY(unsigned int sliceNumber, bool init){
+void MainWindow::updateSliceImageY( int sliceNumber, bool init){
 
   DGtal::functors::Projector<DGtal::Z2i::Space>  invFunctor; invFunctor.initRemoveOneDim(1);
   DGtal::Z2i::Domain domain2D(invFunctor(myImage3D->domain().lowerBound()),
@@ -290,13 +294,16 @@ void MainWindow::updateSliceImageY(unsigned int sliceNumber, bool init){
   double gridSize = ((double)INIT_SCALE1_ZOOM_FACTOR)/ui->_zoomYSlider->value();
   QImage anImage = getImage(sliceImage, gridSize);
   setImageProjY(QPixmap::fromImage(anImage));
+  Z3i::Point imageOrigin = myImage3D->domain().lowerBound();
   if(init){
     (*myViewer) << sliceImage;
-    (*myViewer) << DGtal::UpdateImagePosition< Space, KSpace >(1, DGtal::Viewer3D<>::yDirection, 0.0, sliceNumber, 0.0);
+    (*myViewer) << DGtal::UpdateImagePosition< Space, KSpace >(1, DGtal::Viewer3D<>::yDirection, imageOrigin[0], 
+                                                               sliceNumber, imageOrigin[2]);
     (*myViewer) << Viewer3D<>::updateDisplay;
   }else{
     (*myViewer) << DGtal::UpdateImageData< SliceImageAdapter > (1, sliceImage, 0,0, 0, 0,  DGtal::Viewer3D<>::yDirection);
-    (*myViewer) << DGtal::UpdateImagePosition< Space, KSpace >(1, DGtal::Viewer3D<>::yDirection, 0.0, sliceNumber, 0.0);
+    (*myViewer) << DGtal::UpdateImagePosition< Space, KSpace >(1, DGtal::Viewer3D<>::yDirection, imageOrigin[0], 
+                                                               sliceNumber, imageOrigin[2]);
     (*myViewer).updateList(init);
     (*myViewer).update();
   }
@@ -306,7 +313,7 @@ void MainWindow::updateSliceImageY(unsigned int sliceNumber, bool init){
 }
 
 
-void MainWindow::updateSliceImageZ(unsigned int sliceNumber, bool init){
+void MainWindow::updateSliceImageZ(int sliceNumber, bool init){
 
   DGtal::functors::Projector<DGtal::Z2i::Space>  invFunctor; invFunctor.initRemoveOneDim(2);
   DGtal::Z2i::Domain domain2D(invFunctor(myImage3D->domain().lowerBound()),
@@ -316,13 +323,16 @@ void MainWindow::updateSliceImageZ(unsigned int sliceNumber, bool init){
   double gridSize = (double)INIT_SCALE1_ZOOM_FACTOR/ui->_zoomZSlider->value();
   QImage anImage = getImage(sliceImage, gridSize);
   setImageProjZ(QPixmap::fromImage(anImage));
- if(init){
+  Z3i::Point imageOrigin = myImage3D->domain().lowerBound();
+  if(init){
     (*myViewer) << sliceImage;
-    (*myViewer) << DGtal::UpdateImagePosition< Space, KSpace >(2, DGtal::Viewer3D<>::zDirection, 0.0, 0.0, sliceNumber);
+    (*myViewer) << DGtal::UpdateImagePosition< Space, KSpace >(2, DGtal::Viewer3D<>::zDirection, imageOrigin[0], 
+                                                               imageOrigin[1], sliceNumber);
     (*myViewer) << Viewer3D<>::updateDisplay;
   }else{
     (*myViewer) << DGtal::UpdateImageData< SliceImageAdapter > (2, sliceImage, 0,0, 0, 0,  DGtal::Viewer3D<>::zDirection);
-    (*myViewer) << DGtal::UpdateImagePosition< Space, KSpace >(2, DGtal::Viewer3D<>::zDirection, 0.0,  0.0, sliceNumber);
+    (*myViewer) << DGtal::UpdateImagePosition< Space, KSpace >(2, DGtal::Viewer3D<>::zDirection, imageOrigin[0],
+                                                               imageOrigin[1], sliceNumber);
     (*myViewer).updateList(init);
     (*myViewer).update();
  }
