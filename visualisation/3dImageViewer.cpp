@@ -28,7 +28,6 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 #include <iostream>
-#include <QtGui/qapplication.h>
 
 #include "DGtal/base/Common.h"
 #include "DGtal/base/BasicFunctors.h"
@@ -72,17 +71,17 @@ int main( int argc, char** argv )
   typedef DGtal::ImageContainerBySTLVector<DGtal::Z3i::Domain,  unsigned char > Image3D;
   typedef DGtal::ImageContainerBySTLVector<DGtal::Z2i::Domain,  unsigned char > Image2D;
 
-  
+
   // parse command line ----------------------------------------------
   po::options_description general_opt("Allowed options are: ");
   general_opt.add_options()
     ("help,h", "display this message")
     ("input,i", po::value<std::string>(), "vol file (.vol) , pgm3d (.p3d or .pgm3d) file or sdp (sequence of discrete points)" )
-    ("grid", "draw slice images using grid mode. " ) 
-    ("intergrid", "draw slice images using inter grid mode. " ) 
-    ("emptyMode", "remove the default boundingbox display " ) 
-    ("thresholdImage", "threshold the image to define binary shape" ) 
-    ("thresholdMin,m",  po::value<int>()->default_value(0), "threshold min to define binary shape" ) 
+    ("grid", "draw slice images using grid mode. " )
+    ("intergrid", "draw slice images using inter grid mode. " )
+    ("emptyMode", "remove the default boundingbox display " )
+    ("thresholdImage", "threshold the image to define binary shape" )
+    ("thresholdMin,m",  po::value<int>()->default_value(0), "threshold min to define binary shape" )
     ("thresholdMax,M",  po::value<int>()->default_value(255), "threshold max to define binary shape" )
     ("displaySDP,s", po::value<std::string>(), "display a set of discrete points (.sdp)" )
     ("SDPindex", po::value<std::vector <unsigned int> >()->multitoken(), "specify the sdp index (by default 0,1,2).")
@@ -97,36 +96,36 @@ int main( int argc, char** argv )
 #ifdef WITH_ITK
     ("dicomMin", po::value<int>()->default_value(-1000), "set minimum density threshold on Hounsfield scale")
     ("dicomMax", po::value<int>()->default_value(3000), "set maximum density threshold on Hounsfield scale")
-#endif    
-    ("transparency,t",  po::value<uint>()->default_value(255), "transparency") ; 
-  
+#endif
+    ("transparency,t",  po::value<uint>()->default_value(255), "transparency") ;
+
   bool parseOK=true;
   po::variables_map vm;
   try{
-    po::store(po::parse_command_line(argc, argv, general_opt), vm);  
+    po::store(po::parse_command_line(argc, argv, general_opt), vm);
   }catch(const std::exception& ex){
     parseOK=false;
     trace.info()<< "Error checking program options: "<< ex.what()<< endl;
   }
-  po::notify(vm);    
+  po::notify(vm);
   if( !parseOK || vm.count("help")||argc<=1)
     {
       std::cout << "Usage: " << argv[0] << " [input]\n"
-		<< "Display volume file as a voxel set by using QGLviewer"
-		<< general_opt << "\n";
+    << "Display volume file as a voxel set by using QGLviewer"
+    << general_opt << "\n";
       return 0;
     }
-  
+
   if(! vm.count("input"))
     {
-      trace.error() << " The file name was defined" << endl;      
+      trace.error() << " The file name was defined" << endl;
       return 0;
     }
   string inputFilename = vm["input"].as<std::string>();
   int thresholdMin = vm["thresholdMin"].as<int>();
   int thresholdMax = vm["thresholdMax"].as<int>();
   unsigned char transp = vm["transparency"].as<uint>();
- 
+
   QApplication application(argc,argv);
 
   float sx = vm["scaleX"].as<float>();
@@ -151,35 +150,35 @@ int main( int argc, char** argv )
     mode=Viewer3DImage<>::InterGrid;
   else
     mode=Viewer3DImage<>::BoundingBox;
-   
+
   Viewer3DImage<> viewer(mode);
   viewer.setWindowTitle("simple Volume Viewer");
   viewer.show();
-  viewer.setGLScale(sx, sy, sz);  
-  
+  viewer.setGLScale(sx, sy, sz);
+
 #ifdef WITH_ITK
   int dicomMin = vm["dicomMin"].as<int>();
   int dicomMax = vm["dicomMax"].as<int>();
   typedef DGtal::functors::Rescaling<int ,unsigned char > RescalFCT;
-   
-  Image3D image = extension == "dcm" ? DicomReader< Image3D,  RescalFCT  >::importDicom( inputFilename, 
+
+  Image3D image = extension == "dcm" ? DicomReader< Image3D,  RescalFCT  >::importDicom( inputFilename,
                                                                                          RescalFCT(dicomMin,
                                                                                                    dicomMax,
-                                                                                                   0, 255) ) : 
+                                                                                                   0, 255) ) :
     GenericReader<Image3D>::import( inputFilename );
 #else
   Image3D image = GenericReader<Image3D>::import( inputFilename );
 #endif
   Domain domain = image.domain();
-  
+
   trace.info() << "Image loaded: "<<image<< std::endl;
   viewer.setVolImage(&image);
   viewer << Z3i::Point(512, 512, 0);
   // Used to display 3D surface
   Z3i::DigitalSet set3d(domain);
-  
-  
-  
+
+
+
   viewer << Viewer3D<>::updateDisplay;
   if(vm.count("thresholdImage")){
     GradientColorMap<long> gradient( thresholdMin, thresholdMax);
@@ -188,20 +187,20 @@ int main( int argc, char** argv )
     gradient.addColor(Color::Yellow);
     gradient.addColor(Color::Red);
     for(Domain::ConstIterator it = domain.begin(), itend=domain.end(); it!=itend; ++it){
-      unsigned char  val= image( (*it) );           
+      unsigned char  val= image( (*it) );
       Color c= gradient(val);
       if(val<=thresholdMax && val >=thresholdMin){
-	if(!vm.count("displayDigitalSurface")){
+  if(!vm.count("displayDigitalSurface")){
           viewer <<  CustomColors3D(Color((float)(c.red()), (float)(c.green()),(float)(c.blue()), transp),
-                                    Color((float)(c.red()), (float)(c.green()),(float)(c.blue()), transp));     
-          viewer << *it;     
-	}
+                                    Color((float)(c.red()), (float)(c.green()),(float)(c.blue()), transp));
+          viewer << *it;
+  }
       }else{
-	set3d.insert(*it);
-      }     
+  set3d.insert(*it);
+      }
     }
   }
-  
+
   if(vm.count("displaySDP")){
     if(vm.count("colorSDP")){
       std::vector<int> vcol= vm["colorSDP"].as<std::vector<int > >();
@@ -212,12 +211,12 @@ int main( int argc, char** argv )
       Color c(vcol[0], vcol[1], vcol[2], vcol[3]);
       viewer << CustomColors3D(c, c);
     }
-    
+
     vector<Z3i::Point> vectVoxels;
     if(vm.count("SDPindex")) {
       std::vector<unsigned int > vectIndex = vm["SDPindex"].as<std::vector<unsigned int > >();
       if(vectIndex.size()!=3){
-        trace.error() << "you need to specify the three indexes of vertex." << std::endl; 
+        trace.error() << "you need to specify the three indexes of vertex." << std::endl;
         return 0;
       }
       vectVoxels = PointListReader<Z3i::Point>::getPointsFromFile(vm["displaySDP"].as<std::string>(), vectIndex);
@@ -228,11 +227,11 @@ int main( int argc, char** argv )
       if(!vm.count("displayDigitalSurface")){
         viewer << vectVoxels.at(i);
       }else{
-	set3d.insert(vectVoxels.at(i));
+  set3d.insert(vectVoxels.at(i));
       }
     }
   }
-  
+
   if(vm.count("displayMesh")){
     if(vm.count("colorMesh")){
       std::vector<int> vcol= vm["colorMesh"].as<std::vector<int > >();
@@ -243,12 +242,12 @@ int main( int argc, char** argv )
       Color c(vcol[0], vcol[1], vcol[2], vcol[3]);
       viewer.setFillColor(c);
     }
-    
+
     DGtal::Mesh<Z3i::RealPoint> aMesh;
     MeshReader<Z3i::RealPoint>::importOFFFile(vm["displayMesh"].as<std::string>(), aMesh);
     viewer << aMesh;
   }
-  
+
   if(vm.count("displayDigitalSurface")){
     KSpace K;
     Point low = domain.lowerBound(); low[0]=low[0]-1; low[1]=low[1]-1; low[2]=low[2]-1;
@@ -267,26 +266,26 @@ int main( int argc, char** argv )
     gradient.addColor(DGtal::Color::Blue);
     gradient.addColor(DGtal::Color::Magenta);
     gradient.addColor(DGtal::Color::Red);
-        
+
     viewer << DGtal::SetMode3D(vectConnectedSCell.at(0).at(0).className(), "Basic");
     for(unsigned int i= 0; i <vectConnectedSCell.size(); i++){
       for(unsigned int j= 0; j <vectConnectedSCell.at(i).size(); j++){
-	if(vm.count("colorizeCC")){
-	  DGtal::Color c= gradient(i);
-	  viewer << CustomColors3D(Color(250, 0,0, transp), Color(c.red(),
-								  c.green(),
-								  c.blue(), transp));	    
-	}else  if(vm.count("colorSDP")){
-	  std::vector<int> vcol= vm["colorSDP"].as<std::vector<int > >();
-	  Color c(vcol[0], vcol[1], vcol[2], vcol[3]);
-	  viewer << CustomColors3D(c, c);
-	}
+  if(vm.count("colorizeCC")){
+    DGtal::Color c= gradient(i);
+    viewer << CustomColors3D(Color(250, 0,0, transp), Color(c.red(),
+                  c.green(),
+                  c.blue(), transp));
+  }else  if(vm.count("colorSDP")){
+    std::vector<int> vcol= vm["colorSDP"].as<std::vector<int > >();
+    Color c(vcol[0], vcol[1], vcol[2], vcol[3]);
+    viewer << CustomColors3D(c, c);
+  }
 
-	viewer << vectConnectedSCell.at(i).at(j);
+  viewer << vectConnectedSCell.at(i).at(j);
       }
     }
   }
-  
+
   viewer << Viewer3D<>::updateDisplay;
   return application.exec();
 }

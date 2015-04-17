@@ -44,7 +44,6 @@
 #include <boost/program_options/parsers.hpp>
 #include <boost/program_options/variables_map.hpp>
 
-#include <QtGui/qapplication.h>
 #include "DGtal/base/Common.h"
 #include "DGtal/base/Exceptions.h"
 #include "DGtal/kernel/SpaceND.h"
@@ -76,7 +75,7 @@ const double MS3D_LINESIZE = 0.05;
 template <typename Point, typename RealPoint, typename space, typename kspace >
 void displayAxes( Viewer3D<space, kspace> & viewer,
                   const Point & lowerBound, const Point & upperBound,
-		  const std::string & mode )
+      const std::string & mode )
 {
   RealPoint p0( (double)lowerBound[ 0 ]-0.5,
                 (double)lowerBound[ 1 ]-0.5,
@@ -88,54 +87,54 @@ void displayAxes( Viewer3D<space, kspace> & viewer,
     {
       viewer.setLineColor(AXIS_COLOR);
       viewer.addLine( DGtal::Z3i::RealPoint(p0[ 0 ], p0[ 1 ], p0[ 2 ]),
-		      DGtal::Z3i::RealPoint(p1[ 0 ], p0[ 1 ], p0[ 2 ]),  AXIS_LINESIZE );
+          DGtal::Z3i::RealPoint(p1[ 0 ], p0[ 1 ], p0[ 2 ]),  AXIS_LINESIZE );
       viewer.addLine( DGtal::Z3i::RealPoint(p0[ 0 ], p0[ 1 ], p0[ 2 ]),
-		      DGtal::Z3i::RealPoint(p0[ 0 ], p1[ 1 ], p0[ 2 ]),  AXIS_LINESIZE );
+          DGtal::Z3i::RealPoint(p0[ 0 ], p1[ 1 ], p0[ 2 ]),  AXIS_LINESIZE );
       viewer.addLine( DGtal::Z3i::RealPoint(p0[ 0 ], p0[ 1 ], p0[ 2 ]),
-		      DGtal::Z3i::RealPoint(p0[ 0 ], p0[ 1 ], p1[ 2 ]),  AXIS_LINESIZE );
+          DGtal::Z3i::RealPoint(p0[ 0 ], p0[ 1 ], p1[ 2 ]),  AXIS_LINESIZE );
       viewer.addLine( DGtal::Z3i::RealPoint(p1[ 0 ], p0[ 1 ], p0[ 2 ]),
-		      DGtal::Z3i::RealPoint(p1[ 0 ], p1[ 1 ], p0[ 2 ]),  AXIS_LINESIZE );
+          DGtal::Z3i::RealPoint(p1[ 0 ], p1[ 1 ], p0[ 2 ]),  AXIS_LINESIZE );
       viewer.addLine( DGtal::Z3i::RealPoint(p1[ 0 ], p0[ 1 ], p0[ 2 ]),
-		      DGtal::Z3i::RealPoint(p1[ 0 ], p0[ 1 ], p1[ 2 ]),  AXIS_LINESIZE );
+          DGtal::Z3i::RealPoint(p1[ 0 ], p0[ 1 ], p1[ 2 ]),  AXIS_LINESIZE );
       viewer.addLine( DGtal::Z3i::RealPoint(p0[ 0 ], p1[ 1 ], p0[ 2 ]),
-		      DGtal::Z3i::RealPoint(p1[ 0 ], p1[ 1 ], p0[ 2 ]),  AXIS_LINESIZE );
+          DGtal::Z3i::RealPoint(p1[ 0 ], p1[ 1 ], p0[ 2 ]),  AXIS_LINESIZE );
       viewer.addLine( DGtal::Z3i::RealPoint(p0[ 0 ], p1[ 1 ], p0[ 2 ]),
-		      DGtal::Z3i::RealPoint(p0[ 0 ], p1[ 1 ], p1[ 2 ]),  AXIS_LINESIZE );
+          DGtal::Z3i::RealPoint(p0[ 0 ], p1[ 1 ], p1[ 2 ]),  AXIS_LINESIZE );
       viewer.addLine( DGtal::Z3i::RealPoint(p0[ 0 ], p0[ 1 ], p1[ 2 ]),
-		      DGtal::Z3i::RealPoint(p1[ 0 ], p0[ 1 ], p1[ 2 ]),  AXIS_LINESIZE );
+          DGtal::Z3i::RealPoint(p1[ 0 ], p0[ 1 ], p1[ 2 ]),  AXIS_LINESIZE );
       viewer.addLine( DGtal::Z3i::RealPoint(p0[ 0 ], p0[ 1 ], p1[ 2 ]),
-		      DGtal::Z3i::RealPoint(p0[ 0 ], p1[ 1 ], p1[ 2 ]),  AXIS_LINESIZE );
+          DGtal::Z3i::RealPoint(p0[ 0 ], p1[ 1 ], p1[ 2 ]),  AXIS_LINESIZE );
       viewer.addLine( DGtal::Z3i::RealPoint(p1[ 0 ], p1[ 1 ], p0[ 2 ]),
-		      DGtal::Z3i::RealPoint(p1[ 0 ], p1[ 1 ], p1[ 2 ]),  AXIS_LINESIZE );
+          DGtal::Z3i::RealPoint(p1[ 0 ], p1[ 1 ], p1[ 2 ]),  AXIS_LINESIZE );
       viewer.addLine( DGtal::Z3i::RealPoint(p1[ 0 ], p0[ 1 ], p1[ 2 ]),
-		      DGtal::Z3i::RealPoint(p1[ 0 ], p1[ 1 ], p1[ 2 ]),  AXIS_LINESIZE );
+          DGtal::Z3i::RealPoint(p1[ 0 ], p1[ 1 ], p1[ 2 ]),  AXIS_LINESIZE );
       viewer.addLine( DGtal::Z3i::RealPoint(p0[ 0 ], p1[ 1 ], p1[ 2 ]),
-		      DGtal::Z3i::RealPoint(p1[ 0 ], p1[ 1 ], p1[ 2 ]),  AXIS_LINESIZE );
+          DGtal::Z3i::RealPoint(p1[ 0 ], p1[ 1 ], p1[ 2 ]),  AXIS_LINESIZE );
     }
   if ( mode == "COLORED" )
     {
       viewer.setFillColor(XY_COLOR);
       viewer.addQuad(DGtal::Z3i::RealPoint(p1[ 0 ], p1[ 1 ], p1[ 2 ]),
-		     DGtal::Z3i::RealPoint(p1[ 0 ], p0[ 1 ], p1[ 2 ]),
-		     DGtal::Z3i::RealPoint(p0[ 0 ], p0[ 1 ], p1[ 2 ]),
-		     DGtal::Z3i::RealPoint(p0[ 0 ], p1[ 1 ], p1[ 2 ]) );
+         DGtal::Z3i::RealPoint(p1[ 0 ], p0[ 1 ], p1[ 2 ]),
+         DGtal::Z3i::RealPoint(p0[ 0 ], p0[ 1 ], p1[ 2 ]),
+         DGtal::Z3i::RealPoint(p0[ 0 ], p1[ 1 ], p1[ 2 ]) );
       viewer.setFillColor(XZ_COLOR);
       viewer.addQuad(DGtal::Z3i::RealPoint(p1[ 0 ], p1[ 1 ], p1[ 2 ]),
-		     DGtal::Z3i::RealPoint(p0[ 0 ], p1[ 1 ], p1[ 2 ]),
-		     DGtal::Z3i::RealPoint(p0[ 0 ], p1[ 1 ], p0[ 2 ]),
-		     DGtal::Z3i::RealPoint(p1[ 0 ], p1[ 1 ], p0[ 2 ]));
+         DGtal::Z3i::RealPoint(p0[ 0 ], p1[ 1 ], p1[ 2 ]),
+         DGtal::Z3i::RealPoint(p0[ 0 ], p1[ 1 ], p0[ 2 ]),
+         DGtal::Z3i::RealPoint(p1[ 0 ], p1[ 1 ], p0[ 2 ]));
       viewer.setFillColor(YZ_COLOR);
       viewer.addQuad(DGtal::Z3i::RealPoint(p1[ 0 ], p1[ 1 ], p1[ 2 ]),
-		     DGtal::Z3i::RealPoint(p1[ 0 ], p0[ 1 ], p1[ 2 ]),
-		     DGtal::Z3i::RealPoint(p1[ 0 ], p0[ 1 ], p0[ 2 ]),
-		     DGtal::Z3i::RealPoint(p1[ 0 ], p1[ 1 ], p0[ 2 ]));
+         DGtal::Z3i::RealPoint(p1[ 0 ], p0[ 1 ], p1[ 2 ]),
+         DGtal::Z3i::RealPoint(p1[ 0 ], p0[ 1 ], p0[ 2 ]),
+         DGtal::Z3i::RealPoint(p1[ 0 ], p1[ 1 ], p0[ 2 ]));
     }
 }
 
 template <typename KSpace, typename StandardDSS6Computer, typename space, typename kspace >
 void displayDSS3d( Viewer3D<space, kspace> & viewer,
-		   const KSpace & ks, const StandardDSS6Computer & dss3d,
-		   const DGtal::Color & color3d )
+       const KSpace & ks, const StandardDSS6Computer & dss3d,
+       const DGtal::Color & color3d )
 {
   viewer << CustomColors3D( color3d, color3d ) << dss3d;
 }
@@ -150,8 +149,8 @@ void assign( Point1 & p1, const Point2 & p2 )
 
 template <typename KSpace, typename StandardDSS6Computer, typename space, typename kspace >
 void displayDSS3dTangent( Viewer3D<space, kspace> & viewer,
-			  const KSpace & ks, const StandardDSS6Computer & dss3d,
-			  const DGtal::Color & color3d )
+        const KSpace & ks, const StandardDSS6Computer & dss3d,
+        const DGtal::Color & color3d )
 {
   typedef typename StandardDSS6Computer::Point3d Point;
   typedef typename StandardDSS6Computer::PointD3d PointD3d;
@@ -169,15 +168,15 @@ void displayDSS3dTangent( Viewer3D<space, kspace> & viewer,
   PointD3d Q1 = intercept + t1 * direction;
   PointD3d Q2 = intercept + t2 * direction;
   viewer.setLineColor(color3d);
-  viewer.addLine( DGtal::Z3i::RealPoint(Q1[ 0 ]-0.5, Q1[ 1 ]-0.5, Q1[ 2 ]-0.5), 
-		  DGtal::Z3i::RealPoint(Q2[ 0 ]-0.5, Q2[ 1 ]-0.5, Q2[ 2 ]-0.5), 
-		  MS3D_LINESIZE );
+  viewer.addLine( DGtal::Z3i::RealPoint(Q1[ 0 ]-0.5, Q1[ 1 ]-0.5, Q1[ 2 ]-0.5),
+      DGtal::Z3i::RealPoint(Q2[ 0 ]-0.5, Q2[ 1 ]-0.5, Q2[ 2 ]-0.5),
+      MS3D_LINESIZE );
 }
 
 template <typename KSpace, typename StandardDSS6Computer, typename space, typename kspace >
 void displayProj2d( Viewer3D<space, kspace> & viewer,
-		    const KSpace & ks, const StandardDSS6Computer & dss3d,
-		    const DGtal::Color & color2d )
+        const KSpace & ks, const StandardDSS6Computer & dss3d,
+        const DGtal::Color & color2d )
 {
   typedef typename StandardDSS6Computer::ArithmeticalDSSComputer2d ArithmeticalDSSComputer2d;
   typedef typename ArithmeticalDSSComputer2d::ConstIterator ConstIterator2d;
@@ -189,24 +188,24 @@ void displayProj2d( Viewer3D<space, kspace> & viewer,
     {
       const ArithmeticalDSSComputer2d & dss2d = dss3d.arithmeticalDSS2d( i );
       for ( ConstIterator2d itP = dss2d.begin(), itPEnd = dss2d.end(); itP != itPEnd; ++itP )
-	{
-	  Point2d p = *itP;
-	  Point3d q;
-	  switch (i) {
-	  case 0: q = Point3d( 2*b[ i ]  , 2*p[ 0 ]+1, 2*p[ 1 ]+1 ); break;
-	  case 1: q = Point3d( 2*p[ 0 ]+1, 2*b[ i ]  , 2*p[ 1 ]+1 ); break;
-	  case 2: q = Point3d( 2*p[ 0 ]+1, 2*p[ 1 ]+1, 2*b[ i ]   ); break;
-	  }
-	  Cell c = ks.uCell( q );
-	  viewer << CustomColors3D( color2d, color2d ) << c;
-	}
+  {
+    Point2d p = *itP;
+    Point3d q;
+    switch (i) {
+    case 0: q = Point3d( 2*b[ i ]  , 2*p[ 0 ]+1, 2*p[ 1 ]+1 ); break;
+    case 1: q = Point3d( 2*p[ 0 ]+1, 2*b[ i ]  , 2*p[ 1 ]+1 ); break;
+    case 2: q = Point3d( 2*p[ 0 ]+1, 2*p[ 1 ]+1, 2*b[ i ]   ); break;
+    }
+    Cell c = ks.uCell( q );
+    viewer << CustomColors3D( color2d, color2d ) << c;
+  }
     }
 }
 
 template <typename KSpace, typename StandardDSS6Computer, typename space, typename kspace >
 void displayDSS2d( Viewer3D<space, kspace> & viewer,
-		   const KSpace & ks, const StandardDSS6Computer & dss3d,
-		   const DGtal::Color & color2d )
+       const KSpace & ks, const StandardDSS6Computer & dss3d,
+       const DGtal::Color & color2d )
 {
   typedef typename StandardDSS6Computer::ConstIterator ConstIterator3d;
   typedef typename StandardDSS6Computer::ArithmeticalDSSComputer2d ArithmeticalDSSComputer2d;
@@ -219,8 +218,8 @@ void displayDSS2d( Viewer3D<space, kspace> & viewer,
   Point3d b = ks.lowerBound();
   for ( DGtal::Dimension i = 0; i < 3; ++i )
     {
-      const typename ArithmeticalDSSComputer2d::Primitive & dss2d 
-	= dss3d.arithmeticalDSS2d( i ).primitive();
+      const typename ArithmeticalDSSComputer2d::Primitive & dss2d
+  = dss3d.arithmeticalDSS2d( i ).primitive();
       // draw 2D bounding boxes for each arithmetical dss 2D.
       std::vector<PointD2d> pts2d;
       pts2d.push_back( dss2d.project(dss2d.back(), dss2d.Uf()) );
@@ -230,19 +229,19 @@ void displayDSS2d( Viewer3D<space, kspace> & viewer,
       std::vector<PointD3D> bb;
       PointD3D p3;
       for ( unsigned int j = 0; j < pts2d.size(); ++j )
-	{
-	  switch (i) {
-	  case 0: p3.center[0] = (double) b[ i ]-0.5; p3.center[1] = pts2d[ j ][ 0 ];  p3.center[2] = pts2d[ j ][ 1 ]; break;
-	  case 1: p3.center[0] = pts2d[ j ][ 0 ];  p3.center[1] = (double) b[ i ]-0.5; p3.center[2] = pts2d[ j ][ 1 ];     break;
-	  case 2: p3.center[0] = pts2d[ j ][ 0 ];  p3.center[1] = pts2d[ j ][ 1 ];     p3.center[2] = (double) b[ i ]-0.5; break;
-	  }
-	  bb.push_back( p3 );
-	}
+  {
+    switch (i) {
+    case 0: p3.center[0] = (double) b[ i ]-0.5; p3.center[1] = pts2d[ j ][ 0 ];  p3.center[2] = pts2d[ j ][ 1 ]; break;
+    case 1: p3.center[0] = pts2d[ j ][ 0 ];  p3.center[1] = (double) b[ i ]-0.5; p3.center[2] = pts2d[ j ][ 1 ];     break;
+    case 2: p3.center[0] = pts2d[ j ][ 0 ];  p3.center[1] = pts2d[ j ][ 1 ];     p3.center[2] = (double) b[ i ]-0.5; break;
+    }
+    bb.push_back( p3 );
+  }
       for ( unsigned int j = 0; j < pts2d.size(); ++j ){
-	viewer.setLineColor(color2d);
-	viewer.addLine( DGtal::Z3i::RealPoint(bb[ j ].center[0], bb[ j ].center[1], bb[ j ].center[2]),
+  viewer.setLineColor(color2d);
+  viewer.addLine( DGtal::Z3i::RealPoint(bb[ j ].center[0], bb[ j ].center[1], bb[ j ].center[2]),
                         DGtal::Z3i::RealPoint(bb[ (j+1)%4 ].center[0], bb[ (j+1)%4 ].center[1], bb[ (j+1)%4 ].center[2]),
-			MS3D_LINESIZE );
+      MS3D_LINESIZE );
       }
     } // for ( DGtal::Dimension i = 0; i < 3; ++i )
 }
@@ -253,9 +252,9 @@ void displayDSS2d( Viewer3D<space, kspace> & viewer,
  */
 template <typename KSpace, typename PointIterator, typename space, typename kspace >
 bool displayCover( Viewer3D<space, kspace> & viewer,
-		   const KSpace & ks, PointIterator b, PointIterator e,
-		   bool dss3d, bool proj2d, bool dss2d, bool tangent,
-		   int nbColors )
+       const KSpace & ks, PointIterator b, PointIterator e,
+       bool dss3d, bool proj2d, bool dss2d, bool tangent,
+       int nbColors )
 {
   typedef typename PointIterator::value_type Point;
   typedef StandardDSS6Computer<PointIterator,int,4> SegmentComputer;
@@ -353,10 +352,10 @@ int main(int argc, char **argv)
   if( !parseOK || vm.count("help")||argc<=1)
     {
       std::cout << "Usage: " << argv[0] << " [options] input\n"
-		<< "Display a 3D curve given as the <input> filename (with possibly projections and/or tangent information) by using QGLviewer.\n"
-		<< general_opt << "\n\n";
+    << "Display a 3D curve given as the <input> filename (with possibly projections and/or tangent information) by using QGLviewer.\n"
+    << general_opt << "\n\n";
       std::cout << "Example:\n"
-		<< "3dCurveViewer -C -b 1 -3 -2 -c ${DGtal}/examples/samples/sinus.dat\n";
+    << "3dCurveViewer -C -b 1 -3 -2 -c ${DGtal}/examples/samples/sinus.dat\n";
       return 0;
     }
 
@@ -408,16 +407,16 @@ int main(int argc, char **argv)
     displayAxes<Point,RealPoint, Z3i::Space, Z3i::KSpace>( viewer, lowerBound, upperBound, vm[ "viewBox" ].as<std::string>() );
   // Display 3D tangential cover.
   bool res = displayCover( viewer, ks, sequence.begin(), sequence.end(),
-			   vm.count( "cover3d" ),
-			   vm.count( "curve2d" ),
-			   vm.count( "cover2d" ),
-			   vm.count( "tangent" ),
-			   vm["nbColors"].as<int>() );
+         vm.count( "cover3d" ),
+         vm.count( "curve2d" ),
+         vm.count( "cover2d" ),
+         vm.count( "tangent" ),
+         vm["nbColors"].as<int>() );
   // Display 3D curve points.
   if ( vm.count( "curve3d" ) )
     viewer << CustomColors3D( CURVE3D_COLOR, CURVE3D_COLOR )
-	   << gc.getPointsRange()
-	   << sequence.back(); // curiously, last point is not displayed.
+     << gc.getPointsRange()
+     << sequence.back(); // curiously, last point is not displayed.
 
   // ----------------------------------------------------------------------
   // User "interaction".

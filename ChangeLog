@@ -1,10 +1,13 @@
 	====  Release 0.9 ====
 
+* global/:
+  - Qt prog can now handle Qt5
 
 * visualisation/:
 	- meshViewer: fix to display mesh with colored faces (.off with colors).
 	- 3dCurvatureViewer/Noise: can now be used without QGLViewer if exporting data.
 	- 3dImageViewer: now display the current moving axis which was selected and display the slice numbers (can be disabled by key M).
+	- sliceViewer: fix the bug when displaying vol with non 0 origin point.
 
 
 * volumetric/:

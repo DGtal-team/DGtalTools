@@ -31,7 +31,6 @@
 #include <boost/program_options/options_description.hpp>
 #include <boost/program_options/parsers.hpp>
 #include <boost/program_options/variables_map.hpp>
-#include <QtGui/qapplication.h>
 
 #include "DGtal/base/Common.h"
 #include "DGtal/base/BasicFunctors.h"
@@ -131,9 +130,9 @@ int main( int argc, char** argv )
     int dicomMax = vm["dicomMax"].as<int>();
     typedef DGtal::functors::Rescaling<int ,unsigned char > RescalFCT;
     Image image = extension == "dcm" ? DicomReader< Image,  RescalFCT  >::importDicom( inputFilename,
-										       RescalFCT(dicomMin,
-												 dicomMax,
-												 0, 255) ) :
+                           RescalFCT(dicomMin,
+                         dicomMax,
+                         0, 255) ) :
       GenericReader<Image>::import( inputFilename );
 #else
     Image image = GenericReader<Image>::import (inputFilename );
@@ -148,8 +147,8 @@ int main( int argc, char** argv )
     bool space_ok = ks.init( domain.lowerBound(), domain.upperBound(), true );
     if (!space_ok)
       {
-	trace.error() << "Error in the Khamisky space construction."<<std::endl;
-	return 2;
+  trace.error() << "Error in the Khamisky space construction."<<std::endl;
+  return 2;
       }
     trace.endBlock();
     //! [3dVolBoundaryViewer-KSpace]
@@ -169,12 +168,12 @@ int main( int argc, char** argv )
     MySurfelAdjacency surfAdj( true ); // interior in all directions.
     MySetOfSurfels theSetOfSurfels( ks, surfAdj );
     Surfaces<KSpace>::sMakeBoundary( theSetOfSurfels.surfelSet(),
-				     ks, thresholdedImage,
-				     domain.lowerBound(),
-				     domain.upperBound() );
+             ks, thresholdedImage,
+             domain.lowerBound(),
+             domain.upperBound() );
     MyDigitalSurface digSurf( theSetOfSurfels );
     trace.info() << "Digital surface has " << digSurf.size() << " surfels."
-		 << std::endl;
+     << std::endl;
     trace.endBlock();
     //! [3dVolBoundaryViewer-ExtractingSurface]
 
@@ -187,13 +186,13 @@ int main( int argc, char** argv )
     if ( mode == "BDRY" ){
       viewer << SetMode3D(ks.unsigns( *(digSurf.begin()) ).className(), "Basic");
       for ( ConstIterator it = digSurf.begin(), itE = digSurf.end(); it != itE; ++it )
-	viewer << ks.unsigns( *it );
+  viewer << ks.unsigns( *it );
     }else if ( mode == "INNER" )
       for ( ConstIterator it = digSurf.begin(), itE = digSurf.end(); it != itE; ++it )
-	viewer << ks.sCoords( ks.sDirectIncident( *it, ks.sOrthDir( *it ) ) );
+  viewer << ks.sCoords( ks.sDirectIncident( *it, ks.sOrthDir( *it ) ) );
     else if ( mode == "OUTER" )
       for ( ConstIterator it = digSurf.begin(), itE = digSurf.end(); it != itE; ++it )
-	viewer << ks.sCoords( ks.sIndirectIncident( *it, ks.sOrthDir( *it ) ) );
+  viewer << ks.sCoords( ks.sIndirectIncident( *it, ks.sOrthDir( *it ) ) );
     else{
       trace.error() << "Warning display mode (" << mode << ") not implemented." << std::endl;
       trace.error() << "The display will be empty." << std::endl;
