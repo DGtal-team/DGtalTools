@@ -29,30 +29,82 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 #ifndef Q_MOC_RUN 
-   #include "DGtal/io/viewers/Viewer3D.h"
-   #include <DGtal/images/ImageContainerBySTLVector.h>
-   #include "DGtal/helpers/StdDefs.h"
-   #include "DGtal/images/ConstImageAdapter.h"
+#include "DGtal/io/viewers/Viewer3D.h"
+#include <DGtal/images/ImageContainerBySTLVector.h>
+#include "DGtal/helpers/StdDefs.h"
+#include "DGtal/images/ConstImageAdapter.h"
 #endif 
+#include "DGtal/io/colormaps/GradientColorMap.h"
+#include "DGtal/io/colormaps/HueShadeColorMap.h"
+
 
 #include <QMainWindow>
 
 namespace Ui {
-class MainWindow;
+  class MainWindow;
 
 }
 
 class MainWindow : public QMainWindow
 {
   Q_OBJECT
-typedef DGtal::ImageContainerBySTLVector < DGtal::Z3i::Domain, unsigned char > Image3D;
-typedef DGtal::ImageContainerBySTLVector < DGtal::Z2i::Domain, unsigned char > Image2D;
-typedef DGtal::ConstImageAdapter<Image3D, Image2D::Domain, DGtal::functors::Projector< DGtal::Z3i::Space>,
-                                 Image3D::Value,  DGtal::functors::Identity >  SliceImageAdapter;
   
+
 public:
-explicit MainWindow(DGtal::Viewer3D<> *viewer,  DGtal::ImageContainerBySTLVector < DGtal::Z3i::Domain, unsigned char > *myImage3D,
-                      QWidget *parent = 0, Qt::WindowFlags flags=0);
+  enum ColorMapType {Id, GradientMapHot, GradientMapCool,  HueshadeCM};
+
+  struct ColorMapFunctor{
+    ColorMapFunctor (const ColorMapType type): myType(type), hueShade(DGtal::HueShadeColorMap<unsigned char>(0,255)),
+                                               gradShadeCool(DGtal::GradientColorMap<int, DGtal::CMAP_COOL> (0,255)),
+                                               gradShadeHot(DGtal::GradientColorMap<int, DGtal::CMAP_HOT> (0,255))
+                  
+                                             
+    {
+    };
+    inline
+    unsigned int operator() (unsigned char aVal) const
+    {
+      if(myType == ColorMapType::HueshadeCM)
+        {
+          DGtal::Color col = hueShade((unsigned int)aVal);
+          return  (((unsigned int) col.red()) <<  16)| (((unsigned int) col.green()) << 8)|((unsigned int) col.blue());
+        }
+      else
+        if(myType == ColorMapType::GradientMapHot)
+          {
+            DGtal::Color col = gradShadeHot((unsigned int)aVal);
+            return  (((unsigned int) col.red()) <<  16)| (((unsigned int) col.green()) << 8)|((unsigned int) col.blue());
+          }
+      if(myType == ColorMapType::GradientMapCool)
+        {
+          DGtal::Color col = gradShadeCool((unsigned int)aVal);
+          return  (((unsigned int) col.red()) <<  16)| (((unsigned int) col.green()) << 8)|((unsigned int) col.blue());
+        }
+      else
+        {
+          DGtal::Color col = DGtal::Color(aVal);
+          return (((unsigned int) col.red()) <<  16)| (((unsigned int) col.green()) << 8)|((unsigned int) col.blue());
+        }
+    }
+    ColorMapType myType;
+    DGtal::HueShadeColorMap<unsigned char> hueShade;
+    DGtal::GradientColorMap<int, DGtal::CMAP_COOL> gradShadeCool;
+    DGtal::GradientColorMap<int, DGtal::CMAP_HOT> gradShadeHot;
+  
+  };
+
+
+
+  typedef DGtal::ImageContainerBySTLVector < DGtal::Z3i::Domain, unsigned char > Image3D;
+  typedef DGtal::ImageContainerBySTLVector < DGtal::Z2i::Domain, unsigned char > Image2D;
+  typedef DGtal::ConstImageAdapter<Image3D, Image2D::Domain, DGtal::functors::Projector< DGtal::Z3i::Space>,
+                                   Image3D::Value,  DGtal::functors::Identity >  SliceImageAdapter;
+  typedef DGtal::ConstImageAdapter<Image3D, Image2D::Domain, DGtal::functors::Projector< DGtal::Z3i::Space>,
+                                   Image3D::Value, ColorMapFunctor  >  SliceImageAdapterFct;
+    
+public:
+  explicit MainWindow(DGtal::Viewer3D<> *viewer,  DGtal::ImageContainerBySTLVector < DGtal::Z3i::Domain, 
+                      unsigned char > *myImage3D, const ColorMapFunctor &aFunctor, QWidget *parent = 0, Qt::WindowFlags flags=0);
   ~MainWindow();
   void setImageProjX(const QPixmap &aPixMap);
   void setImageProjY(const QPixmap &aPixMap);
@@ -87,6 +139,7 @@ private:
   Ui::MainWindow *ui;
   DGtal::Viewer3D<> *myViewer;  
   Image3D *myImage3D;
+  ColorMapFunctor myColorMap;
 };
 
 #endif // MAINWINDOW_H
