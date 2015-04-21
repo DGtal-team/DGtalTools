@@ -55,8 +55,8 @@ public:
 
   struct ColorMapFunctor{
     ColorMapFunctor (const ColorMapType type): myType(type), hueShade(DGtal::HueShadeColorMap<unsigned char>(0,255)),
-                                               gradShadeCool(DGtal::GradientColorMap<int, DGtal::CMAP_COOL> (0,255)),
-                                               gradShadeHot(DGtal::GradientColorMap<int, DGtal::CMAP_HOT> (0,255))
+                                               gradShadeCool(DGtal::GradientColorMap<unsigned char, DGtal::CMAP_COOL> (0,255)),
+                                               gradShadeHot(DGtal::GradientColorMap<unsigned char, DGtal::CMAP_HOT> (0,255))
                   
                                              
     {
@@ -88,8 +88,8 @@ public:
     }
     ColorMapType myType;
     DGtal::HueShadeColorMap<unsigned char> hueShade;
-    DGtal::GradientColorMap<int, DGtal::CMAP_COOL> gradShadeCool;
-    DGtal::GradientColorMap<int, DGtal::CMAP_HOT> gradShadeHot;
+    DGtal::GradientColorMap<unsigned char, DGtal::CMAP_COOL> gradShadeCool;
+    DGtal::GradientColorMap<unsigned char, DGtal::CMAP_HOT> gradShadeHot;
   
   };
 
