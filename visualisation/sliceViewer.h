@@ -64,27 +64,24 @@ public:
     inline
     unsigned int operator() (unsigned char aVal) const
     {
-      if(myType == ColorMapType::HueshadeCM)
+      DGtal::Color col;
+      if(myType == HueshadeCM)
         {
-          DGtal::Color col = hueShade((unsigned int)aVal);
-          return  (((unsigned int) col.red()) <<  16)| (((unsigned int) col.green()) << 8)|((unsigned int) col.blue());
+           col = hueShade((unsigned int)aVal);
         }
-      else
-        if(myType == ColorMapType::GradientMapHot)
+      else if(myType == GradientMapHot)
           {
-            DGtal::Color col = gradShadeHot((unsigned int)aVal);
-            return  (((unsigned int) col.red()) <<  16)| (((unsigned int) col.green()) << 8)|((unsigned int) col.blue());
+            col = gradShadeHot((unsigned int)aVal);
           }
-      if(myType == ColorMapType::GradientMapCool)
+      else if(myType == GradientMapCool)
         {
-          DGtal::Color col = gradShadeCool((unsigned int)aVal);
-          return  (((unsigned int) col.red()) <<  16)| (((unsigned int) col.green()) << 8)|((unsigned int) col.blue());
+          col = gradShadeCool((unsigned int)aVal);
         }
       else
         {
-          DGtal::Color col = DGtal::Color(aVal);
-          return (((unsigned int) col.red()) <<  16)| (((unsigned int) col.green()) << 8)|((unsigned int) col.blue());
+          col = DGtal::Color(aVal);
         }
+      return  (((unsigned int) col.red()) <<  16)| (((unsigned int) col.green()) << 8)|((unsigned int) col.blue());
     }
     ColorMapType myType;
     DGtal::HueShadeColorMap<unsigned char> hueShade;

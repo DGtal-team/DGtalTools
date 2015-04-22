@@ -423,10 +423,10 @@ int main( int argc, char** argv )
     bool usegh = vm.count("gradHotColorMap");
     bool usegc = vm.count("gradCoolColorMap");
     
-    MainWindow w(viewer, &image, MainWindow::ColorMapFunctor(usehm? MainWindow::ColorMapType::HueshadeCM:
-                                                             usegh? MainWindow::ColorMapType::GradientMapHot:
-                                                             usegc? MainWindow::ColorMapType::GradientMapCool:
-                                                             MainWindow::ColorMapType::Id), 0,0);
+    MainWindow w(viewer, &image, MainWindow::ColorMapFunctor(usehm? MainWindow::HueshadeCM:
+                                                             usegh? MainWindow::GradientMapHot:
+                                                             usegc? MainWindow::GradientMapCool:
+                                                             MainWindow::Id), 0,0);
     w.setWindowTitle ( QString("sliceViewer"));
     w.updateSliceImageX(0, true);
     w.updateSliceImageY(0, true);
