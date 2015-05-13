@@ -893,7 +893,7 @@ int main( int argc, char** argv )
                 << "ie. true estimators, is enabled, whereas the next ones are disabled. "
                 << std::endl
                 << "Below are the different available properties: " << std::endl
-                << "\t - Tangeant" << std::endl
+                << "\t - Tangent" << std::endl
                 << "\t - Curvature" << std::endl
                 << std::endl
                 << "Example: "<<std::endl
