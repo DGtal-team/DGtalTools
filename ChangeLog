@@ -5,7 +5,10 @@
 
 * visualisation/:
 	- meshViewer: fix to display mesh with colored faces (.off with colors).
-	- 3dCurvatureViewer/Noise: can now be used without QGLViewer if exporting data.
+	- 3dCurvatureViewer/Noise: can now be used without QGLViewer if
+	exporting data (Jérémy Levallois).
+	- 3dCurvatureViewer/Noise: can now export II based normal vector
+	field (Jérémy Levallois, David Coeurjolly).
 	- 3dImageViewer: now display the current moving axis which was selected and display the slice numbers (can be disabled by key M).
 	- sliceViewer: fix the bug when displaying vol with non 0 origin point.
 
