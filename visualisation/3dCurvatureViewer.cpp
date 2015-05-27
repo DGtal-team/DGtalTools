@@ -109,8 +109,8 @@ int main( int argc, char** argv )
       ("minImageThreshold,l",  po::value<  int >()->default_value(0), "set the minimal image threshold to define the image object (object defined by the voxel with intensity belonging to ]minImageThreshold, maxImageThreshold ] )." )
       ("maxImageThreshold,u",  po::value<  int >()->default_value(1), "set the minimal image threshold to define the image object (object defined by the voxel with intensity belonging to ]minImageThreshold, maxImageThreshold] )." )
       ("mode,m", po::value< std::string >()->default_value("mean"), "type of output : mean, gaussian, k1, k2, prindir1, prindir2 or normal (default mean)")
-      ("export,e", po::value< std::string >(), "Export the scene to specified OBJ filename." )
-      ("exportDat,E", po::value<std::string>(), "Export resulting curvature (for mean, gaussian, k1 or k2 mode) in a simple data file each line representing a surfel. ")
+      ("exportOBJ,o", po::value< std::string >(), "Export the scene to specified OBJ filename." )
+      ("exportDAT,d", po::value<std::string>(), "Export resulting curvature (for mean, gaussian, k1 or k2 mode) in a simple data file each line representing a surfel. ")
       ("exportOnly", "Used to only export the result without the 3d Visualisation (usefull for scripts)." )
       ("imageScale,s", po::value<std::vector<double> >()->multitoken(), "scaleX, scaleY, scaleZ: re sample the source image according with a grid of size 1.0/scale (usefull to compute curvature on image defined on anisotropic grid). Set by default to 1.0 for the three axis.  ")
       ("normalization,n", "When exporting to OBJ, performs a normalization so that the geometry fits in [-1/2,1/2]^3") ;
@@ -157,8 +157,8 @@ int main( int argc, char** argv )
 #else
   bool enable_visu = !vm.count("exportOnly"); ///<! Default QGLViewer viewer. Disabled if exportOnly is set.
 #endif
-  bool enable_obj = vm.count("export"); ///<! Export to a .obj file.
-  bool enable_dat = vm.count("exportDat"); ///<! Export to a .dat file.
+  bool enable_obj = vm.count("exportOBJ"); ///<! Export to a .obj file.
+  bool enable_dat = vm.count("exportDAT"); ///<! Export to a .dat file.
 
   if( !enable_visu && !enable_obj && !enable_dat )
   {
@@ -199,7 +199,7 @@ int main( int argc, char** argv )
 
   if( enable_obj )
   {
-    export_obj_filename = vm["export"].as< std::string >();
+    export_obj_filename = vm["exportOBJ"].as< std::string >();
     if( export_obj_filename.find(".obj") == std::string::npos )
     {
       std::ostringstream oss;
@@ -211,7 +211,7 @@ int main( int argc, char** argv )
 
   if( enable_dat )
   {
-    export_dat_filename = vm["exportDat"].as<std::string>();
+    export_dat_filename = vm["exportDAT"].as<std::string>();
   }
 
   double re_convolution_kernel = vm["radius"].as< double >();
