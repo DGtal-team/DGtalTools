@@ -1,0 +1,479 @@
+/**
+*  This program is free software: you can redistribute it and/or modify
+*  it under the terms of the GNU Lesser General Public License as
+*  published by the Free Software Foundation, either version 3 of the
+*  License, or  (at your option) any later version.
+*
+*  This program is distributed in the hope that it will be useful,
+*  but WITHOUT ANY WARRANTY; without even the implied warranty of
+*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+*  GNU General Public License for more details.
+*
+*  You should have received a copy of the GNU General Public License
+*  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*
+**/
+
+/**
+* @file 3dCurveTangentEstimator.cpp
+* @ingroup visualisationTools
+* @author Jacques-Olivier Lachaud (\c jacques-olivier.lachaud@univ-savoie.fr )
+* Laboratory of Mathematics (CNRS, UMR 5127), University of Savoie, France
+*
+*
+* @date 2015/06/16
+*
+* This file is part of the DGtal library
+*/
+
+/**
+* Description of 3dCurveTangentEstimator <p>
+*
+* Display a 3D curve given as the <input> filename (with possibly
+* projections and/or tangent information) by using QGLviewer.
+*/
+
+#include <iostream>
+#include <iterator>
+#include <cstdio>
+#include <cmath>
+#include <fstream>
+#include <vector>
+
+#include <boost/program_options/options_description.hpp>
+#include <boost/program_options/parsers.hpp>
+#include <boost/program_options/variables_map.hpp>
+
+#include "DGtal/base/Common.h"
+#include "DGtal/base/Exceptions.h"
+#include "DGtal/kernel/SpaceND.h"
+#include "DGtal/kernel/domains/HyperRectDomain.h"
+#include "DGtal/kernel/BasicPointPredicates.h"
+#include "DGtal/math/linalg/EigenDecomposition.h"
+#include "DGtal/topology/KhalimskySpaceND.h"
+#include "DGtal/geometry/curves/GridCurve.h"
+#include "DGtal/geometry/curves/StandardDSS6Computer.h"
+#include "DGtal/geometry/curves/SaturatedSegmentation.h"
+#include "DGtal/geometry/volumes/distance/ExactPredicateLpSeparableMetric.h"
+#include "DGtal/geometry/volumes/estimation/VoronoiCovarianceMeasure.h"
+#include "DGtal/io/viewers/Viewer3D.h"
+#include "DGtal/io/readers/PointListReader.h"
+#include "DGtal/io/DrawWithDisplay3DModifier.h"
+
+
+using namespace DGtal;
+using namespace std;
+
+const Color  AXIS_COLOR( 0, 0, 0, 255 );
+const double AXIS_LINESIZE = 0.1;
+const Color  XY_COLOR( 0, 0, 255, 50 );
+const Color  XZ_COLOR( 0, 255, 0, 50 );
+const Color  YZ_COLOR( 255, 0, 0, 50 );
+const Color  CURVE3D_COLOR( 100, 100, 140, 128 );
+const Color  CURVE2D_COLOR( 200, 200, 200, 100 );
+const double MS3D_LINESIZE = 0.05;
+
+///////////////////////////////////////////////////////////////////////////////
+// Functions for displaying the tangential cover of a 3D curve.
+///////////////////////////////////////////////////////////////////////////////
+template <typename Point, typename RealPoint, typename space, typename kspace >
+void displayAxes( Viewer3D<space, kspace> & viewer,
+                  const Point & lowerBound, const Point & upperBound,
+                  const std::string & mode )
+{
+  RealPoint p0( (double)lowerBound[ 0 ]-0.5,
+                (double)lowerBound[ 1 ]-0.5,
+                (double)lowerBound[ 2 ]-0.5 );
+  RealPoint p1( (double)upperBound[ 0 ]-0.5,
+                (double)upperBound[ 1 ]-0.5,
+                (double)upperBound[ 2 ]-0.5 );
+  if ( ( mode == "WIRED" ) || ( mode == "COLORED" ) )
+    {
+      viewer.setLineColor(AXIS_COLOR);
+      viewer.addLine( DGtal::Z3i::RealPoint(p0[ 0 ], p0[ 1 ], p0[ 2 ]),
+                      DGtal::Z3i::RealPoint(p1[ 0 ], p0[ 1 ], p0[ 2 ]),  AXIS_LINESIZE );
+      viewer.addLine( DGtal::Z3i::RealPoint(p0[ 0 ], p0[ 1 ], p0[ 2 ]),
+                      DGtal::Z3i::RealPoint(p0[ 0 ], p1[ 1 ], p0[ 2 ]),  AXIS_LINESIZE );
+      viewer.addLine( DGtal::Z3i::RealPoint(p0[ 0 ], p0[ 1 ], p0[ 2 ]),
+                      DGtal::Z3i::RealPoint(p0[ 0 ], p0[ 1 ], p1[ 2 ]),  AXIS_LINESIZE );
+      viewer.addLine( DGtal::Z3i::RealPoint(p1[ 0 ], p0[ 1 ], p0[ 2 ]),
+                      DGtal::Z3i::RealPoint(p1[ 0 ], p1[ 1 ], p0[ 2 ]),  AXIS_LINESIZE );
+      viewer.addLine( DGtal::Z3i::RealPoint(p1[ 0 ], p0[ 1 ], p0[ 2 ]),
+                      DGtal::Z3i::RealPoint(p1[ 0 ], p0[ 1 ], p1[ 2 ]),  AXIS_LINESIZE );
+      viewer.addLine( DGtal::Z3i::RealPoint(p0[ 0 ], p1[ 1 ], p0[ 2 ]),
+                      DGtal::Z3i::RealPoint(p1[ 0 ], p1[ 1 ], p0[ 2 ]),  AXIS_LINESIZE );
+      viewer.addLine( DGtal::Z3i::RealPoint(p0[ 0 ], p1[ 1 ], p0[ 2 ]),
+                      DGtal::Z3i::RealPoint(p0[ 0 ], p1[ 1 ], p1[ 2 ]),  AXIS_LINESIZE );
+      viewer.addLine( DGtal::Z3i::RealPoint(p0[ 0 ], p0[ 1 ], p1[ 2 ]),
+                      DGtal::Z3i::RealPoint(p1[ 0 ], p0[ 1 ], p1[ 2 ]),  AXIS_LINESIZE );
+      viewer.addLine( DGtal::Z3i::RealPoint(p0[ 0 ], p0[ 1 ], p1[ 2 ]),
+                      DGtal::Z3i::RealPoint(p0[ 0 ], p1[ 1 ], p1[ 2 ]),  AXIS_LINESIZE );
+      viewer.addLine( DGtal::Z3i::RealPoint(p1[ 0 ], p1[ 1 ], p0[ 2 ]),
+                      DGtal::Z3i::RealPoint(p1[ 0 ], p1[ 1 ], p1[ 2 ]),  AXIS_LINESIZE );
+      viewer.addLine( DGtal::Z3i::RealPoint(p1[ 0 ], p0[ 1 ], p1[ 2 ]),
+                      DGtal::Z3i::RealPoint(p1[ 0 ], p1[ 1 ], p1[ 2 ]),  AXIS_LINESIZE );
+      viewer.addLine( DGtal::Z3i::RealPoint(p0[ 0 ], p1[ 1 ], p1[ 2 ]),
+                      DGtal::Z3i::RealPoint(p1[ 0 ], p1[ 1 ], p1[ 2 ]),  AXIS_LINESIZE );
+    }
+  if ( mode == "COLORED" )
+    {
+      viewer.setFillColor(XY_COLOR);
+      viewer.addQuad(DGtal::Z3i::RealPoint(p1[ 0 ], p1[ 1 ], p1[ 2 ]),
+                     DGtal::Z3i::RealPoint(p1[ 0 ], p0[ 1 ], p1[ 2 ]),
+                     DGtal::Z3i::RealPoint(p0[ 0 ], p0[ 1 ], p1[ 2 ]),
+                     DGtal::Z3i::RealPoint(p0[ 0 ], p1[ 1 ], p1[ 2 ]) );
+      viewer.setFillColor(XZ_COLOR);
+      viewer.addQuad(DGtal::Z3i::RealPoint(p1[ 0 ], p1[ 1 ], p1[ 2 ]),
+                     DGtal::Z3i::RealPoint(p0[ 0 ], p1[ 1 ], p1[ 2 ]),
+                     DGtal::Z3i::RealPoint(p0[ 0 ], p1[ 1 ], p0[ 2 ]),
+                     DGtal::Z3i::RealPoint(p1[ 0 ], p1[ 1 ], p0[ 2 ]));
+      viewer.setFillColor(YZ_COLOR);
+      viewer.addQuad(DGtal::Z3i::RealPoint(p1[ 0 ], p1[ 1 ], p1[ 2 ]),
+                     DGtal::Z3i::RealPoint(p1[ 0 ], p0[ 1 ], p1[ 2 ]),
+                     DGtal::Z3i::RealPoint(p1[ 0 ], p0[ 1 ], p0[ 2 ]),
+                     DGtal::Z3i::RealPoint(p1[ 0 ], p1[ 1 ], p0[ 2 ]));
+    }
+}
+
+template <typename KSpace, typename StandardDSS6Computer, typename space, typename kspace >
+void displayDSS3d( Viewer3D<space, kspace> & viewer,
+                   const KSpace & ks, const StandardDSS6Computer & dss3d,
+                   const DGtal::Color & color3d )
+{
+  viewer << CustomColors3D( color3d, color3d ) << dss3d;
+}
+
+template <typename Point1, typename Point2>
+void assign( Point1 & p1, const Point2 & p2 )
+{
+  p1[ 0 ] = p2[ 0 ];
+  p1[ 1 ] = p2[ 1 ];
+  p1[ 2 ] = p2[ 2 ];
+}
+
+template <typename KSpace, typename StandardDSS6Computer, typename space, typename kspace >
+void displayDSS3dTangent( Viewer3D<space, kspace> & viewer,
+                          const KSpace & ks, const StandardDSS6Computer & dss3d,
+                          const DGtal::Color & color3d )
+{
+  typedef typename StandardDSS6Computer::Point3d Point;
+  typedef typename StandardDSS6Computer::PointD3d PointD3d;
+  typedef typename Display3D<>::BallD3D PointD3D;
+  Point directionZ3;
+  PointD3d P1, P2, direction, intercept, thickness;
+  dss3d.getParameters( directionZ3, intercept, thickness );
+  assign( direction, directionZ3 );
+  direction /= direction.norm();
+  assign( P1, *dss3d.begin() );
+  assign( P2, *(dss3d.end()-1) );
+  double t1 = (P1 - intercept).dot( direction );
+  double t2 = (P2 - intercept).dot( direction );
+
+  PointD3d Q1 = intercept + t1 * direction;
+  PointD3d Q2 = intercept + t2 * direction;
+  viewer.setLineColor(color3d);
+  viewer.addLine( DGtal::Z3i::RealPoint(Q1[ 0 ]-0.5, Q1[ 1 ]-0.5, Q1[ 2 ]-0.5),
+                  DGtal::Z3i::RealPoint(Q2[ 0 ]-0.5, Q2[ 1 ]-0.5, Q2[ 2 ]-0.5),
+                  MS3D_LINESIZE );
+}
+
+template <typename KSpace, typename StandardDSS6Computer, typename space, typename kspace >
+void displayProj2d( Viewer3D<space, kspace> & viewer,
+                    const KSpace & ks, const StandardDSS6Computer & dss3d,
+                    const DGtal::Color & color2d )
+{
+  typedef typename StandardDSS6Computer::ArithmeticalDSSComputer2d ArithmeticalDSSComputer2d;
+  typedef typename ArithmeticalDSSComputer2d::ConstIterator ConstIterator2d;
+  typedef typename ArithmeticalDSSComputer2d::Point Point2d;
+  typedef typename KSpace::Cell Cell;
+  typedef typename KSpace::Point Point3d;
+  Point3d b = ks.lowerBound();
+  for ( DGtal::Dimension i = 0; i < 3; ++i )
+    {
+      const ArithmeticalDSSComputer2d & dss2d = dss3d.arithmeticalDSS2d( i );
+      for ( ConstIterator2d itP = dss2d.begin(), itPEnd = dss2d.end(); itP != itPEnd; ++itP )
+        {
+          Point2d p = *itP;
+          Point3d q;
+          switch (i) {
+          case 0: q = Point3d( 2*b[ i ]  , 2*p[ 0 ]+1, 2*p[ 1 ]+1 ); break;
+          case 1: q = Point3d( 2*p[ 0 ]+1, 2*b[ i ]  , 2*p[ 1 ]+1 ); break;
+          case 2: q = Point3d( 2*p[ 0 ]+1, 2*p[ 1 ]+1, 2*b[ i ]   ); break;
+          }
+          Cell c = ks.uCell( q );
+          viewer << CustomColors3D( color2d, color2d ) << c;
+        }
+    }
+}
+
+template <typename KSpace, typename StandardDSS6Computer, typename space, typename kspace >
+void displayDSS2d( Viewer3D<space, kspace> & viewer,
+                   const KSpace & ks, const StandardDSS6Computer & dss3d,
+                   const DGtal::Color & color2d )
+{
+  typedef typename StandardDSS6Computer::ConstIterator ConstIterator3d;
+  typedef typename StandardDSS6Computer::ArithmeticalDSSComputer2d ArithmeticalDSSComputer2d;
+  typedef typename ArithmeticalDSSComputer2d::ConstIterator ConstIterator2d;
+  typedef typename ArithmeticalDSSComputer2d::Point Point2d;
+  typedef typename KSpace::Cell Cell;
+  typedef typename KSpace::Point Point3d;
+  typedef DGtal::PointVector<2,double> PointD2d;
+  typedef typename Display3D<>::BallD3D PointD3D;
+  Point3d b = ks.lowerBound();
+  for ( DGtal::Dimension i = 0; i < 3; ++i )
+    {
+      const typename ArithmeticalDSSComputer2d::Primitive & dss2d
+        = dss3d.arithmeticalDSS2d( i ).primitive();
+      // draw 2D bounding boxes for each arithmetical dss 2D.
+      std::vector<PointD2d> pts2d;
+      pts2d.push_back( dss2d.project(dss2d.back(), dss2d.Uf()) );
+      pts2d.push_back( dss2d.project(dss2d.back(), dss2d.Lf()) );
+      pts2d.push_back( dss2d.project(dss2d.front(), dss2d.Lf()) );
+      pts2d.push_back( dss2d.project(dss2d.front(), dss2d.Uf()) );
+      std::vector<PointD3D> bb;
+      PointD3D p3;
+      for ( unsigned int j = 0; j < pts2d.size(); ++j )
+        {
+          switch (i) {
+          case 0: p3.center[0] = (double) b[ i ]-0.5; p3.center[1] = pts2d[ j ][ 0 ];  p3.center[2] = pts2d[ j ][ 1 ]; break;
+          case 1: p3.center[0] = pts2d[ j ][ 0 ];  p3.center[1] = (double) b[ i ]-0.5; p3.center[2] = pts2d[ j ][ 1 ];     break;
+          case 2: p3.center[0] = pts2d[ j ][ 0 ];  p3.center[1] = pts2d[ j ][ 1 ];     p3.center[2] = (double) b[ i ]-0.5; break;
+          }
+          bb.push_back( p3 );
+        }
+      for ( unsigned int j = 0; j < pts2d.size(); ++j ){
+        viewer.setLineColor(color2d);
+        viewer.addLine( DGtal::Z3i::RealPoint(bb[ j ].center[0], bb[ j ].center[1], bb[ j ].center[2]),
+                        DGtal::Z3i::RealPoint(bb[ (j+1)%4 ].center[0], bb[ (j+1)%4 ].center[1], bb[ (j+1)%4 ].center[2]),
+                        MS3D_LINESIZE );
+      }
+    } // for ( DGtal::Dimension i = 0; i < 3; ++i )
+}
+
+/**
+* segmentation test
+*
+*/
+template <typename KSpace, typename PointIterator, typename space, typename kspace >
+bool displayCover( Viewer3D<space, kspace> & viewer,
+                   const KSpace & ks, PointIterator b, PointIterator e,
+                   bool dss3d, bool proj2d, bool dss2d, bool tangent,
+                   int nbColors )
+{
+  typedef typename PointIterator::value_type Point;
+  typedef StandardDSS6Computer<PointIterator,int,8> SegmentComputer;
+  typedef SaturatedSegmentation<SegmentComputer> Decomposition;
+  typedef typename Decomposition::SegmentComputerIterator SegmentComputerIterator;
+  typedef typename SegmentComputer::ArithmeticalDSSComputer2d ArithmeticalDSSComputer2d;
+  SegmentComputer algo;
+  Decomposition theDecomposition(b, e, algo);
+
+  viewer << SetMode3D( algo.className(), "BoundingBox" );
+  HueShadeColorMap<int> cmap_hue( 0, nbColors, 1 );
+
+  unsigned int c = 0;
+  for ( SegmentComputerIterator i = theDecomposition.begin();
+        i != theDecomposition.end(); ++i)
+    {
+      SegmentComputer ms3d(*i);
+      const ArithmeticalDSSComputer2d & dssXY = ms3d.arithmeticalDSS2dXY();
+      const ArithmeticalDSSComputer2d & dssXZ = ms3d.arithmeticalDSS2dXZ();
+      const ArithmeticalDSSComputer2d & dssYZ = ms3d.arithmeticalDSS2dYZ();
+      Point f = *ms3d.begin();
+      Point l = *(ms3d.end() - 1);
+      trace.info() << "- " << c
+                   << " MS3D,"
+                   << " [" << f[ 0 ] << "," << f[ 1 ] << ","<< f[ 2 ] << "]"
+                   << "->[" << l[ 0 ] << "," << l[ 1 ] << ","<< l[ 2 ] << "]"
+                   << ", XY("
+                   << dssXY.a() << "," << dssXY.b() << "," << dssXY.mu()
+                   << "), XZ("
+                   << dssXZ.a() << "," << dssXZ.b() << "," << dssXZ.mu()
+                   << "), YZ("
+                   << dssYZ.a() << "," << dssYZ.b() << "," << dssYZ.mu()
+                   << ")" << std::endl;
+      //trace.info() << ms3d << std::endl;  // information
+
+      Color color = cmap_hue( c );
+      if ( tangent ) displayDSS3dTangent( viewer, ks, ms3d, color );
+      if ( dss3d )   displayDSS3d( viewer, ks, ms3d, color );
+      if ( dss2d )   displayDSS2d( viewer, ks, ms3d, color );
+      if ( proj2d )  displayProj2d( viewer, ks, ms3d, CURVE2D_COLOR );
+      c++;
+    }
+  return true;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+namespace po = boost::program_options;
+
+/**
+Main function.
+
+@param argc the number of parameters given on the line command.
+
+@param argv an array of C-string, such that argv[0] is the name of
+the program, argv[1] the first parameter, etc.
+*/
+int main(int argc, char **argv)
+{
+  using namespace std;
+  using namespace DGtal;
+  typedef SpaceND<3,int>                         Z3;
+  typedef KhalimskySpaceND<3,int>                K3;
+  typedef Z3::Point                              Point;
+  typedef Z3::RealPoint                          RealPoint;
+  typedef Z3::RealVector                         RealVector;
+  typedef ExactPredicateLpSeparableMetric<Z3, 2> Metric; // L2-metric
+  typedef EigenDecomposition<3,double>           LinearAlgebraTool;
+  typedef LinearAlgebraTool::Matrix              Matrix;
+  typedef HyperRectDomain<Z3>                    Domain;
+  typedef VoronoiCovarianceMeasure<Z3,Metric>    VCM;
+  typedef functors::HatPointFunction<Point,double> KernelFunction;
+
+  // specify command line ----------------------------------------------
+  QApplication application(argc,argv); // remove Qt arguments.
+  po::options_description general_opt("Specific allowed options (for Qt options, see Qt official site) are: ");
+  general_opt.add_options()
+    ("help,h", "display this message")
+    ("input,i", po::value<string>(), "the name of the text file containing the list of 3D points (x y z per line)" )
+    ("box,b",  po::value<int>()->default_value( 0 ), "specifies the the tightness of the bounding box around the curve with a given integer displacement <arg> to enlarge it (0 is tight)" )
+    ("viewBox,v",  po::value<string>()->default_value( "WIRED" ), "displays the bounding box, <arg>=WIRED means that only edges are displayed, <arg>=COLORED adds colors for planes (XY is red, XZ green, YZ, blue)." )
+    ("curve3d,C", "displays the 3D curve")
+    ("curve2d,c", "displays the 2D projections of the 3D curve on the bounding box")
+    ("cover3d,3", "displays the 3D tangential cover of the curve" )
+    ("cover2d,2", "displays the 2D projections of the 3D tangential cover of the curve" )
+    ("nbColors,n",  po::value<int>()->default_value( 3 ), "sets the number of successive colors used for displaying 2d and 3d maximal segments (default is 3: red, green, blue)" )
+    ("tangent,t", "displays the tangents to the curve" )
+    ("vcm,V", "displays the VCM tangents to the curve" )
+    ("big-radius,R", po::value<double>()->default_value( 10.0 ), "the radius parameter R in the VCM estimator." )
+    ("small-radius,r", po::value<double>()->default_value( 3.0 ), "the radius parameter r in the VCM estimator." )
+    ;
+  po::positional_options_description pos_opt;
+  pos_opt.add("input", 1);
+
+  // parse command line ----------------------------------------------
+  bool parseOK=true;
+  po::variables_map vm;
+  try {
+    po::command_line_parser clp( argc, argv );
+    clp.options( general_opt ).positional( pos_opt );
+    po::store( clp.run(), vm );
+  } catch( const exception& ex ) {
+    parseOK = false;
+    trace.info() << "Error checking program options: "<< ex.what() << endl;
+  }
+  po::notify( vm );
+  if( !parseOK || vm.count("help")||argc<=1)
+    {
+      cout << "Usage: " << argv[0] << " [options] input\n"
+                << "Display a 3D curve given as the <input> filename (with possibly projections and/or tangent information) by using QGLviewer.\n"
+                << general_opt << "\n\n";
+      cout << "Example:\n"
+                << "3dCurveTangentEstimator -C -b 1 -3 -2 -c ${DGtal}/examples/samples/sinus.dat\n";
+      return 0;
+    }
+
+  // process command line ----------------------------------------------
+  string input = vm["input"].as<string>();
+  int b = vm["box"].as<int>();
+  // Create curve 3D.
+  vector<Point> sequence;
+  fstream inputStream;
+  inputStream.open ( input.c_str(), ios::in);
+  try {
+    sequence = PointListReader<Point>::getPointsFromInputStream( inputStream );
+    if ( sequence.size() == 0) throw IOException();
+  }
+  catch (DGtal::IOException & ioe) {
+    trace.error() << "Size is null." << endl;
+  }
+  inputStream.close();
+
+  // start viewer
+  Viewer3D<> viewer;
+  trace.beginBlock ( "Tool 3dCurveTangentEstimator" );
+
+  // ----------------------------------------------------------------------
+  // Create domain and curve.
+  Point lowerBound = sequence[ 0 ];
+  Point upperBound = sequence[ 0 ];
+  for ( unsigned int j = 1; j < sequence.size(); ++j )
+    {
+      lowerBound = lowerBound.inf( sequence[ j ] );
+      upperBound = upperBound.sup( sequence[ j ] );
+    }
+  lowerBound -= Point::diagonal( b );
+  upperBound += Point::diagonal( b+1 );
+
+  if ( vm.count( "vcm" ) )
+    {
+      // input points of the curve are in sequence vector.
+      const double R = vm["big-radius"].as<double>();
+      trace.info() << "Big radius   R = " << R << endl;
+      const double r = vm["small-radius"].as<double>();;
+      trace.info() << "Small radius r = " << r << endl;
+      
+      Metric l2;
+      VCM vcm( R, ceil( r ), l2, true );
+      vcm.init( sequence.begin(), sequence.end() );
+      Domain domain = vcm.domain();
+      KernelFunction chi( 1.0, r );
+      Matrix vcm_r, evec;
+      RealVector eval;
+      for ( vector<Point>::const_iterator it = sequence.begin(), itE = sequence.end();
+            it != itE; ++it )
+        {
+          // Compute VCM and diagonalize it.
+          vcm_r = vcm.measure( chi, *it );
+          LinearAlgebraTool::getEigenDecomposition( vcm_r, evec, eval );
+          // Display normal
+          RealVector tangent = evec.column( 0 );
+          RealPoint p( (*it)[ 0 ], (*it)[ 1 ], (*it)[ 2 ] ); 
+          viewer.setFillColor( CURVE3D_COLOR );
+          viewer.setLineColor( CURVE3D_COLOR );
+          viewer.addLine( p + 2.0*tangent, p - 2.0*tangent,  5.0 );
+          viewer.addBall( p, 0.125, 8 );
+        }      
+    }
+  K3 ks; ks.init( lowerBound, upperBound, true );
+  GridCurve<K3> gc( ks );
+  try {
+    gc.initFromPointsVector( sequence );
+  } catch (DGtal::ConnectivityException& /*ce*/) {
+    trace.warning() << "ConnectivityException" << endl;
+    //throw ConnectivityException();
+    //return false;
+  }
+
+  // ----------------------------------------------------------------------
+  // Displays everything.
+  viewer.show();
+  // Display axes.
+  if ( vm.count( "viewBox" ) )
+    displayAxes<Point,RealPoint, Z3i::Space, Z3i::KSpace>( viewer, lowerBound, upperBound, vm[ "viewBox" ].as<std::string>() );
+  // Display 3D tangential cover.
+  bool res = displayCover( viewer, ks, sequence.begin(), sequence.end(),
+                           vm.count( "cover3d" ),
+                           vm.count( "curve2d" ),
+                           vm.count( "cover2d" ),
+                           vm.count( "tangent" ),
+                           vm["nbColors"].as<int>() );
+  // Display 3D curve points.
+  if ( vm.count( "curve3d" ) )
+    {
+      viewer << CustomColors3D( CURVE3D_COLOR, CURVE3D_COLOR );
+      for ( vector<Point>::const_iterator it = sequence.begin(), itE = sequence.end();
+            it != itE; ++it )
+        viewer << *it;
+    }
+  // ----------------------------------------------------------------------
+  // User "interaction".
+  viewer << Viewer3D<>::updateDisplay;
+  application.exec();
+  trace.emphase() << ( res ? "Passed." : "Error." ) << endl;
+  trace.endBlock();
+
+  return res ? 0 : 1;
+}
