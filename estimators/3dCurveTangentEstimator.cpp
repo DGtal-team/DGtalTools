@@ -254,14 +254,15 @@ void displayDSS2d( Viewer3D<space, kspace> & viewer,
 * segmentation test
 *
 */
-template <typename KSpace, typename PointIterator, typename space, typename kspace >
+template <typename KSpace, typename PointIterator, typename space, typename kspace,
+          int CONNECTIVITY >
 bool displayCover( Viewer3D<space, kspace> & viewer,
                    const KSpace & ks, PointIterator b, PointIterator e,
                    bool dss3d, bool proj2d, bool dss2d, bool tangent,
                    int nbColors )
 {
   typedef typename PointIterator::value_type Point;
-  typedef StandardDSS6Computer<PointIterator,int,8> SegmentComputer;
+  typedef StandardDSS6Computer<PointIterator,int, CONNECTIVITY> SegmentComputer;
   typedef SaturatedSegmentation<SegmentComputer> Decomposition;
   typedef typename Decomposition::SegmentComputerIterator SegmentComputerIterator;
   typedef typename SegmentComputer::ArithmeticalDSSComputer2d ArithmeticalDSSComputer2d;
@@ -304,6 +305,31 @@ bool displayCover( Viewer3D<space, kspace> & viewer,
   return true;
 }
 
+/**
+* Displays the tangential cover of 6-connected curves (i.e. standard curves).
+*/
+template <typename KSpace, typename PointIterator, typename space, typename kspace>
+bool displayCover6( Viewer3D<space, kspace> & viewer,
+                   const KSpace & ks, PointIterator b, PointIterator e,
+                   bool dss3d, bool proj2d, bool dss2d, bool tangent,
+                   int nbColors )
+{
+  return displayCover<KSpace, PointIterator, space, kspace, 4>( viewer, ks, b, e, dss3d, proj2d, dss2d, tangent, nbColors );
+}
+
+/**
+* Displays the tangential cover of 26-connected curves (i.e. naive
+* curves). Note that is still experimental.
+*/
+template <typename KSpace, typename PointIterator, typename space, typename kspace>
+bool displayCover26( Viewer3D<space, kspace> & viewer,
+                     const KSpace & ks, PointIterator b, PointIterator e,
+                     bool dss3d, bool proj2d, bool dss2d, bool tangent,
+                     int nbColors )
+{
+  return displayCover<KSpace, PointIterator, space, kspace, 8>( viewer, ks, b, e, dss3d, proj2d, dss2d, tangent, nbColors );
+}
+
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace po = boost::program_options;
@@ -337,9 +363,10 @@ int main(int argc, char **argv)
   po::options_description general_opt("Specific allowed options (for Qt options, see Qt official site) are: ");
   general_opt.add_options()
     ("help,h", "display this message")
-    ("input,i", po::value<string>(), "the name of the text file containing the list of 3D points (x y z per line)" )
+    ("input,i", po::value<string>(), "the name of the text file containing the list of 3D points: (x y z) per line." )
     ("box,b",  po::value<int>()->default_value( 0 ), "specifies the the tightness of the bounding box around the curve with a given integer displacement <arg> to enlarge it (0 is tight)" )
     ("viewBox,v",  po::value<string>()->default_value( "WIRED" ), "displays the bounding box, <arg>=WIRED means that only edges are displayed, <arg>=COLORED adds colors for planes (XY is red, XZ green, YZ, blue)." )
+    ("connectivity,T", po::value<string>()->default_value( "6" ), "specifies whether it is a 6-connected curve or a 26-connected curve: arg=6 | 26.")
     ("curve3d,C", "displays the 3D curve")
     ("curve2d,c", "displays the 2D projections of the 3D curve on the bounding box")
     ("cover3d,3", "displays the 3D tangential cover of the curve" )
@@ -349,6 +376,7 @@ int main(int argc, char **argv)
     ("vcm,V", "displays the VCM tangents to the curve" )
     ("big-radius,R", po::value<double>()->default_value( 10.0 ), "the radius parameter R in the VCM estimator." )
     ("small-radius,r", po::value<double>()->default_value( 3.0 ), "the radius parameter r in the VCM estimator." )
+    ("output,o", po::value<string>()->default_value( "3d-curve-tangent-estimations"), "the basename of the output text file which will contain points and tangent vectors: (x y z tx ty tz) per line" )
     ;
   po::positional_options_description pos_opt;
   pos_opt.add("input", 1);
@@ -414,7 +442,11 @@ int main(int argc, char **argv)
       trace.info() << "Big radius   R = " << R << endl;
       const double r = vm["small-radius"].as<double>();;
       trace.info() << "Small radius r = " << r << endl;
-      
+
+      string output = vm["output"].as<string>();
+      fstream outputStream;
+      outputStream.open ( (output + ".vcm").c_str(), ios::out);
+      outputStream << "# VCM estimation R=" << R << " r=" << r << " chi=hat" << endl; 
       Metric l2;
       VCM vcm( R, ceil( r ), l2, true );
       vcm.init( sequence.begin(), sequence.end() );
@@ -435,16 +467,17 @@ int main(int argc, char **argv)
           viewer.setLineColor( CURVE3D_COLOR );
           viewer.addLine( p + 2.0*tangent, p - 2.0*tangent,  5.0 );
           viewer.addBall( p, 0.125, 8 );
+          outputStream << (*it)[0]   << " " << (*it)[1]   << " " << (*it)[2] << " "
+                       << tangent[0] << " " << tangent[1] << " " << tangent[2] << endl;
         }      
+      outputStream.close();
     }
   K3 ks; ks.init( lowerBound, upperBound, true );
   GridCurve<K3> gc( ks );
   try {
     gc.initFromPointsVector( sequence );
   } catch (DGtal::ConnectivityException& /*ce*/) {
-    trace.warning() << "ConnectivityException" << endl;
-    //throw ConnectivityException();
-    //return false;
+    trace.warning() << "[ConnectivityException] GridCurve only accepts a sequence of face adjacent points. Try connectivity=6 instead." << endl;
   }
 
   // ----------------------------------------------------------------------
@@ -454,12 +487,19 @@ int main(int argc, char **argv)
   if ( vm.count( "viewBox" ) )
     displayAxes<Point,RealPoint, Z3i::Space, Z3i::KSpace>( viewer, lowerBound, upperBound, vm[ "viewBox" ].as<std::string>() );
   // Display 3D tangential cover.
-  bool res = displayCover( viewer, ks, sequence.begin(), sequence.end(),
-                           vm.count( "cover3d" ),
-                           vm.count( "curve2d" ),
-                           vm.count( "cover2d" ),
-                           vm.count( "tangent" ),
-                           vm["nbColors"].as<int>() );
+  bool res = vm[ "connectivity" ].as<string>() == "6"
+    ? displayCover6( viewer, ks, sequence.begin(), sequence.end(),
+                    vm.count( "cover3d" ),
+                    vm.count( "curve2d" ),
+                    vm.count( "cover2d" ),
+                    vm.count( "tangent" ),
+                    vm["nbColors"].as<int>() )
+    : displayCover26( viewer, ks, sequence.begin(), sequence.end(),
+                      vm.count( "cover3d" ),
+                      vm.count( "curve2d" ),
+                      vm.count( "cover2d" ),
+                      vm.count( "tangent" ),
+                      vm["nbColors"].as<int>() );
   // Display 3D curve points.
   if ( vm.count( "curve3d" ) )
     {
