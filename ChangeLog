@@ -19,6 +19,9 @@
 	- imgAddNoise: a new tool to add noise (Kanungo's) to a binary 2D object
 	- volAddNoise: a new tool to add noise (Kanungo's) to a binary 3D object
 
+* estimators/:
+	- 3dCurveTangentEstimator: a simple tool to estimate the tangent to a set of points approaching a 3D curve, based on digital Voronoi Covariance Measure.
+
 
 	====  Release 0.8 ====
 
