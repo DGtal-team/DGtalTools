@@ -364,6 +364,7 @@ int main(int argc, char **argv)
   general_opt.add_options()
     ("help,h", "display this message")
     ("input,i", po::value<string>(), "the name of the text file containing the list of 3D points: (x y z) per line." )
+    ("view,V", po::value<string>()->default_value( "OFF" ), "toggles display ON/OFF" )
     ("box,b",  po::value<int>()->default_value( 0 ), "specifies the the tightness of the bounding box around the curve with a given integer displacement <arg> to enlarge it (0 is tight)" )
     ("viewBox,v",  po::value<string>()->default_value( "WIRED" ), "displays the bounding box, <arg>=WIRED means that only edges are displayed, <arg>=COLORED adds colors for planes (XY is red, XZ green, YZ, blue)." )
     ("connectivity,T", po::value<string>()->default_value( "6" ), "specifies whether it is a 6-connected curve or a 26-connected curve: arg=6 | 26.")
@@ -373,7 +374,6 @@ int main(int argc, char **argv)
     ("cover2d,2", "displays the 2D projections of the 3D tangential cover of the curve" )
     ("nbColors,n",  po::value<int>()->default_value( 3 ), "sets the number of successive colors used for displaying 2d and 3d maximal segments (default is 3: red, green, blue)" )
     ("tangent,t", "displays the tangents to the curve" )
-    ("vcm,V", "displays the VCM tangents to the curve" )
     ("big-radius,R", po::value<double>()->default_value( 10.0 ), "the radius parameter R in the VCM estimator." )
     ("small-radius,r", po::value<double>()->default_value( 3.0 ), "the radius parameter r in the VCM estimator." )
     ("output,o", po::value<string>()->default_value( "3d-curve-tangent-estimations"), "the basename of the output text file which will contain points and tangent vectors: (x y z tx ty tz) per line" )
@@ -396,10 +396,12 @@ int main(int argc, char **argv)
   if( !parseOK || vm.count("help")||argc<=1)
     {
       cout << "Usage: " << argv[0] << " [options] input\n"
-                << "Display a 3D curve given as the <input> filename (with possibly projections and/or tangent information) by using QGLviewer.\n"
+                << "This program estimates the tangent vector to a set of 3D integer points, which are supposed to approach a 3D curve. This set of points is given as a list of points in file <input>. The tangent estimator uses the digital Voronoi Covariance Measure. This program can also displays the curve and tangent estimations, and it can also extract maximal digital straight segments (2D and 3D)."
+           << endl
+           << "Note: It is not compulsory for the points to be ordered in sequence, except if you wish to compute maximal digital straight segments. In this case, you can select the connectivity of your curve between 6 (standard) or 26 (naive).\n"
                 << general_opt << "\n\n";
       cout << "Example:\n"
-                << "3dCurveTangentEstimator -C -b 1 -3 -2 -c ${DGtal}/examples/samples/sinus.dat\n";
+                << "3dCurveTangentEstimator -i ${DGtal}/examples/samples/sinus.dat -V ON -c -R 20 -r 3 -T 6\n";
       return 0;
     }
 
@@ -420,6 +422,7 @@ int main(int argc, char **argv)
   inputStream.close();
 
   // start viewer
+  bool view = vm[ "view" ].as<string>() == "ON";
   Viewer3D<> viewer;
   trace.beginBlock ( "Tool 3dCurveTangentEstimator" );
 
@@ -435,43 +438,46 @@ int main(int argc, char **argv)
   lowerBound -= Point::diagonal( b );
   upperBound += Point::diagonal( b+1 );
 
-  if ( vm.count( "vcm" ) )
+  // input points of the curve are in sequence vector.
+  const double R = vm["big-radius"].as<double>();
+  trace.info() << "Big radius   R = " << R << endl;
+  const double r = vm["small-radius"].as<double>();;
+  trace.info() << "Small radius r = " << r << endl;
+  
+  string output = vm["output"].as<string>();
+  fstream outputStream;
+  outputStream.open ( (output + ".vcm").c_str(), ios::out);
+  outputStream << "# VCM estimation R=" << R << " r=" << r << " chi=hat" << endl; 
+  Metric l2;
+  VCM vcm( R, ceil( r ), l2, true );
+  vcm.init( sequence.begin(), sequence.end() );
+  Domain domain = vcm.domain();
+  KernelFunction chi( 1.0, r );
+  Matrix vcm_r, evec;
+  RealVector eval;
+  for ( vector<Point>::const_iterator it = sequence.begin(), itE = sequence.end();
+        it != itE; ++it )
     {
-      // input points of the curve are in sequence vector.
-      const double R = vm["big-radius"].as<double>();
-      trace.info() << "Big radius   R = " << R << endl;
-      const double r = vm["small-radius"].as<double>();;
-      trace.info() << "Small radius r = " << r << endl;
-
-      string output = vm["output"].as<string>();
-      fstream outputStream;
-      outputStream.open ( (output + ".vcm").c_str(), ios::out);
-      outputStream << "# VCM estimation R=" << R << " r=" << r << " chi=hat" << endl; 
-      Metric l2;
-      VCM vcm( R, ceil( r ), l2, true );
-      vcm.init( sequence.begin(), sequence.end() );
-      Domain domain = vcm.domain();
-      KernelFunction chi( 1.0, r );
-      Matrix vcm_r, evec;
-      RealVector eval;
-      for ( vector<Point>::const_iterator it = sequence.begin(), itE = sequence.end();
-            it != itE; ++it )
+      // Compute VCM and diagonalize it.
+      vcm_r = vcm.measure( chi, *it );
+      LinearAlgebraTool::getEigenDecomposition( vcm_r, evec, eval );
+      // Display normal
+      RealVector tangent = evec.column( 0 );
+      RealPoint p( (*it)[ 0 ], (*it)[ 1 ], (*it)[ 2 ] ); 
+      if ( view ) 
         {
-          // Compute VCM and diagonalize it.
-          vcm_r = vcm.measure( chi, *it );
-          LinearAlgebraTool::getEigenDecomposition( vcm_r, evec, eval );
-          // Display normal
-          RealVector tangent = evec.column( 0 );
-          RealPoint p( (*it)[ 0 ], (*it)[ 1 ], (*it)[ 2 ] ); 
-          viewer.setFillColor( CURVE3D_COLOR );
-          viewer.setLineColor( CURVE3D_COLOR );
+          viewer.setFillColor( Color(255,0,0,255) );
+          viewer.setLineColor( Color(255,0,0,255) );
           viewer.addLine( p + 2.0*tangent, p - 2.0*tangent,  5.0 );
+          viewer.setFillColor( Color( 100, 100, 140, 255 ) );
+          viewer.setLineColor( Color( 100, 100, 140, 255 ) );
           viewer.addBall( p, 0.125, 8 );
-          outputStream << (*it)[0]   << " " << (*it)[1]   << " " << (*it)[2] << " "
-                       << tangent[0] << " " << tangent[1] << " " << tangent[2] << endl;
-        }      
-      outputStream.close();
-    }
+        }
+      outputStream << (*it)[0]   << " " << (*it)[1]   << " " << (*it)[2] << " "
+                   << tangent[0] << " " << tangent[1] << " " << tangent[2] << endl;
+    }      
+  outputStream.close();
+
   K3 ks; ks.init( lowerBound, upperBound, true );
   GridCurve<K3> gc( ks );
   try {
@@ -482,36 +488,40 @@ int main(int argc, char **argv)
 
   // ----------------------------------------------------------------------
   // Displays everything.
-  viewer.show();
-  // Display axes.
-  if ( vm.count( "viewBox" ) )
-    displayAxes<Point,RealPoint, Z3i::Space, Z3i::KSpace>( viewer, lowerBound, upperBound, vm[ "viewBox" ].as<std::string>() );
-  // Display 3D tangential cover.
-  bool res = vm[ "connectivity" ].as<string>() == "6"
-    ? displayCover6( viewer, ks, sequence.begin(), sequence.end(),
-                    vm.count( "cover3d" ),
-                    vm.count( "curve2d" ),
-                    vm.count( "cover2d" ),
-                    vm.count( "tangent" ),
-                    vm["nbColors"].as<int>() )
-    : displayCover26( viewer, ks, sequence.begin(), sequence.end(),
-                      vm.count( "cover3d" ),
-                      vm.count( "curve2d" ),
-                      vm.count( "cover2d" ),
-                      vm.count( "tangent" ),
-                      vm["nbColors"].as<int>() );
-  // Display 3D curve points.
-  if ( vm.count( "curve3d" ) )
+  bool res = true;
+  if ( view )
     {
-      viewer << CustomColors3D( CURVE3D_COLOR, CURVE3D_COLOR );
-      for ( vector<Point>::const_iterator it = sequence.begin(), itE = sequence.end();
-            it != itE; ++it )
-        viewer << *it;
+      viewer.show();
+      // Display axes.
+      if ( vm.count( "viewBox" ) )
+        displayAxes<Point,RealPoint, Z3i::Space, Z3i::KSpace>( viewer, lowerBound, upperBound, vm[ "viewBox" ].as<std::string>() );
+      // Display 3D tangential cover.
+      res = vm[ "connectivity" ].as<string>() == "6"
+        ? displayCover6( viewer, ks, sequence.begin(), sequence.end(),
+                         vm.count( "cover3d" ),
+                         vm.count( "curve2d" ),
+                         vm.count( "cover2d" ),
+                         vm.count( "tangent" ),
+                         vm["nbColors"].as<int>() )
+        : displayCover26( viewer, ks, sequence.begin(), sequence.end(),
+                          vm.count( "cover3d" ),
+                          vm.count( "curve2d" ),
+                          vm.count( "cover2d" ),
+                          vm.count( "tangent" ),
+                          vm["nbColors"].as<int>() );
+      // Display 3D curve points.
+      if ( vm.count( "curve3d" ) )
+        {
+          viewer << CustomColors3D( CURVE3D_COLOR, CURVE3D_COLOR );
+          for ( vector<Point>::const_iterator it = sequence.begin(), itE = sequence.end();
+                it != itE; ++it )
+            viewer << *it;
+        }
+      // ----------------------------------------------------------------------
+      // User "interaction".
+      viewer << Viewer3D<>::updateDisplay;
+      application.exec();
     }
-  // ----------------------------------------------------------------------
-  // User "interaction".
-  viewer << Viewer3D<>::updateDisplay;
-  application.exec();
   trace.emphase() << ( res ? "Passed." : "Error." ) << endl;
   trace.endBlock();
 
