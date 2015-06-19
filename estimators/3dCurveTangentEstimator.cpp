@@ -423,8 +423,6 @@ int main(int argc, char **argv)
 
   // start viewer
   bool view = vm[ "view" ].as<string>() == "ON";
-  Viewer3D<> viewer;
-  trace.beginBlock ( "Tool 3dCurveTangentEstimator" );
 
   // ----------------------------------------------------------------------
   // Create domain and curve.
@@ -437,6 +435,9 @@ int main(int argc, char **argv)
     }
   lowerBound -= Point::diagonal( b );
   upperBound += Point::diagonal( b+1 );
+  K3 ks; ks.init( lowerBound, upperBound, true );
+  Viewer3D<Z3,K3> viewer( ks );
+  trace.beginBlock ( "Tool 3dCurveTangentEstimator" );
 
   // input points of the curve are in sequence vector.
   const double R = vm["big-radius"].as<double>();
@@ -478,7 +479,6 @@ int main(int argc, char **argv)
     }      
   outputStream.close();
 
-  K3 ks; ks.init( lowerBound, upperBound, true );
   GridCurve<K3> gc( ks );
   try {
     gc.initFromPointsVector( sequence );
@@ -519,7 +519,7 @@ int main(int argc, char **argv)
         }
       // ----------------------------------------------------------------------
       // User "interaction".
-      viewer << Viewer3D<>::updateDisplay;
+      viewer << Viewer3D<Z3,K3>::updateDisplay;
       application.exec();
     }
   trace.emphase() << ( res ? "Passed." : "Error." ) << endl;
