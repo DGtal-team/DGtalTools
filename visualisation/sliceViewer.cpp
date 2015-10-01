@@ -47,10 +47,11 @@
 #include "sliceViewer.h"
 #include "ui_sliceViewer.h"
 
-
+#ifndef Q_MOC_RUN
 #include <boost/program_options/options_description.hpp>
 #include <boost/program_options/parsers.hpp>
 #include <boost/program_options/variables_map.hpp>
+#endif
 
 using namespace std;
 using namespace DGtal;
