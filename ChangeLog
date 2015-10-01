@@ -21,7 +21,6 @@
 	- heightfield2shading: a new tool to render a 2D heightfield image into a shading one.
 	- mesh2heightfield:  new tool to convert a mesh file into a 2D heightmap (from a normal direction N and from a starting point P).
 
-
 	====  Release 0.8 ====
 
 * visualisation/:
