@@ -18,6 +18,7 @@ SET(DGTAL_TOOLS_SRC
   volBoundary2obj
   vol2heightfield
   heightfield2vol
+  heightfield2shading
   mesh2heightfield)
 
 if( WITH_HDF5 )
@@ -38,7 +39,8 @@ ENDFOREACH(FILE)
 
 if (  WITH_ITK )
   SET(DGTAL_TOOLS_ITK
-    dicom2vol)
+    dicom2vol
+    itk2vol)
   FOREACH(FILE ${DGTAL_TOOLS_ITK})
      add_executable(${FILE} ${FILE})
      target_link_libraries (${FILE} ${DGTAL_LIBRARIES} ${DGtalToolsLibDependencies} )
