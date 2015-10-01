@@ -28,7 +28,7 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 #include <iostream>
-
+#include <sstream>
 #include "DGtal/base/Common.h"
 
 #include "DGtal/io/Display3D.h"
@@ -54,7 +54,7 @@ int main( int argc, char** argv )
   po::options_description general_opt("Allowed options are: ");
   general_opt.add_options()
     ("help,h", "display this message")
-    ("input,i", po::value<std::string>(), "off file (.off), or OFS file (.ofs) " )
+    ("input,i", po::value<std::vector<string> >()->multitoken(), "off files (.off), or OFS file (.ofs) " )
     ("scaleX,x",  po::value<float>()->default_value(1.0), "set the scale value in the X direction (default 1.0)" )
     ("scaleY,y",  po::value<float>()->default_value(1.0), "set the scale value in the Y direction (default 1.0)" )
     ("scaleZ,z",  po:: value<float>()->default_value(1.0), "set the scale value in the Z direction (default 1.0)")
@@ -62,6 +62,7 @@ int main( int argc, char** argv )
     ("customColorMesh",po::value<std::vector<unsigned int> >()->multitoken(), "set the R, G, B, A components of the colors of the mesh faces and eventually the color R, G, B, A of the mesh edge lines (set by default to black). " )
     ("customColorSDP",po::value<std::vector<unsigned int> >()->multitoken(), "set the R, G, B, A components of the colors of the sdp view" )
     ("displaySDP,s", po::value<std::string>(), "Add the display of a set of discrete points as ball of radius 0.5.")
+    ("SDPradius", po::value<double>()->default_value(0.5), "change the ball radius to display a set of discrete points (used with displaySDP option)")
     ("invertNormal,n", "threshold min to define binary shape" )
     ("drawVertex,v", "draw the vertex of the mesh" );
 
@@ -90,7 +91,7 @@ int main( int argc, char** argv )
 
 
 
-  string inputFilename = vm["input"].as<std::string>();
+  std::vector<std::string> inputFilenameVect = vm["input"].as<std::vector<std::string > >();
   float sx = vm["scaleX"].as<float>();
   float sy = vm["scaleY"].as<float>();
   float sz = vm["scaleZ"].as<float>();
@@ -147,19 +148,28 @@ int main( int argc, char** argv )
 
   QApplication application(argc,argv);
   Viewer3D<> viewer;
-  viewer.setWindowTitle("simple Volume Viewer");
+  std::stringstream title; 
+  title  << "Simple Mesh Viewer: " << inputFilenameVect[0];
+  viewer.setWindowTitle(title.str().c_str());
   viewer.show();
   viewer.myGLLineMinWidth = lineWidth;
   viewer.setGLScale(sx, sy, sz);
   bool invertNormal= vm.count("invertNormal");
 
 
-
+  double ballRadius = vm["SDPradius"].as<double>();
 
   trace.info() << "Importing mesh... ";
 
-  Mesh<DGtal::Z3i::RealPoint> anImportedMesh(!vm.count("customColorMesh"));
-  bool import = anImportedMesh << inputFilename;
+  std::vector<Mesh<DGtal::Z3i::RealPoint> >  vectMesh;
+  for(unsigned int i = 0; i< inputFilenameVect.size(); i++){
+    Mesh<DGtal::Z3i::RealPoint> aMesh(!vm.count("customColorMesh"));
+    aMesh << inputFilenameVect[i];
+    vectMesh.push_back(aMesh);
+  }
+  
+  
+  bool import = vectMesh.size()==inputFilenameVect.size();
   if(!import){
     trace.info() << "File import failed. " << std::endl;
     return 0;
@@ -173,23 +183,30 @@ int main( int argc, char** argv )
     viewer << CustomColors3D(Color(sdpColorR, sdpColorG, sdpColorB, sdpColorA),
                              Color(sdpColorR, sdpColorG, sdpColorB, sdpColorA));
     for(unsigned int i=0;i< vectPoints.size(); i++){
-      viewer.addBall(vectPoints.at(i), 0.5);
+      viewer.addBall(vectPoints.at(i), ballRadius);
     }
   }
   if(invertNormal){
-    anImportedMesh.invertVertexFaceOrder();
+     for(unsigned int i=0; i<vectMesh.size(); i++){
+       vectMesh[i].invertVertexFaceOrder();
+     }
   }
 
   viewer << CustomColors3D(Color(meshColorRLine, meshColorGLine, meshColorBLine, meshColorALine),
                            Color(meshColorR, meshColorG, meshColorB, meshColorA));
-  viewer << anImportedMesh;
+  for(unsigned int i=0; i<vectMesh.size(); i++){
+    viewer << vectMesh[i];
+  }
 
   if(vm.count("drawVertex")){
-    for( Mesh<DGtal::Z3i::RealPoint>::VertexStorage::const_iterator it = anImportedMesh.vertexBegin();
-     it!=anImportedMesh.vertexEnd(); ++it){
-      DGtal::Z3i::Point pt;
-      pt[0]=(*it)[0]; pt[1]=(*it)[1]; pt[2]=(*it)[2];
-      viewer << pt;
+    for(unsigned int i=0; i<vectMesh.size(); i++){
+      
+      for( Mesh<DGtal::Z3i::RealPoint>::VertexStorage::const_iterator it = vectMesh[i].vertexBegin();
+           it!=vectMesh[i].vertexEnd(); ++it){
+        DGtal::Z3i::Point pt;
+        pt[0]=(*it)[0]; pt[1]=(*it)[1]; pt[2]=(*it)[2];
+        viewer << pt;
+      }
     }
   }
 

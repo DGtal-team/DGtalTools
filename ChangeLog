@@ -8,6 +8,7 @@
 	- 3dCurvatureViewer/Noise: can now be used without QGLViewer if exporting data.
 	- 3dImageViewer: now display the current moving axis which was selected and display the slice numbers (can be disabled by key M).
 	- sliceViewer: fix the bug when displaying vol with non 0 origin point.
+	- itk2vol: convert any image of itk format (mhd, mha, ...) to vol (available with the itk option in DGtal).
 	- sliceViewer: can now display 3d image with predefined color map (hue, gradient).
 
 * volumetric/:
@@ -18,6 +19,7 @@
 	- heightfield2vol: a new tool to transform 2D heightmap into volumetric file.
 	- imgAddNoise: a new tool to add noise (Kanungo's) to a binary 2D object
 	- volAddNoise: a new tool to add noise (Kanungo's) to a binary 3D object
+	- heightfield2shading: a new tool to render a 2D heightfield image into a shading one.
 
 
 	====  Release 0.8 ====

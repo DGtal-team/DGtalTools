@@ -58,6 +58,7 @@ Utilities to convert various simple file formats:
   - heightfield2vol: a new tool to transform 2D heightmap into volumetric file.
   - img2freeman: to extract a freeman chain contour from a grayscale image.
   - imgAddNoise: a new tool to add noise (Kanungo's) to a binary 2D object.
+  - itk2vol: convert any image of itk format (mhd, mha, ...) to vol (available with the itk option in DGtal).
   - longvol2vol: convert longvol to vol file using different conversion policies.  
   - ofs2off: convert OFS mesh format towards a OFF variant.
   - raw2HDF5: convert raw image to HDF5.
