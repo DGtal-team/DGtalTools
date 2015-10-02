@@ -30,12 +30,12 @@
 #define MAINWINDOW_H
 #ifndef Q_MOC_RUN 
 #include "DGtal/io/viewers/Viewer3D.h"
-#include <DGtal/images/ImageContainerBySTLVector.h>
+#include "DGtal/images/ImageContainerBySTLVector.h"
 #include "DGtal/helpers/StdDefs.h"
 #include "DGtal/images/ConstImageAdapter.h"
-#endif 
 #include "DGtal/io/colormaps/GradientColorMap.h"
 #include "DGtal/io/colormaps/HueShadeColorMap.h"
+#endif 
 
 
 #include <QMainWindow>
