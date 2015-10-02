@@ -80,7 +80,7 @@ getImage(const TImage &anImage, double gridSize, const MainWindow::ColorMapFunct
   std::vector<double> scales;
   scales.push_back(gridSize);
   scales.push_back(gridSize);
-
+  
   functors::BasicDomainSubSampler<typename TImage::Domain,unsigned  int, double> subSampler (anImage.domain(),
                                                                                              scales, Z2i::Point(0,0));
   typename TImage::Domain newDomain = subSampler.getSubSampledDomain();
@@ -121,6 +121,11 @@ MainWindow::MainWindow(DGtal::Viewer3D<> *aViewer,
   QObject::connect(ui->_scale1ButtonY, SIGNAL(clicked()), this, SLOT(setScale1_1_ImageY()));
   QObject::connect(ui->_scale1ButtonZ, SIGNAL(clicked()), this, SLOT(setScale1_1_ImageZ()));
 
+  QObject::connect(ui->_CoolButton, SIGNAL(clicked()), this, SLOT(changeCoolColorMap()));
+  QObject::connect(ui->_HotButton, SIGNAL(clicked()), this, SLOT(changeHotColorMap()));
+  QObject::connect(ui->_HueButton, SIGNAL(clicked()), this, SLOT(changeHueColorMap()));
+  QObject::connect(ui->_NormalButton, SIGNAL(clicked()), this, SLOT(changeNormalColorMap()));
+
   ui->_horizontalSliderZ->setMinimum(anImage->domain().lowerBound()[2]);
   ui->_horizontalSliderZ->setMaximum(anImage->domain().upperBound()[2]);
 
@@ -150,6 +155,30 @@ MainWindow::~MainWindow()
 {
   delete ui;
 }
+
+void MainWindow::updateAllDisplayedImages(){
+  updateSliceImageX();
+  updateSliceImageY();
+  updateSliceImageZ();
+}  
+void MainWindow::changeNormalColorMap(){
+  myColorMap = MainWindow::Id ; 
+  updateAllDisplayedImages();
+}
+
+void MainWindow::changeCoolColorMap(){
+  myColorMap = MainWindow::GradientMapCool; 
+  updateAllDisplayedImages();
+}
+void MainWindow::changeHueColorMap(){
+  myColorMap = MainWindow::HueshadeCM;
+  updateAllDisplayedImages();
+}
+void MainWindow::changeHotColorMap(){
+  myColorMap = MainWindow::GradientMapHot;
+  updateAllDisplayedImages();
+}
+
 
 void MainWindow::setImageProjX(const QPixmap &aPixMap){
   ui->ImageProjX->setPixmap(aPixMap);

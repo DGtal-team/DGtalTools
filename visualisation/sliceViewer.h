@@ -115,8 +115,8 @@ public:
   void updateZoomImageX(unsigned int sliceNumber, double gridSize);
   void updateZoomImageY(unsigned int sliceNumber, double gridSize);
   void updateZoomImageZ(unsigned int sliceNumber, double gridSize);
-
-
+  void updateAllDisplayedImages();                                                                 
+                                                                  
 
 public slots:
   void updateSliceImageX();
@@ -131,7 +131,13 @@ public slots:
   void setScale1_1_ImageY();
   void setScale1_1_ImageZ();
 
+  void changeNormalColorMap();
+  void changeCoolColorMap();
+  void changeHueColorMap();
+  void changeHotColorMap();
   
+
+
 private:
   Ui::MainWindow *ui;
   DGtal::Viewer3D<> *myViewer;  
