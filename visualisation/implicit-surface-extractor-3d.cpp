@@ -33,6 +33,7 @@
 #include <boost/program_options/options_description.hpp>
 #include <boost/program_options/parsers.hpp>
 #include <boost/program_options/variables_map.hpp>
+//#include <boost/unordered_map.hpp>
 
 #include "DGtal/base/Common.h"
 #include "DGtal/base/CountedPtr.h"
@@ -284,7 +285,7 @@ getCellsWithinBounds( CellOutputIterator itBdry, CellOutputIterator itInner,
           if ( ( kLow.inf( kCell ) == kLow ) && ( kUp.sup( kCell ) == kUp ) )
             { // Inside or on boundary.
               bool bdry = false;
-              for ( Dimension j = 0; j < Point::dimension - 1; ++j )
+              for ( Dimension j = 0; j < Point::dimension; ++j )
                 {
                   if ( ( kCell[ j ] == kLow[ j ] ) || ( kCell[ j ] == kUp[ j ] ) )
                     {
@@ -377,31 +378,82 @@ RealPoint projectNewton( const ImplicitSurface & is,
 }
 
 
-template <typename CubicalComplex4, typename ImplicitShape4, 
-          typename ImplicitDigitalShape4, typename ImplicitShape3>
+template <typename CubicalComplex3, typename ImplicitShape3, 
+          typename ImplicitDigitalShape3>
 void projectComplex( std::vector< typename ImplicitShape3::RealPoint >& points,
-                     const CubicalComplex4& complex4,
-                     const ImplicitShape4& shape,
-                     const ImplicitDigitalShape4& dshape,
-                     const ImplicitShape3& shape3,
+                     const CubicalComplex3& complex3,
+                     const ImplicitShape3& shape,
+                     const ImplicitDigitalShape3& dshape,
                      double epsilon,
-                     unsigned int max_iter )
+                     unsigned int max_iter, 
+                     double max_distance )
 {
-  typedef typename CubicalComplex4::Cell     Cell4;
-  typedef typename CubicalComplex4::Point    Point4;
-  typedef typename CubicalComplex4::CellMapConstIterator CellMapConstIterator;
-  typedef typename ImplicitShape4::RealPoint RealPoint4;
-  typedef typename ImplicitShape4::Ring      Ring;
+  typedef typename CubicalComplex3::Cell     Cell3;
+  typedef typename CubicalComplex3::Point    Point3;
+  typedef typename CubicalComplex3::CellMapConstIterator CellMapConstIterator;
   typedef typename ImplicitShape3::RealPoint RealPoint3;
+  typedef typename ImplicitShape3::Ring      Ring;
   points.clear();
-  for ( CellMapConstIterator it = complex4.begin( 0 ), itE = complex4.end( 0 ); it != itE; ++it )
+  for ( CellMapConstIterator it = complex3.begin( 0 ), itE = complex3.end( 0 ); it != itE; ++it )
     {
-      Cell4 cell    = it->first;
-      Point4 dp     = complex4.space().uCoords( cell );
-      RealPoint4 p  = dshape->embed( dp );
-      RealPoint3 p3 = RealPoint3( p[ 0 ], p[ 1 ], p[ 2 ] );
-      RealPoint3 q  = projectNewton( shape3, p3, epsilon, max_iter );
+      Cell3 cell    = it->first;
+      Point3 dp     = complex3.space().uKCoords( cell ) - Point3::diagonal( 1 );
+      RealPoint3 p  = dshape->embed( dp ) / 2.0;
+      RealPoint3 q  = projectNewton( shape, p, epsilon, max_iter );
+      double     d  = (p-q).norm();
+      if ( d > max_distance ) q = p + (q-p)*( max_distance / d );
       points.push_back( q );
+    }
+}
+
+template <typename CubicalComplex3, typename ImplicitShape3, 
+          typename ImplicitDigitalShape3>
+typename ImplicitShape3::Ring
+getValue( const CubicalComplex3& complex3,
+          const typename CubicalComplex3::Cell& cell,
+          const ImplicitShape3& shape,
+          const ImplicitDigitalShape3& dshape )
+{
+  typedef typename CubicalComplex3::Cell     Cell3;
+  typedef typename CubicalComplex3::Cells    Cells3;
+  typedef typename CubicalComplex3::Point    Point3;
+  typedef typename ImplicitShape3::RealPoint RealPoint3;
+  typedef typename ImplicitShape3::Ring      Ring;
+
+  Point3 dp    = complex3.space().uKCoords( cell ) - Point3::diagonal( 1 );
+  RealPoint3 p = dshape->embed( dp ) / 2.0;
+  Ring v       = shape( p );
+  // Cells3 bdry = complex3.cellBoundary( cell, true );
+  // for ( typename Cells3::const_iterator it = bdry.begin(), itE = bdry.end(); it != itE; ++it )
+  //   {
+  //     dp      = complex3.space().uKCoords( *it );
+  //     p       = dshape->embed( dp ) / 2.0;
+  //     Ring v2 = shape( p );
+  //     if ( abs( v2 ) < abs( v ) ) v = v2;
+  //   }
+  return v;
+}
+
+
+template <typename CubicalComplex3, typename ImplicitShape3, 
+          typename ImplicitDigitalShape3>
+void doNotProjectComplex( std::vector< typename ImplicitShape3::RealPoint >& points,
+                          const CubicalComplex3& complex3,
+                          const ImplicitShape3& shape,
+                          const ImplicitDigitalShape3& dshape )
+{
+  typedef typename CubicalComplex3::Cell     Cell3;
+  typedef typename CubicalComplex3::Point    Point3;
+  typedef typename CubicalComplex3::CellMapConstIterator CellMapConstIterator;
+  typedef typename ImplicitShape3::RealPoint RealPoint3;
+  typedef typename ImplicitShape3::Ring      Ring;
+  points.clear();
+  for ( CellMapConstIterator it = complex3.begin( 0 ), itE = complex3.end( 0 ); it != itE; ++it )
+    {
+      Cell3 cell    = it->first;
+      Point3 dp     = complex3.space().uKCoords( cell );
+      RealPoint3 p  = dshape->embed( dp ) / 2.0;
+      points.push_back( p );
     }
 }
 
@@ -414,31 +466,22 @@ int main( int argc, char** argv )
   typedef KhalimskySpaceND<3,Integer>       KSpace3;
   typedef KSpace3::Cell                     Cell3;
   typedef std::map<Cell3, CubicalCellData>  Map3;
+  // typedef boost::unordered_map<Cell3, CubicalCellData>  Map3;
   typedef CubicalComplex< KSpace3, Map3 >   CC3;
   typedef Space3::Point                     Point3;
   typedef Space3::RealPoint                 RealPoint3;
+  typedef Space3::RealVector                RealVector3;
   typedef RealPoint3::Coordinate            Ring;
   typedef Ring                              Scalar;
   typedef MPolynomial<3, Ring>              Polynomial3;
   typedef MPolynomialReader<3, Ring>        Polynomial3Reader;
   typedef ImplicitPolynomial3Shape<Space3>  ImplicitShape3;
-  typedef SpaceND<4,Integer>                Space4;
-  typedef KhalimskySpaceND<4,Integer>       KSpace4;
-  typedef KSpace4::Cell                     Cell4;
-  typedef KSpace4::SCell                    SCell4;
-  typedef Space4::Point                     Point4;
-  typedef Space4::RealPoint                 RealPoint4;
-  typedef Space4::RealVector                RealVector4;
-  typedef ImplicitSurface4DExtension<Space3,Space4,Polynomial3>
-                                            ImplicitShape4;
-  typedef GaussDigitizer< Space4, ImplicitShape4 > 
-                                            ImplicitDigitalShape4;
-  typedef ImplicitDigitalShape4::Domain     Domain4;
-  typedef std::map<Cell4, CubicalCellData>  Map4;
-  typedef CubicalComplex< KSpace4, Map4 >   CC4;
-  typedef CC4::CellMapIterator              CellMapIterator;
-  typedef CC4::CellMapConstIterator         CellMapConstIterator;
-  typedef CC4::Cells                        Cells4;
+  typedef GaussDigitizer< Space3, ImplicitShape3 > 
+                                            ImplicitDigitalShape3;
+  typedef ImplicitDigitalShape3::Domain     Domain3;
+  typedef CC3::CellMapIterator              CellMapIterator;
+  typedef CC3::CellMapConstIterator         CellMapConstIterator;
+  typedef CC3::Cells                        Cells3;
 
   //-------------- parse command line ----------------------------------------------
   namespace po = boost::program_options;
@@ -449,10 +492,11 @@ int main( int argc, char** argv )
     ("minAABB,a",  po::value<double>()->default_value( -10.0 ), "the min value of the AABB bounding box (domain)" )
     ("maxAABB,A",  po::value<double>()->default_value( 10.0 ), "the max value of the AABB bounding box (domain)" )
     ("gridstep,g", po::value< double >()->default_value( 1.0 ), "the gridstep that defines the digitization (often called h). " )
-    ("timestep,t", po::value< double >()->default_value( 0.000001 ), "the gridstep that defines the digitization in the 4th dimension (small is generally a good idea, default is 1e-6). " )
-    ("epsilon,e", po::value< double >()->default_value( 0.0000001 ), "the maximum precision relative to the implicit surface." )
+    ("thickness,t", po::value< double >()->default_value( 1e-2 ), "the thickening parameter for the implicit surface." )
+    ("project,P", po::value< std::string >()->default_value( "Newton" ), "defines the projection: either No or Newton." )
+    ("epsilon,e", po::value< double >()->default_value( 1e-6 ), "the maximum precision relative to the implicit surface in the Newton approximation of F=0." )
     ("max_iter,n", po::value< unsigned int >()->default_value( 500 ), "the maximum number of iteration in the Newton approximation of F=0." )
-    ("view,v", po::value< std::string >()->default_value( "Normal" ), "specifies if the surface is viewed as is (Normal) or if places close to singularities are highlighted (Singular)." )
+    ("view,v", po::value< std::string >()->default_value( "Normal" ), "specifies if the surface is viewed as is (Normal) or if places close to singularities are highlighted (Singular), or if unsure places should not be displayed (Hide)." )
     ;
 
   bool parseOK=true;
@@ -474,13 +518,16 @@ int main( int argc, char** argv )
                 << endl
 		<< general_opt << "\n";
       cerr << "Example:\n" << endl
-           << "./implicit-surface-extractor -p \"-0.9*(y^2+z^2-1)^2-(x^2+y^2-1)^3\"" << endl
+           << "./implicit-surface-extractor-3d -p \"x^2-y*z^2\" -g 0.1" << endl
            << " - whitney  : x^2-y*z^2" << endl
            << " - 4lines   : x*y*(y-x)*(y-z*x)" << endl
            << " - cone     : z^2-x^2-y^2" << endl
            << " - simonU   : x^2-z*y^2+x^4+y^4" << endl
            << " - cayley3  : 4*(x^2 + y^2 + z^2) + 16*x*y*z - 1" << endl
            << " - crixxi   : -0.9*(y^2+z^2-1)^2-(x^2+y^2-1)^3" << endl << endl;
+      cerr << "Some other examples (more difficult):" << endl
+           << "./implicit-surface-extractor-3d -a -2 -A 2 -p \"((y^2+z^2-1)^2-(x^2+y^2-1)^3)*(y*(x-1)^2-z*(x+1))^2\" -g 0.025 -e 1e-6 -n 50000 -v Singular -t 0.5 -P Newton" << endl
+           << "./implicit-surface-extractor-3d -a -2 -A 2 -p \"(x^5-4*z^3*y^2)*((x+y)^2-(z-x)^3)\" -g 0.025 -e 1e-6 -n 50000 -v Singular -t 0.05 -P Newton" << endl;
       return 0;
     }
 
@@ -497,76 +544,78 @@ int main( int argc, char** argv )
       return 2;
     }
   // Creating implicit shape and storing it with smart pointer for automatic deallocation.
-  ImplicitShape3 shape3( poly );
-  CountedPtr<ImplicitShape4> shape( new ImplicitShape4( poly ) ); 
+  CountedPtr<ImplicitShape3> shape( new ImplicitShape3( poly ) );
 
   Ring min_x = vm[ "minAABB" ].as<double>();
   Ring max_x = vm[ "maxAABB" ].as<double>();
   Ring h     = vm[ "gridstep" ].as<double>();
-  Ring t     = vm[ "timestep" ].as<double>();
-  RealPoint4 p1( min_x, min_x, min_x, -t*h );
-  RealPoint4 p2( max_x, max_x, max_x,  0 );
+  RealPoint3 p1( min_x, min_x, min_x );
+  RealPoint3 p2( max_x, max_x, max_x );
   // Creating digitized shape and storing it with smart pointer for automatic deallocation.
-  CountedPtr<ImplicitDigitalShape4> dshape( new ImplicitDigitalShape4() );
+  CountedPtr<ImplicitDigitalShape3> dshape( new ImplicitDigitalShape3() );
   dshape->attach( *shape );
-  dshape->init( p1, p2, RealVector4( h, h, h, t ) );
-  Domain4 domain4 = dshape->getDomain();
-  KSpace4 K4;
-  K4.init( domain4.lowerBound(), domain4.upperBound(), true );
-  trace.info() << "- domain is " << domain4 << std::endl;
+  dshape->init( p1, p2, RealVector3( h, h, h ) );
+  Domain3 domain3 = dshape->getDomain();
+  KSpace3 K3;
+  K3.init( domain3.lowerBound(), domain3.upperBound(), true );
+  trace.info() << "- domain is " << domain3 << std::endl;
   trace.endBlock();
 
   //-------------- read polynomial and creating 4d implicit fct -----------------
-  trace.beginBlock( "Extracting isosurface 0 of 4D polynomial. " );
-  CC4 complex4( K4 );
-  std::vector<SCell4> surface_cells;
-  std::back_insert_iterator< std::vector<SCell4> > outItSurface( surface_cells );
-  Surfaces<KSpace4>::sWriteBoundary( outItSurface,
-                                     K4, *dshape, domain4.lowerBound(), domain4.upperBound() );
-  trace.info() << "- 4D surface has " << surface_cells.size() << " 3-cells." << endl;
-  typedef SetOfSurfels<KSpace4> SurfaceContainer;
-  SurfaceContainer* ptrF0 = new SurfaceContainer( K4, SurfelAdjacency< KSpace4::dimension >( false ) );
-  ptrF0->surfelSet().insert( surface_cells.begin(), surface_cells.end() );
-  DigitalSurface<SurfaceContainer> surface( ptrF0 );
-  std::vector<Cell4> sure_cells;
-  std::vector<Cell4> unsure_cells;
-  analyzeSurface( std::back_inserter( sure_cells ), std::back_inserter( unsure_cells ),
-                  surface );
-  trace.info() << "- sure cells   = " << sure_cells.size() << endl;
-  trace.info() << "- unsure cells = " << unsure_cells.size() << endl;
+  trace.beginBlock( "Extracting thickened isosurface [-t,+t] of 3D polynomial. " );
   CubicalCellData unsure_data( 0 );
-  CubicalCellData sure_data( CC4::FIXED );
-  complex4.insertCells( sure_cells.begin(), sure_cells.end(), sure_data );
-  complex4.insertCells( unsure_cells.begin(), unsure_cells.end(), unsure_data );
-  surface_cells.clear();
+  CubicalCellData sure_data( CC3::FIXED );
+  Ring t     = vm[ "thickness" ].as<double>();
+  CC3  complex3( K3 );
+  for ( Domain3::ConstIterator it = domain3.begin(), itE = domain3.end(); it != itE; ++it )
+    {
+      Cell3 spel    = K3.uSpel( *it );
+      // RealPoint3 px = dshape->embed( *it );
+      RealPoint3 px = dshape->embed( K3.uKCoords( spel ) - Point3::diagonal( 1 ) ) / 2.0;
+      Ring s        = (*shape)( px );
+      if ( (-t <= s ) && ( s <= t ) ) complex3.insertCell( spel, unsure_data );
+    }
+  trace.info() << "-    K[-t,+t]        = " << complex3 << endl;
+  complex3.close();
+  trace.info() << "- Cl K[-t,+t]        = " << complex3 << endl;
+  std::vector<Cell3> separating_cells;
+  std::back_insert_iterator< std::vector<Cell3> > outItSurface( separating_cells );
+  Surfaces<KSpace3>::uWriteBoundary( outItSurface,
+                                     K3, *dshape, domain3.lowerBound(), domain3.upperBound() );
+  trace.info() << "- separating S       = " << separating_cells.size() << " 2-cells." << endl;
+  complex3.insertCells( separating_cells.begin(), separating_cells.end(), sure_data );
+  for ( std::vector<Cell3>::const_iterator it = separating_cells.begin(), itE = separating_cells.end(); it != itE; ++it )
+    {
+      Cells3 bdry = K3.uFaces( *it );
+      for ( Cells3::const_iterator itBdry = bdry.begin(), itBdryE = bdry.end(); itBdry != itBdryE; ++itBdry )
+        complex3.insertCell( *itBdry, sure_data );
+    }
+  separating_cells.clear();
+  trace.info() << "- Cl K[-t,+t] + Cl S = " << complex3 << endl;
   trace.endBlock();
 
   //-------------- Get boundary and inner cells  --------------------------------
   trace.beginBlock( "Get boundary and inner cells. " );
-  std::vector<Cell4> inner;
-  std::vector<Cell4> bdry;
-  complex4.close();
-  trace.info() << "- K=" << complex4 << endl;
+  std::vector<Cell3> inner;
+  std::vector<Cell3> bdry;
   getCellsWithinBounds( std::back_inserter( bdry ), std::back_inserter( inner ),
-                        complex4, K4.uKCoords( K4.lowerCell() ), K4.uKCoords( K4.upperCell() ) );
+                        complex3, K3.uKCoords( K3.lowerCell() ), K3.uKCoords( K3.upperCell() ) );
   trace.info() << "- there are " << inner.size() << " inner cells." << endl;
   trace.info() << "- there are " << bdry.size() << " boundary cells." << endl;
   trace.endBlock();
 
   //-------------- Compute priority function  -----------------------------------
   trace.beginBlock( "Compute priority function. " );
-  Dimension d = complex4.dim();
+  Dimension d = complex3.dim();
   for ( Dimension i = 0; i <= d; ++i )
     {
-      for ( CellMapIterator it = complex4.begin( i ), itE = complex4.end( i ); it != itE; ++it )
+      for ( CellMapIterator it = complex3.begin( i ), itE = complex3.end( i ); it != itE; ++it )
         {
-          Cell4 cell   = it->first;
-          Point4 dp    = K4.uCoords( cell );
-          RealPoint4 p = dshape->embed( dp );
-          Ring v       = (*shape)( p );
-          v = abs( 1000.0*v );
-          if ( v > 1000000.0 ) v = 1000000.0;
-          it->second.data &= ~CC4::VALUE;
+          Cell3 cell   = it->first;
+          Ring v       = getValue( complex3, cell, *shape, dshape );
+          v = abs( 10000.0*v );
+          if ( v > 10000000.0 ) v = 10000000.0;
+          it->second.data &= ~CC3::VALUE;
           it->second.data |= (uint32_t) floor( v );
           // std::cout << " " << it->second.data;
         }
@@ -575,26 +624,25 @@ int main( int argc, char** argv )
 
   //-------------- Collapse boundary -------------------------------------------
   trace.beginBlock( "Collapse boundary. " );
-  typename CC4::DefaultCellMapIteratorPriority priority;
-  CC4 bdry_complex4( K4 );
-  for ( std::vector<Cell4>::const_iterator it = bdry.begin(), itE = bdry.end(); it != itE; ++it )
+  typename CC3::DefaultCellMapIteratorPriority priority;
+  CC3 bdry_complex3( K3 );
+  for ( std::vector<Cell3>::const_iterator it = bdry.begin(), itE = bdry.end(); it != itE; ++it )
     {
-      Cell4 cell = *it;
-      Dimension d = K4.uDim( cell );
-      CellMapConstIterator cmIt = complex4.find( d, cell );
-      bdry_complex4.insertCell( d, cell, cmIt->second );
+      Cell3 cell = *it;
+      Dimension d = K3.uDim( cell );
+      CellMapConstIterator cmIt = complex3.find( d, cell );
+      bdry_complex3.insertCell( d, cell, cmIt->second );
     }
-  //bdry_complex4.insertCells( bdry.begin(), bdry.end() );
-  trace.info() << "- [before collapse] K_bdry =" << bdry_complex4 << endl;
-  bdry_complex4.collapse( bdry.begin(), bdry.end(), priority, true, true, true );
-  trace.info() << "- [after collapse]  K_bdry =" << bdry_complex4 << endl;
-  for ( std::vector<Cell4>::const_iterator it = bdry.begin(), itE = bdry.end(); it != itE; ++it )
+  trace.info() << "- [before collapse] K_bdry =" << bdry_complex3 << endl;
+  bdry_complex3.collapse( bdry.begin(), bdry.end(), priority, true, true, false );
+  trace.info() << "- [after collapse]  K_bdry =" << bdry_complex3 << endl;
+  for ( std::vector<Cell3>::const_iterator it = bdry.begin(), itE = bdry.end(); it != itE; ++it )
     {
-      Cell4 cell  = *it;
-      Dimension d = K4.uDim( cell );
-      CellMapConstIterator cmIt = bdry_complex4.find( d, cell );
-      if ( cmIt != bdry_complex4.end( d ) ) {
-        CellMapIterator cmIt2 = complex4.find( d, cell );
+      Cell3 cell  = *it;
+      Dimension d = K3.uDim( cell );
+      CellMapConstIterator cmIt = bdry_complex3.find( d, cell );
+      if ( cmIt != bdry_complex3.end( d ) ) {
+        CellMapIterator cmIt2 = complex3.find( d, cell );
         cmIt2->second = sure_data;
       }
     }
@@ -604,76 +652,93 @@ int main( int argc, char** argv )
   trace.beginBlock( "Collapse all. " );
   std::copy( bdry.begin(), bdry.end(), std::back_inserter( inner ) );
   //typename CC4::DefaultCellMapIteratorPriority priority;
-  complex4.collapse( inner.begin(), inner.end(), priority, true, true, true );
-  trace.info() << "- K=" << complex4 << endl;
+  complex3.collapse( inner.begin(), inner.end(), priority, true, true, true );
+  trace.info() << "- K = " << complex3 << endl;
   trace.endBlock();
 
   //-------------- Project complex onto surface --------------------------------
   trace.beginBlock( "Project complex onto surface. " );
+  std::string project   = vm[ "project" ].as<std::string>();
   double epsilon        = vm[ "epsilon" ].as<double>();
   unsigned int max_iter = vm[ "max_iter" ].as<unsigned int>();
   std::vector<RealPoint3> points;
-  projectComplex( points, complex4, *shape, dshape, shape3, epsilon, max_iter );
+  if ( project == "Newton" )
+    projectComplex( points, complex3, *shape, dshape, epsilon, max_iter, h * sqrt(3.0));
+  else
+    doNotProjectComplex( points, complex3, *shape, dshape );
   trace.endBlock();
 
   //-------------- Create Mesh -------------------------------------------
   trace.beginBlock( "Create Mesh. " );
   std::string view = vm[ "view" ].as<std::string>();
   bool highlight = ( view == "Singular" );
+  bool hide      = ( view == "Hide" );
   Mesh<RealPoint3> mesh( true );
-  std::map<Cell4,unsigned int> indices;
+  std::map<Cell3,unsigned int> indices;
   int idx = 0;
-  for ( CellMapConstIterator it = complex4.begin( 0 ), itE = complex4.end( 0 ); it != itE; ++it, ++idx )
+  for ( CellMapConstIterator it = complex3.begin( 0 ), itE = complex3.end( 0 ); it != itE; ++it, ++idx )
     {
-      Cell4 cell = it->first;
+      Cell3 cell = it->first;
       indices[ cell ] = idx;
       mesh.addVertex( points[ idx ] );
     }
-  for ( CellMapConstIterator it = complex4.begin( 2 ), itE = complex4.end( 2 ); it != itE; ++it, ++idx )
+  for ( CellMapConstIterator it = complex3.begin( 2 ), itE = complex3.end( 2 ); it != itE; ++it )
     {
-      Cell4 cell = it->first;
-      bool fixed = it->second.data & CC4::FIXED;
-      Cells4 bdry = complex4.cellBoundary( cell, true );
+      Cell3 cell = it->first;
+      bool fixed = it->second.data & CC3::FIXED;
+      Cells3 bdry = complex3.cellBoundary( cell, true );
       std::vector<unsigned int> face_idx;
-      for ( Cells4::const_iterator itC = bdry.begin(), itCE = bdry.end(); itC != itCE; ++itC )
+      for ( Cells3::const_iterator itC = bdry.begin(), itCE = bdry.end(); itC != itCE; ++itC )
         {
-          if ( complex4.dim( *itC ) == 0 )
+          if ( complex3.dim( *itC ) == 0 )
             face_idx.push_back( indices[ *itC ] );
         }
+      if ( ( ! fixed ) && hide ) continue;
       Color color = highlight
-        ? ( fixed ? Color::White : Color(128,255,128)  )
+        ? ( fixed ? Color::White : Color(128,255,128) )
         : Color::White;
-      mesh.addQuadFace( face_idx[ 0 ], face_idx[ 1 ], face_idx[ 3 ], face_idx[ 2 ], color );
+      RealVector3 diag03 = points[ face_idx[ 0 ] ] - points[ face_idx[ 3 ] ];
+      RealVector3 diag12 = points[ face_idx[ 1 ] ] - points[ face_idx[ 2 ] ];
+      if ( diag03.dot( diag03 ) <= diag12.dot( diag12 ) )
+        {
+          mesh.addTriangularFace( face_idx[ 0 ], face_idx[ 1 ], face_idx[ 3 ], color );
+          mesh.addTriangularFace( face_idx[ 0 ], face_idx[ 3 ], face_idx[ 2 ], color );
+        }
+      else
+        {
+          mesh.addTriangularFace( face_idx[ 0 ], face_idx[ 1 ], face_idx[ 2 ], color );
+          mesh.addTriangularFace( face_idx[ 1 ], face_idx[ 3 ], face_idx[ 2 ], color );
+        }
+      //mesh.addQuadFace( face_idx[ 0 ], face_idx[ 1 ], face_idx[ 3 ], face_idx[ 2 ], color );
      }
   trace.endBlock();
 
   //-------------- View surface -------------------------------------------
   QApplication application(argc,argv);
-  Point4 low4 = K4.lowerBound();
-  Point4 up4  = K4.upperBound();
-  KSpace3 K3;
-  K3.init( Point3( low4[ 0 ], low4[ 1 ], low4[ 2 ] ),
-           Point3( up4 [ 0 ], up4 [ 1 ], up4 [ 2 ] ), true );
   Viewer3D<Space3,KSpace3> viewer( K3 );
   viewer.setWindowTitle("simple Volume Viewer");
   viewer.show();
   viewer << mesh;
-  // for ( Dimension i = 0; i <= d; ++i )
-  //   {
-  //     for ( CellMapConstIterator it = complex4.begin( i ), itE = complex4.end( i ); it != itE; ++it )
-  //       {
-  //         bool fixed = it->second.data & CC4::FIXED;
-  //         Cell4 cell = it->first;
-  //         std::vector<Cell4> dummy;
-  //         std::back_insert_iterator< std::vector<Cell4> > outIt( dummy );
-  //         complex4.directCoFaces( outIt, cell );
-  //         if ( ! dummy.empty() ) continue;
-  //         Point4 kcell = K4.uKCoords( cell ); 
-  //         Cell3 proj_cell = K3.uCell( Point3( kcell[ 0 ], kcell[ 1 ], kcell[ 2 ] ) );
-  //         viewer.setFillColor( fixed ? Color::Red : Color::White );
-  //         viewer << proj_cell;
-  //       }
-  //   }
+  // Display lines that are not in the mesh.
+  for ( CellMapConstIterator it = complex3.begin( 1 ), itE = complex3.end( 1 ); it != itE; ++it )
+    {
+      Cell3 cell  = it->first;
+      bool fixed  = it->second.data & CC3::FIXED;
+      std::vector<Cell3> dummy;
+      std::back_insert_iterator< std::vector<Cell3> > outIt( dummy );
+      complex3.directCoFaces( outIt, cell );
+      if ( ! dummy.empty() )     continue;
+
+      Cells3 bdry = complex3.cellBoundary( cell, true );
+      Cell3 v0    = *(bdry.begin() );
+      Cell3 v1    = *(bdry.begin() + 1);
+      if ( ( ! fixed ) && hide ) continue;
+      Color color = highlight
+        ? ( fixed ? Color::White : Color(128,255,128) )
+        : Color::White;
+      viewer.setLineColor( color );
+      viewer.addLine( points[ indices[ v0 ] ], points[ indices[ v1 ] ], h/2.0 );
+    }
   viewer << Viewer3D<Space3,KSpace3>::updateDisplay;
   return application.exec();
 

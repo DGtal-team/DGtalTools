@@ -4,6 +4,7 @@ SET(DGTAL_TOOLS_SRC
         3dCurvatureViewer
         3dCurvatureViewerNoise
 	implicit-surface-extractor
+	implicit-surface-extractor-3d
 )
 
 foreach (FILE ${DGTAL_TOOLS_SRC})
