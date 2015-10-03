@@ -73,15 +73,14 @@ template <typename TImage>
 static QImage
 getImage(const TImage &anImage, double gridSize, const MainWindow::ColorMapFunctor &colFunctor ){
   typedef ConstImageAdapter<TImage, typename TImage::Domain,
-                            functors::BasicDomainSubSampler<typename TImage::Domain, unsigned int, double>,
+                            functors::BasicDomainSubSampler<typename TImage::Domain, int, double>,
                             unsigned int,
                             MainWindow::ColorMapFunctor> ConstImageAdapterForSubSampling;
 
   std::vector<double> scales;
   scales.push_back(gridSize);
-  scales.push_back(gridSize);
-  
-  functors::BasicDomainSubSampler<typename TImage::Domain,unsigned  int, double> subSampler (anImage.domain(),
+  scales.push_back(gridSize);  
+  functors::BasicDomainSubSampler<typename TImage::Domain,  int, double> subSampler (anImage.domain(),
                                                                                              scales, Z2i::Point(0,0));
   typename TImage::Domain newDomain = subSampler.getSubSampledDomain();
   ConstImageAdapterForSubSampling  scaledImage (anImage, newDomain, subSampler, colFunctor );
@@ -147,7 +146,7 @@ MainWindow::MainWindow(DGtal::Viewer3D<> *aViewer,
   ui->_zoomZSlider->setMaximum(MAX_ZOOM_FACTOR);
   ui->_zoomZSlider->setValue(INIT_SCALE1_ZOOM_FACTOR);
 
-
+  
 
 }
 
@@ -364,7 +363,8 @@ void MainWindow::updateSliceImageZ(int sliceNumber, bool init){
     (*myViewer).updateList(init);
     (*myViewer).update();
   }
-  
+
+      
 }
 
 
@@ -461,9 +461,13 @@ int main( int argc, char** argv )
     w.updateSliceImageX(0, true);
     w.updateSliceImageY(0, true);
     w.updateSliceImageZ(0, true);
-
-
     w.show();
+    Z3i::Point size = image.domain().upperBound() - image.domain().lowerBound();
+    Z3i::Point center = image.domain().lowerBound()+size/2;
+    unsigned int maxDist = std::max(std::max(size[2], size[1]), size[2]);
+    viewer->camera()->setPosition(qglviewer::Vec(center[0],center[1], 
+                                                 2.0*maxDist));
+    viewer->camera()->setSceneCenter(qglviewer::Vec(center[0],center[1],center[2]));
     application.exec();
     delete viewer;
   }
