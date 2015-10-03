@@ -55,6 +55,7 @@ Utilities to convert various simple file formats:
   - freeman2img: transform one or several freeman chains into a pgm file by filling their interior areas.
   - freeman2sdp: convert freeman chain towards a Sequence of Discrete Points.
   - HDF52vol: convert HDF5 to vol file format. 
+  - heightfield2shading: Render a 2D heightfield image into a shading image from various reflectance models (lambertian, specular, custom reflectance map).
   - heightfield2vol: a new tool to transform 2D heightmap into volumetric file.
   - img2freeman: to extract a freeman chain contour from a grayscale image.
   - imgAddNoise: a new tool to add noise (Kanungo's) to a binary 2D object.
@@ -89,10 +90,13 @@ Utilities to convert various simple file formats:
 <td>volAddNoise</td>
 </tr>
 <tr>
-<td> <img height=150 src="https://cloud.githubusercontent.com/assets/772865/7106643/c09cb8d4-e148-11e4-8653-2d5bac5dc3c5.png"> </td>
+<td> <img height=150 src="https://cloud.githubusercontent.com/assets/772865/7106643/c09cb8d4-e148-11e4-8653-2d5bac5dc3c5.png"> 
+<td align=center> <img height=150 src= "https://cloud.githubusercontent.com/assets/772865/10265156/64aaad64-6a24-11e5-9773-628c661fa76c.png">
+</td>
 </tr>
 <tr>
 <td>mesh2heightfield</td>
+<td>heightfield2shading</td>
 </tr>
 
 <tr>
