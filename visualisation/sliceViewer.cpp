@@ -89,7 +89,7 @@ getImage(const TImage &anImage, double gridSize, const MainWindow::ColorMapFunct
   QImage res (width, height,QImage::Format_RGB32 );
   for(unsigned int i=0; i<height; i++){
     for(unsigned int j=0; j<width; j++){
-      res.setPixel(j, i, scaledImage(Z2i::Point(j,i)+scaledImage.domain().lowerBound()));
+      res.setPixel(j, height-i-1, scaledImage(Z2i::Point(j,i)+scaledImage.domain().lowerBound()));
     }
   }
   return  res;
