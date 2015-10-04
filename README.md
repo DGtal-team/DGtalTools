@@ -208,7 +208,7 @@ Here are some illustrations of such a tools:
 <td><img height=130 src="https://f.cloud.github.com/assets/772865/684598/c3adcf4c-d9ff-11e2-8c3f-e67c8abd0c76.png"></td>
 <td><img height=130 src="https://f.cloud.github.com/assets/772865/684622/d698405a-da00-11e2-8aa0-19212a58ce23.png"></td>
 <td><img width=300 src="https://cloud.githubusercontent.com/assets/772865/2720141/6c42a0e0-c56b-11e3-8328-a6d88242f21e.png"> </td>
-<td><img  width=300 src="https://cloud.githubusercontent.com/assets/772865/4023650/8fc2fe86-2b9e-11e4-98cf-7123c1a933fd.png"></td>
+<td><img  width=300 src="https://cloud.githubusercontent.com/assets/772865/10269635/8678ca02-6add-11e5-9d83-fbcf3608612f.png"></td>
 </tr>
 <tr>
 <td>displayContours</td>
