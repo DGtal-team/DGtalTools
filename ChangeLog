@@ -8,7 +8,7 @@
 	- 3dCurvatureViewer/Noise: can now be used without QGLViewer if exporting data.
 	- 3dImageViewer: now display the current moving axis which was selected and display the slice numbers (can be disabled by key M).
 	- sliceViewer: fix the bug when displaying vol with non 0 origin point.
-
+	- itk2vol: convert any image of itk format (mhd, mha, ...) to vol (available with the itk option in DGtal).
 
 * volumetric/:
 	- volIntensityScale: a simple tool to apply a linear scale of the intensity given in a volumetric file.
@@ -21,7 +21,8 @@
 
 * estimators/:
 	- 3dCurveTangentEstimator: a simple tool to estimate the tangent to a set of points approaching a 3D curve, based on digital Voronoi Covariance Measure.
-
+	- heightfield2shading: a new tool to render a 2D heightfield image into a shading one.
+	- mesh2heightfield:  new tool to convert a mesh file into a 2D heightmap (from a normal direction N and from a starting point P).
 
 	====  Release 0.8 ====
 
