@@ -153,11 +153,24 @@ void displayDSS3dTangent( Viewer3D<space, kspace> & viewer,
         const DGtal::Color & color3d )
 {
   typedef typename StandardDSS6Computer::Point3d Point;
-  typedef typename StandardDSS6Computer::PointD3d PointD3d;
+  typedef typename StandardDSS6Computer::PointR3d PointR3d;
+  typedef DGtal::PointVector<3,double> PointD3d;
   typedef typename Display3D<>::BallD3D PointD3D;
   Point directionZ3;
-  PointD3d P1, P2, direction, intercept, thickness;
-  dss3d.getParameters( directionZ3, intercept, thickness );
+  PointR3d interceptR, thicknessR;
+  PointD3d P1, P2, direction;
+  dss3d.getParameters( directionZ3, interceptR, thicknessR );
+  
+  PointD3d intercept;
+  intercept[0] = (double) NumberTraits<int>::castToInt64_t ( interceptR[0].first ) / (double) NumberTraits<int>::castToInt64_t ( interceptR[0].second );
+  intercept[1] = (double) NumberTraits<int>::castToInt64_t ( interceptR[1].first ) / (double) NumberTraits<int>::castToInt64_t ( interceptR[1].second );
+  intercept[2] = (double) NumberTraits<int>::castToInt64_t ( interceptR[2].first ) / (double) NumberTraits<int>::castToInt64_t ( interceptR[2].second );
+  
+  PointD3d thickness;
+  thickness[0] = (double) NumberTraits<int>::castToInt64_t ( thicknessR[0].first ) / (double) NumberTraits<int>::castToInt64_t ( thicknessR[0].second );
+  thickness[1] = (double) NumberTraits<int>::castToInt64_t ( thicknessR[1].first ) / (double) NumberTraits<int>::castToInt64_t ( thicknessR[1].second );
+  thickness[2] = (double) NumberTraits<int>::castToInt64_t ( thicknessR[2].first ) / (double) NumberTraits<int>::castToInt64_t ( thicknessR[2].second );
+  
   assign( direction, directionZ3 );
   direction /= direction.norm();
   assign( P1, *dss3d.begin() );

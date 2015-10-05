@@ -22,6 +22,9 @@
 	- heightfield2shading: a new tool to render a 2D heightfield image into a shading one.
 	- mesh2heightfield:  new tool to convert a mesh file into a 2D heightmap (from a normal direction N and from a starting point P).
 
+* estimators/:
+	- 3dCurveTangentEstimator: a simple tool to estimate and visualize the tangent to a set of points approaching a 3D curve. Two estimators are implemented, one based on digital Voronoi Covariance Measure, the other based on 3D lambda-MST.
+
 	====  Release 0.8 ====
 
 * visualisation/:
