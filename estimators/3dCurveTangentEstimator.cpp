@@ -642,9 +642,13 @@ int main(int argc, char **argv)
   if( !parseOK || vm.count("help")||argc<=1)
   {
     cout << "Usage: " << argv[0] << " [options] input\n"
-    << "This program estimates the tangent vector to a set of 3D integer points, which are supposed to approach a 3D curve. This set of points is given as a list of points in file <input>. The tangent estimator uses either the digital Voronoi Covariance Measure (VCM) or the 3D lambda-Maximal Segment Tangent (L-MST). This program can also displays the curve and tangent estimations, and it can also extract maximal digital straight segments (2D and 3D)."
+    << "This program estimates the tangent vector to a set of 3D integer points, which are supposed to approach a 3D curve. "
+    << "This set of points is given as a list of points in file <input>. The tangent estimator uses either the digital Voronoi "
+    << "Covariance Measure (VCM) or the 3D lambda-Maximal Segment Tangent (L-MST). This program can also displays the curve and tangent estimations, "
+    << "and it can also extract maximal digital straight segments (2D and 3D)."
     << endl
-    << "Note: It is not compulsory for the points to be ordered in sequence, except if you wish to compute maximal digital straight segments. In this case, you can select the connectivity of your curve between 6 (standard) or 26 (naive).\n"
+    << "Note: It is not compulsory for the points to be ordered in sequence, except if you wish to compute maximal digital straight segments. " 
+    << "In this case, you can select the connectivity of your curve between 6 (standard) or 26 (naive).\n"
     << general_opt << "\n\n";
     cout << "Example:\n"
     << "3dCurveTangentEstimator -i ${DGtal}/examples/samples/sinus.dat -V ON -c -R 20 -r 3 -T 6\n";
