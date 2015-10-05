@@ -119,8 +119,8 @@ else the space is automatically defined from the freemanchain bounding boxes.");
         fc.computeBoundingBox(t_minx, t_miny, t_maxx, t_maxy);
         minx = t_minx > minx? minx: t_minx;
         miny = t_miny > miny? miny: t_miny;
-        maxx = t_maxx <= maxx? maxx: t_maxx;
-        maxy = t_maxy <= maxy? maxy: t_maxy;
+        maxx = t_maxx < maxx? maxx: t_maxx;
+        maxy = t_maxy < maxy? maxy: t_maxy;
       }
       minx-=border; miny-=border; maxx+=border;   maxy+=border;
     }else{
@@ -140,11 +140,11 @@ else the space is automatically defined from the freemanchain bounding boxes.");
     std::set<Cell> interiorCell;
     for(std::vector< FreemanChain >::const_iterator it = vectFcs.begin(); it!= vectFcs.end(); it++){
       FreemanChain fc = *it;
-      FreemanChain::getInterPixelLinels(aKSpace, fc, boundarySCell, true);     
+      FreemanChain::getInterPixelLinels(aKSpace, fc, boundarySCell, true);
     }
 
     Image2D imageResult (Z2i::Domain(Z2i::Point(minx, miny), Z2i::Point(maxx, maxy))); 
-    Surfaces<KSpace>::uFillInterior(aKSpace, functors::SurfelSetPredicate<std::set<SCell>,SCell>(boundarySCell), imageResult, 255, true, true );  
+    Surfaces<KSpace>::uFillInterior(aKSpace, functors::SurfelSetPredicate<std::set<SCell>,SCell>(boundarySCell), imageResult, 255, false, true );  
     imageResult >> vm["output"].as<std::string>();
   }
 
