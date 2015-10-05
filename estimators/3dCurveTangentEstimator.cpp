@@ -170,12 +170,12 @@ void displayDSS3dTangent( Viewer3D<space, kspace> & viewer,
   Z3i::RealPoint P1, P2, direction, intercept, thickness;  
   dss3d.getParameters( directionZ3, interceptR, thicknessR );
   
-  intercept[0] = (double) NumberTraits<Integer>::castToInt64_t ( interceptR[0].first ) / (double) NumberTraits<Integer>::castToInt64_t ( interceptR[0].second );
-  intercept[1] = (double) NumberTraits<Integer>::castToInt64_t ( interceptR[1].first ) / (double) NumberTraits<Integer>::castToInt64_t ( interceptR[1].second );
-  intercept[2] = (double) NumberTraits<Integer>::castToInt64_t ( interceptR[2].first ) / (double) NumberTraits<Integer>::castToInt64_t ( interceptR[2].second );
-  thickness[0] = (double) NumberTraits<Integer>::castToInt64_t ( thicknessR[0].first ) / (double) NumberTraits<Integer>::castToInt64_t ( thicknessR[0].second );
-  thickness[1] = (double) NumberTraits<Integer>::castToInt64_t ( thicknessR[1].first ) / (double) NumberTraits<Integer>::castToInt64_t ( thicknessR[1].second );
-  thickness[2] = (double) NumberTraits<Integer>::castToInt64_t ( thicknessR[2].first ) / (double) NumberTraits<Integer>::castToInt64_t ( thicknessR[2].second );
+  intercept[0] = (double) NumberTraits<Integer>::castToDouble ( interceptR[0].first ) / (double) NumberTraits<Integer>::castToDouble ( interceptR[0].second );
+  intercept[1] = (double) NumberTraits<Integer>::castToDouble ( interceptR[1].first ) / (double) NumberTraits<Integer>::castToDouble ( interceptR[1].second );
+  intercept[2] = (double) NumberTraits<Integer>::castToDouble ( interceptR[2].first ) / (double) NumberTraits<Integer>::castToDouble ( interceptR[2].second );
+  thickness[0] = (double) NumberTraits<Integer>::castToDouble ( thicknessR[0].first ) / (double) NumberTraits<Integer>::castToDouble ( thicknessR[0].second );
+  thickness[1] = (double) NumberTraits<Integer>::castToDouble ( thicknessR[1].first ) / (double) NumberTraits<Integer>::castToDouble ( thicknessR[1].second );
+  thickness[2] = (double) NumberTraits<Integer>::castToDouble ( thicknessR[2].first ) / (double) NumberTraits<Integer>::castToDouble ( thicknessR[2].second );
   
   assign( direction, directionZ3 );
   direction /= direction.norm();
@@ -210,10 +210,11 @@ void displayProj2d6( Viewer3D<space, kspace> & viewer,
   {
     Point2d p = *itP;
     Point3d q;
-    switch (i) {
-    case 0: q = Point3d( 2*b[ i ]  , 2*p[ 0 ]+1, 2*p[ 1 ]+1 ); break;
-    case 1: q = Point3d( 2*p[ 0 ]+1, 2*b[ i ]  , 2*p[ 1 ]+1 ); break;
-    case 2: q = Point3d( 2*p[ 0 ]+1, 2*p[ 1 ]+1, 2*b[ i ]   ); break;
+    switch (i) 
+    {
+      case 0: q = Point3d( 2*b[ i ]  , 2*p[ 0 ]+1, 2*p[ 1 ]+1 ); break;
+      case 1: q = Point3d( 2*p[ 0 ]+1, 2*b[ i ]  , 2*p[ 1 ]+1 ); break;
+      case 2: q = Point3d( 2*p[ 0 ]+1, 2*p[ 1 ]+1, 2*b[ i ]   ); break;
     }
     Cell c = ks.uCell( q );
     viewer << CustomColors3D( color2d, color2d ) << c;
@@ -249,10 +250,11 @@ void displayDSS2d6( Viewer3D<space, kspace> & viewer,
       PointD3D p3;
       for ( unsigned int j = 0; j < pts2d.size(); ++j )
   {
-    switch (i) {
-    case 0: p3.center[0] = (double) b[ i ]-0.5; p3.center[1] = pts2d[ j ][ 0 ];  p3.center[2] = pts2d[ j ][ 1 ]; break;
-    case 1: p3.center[0] = pts2d[ j ][ 0 ];  p3.center[1] = (double) b[ i ]-0.5; p3.center[2] = pts2d[ j ][ 1 ];     break;
-    case 2: p3.center[0] = pts2d[ j ][ 0 ];  p3.center[1] = pts2d[ j ][ 1 ];     p3.center[2] = (double) b[ i ]-0.5; break;
+    switch (i) 
+    {
+      case 0: p3.center[0] = (double) b[ i ]-0.5; p3.center[1] = pts2d[ j ][ 0 ];  p3.center[2] = pts2d[ j ][ 1 ]; break;
+      case 1: p3.center[0] = pts2d[ j ][ 0 ];  p3.center[1] = (double) b[ i ]-0.5; p3.center[2] = pts2d[ j ][ 1 ];     break;
+      case 2: p3.center[0] = pts2d[ j ][ 0 ];  p3.center[1] = pts2d[ j ][ 1 ];     p3.center[2] = (double) b[ i ]-0.5; break;
     }
     bb.push_back( p3 );
   }
@@ -287,7 +289,8 @@ void displayProj2d26( Viewer3D<space, kspace> & viewer,
   bool validXZ = dss3d.validArithmeticalDSS2d ( 1 );
   bool validYZ = dss3d.validArithmeticalDSS2d ( 0 );
   
-  if ( validXY && validXZ ) { //XY-plane, XZ-plane
+  if ( validXY && validXZ ) 
+  { //XY-plane, XZ-plane
     for ( ConstIterator2d itXY = dssXY.begin(), itXZ = dssXZ.begin(), itPEnd = dssXY.end(); itXY != itPEnd; ++itXY, ++itXZ )
     {
       Point2d p1 = *itXY, p2 = *itXZ;
@@ -300,8 +303,11 @@ void displayProj2d26( Viewer3D<space, kspace> & viewer,
       viewer << CustomColors3D( color2d, color2d ) << c2;
       viewer << CustomColors3D( color2d, color2d ) << c3;
     }
-  }  else {
-    if ( validYZ && validXY ) { //XY-plane, YZ-plane
+  }  
+  else 
+  {
+    if ( validYZ && validXY ) 
+    { //XY-plane, YZ-plane
       for ( ConstIterator2d itYZ = dssYZ.begin(), itXY = dssXY.begin(), itPEnd = dssXY.end(); itXY != itPEnd; ++itXY, ++itYZ )
       {
 	Point2d p1 = *itYZ, p2 = *itXY;
@@ -314,7 +320,8 @@ void displayProj2d26( Viewer3D<space, kspace> & viewer,
 	viewer << CustomColors3D( color2d, color2d ) << c2;
 	viewer << CustomColors3D( color2d, color2d ) << c3;
       }
-    } else
+    } 
+    else
     {
       for ( ConstIterator2d itYZ = dssYZ.begin(), itXZ = dssXZ.begin(), itPEnd = dssXZ.end(); itXZ != itPEnd; ++itXZ, ++itYZ )
       {
@@ -364,7 +371,8 @@ void displayDSS2d26( Viewer3D<space, kspace> & viewer,
     PointD3D p3;
     for ( unsigned int j = 0; j < pts2d.size(); ++j )
     {
-      switch (i) {
+      switch (i) 
+      {
 	case 0: p3.center[0] = (double) b[ i ]-0.5; p3.center[1] = pts2d[ j ][ 0 ];  p3.center[2] = pts2d[ j ][ 1 ]; break;
 	case 1: p3.center[0] = pts2d[ j ][ 0 ];  p3.center[1] = (double) b[ i ]-0.5; p3.center[2] = pts2d[ j ][ 1 ];     break;
 	case 2: p3.center[0] = pts2d[ j ][ 0 ];  p3.center[1] = pts2d[ j ][ 1 ];     p3.center[2] = (double) b[ i ]-0.5; break;
@@ -630,11 +638,14 @@ int main(int argc, char **argv)
   // parse command line ----------------------------------------------
   bool parseOK=true;
   po::variables_map vm;
-  try {
+  try 
+  {
     po::command_line_parser clp( argc, argv );
     clp.options( general_opt ).positional( pos_opt );
     po::store( clp.run(), vm );
-  } catch( const exception& ex ) {
+  } 
+  catch( const exception& ex ) 
+  {
     parseOK = false;
     trace.info() << "Error checking program options: "<< ex.what() << endl;
   }
@@ -642,9 +653,17 @@ int main(int argc, char **argv)
   if( !parseOK || vm.count("help")||argc<=1)
   {
     cout << "Usage: " << argv[0] << " [options] input\n"
-    << "This program estimates the tangent vector to a set of 3D integer points, which are supposed to approach a 3D curve. This set of points is given as a list of points in file <input>. The tangent estimator uses either the digital Voronoi Covariance Measure (VCM) or the 3D lambda-Maximal Segment Tangent (L-MST). This program can also displays the curve and tangent estimations, and it can also extract maximal digital straight segments (2D and 3D)."
+    << "This program estimates the tangent vector to a set of 3D integer points, which are supposed to approximate a 3D curve. "
+    << "This set of points is given as a list of points in file <input>."
+    << endl 
+    << "The tangent estimator uses either the digital Voronoi Covariance Measure (VCM) or the 3D lambda-Maximal Segment Tangent (L-MST)." 
     << endl
-    << "Note: It is not compulsory for the points to be ordered in sequence, except if you wish to compute maximal digital straight segments. In this case, you can select the connectivity of your curve between 6 (standard) or 26 (naive).\n"
+    << "This program can also displays the curve and tangent estimations, "
+    << "and it can also extract maximal digital straight segments (2D and 3D)."
+    << endl
+    << "Note: It is not compulsory for the points to be ordered in sequence, except if you wish to compute maximal digital straight segments." 
+    << endl
+    << "In this case, you can select the connectivity of your curve between 6 (standard) or 26 (naive).\n"
     << general_opt << "\n\n";
     cout << "Example:\n"
     << "3dCurveTangentEstimator -i ${DGtal}/examples/samples/sinus.dat -V ON -c -R 20 -r 3 -T 6\n";
@@ -658,11 +677,13 @@ int main(int argc, char **argv)
   vector<Point> sequence;
   fstream inputStream;
   inputStream.open ( input.c_str(), ios::in);
-  try {
+  try 
+  {
     sequence = PointListReader<Point>::getPointsFromInputStream( inputStream );
     if ( sequence.size() == 0) throw IOException();
   }
-  catch (DGtal::IOException & ioe) {
+  catch (DGtal::IOException & ioe) 
+  {
     trace.error() << "Size is null." << endl;
   }
   inputStream.close();
@@ -729,9 +750,12 @@ int main(int argc, char **argv)
   }
   
   GridCurve<K3> gc( ks );
-  try {
+  try 
+  {
     gc.initFromPointsVector( sequence );
-  } catch (DGtal::ConnectivityException& /*ce*/) {
+  } 
+  catch (DGtal::ConnectivityException& /*ce*/) 
+  {
     trace.warning() << "[ConnectivityException] GridCurve only accepts a sequence of face adjacent points. Try connectivity=6 instead." << endl;
   }
   
