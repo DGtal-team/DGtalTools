@@ -140,14 +140,11 @@ else the space is automatically defined from the freemanchain bounding boxes.");
     std::set<Cell> interiorCell;
     for(std::vector< FreemanChain >::const_iterator it = vectFcs.begin(); it!= vectFcs.end(); it++){
       FreemanChain fc = *it;
-      trace.info() << "inter done: " << fc.size() <<  std::endl;
-      FreemanChain::getInterPixelLinels(aKSpace, fc, boundarySCell, true); 
-    
+      FreemanChain::getInterPixelLinels(aKSpace, fc, boundarySCell, true);     
     }
 
     Image2D imageResult (Z2i::Domain(Z2i::Point(minx, miny), Z2i::Point(maxx, maxy))); 
     Surfaces<KSpace>::uFillInterior(aKSpace, functors::SurfelSetPredicate<std::set<SCell>,SCell>(boundarySCell), imageResult, 255, true, true );  
-    trace.info() << "fill done" << std::endl;
     imageResult >> vm["output"].as<std::string>();
   }
 
