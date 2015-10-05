@@ -33,6 +33,10 @@
         - freeman2img: (extended from previous freeman2pgm) fix options issues.
 
 
+* estimators/:
+	- 3dCurveTangentEstimator: a simple tool to estimate and visualize the tangent to a set of points approaching a 3D curve. 
+	  Two estimators are implemented, one based on digital Voronoi Covariance Measure, the other based on 3D lambda-MST.
+
 	====  Release 0.8 ====
 
 * visualisation/:
