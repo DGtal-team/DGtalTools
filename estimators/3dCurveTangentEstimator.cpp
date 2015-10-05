@@ -170,12 +170,12 @@ void displayDSS3dTangent( Viewer3D<space, kspace> & viewer,
   Z3i::RealPoint P1, P2, direction, intercept, thickness;  
   dss3d.getParameters( directionZ3, interceptR, thicknessR );
   
-  intercept[0] = (double) NumberTraits<Integer>::castToInt64_t ( interceptR[0].first ) / (double) NumberTraits<Integer>::castToInt64_t ( interceptR[0].second );
-  intercept[1] = (double) NumberTraits<Integer>::castToInt64_t ( interceptR[1].first ) / (double) NumberTraits<Integer>::castToInt64_t ( interceptR[1].second );
-  intercept[2] = (double) NumberTraits<Integer>::castToInt64_t ( interceptR[2].first ) / (double) NumberTraits<Integer>::castToInt64_t ( interceptR[2].second );
-  thickness[0] = (double) NumberTraits<Integer>::castToInt64_t ( thicknessR[0].first ) / (double) NumberTraits<Integer>::castToInt64_t ( thicknessR[0].second );
-  thickness[1] = (double) NumberTraits<Integer>::castToInt64_t ( thicknessR[1].first ) / (double) NumberTraits<Integer>::castToInt64_t ( thicknessR[1].second );
-  thickness[2] = (double) NumberTraits<Integer>::castToInt64_t ( thicknessR[2].first ) / (double) NumberTraits<Integer>::castToInt64_t ( thicknessR[2].second );
+  intercept[0] = (double) NumberTraits<Integer>::castToDouble ( interceptR[0].first ) / (double) NumberTraits<Integer>::castToDouble ( interceptR[0].second );
+  intercept[1] = (double) NumberTraits<Integer>::castToDouble ( interceptR[1].first ) / (double) NumberTraits<Integer>::castToDouble ( interceptR[1].second );
+  intercept[2] = (double) NumberTraits<Integer>::castToDouble ( interceptR[2].first ) / (double) NumberTraits<Integer>::castToDouble ( interceptR[2].second );
+  thickness[0] = (double) NumberTraits<Integer>::castToDouble ( thicknessR[0].first ) / (double) NumberTraits<Integer>::castToDouble ( thicknessR[0].second );
+  thickness[1] = (double) NumberTraits<Integer>::castToDouble ( thicknessR[1].first ) / (double) NumberTraits<Integer>::castToDouble ( thicknessR[1].second );
+  thickness[2] = (double) NumberTraits<Integer>::castToDouble ( thicknessR[2].first ) / (double) NumberTraits<Integer>::castToDouble ( thicknessR[2].second );
   
   assign( direction, directionZ3 );
   direction /= direction.norm();
