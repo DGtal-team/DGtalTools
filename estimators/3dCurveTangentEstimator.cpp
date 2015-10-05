@@ -205,11 +205,12 @@ void displayProj2d( Viewer3D<space, kspace> & viewer,
   const ArithmeticalDSSComputer2d & dssXY = dss3d.arithmeticalDSS2dXY();
   const ArithmeticalDSSComputer2d & dssXZ = dss3d.arithmeticalDSS2dXZ();
   const ArithmeticalDSSComputer2d & dssYZ = dss3d.arithmeticalDSS2dYZ();
-  unsigned int lenXY = distance ( dssXY.begin(), dssXY.end() );
-  unsigned int lenXZ = distance ( dssXZ.begin(), dssXZ.end() );
-  unsigned int lenYZ = distance ( dssYZ.begin(), dssYZ.end() );
   
-  if ( lenXY > lenYZ && lenXZ > lenYZ ) { //XY-plane, XZ-plane
+  bool validXY = dss3d.validArithmeticalDSS2d ( 2 );
+  bool validXZ = dss3d.validArithmeticalDSS2d ( 1 );
+  bool validYZ = dss3d.validArithmeticalDSS2d ( 0 );
+  
+  if ( validXY && validXZ ) { //XY-plane, XZ-plane
     for ( ConstIterator2d itXY = dssXY.begin(), itXZ = dssXZ.begin(), itPEnd = dssXY.end(); itXY != itPEnd; ++itXY, ++itXZ )
     {
       Point2d p1 = *itXY, p2 = *itXZ;
@@ -223,7 +224,7 @@ void displayProj2d( Viewer3D<space, kspace> & viewer,
       viewer << CustomColors3D( color2d, color2d ) << c3;
     }
   }  else {
-    if ( lenYZ > lenXZ && lenXY > lenXZ ) { //XY-plane, YZ-plane
+    if ( validYZ && validXY ) { //XY-plane, YZ-plane
       for ( ConstIterator2d itYZ = dssYZ.begin(), itXY = dssXY.begin(), itPEnd = dssXY.end(); itXY != itPEnd; ++itXY, ++itYZ )
       {
 	Point2d p1 = *itYZ, p2 = *itXY;
