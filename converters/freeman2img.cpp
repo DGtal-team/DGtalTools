@@ -65,6 +65,7 @@ int main( int argc, char** argv )
     ("help,h", "display this message")  
     ("input,i", po::value<std::string>(), "the input FreemanChain file name")
     ("output,o", po::value<std::string>()->default_value("result.pgm"), " the output filename")
+    ("border,b", po::value<unsigned int>()->default_value(0), " add a border in the resulting image (used only in the automatic mode i.e when --space is not used.")
     ("space,s", po::value<std::vector <int> >()->multitoken(), "Define the space from its bounding box (lower and upper coordinates) \
 else the space is automatically defined from the freemanchain bounding boxes.");
   
@@ -83,9 +84,9 @@ else the space is automatically defined from the freemanchain bounding boxes.");
     trace.info()<< "Error checking program options: "<< ex.what()<< std::endl;
   }
   
- 
+  
   po::notify(vm);    
-  if(!parseOK||vm.count("help")||argc<=1 || (!(vm.count("FreemanChain")||vm.count("f")   ) ) )
+  if(!parseOK||vm.count("help")||argc<=1 || (!(vm.count("input")   ) ) )
     {
       if(!parseOK){
         trace.info() <<" Error parsing options\n" <<std::endl;
@@ -94,25 +95,34 @@ else the space is automatically defined from the freemanchain bounding boxes.");
                   << "The transformation can fill shapes with hole by using the freemanchain orientation."
                   <<" The interior is considered on the left according to a freeman chain move, i.e. a clockwise oriented contour represents a hole in the shape." <<std::endl
                   << "Basic usage: "<<std::endl
-                  << "\t freeman2img [options] --FreemanChain  <fileName>  "<<std::endl
+                  << "\t freeman2img  -i  inputChain.fc -o contourDisplay.pgm -b 5  "<<std::endl
 		  << general_opt << "\n";
       return 0;
     }  
   
-  if( vm.count("FreemanChain") ){
+  if( vm.count("input") ){
+    unsigned int border = vm["border"].as<unsigned int>();
     std::string fileName = vm["input"].as<std::string>();
     std::vector< FreemanChain > vectFcs =  PointListReader< Z2i::Point >::getFreemanChainsFromFile<Z2i::Integer> (fileName);    
-    int minx, miny, maxx, maxy;
+    int minx=std::numeric_limits<int>::max();
+    int miny=std::numeric_limits<int>::max();
+    int maxx=std::numeric_limits<int>::min();
+    int maxy=std::numeric_limits<int>::min();
+        
     if(!vm.count("space")){
       for(std::vector< FreemanChain >::const_iterator it = vectFcs.begin(); it!= vectFcs.end(); it++){
         FreemanChain fc = *it;
-        int t_minx, t_miny, t_maxx, t_maxy;
+        int t_minx=std::numeric_limits<int>::max();
+        int t_miny=std::numeric_limits<int>::max();
+        int t_maxx=std::numeric_limits<int>::min();
+        int t_maxy=std::numeric_limits<int>::min();
         fc.computeBoundingBox(t_minx, t_miny, t_maxx, t_maxy);
         minx = t_minx > minx? minx: t_minx;
         miny = t_miny > miny? miny: t_miny;
         maxx = t_maxx < maxx? maxx: t_maxx;
         maxy = t_maxy < maxy? maxy: t_maxy;
       }
+      minx-=border; miny-=border; maxx+=border;   maxy+=border;
     }else{
       std::vector<int> vectSpace = vm["space"].as<std::vector<int> > ();
       if(vectSpace.size()!=4){
@@ -122,8 +132,7 @@ else the space is automatically defined from the freemanchain bounding boxes.");
       minx = vectSpace[0];
       miny = vectSpace[1];
       maxx = vectSpace[2];
-      maxy = vectSpace[3];
-      
+      maxy = vectSpace[3];      
     }
     KSpace aKSpace;
     aKSpace.init(Z2i::Point(minx, miny), Z2i::Point(maxx, maxy), false);
@@ -131,11 +140,11 @@ else the space is automatically defined from the freemanchain bounding boxes.");
     std::set<Cell> interiorCell;
     for(std::vector< FreemanChain >::const_iterator it = vectFcs.begin(); it!= vectFcs.end(); it++){
       FreemanChain fc = *it;
-      FreemanChain::getInterPixelLinels(aKSpace, fc, boundarySCell, true); 
+      FreemanChain::getInterPixelLinels(aKSpace, fc, boundarySCell, true);
     }
-    
+
     Image2D imageResult (Z2i::Domain(Z2i::Point(minx, miny), Z2i::Point(maxx, maxy))); 
-    Surfaces<KSpace>::uFillInterior(aKSpace, functors::SurfelSetPredicate<std::set<SCell>,SCell>(boundarySCell), imageResult, 255, false, false );  
+    Surfaces<KSpace>::uFillInterior(aKSpace, functors::SurfelSetPredicate<std::set<SCell>,SCell>(boundarySCell), imageResult, 255, false, true );  
     imageResult >> vm["output"].as<std::string>();
   }
 
