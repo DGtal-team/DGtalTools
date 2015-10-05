@@ -53,6 +53,7 @@
 #include "DGtal/topology/KhalimskySpaceND.h"
 #include "DGtal/geometry/curves/GridCurve.h"
 #include "DGtal/geometry/curves/Naive3DDSSComputer.h"
+#include "DGtal/geometry/curves/StandardDSS6Computer.h"
 #include "DGtal/geometry/curves/SaturatedSegmentation.h"
 #include "DGtal/geometry/volumes/distance/ExactPredicateLpSeparableMetric.h"
 #include "DGtal/geometry/volumes/estimation/VoronoiCovarianceMeasure.h"
@@ -189,9 +190,83 @@ void displayDSS3dTangent( Viewer3D<space, kspace> & viewer,
 		  MS3D_LINESIZE );
 }
 
+template <typename KSpace, typename StandardDSS6Computer, typename space, typename kspace >
+void displayProj2d6( Viewer3D<space, kspace> & viewer,
+        const KSpace & ks, const StandardDSS6Computer & dss3d,
+        const DGtal::Color & color2d )
+{
+  typedef typename StandardDSS6Computer::ArithmeticalDSSComputer2d ArithmeticalDSSComputer2d;
+  typedef typename ArithmeticalDSSComputer2d::ConstIterator ConstIterator2d;
+  typedef typename ArithmeticalDSSComputer2d::Point Point2d;
+  typedef typename KSpace::Cell Cell;
+  typedef typename KSpace::Point Point3d;
+  Point3d b = ks.lowerBound();
+  for ( DGtal::Dimension i = 0; i < 3; ++i )
+    {
+      const ArithmeticalDSSComputer2d & dss2d = dss3d.arithmeticalDSS2d( i );
+      for ( ConstIterator2d itP = dss2d.begin(), itPEnd = dss2d.end(); itP != itPEnd; ++itP )
+  {
+    Point2d p = *itP;
+    Point3d q;
+    switch (i) {
+    case 0: q = Point3d( 2*b[ i ]  , 2*p[ 0 ]+1, 2*p[ 1 ]+1 ); break;
+    case 1: q = Point3d( 2*p[ 0 ]+1, 2*b[ i ]  , 2*p[ 1 ]+1 ); break;
+    case 2: q = Point3d( 2*p[ 0 ]+1, 2*p[ 1 ]+1, 2*b[ i ]   ); break;
+    }
+    Cell c = ks.uCell( q );
+    viewer << CustomColors3D( color2d, color2d ) << c;
+  }
+    }
+}
+
+template <typename KSpace, typename StandardDSS6Computer, typename space, typename kspace >
+void displayDSS2d6( Viewer3D<space, kspace> & viewer,
+       const KSpace & ks, const StandardDSS6Computer & dss3d,
+       const DGtal::Color & color2d )
+{
+  typedef typename StandardDSS6Computer::ConstIterator ConstIterator3d;
+  typedef typename StandardDSS6Computer::ArithmeticalDSSComputer2d ArithmeticalDSSComputer2d;
+  typedef typename ArithmeticalDSSComputer2d::ConstIterator ConstIterator2d;
+  typedef typename ArithmeticalDSSComputer2d::Point Point2d;
+  typedef typename KSpace::Cell Cell;
+  typedef typename KSpace::Point Point3d;
+  typedef DGtal::PointVector<2,double> PointD2d;
+  typedef typename Display3D<>::BallD3D PointD3D;
+  Point3d b = ks.lowerBound();
+  for ( DGtal::Dimension i = 0; i < 3; ++i )
+    {
+      const typename ArithmeticalDSSComputer2d::Primitive & dss2d
+  = dss3d.arithmeticalDSS2d( i ).primitive();
+      // draw 2D bounding boxes for each arithmetical dss 2D.
+      std::vector<PointD2d> pts2d;
+      pts2d.push_back( dss2d.project(dss2d.back(), dss2d.Uf()) );
+      pts2d.push_back( dss2d.project(dss2d.back(), dss2d.Lf()) );
+      pts2d.push_back( dss2d.project(dss2d.front(), dss2d.Lf()) );
+      pts2d.push_back( dss2d.project(dss2d.front(), dss2d.Uf()) );
+      std::vector<PointD3D> bb;
+      PointD3D p3;
+      for ( unsigned int j = 0; j < pts2d.size(); ++j )
+  {
+    switch (i) {
+    case 0: p3.center[0] = (double) b[ i ]-0.5; p3.center[1] = pts2d[ j ][ 0 ];  p3.center[2] = pts2d[ j ][ 1 ]; break;
+    case 1: p3.center[0] = pts2d[ j ][ 0 ];  p3.center[1] = (double) b[ i ]-0.5; p3.center[2] = pts2d[ j ][ 1 ];     break;
+    case 2: p3.center[0] = pts2d[ j ][ 0 ];  p3.center[1] = pts2d[ j ][ 1 ];     p3.center[2] = (double) b[ i ]-0.5; break;
+    }
+    bb.push_back( p3 );
+  }
+      for ( unsigned int j = 0; j < pts2d.size(); ++j ){
+  viewer.setLineColor(color2d);
+  viewer.addLine( DGtal::Z3i::RealPoint(bb[ j ].center[0], bb[ j ].center[1], bb[ j ].center[2]),
+                        DGtal::Z3i::RealPoint(bb[ (j+1)%4 ].center[0], bb[ (j+1)%4 ].center[1], bb[ (j+1)%4 ].center[2]),
+      MS3D_LINESIZE );
+      }
+    } // for ( DGtal::Dimension i = 0; i < 3; ++i )
+}
+
+
 //Why not to just project 3D curve?
 template <typename KSpace, typename Naive3DDSSComputer, typename space, typename kspace >
-void displayProj2d( Viewer3D<space, kspace> & viewer,
+void displayProj2d26( Viewer3D<space, kspace> & viewer,
 		    const KSpace & ks, const Naive3DDSSComputer & dss3d,
 		    const DGtal::Color & color2d )
 {
@@ -257,7 +332,7 @@ void displayProj2d( Viewer3D<space, kspace> & viewer,
 
 
 template <typename KSpace, typename Naive3DDSSComputer, typename space, typename kspace >
-void displayDSS2d( Viewer3D<space, kspace> & viewer,
+void displayDSS2d26( Viewer3D<space, kspace> & viewer,
 		   const KSpace & ks, const Naive3DDSSComputer & dss3d,
 		   const DGtal::Color & color2d )
 {
@@ -304,18 +379,68 @@ void displayDSS2d( Viewer3D<space, kspace> & viewer,
 }
 
 /**
- * segmentation test
- *
+ * Displays the tangential cover of 6-connected curves (i.e. standard curves).
  */
-template <typename KSpace, typename PointIterator, typename space, typename kspace,
-int CONNECTIVITY >
-bool displayCover( Viewer3D<space, kspace> & viewer,
+template <typename KSpace, typename PointIterator, typename space, typename kspace >
+bool displayCover6( Viewer3D<space, kspace> & viewer,
+       const KSpace & ks, PointIterator b, PointIterator e,
+       bool dss3d, bool proj2d, bool dss2d, bool tangent,
+       int nbColors )
+{
+  typedef typename PointIterator::value_type Point;
+  typedef StandardDSS6Computer<PointIterator,int,4> SegmentComputer;
+  typedef SaturatedSegmentation<SegmentComputer> Decomposition;
+  typedef typename Decomposition::SegmentComputerIterator SegmentComputerIterator;
+  typedef typename SegmentComputer::ArithmeticalDSSComputer2d ArithmeticalDSSComputer2d;
+  SegmentComputer algo;
+  Decomposition theDecomposition(b, e, algo);
+
+  viewer << SetMode3D( algo.className(), "BoundingBox" );
+  HueShadeColorMap<int> cmap_hue( 0, nbColors, 1 );
+
+  unsigned int c = 0;
+  for ( SegmentComputerIterator i = theDecomposition.begin();
+        i != theDecomposition.end(); ++i)
+    {
+      SegmentComputer ms3d(*i);
+      const ArithmeticalDSSComputer2d & dssXY = ms3d.arithmeticalDSS2dXY();
+      const ArithmeticalDSSComputer2d & dssXZ = ms3d.arithmeticalDSS2dXZ();
+      const ArithmeticalDSSComputer2d & dssYZ = ms3d.arithmeticalDSS2dYZ();
+      Point f = *ms3d.begin();
+      Point l = *(ms3d.end() - 1);
+      trace.info() << "- " << c
+                   << " MS3D,"
+                   << " [" << f[ 0 ] << "," << f[ 1 ] << ","<< f[ 2 ] << "]"
+                   << "->[" << l[ 0 ] << "," << l[ 1 ] << ","<< l[ 2 ] << "]"
+                   << ", XY("
+                   << dssXY.a() << "," << dssXY.b() << "," << dssXY.mu()
+                   << "), XZ("
+                   << dssXZ.a() << "," << dssXZ.b() << "," << dssXZ.mu()
+                   << "), YZ("
+                   << dssYZ.a() << "," << dssYZ.b() << "," << dssYZ.mu()
+                   << ")" << std::endl;
+      Color color = cmap_hue( c );
+      if ( tangent ) displayDSS3dTangent( viewer, ks, ms3d, color );
+      if ( dss3d )   displayDSS3d( viewer, ks, ms3d, color );
+      if ( dss2d )   displayDSS2d6( viewer, ks, ms3d, color );
+      if ( proj2d )  displayProj2d6( viewer, ks, ms3d, CURVE2D_COLOR );
+      c++;
+    }
+  return true;
+}
+
+/**
+ * Displays the tangential cover of 26-connected curves (i.e. naive
+ * curves). Note that is still experimental.
+ */
+template <typename KSpace, typename PointIterator, typename space, typename kspace >
+bool displayCover26( Viewer3D<space, kspace> & viewer,
 		   const KSpace & ks, PointIterator b, PointIterator e,
 		   bool dss3d, bool proj2d, bool dss2d, bool tangent,
 		   int nbColors )
 {
   typedef typename PointIterator::value_type Point;
-  typedef Naive3DDSSComputer<PointIterator,int, CONNECTIVITY> SegmentComputer;
+  typedef Naive3DDSSComputer<PointIterator,int, 8 > SegmentComputer;
   typedef SaturatedSegmentation<SegmentComputer> Decomposition;
   typedef typename Decomposition::SegmentComputerIterator SegmentComputerIterator;
   typedef typename SegmentComputer::ArithmeticalDSSComputer2d ArithmeticalDSSComputer2d;
@@ -351,36 +476,11 @@ bool displayCover( Viewer3D<space, kspace> & viewer,
 	 Color color = cmap_hue( c );
 	 if ( tangent ) displayDSS3dTangent( viewer, ks, ms3d, color );
 	 if ( dss3d )   displayDSS3d( viewer, ks, ms3d, color );
-	 if ( dss2d )   displayDSS2d( viewer, ks, ms3d, color );
-	 if ( proj2d )  displayProj2d( viewer, ks, ms3d, CURVE2D_COLOR );
+	 if ( dss2d )   displayDSS2d26( viewer, ks, ms3d, color );
+	 if ( proj2d )  displayProj2d26( viewer, ks, ms3d, CURVE2D_COLOR );
 	 c++;
        }
        return true;
-}
-
-/**
- * Displays the tangential cover of 6-connected curves (i.e. standard curves).
- */
-template <typename KSpace, typename PointIterator, typename space, typename kspace>
-bool displayCover6( Viewer3D<space, kspace> & viewer,
-		    const KSpace & ks, PointIterator b, PointIterator e,
-		    bool dss3d, bool proj2d, bool dss2d, bool tangent,
-		    int nbColors )
-{
-  return displayCover<KSpace, PointIterator, space, kspace, 4>( viewer, ks, b, e, dss3d, proj2d, dss2d, tangent, nbColors );
-}
-
-/**
- * Displays the tangential cover of 26-connected curves (i.e. naive
- * curves). Note that is still experimental.
- */
-template <typename KSpace, typename PointIterator, typename space, typename kspace>
-bool displayCover26( Viewer3D<space, kspace> & viewer,
-		     const KSpace & ks, PointIterator b, PointIterator e,
-		     bool dss3d, bool proj2d, bool dss2d, bool tangent,
-		     int nbColors )
-{
-  return displayCover<KSpace, PointIterator, space, kspace, 8>( viewer, ks, b, e, dss3d, proj2d, dss2d, tangent, nbColors );
 }
 
 template < typename PointIterator, typename Space, typename TangentSequence >
@@ -418,11 +518,41 @@ void ComputeVCM ( const double & R, const double & r,
   outputStream.close();
 }
 
-template < typename PointIterator, typename Space, typename TangentSequence, int CONNECTIVITY >
-bool ComputeLMST ( const PointIterator & begin, const PointIterator & end, TangentSequence & tangents, const std::string & output  )
+template < typename PointIterator, typename Space, typename TangentSequence >
+bool ComputeLMST6 ( const PointIterator & begin, const PointIterator & end, TangentSequence & tangents, const std::string & output  )
 {
   typedef typename PointIterator::value_type Point;
-  typedef Naive3DDSSComputer<PointIterator,int, CONNECTIVITY> SegmentComputer;
+  typedef StandardDSS6Computer<PointIterator,int, 4 > SegmentComputer;
+  typedef SaturatedSegmentation<SegmentComputer> Decomposition;
+  typedef typename Decomposition::SegmentComputerIterator SegmentComputerIterator;
+  typedef typename SegmentComputer::ArithmeticalDSSComputer2d ArithmeticalDSSComputer2d;
+  SegmentComputer algo;
+  Decomposition theDecomposition ( begin, end, algo );
+  
+  fstream outputStream;
+  outputStream.open ( ( output + ".lmst" ).c_str(), std::ios::out );
+  outputStream << "X Y Z X Y Z" << endl;
+  
+  LambdaMST3D < Decomposition > lmst64;
+  lmst64.attach ( theDecomposition );
+  lmst64.init ( begin, end );
+  lmst64.eval ( begin, end, std::back_inserter ( tangents ) );
+  typename TangentSequence::iterator itt = tangents.begin();
+  for ( PointIterator it = begin; it != end; ++it, ++itt )
+  {
+    typename Space::RealVector & tangent = (*itt);
+    if ( tangent.norm() != 0. )
+      tangent = tangent.getNormalized();
+    outputStream << (*it)[0] << " " << (*it)[1] << " " << (*it)[2] << " "
+    << tangent[0] << " " << tangent[1] << " " << tangent[2] << endl;
+  }
+}
+
+template < typename PointIterator, typename Space, typename TangentSequence >
+bool ComputeLMST26 ( const PointIterator & begin, const PointIterator & end, TangentSequence & tangents, const std::string & output  )
+{
+  typedef typename PointIterator::value_type Point;
+  typedef Naive3DDSSComputer<PointIterator,int, 8 > SegmentComputer;
   typedef SaturatedSegmentation<SegmentComputer> Decomposition;
   typedef typename Decomposition::SegmentComputerIterator SegmentComputerIterator;
   typedef typename SegmentComputer::ArithmeticalDSSComputer2d ArithmeticalDSSComputer2d;
@@ -570,9 +700,9 @@ int main(int argc, char **argv)
   else if ( method == "L-MST" )
   {
     if (vm[ "connectivity" ].as<string>() == "6")
-      ComputeLMST  < PointIterator, Z3, std::vector< RealVector >, 4 > ( sequence.begin(), sequence.end(), tangents, output );
+      ComputeLMST6  < PointIterator, Z3, std::vector< RealVector > > ( sequence.begin(), sequence.end(), tangents, output );
     else
-      ComputeLMST  < PointIterator, Z3, std::vector< RealVector >, 8 > ( sequence.begin(), sequence.end(), tangents, output );
+      ComputeLMST26  < PointIterator, Z3, std::vector< RealVector > > ( sequence.begin(), sequence.end(), tangents, output );
   }
   else
   {
