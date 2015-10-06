@@ -532,20 +532,20 @@ int main( int argc, char** argv )
       {
         typedef functors::IINormalDirectionFunctor<Z3i::Space> MyIICurvatureFunctor;
         typedef IntegralInvariantCovarianceEstimator<Z3i::KSpace, Predicate, MyIICurvatureFunctor> MyIIEstimator;
-        
+
         MyIICurvatureFunctor functor;
         functor.init( h, re_convolution_kernel );
-        
+
         MyIIEstimator estimator( functor );
         estimator.attach( K, predicate );
         estimator.setParams( re_convolution_kernel/h );
         estimator.init( h, abegin, aend );
-        
+
         estimator.eval( abegin, aend, resultsIterator );
       }
 
-      
-      
+
+
       ///Visualizaton / export
 
 #ifdef WITH_VISU3D_QGLVIEWER
@@ -585,6 +585,14 @@ int main( int argc, char** argv )
           board << CustomColors3D( DGtal::Color(255,255,255,255),
                                    DGtal::Color(255,255,255,255))
                 << unsignedSurfel;
+        }
+
+        if( enable_dat )
+        {
+          Point kCoords = K.uKCoords(K.unsigns(*abegin2));
+          outDat << kCoords[0] << " " << kCoords[1] << " " << kCoords[2] << " "
+          << results[i][0] << " " << results[i][1] << " " << results[i][2]
+          << std::endl;
         }
 
         RealPoint center = embedder( outer );
