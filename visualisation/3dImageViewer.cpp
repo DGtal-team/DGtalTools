@@ -85,6 +85,7 @@ int main( int argc, char** argv )
     ("thresholdMax,M",  po::value<int>()->default_value(255), "threshold max to define binary shape" )
     ("displaySDP,s", po::value<std::string>(), "display a set of discrete points (.sdp)" )
     ("SDPindex", po::value<std::vector <unsigned int> >()->multitoken(), "specify the sdp index (by default 0,1,2).")
+    ("SDPball", po::value<double>()->default_value(0.5), "use balls to display a set of discrete points (used with displaySDP option)")
     ("displayMesh", po::value<std::string>(), "display a Mesh given in OFF or OFS format. " )
     ("displayDigitalSurface", "display the digital surface instead of display all the set of voxels (used with thresholdImage or displaySDP options)" )
     ("colorizeCC", "colorize each Connected Components of the surface displayed by displayDigitalSurface option." )
@@ -127,11 +128,12 @@ int main( int argc, char** argv )
   unsigned char transp = vm["transparency"].as<uint>();
 
   QApplication application(argc,argv);
-
+  
   float sx = vm["scaleX"].as<float>();
   float sy = vm["scaleY"].as<float>();
   float sz = vm["scaleZ"].as<float>();
 
+  double ballRadius = vm["SDPball"].as<double>();
   string extension = inputFilename.substr(inputFilename.find_last_of(".") + 1);
   if(extension!="vol" && extension != "p3d" && extension != "pgm3D" && extension != "pgm3d" && extension != "sdp" && extension != "pgm"
 #ifdef WITH_ITK
@@ -225,9 +227,13 @@ int main( int argc, char** argv )
     }
     for(unsigned int i=0;i< vectVoxels.size(); i++){
       if(!vm.count("displayDigitalSurface")){
-        viewer << vectVoxels.at(i);
+        if(vm.count("SDPball")){
+          viewer.addBall (vectVoxels.at(i), ballRadius);
+        }else{
+          viewer << vectVoxels.at(i);
+        }
       }else{
-  set3d.insert(vectVoxels.at(i));
+        set3d.insert(vectVoxels.at(i));
       }
     }
   }
@@ -243,7 +249,7 @@ int main( int argc, char** argv )
       viewer.setFillColor(c);
     }
 
-    DGtal::Mesh<Z3i::RealPoint> aMesh;
+    DGtal::Mesh<Z3i::RealPoint> aMesh(!vm.count("colorMesh"));
     MeshReader<Z3i::RealPoint>::importOFFFile(vm["displayMesh"].as<std::string>(), aMesh);
     viewer << aMesh;
   }
@@ -285,7 +291,7 @@ int main( int argc, char** argv )
       }
     }
   }
-
+  
   viewer << Viewer3D<>::updateDisplay;
   return application.exec();
 }
