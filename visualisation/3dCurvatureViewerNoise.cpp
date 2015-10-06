@@ -112,9 +112,9 @@ int main( int argc, char** argv )
       ("threshold,t",  po::value< unsigned int >()->default_value(8), "Min size of SCell boundary of an object" )
       ("minImageThreshold,l",  po::value<  int >()->default_value(0), "set the minimal image threshold to define the image object (object defined by the voxel with intensity belonging to ]minImageThreshold, maxImageThreshold ] )." )
       ("maxImageThreshold,u",  po::value<  int >()->default_value(1), "set the minimal image threshold to define the image object (object defined by the voxel with intensity belonging to ]minImageThreshold, maxImageThreshold] )." )
-      ("mode,m", po::value< std::string >()->default_value("mean"), "type of output : mean, gaussian, k1, k2, prindir1 or prindir2 (default mean)")
-      ("export,e", po::value< std::string >(), "Export the scene to specified OBJ filename." )
-      ("exportDat,E", po::value<std::string>(), "Export resulting curvature (for mean, gaussian, k1 or k2 mode) in a simple data file each line representing a surfel. ")
+      ("mode,m", po::value< std::string >()->default_value("mean"), "type of output : mean, gaussian, k1, k2, prindir1, prindir2 or normal(default mean)")
+      ("exportOBJ,o", po::value< std::string >(), "Export the scene to specified OBJ filename." )
+      ("exportDAT,d", po::value<std::string>(), "Export resulting curvature (for mean, gaussian, k1 or k2 mode) in a simple data file each line representing a surfel. ")
       ("exportOnly", "Used to only export the result without the 3d Visualisation (usefull for scripts)." )
       ("imageScale,s", po::value<std::vector<double> >()->multitoken(), "scaleX, scaleY, scaleZ: re sample the source image according with a grid of size 1.0/scale (usefull to compute curvature on image defined on anisotropic grid). Set by default to 1.0 for the three axis.  ")
       ("normalization,n", "When exporting to OBJ, performs a normalization so that the geometry fits in [-1/2,1/2]^3") ;
@@ -150,7 +150,7 @@ int main( int argc, char** argv )
     mode =  vm["mode"].as< std::string >();
   if ( parseOK && ( mode.compare("gaussian") != 0 ) && ( mode.compare("mean") != 0 ) &&
        ( mode.compare("k1") != 0 ) && ( mode.compare("k2") != 0 ) &&
-       ( mode.compare("prindir1") != 0 ) && ( mode.compare("prindir2") != 0 ))
+       ( mode.compare("prindir1") != 0 ) && ( mode.compare("prindir2") != 0 )&& ( mode.compare("normal") != 0 ))
   {
     parseOK = false;
     trace.error() << " The selected mode ("<<mode << ") is not defined."<<std::endl;
@@ -168,8 +168,8 @@ int main( int argc, char** argv )
 #else
   bool enable_visu = !vm.count("exportOnly"); ///<! Default QGLViewer viewer. Disabled if exportOnly is set.
 #endif
-  bool enable_obj = vm.count("export"); ///<! Export to a .obj file.
-  bool enable_dat = vm.count("exportDat"); ///<! Export to a .dat file.
+  bool enable_obj = vm.count("exportOBJ"); ///<! Export to a .obj file.
+  bool enable_dat = vm.count("exportDAT"); ///<! Export to a .dat file.
 
   if( !enable_visu && !enable_obj && !enable_dat )
   {
@@ -195,6 +195,7 @@ int main( int argc, char** argv )
                 << "\t - \"k2\" for the second principal curvature" << std::endl
                 << "\t - \"prindir1\" for the first principal curvature direction" << std::endl
                 << "\t - \"prindir2\" for the second principal curvature direction" << std::endl
+                << "\t - \"normal\" for the normal vector" << std::endl
                 << std::endl;
     return 0;
   }
@@ -209,7 +210,7 @@ int main( int argc, char** argv )
 
   if( enable_obj )
   {
-    export_obj_filename = vm["export"].as< std::string >();
+    export_obj_filename = vm["exportOBJ"].as< std::string >();
     if( export_obj_filename.find(".obj") == std::string::npos )
     {
       std::ostringstream oss;
@@ -221,7 +222,7 @@ int main( int argc, char** argv )
 
   if( enable_dat )
   {
-    export_dat_filename = vm["exportDat"].as<std::string>();
+    export_dat_filename = vm["exportDAT"].as<std::string>();
   }
 
   double re_convolution_kernel = vm["radius"].as< double >();
@@ -548,8 +549,24 @@ int main( int argc, char** argv )
         estimator.init( h, abegin, aend );
 
         estimator.eval( abegin, aend, resultsIterator );
+      }else if( mode.compare("normal") == 0 )
+      {
+        typedef functors::IINormalDirectionFunctor<Z3i::Space> MyIICurvatureFunctor;
+        typedef IntegralInvariantCovarianceEstimator<Z3i::KSpace, Predicate, MyIICurvatureFunctor> MyIIEstimator;
+        
+        MyIICurvatureFunctor functor;
+        functor.init( h, re_convolution_kernel );
+        
+        MyIIEstimator estimator( functor );
+        estimator.attach( K, predicate );
+        estimator.setParams( re_convolution_kernel/h );
+        estimator.init( h, abegin, aend );
+        
+        estimator.eval( abegin, aend, resultsIterator );
       }
 
+      //Visualization + export
+      
 #ifdef WITH_VISU3D_QGLVIEWER
       if( enable_visu )
       {
@@ -602,6 +619,10 @@ int main( int argc, char** argv )
           {
             viewer.setLineColor( AXIS_COLOR_RED );
           }
+          else if( mode.compare("normal") == 0 )
+          {
+            viewer.setLineColor( AXIS_COLOR_GREEN );
+          }
 
           viewer.addLine (
                 RealPoint(
@@ -627,6 +648,10 @@ int main( int argc, char** argv )
           else if( mode.compare("prindir2") == 0 )
           {
             board.setFillColor( AXIS_COLOR_RED );
+          }
+          else if( mode.compare("normal") == 0 )
+          {
+            board.setFillColor( AXIS_COLOR_GREEN );
           }
 
           board.addCylinder (
