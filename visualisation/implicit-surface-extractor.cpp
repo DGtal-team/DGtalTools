@@ -43,6 +43,7 @@
 #include "DGtal/io/viewers/Viewer3D.h"
 #include "DGtal/topology/KhalimskySpaceND.h"
 #include "DGtal/topology/CubicalComplex.h"
+#include "DGtal/topology/CubicalComplexFunctions.h"
 #include "DGtal/topology/SetOfSurfels.h"
 #include "DGtal/topology/DigitalSurface.h"
 #include "DGtal/topology/helpers/Surfaces.h"
@@ -581,20 +582,21 @@ int main( int argc, char** argv )
     {
       Cell4 cell = *it;
       Dimension d = K4.uDim( cell );
-      CellMapConstIterator cmIt = complex4.find( d, cell );
+      CellMapConstIterator cmIt = complex4.findCell( d, cell );
       bdry_complex4.insertCell( d, cell, cmIt->second );
     }
   //bdry_complex4.insertCells( bdry.begin(), bdry.end() );
   trace.info() << "- [before collapse] K_bdry =" << bdry_complex4 << endl;
-  bdry_complex4.collapse( bdry.begin(), bdry.end(), priority, true, true, true );
+  functions::collapse( bdry_complex4, bdry.begin(), bdry.end(), priority, 
+                       true, true, true );
   trace.info() << "- [after collapse]  K_bdry =" << bdry_complex4 << endl;
   for ( std::vector<Cell4>::const_iterator it = bdry.begin(), itE = bdry.end(); it != itE; ++it )
     {
       Cell4 cell  = *it;
       Dimension d = K4.uDim( cell );
-      CellMapConstIterator cmIt = bdry_complex4.find( d, cell );
+      CellMapConstIterator cmIt = bdry_complex4.findCell( d, cell );
       if ( cmIt != bdry_complex4.end( d ) ) {
-        CellMapIterator cmIt2 = complex4.find( d, cell );
+        CellMapIterator cmIt2 = complex4.findCell( d, cell );
         cmIt2->second = sure_data;
       }
     }
@@ -604,7 +606,8 @@ int main( int argc, char** argv )
   trace.beginBlock( "Collapse all. " );
   std::copy( bdry.begin(), bdry.end(), std::back_inserter( inner ) );
   //typename CC4::DefaultCellMapIteratorPriority priority;
-  complex4.collapse( inner.begin(), inner.end(), priority, true, true, true );
+  functions::collapse( complex4, inner.begin(), inner.end(), priority, 
+                       true, true, true );
   trace.info() << "- K=" << complex4 << endl;
   trace.endBlock();
 
