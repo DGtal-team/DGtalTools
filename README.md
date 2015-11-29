@@ -23,6 +23,7 @@ user to show how to include the DGtal library framework directly in their
 own source code (in complement of DGtal tutorial http://liris.cnrs.fr/dgtal/doc/nightly/packageTutorials.html).
 
 
+* Release 0.9 DOI [![DOI](https://zenodo.org/badge/doi/10.5281/zenodo.31882.svg)](http://dx.doi.org/10.5281/zenodo.31882)
 * Release 0.8 DOI [![DOI](https://zenodo.org/badge/doi/10.5281/zenodo.11587.svg)](http://dx.doi.org/10.5281/zenodo.11587)
 * [![Build Status](https://api.travis-ci.org/DGtal-team/DGtalTools.svg?branch=master)](https://travis-ci.org/DGtal-team/DGtalTools)
 
@@ -55,11 +56,13 @@ Utilities to convert various simple file formats:
   - freeman2img: transform one or several freeman chains into a pgm file by filling their interior areas.
   - freeman2sdp: convert freeman chain towards a Sequence of Discrete Points.
   - HDF52vol: convert HDF5 to vol file format. 
+  - heightfield2shading: Render a 2D heightfield image into a shading image from various reflectance models (lambertian, specular, custom reflectance map).
   - heightfield2vol: a new tool to transform 2D heightmap into volumetric file.
   - img2freeman: to extract a freeman chain contour from a grayscale image.
   - imgAddNoise: a new tool to add noise (Kanungo's) to a binary 2D object.
   - itk2vol: convert any image of itk format (mhd, mha, ...) to vol (available with the itk option in DGtal).
   - longvol2vol: convert longvol to vol file using different conversion policies.  
+  - mesh2heightfield: a tool to convert a mesh file into a 2D heightmap (from a normal direction N and from a starting point P).
   - ofs2off: convert OFS mesh format towards a OFF variant.
   - raw2HDF5: convert raw image to HDF5.
   - raw2vol and vol2raw: transform 3D volumes files from (resp. to) raw to vol.
@@ -86,7 +89,21 @@ Utilities to convert various simple file formats:
 <td>heightmap2vol</td>
 <td>imgAddNoise</td> 
 <td>volAddNoise</td>
+</tr>
+<tr>
+<td> <img height=150 src="https://cloud.githubusercontent.com/assets/772865/7106643/c09cb8d4-e148-11e4-8653-2d5bac5dc3c5.png"> 
+<td align=center> <img height=150 src= "https://cloud.githubusercontent.com/assets/772865/10265156/64aaad64-6a24-11e5-9773-628c661fa76c.png">
+</td>
+</tr>
+<tr>
+<td>mesh2heightfield</td>
+<td>heightfield2shading</td>
+</tr>
+
+<tr>
+
 </table>
+
 </center>
 
 
@@ -192,7 +209,7 @@ Here are some illustrations of such a tools:
 <td><img height=130 src="https://f.cloud.github.com/assets/772865/684598/c3adcf4c-d9ff-11e2-8c3f-e67c8abd0c76.png"></td>
 <td><img height=130 src="https://f.cloud.github.com/assets/772865/684622/d698405a-da00-11e2-8aa0-19212a58ce23.png"></td>
 <td><img width=300 src="https://cloud.githubusercontent.com/assets/772865/2720141/6c42a0e0-c56b-11e3-8328-a6d88242f21e.png"> </td>
-<td><img  width=300 src="https://cloud.githubusercontent.com/assets/772865/4023650/8fc2fe86-2b9e-11e4-98cf-7123c1a933fd.png"></td>
+<td><img  width=300 src="https://cloud.githubusercontent.com/assets/772865/10269635/8678ca02-6add-11e5-9d83-fbcf3608612f.png"></td>
 </tr>
 <tr>
 <td>displayContours</td>
