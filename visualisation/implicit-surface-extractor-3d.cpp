@@ -58,45 +58,6 @@ using namespace std;
 using namespace DGtal;
 
 
-/**
- * Computes the cells of the given complex that lies on the
- * boundary or inside the given bounds.
- */
-template <typename CubicalComplex, 
-          typename CellOutputIterator>
-void 
-getCellsWithinBounds( CellOutputIterator itBdry, CellOutputIterator itInner,
-                   const CubicalComplex& K, 
-                   const typename CubicalComplex::Point& kLow,  
-                   const typename CubicalComplex::Point& kUp )
-{
-  typedef typename CubicalComplex::Cell                 Cell;
-  typedef typename CubicalComplex::Point                Point;
-  typedef typename CubicalComplex::CellMapConstIterator CellMapConstIterator;
-  Dimension d = K.dim();
-  for ( Dimension i = 0; i <= d; ++i )
-    {
-      for ( CellMapConstIterator it = K.begin( i ), itE = K.end( i ); it != itE; ++it )
-        {
-          Cell cell = it->first;
-          Point kCell = K.space().uKCoords( cell );
-          if ( ( kLow.inf( kCell ) == kLow ) && ( kUp.sup( kCell ) == kUp ) )
-            { // Inside or on boundary.
-              bool bdry = false;
-              for ( Dimension j = 0; j < Point::dimension; ++j )
-                {
-                  if ( ( kCell[ j ] == kLow[ j ] ) || ( kCell[ j ] == kUp[ j ] ) )
-                    {
-                      bdry = true;
-                      break;
-                    }
-                }
-              if ( bdry ) *itBdry++  = cell;
-              else        *itInner++ = cell;
-            }
-        }
-    }
-}
 
 template <typename CellOutputIterator, typename DigitalSurface>
 void
@@ -396,8 +357,9 @@ int main( int argc, char** argv )
   trace.beginBlock( "Get boundary and inner cells. " );
   std::vector<Cell3> inner;
   std::vector<Cell3> bdry;
-  getCellsWithinBounds( std::back_inserter( bdry ), std::back_inserter( inner ),
-                        complex3, K3.uKCoords( K3.lowerCell() ), K3.uKCoords( K3.upperCell() ) );
+  functions::ccops::filterCellsWithinBounds
+    ( complex3, K3.uKCoords( K3.lowerCell() ), K3.uKCoords( K3.upperCell() ),
+       std::back_inserter( bdry ), std::back_inserter( inner ) );
   trace.info() << "- there are " << inner.size() << " inner cells." << endl;
   trace.info() << "- there are " << bdry.size() << " boundary cells." << endl;
   trace.endBlock();
@@ -432,8 +394,8 @@ int main( int argc, char** argv )
       bdry_complex3.insertCell( d, cell, cmIt->second );
     }
   trace.info() << "- [before collapse] K_bdry =" << bdry_complex3 << endl;
-  functions::collapse( bdry_complex3, bdry.begin(), bdry.end(), priority,
-                       true, true, false );
+  functions::ccops::collapse( bdry_complex3, bdry.begin(), bdry.end(), priority,
+                              true, true, false );
   trace.info() << "- [after collapse]  K_bdry =" << bdry_complex3 << endl;
   for ( std::vector<Cell3>::const_iterator it = bdry.begin(), itE = bdry.end(); it != itE; ++it )
     {
@@ -451,8 +413,8 @@ int main( int argc, char** argv )
   trace.beginBlock( "Collapse all. " );
   std::copy( bdry.begin(), bdry.end(), std::back_inserter( inner ) );
   //typename CC4::DefaultCellMapIteratorPriority priority;
-  functions::collapse( complex3, inner.begin(), inner.end(), priority, 
-                       true, true, true );
+  functions::ccops::collapse( complex3, inner.begin(), inner.end(), priority, 
+                              true, true, true );
   trace.info() << "- K = " << complex3 << endl;
   trace.endBlock();
 
@@ -541,8 +503,5 @@ int main( int argc, char** argv )
     }
   viewer << Viewer3D<Space3,KSpace3>::updateDisplay;
   return application.exec();
-
-
-  return 0;
 }
 ///////////////////////////////////////////////////////////////////////////////
