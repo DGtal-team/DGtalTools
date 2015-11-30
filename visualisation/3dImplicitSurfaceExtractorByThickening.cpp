@@ -277,7 +277,7 @@ int main( int argc, char** argv )
                 << endl
 		<< general_opt << "\n";
       cerr << "Example:\n" << endl
-           << "./implicit-surface-extractor-3d -p \"x^2-y*z^2\" -g 0.1" << endl
+           << argv[0] << " -p \"x^2-y*z^2\" -g 0.1" << endl
            << " - whitney  : x^2-y*z^2" << endl
            << " - 4lines   : x*y*(y-x)*(y-z*x)" << endl
            << " - cone     : z^2-x^2-y^2" << endl
@@ -285,8 +285,8 @@ int main( int argc, char** argv )
            << " - cayley3  : 4*(x^2 + y^2 + z^2) + 16*x*y*z - 1" << endl
            << " - crixxi   : -0.9*(y^2+z^2-1)^2-(x^2+y^2-1)^3" << endl << endl;
       cerr << "Some other examples (more difficult):" << endl
-           << "./implicit-surface-extractor-3d -a -2 -A 2 -p \"((y^2+z^2-1)^2-(x^2+y^2-1)^3)*(y*(x-1)^2-z*(x+1))^2\" -g 0.025 -e 1e-6 -n 50000 -v Singular -t 0.5 -P Newton" << endl
-           << "./implicit-surface-extractor-3d -a -2 -A 2 -p \"(x^5-4*z^3*y^2)*((x+y)^2-(z-x)^3)\" -g 0.025 -e 1e-6 -n 50000 -v Singular -t 0.05 -P Newton" << endl;
+           << argv[0] << " -a -2 -A 2 -p \"((y^2+z^2-1)^2-(x^2+y^2-1)^3)*(y*(x-1)^2-z*(x+1))^2\" -g 0.025 -e 1e-6 -n 50000 -v Singular -t 0.5 -P Newton" << endl
+           << argv[0] << " -a -2 -A 2 -p \"(x^5-4*z^3*y^2)*((x+y)^2-(z-x)^3)\" -g 0.025 -e 1e-6 -n 50000 -v Singular -t 0.05 -P Newton" << endl;
       return 0;
     }
 

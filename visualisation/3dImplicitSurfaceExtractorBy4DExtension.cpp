@@ -437,7 +437,7 @@ int main( int argc, char** argv )
                 << endl
 		<< general_opt << "\n";
       cerr << "Example:\n" << endl
-           << "./implicit-surface-extractor -p \"-0.9*(y^2+z^2-1)^2-(x^2+y^2-1)^3\"" << endl
+           << argv[ 0 ] << " -p \"-0.9*(y^2+z^2-1)^2-(x^2+y^2-1)^3\"" << endl
            << " - whitney  : x^2-y*z^2" << endl
            << " - 4lines   : x*y*(y-x)*(y-z*x)" << endl
            << " - cone     : z^2-x^2-y^2" << endl
