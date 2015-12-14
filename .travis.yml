@@ -28,6 +28,9 @@ addons:
     - libgraphicsmagick++1-dev
     - libqglviewer-qt4-dev
     - libinsighttoolkit3-dev 
+    - g++-4.8
+    - gcc-4.8
+  
 
 
 before_script:
