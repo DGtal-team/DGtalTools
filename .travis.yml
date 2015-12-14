@@ -15,9 +15,12 @@ env:
 
 addons:
   apt:
-    packages:
+   sources:
+    - deadsnakes
+    - ubuntu-toolchain-r-test
+   packages:
     - libhdf5-serial-dev
-    - libboost-program-options-dev
+    - libboost-dev
     - libcairo2-dev
     - doxygen
     - doxygen-latex
