@@ -31,8 +31,9 @@ addons:
 
 
 before_script:
-  - git clone git://github.com/DGtal-team/DGtal.git
+  - git clone git://github.com/dcoeurjo/DGtal.git
   - cd DGtal
+  - git pull origin cpp11
   - cmake . $DGTALTYPE 
   - make 
   - cd ..
