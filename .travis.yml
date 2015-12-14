@@ -25,7 +25,7 @@ addons:
     - doxygen
     - doxygen-latex
     - graphviz
-    - libboost-system-dev
+    - libboost-program-options-dev
     - libgmp-dev
     - libgdcm2-dev 
     - libgraphicsmagick++1-dev
