@@ -36,11 +36,14 @@ addons:
   
 
 
+before_install:
+  - if [ $CXX == "g++" ]; then CCOMPILER="gcc-4.8"; CXXCOMPILER="g++-4.8"; fi
+
 before_script:
   - git clone git://github.com/dcoeurjo/DGtal.git
   - cd DGtal
   - git pull origin cpp11
-  - cmake . $DGTALTYPE 
+  - cmake . $DGTALTYPE -DCMAKE_CXX_COMPILER=$CXXCOMPILER -DCMAKE_C_COMPILER=$CCOMPILER
   - make 
   - cd ..
 
