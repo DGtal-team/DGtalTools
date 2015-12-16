@@ -238,7 +238,7 @@ int main( int argc, char** argv )
       }
     }
   }
-  
+
   
   if (displayVectorField) {
     std::vector<unsigned int > vectFieldIndexes1 = {vectFieldIndexes[0],vectFieldIndexes[1], vectFieldIndexes[2]};
@@ -246,8 +246,9 @@ int main( int argc, char** argv )
     
     std::vector<DGtal::Z3i::RealPoint> vectPt1 = PointListReader<DGtal::Z3i::RealPoint>::getPointsFromFile(vm["displayVectorField"].as<std::string>(), vectFieldIndexes1);
     std::vector<DGtal::Z3i::RealPoint> vectPt2 = PointListReader<DGtal::Z3i::RealPoint>::getPointsFromFile(vm["displayVectorField"].as<std::string>(), vectFieldIndexes2);
-    
+    viewer.createNewLineList();
     for (unsigned int i = 0; i < vectPt1.size(); i++) {
+    
       viewer.setLineColor(vFieldLineColor);
       viewer.addLine(vectPt1[i], vectPt2[i]);
     }
