@@ -36,6 +36,7 @@
 #include "DGtal/io/Color.h"
 #include "DGtal/shapes/Shapes.h"
 #include "DGtal/helpers/StdDefs.h"
+#include "DGtal/io/readers/PointListReader.h"
 
 #include "DGtal/io/readers/GenericReader.h"
 #include "DGtal/images/imagesSetsUtils/SetFromImage.h"
@@ -80,9 +81,12 @@ int main( int argc, char** argv )
   general_opt.add_options()
     ( "help,h", "display this message." )
     ( "input,i", po::value<std::string>(), "Input volumetric file (.vol, .pgm3d or p3d)" )
-    ( "min,m", po::value<int>()->default_value( 0 ), "Minimum (excluded) value for threshold." )
-    ( "max,M", po::value<int>()->default_value( 255 ), "Maximum (included) value for threshold." )
-    ("fixedPoints", po::value<std::vector <int> >()->multitoken(), "defines the coordinates of points which should not be removed." );
+    ( "fixedPointSDP,s", po::value<std::string>(), "use fixed points from a file instead.")
+    ( "min,m", po::value<int>()->default_value( 0 ), "Minimum (excluded) value for threshold.")
+    ( "max,M", po::value<int>()->default_value( 255 ), "Maximum (included) value for threshold.")
+    ( "exportSDP,e", po::value<std::string>(), "Export the resulting set of points in a simple (sequence of discrete point (sdp)).")
+
+  ("fixedPoints", po::value<std::vector <int> >()->multitoken(), "defines the coordinates of points which should not be removed." );
 
 
   bool parseOK=true;
@@ -113,7 +117,7 @@ int main( int argc, char** argv )
   if ( ! ( vm.count ( "input" ) ) ) missingParam ( "--input" );
   std::string filename = vm["input"].as<std::string>();
 
-
+  
   typedef ImageSelector < Z3i::Domain, unsigned char>::Type Image;
   Image image = GenericReader<Image>::import ( filename );
 
@@ -143,8 +147,13 @@ int main( int argc, char** argv )
       trace.error()<< " The coordinates should be 3d coordinates, ignoring fixedPoints option." << std::endl;
     }
   }
-
-
+  if(vm.count("fixedPointSDP")){
+    std::vector<Z3i::Point> vPt = PointListReader<Z3i::Point>::getPointsFromFile(vm["fixedPointSDP"].as<std::string>());
+    for( auto &p: vPt){
+      fixedSet.insert(p);
+    }
+  }
+  
   SetFromImage<DigitalSet>::append<Image>(shape_set, image,
                                           vm[ "min" ].as<int>(), vm[ "max" ].as<int>() );
   trace.info() << shape_set<<std::endl;
@@ -215,7 +224,16 @@ int main( int argc, char** argv )
   viewer << shape_set;
 
   viewer<< Viewer3D<>::updateDisplay;
-
+  
+  if (vm.count("exportSDP")){
+    std::ofstream out;
+    out.open(vm["exportSDP"].as<std::string>().c_str());
+    for (auto &p : S){
+      out << p[0] << " " << p[1] << " " << p[2] << std::endl;
+    }
+  }
+  
+  
   return application.exec();
 
 }
