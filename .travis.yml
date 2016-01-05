@@ -21,6 +21,7 @@ addons:
    packages:
     - libhdf5-serial-dev
     - libboost-dev
+    - libboost-system-dev
     - libcairo2-dev
     - doxygen
     - doxygen-latex
@@ -42,10 +43,12 @@ before_install:
 before_script:
   - git clone git://github.com/DGtal-team/DGtal.git
   - cd DGtal
+  - git remote add davidRemote git://github.com/dcoeurjo/DGtal.git
+  - git pull davidRemote MSBuild
   - cmake . $DGTALTYPE -DCMAKE_CXX_COMPILER=$CXXCOMPILER -DCMAKE_C_COMPILER=$CCOMPILER
   - make 
   - cd ..
 
 script: 
-   - cmake . -DDGtal_DIR=$PWD/DGtal -DCMAKE_BUILD_TYPE=Debug
+   - cmake .  -DDGtal_DIR=$PWD/DGtal/ -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_COMPILER=$CXXCOMPILER -DCMAKE_C_COMPILER=$CCOMPILER
    - make
