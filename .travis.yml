@@ -37,7 +37,7 @@ addons:
 before_install:
   - env
   - export SRC_DIR="`pwd`"
-  - if [ $CXX == "g++" ]; then export CXX="g++-4.8" ; CC="gcc-4.8" ;BOOST_TOOLSET=gcc; CCOMPILER="gcc-4.8"; CXXCOMPILER="g++-4.8"; fi
+  - if [ $CXX == "g++" ]; then export CXX="g++-4.8"  CC="gcc-4.8" BOOST_TOOLSET=gcc CCOMPILER="gcc-4.8" CXXCOMPILER="g++-4.8"; fi
   - if [ "$CXX" = "clang++" ]; then export BOOST_TOOLSET=clang; fi
   # Manual boost install since linking fails with libboost-program-options1.46-dev and g++48
   - export DOWNLOAD_ROOT="$HOME/download"; if [ ! -d "$DOWNLOAD_ROOT" ]; then mkdir -p "$DOWNLOAD_ROOT"; fi
