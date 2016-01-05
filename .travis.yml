@@ -41,9 +41,10 @@ before_install:
 
 before_script:
   - git clone git://github.com/DGtal-team/DGtal.git
-  - git remote add davidRemote git://github.com/dcoeurjo/DGtal.git
   - cd DGtal
+  - git remote add davidRemote git://github.com/dcoeurjo/DGtal.git
   - git pull davidRemote MSBuild
+
   - cmake . $DGTALTYPE -DCMAKE_CXX_COMPILER=$CXXCOMPILER -DCMAKE_C_COMPILER=$CCOMPILER
   - make 
   - cd ..
