@@ -43,7 +43,8 @@ before_script:
   - git clone git://github.com/DGtal-team/DGtal.git
   - cd DGtal
   - git remote add davidRemote git://github.com/dcoeurjo/DGtal.git
-  - git pull davidRemote MSBuild
+  - git remote add bertrandRemote git://github.com/kerautret/DGtal.git
+  - git pull bertrandRemote TestMSBuild
 
   - cmake . $DGTALTYPE -DCMAKE_CXX_COMPILER=$CXXCOMPILER -DCMAKE_C_COMPILER=$CCOMPILER
   - make 
