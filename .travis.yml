@@ -49,6 +49,7 @@ before_install:
   - if [ ! -f "$BOOST_ROOT/b2" ]; then cd "$BOOST_ROOT"; ./bootstrap.sh --with-toolset="$BOOST_TOOLSET" --with-libraries=program_options; fi
 
 before_script:
+  - cd $SRC_DIR
   - git clone git://github.com/DGtal-team/DGtal.git
   - cd DGtal
   - cmake . $DGTALTYPE -DCMAKE_CXX_COMPILER=$CXXCOMPILER -DCMAKE_C_COMPILER=$CCOMPILER -DBOOST_ROOT=$BOOST_ROOT
