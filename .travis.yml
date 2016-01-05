@@ -41,8 +41,8 @@ before_install:
 
 before_script:
   - git clone git://github.com/dcoeurjo/DGtal.git
-  - git checkout MSBuild
   - cd DGtal
+  - git checkout MSBuild
   - cmake . $DGTALTYPE -DCMAKE_CXX_COMPILER=$CXXCOMPILER -DCMAKE_C_COMPILER=$CCOMPILER
   - make 
   - cd ..
