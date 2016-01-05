@@ -20,12 +20,12 @@ addons:
     - ubuntu-toolchain-r-test
    packages:
     - libhdf5-serial-dev
-    - libboost-dev
+    - libboost1.49-dev
     - libcairo2-dev
     - doxygen
     - doxygen-latex
     - graphviz
-    - libboost-program-options-dev
+    - libboost-program-options1.49-dev
     - libgmp-dev
     - libgdcm2-dev 
     - libgraphicsmagick++1-dev
@@ -49,5 +49,5 @@ before_script:
   - cd ..
 
 script: 
-   - cmake .  -DDGtal_DIR=$PWD/DGtal/build -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_COMPILER=$CXXCOMPILER -DCMAKE_C_COMPILER=$CCOMPILER
+   - cmake .  -DDGtal_DIR=$PWD/DGtal -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_COMPILER=$CXXCOMPILER -DCMAKE_C_COMPILER=$CCOMPILER
    - make
