@@ -45,11 +45,10 @@ before_script:
   - git remote add davidRemote git://github.com/dcoeurjo/DGtal.git
   - git remote add bertrandRemote git://github.com/kerautret/DGtal.git
   - git pull bertrandRemote TestMSBuild
-
   - cmake . $DGTALTYPE -DCMAKE_CXX_COMPILER=$CXXCOMPILER -DCMAKE_C_COMPILER=$CCOMPILER
   - make 
   - cd ..
 
 script: 
-   - cmake . -DDGtal_DIR=$PWD/DGtal -DCMAKE_BUILD_TYPE=Debug
+   - cmake . -DCMAKE_CXX_COMPILER=$CXXCOMPILER -DCMAKE_C_COMPILER=$CCOMPILER -DDGtal_DIR=$PWD/DGtal -DCMAKE_BUILD_TYPE=Debug
    - make
