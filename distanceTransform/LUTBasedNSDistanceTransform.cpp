@@ -31,8 +31,8 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #if !defined(WITH_NETPBM) && !defined(WITH_PNG)
-#warning Neither libpng nor libnetpbm is available, image i/o is disabled,
-#warning use cmake with option -DWITH_PNG or -DWITH_NETPBM
+#pragma message ( "Neither libpng nor libnetpbm is available, image i/o is disabled," )
+#pragma message ( "use cmake with option -DWITH_PNG or -DWITH_NETPBM" )
 #endif
 
 #include <iostream>
