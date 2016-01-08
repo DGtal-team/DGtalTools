@@ -5,13 +5,13 @@ environment:
   
 
   matrix:
-  - VS_GEN: Visual Studio 14 2015
-    CONFIG: RelWithDebInfo
-    B_NAME: Win32
-    BOOST_LIBRARYDIR: "C:\\Libraries\\boost_1_59_0\\lib32-msvc-14.0"
+#  - VS_GEN: Visual Studio 14 2015
+#    CONFIG: RelWithDebInfo
+#    B_NAME: Win32
+#    BOOST_LIBRARYDIR: "C:\\Libraries\\boost_1_59_0\\lib32-msvc-14.0"
 
   - VS_GEN: Visual Studio 14 2015 Win64
-    CONFIG: Release
+    CONFIG: RelWithDebInfo
     B_NAME: Win64
     BOOST_LIBRARYDIR: "C:\\Libraries\\boost_1_59_0\\lib64-msvc-14.0"
 
