@@ -5,15 +5,15 @@ environment:
   
 
   matrix:
-#  - VS_GEN: Visual Studio 14 2015
-#    CONFIG: RelWithDebInfo
-#    B_NAME: Win32
-#    BOOST_LIBRARYDIR: "C:\\Libraries\\boost_1_59_0\\lib32-msvc-14.0"
+  - VS_GEN: Visual Studio 14 2015
+     CONFIG: RelWithDebInfo
+     B_NAME: Win32
+     BOOST_LIBRARYDIR: "C:\\Libraries\\boost_1_59_0\\lib32-msvc-14.0"
 
-  - VS_GEN: Visual Studio 14 2015 Win64
-    CONFIG: Release
-    B_NAME: Win64
-    BOOST_LIBRARYDIR: "C:\\Libraries\\boost_1_59_0\\lib64-msvc-14.0"
+#  - VS_GEN: Visual Studio 14 2015 Win64
+#    CONFIG: Release
+#    B_NAME: Win64
+#    BOOST_LIBRARYDIR: "C:\\Libraries\\boost_1_59_0\\lib64-msvc-14.0"
 
 
 matrix:
@@ -49,8 +49,8 @@ install:
 before_build:
   - git clone -q --branch=master https://github.com/kerautret/DGtal.git C:\projects\dgtal
   - cd C:\projects\dgtal
-  - cmake -Wno-dev -G"%VS_GEN%" -DCMAKE_BUILD_TYPE=%CONFIG% -DBUILD_TESTING:BOOL=OFF -DBUILD_EXAMPLES:BOOL=OFF -DBUILD_SHARED_LIBS:BOOL=FALSE  -DBOOST_ROOT=%BOOST_ROOT% .
-  - msbuild /m /p:Configuration=%CONFIG% /p:Platform="Any CPU" DGtal.sln 
+  - cmake -Wno-dev -G"%VS_GEN%" -DCMAKE_BUILD_TYPE=%CONFIG% -DBUILD_TESTING:BOOL=OFF -DWITH_QGLVIEWER:BOOL=ON -DBUILD_EXAMPLES:BOOL=OFF -DBUILD_SHARED_LIBS:BOOL=FALSE  -DBOOST_ROOT=%BOOST_ROOT% .
+  - msbuild /m /p:Configuration=%CONFIG% /p:Platform=%B_NAME% DGtal.sln 
   - cd %APPVEYOR_BUILD_FOLDER%
   - cmake -Wno-dev -G"%VS_GEN%" -DCMAKE_BUILD_TYPE=%CONFIG%   -DBOOST_ROOT=%BOOST_ROOT%   -DBOOST_LIBRARYDIR="%BOOST_LIBRARYDIR%" -DDGtal_DIR=C:\projects\dgtal .
 
@@ -65,8 +65,8 @@ build_script:
   - msbuild /m /p:Configuration=%CONFIG% /p:Platform=%B_NAME% DGtalTools.sln 
 
 # - ctest -D ExperimentalStart -C %CONFIG%
- # - ctest -D ExperimentalBuild -j2 -C %CONFIG%
- # - ctest -D ExperimentalTest -j2 -C %CONFIG% 
+# - ctest -D ExperimentalBuild -j2 -C %CONFIG%
+# - ctest -D ExperimentalTest -j2 -C %CONFIG% 
 
 test: off
 deploy: off
