@@ -105,7 +105,7 @@ int main( int argc, char** argv )
     ("input,i", po::value<std::string>(), "heightfield file." )
     ("output,o", po::value<std::string>(), "volumetric file ") 
     ("scale,s", po::value<double>()->default_value(1.0), "set the scale factor on height values. (default 1.0)")
-    ("volZ,z", po::value<uint32_t>()->default_value(255), "set the Z max value of domain.")    
+    ("volZ,z", po::value<unsigned int>()->default_value(255), "set the Z max value of domain.")    
     ("foregroundValue,f", po::value<unsigned int>()->default_value(128), "specify the foreground value of the resulting voxel." )
     ("backgroundValue,b", po::value<unsigned int>()->default_value(0), "specify the background value of the resulting volumetric file.");
   
@@ -140,7 +140,7 @@ int main( int argc, char** argv )
   trace.info() << "Reading input file " << inputFilename ; 
   Image2D inputImage = DGtal::GenericReader<Image2D>::import(inputFilename);  
   double scale = vm["scale"].as<double>(); 
-  uint32_t maxZ = vm["volZ"].as<uint32_t>();
+  unsigned int  maxZ = vm["volZ"].as<unsigned int>();
   trace.info() << " [done] " << std::endl ; 
   
   unsigned int foregroundValue = vm["foregroundValue"].as<unsigned int>();
