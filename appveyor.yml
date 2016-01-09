@@ -45,7 +45,7 @@ init:
 install:
 
 before_build:
-  - git clone -q --branch=master https://github.com/kerautret/DGtal.git C:\projects\dgtal
+  - git clone -q --branch=master https://github.com/DGtal-team/DGtal.git C:\projects\dgtal
   - cd C:\projects\dgtal
   - cmake -Wno-dev -G"%VS_GEN%" -DCMAKE_BUILD_TYPE=%CONFIG% -DBUILD_TESTING:BOOL=OFF -DBUILD_EXAMPLES:BOOL=OFF -DBUILD_SHARED_LIBS:BOOL=FALSE  -DBOOST_ROOT=%BOOST_ROOT% .
   - msbuild /m /p:Configuration=%CONFIG% /p:Platform=%B_NAME% DGtal.sln 
