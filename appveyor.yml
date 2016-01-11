@@ -7,6 +7,7 @@ environment:
     CONFIG: RelWithDebInfo
     B_NAME: Win32
     BOOST_LIBRARYDIR: "C:\\Libraries\\boost_1_59_0\\lib32-msvc-14.0"
+    CONFIGQGL: Release
 
 #  - VS_GEN: Visual Studio 14 2015 Win64
 #    CONFIG: Release
@@ -45,9 +46,13 @@ init:
 install:
 
 before_build:
-  - git clone -q --branch=master https://github.com/DGtal-team/DGtal.git C:\projects\dgtal
+  - git clone https://github.com/kerautret/libQGLViewer.git C:\projects\libqglviewer
+  - cd C:\projects\libqglviewer\QGLViewer
+  - qmake -t vclib QGLViewer.pro -spec win32-msvc2013 -o  qglviewer.vcxproj
+  - msbuild /m /p:Configuration=%CONFIGQGL% /p:Platform=%B_NAME% qglviewer.vcxproj 
+  - git clone -q --branch=master https://github.com/kerautret/DGtal.git C:\projects\dgtal
   - cd C:\projects\dgtal
-  - cmake -Wno-dev -G"%VS_GEN%" -DCMAKE_BUILD_TYPE=%CONFIG% -DBUILD_TESTING:BOOL=OFF -DBUILD_EXAMPLES:BOOL=OFF -DBUILD_SHARED_LIBS:BOOL=FALSE  -DBOOST_ROOT=%BOOST_ROOT% .
+  - cmake -Wno-dev -G"%VS_GEN%" -DCMAKE_BUILD_TYPE=%CONFIG% -DWITH_QGLVIEWER:BOOL=ON -DQGLVIEWER_INCLUDE_DIR=C:\projects\libqglviewer -DQGLVIEWER_LIBRARIES=C:\projects\libqglviewer\QGLViewer\QGLViewer2.lib -DBUILD_TESTING:BOOL=OFF -DBUILD_EXAMPLES:BOOL=OFF -DBUILD_SHARED_LIBS:BOOL=FALSE  -DBOOST_ROOT=%BOOST_ROOT% .
   - msbuild /m /p:Configuration=%CONFIG% /p:Platform=%B_NAME% DGtal.sln 
   - cd %APPVEYOR_BUILD_FOLDER%
   - cmake -Wno-dev -G"%VS_GEN%" -DCMAKE_BUILD_TYPE=%CONFIG%   -DBOOST_ROOT=%BOOST_ROOT%   -DBOOST_LIBRARYDIR="%BOOST_LIBRARYDIR%" -DDGtal_DIR=C:\projects\dgtal .
