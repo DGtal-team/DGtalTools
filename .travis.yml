@@ -54,7 +54,7 @@ before_script:
   - 'echo "using clang : : ccache $CXX : <cflags>-std=c11 <cxxflags>-std=c++11 ;" >> ~/user-config.jam'
   - cd "$BOOST_ROOT"; ./b2 toolset="$BOOST_TOOLSET" threading=multi --prefix="$BOOST_ROOT" -d0 install
   - cd $SRC_DIR
-  - git clone git://github.com/DGtal-team/DGtal.git
+  - git clone git://github.com/kerautret/DGtal.git
   - cd DGtal
   - cmake . $DGTALTYPE -DCMAKE_CXX_COMPILER=$CXXCOMPILER -DCMAKE_C_COMPILER=$CCOMPILER -DBOOST_ROOT=$BOOST_ROOT
   - make 
