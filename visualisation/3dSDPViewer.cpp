@@ -36,7 +36,7 @@
 #include "DGtal/io/readers/MeshReader.h"
 #include "DGtal/topology/helpers/Surfaces.h"
 #include "DGtal/topology/SurfelAdjacency.h"
-
+#include "DGtal/shapes/Mesh.h"
 #include "DGtal/io/Color.h"
 #include "DGtal/io/colormaps/GradientColorMap.h"
 #include "DGtal/io/readers/GenericReader.h"
@@ -64,6 +64,7 @@ int main( int argc, char** argv )
     ("input,i", po::value<std::string>(), "input file: sdp (sequence of discrete points)" )
     ("SDPindex", po::value<std::vector <unsigned int> >()->multitoken(), "specify the sdp index (by default 0,1,2).")
     ("pointColor,c", po::value<std::vector <int> >()->multitoken(), "set the color of  points: r g b a " )
+    ("addMesh,m", po::value<std::string>(), "append a mesh (off/obj) to the point set visualization.")
     ("lineColor,l",po::value<std::vector <int> >()->multitoken(), "set the color of line: r g b a " )
     ("colorFromLabels", "use the color indexed from labels in the file.")
     ("labelsIndex", po::value<unsigned int>(), "define the index of the label in the source file (used by --LabelsIndex) ")
@@ -102,7 +103,7 @@ int main( int argc, char** argv )
   double sphereRadius = 0.2;
   unsigned int sphereResolution = vm["sphereResolution"].as<unsigned int>();
   double lineSize =0.2;
-
+  
   Color lineColor(100, 100, 250);
   Color pointColor(250, 250, 250);
   if(parseOK){
@@ -236,7 +237,13 @@ int main( int argc, char** argv )
       viewer.addLine(vectorsPt.at(i),vectorsPt.at(i+1), lineSize);
     }
 
-
+  }
+  if(vm.count("addMesh")){
+    viewer.setFillColor(DGtal::Color::White);
+    std::string meshName = vm["addMesh"].as<std::string>();
+    Mesh<Z3i::RealPoint> mesh;
+    mesh << meshName ;
+    viewer << mesh;
   }
 
   viewer << Viewer3D<>::updateDisplay;

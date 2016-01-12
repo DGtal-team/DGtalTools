@@ -18,7 +18,8 @@ SET(DGTAL_TOOLS_SRC
   volBoundary2obj
   vol2heightfield
   heightfield2vol
-  heightfield2shading)
+  heightfield2shading
+  mesh2heightfield)
 
 if( WITH_HDF5 )
 SET(DGTAL_TOOLS_SRC ${DGTAL_TOOLS_SRC}
