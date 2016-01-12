@@ -44,6 +44,7 @@
 #include "DGtal/io/viewers/Viewer3D.h"
 #include "DGtal/topology/KhalimskySpaceND.h"
 #include "DGtal/topology/CubicalComplex.h"
+#include "DGtal/topology/CubicalComplexFunctions.h"
 #include "DGtal/topology/SetOfSurfels.h"
 #include "DGtal/topology/DigitalSurface.h"
 #include "DGtal/topology/helpers/Surfaces.h"
@@ -630,19 +631,19 @@ int main( int argc, char** argv )
     {
       Cell3 cell = *it;
       Dimension d = K3.uDim( cell );
-      CellMapConstIterator cmIt = complex3.find( d, cell );
+      CellMapConstIterator cmIt = complex3.findCell( d, cell );
       bdry_complex3.insertCell( d, cell, cmIt->second );
     }
   trace.info() << "- [before collapse] K_bdry =" << bdry_complex3 << endl;
-  bdry_complex3.collapse( bdry.begin(), bdry.end(), priority, true, true, false );
+  functions::collapse( bdry_complex3, bdry.begin(), bdry.end(), priority, true, true, false );
   trace.info() << "- [after collapse]  K_bdry =" << bdry_complex3 << endl;
   for ( std::vector<Cell3>::const_iterator it = bdry.begin(), itE = bdry.end(); it != itE; ++it )
     {
       Cell3 cell  = *it;
       Dimension d = K3.uDim( cell );
-      CellMapConstIterator cmIt = bdry_complex3.find( d, cell );
+      CellMapConstIterator cmIt = bdry_complex3.findCell( d, cell );
       if ( cmIt != bdry_complex3.end( d ) ) {
-        CellMapIterator cmIt2 = complex3.find( d, cell );
+        CellMapIterator cmIt2 = complex3.findCell( d, cell );
         cmIt2->second = sure_data;
       }
     }
@@ -651,8 +652,7 @@ int main( int argc, char** argv )
   //-------------- Collapse all -------------------------------------------
   trace.beginBlock( "Collapse all. " );
   std::copy( bdry.begin(), bdry.end(), std::back_inserter( inner ) );
-  //typename CC4::DefaultCellMapIteratorPriority priority;
-  complex3.collapse( inner.begin(), inner.end(), priority, true, true, true );
+  functions::collapse( complex3, inner.begin(), inner.end(), priority, true, true, true );
   trace.info() << "- K = " << complex3 << endl;
   trace.endBlock();
 
