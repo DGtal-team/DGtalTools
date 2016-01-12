@@ -367,6 +367,29 @@ void projectComplex( std::vector< typename ImplicitShape3::RealPoint >& points,
     }
 }
 
+template <typename CubicalComplex4, typename ImplicitShape4, 
+          typename ImplicitDigitalShape4, typename ImplicitShape3>
+void doNotProjectComplex( std::vector< typename ImplicitShape3::RealPoint >& points,
+                          const CubicalComplex4& complex4,
+                          const ImplicitShape4& shape,
+                          const ImplicitDigitalShape4& dshape,
+                          const ImplicitShape3& shape3 )
+{
+  typedef typename CubicalComplex4::Cell     Cell4;
+  typedef typename CubicalComplex4::Point    Point4;
+  typedef typename CubicalComplex4::CellMapConstIterator CellMapConstIterator;
+  typedef typename ImplicitShape4::RealPoint RealPoint4;
+  typedef typename ImplicitShape4::Ring      Ring;
+  typedef typename ImplicitShape3::RealPoint RealPoint3;
+  for ( CellMapConstIterator it = complex4.begin( 0 ), itE = complex4.end( 0 ); it != itE; ++it )
+    {
+      Cell4 cell    = it->first;
+      Point4 dp     = complex4.space().uCoords( cell );
+      RealPoint4 p  = dshape->embed( dp );
+      RealPoint3 p3 = RealPoint3( p[ 0 ], p[ 1 ], p[ 2 ] );
+      points.push_back( p3 );
+    }
+}
     
 
 int main( int argc, char** argv )
@@ -413,6 +436,7 @@ int main( int argc, char** argv )
     ("maxAABB,A",  po::value<double>()->default_value( 10.0 ), "the max value of the AABB bounding box (domain)" )
     ("gridstep,g", po::value< double >()->default_value( 1.0 ), "the gridstep that defines the digitization (often called h). " )
     ("timestep,t", po::value< double >()->default_value( 0.000001 ), "the gridstep that defines the digitization in the 4th dimension (small is generally a good idea, default is 1e-6). " )
+    ("project,P", po::value< std::string >()->default_value( "Newton" ), "defines the projection: either No or Newton." )
     ("epsilon,e", po::value< double >()->default_value( 0.0000001 ), "the maximum precision relative to the implicit surface." )
     ("max_iter,n", po::value< unsigned int >()->default_value( 500 ), "the maximum number of iteration in the Newton approximation of F=0." )
     ("view,v", po::value< std::string >()->default_value( "Normal" ), "specifies if the surface is viewed as is (Normal) or if places close to singularities are highlighted (Singular)." )
@@ -574,10 +598,14 @@ int main( int argc, char** argv )
 
   //-------------- Project complex onto surface --------------------------------
   trace.beginBlock( "Project complex onto surface. " );
+  std::string project   = vm[ "project" ].as<std::string>();
   double epsilon        = vm[ "epsilon" ].as<double>();
   unsigned int max_iter = vm[ "max_iter" ].as<unsigned int>();
   std::vector<RealPoint3> points;
-  projectComplex( points, complex4, *shape, dshape, shape3, epsilon, max_iter );
+  if ( project == "Newton" )
+    projectComplex( points, complex4, *shape, dshape, shape3, epsilon, max_iter );
+  else
+    doNotProjectComplex( points, complex4, *shape, dshape, shape3 );
   trace.endBlock();
 
   //-------------- Create Mesh -------------------------------------------
