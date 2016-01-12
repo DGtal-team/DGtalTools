@@ -3,8 +3,8 @@ SET(DGTAL_TOOLS_SRC
         patternTriangulation
         3dCurvatureViewer
         3dCurvatureViewerNoise
-	implicit-surface-extractor
-	implicit-surface-extractor-3d
+	3dImplicitSurfaceExtractorBy4DExtension
+	3dImplicitSurfaceExtractorByThickening
 )
 
 foreach (FILE ${DGTAL_TOOLS_SRC})

@@ -33,7 +33,6 @@
 #include <boost/program_options/options_description.hpp>
 #include <boost/program_options/parsers.hpp>
 #include <boost/program_options/variables_map.hpp>
-//#include <boost/unordered_map.hpp>
 
 #include "DGtal/base/Common.h"
 #include "DGtal/base/CountedPtr.h"
@@ -58,248 +57,6 @@ using namespace std;
 using namespace DGtal;
 
 
-/**
- * This 4D extension of a 3D implicit function transforms f(x,y,z) as:
- * \f$ F(x,y,z,t) = f(x,y,z) - t | \nabla f(x,y,z) | \f$.
- */
-template <typename TSpace3, typename TSpace4, typename TPolynomial3>
-struct ImplicitSurface4DProductExtension {
-  typedef TSpace3                          Space3;
-  typedef TSpace4                          Space4;
-  typedef TPolynomial3                     Polynomial3;
-  typedef typename Space3::RealPoint       RealPoint3;
-  typedef typename Space3::RealVector      RealVector3;
-  typedef typename Space3::Integer         Integer;
-  typedef typename RealPoint3::Coordinate  Ring;
-  typedef typename Space4::RealPoint       RealPoint4;
-  typedef typename Space4::RealVector      RealVector4;
-  typedef RealPoint4                       RealPoint;
-  typedef RealVector4                      RealVector;
-
-  ImplicitSurface4DProductExtension( Clone<Polynomial3> poly )
-    : f( poly )
-  {
-    fx  = derivative<0>( f );
-    fy  = derivative<1>( f );
-    fz  = derivative<2>( f );
-    fxx = derivative<0>( fx );
-    fxy = derivative<0>( fy );
-    fxz = derivative<0>( fz );
-    fyy = derivative<1>( fy );
-    fyz = derivative<1>( fz );
-    fzz = derivative<2>( fz );
-  }
-
-  /**
-     @param aPoint any point in the Euclidean space.
-     @return the value of the polynomial at \a aPoint.
-  */
-  Ring operator()(const RealPoint &aPoint) const
-  {
-    Ring x = aPoint[ 0 ];
-    Ring y = aPoint[ 1 ];
-    Ring z = aPoint[ 2 ];
-    Ring t = aPoint[ 3 ];
-    RealVector3 grad( fx(x)(y)(z), fy(x)(y)(z), fz(x)(y)(z) );
-    return f(x)(y)(z) - t * grad.norm();
-  }
-
-  /**
-     @param aPoint any point in the Euclidean space.
-     @return 'true' if the polynomial value is < 0.
-  */
-  bool isInside(const RealPoint &aPoint) const
-  {
-    return this->operator()( aPoint ) <= NumberTraits<Ring>::ZERO;
-  }
-
-  /**
-     @param aPoint any point in the Euclidean space.
-     
-     @return INSIDE if the polynomial value is < 0, OUTSIDE if > 0,
-     ON otherwise.
-  */
-  Orientation orientation(const RealPoint &aPoint) const
-  {
-    Ring v = this->operator()( aPoint );
-    if ( v > NumberTraits<Ring>::ZERO )      return OUTSIDE;
-    else if ( v < NumberTraits<Ring>::ZERO ) return INSIDE;
-    else                                     return ON;
-  }
-
-  /**
-     @param aPoint any point in the Euclidean space.
-     @return the gradient vector of the polynomial at \a aPoint.
-  */
-  inline
-  RealVector gradient( const RealPoint &aPoint ) const
-  {
-    Ring x = aPoint[ 0 ];
-    Ring y = aPoint[ 1 ];
-    Ring z = aPoint[ 2 ];
-    Ring t = aPoint[ 3 ];
-    RealVector3 grad( fx(x)(y)(z), fy(x)(y)(z), fz(x)(y)(z) );
-    Ring ngrad = grad.norm();
-    grad /= ngrad;
-    RealVector d_gradx( fxx(x)(y)(z), fxy(x)(y)(z),fxz(x)(y)(z) );
-    RealVector d_grady( fxy(x)(y)(z), fyy(x)(y)(z),fyz(x)(y)(z) );
-    RealVector d_gradz( fxz(x)(y)(z), fyz(x)(y)(z),fzz(x)(y)(z) );
-    return RealVector( grad[ 0 ] - t * d_gradx.dot( grad ),
-                       grad[ 1 ] - t * d_grady.dot( grad ),
-                       grad[ 2 ] - t * d_gradz.dot( grad ),
-                       -ngrad );
-                      
-  }
-
-private:
-  Polynomial3 f;
-  Polynomial3 fx;
-  Polynomial3 fy;
-  Polynomial3 fz;
-  Polynomial3 fxx;
-  Polynomial3 fxy;
-  Polynomial3 fxz;
-  Polynomial3 fyy;
-  Polynomial3 fyz;
-  Polynomial3 fzz;
-};
-
-/**
- * This 4D extension of a 3D implicit function transforms f(x,y,z) as:
- * \f$ F(x,y,z,t) = f(x,y,z) - t | \nabla f(x,y,z) | \f$.
- */
-template <typename TSpace3, typename TSpace4, typename TPolynomial3>
-struct ImplicitSurface4DExtension {
-  typedef TSpace3                          Space3;
-  typedef TSpace4                          Space4;
-  typedef TPolynomial3                     Polynomial3;
-  typedef typename Space3::RealPoint       RealPoint3;
-  typedef typename Space3::RealVector      RealVector3;
-  typedef typename Space3::Integer         Integer;
-  typedef typename RealPoint3::Coordinate  Ring;
-  typedef typename Space4::RealPoint       RealPoint4;
-  typedef typename Space4::RealVector      RealVector4;
-  typedef RealPoint4                       RealPoint;
-  typedef RealVector4                      RealVector;
-
-  ImplicitSurface4DExtension( Clone<Polynomial3> poly )
-    : f( poly )
-  {
-    fx  = derivative<0>( f );
-    fy  = derivative<1>( f );
-    fz  = derivative<2>( f );
-    fxx = derivative<0>( fx );
-    fxy = derivative<0>( fy );
-    fxz = derivative<0>( fz );
-    fyy = derivative<1>( fy );
-    fyz = derivative<1>( fz );
-    fzz = derivative<2>( fz );
-  }
-
-  /**
-     @param aPoint any point in the Euclidean space.
-     @return the value of the polynomial at \a aPoint.
-  */
-  Ring operator()(const RealPoint &aPoint) const
-  {
-    Ring x = aPoint[ 0 ];
-    Ring y = aPoint[ 1 ];
-    Ring z = aPoint[ 2 ];
-    Ring t = aPoint[ 3 ];
-    // RealVector3 grad( fx(x)(y)(z), fy(x)(y)(z), fz(x)(y)(z) );
-    return f(x)(y)(z) - t;
-  }
-
-  /**
-     @param aPoint any point in the Euclidean space.
-     @return 'true' if the polynomial value is < 0.
-  */
-  bool isInside(const RealPoint &aPoint) const
-  {
-    return this->operator()( aPoint ) <= NumberTraits<Ring>::ZERO;
-  }
-
-  /**
-     @param aPoint any point in the Euclidean space.
-     
-     @return INSIDE if the polynomial value is < 0, OUTSIDE if > 0,
-     ON otherwise.
-  */
-  Orientation orientation(const RealPoint &aPoint) const
-  {
-    Ring v = this->operator()( aPoint );
-    if ( v > NumberTraits<Ring>::ZERO )      return OUTSIDE;
-    else if ( v < NumberTraits<Ring>::ZERO ) return INSIDE;
-    else                                     return ON;
-  }
-
-  /**
-     @param aPoint any point in the Euclidean space.
-     @return the gradient vector of the polynomial at \a aPoint.
-  */
-  inline
-  RealVector gradient( const RealPoint &aPoint ) const
-  {
-    Ring x = aPoint[ 0 ];
-    Ring y = aPoint[ 1 ];
-    Ring z = aPoint[ 2 ];
-    Ring t = aPoint[ 3 ];
-    return RealVector( fx(x)(y)(z), fy(x)(y)(z), fz(x)(y)(z), -1.0 );
-  }
-
-private:
-  Polynomial3 f;
-  Polynomial3 fx;
-  Polynomial3 fy;
-  Polynomial3 fz;
-  Polynomial3 fxx;
-  Polynomial3 fxy;
-  Polynomial3 fxz;
-  Polynomial3 fyy;
-  Polynomial3 fyz;
-  Polynomial3 fzz;
-};
-
-
-/**
- * Computes the cells of the given complex that lies on the
- * boundary or inside the given bounds.
- */
-template <typename CubicalComplex, 
-          typename CellOutputIterator>
-void 
-getCellsWithinBounds( CellOutputIterator itBdry, CellOutputIterator itInner,
-                   const CubicalComplex& K, 
-                   const typename CubicalComplex::Point& kLow,  
-                   const typename CubicalComplex::Point& kUp )
-{
-  typedef typename CubicalComplex::Cell                 Cell;
-  typedef typename CubicalComplex::Point                Point;
-  typedef typename CubicalComplex::CellMapConstIterator CellMapConstIterator;
-  Dimension d = K.dim();
-  for ( Dimension i = 0; i <= d; ++i )
-    {
-      for ( CellMapConstIterator it = K.begin( i ), itE = K.end( i ); it != itE; ++it )
-        {
-          Cell cell = it->first;
-          Point kCell = K.space().uKCoords( cell );
-          if ( ( kLow.inf( kCell ) == kLow ) && ( kUp.sup( kCell ) == kUp ) )
-            { // Inside or on boundary.
-              bool bdry = false;
-              for ( Dimension j = 0; j < Point::dimension; ++j )
-                {
-                  if ( ( kCell[ j ] == kLow[ j ] ) || ( kCell[ j ] == kUp[ j ] ) )
-                    {
-                      bdry = true;
-                      break;
-                    }
-                }
-              if ( bdry ) *itBdry++  = cell;
-              else        *itInner++ = cell;
-            }
-        }
-    }
-}
 
 template <typename CellOutputIterator, typename DigitalSurface>
 void
@@ -424,14 +181,6 @@ getValue( const CubicalComplex3& complex3,
   Point3 dp    = complex3.space().uKCoords( cell ) - Point3::diagonal( 1 );
   RealPoint3 p = dshape->embed( dp ) / 2.0;
   Ring v       = shape( p );
-  // Cells3 bdry = complex3.cellBoundary( cell, true );
-  // for ( typename Cells3::const_iterator it = bdry.begin(), itE = bdry.end(); it != itE; ++it )
-  //   {
-  //     dp      = complex3.space().uKCoords( *it );
-  //     p       = dshape->embed( dp ) / 2.0;
-  //     Ring v2 = shape( p );
-  //     if ( abs( v2 ) < abs( v ) ) v = v2;
-  //   }
   return v;
 }
 
@@ -519,7 +268,7 @@ int main( int argc, char** argv )
                 << endl
 		<< general_opt << "\n";
       cerr << "Example:\n" << endl
-           << "./implicit-surface-extractor-3d -p \"x^2-y*z^2\" -g 0.1" << endl
+           << argv[0] << " -p \"x^2-y*z^2\" -g 0.1 -a -2 -A 2 -v Singular" << endl
            << " - whitney  : x^2-y*z^2" << endl
            << " - 4lines   : x*y*(y-x)*(y-z*x)" << endl
            << " - cone     : z^2-x^2-y^2" << endl
@@ -527,13 +276,13 @@ int main( int argc, char** argv )
            << " - cayley3  : 4*(x^2 + y^2 + z^2) + 16*x*y*z - 1" << endl
            << " - crixxi   : -0.9*(y^2+z^2-1)^2-(x^2+y^2-1)^3" << endl << endl;
       cerr << "Some other examples (more difficult):" << endl
-           << "./implicit-surface-extractor-3d -a -2 -A 2 -p \"((y^2+z^2-1)^2-(x^2+y^2-1)^3)*(y*(x-1)^2-z*(x+1))^2\" -g 0.025 -e 1e-6 -n 50000 -v Singular -t 0.5 -P Newton" << endl
-           << "./implicit-surface-extractor-3d -a -2 -A 2 -p \"(x^5-4*z^3*y^2)*((x+y)^2-(z-x)^3)\" -g 0.025 -e 1e-6 -n 50000 -v Singular -t 0.05 -P Newton" << endl;
+           << argv[0] << " -a -2 -A 2 -p \"((y^2+z^2-1)^2-(x^2+y^2-1)^3)*(y*(x-1)^2-z*(x+1))^2\" -g 0.025 -e 1e-6 -n 50000 -v Singular -t 0.5 -P Newton" << endl
+           << argv[0] << " -a -2 -A 2 -p \"(x^5-4*z^3*y^2)*((x+y)^2-(z-x)^3)\" -g 0.025 -e 1e-6 -n 50000 -v Singular -t 0.05 -P Newton" << endl;
       return 0;
     }
 
-  //-------------- read polynomial and creating 4d implicit fct -----------------
-  trace.beginBlock( "Reading polynomial and creating 4D implicit function" );
+  //-------------- read polynomial and creating 3d implicit fct -----------------
+  trace.beginBlock( "Reading polynomial and creating 3D implicit function" );
   string poly_str = vm[ "polynomial" ].as<string>();
   Polynomial3 poly;
   Polynomial3Reader reader;
@@ -562,7 +311,7 @@ int main( int argc, char** argv )
   trace.info() << "- domain is " << domain3 << std::endl;
   trace.endBlock();
 
-  //-------------- read polynomial and creating 4d implicit fct -----------------
+  //-------------- read polynomial and creating 3d implicit fct -----------------
   trace.beginBlock( "Extracting thickened isosurface [-t,+t] of 3D polynomial. " );
   CubicalCellData unsure_data( 0 );
   CubicalCellData sure_data( CC3::FIXED );
@@ -599,8 +348,9 @@ int main( int argc, char** argv )
   trace.beginBlock( "Get boundary and inner cells. " );
   std::vector<Cell3> inner;
   std::vector<Cell3> bdry;
-  getCellsWithinBounds( std::back_inserter( bdry ), std::back_inserter( inner ),
-                        complex3, K3.uKCoords( K3.lowerCell() ), K3.uKCoords( K3.upperCell() ) );
+  functions::filterCellsWithinBounds
+    ( complex3, K3.uKCoords( K3.lowerCell() ), K3.uKCoords( K3.upperCell() ),
+       std::back_inserter( bdry ), std::back_inserter( inner ) );
   trace.info() << "- there are " << inner.size() << " inner cells." << endl;
   trace.info() << "- there are " << bdry.size() << " boundary cells." << endl;
   trace.endBlock();
@@ -741,8 +491,5 @@ int main( int argc, char** argv )
     }
   viewer << Viewer3D<Space3,KSpace3>::updateDisplay;
   return application.exec();
-
-
-  return 0;
 }
 ///////////////////////////////////////////////////////////////////////////////

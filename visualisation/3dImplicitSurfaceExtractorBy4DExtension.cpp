@@ -260,49 +260,10 @@ private:
 };
 
 
-/**
- * Computes the cells of the given complex that lies on the
- * boundary or inside the given bounds.
- */
-template <typename CubicalComplex, 
-          typename CellOutputIterator>
-void 
-getCellsWithinBounds( CellOutputIterator itBdry, CellOutputIterator itInner,
-                   const CubicalComplex& K, 
-                   const typename CubicalComplex::Point& kLow,  
-                   const typename CubicalComplex::Point& kUp )
-{
-  typedef typename CubicalComplex::Cell                 Cell;
-  typedef typename CubicalComplex::Point                Point;
-  typedef typename CubicalComplex::CellMapConstIterator CellMapConstIterator;
-  Dimension d = K.dim();
-  for ( Dimension i = 0; i <= d; ++i )
-    {
-      for ( CellMapConstIterator it = K.begin( i ), itE = K.end( i ); it != itE; ++it )
-        {
-          Cell cell = it->first;
-          Point kCell = K.space().uKCoords( cell );
-          if ( ( kLow.inf( kCell ) == kLow ) && ( kUp.sup( kCell ) == kUp ) )
-            { // Inside or on boundary.
-              bool bdry = false;
-              for ( Dimension j = 0; j < Point::dimension - 1; ++j )
-                {
-                  if ( ( kCell[ j ] == kLow[ j ] ) || ( kCell[ j ] == kUp[ j ] ) )
-                    {
-                      bdry = true;
-                      break;
-                    }
-                }
-              if ( bdry ) *itBdry++  = cell;
-              else        *itInner++ = cell;
-            }
-        }
-    }
-}
-
 template <typename CellOutputIterator, typename DigitalSurface>
 void
-analyzeSurface( CellOutputIterator itSure, CellOutputIterator itUnsure, DigitalSurface surface )
+analyzeSurface( CellOutputIterator itSure, CellOutputIterator itUnsure, 
+                DigitalSurface surface )
 {
   typedef typename DigitalSurface::KSpace        KSpace;
   typedef typename DigitalSurface::Surfel        Surfel;
@@ -426,6 +387,7 @@ int main( int argc, char** argv )
   typedef SpaceND<4,Integer>                Space4;
   typedef KhalimskySpaceND<4,Integer>       KSpace4;
   typedef KSpace4::Cell                     Cell4;
+  typedef KSpace4::Cells                    Cells4;
   typedef KSpace4::SCell                    SCell4;
   typedef Space4::Point                     Point4;
   typedef Space4::RealPoint                 RealPoint4;
@@ -475,7 +437,7 @@ int main( int argc, char** argv )
                 << endl
 		<< general_opt << "\n";
       cerr << "Example:\n" << endl
-           << "./implicit-surface-extractor -p \"-0.9*(y^2+z^2-1)^2-(x^2+y^2-1)^3\"" << endl
+           << argv[ 0 ] << " -p \"-0.9*(y^2+z^2-1)^2-(x^2+y^2-1)^3\" -g 0.06125 -a -2 -A 2 -v Singular -t 0.02" << endl
            << " - whitney  : x^2-y*z^2" << endl
            << " - 4lines   : x*y*(y-x)*(y-z*x)" << endl
            << " - cone     : z^2-x^2-y^2" << endl
@@ -548,8 +510,9 @@ int main( int argc, char** argv )
   std::vector<Cell4> bdry;
   complex4.close();
   trace.info() << "- K=" << complex4 << endl;
-  getCellsWithinBounds( std::back_inserter( bdry ), std::back_inserter( inner ),
-                        complex4, K4.uKCoords( K4.lowerCell() ), K4.uKCoords( K4.upperCell() ) );
+  functions::filterCellsWithinBounds
+    ( complex4, K4.uKCoords( K4.lowerCell() ), K4.uKCoords( K4.upperCell() ),
+      std::back_inserter( bdry ), std::back_inserter( inner ) );
   trace.info() << "- there are " << inner.size() << " inner cells." << endl;
   trace.info() << "- there are " << bdry.size() << " boundary cells." << endl;
   trace.endBlock();
@@ -659,10 +622,22 @@ int main( int argc, char** argv )
   viewer.setWindowTitle("simple Volume Viewer");
   viewer.show();
   viewer << mesh;
+  viewer.setLineColor( highlight ? Color::Red : Color( 120, 120, 120 ) );
+  // Drawing lines
+  for ( CellMapConstIterator it = complex4.begin( 1 ), itE = complex4.end( 1 ); it != itE; ++it )
+    {
+      Cell4 cell = it->first;
+      std::vector<Cell4> dummy;
+      std::back_insert_iterator< std::vector<Cell4> > outIt1( dummy );
+      complex4.directCoFaces( outIt1, cell );
+      if ( ! dummy.empty() ) continue;
+      Cells4 vertices = complex4.cellBoundary( cell );
+      ASSERT( vertices.size() == 2 );
+      RealPoint3 p1 = points[ indices[ vertices.front() ] ];
+      RealPoint3 p2 = points[ indices[ vertices.back()  ] ];
+      viewer.addLine( p1, p2, 0.05 );
+    }
   viewer << Viewer3D<Space3,KSpace3>::updateDisplay;
   return application.exec();
-
-
-  return 0;
 }
 ///////////////////////////////////////////////////////////////////////////////
