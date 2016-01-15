@@ -136,7 +136,7 @@ int main( int argc, char** argv )
     ("input,i", po::value<std::string>(), "image file name")
     ("min,m", po::value<int>(), "min image threshold value (default 128)")
     ("max,M", po::value<int>(), "max image threshold value (default 255)")
-    ("sort", "to sort by decreasing size, the resulting freemanchain.") 
+    ("sort", "to sort the resulting freemanchain by decreasing size.") 
     ("minSize,s", po::value<int>(), "minSize of the extracted freeman chain (default 0)")
     ("contourSelect,c", po::value<std::vector <int> >()->multitoken(), 
      "Select contour according reference point and maximal distance:  ex. --contourSelect X Y distanceMax")

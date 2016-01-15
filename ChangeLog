@@ -1,7 +1,7 @@
 ====  Release 0.9.1 ====
 
 * converters/:
-- img2freeman: add a sort option to sort by increasing size the resulting contours.
+- img2freeman: new option to sort the resulting contours by increasing size.
 
 
 
