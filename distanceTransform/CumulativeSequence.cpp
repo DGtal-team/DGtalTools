@@ -29,6 +29,7 @@
  */
 
 #include <assert.h>
+#include <algorithm>
 
 #include "CumulativeSequence.h"
 
