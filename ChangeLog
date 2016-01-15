@@ -1,3 +1,10 @@
+====  Release 0.9.1 ====
+
+* converters/:
+- img2freeman: new option to sort the resulting contours by increasing size.
+
+
+
 ====  Release 0.9 ====
 
 * global/:
