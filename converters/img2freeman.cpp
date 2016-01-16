@@ -80,13 +80,22 @@ getOtsuThreshold(const Image &image){
   return thresholdRes;
 }
 
+struct CompContours{
+  bool operator()(std::vector<Z2i::Point> a, std::vector<Z2i::Point> b ){
+    return a.size() > b.size();
+  }
+};
 
 
-
-void saveAllContoursAsFc(std::vector< std::vector< Z2i::Point >  >  vectContoursBdryPointels, unsigned int minSize){
+void saveAllContoursAsFc( std::vector< std::vector< Z2i::Point >  >  vectContoursBdryPointels, 
+                         unsigned int minSize, bool sort=false){
+  CompContours comp;
+  if(sort){
+    std::sort(vectContoursBdryPointels.begin(), vectContoursBdryPointels.end(), comp);
+  }
   for(unsigned int k=0; k<vectContoursBdryPointels.size(); k++){
     if(vectContoursBdryPointels.at(k).size()>minSize){
-      	  FreemanChain<Z2i::Integer> fc (vectContoursBdryPointels.at(k));    
+      FreemanChain<Z2i::Integer> fc (vectContoursBdryPointels.at(k));    
 	  std::cout << fc.x0 << " " << fc.y0   << " " << fc.chain << std::endl; 
 	  
     }
@@ -95,7 +104,12 @@ void saveAllContoursAsFc(std::vector< std::vector< Z2i::Point >  >  vectContours
 
 
 void saveSelContoursAsFC(std::vector< std::vector< Z2i::Point >  >  vectContoursBdryPointels, 
-			 unsigned int minSize, Z2i::Point refPoint, double selectDistanceMax){
+			 unsigned int minSize, Z2i::Point refPoint, double selectDistanceMax, 
+                         bool sort=false){
+  CompContours comp;
+  if(sort){
+    std::sort(vectContoursBdryPointels.begin(), vectContoursBdryPointels.end(), comp);
+  }
 
   for(unsigned int k=0; k<vectContoursBdryPointels.size(); k++){
     if(vectContoursBdryPointels.at(k).size()>minSize){
@@ -122,7 +136,7 @@ int main( int argc, char** argv )
     ("input,i", po::value<std::string>(), "image file name")
     ("min,m", po::value<int>(), "min image threshold value (default 128)")
     ("max,M", po::value<int>(), "max image threshold value (default 255)")
-    
+    ("sort", "to sort the resulting freemanchain by decreasing size.") 
     ("minSize,s", po::value<int>(), "minSize of the extracted freeman chain (default 0)")
     ("contourSelect,c", po::value<std::vector <int> >()->multitoken(), 
      "Select contour according reference point and maximal distance:  ex. --contourSelect X Y distanceMax")
@@ -149,11 +163,11 @@ int main( int argc, char** argv )
       return 0;
     }
   
-  
   double minThreshold = 128;
   double maxThreshold = 255;
   unsigned int minSize =0;
   bool select=false;
+  bool sortCnt = vm.count("sort");
   bool thresholdRange=vm.count("thresholdRangeMin")||vm.count("thresholdRangeMax");
   Z2i::Point selectCenter;
   unsigned int selectDistanceMax = 0; 
@@ -239,9 +253,9 @@ int main( int argc, char** argv )
     Surfaces<Z2i::KSpace>::extractAllPointContours4C( vectContoursBdryPointels,
 						      ks, predicate, sAdj );  
     if(select){
-      saveSelContoursAsFC(vectContoursBdryPointels,  minSize, selectCenter,  selectDistanceMax);
+      saveSelContoursAsFC(vectContoursBdryPointels,  minSize, selectCenter,  selectDistanceMax, sortCnt);
     }else{
-      saveAllContoursAsFc(vectContoursBdryPointels,  minSize); 
+      saveAllContoursAsFc(vectContoursBdryPointels,  minSize, sortCnt); 
     }
   }else{
     for(int i=0; minThreshold+i*increment< maxThreshold; i++){
@@ -260,9 +274,9 @@ int main( int argc, char** argv )
       Surfaces<Z2i::KSpace>::extractAllPointContours4C( vectContoursBdryPointels,
 							ks, predicate, sAdj );  
       if(select){
-	saveSelContoursAsFC(vectContoursBdryPointels,  minSize, selectCenter,  selectDistanceMax);
+	saveSelContoursAsFC(vectContoursBdryPointels,  minSize, selectCenter,  selectDistanceMax, sortCnt);
       }else{
-	saveAllContoursAsFc(vectContoursBdryPointels,  minSize); 
+	saveAllContoursAsFc(vectContoursBdryPointels,  minSize, sortCnt); 
       }
       trace.info() << " [done]" << std::endl;
     }
