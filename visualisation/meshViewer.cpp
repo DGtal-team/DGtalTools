@@ -67,7 +67,7 @@ int main( int argc, char** argv )
   ("customColorMesh",po::value<std::vector<unsigned int> >()->multitoken(), "set the R, G, B, A components of the colors of the mesh faces and eventually the color R, G, B, A of the mesh edge lines (set by default to black). " )
   ("customColorSDP",po::value<std::vector<unsigned int> >()->multitoken(), "set the R, G, B, A components of the colors of  the sdp view" )
   ("displayVectorField,f",po::value<std::string>(),  "display a vector field from a simple sdp file (two points per line)" )
-  ("vectorFieldIndex",po::value<std::vector<unsigned int> >()->multitoken(), "specify special indexes for the two point coordinates (instead usinf the default indexes: 0 1, 2, 3, 4, 5)" )
+  ("vectorFieldIndex",po::value<std::vector<unsigned int> >()->multitoken(), "specify special indices for the two point coordinates (instead usinf the default indices: 0 1, 2, 3, 4, 5)" )
   ("customLineColor",po::value<std::vector<unsigned int> >()->multitoken(), "set the R, G, B components of the colors of the lines displayed from the --displayVectorField option (red by default). " )
   ("displaySDP,s", po::value<std::string>(), "Add the display of a set of discrete points as ball of radius 0.5.")
   ("SDPradius", po::value<double>()->default_value(0.5), "change the ball radius to display a set of discrete points (used with displaySDP option)")
@@ -122,14 +122,14 @@ int main( int argc, char** argv )
   
   
   bool displayVectorField = vm.count("displayVectorField");
-  std::vector<unsigned int> vectFieldIndexes = {0,1,2,3,4,5};
+  std::vector<unsigned int> vectFieldIndices = {0,1,2,3,4,5};
   
   if (displayVectorField) {
     if(vm.count("vectorFieldIndex")){
-      vectFieldIndexes = vm["vectorFieldIndex"].as<std::vector<unsigned int> >();
-      if (vectFieldIndexes.size() != 6) {
-        trace.warning() << "you should specify indexes for each of the 6 field of the two coordinates." << std::endl;
-        vectFieldIndexes = {0,1,2,3,4,5};
+      vectFieldIndices = vm["vectorFieldIndex"].as<std::vector<unsigned int> >();
+      if (vectFieldIndices.size() != 6) {
+        trace.warning() << "you should specify indices for each of the 6 fields of the two coordinates." << std::endl;
+        vectFieldIndices = {0,1,2,3,4,5};
       }
     }
   }
@@ -241,11 +241,11 @@ int main( int argc, char** argv )
 
   
   if (displayVectorField) {
-    std::vector<unsigned int > vectFieldIndexes1 = {vectFieldIndexes[0],vectFieldIndexes[1], vectFieldIndexes[2]};
-    std::vector<unsigned int > vectFieldIndexes2 = {vectFieldIndexes[3],vectFieldIndexes[4], vectFieldIndexes[5]};
+    std::vector<unsigned int > vectFieldIndices1 = {vectFieldIndices[0],vectFieldIndices[1], vectFieldIndices[2]};
+    std::vector<unsigned int > vectFieldIndices2 = {vectFieldIndices[3],vectFieldIndices[4], vectFieldIndices[5]};
     
-    std::vector<DGtal::Z3i::RealPoint> vectPt1 = PointListReader<DGtal::Z3i::RealPoint>::getPointsFromFile(vm["displayVectorField"].as<std::string>(), vectFieldIndexes1);
-    std::vector<DGtal::Z3i::RealPoint> vectPt2 = PointListReader<DGtal::Z3i::RealPoint>::getPointsFromFile(vm["displayVectorField"].as<std::string>(), vectFieldIndexes2);
+    std::vector<DGtal::Z3i::RealPoint> vectPt1 = PointListReader<DGtal::Z3i::RealPoint>::getPointsFromFile(vm["displayVectorField"].as<std::string>(), vectFieldIndices1);
+    std::vector<DGtal::Z3i::RealPoint> vectPt2 = PointListReader<DGtal::Z3i::RealPoint>::getPointsFromFile(vm["displayVectorField"].as<std::string>(), vectFieldIndices2);
     viewer.createNewLineList();
     for (unsigned int i = 0; i < vectPt1.size(); i++) {
     
