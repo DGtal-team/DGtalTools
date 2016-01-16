@@ -81,12 +81,11 @@ int main( int argc, char** argv )
   general_opt.add_options()
     ( "help,h", "display this message." )
     ( "input,i", po::value<std::string>(), "Input volumetric file (.vol, .pgm3d or p3d)" )
-    ( "fixedPointSDP,s", po::value<std::string>(), "use fixed points from a file instead.")
     ( "min,m", po::value<int>()->default_value( 0 ), "Minimum (excluded) value for threshold.")
     ( "max,M", po::value<int>()->default_value( 255 ), "Maximum (included) value for threshold.")
     ( "exportSDP,e", po::value<std::string>(), "Export the resulting set of points in a simple (sequence of discrete point (sdp)).")
-
-  ("fixedPoints", po::value<std::vector <int> >()->multitoken(), "defines the coordinates of points which should not be removed." );
+    ("fixedPoints", po::value<std::vector <int> >()->multitoken(), "defines the coordinates of points which should not be removed." )
+    ( "fixedPointSDP,s", po::value<std::string>(), "use fixed points from a file.");
 
 
   bool parseOK=true;
@@ -139,20 +138,23 @@ int main( int argc, char** argv )
   if( vm.count("fixedPoints")){
     std::vector<int> vectC = vm["fixedPoints"].as<std::vector<int> >();
     if(vectC.size()%3==0){
-      for( unsigned int i=0; i < vectC.size()-2; i=i+3){
-        Z3i::Point pt(vectC.at(i), vectC.at(i+1), vectC.at(i+2));
-        fixedSet.insertNew(pt);
-      }
+      for( unsigned int i=0; i < vectC.size()-2; i=i+3)
+        {
+          Z3i::Point pt(vectC.at(i), vectC.at(i+1), vectC.at(i+2));
+        // FIXME: xedSet.insertNew(pt);
+        }
     }else{
       trace.error()<< " The coordinates should be 3d coordinates, ignoring fixedPoints option." << std::endl;
     }
   }
-  if(vm.count("fixedPointSDP")){
-    std::vector<Z3i::Point> vPt = PointListReader<Z3i::Point>::getPointsFromFile(vm["fixedPointSDP"].as<std::string>());
-    for( auto &p: vPt){
-      fixedSet.insert(p);
+  if(vm.count("fixedPointSDP"))
+    {
+      std::vector<Z3i::Point> vPt = PointListReader<Z3i::Point>::getPointsFromFile(vm["fixedPointSDP"].as<std::string>());
+      for( auto &p: vPt)
+        {
+          // FIXME: xedSet.insert(p);
+        }
     }
-  }
   
   SetFromImage<DigitalSet>::append<Image>(shape_set, image,
                                           vm[ "min" ].as<int>(), vm[ "max" ].as<int>() );
@@ -178,14 +180,14 @@ int main( int argc, char** argv )
       trace.progressBar(0, (double)S.size());
       for ( DigitalSet::Iterator it = S.begin(); it != S.end(); ++it )
         {
-    if ( nb % 100 == 0 ) trace.progressBar((double)nb, (double)S.size());
+          if ( nb % 100 == 0 ) trace.progressBar((double)nb, (double)S.size());
           nb++;
-    if (dt( *it ) <= layer)
-      {
-        if ( shape.isSimple( *it ) )
-    Q.push( it );
-      }
-  }
+          if (dt( *it ) <= layer)
+            {
+              if ( shape.isSimple( *it ) )
+                Q.push( it );
+            }
+        }
       trace.progressBar( (double)S.size(), (double)S.size() );
       nb_simple = 0;
       while ( ! Q.empty() )
@@ -200,7 +202,7 @@ int main( int argc, char** argv )
         }
       trace.info() << "Nb simple points : "<<nb_simple<< " " << std::endl;
       ++layer;
-     }
+    }
   while ( nb_simple != 0 );
   trace.endBlock();
 
@@ -225,15 +227,15 @@ int main( int argc, char** argv )
 
   viewer<< Viewer3D<>::updateDisplay;
   
-  if (vm.count("exportSDP")){
-    std::ofstream out;
-    out.open(vm["exportSDP"].as<std::string>().c_str());
-    for (auto &p : S){
-      out << p[0] << " " << p[1] << " " << p[2] << std::endl;
+  if (vm.count("exportSDP"))
+    {
+      std::ofstream out;
+      out.open(vm["exportSDP"].as<std::string>().c_str());
+      for (auto &p : S)
+        {
+          out << p[0] << " " << p[1] << " " << p[2] << std::endl;
+        }
     }
-  }
-  
-  
   return application.exec();
 
 }
