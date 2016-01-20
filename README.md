@@ -38,8 +38,6 @@ Actually the DGTal project is organized as follows:
 
  - [Converters](#converters)
 
- - [DistanceTransform](#distancetransform)
-
  - [Estimators](#estimators)
 
  - [ShapeGenerator](#shapegenerator)
@@ -110,13 +108,6 @@ Utilities to convert various simple file formats:
 </center>
 
 
-
-
-DistanceTransform
------------------
-  - LUTBasedNSDistanceTransform: Compute the 2D translated neighborhood-sequence distance transform of a binary image.
-  - CumulativeSequenceTest and RationalBeattySequenceTest: tests from LUTBasedNSDistanceTransform.
-  
 
 
 Estimators
