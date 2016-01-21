@@ -1,110 +1,135 @@
-# How to contribute to DGtal
+# How to contribute to DGtalTools
 
-In this document, we describe how to contribute to
-[DGtal](http://dgtal.org) library and its
-[DGtalTools](http://dgtal.org/tools) and
-[DGtalTools-contrib](http://dgtal.org/tools) projects.  Please keep in
-mind that DGtal is an open-source initiative under LGPL license.
+In this document, we describe how to contribute to the
+[DGtalTools](http://dgtal.org/tools) projects. Please keep in mind
+the DGtalTools project is an open-source initiative under LGPL
+license.
 
-A first way to contribute to the library is to give us feedbacks and
-comments using
-[Github issue tracker](https://github.com/DGtal-team/DGtal/issues). Do
-not hesitate to create an issue (feature request, bug report, issues
-with the documentation...).
+A first way to contribute to the project is to give us feedbacks and
+comments using [Github issue
+tracker](https://github.com/DGtal-team/DGtalTools/issues). Do not
+hesitate to create an issue (feature request, bug report, issues with
+the tool descriptions...).
+
+
+## Choice between DGtalTools/DGtalTools-contrib
+
+The DGtalTools project is mainly defined to host tools with a direct
+link to the [DGtal](http://dgtal.org) library and should exploit some
+specific DGtal features. For instance, the *3dCurvatureViewer* tool is
+based on the [integral invariant
+estimator](http://liris.cnrs.fr/dgtal/doc/nightly/LocalEstimatorsFromSurfel.html).
+
+Contrary to the DGtalTools project, the
+[DGtalTools-contrib](https://github.com/DGtal-team/DGtalTools-contrib)
+project can contain some tools which are not directly related to DGtal
+but which uses some feature of DGtal. Note that the
+[DGtalTools-contrib](https://github.com/DGtal-team/DGtalTools-contrib)
+project can also contains some development tools or prototype used to
+share recent research in progress.
+
+
+
 
 ## Contribution reviewing process
 
-We process contributions to the library using GitHub Pull-request
+We process contributions to the project using GitHub Pull-request
 mechanism. If you want to contribute, you would have to:
 * create an account on GitHub;
-* clone [DGtal](https://github.com/DGtal-team/DGtal) main repository
-  (or [DGtalTools](https://github.com/DGtal-team/DGtalTools),
-[DGtalTools-contrib](https://github.com/DGtal-team/DGtalTools-contrib));
-* create a branch for your contribution and push it to your DGtal
+* clone and install the last version of the
+  [DGtal](https://github.com/DGtal-team/DGtal) main repository;
+
+* clone [DGtalTools](https://github.com/DGtal-team/DGtalTools) ;
+
+* create a branch for your contribution and push it to your DGtalTools
   clone;
 * create a GitHub pull-request to ask for an inclusion.
 
+
 Each pull-request must contain:
-* a [doxygen](http://doxygen.org) documented source-code satisfying
-  the coding style (see below);
-* a unit test file testing the features in the contribution (written
-  using [Catch](http://catch-lib.net), see for instance
-  [this tutorial](http://dgtal.org/doc/stable/moduleCatch.html));
-* a user-oriented documentation page describing the feature (using
-  [doxygen](http://doxgen.org));
-* an informative pull-request comment describing the contribution;
+* an informative pull-request comment describing the new contribution;
 * a new entry in the project ```Changelog.md``` file.
 
-Once the pull-request has been sent, a DGtal package manager will
-review the code and may ask for edits before being merged to the DGtal
+Once the pull-request has been sent, a DGtalTools package manager will
+review the code and may ask for edits before being merged to the DGtalTools
 master branch. Note that we use [Travis](http://travis-ci.org) as
 Continuous Integration platform. When creating a pull-request, several
 builds are tested on several systems (linux, macos), compilers (gcc,
 clang) and configurations (DGtal dependencies). On Microsoft Windows
 platforms, we use [Appeveyor](http://www.appveyor.com) service to test
-DGtal build.  Before being merged, a pull-request must pass all these
+DGtalTools build.  Before being merged, a pull-request must pass all these
 tests.
 
 More information are described in the
 [DGtal documentation](http://dgtal.org/doc/stable/moduleFAQGit.html).
 
-## Code Structure
-
-### Folders
-
-DGtal features are organized into
-[packages](http://dgtal.org/doc/stable/) and modules
-(e.g. [Geometry Package modules](http://dgtal.org/doc/stable/packageGeometry.html)). The
-source code folders follows this decomposition:
-* ```src/DGtal/```: the main source code tree.
-* Each package has its own subfolder. For instance
-  ```src/DGtal/kernel``` for the Kernel Package.
-* Each package also contains its documentation pages
-  (e.g. ```src/DGtal/kernel/doc```).
-* ```tests/``` contains all unit test files. This folder is also
-  decomposted into package folders (e.g. ```tests/kernel/``` for unit
-  tests of the Kernel package modules).
-* ```examples/```examples source files (mostly used for documentation
-  purposes).
-* ```cmake```contains all [cmake](http://cmake.org) configuration
-  scripts.
-
-### Namespaces
-
-All DGtal classes and functions are contained in a ```DGtal::``` C++
-namespace. Additionally, sub-namespaces are used to gather specific
-codes:
-* ```DGtal::functions::``` contains all DGtal global functions.
-* ```DGtal::functors::``` contains all DGtal C++ functors.
-* ```DGtal::concepts::``` contains all DGtal concepts.
-* ```DGtal::experimental::``` contains classes and features that have a "beta" status.
-* ```DGtal::Z2i::``` and ```DGtal::Z3i::``` are user-oriented
-  namespaces that contain predefined types for digital geometry in
-  dimension 2 and 3 (respectivelly) using an arithmetical kernel based
-  on ```DGtal::int32_t```.
-* ```DGtal::deprecated::``` contains deprecated classes  and functions.
-* ```DGtal::detail::``` contains some internal classes and funcitons.
 
 
-## Coding style
+## Project organisation
 
-We expect the source code to match with some coding style rules
-described below. We strongly encourage the developers to consider
-scripts and unit-test/class templates provided in the
+The DGtalTools project is organized with the following structure:
+
+  - Converters: utilities to convert various simple file formats;
+  - Estimators:  geometric estimators based on DGtal algorithms (2D/3D curvature, length or tangent estimators);
+  - ShapeGenerator: tools to generate shapes;
+  - Visualization: tools to display results of DGtal algorithms (contours/surface display, volumetric images...);
+  - Volumetric: 3d volumetric processing tools (marching cubes, image transforms,...).
+
+
+
+## Tools structure 
+
+The simplest way to start creating a new tool is to use the script
+```newtools.sh``` given in the
 [DGtalScripts](https://github.com/DGtal-team/DGtalScripts)
-project. These scripts can be used to create templates of classes and
-tools that satisfy the guideline.
+scripts. This script generates a new empty tool containing only these minimal features:
+  - inclusion of a DGtal base headers;
+  - example of input options use (based on the ```boost::program_options```).
+    For instance, you can complete this example of options:
+    ```c++
+       po::options_description general_opt("Allowed options are");
+       general_opt.add_options()
+            ("help,h", "display this message")
+            ("param,p", po::value< double >(), "a special parameter")
+ 
+     ```
 
-### Documentation
+  - description the tool including a simple use example. You can refer to existing samples of the DGtal directory:
+    ```c++
 
-All classes, types, methods and members must be documented using
-[doxygen](http://doxygen.org) syntax. Please use
-[DGtalScripts](https://github.com/DGtal-team/DGtalScripts) scripts to
-create package and module documentation pages.
+       trace.info() << "Usage: " << argv[0] << " [options] input\n"
+                 << "Display a 3D curve given as the <input> filename (with possibly projections and/or tangent information) by using QGLviewer.\n"
+                 << general_opt << "\n\n";
+       trace.info() << "Example:\n"
+                 << "3dCurveViewer -C -b 1 -3 -2 -c ${DGtal}/examples/samples/sinus.dat\n";
+      return 0;
+```
+
+
+
+
+
+Then, when your tool is defined, you have to include it in the
+CMakeLists.txt file associated to its group. For instance, if you
+create a new tool **xxx** in the group **Visualisation**, you have to
+update the *CMakeLists.txt* file of the directory ```DGtalTools/visualisation```:
+```cmake
+
+SET(DGTAL_TOOLS_SRC
+	displayContours
+        patternTriangulation
+        3dCurvatureViewer
+        3dCurvatureViewerNoise
+        xxx
+)
+```
+
+
+
+
 
 ### Indent style
-
-The DGtal indent style follow
+The indent style should be the same as the one of the DGtal library: the indent style follow
 [Allman Style](https://en.wikipedia.org/wiki/Indent_style#Allman_style)
 for C/C++ code. Here you have an example:
 
@@ -133,6 +158,8 @@ class NewClass
     unsigned int myMember;
 };
 ```
+
+
 ### Naming rules
 
 * Types/methods/variable/classes in ```CamelCase```: (e.g.
@@ -147,20 +174,7 @@ class NewClass
 
 ``` c++ void superFunction(const Value & aParameter); ```
 
-### Other rules
 
-* All file must contain a proper LGPL/GPL header. See the source files for examples.
-* Class member accessors/mutators
- * accessors are usually not prefixed by "get" is is name by the class member
- * if the accessor needs some computations, it is prefixed by "get"
-
-      `Value parameter()` (if a `Value myParameter` exists)
-
-      `Value getParameter()` (there is "computation")
-
- * Setter methods are prefixed by "set"
-
-      `anImage.setValue (...)`
 
 
 ## Contributor license agreement
@@ -182,3 +196,5 @@ If you have any questions, do not hesitate to contact the developers
 on the mailing-lists:
 [dgtal-devel@lists.gforge.liris.cnrs.fr](mailto:dgtal-devel@lists.gforge.liris.cnrs.fr)
 or [contacts@dgtal.org](mailto:contacts@dgtal.org).
+
+
