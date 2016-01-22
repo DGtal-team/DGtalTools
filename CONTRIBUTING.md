@@ -23,10 +23,10 @@ estimator](http://liris.cnrs.fr/dgtal/doc/nightly/LocalEstimatorsFromSurfel.html
 Contrary to the DGtalTools project, the
 [DGtalTools-contrib](https://github.com/DGtal-team/DGtalTools-contrib)
 project can contain some tools which are not directly related to DGtal
-but which uses some feature of DGtal. Note that the
+but which use some feature of DGtal. Note that the
 [DGtalTools-contrib](https://github.com/DGtal-team/DGtalTools-contrib)
-project can also contains some development tools or prototype used to
-share recent research in progress.
+project can also contain some development tools or prototype used to
+share recent research.
 
 
 
