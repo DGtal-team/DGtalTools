@@ -167,7 +167,7 @@ private:
 
 /**
  * This 4D extension of a 3D implicit function transforms f(x,y,z) as:
- * \f$ F(x,y,z,t) = f(x,y,z) - t | \nabla f(x,y,z) | \f$.
+ * \f$ F(x,y,z,t) = f(x,y,z) - t \f$.
  */
 template <typename TSpace3, typename TSpace4, typename TPolynomial3>
 struct ImplicitSurface4DExtension {
@@ -417,7 +417,7 @@ int main( int argc, char** argv )
   typedef Space4::Point                     Point4;
   typedef Space4::RealPoint                 RealPoint4;
   typedef Space4::RealVector                RealVector4;
-  typedef ImplicitSurface4DExtension<Space3,Space4,Polynomial3>
+  typedef ImplicitSurface4DProductExtension<Space3,Space4,Polynomial3>
                                             ImplicitShape4;
   typedef GaussDigitizer< Space4, ImplicitShape4 > 
                                             ImplicitDigitalShape4;

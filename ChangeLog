@@ -8,6 +8,22 @@
 - meshViewer: new possibility to display a vector field from a simple sdp
   file (B. Kerautret).
 
+- 3dImplicitSurfaceExtractorByThickening: a tool to visualize 3d
+  polynomial implicit surface defined as some f(x,y,z)=0. Its
+  principle is to thickened the set {f=0} as {|f|<=e}, to extract an
+  associated cubical complex, then to collapse it to capture the
+  correct topology of {f=0}. Afterwards, the complex is projected
+  onto f=0 with Newton's method. (J.-O. Lachaud)
+
+- 3dImplicitSurfaceExtractorBy4DExtension: a tool to visualize 3d
+  polynomial implicit surface defined as some f(x,y,z)=0. Its
+  principle is to extend f as a 4D function F(x,y,z,t)=0 (for
+  instance F=f-|nabla f|t). This 4d hypersurface is easier to
+  detect. It is transformed into 4D cubical complex, that is then
+  collapsed to capture the correct topology of {f=0}. Afterwards,
+  the complex is projected in 3D onto f=0 with Newton's
+  method. (J.-O. Lachaud)
+
 * converters/:
 - homotopicThinning3D: the fixed points can be set from a file. (B. Kerautret)
 
