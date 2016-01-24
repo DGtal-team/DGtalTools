@@ -217,12 +217,12 @@ Here are some illustrations of such a tools:
 <tr>
 <td><img  width=300 src="https://cloud.githubusercontent.com/assets/772865/3486505/6edb2144-043e-11e4-81c4-2c20f272a119.png" </td>
 <td><img width=300 src="https://cloud.githubusercontent.com/assets/772865/4118303/5f53f61c-329f-11e4-9629-23c53afd9eff.png" </td>
-<td><img width=300 src="https://cloud.githubusercontent.com/assets/772865/12538898/00459c06-c2e6-11e5-91f6-d14494ab05da.png"</td>
+<td align="center" colspan="2"><img width=250 src="https://cloud.githubusercontent.com/assets/772865/12538898/00459c06-c2e6-11e5-91f6-d14494ab05da.png"</td>
 </tr>
 <tr>
 <td>3dHeightMapViewer</td>
 <td>3dCompSurfelData</td>
-<td> 3dImplicitSurfaceExtractorByThickening </td>
+<td  align="center" colspan="2">3dImplicitSurfaceExtractorByThickening </td>
 </tr>
 
 
