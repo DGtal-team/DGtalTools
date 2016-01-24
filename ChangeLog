@@ -1,3 +1,18 @@
+====  Release 0.9.1 ====
+
+* converters/:
+- img2freeman: new option to sort the resulting contours by increasing size
+  (B. Kerautret).
+
+* visualisation/:
+- meshViewer: new possibility to display a vector field from a simple sdp
+  file (B. Kerautret).
+
+* converters/:
+- homotopicThinning3D: the fixed points can be set from a file. (B. Kerautret)
+
+
+
 ====  Release 0.9 ====
 
 * global/:

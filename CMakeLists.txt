@@ -11,6 +11,9 @@ FIND_PACKAGE(DGtal 0.9 REQUIRED)
 INCLUDE_DIRECTORIES(${DGTAL_INCLUDE_DIRS})
 LINK_DIRECTORIES(${DGTAL_LIBRARY_DIRS})
 
+
+SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+
  # -------------------------------------------------------------------------
  # This test is for instance used for ITK v3.x. ITK forces a limited
  # template depth. We remove this option.
@@ -58,5 +61,4 @@ add_subdirectory(shapeGenerator)
 add_subdirectory(estimators)
 add_subdirectory(converters)
 add_subdirectory(visualisation)
-add_subdirectory(distanceTransform)
 add_subdirectory(geometricTransform)
