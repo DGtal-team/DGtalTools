@@ -15,14 +15,16 @@
  **/
 
 /**
- * @file cubical-complex-collapse.cpp
- * @ingroup Examples
+ * @file 3dImplicitSurfaceExtractorBy4DExtension.cpp
+ * @ingroup Visualisation
  * @author Jacques-Olivier Lachaud (\c jacques-olivier.lachaud@univ-savoie.fr )
  * Laboratory of Mathematics (CNRS, UMR 5127), University of Savoie, France
  *
  * @date 2015/08/28
  *
- * An example file named cubical-complex-collapse.cpp.
+ * A tool to visualize 3D implicit surface by viewing it as 4D
+ * hypersurface to detect zeroes and then shrink it with cubical
+ * complex collapses.
  *
  * This file is part of the DGtal library.
  */
@@ -647,7 +649,7 @@ int main( int argc, char** argv )
   K3.init( Point3( low4[ 0 ], low4[ 1 ], low4[ 2 ] ),
            Point3( up4 [ 0 ], up4 [ 1 ], up4 [ 2 ] ), true );
   Viewer3D<Space3,KSpace3> viewer( K3 );
-  viewer.setWindowTitle("simple Volume Viewer");
+  viewer.setWindowTitle("Implicit surface viewer by 4d extension");
   viewer.show();
   viewer << mesh;
   viewer.setLineColor( highlight ? Color::Red : Color( 120, 120, 120 ) );
