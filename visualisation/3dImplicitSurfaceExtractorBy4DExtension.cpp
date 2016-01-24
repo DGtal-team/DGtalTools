@@ -557,7 +557,7 @@ int main( int argc, char** argv )
           v = abs( 1000.0*v );
           if ( v > 1000000.0 ) v = 1000000.0;
           it->second.data &= ~CC4::VALUE;
-          it->second.data |= (uint32_t) floor( v );
+          it->second.data |= (DGtal::uint32_t) floor( v );
           // std::cout << " " << it->second.data;
         }
     }
