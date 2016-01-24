@@ -175,6 +175,8 @@ Visualization
   - 3dDisplaySurfelData: displays surfel data from SDP file with color attributes given as scalar interpreted as color.
   - 3dHeightMapViewer: display a 2D image as heightmap by using QGLviewer.
   - 3dImageViewer: tools to display 3d slice images (.vol, .pgm3d and  dicom with ITK) with QGLViewer.
+  - 3dImplicitSurfaceExtractorBy4DExtension: a tool to visualize 3d polynomial implicit surface defined as some f(x,y,z)=0.
+  - 3dImplicitSurfaceExtractorByThickening: a tool to visualize 3d polynomial implicit surface defined as some f(x,y,z)=0.
   - 3dSDPViewer: basic display of a sequence of 3d points (as voxel or sphere) and vectors by using QGLviewer.
   - 3dVolBoundaryViewer: Display the boundary of a volume file by using QGLviewer. 
   - 3dVolViewer: volume file (.vol, .pgm3d and dicom with ITK ) viewer with QGLViewer.
@@ -215,10 +217,12 @@ Here are some illustrations of such a tools:
 <tr>
 <td><img  width=300 src="https://cloud.githubusercontent.com/assets/772865/3486505/6edb2144-043e-11e4-81c4-2c20f272a119.png" </td>
 <td><img width=300 src="https://cloud.githubusercontent.com/assets/772865/4118303/5f53f61c-329f-11e4-9629-23c53afd9eff.png" </td>
+<td><img width=300 src="https://cloud.githubusercontent.com/assets/772865/12538898/00459c06-c2e6-11e5-91f6-d14494ab05da.png"</td>
 </tr>
 <tr>
 <td>3dHeightMapViewer</td>
 <td>3dCompSurfelData</td>
+<td> 3dImplicitSurfaceExtractorByThickening </td>
 </tr>
 
 
