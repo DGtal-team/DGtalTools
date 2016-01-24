@@ -529,7 +529,7 @@ void ComputeVCM ( const double & R, const double & r,
 }
 
 template < typename PointIterator, typename Space, typename TangentSequence >
-bool ComputeLMST6 ( const PointIterator & begin, const PointIterator & end, TangentSequence & tangents, const std::string & output  )
+void ComputeLMST6 ( const PointIterator & begin, const PointIterator & end, TangentSequence & tangents, const std::string & output  )
 {
   typedef typename PointIterator::value_type Point;
   typedef StandardDSS6Computer<PointIterator,int, 4 > SegmentComputer;
@@ -559,7 +559,7 @@ bool ComputeLMST6 ( const PointIterator & begin, const PointIterator & end, Tang
 }
 
 template < typename PointIterator, typename Space, typename TangentSequence >
-bool ComputeLMST26 ( const PointIterator & begin, const PointIterator & end, TangentSequence & tangents, const std::string & output  )
+void ComputeLMST26 ( const PointIterator & begin, const PointIterator & end, TangentSequence & tangents, const std::string & output  )
 {
   typedef typename PointIterator::value_type Point;
   typedef Naive3DDSSComputer<PointIterator,int, 8 > SegmentComputer;
