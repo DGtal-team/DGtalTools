@@ -24,7 +24,9 @@ if (  WITH_VISU3D_QGLVIEWER )
     meshViewer
     3dHeightMapViewer
     3dDisplaySurfelData
-	3dCompSurfelData)
+    3dCompSurfelData
+    3dImplicitSurfaceExtractorBy4DExtension
+    3dImplicitSurfaceExtractorByThickening )
 
   FOREACH(FILE ${DGTAL_EXAMPLES_QGL_SRC})
     add_executable(${FILE} ${FILE})

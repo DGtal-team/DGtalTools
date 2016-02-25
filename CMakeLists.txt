@@ -7,9 +7,12 @@ PROJECT(DGtalTools)
 cmake_minimum_required (VERSION 2.6) 
 
 
-FIND_PACKAGE(DGtal 0.9 REQUIRED)
+FIND_PACKAGE(DGtal 0.9.1 REQUIRED)
 INCLUDE_DIRECTORIES(${DGTAL_INCLUDE_DIRS})
 LINK_DIRECTORIES(${DGTAL_LIBRARY_DIRS})
+
+
+SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
  # -------------------------------------------------------------------------
  # This test is for instance used for ITK v3.x. ITK forces a limited
@@ -33,7 +36,7 @@ LINK_DIRECTORIES(${DGTAL_LIBRARY_DIRS})
 SET(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
 SET(DGtalTools_VERSION_MAJOR 0)
 SET(DGtalTools_VERSION_MINOR 9)
-SET(DGtalTools_VERSION_PATCH beta)
+SET(DGtalTools_VERSION_PATCH 2beta)
 SET(DGTALTOOLS_VERSION "${DGtalTools_VERSION_MAJOR}.${DGtalTools_VERSION_MINOR}.${DGtalTools_VERSION_PATCH}")
 SET(PROJECT_VERSION "${DGtalTools_VERSION_MAJOR}.${DGtalTools_VERSION_MINOR}.${DGtalTools_VERSION_PATCH}")
 SET(VERSION ${DGtalTools_VERSION_MAJOR}.${DGtalTools_VERSION_MINOR}.${DGtalTools_VERSION_PATCH})
@@ -58,5 +61,4 @@ add_subdirectory(shapeGenerator)
 add_subdirectory(estimators)
 add_subdirectory(converters)
 add_subdirectory(visualisation)
-add_subdirectory(distanceTransform)
 add_subdirectory(geometricTransform)

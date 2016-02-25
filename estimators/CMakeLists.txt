@@ -23,7 +23,8 @@ endif ( WITH_VISU3D_QGLVIEWER )
 
 if (  WITH_CGAL )
   SET(CGAL_TESTS_SRC
-    3dLocalEstimators )
+#    3dLocalEstimators 
+     )
   FOREACH(FILE ${CGAL_TESTS_SRC})
     add_executable(${FILE} ${FILE})
     target_link_libraries (${FILE}  ${DGTAL_LIBRARIES} ${DGtalToolsLibDependencies})

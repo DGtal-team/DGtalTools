@@ -86,7 +86,7 @@ int main( int argc, char** argv )
       return 0;
     }
   
-  if(! vm.count("input-files")||! vm.count("output"))
+  if(! (vm.count("input") && vm.count("output")) )
     {
       trace.error() << " Input and output filename are needed to be defined" << endl;      
       return 0;

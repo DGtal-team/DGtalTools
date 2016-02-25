@@ -23,6 +23,10 @@ user to show how to include the DGtal library framework directly in their
 own source code (in complement of DGtal tutorial http://liris.cnrs.fr/dgtal/doc/nightly/packageTutorials.html).
 
 
+More Information
+----------------
+* Related DGtalTools-contrib: https://github.com/DGtal-team/DGtalTools-contrib
+* Release 0.9.1 DOI [![DOI](https://zenodo.org/badge/doi/10.5281/zenodo.45130.svg)](http://dx.doi.org/10.5281/zenodo.45130)
 * Release 0.9 DOI [![DOI](https://zenodo.org/badge/doi/10.5281/zenodo.31882.svg)](http://dx.doi.org/10.5281/zenodo.31882)
 * Release 0.8 DOI [![DOI](https://zenodo.org/badge/doi/10.5281/zenodo.11587.svg)](http://dx.doi.org/10.5281/zenodo.11587)
 * [![Build Status](https://api.travis-ci.org/DGtal-team/DGtalTools.svg?branch=master)](https://travis-ci.org/DGtal-team/DGtalTools)
@@ -34,8 +38,6 @@ Organisation
 Actually the DGTal project is organized as follows:
 
  - [Converters](#converters)
-
- - [DistanceTransform](#distancetransform)
 
  - [Estimators](#estimators)
 
@@ -109,13 +111,6 @@ Utilities to convert various simple file formats:
 
 
 
-DistanceTransform
------------------
-  - LUTBasedNSDistanceTransform: Compute the 2D translated neighborhood-sequence distance transform of a binary image.
-  - CumulativeSequenceTest and RationalBeattySequenceTest: tests from LUTBasedNSDistanceTransform.
-  
-
-
 Estimators
 ----------
 
@@ -181,6 +176,8 @@ Visualization
   - 3dDisplaySurfelData: displays surfel data from SDP file with color attributes given as scalar interpreted as color.
   - 3dHeightMapViewer: display a 2D image as heightmap by using QGLviewer.
   - 3dImageViewer: tools to display 3d slice images (.vol, .pgm3d and  dicom with ITK) with QGLViewer.
+  - 3dImplicitSurfaceExtractorBy4DExtension: a tool to visualize 3d polynomial implicit surface defined as some f(x,y,z)=0.
+  - 3dImplicitSurfaceExtractorByThickening: a tool to visualize 3d polynomial implicit surface defined as some f(x,y,z)=0.
   - 3dSDPViewer: basic display of a sequence of 3d points (as voxel or sphere) and vectors by using QGLviewer.
   - 3dVolBoundaryViewer: Display the boundary of a volume file by using QGLviewer. 
   - 3dVolViewer: volume file (.vol, .pgm3d and dicom with ITK ) viewer with QGLViewer.
@@ -221,10 +218,12 @@ Here are some illustrations of such a tools:
 <tr>
 <td><img  width=300 src="https://cloud.githubusercontent.com/assets/772865/3486505/6edb2144-043e-11e4-81c4-2c20f272a119.png" </td>
 <td><img width=300 src="https://cloud.githubusercontent.com/assets/772865/4118303/5f53f61c-329f-11e4-9629-23c53afd9eff.png" </td>
+<td align="center" colspan="2"><img width=250 src="https://cloud.githubusercontent.com/assets/772865/12538898/00459c06-c2e6-11e5-91f6-d14494ab05da.png"</td>
 </tr>
 <tr>
 <td>3dHeightMapViewer</td>
 <td>3dCompSurfelData</td>
+<td  align="center" colspan="2">3dImplicitSurfaceExtractorByThickening </td>
 </tr>
 
 
