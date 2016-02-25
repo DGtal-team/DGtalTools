@@ -11,12 +11,12 @@ env:
 
 before_script:
   - sudo apt-get -qq install libboost-program-options-dev libboost-system-dev libqglviewer-qt4-dev  libinsighttoolkit3-dev libgdcm2-dev
-  - git clone git://github.com/DGtal-team/DGtal.git
+  - git clone --depth 1 git://github.com/DGtal-team/DGtal.git
   - cd DGtal
-  - cmake . $DGTALTYPE 
+  - cmake . $DGTALTYPE
   - make && sudo make install
   - cd ..
 
-script: 
+script:
    - cmake . -DCMAKE_BUILD_TYPE=Debug
    - make
