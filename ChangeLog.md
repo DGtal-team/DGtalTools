@@ -2,7 +2,7 @@
 
 - *visualisation*:
   - 3dSDPViewer: add the possibility to display a set of point by using
-    different ball size (specified in the input sdp file) (B. Kerautret).
+    different sphere sizes (specified in the input sdp file) (B. Kerautret).
 
 
 
