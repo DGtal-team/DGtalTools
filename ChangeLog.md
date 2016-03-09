@@ -1,6 +1,12 @@
-# DGtalTools 0.9.2 
+# DGtalTools 0.9.2
 
-# DGtalTools 0.9.1 
+- *visualisation*:
+  - 3dSDPViewer: add the possibility to display a set of point by using
+    different ball size (specified in the input sdp file) (B. Kerautret).
+
+
+
+# DGtalTools 0.9.1
 
 - *converters*:
   - img2freeman: new option to sort the resulting contours by increasing size

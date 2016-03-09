@@ -32,6 +32,7 @@
 #include "DGtal/helpers/StdDefs.h"
 #include "DGtal/io/viewers/Viewer3D.h"
 #include "DGtal/io/DrawWithDisplay3DModifier.h"
+#include "DGtal/io/readers/TableReader.h"
 #include "DGtal/io/readers/PointListReader.h"
 #include "DGtal/io/readers/MeshReader.h"
 #include "DGtal/topology/helpers/Surfaces.h"
@@ -74,8 +75,9 @@ int main( int argc, char** argv )
     ("scaleX,x",  po::value<float>()->default_value(1.0), "set the scale value in the X direction (default 1.0)" )
     ("scaleY,y",  po::value<float>()->default_value(1.0), "set the scale value in the Y direction (default 1.0)" )
     ("scaleZ,z",  po::value<float>()->default_value(1.0), "set the scale value in the Z direction (default 1.0)")
-    ("sphereRadius,s",  po::value<double>()->default_value(0.2), "defines the sphere radius (used when the primitive is set to the sphere). (default value 0.2)")
     ("sphereResolution",  po::value<unsigned int>()->default_value(30), "defines the sphere resolution (used when the primitive is set to the sphere). (default resolution: 30)")
+    ("sphereRadius,s",  po::value<double>()->default_value(0.2), "defines the sphere radius (used when the primitive is set to the sphere). (default value 0.2)")
+    ("sphereRadiusFromInput", "takes as sphere radius the 4th field of the sdp input file.")
     ("lineSize",  po::value<double>()->default_value(0.2), "defines the line size (used when the --drawLines or --drawVectors option is selected). (default value 0.2))")
     ("primitive,p", po::value<std::string>()->default_value("sphere"), "set the primitive to display the set of points (can be sphere or voxel (default)")
     ("drawVectors,v", po::value<std::string>(), "SDP vector file: draw a set of vectors from the given file (each vector are determined by two consecutive point given, each point represented by its coordinates on a single line.") ;
@@ -83,8 +85,9 @@ int main( int argc, char** argv )
 
   bool parseOK=true;
   bool cannotStart= false;
-  typedef PointVector<1, int> Point1D;
 
+  typedef PointVector<1, int> Point1D;
+  
 
   po::variables_map vm;
   try{
@@ -101,8 +104,10 @@ int main( int argc, char** argv )
     }
   std::string typePrimitive;
   double sphereRadius = 0.2;
+  std::vector<double> vectSphereRadius;
   unsigned int sphereResolution = vm["sphereResolution"].as<unsigned int>();
   double lineSize =0.2;
+  bool useMultiRad = vm.count("sphereRadiusFromInput");
   
   Color lineColor(100, 100, 250);
   Color pointColor(250, 250, 250);
@@ -182,6 +187,9 @@ int main( int argc, char** argv )
     }
   }
 
+  if(useMultiRad){
+    vectSphereRadius = TableReader<double>::getColumnElementsFromFile(inputFilename,3);
+  }
 
   GradientColorMap< int > gradientColorMap( 1, (!colorFromLabels)? 1:  * std::max_element(vectLabels.begin(), vectLabels.end()));
   if(colorFromLabels){
@@ -214,6 +222,10 @@ int main( int argc, char** argv )
                              (int)vectVoxels.at(i)[1],
                              (int)vectVoxels.at(i)[2]);
       }else{
+        if(useMultiRad){
+          sphereRadius = vectSphereRadius[i];
+        }
+        
         viewer.addBall(vectVoxels.at(i), sphereRadius, sphereResolution);
       }
     }
