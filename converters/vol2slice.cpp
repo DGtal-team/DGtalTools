@@ -128,7 +128,8 @@ int main( int argc, char** argv )
     DGtal::Z2i::Domain domain2D(invFunctor(input3dImage.domain().lowerBound()),
   				invFunctor(input3dImage.domain().upperBound()));
     DGtal::functors::Projector<DGtal::Z3i::Space> aSliceFunctor(i); aSliceFunctor.initAddOneDim(sliceOrientation);
-    SliceImageAdapter sliceImage(input3dImage, domain2D, aSliceFunctor, DGtal::functors::Identity());
+    const DGtal::functors::Identity identityFunctor{};
+    SliceImageAdapter sliceImage( input3dImage, domain2D, aSliceFunctor, identityFunctor );
     stringstream outName; outName << outputBasename << "_" <<  boost::format("%|05|")% i <<"."<< outputExt ;
     trace.info() << ": "<< outName.str() ;
     GenericWriter<SliceImageAdapter>::exportFile(outName.str(), sliceImage);
