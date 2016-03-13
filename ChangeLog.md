@@ -1,5 +1,9 @@
 # DGtalTools 0.9.2 
 
+- *global*:
+  - fix uses of temporaries when ConstAlias is needed.
+    (Roland Denis, [#253](https://github.com/DGtal-team/DGtalTools/pull/253))
+
 # DGtalTools 0.9.1 
 
 - *converters*:
