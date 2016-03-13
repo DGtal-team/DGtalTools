@@ -265,7 +265,8 @@ int main( int argc, char** argv )
   DGtal::functors::BasicDomainSubSampler< HyperRectDomain< SpaceND< 3, int > >,
                                           DGtal::int32_t, double > reSampler(image.domain(),
                                                                              aGridSizeReSample,  shiftVector3D);
-  SamplerImageAdapter sampledImage (image, reSampler.getSubSampledDomain(), reSampler, functors::Identity());
+  const functors::Identity identityFunctor{};
+  SamplerImageAdapter sampledImage ( image, reSampler.getSubSampledDomain(), reSampler, identityFunctor );
   ImagePredicate predicateIMG = ImagePredicate( sampledImage,  minImageThreshold, maxImageThreshold );
   DomainPredicate<Z3i::Domain> domainPredicate( sampledImage.domain() );
   AndBoolFct2 andF;
