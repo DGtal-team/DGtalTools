@@ -124,7 +124,8 @@ int main( int argc, char** argv )
   typedef functors::IntervalForegroundPredicate<Image> Predicate;
   Predicate aPredicate(image, vm[ "min" ].as<int>(), vm[ "max" ].as<int>() );
 
-  DistanceTransformation<Z3i::Space, Predicate , Z3i::L2Metric> dt(image.domain(),aPredicate, Z3i::L2Metric() );
+  const Z3i::L2Metric aMetric{};
+  DistanceTransformation<Z3i::Space, Predicate , Z3i::L2Metric> dt(image.domain(), aPredicate, aMetric );
   trace.endBlock();
   trace.info() <<image<<std::endl;
 

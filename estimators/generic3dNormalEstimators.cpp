@@ -516,7 +516,8 @@ int chooseSurface
       typedef typename Surface::Surfel Surfel;
       SurfelAdjacency< KSpace::dimension > surfAdj( true );
       Surfel bel;
-      KanungoPredicate* noisified_dshape = new KanungoPredicate( dshape, dshape.getDomain(), noiseLevel );
+      const Domain shapeDomain = dshape.getDomain();
+      KanungoPredicate* noisified_dshape = new KanungoPredicate( dshape, shapeDomain, noiseLevel );
       // We have to search for a big connected component.
       CountedPtr<Surface> ptrSurface;
       double minsize = dshape.getUpperBound()[0] - dshape.getLowerBound()[0];
