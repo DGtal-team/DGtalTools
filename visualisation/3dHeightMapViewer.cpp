@@ -225,11 +225,9 @@ int main( int argc, char** argv )
 
   QApplication application(argc,argv);
   RealPoint plow (image.domain().lowerBound()[0]-0.5,
-                  image.domain().lowerBound()[1]-0.5,
-                  image.domain().lowerBound()[2]-0.5);
+                  image.domain().lowerBound()[1]-0.5);
   RealPoint pup (image.domain().upperBound()[0]+0.5,
-                 image.domain().upperBound()[1]+0.5,
-                 image.domain().upperBound()[2]+0.5);
+                 image.domain().upperBound()[1]+0.5);
   Viewer3DImageSpec<> viewer(plow, pup) ;
   viewer.setWindowTitle("Height Map Viewer");
   viewer.show();
