@@ -75,8 +75,9 @@ getStatsFromDistanceMap(Statistic<double> & stats, const Image3D &imageA, int aM
   
 
   // Applying the distance transform on the digital surface of the set: 
-  typedef  DistanceTransformation<Z3i::Space, NegPredicate, Z3i::L2Metric> DTL2;   
-  DTL2 dtL2(&(imageA.domain()), NegPredicate(set3dRef), &Z3i::l2Metric);
+  typedef  DistanceTransformation<Z3i::Space, NegPredicate, Z3i::L2Metric> DTL2;
+  const NegPredicate aPredicate( set3dRef );
+  DTL2 dtL2( imageA.domain(), aPredicate, Z3i::l2Metric );
 
   // Get the set of point of imageB: (use -1 and +1 since the interval of append function are open)
   Z3i::DigitalSet set3dComp (imageB.domain()); 

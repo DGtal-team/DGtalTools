@@ -253,7 +253,8 @@ void MainWindow::updateZoomImageX(unsigned int sliceNumber, double gridSize){
   DGtal::Z2i::Domain domain2D(invFunctor(myImage3D->domain().lowerBound()),
                               invFunctor(myImage3D->domain().upperBound()));
   DGtal::functors::Projector<DGtal::Z3i::Space> aSliceFunctor(sliceNumber); aSliceFunctor.initAddOneDim(0);
-  SliceImageAdapter sliceImage(*myImage3D, domain2D, aSliceFunctor, functors::Identity());
+  const functors::Identity identityFunctor{};
+  SliceImageAdapter sliceImage( *myImage3D, domain2D, aSliceFunctor, identityFunctor );
   QImage anImage = getImage(sliceImage, gridSize, myColorMap);
   setImageProjX(QPixmap::fromImage(anImage));
 }
@@ -263,7 +264,8 @@ void MainWindow::updateZoomImageY(unsigned int sliceNumber, double gridSize){
   DGtal::Z2i::Domain domain2D(invFunctor(myImage3D->domain().lowerBound()),
                               invFunctor(myImage3D->domain().upperBound()));
   DGtal::functors::Projector<DGtal::Z3i::Space> aSliceFunctor(sliceNumber); aSliceFunctor.initAddOneDim(1);
-  SliceImageAdapter sliceImage(*myImage3D, domain2D, aSliceFunctor, functors::Identity());
+  const functors::Identity identityFunctor{};
+  SliceImageAdapter sliceImage( *myImage3D, domain2D, aSliceFunctor, identityFunctor );
 
   QImage anImage = getImage(sliceImage, gridSize, myColorMap);
   setImageProjY(QPixmap::fromImage(anImage));
@@ -275,7 +277,8 @@ void MainWindow::updateZoomImageZ(unsigned int sliceNumber, double gridSize){
   DGtal::Z2i::Domain domain2D(invFunctor(myImage3D->domain().lowerBound()),
                               invFunctor(myImage3D->domain().upperBound()));
   DGtal::functors::Projector<DGtal::Z3i::Space> aSliceFunctor(sliceNumber); aSliceFunctor.initAddOneDim(2);
-  SliceImageAdapter sliceImage(*myImage3D, domain2D, aSliceFunctor, functors::Identity());
+  const functors::Identity identityFunctor{};
+  SliceImageAdapter sliceImage( *myImage3D, domain2D, aSliceFunctor, identityFunctor );
   QImage anImage = getImage(sliceImage, gridSize, myColorMap );
   setImageProjZ(QPixmap::fromImage(anImage));
 }
@@ -286,7 +289,8 @@ void MainWindow::updateSliceImageX(int sliceNumber, bool init){
   DGtal::Z2i::Domain domain2D(invFunctor(myImage3D->domain().lowerBound()),
                               invFunctor(myImage3D->domain().upperBound()));
   DGtal::functors::Projector<DGtal::Z3i::Space> aSliceFunctor(sliceNumber); aSliceFunctor.initAddOneDim(0);
-  SliceImageAdapter sliceImage (*myImage3D, domain2D, aSliceFunctor, functors::Identity());
+  const functors::Identity identityFunctor{};
+  SliceImageAdapter sliceImage ( *myImage3D, domain2D, aSliceFunctor, identityFunctor );
   
   double gridSize = ((double)INIT_SCALE1_ZOOM_FACTOR)/ui->_zoomXSlider->value();
   QImage anImage = getImage(sliceImage, gridSize,myColorMap);
@@ -316,7 +320,8 @@ void MainWindow::updateSliceImageY( int sliceNumber, bool init){
   DGtal::Z2i::Domain domain2D(invFunctor(myImage3D->domain().lowerBound()),
                               invFunctor(myImage3D->domain().upperBound()));
   DGtal::functors::Projector<DGtal::Z3i::Space> aSliceFunctor(sliceNumber); aSliceFunctor.initAddOneDim(1);
-  SliceImageAdapter sliceImage(*myImage3D, domain2D, aSliceFunctor, functors::Identity());
+  const functors::Identity identityFunctor{};
+  SliceImageAdapter sliceImage( *myImage3D, domain2D, aSliceFunctor, identityFunctor );
   
   double gridSize = ((double)INIT_SCALE1_ZOOM_FACTOR)/ui->_zoomYSlider->value();
   QImage anImage = getImage(sliceImage, gridSize, myColorMap);
@@ -344,7 +349,8 @@ void MainWindow::updateSliceImageZ(int sliceNumber, bool init){
   DGtal::Z2i::Domain domain2D(invFunctor(myImage3D->domain().lowerBound()),
                               invFunctor(myImage3D->domain().upperBound()));
   DGtal::functors::Projector<DGtal::Z3i::Space> aSliceFunctor(sliceNumber); aSliceFunctor.initAddOneDim(2);
-  SliceImageAdapter sliceImage(*myImage3D, domain2D, aSliceFunctor, functors::Identity());
+  const functors::Identity identityFunctor{};
+  SliceImageAdapter sliceImage( *myImage3D, domain2D, aSliceFunctor, identityFunctor );
   double gridSize = (double)INIT_SCALE1_ZOOM_FACTOR/ui->_zoomZSlider->value();
   QImage anImage = getImage(sliceImage, gridSize, myColorMap);
   setImageProjZ(QPixmap::fromImage(anImage));

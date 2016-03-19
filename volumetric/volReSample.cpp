@@ -116,7 +116,9 @@ int main( int argc, char** argv )
   DGtal::functors::BasicDomainSubSampler< HyperRectDomain<SpaceND<3, int> >,  
                                           DGtal::int32_t, double > reSampler(input3dImage.domain(),
                                                                              aGridSizeReSample,  shiftVector3D);  
-  SamplerImageAdapter sampledImage (input3dImage,reSampler.getSubSampledDomain(), reSampler, functors::Identity());
+
+  const functors::Identity aFunctor{};
+  SamplerImageAdapter sampledImage ( input3dImage, reSampler.getSubSampledDomain(), reSampler, aFunctor );
   GenericWriter<SamplerImageAdapter>::exportFile(outputFileName, sampledImage);
   
 
