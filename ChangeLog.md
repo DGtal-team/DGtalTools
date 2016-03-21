@@ -1,10 +1,15 @@
-# DGtalTools 0.9.2 
+# DGtalTools 0.9.2
 
 - *global*:
   - fix uses of temporaries when ConstAlias is needed.
     (Roland Denis, [#253](https://github.com/DGtal-team/DGtalTools/pull/253))
 
-# DGtalTools 0.9.1 
+- *volumetric*:
+  - fix reading options bug in volCComponentCounter and sdp2vol.
+    (Bertrand Kerautret,
+    [#254](https://github.com/DGtal-team/DGtalTools/pull/254)
+
+# DGtalTools 0.9.1
 
 - *converters*:
   - img2freeman: new option to sort the resulting contours by increasing size
