@@ -109,6 +109,31 @@ MainWindow::MainWindow(DGtal::Viewer3D<> *aViewer,
   ui->setupUi(this);
   ui->verticalLayout_5->addWidget(aViewer);
 
+
+  ui->_horizontalSliderZ->setMinimum(anImage->domain().lowerBound()[2]);
+  ui->_horizontalSliderZ->setMaximum(anImage->domain().upperBound()[2]);
+  ui->_horizontalSliderZ->setValue(anImage->domain().lowerBound()[2]);
+
+  ui->_horizontalSliderY->setMinimum(anImage->domain().lowerBound()[1]);
+  ui->_horizontalSliderY->setMaximum(anImage->domain().upperBound()[1]);
+  ui->_horizontalSliderY->setValue(anImage->domain().lowerBound()[1]);
+
+  ui->_horizontalSliderX->setMinimum(anImage->domain().lowerBound()[0]);
+  ui->_horizontalSliderX->setMaximum(anImage->domain().upperBound()[0]);
+  ui->_horizontalSliderX->setValue(anImage->domain().lowerBound()[0]);
+
+  ui->_zoomXSlider->setMinimum( MIN_ZOOM_FACTOR);
+  ui->_zoomXSlider->setMaximum( MAX_ZOOM_FACTOR);
+  ui->_zoomXSlider->setValue(INIT_SCALE1_ZOOM_FACTOR);
+
+  ui->_zoomYSlider->setMinimum(MIN_ZOOM_FACTOR);
+  ui->_zoomYSlider->setMaximum(MAX_ZOOM_FACTOR);
+  ui->_zoomYSlider->setValue(INIT_SCALE1_ZOOM_FACTOR);
+
+  ui->_zoomZSlider->setMinimum(MIN_ZOOM_FACTOR);
+  ui->_zoomZSlider->setMaximum(MAX_ZOOM_FACTOR);
+  ui->_zoomZSlider->setValue(INIT_SCALE1_ZOOM_FACTOR);
+
   QObject::connect(ui->_horizontalSliderX, SIGNAL(valueChanged(int)), this, SLOT(updateSliceImageX()));
   QObject::connect(ui->_horizontalSliderY, SIGNAL(valueChanged(int)), this, SLOT(updateSliceImageY()));
   QObject::connect(ui->_horizontalSliderZ, SIGNAL(valueChanged(int)), this, SLOT(updateSliceImageZ()));
@@ -124,28 +149,6 @@ MainWindow::MainWindow(DGtal::Viewer3D<> *aViewer,
   QObject::connect(ui->_HotButton, SIGNAL(clicked()), this, SLOT(changeHotColorMap()));
   QObject::connect(ui->_HueButton, SIGNAL(clicked()), this, SLOT(changeHueColorMap()));
   QObject::connect(ui->_NormalButton, SIGNAL(clicked()), this, SLOT(changeNormalColorMap()));
-
-  ui->_horizontalSliderZ->setMinimum(anImage->domain().lowerBound()[2]);
-  ui->_horizontalSliderZ->setMaximum(anImage->domain().upperBound()[2]);
-
-  ui->_horizontalSliderY->setMinimum(anImage->domain().lowerBound()[1]);
-  ui->_horizontalSliderY->setMaximum(anImage->domain().upperBound()[1]);
-
-  ui->_horizontalSliderX->setMinimum(anImage->domain().lowerBound()[0]);
-  ui->_horizontalSliderX->setMaximum(anImage->domain().upperBound()[0]);
-
-  ui->_zoomXSlider->setMinimum( MIN_ZOOM_FACTOR);
-  ui->_zoomXSlider->setMaximum( MAX_ZOOM_FACTOR);
-  ui->_zoomXSlider->setValue(INIT_SCALE1_ZOOM_FACTOR);
-
-  ui->_zoomYSlider->setMinimum(MIN_ZOOM_FACTOR);
-  ui->_zoomYSlider->setMaximum(MAX_ZOOM_FACTOR);
-  ui->_zoomYSlider->setValue(INIT_SCALE1_ZOOM_FACTOR);
-
-  ui->_zoomZSlider->setMinimum(MIN_ZOOM_FACTOR);
-  ui->_zoomZSlider->setMaximum(MAX_ZOOM_FACTOR);
-  ui->_zoomZSlider->setValue(INIT_SCALE1_ZOOM_FACTOR);
-
   
 
 }
@@ -464,15 +467,15 @@ int main( int argc, char** argv )
                                                              usegc? MainWindow::GradientMapCool:
                                                              MainWindow::Id), 0,0);
     w.setWindowTitle ( QString("sliceViewer"));
-    w.updateSliceImageX(0, true);
-    w.updateSliceImageY(0, true);
-    w.updateSliceImageZ(0, true);
+    w.updateSliceImageX( image.domain().lowerBound()[0], true);
+    w.updateSliceImageY( image.domain().lowerBound()[1], true);
+    w.updateSliceImageZ( image.domain().lowerBound()[2], true);
     w.show();
     Z3i::Point size = image.domain().upperBound() - image.domain().lowerBound();
     Z3i::Point center = image.domain().lowerBound()+size/2;
     unsigned int maxDist = std::max(std::max(size[2], size[1]), size[2]);
     viewer->camera()->setPosition(qglviewer::Vec(center[0],center[1], 
-                                                 2.0*maxDist));
+                                                 center[2] + 2.0*maxDist));
     viewer->camera()->setSceneCenter(qglviewer::Vec(center[0],center[1],center[2]));
     application.exec();
     delete viewer;
