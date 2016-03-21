@@ -7,7 +7,7 @@
 - *volumetric*:
   - fix reading options bug in volCComponentCounter and sdp2vol.
     (Bertrand Kerautret,
-    [#254](https://github.com/DGtal-team/DGtalTools/pull/254)
+    [#254](https://github.com/DGtal-team/DGtalTools/pull/254))
 
 # DGtalTools 0.9.1
 
