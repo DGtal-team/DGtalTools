@@ -7,11 +7,12 @@
 - *visualisation*:
   - 3dSDPViewer: add the possibility to display a set of point by using
     different sphere sizes (specified in the input sdp file) (B. Kerautret).
-   (Bertrand Kerautret, [#252](https://github.com/DGtal-team/DGtalTools/pull/252))
+   (Bertrand Kerautret, [#252](https://github.com/DGtal-team/DGtalTools/pul
 
-# DGtalTools 0.9.1 
-
-
+- *volumetric*:
+  - fix reading options bug in volCComponentCounter and sdp2vol.
+    (Bertrand Kerautret,
+    [#254](https://github.com/DGtal-team/DGtalTools/pull/254))
 
 # DGtalTools 0.9.1
 

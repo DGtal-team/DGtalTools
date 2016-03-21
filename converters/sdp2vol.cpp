@@ -72,13 +72,13 @@ int main( int argc, char** argv )
   if( !parseOK || vm.count("help"))
     {
       std::cout << "Usage: " << argv[0] << " [input-file] [output]\n"
-		<< "Convert volumetric  file into a digital set of points from a given threshold."
+		<< "Convert digital set of points into a volumic file."
 		<< general_opt << "\n";
       std::cout << "Example:\n"
-		<< "vol2sdp -i ${DGtal}/examples/samples/lobster.vol -o volumeList.p3d \n";
+		<< "sdp2vol -i volumePoints.sdp -o volume.vol -d 0 0 0 10 10 10 \n";
       return 0;
     }
-  if(! vm.count("sdp") ||! vm.count("output") || !vm.count("domain") )
+  if(! vm.count("input") ||! vm.count("output") || !vm.count("domain") )
     {
       trace.error() << " Input/ output filename and domain are needed to be defined" << endl;      
       return 0;
