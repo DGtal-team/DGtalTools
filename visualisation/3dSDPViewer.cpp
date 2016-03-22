@@ -39,7 +39,6 @@
 #include "DGtal/topology/SurfelAdjacency.h"
 #include "DGtal/shapes/Mesh.h"
 #include "DGtal/io/Color.h"
-#include "DGtal/io/colormaps/GradientColorMap.h"
 #include "DGtal/io/readers/GenericReader.h"
 
 #include <boost/program_options/options_description.hpp>
@@ -67,8 +66,8 @@ int main( int argc, char** argv )
     ("pointColor,c", po::value<std::vector <int> >()->multitoken(), "set the color of  points: r g b a " )
     ("addMesh,m", po::value<std::string>(), "append a mesh (off/obj) to the point set visualization.")
     ("lineColor,l",po::value<std::vector <int> >()->multitoken(), "set the color of line: r g b a " )
-    ("colorFromLabels", "use the color indexed from labels in the file.")
-    ("labelsIndex", po::value<unsigned int>(), "define the index of the label in the source file (used by --LabelsIndex) ")
+    ("importColors", "import point colors from the input file (R G B colors should be by default at index 3, 4, 5).")
+    ("setColorsIndex", po::value<unsigned int>(), "customize the index of the imported colors in the source file (used by -importColor).")
     ("filter,f",po::value<double>()->default_value(100.0), "filter input file in order to display only the [arg] pourcent of the input 3D points (uniformly selected)." )
     ("noPointDisplay", "usefull for instance to only display the lines between points.")
     ("drawLines", "draw the line between discrete points." )
@@ -164,7 +163,7 @@ int main( int argc, char** argv )
   float sy = vm["scaleY"].as<float>();
   float sz = vm["scaleZ"].as<float>();
 
-  bool colorFromLabels = vm.count("colorFromLabels");
+  bool importColors = vm.count("importColors");
 
 
   typedef Viewer3D<Z3i::Space, Z3i::KSpace> Viewer;
@@ -177,38 +176,42 @@ int main( int argc, char** argv )
   viewer << CustomColors3D(pointColor, pointColor);
 
 
-  // Get vector of labels if exists.
-  std::vector<unsigned int> vectLabels;
-  if(colorFromLabels)
+  // Get vector of colors if imported.
+  std::vector<Color> vectColors;
+  if(vm.count("importColors"))
     {
-      std::vector<Point1D> vectVal;
-      std::vector<unsigned int> vectIndex;
-      if(vm.count("labelsIndex"))
+      std::vector<unsigned int > vectIndex;
+      if(vm.count("setColorsIndex"))
         {
-          vectIndex.push_back(vm["labelsIndex"].as<unsigned int>());
+          vectIndex = vm["setColorsIndex"].as<std::vector<unsigned int > >();
+          if(vectIndex.size()!=3)
+            {
+              trace.error() << "you need to specify the three indexes of color." << std::endl;
+              return 0;
+            }
         }
       else
         {
           vectIndex.push_back(3);
+          vectIndex.push_back(4);
+          vectIndex.push_back(5);
         }
-      vectVal = PointListReader<Point1D>::getPointsFromFile(inputFilename, vectIndex);
-      for(std::vector<Point1D>::iterator it= vectVal.begin(); it!=vectVal.end(); it++)
-        {
-          vectLabels.push_back((unsigned int)(*it)[0]);
-        }
+        
+      
+      std::vector<unsigned int> r = TableReader<unsigned int>::getColumnElementsFromFile(inputFilename,vectIndex[0]);
+      std::vector<unsigned int> g = TableReader<unsigned int>::getColumnElementsFromFile(inputFilename,vectIndex[1]);
+      std::vector<unsigned int> b = TableReader<unsigned int>::getColumnElementsFromFile(inputFilename,vectIndex[2]);
+      for (unsigned int i = 0; i<r.size(); i++){
+        vectColors.push_back(Color(r[i], g[i], b[i]));
+      }
     }
+  
   
   if(useMultiRad)
     {
       vectSphereRadius = TableReader<double>::getColumnElementsFromFile(inputFilename,3);
     }
 
-  GradientColorMap< int > gradientColorMap( 1, (!colorFromLabels)? 1:  * std::max_element(vectLabels.begin(), vectLabels.end()));
-  if(colorFromLabels)
-    {
-      gradientColorMap.addColor( Color(255,100,100 ) );
-      gradientColorMap.addColor( Color(1,100, 255 ) );
-    }
   vector<Z3i::RealPoint> vectVoxels;
   if(vm.count("SDPindex"))
     {
@@ -231,9 +234,9 @@ int main( int argc, char** argv )
       int step = max(1, (int) (100/percent));
       for(unsigned int i=0;i< vectVoxels.size(); i=i+step)
         {
-          if(colorFromLabels)
+          if(importColors)
             {
-              Color col = gradientColorMap((int) vectLabels.at(i));
+              Color col = vectColors[i];
               viewer.setFillColor(col);
             }
 
