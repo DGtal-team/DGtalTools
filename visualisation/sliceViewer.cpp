@@ -251,7 +251,7 @@ void MainWindow::updateZoomImageZ(){
 }
 
 
-void MainWindow::updateZoomImageX(unsigned int sliceNumber, double gridSize){
+void MainWindow::updateZoomImageX(int sliceNumber, double gridSize){
   DGtal::functors::Projector<DGtal::Z2i::Space>  invFunctor; invFunctor.initRemoveOneDim(0);
   DGtal::Z2i::Domain domain2D(invFunctor(myImage3D->domain().lowerBound()),
                               invFunctor(myImage3D->domain().upperBound()));
@@ -262,7 +262,7 @@ void MainWindow::updateZoomImageX(unsigned int sliceNumber, double gridSize){
   setImageProjX(QPixmap::fromImage(anImage));
 }
 
-void MainWindow::updateZoomImageY(unsigned int sliceNumber, double gridSize){
+void MainWindow::updateZoomImageY(int sliceNumber, double gridSize){
   DGtal::functors::Projector<DGtal::Z2i::Space>  invFunctor; invFunctor.initRemoveOneDim(1);
   DGtal::Z2i::Domain domain2D(invFunctor(myImage3D->domain().lowerBound()),
                               invFunctor(myImage3D->domain().upperBound()));
@@ -275,7 +275,7 @@ void MainWindow::updateZoomImageY(unsigned int sliceNumber, double gridSize){
 }
 
 
-void MainWindow::updateZoomImageZ(unsigned int sliceNumber, double gridSize){
+void MainWindow::updateZoomImageZ(int sliceNumber, double gridSize){
   DGtal::functors::Projector<DGtal::Z2i::Space>  invFunctor; invFunctor.initRemoveOneDim(2);
   DGtal::Z2i::Domain domain2D(invFunctor(myImage3D->domain().lowerBound()),
                               invFunctor(myImage3D->domain().upperBound()));
