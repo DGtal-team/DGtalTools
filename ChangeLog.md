@@ -4,6 +4,10 @@
   - fix uses of temporaries when ConstAlias is needed.
     (Roland Denis, [#253](https://github.com/DGtal-team/DGtalTools/pull/253))
 
+- *visualisation*:
+  - sliceViewer: fix bug when imported image domain doesn't contain (0,0,0) point.
+    (Roland Denis, [#256](https://github.com/DGtal-team/DGtalTools/pull/256))
+
 - *volumetric*:
   - fix reading options bug in volCComponentCounter and sdp2vol.
     (Bertrand Kerautret,
