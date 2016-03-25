@@ -40,6 +40,7 @@
 #include "DGtal/io/Color.h"
 #include "DGtal/io/colormaps/GradientColorMap.h"
 #include "DGtal/io/readers/GenericReader.h"
+#include "DGtal/io/DrawWithDisplay3DModifier.h"
 
 #include <boost/program_options/options_description.hpp>
 #include <boost/program_options/parsers.hpp>
@@ -52,6 +53,23 @@ using namespace Z3i;
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace po = boost::program_options;
+typedef Viewer3D<Z3i::Space, Z3i::KSpace> Viewer;
+
+
+// call back function to display voxel coordinates 
+int 
+displayCoordsCallBack( void* viewer, int32_t name, void* data )
+{
+  vector<Z3i::RealPoint> *vectVoxels = (vector<Z3i::RealPoint> *) data;
+  std::stringstream ss;
+  ss << "Selected voxel: (" << (*vectVoxels)[name][0] <<  ", ";
+  ss << (*vectVoxels)[name][1] <<  ", ";
+  ss << (*vectVoxels)[name][2] <<  ") ";
+  ((Viewer *) viewer)->displayMessage(QString(ss.str().c_str()), 100000);
+
+return 0;
+}
+
 
 int main( int argc, char** argv )
 {
@@ -77,12 +95,14 @@ int main( int argc, char** argv )
     ("sphereRadius,s",  po::value<double>()->default_value(0.2), "defines the sphere radius (used when the primitive is set to the sphere). (default value 0.2)")
     ("sphereResolution",  po::value<unsigned int>()->default_value(30), "defines the sphere resolution (used when the primitive is set to the sphere). (default resolution: 30)")
     ("lineSize",  po::value<double>()->default_value(0.2), "defines the line size (used when the --drawLines or --drawVectors option is selected). (default value 0.2))")
-    ("primitive,p", po::value<std::string>()->default_value("sphere"), "set the primitive to display the set of points (can be sphere or voxel (default)")
-    ("drawVectors,v", po::value<std::string>(), "SDP vector file: draw a set of vectors from the given file (each vector are determined by two consecutive point given, each point represented by its coordinates on a single line.") ;
+    ("primitive,p", po::value<std::string>()->default_value("voxel"), "set the primitive to display the set of points (can be sphere or voxel (default)")
+    ("drawVectors,v", po::value<std::string>(), "SDP vector file: draw a set of vectors from the given file (each vector are determined by two consecutive point given, each point represented by its coordinates on a single line.")
+    ("interactiveDisplayVoxCoords", "by using this option the pixel coordinates can be displayed after selection (shift+left click on voxel)." );
 
 
   bool parseOK=true;
   bool cannotStart= false;
+
   typedef PointVector<1, int> Point1D;
 
 
@@ -147,14 +167,13 @@ int main( int argc, char** argv )
 
 
   QApplication application(argc,argv);
-  typedef Viewer3D<Z3i::Space, Z3i::KSpace> Viewer;
 
   float sx = vm["scaleX"].as<float>();
   float sy = vm["scaleY"].as<float>();
   float sz = vm["scaleZ"].as<float>();
 
   bool colorFromLabels = vm.count("colorFromLabels");
-
+  bool interactiveDisplayVoxCoords = vm.count("interactiveDisplayVoxCoords");
 
   typedef Viewer3D<Z3i::Space, Z3i::KSpace> Viewer;
   Z3i::KSpace K;
@@ -199,7 +218,7 @@ int main( int argc, char** argv )
   }else{
     vectVoxels = PointListReader<Z3i::RealPoint>::getPointsFromFile(inputFilename);
   }
-
+  int name = 0;
   if(!vm.count("noPointDisplay")){
     double percent = vm["filter"].as<double>();
     int step = max(1, (int) (100/percent));
@@ -210,6 +229,10 @@ int main( int argc, char** argv )
       }
 
       if(typePrimitive=="voxel"){
+        if (interactiveDisplayVoxCoords)
+          {
+            viewer << SetName3D( name++ ) ;
+          }
         viewer << Z3i::Point((int)vectVoxels.at(i)[0],
                              (int)vectVoxels.at(i)[1],
                              (int)vectVoxels.at(i)[2]);
@@ -245,7 +268,10 @@ int main( int argc, char** argv )
     mesh << meshName ;
     viewer << mesh;
   }
-
+  if (interactiveDisplayVoxCoords)
+    {
+      viewer << SetSelectCallback3D( displayCoordsCallBack,  &vectVoxels,  0, vectVoxels.size()-1 );
+    }
   viewer << Viewer3D<>::updateDisplay;
   return application.exec();
 }
