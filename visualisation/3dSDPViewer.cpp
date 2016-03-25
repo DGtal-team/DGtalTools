@@ -58,7 +58,7 @@ typedef Viewer3D<Z3i::Space, Z3i::KSpace> Viewer;
 
 // call back function to display voxel coordinates 
 int 
-displayCoordsCallBack( void* viewer, int32_t name, void* data )
+displayCoordsCallBack( void* viewer, DGtal::int32_t name, void* data )
 {
   vector<Z3i::RealPoint> *vectVoxels = (vector<Z3i::RealPoint> *) data;
   std::stringstream ss;
