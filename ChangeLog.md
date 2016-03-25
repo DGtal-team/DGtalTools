@@ -7,6 +7,10 @@
 - *visualisation*:
   - sliceViewer: fix bug when imported image domain doesn't contain (0,0,0) point.
     (Roland Denis, [#256](https://github.com/DGtal-team/DGtalTools/pull/256))
+  - 3dSDPViewer: add an option to display on screen the selected voxel.
+    (Bertrand Kerautret,
+    [#257](https://github.com/DGtal-team/DGtalTools/pull/257))
+
 
 - *volumetric*:
   - fix reading options bug in volCComponentCounter and sdp2vol.
