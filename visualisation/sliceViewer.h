@@ -112,9 +112,9 @@ public:
   void updateSliceImageY( int sliceNumber, bool init);
   void updateSliceImageZ( int sliceNumber, bool init);
 
-  void updateZoomImageX(unsigned int sliceNumber, double gridSize);
-  void updateZoomImageY(unsigned int sliceNumber, double gridSize);
-  void updateZoomImageZ(unsigned int sliceNumber, double gridSize);
+  void updateZoomImageX(int sliceNumber, double gridSize);
+  void updateZoomImageY(int sliceNumber, double gridSize);
+  void updateZoomImageZ(int sliceNumber, double gridSize);
   void updateAllDisplayedImages();                                                                 
                                                                   
 
