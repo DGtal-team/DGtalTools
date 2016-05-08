@@ -45,7 +45,8 @@ using namespace Z3i;
 
 /**
  @page vol2obj vol2obj
- @brief Convert any volumetric file to an OBJ one. Each voxel is exported as a unit cube.
+ @brief Convert any volumetric file to an OBJ one. Each grid point with value between
+ @a thresholdMin and @a thresholdMax is exported as a unit cube.
 
 
 @b Usage: vol2obj [input-file]
