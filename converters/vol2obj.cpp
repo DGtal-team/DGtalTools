@@ -48,9 +48,6 @@ using namespace Z3i;
  @brief Convert any volumetric file to an OBJ one. Each grid point with value between
  [@a thresholdMin,@a thresholdMax] is exported as a unit cube.
 
-Testing crossref: DGtal::Z3i::Point, DGtal::SpaceND, DGtal::ImageContainerBySTLVector
-
-
 
 @b Usage: vol2obj [input-file]
 
