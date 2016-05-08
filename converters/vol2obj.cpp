@@ -62,9 +62,9 @@ using namespace Z3i;
    -M [ --thresholdMax ] arg (=255) threshold max to define binary shape
 @endcode
 
+@see vol2obj.cpp
+
 */
-
-
 ///////////////////////////////////////////////////////////////////////////////
 namespace po = boost::program_options;
 
