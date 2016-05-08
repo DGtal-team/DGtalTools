@@ -43,6 +43,28 @@ using namespace std;
 using namespace DGtal;
 using namespace Z3i;
 
+/**
+ @page vol2obj vol2obj
+ @brief Convert any volumetric file to an OBJ one. Each voxel is exported as a unit cube.
+
+
+@b Usage: vol2obj [input-file]
+
+@b Allowed @b options @b are:
+
+@code
+   -h [ --help ]                    display this message
+   -i [ --input ] arg               vol file (.vol) , pgm3d (.p3d or .pgm3d, pgm
+                                    (with 3 dims)) file or sdp (sequence of
+                                    discrete points)
+   -o [ --output ] arg              Output OBJ filename
+   -m [ --thresholdMin ] arg (=0)   threshold min to define binary shape
+   -M [ --thresholdMax ] arg (=255) threshold max to define binary shape
+@endcode
+
+*/
+
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace po = boost::program_options;
 
