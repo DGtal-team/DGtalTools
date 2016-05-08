@@ -666,11 +666,11 @@ WARN_LOGFILE           =
 
 INPUT                  = @top_srcdir@/doc \
                          @top_srcdir@/converters \
-                         @top_srcdir@/visualization \
+                         @top_srcdir@/visualisation \
                          @top_srcdir@/estimators \
                          @top_srcdir@/shapeGenerator \
                          @top_srcdir@/geometricTransform \
-                         @top_srcdir@/volumetric 
+                         @top_srcdir@/volumetric
 
 # This tag can be used to specify the character encoding of the source files
 # that doxygen parses. Internally doxygen uses the UTF-8 encoding, which is
@@ -1015,21 +1015,21 @@ HTML_INDEX_NUM_ENTRIES = 100
 # See http://developer.apple.com/tools/creatingdocsetswithdoxygen.html
 # for more information.
 
-GENERATE_DOCSET        = YES
+GENERATE_DOCSET        = NO
 
 # When GENERATE_DOCSET tag is set to YES, this tag determines the name of the
 # feed. A documentation feed provides an umbrella under which multiple
 # documentation sets from a single provider (such as a company or product suite)
 # can be grouped.
 
-DOCSET_FEEDNAME        = "DGtal generated docs"
+DOCSET_FEEDNAME        = "DGtalTools generated docs"
 
 # When GENERATE_DOCSET tag is set to YES, this tag specifies a string that
 # should uniquely identify the documentation set bundle. This should be a
 # reverse domain-name style string, e.g. com.mycompany.MyDocSet. Doxygen
 # will append .docset to the name.
 
-DOCSET_BUNDLE_ID       = org.dgtal
+DOCSET_BUNDLE_ID       = org.dgtaltools
 
 # When GENERATE_PUBLISHER_ID tag specifies a string that should uniquely
 # identify the documentation publisher. This should be a reverse domain-name
@@ -1590,12 +1590,13 @@ SKIP_FUNCTION_MACROS   = YES
 # NOT include the path). If a tag file is not located in the directory in which
 # doxygen is run, you must also specify the path to the tagfile here.
 
-TAGFILES               = Board-tagfile
+TAGFILES               = DGtal-tagfile="http://dgtal.org/doc/nightly/tags/" \
+                         Board-tagfile="http://dgtal.org/doc/nightly/tags/"
 
 # When a file name is specified after GENERATE_TAGFILE, doxygen will create
 # a tag file that is based on the input files it reads.
 
-GENERATE_TAGFILE       = DGtal-tagfile
+GENERATE_TAGFILE       = DGtalTools-tagfile
 
 # If the ALLEXTERNALS tag is set to YES all external classes will be listed
 # in the class index. If set to NO only the inherited external classes
