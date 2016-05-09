@@ -88,7 +88,7 @@ Utilities to convert various simple file formats:
 </tr>
 <tr>
 <td>vol2heightmap</td>
-<td>heightmap2vol</td>
+<td>heightfield2vol</td>
 <td>imgAddNoise</td> 
 <td>volAddNoise</td>
 </tr>
