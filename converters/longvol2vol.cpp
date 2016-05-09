@@ -42,6 +42,32 @@ using namespace Z3i;
 
 namespace po = boost::program_options;
 
+/**
+ @page longvol2vol longvol2vol
+ @brief  Converts a longvol (long int) to a vol file (unsigned char).
+
+@b Usage: longvol2vol [input] [output]
+
+@b Allowed @b options @b are:
+
+@code
+  -h [ --help ]          display this message.
+  -i [ --input ] arg     Input longvol filename.
+  -o [ --output ] arg    Output vole filename.
+  -m [ --mode ] arg (=0) Conversion mode:
+                          0 = cast (default)
+                          1 = Linear Scaling
+                          2 = Grayscale cycle (32 steps, except 0 values).
+@endcode
+
+@b Example:
+@code
+  $ longvol2vol -i ${DGtal}/tests/samples/test.longvol -o out.vol 
+@endcode
+
+@see longvol2vol.cpp
+
+*/
 
 /**
  * Cycle scaling functor
@@ -113,7 +139,7 @@ int main(int argc, char**argv)
   po::notify ( vm );
   if (!parseOK || vm.count ( "help" ) ||argc<=1 )
   {
-    trace.info() << "Convert a longvol (long int) to a vol file (unsigned char)."<<std::endl
+    trace.info() << "Converts a longvol (long int) to a vol file (unsigned char)."<<std::endl
     << std::endl << "Basic usage: "<<std::endl
     << "\tlongvol2vol --input <LongvolFileName> --o <VolOutputFileName> "<<std::endl
     << general_opt << "\n";

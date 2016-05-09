@@ -33,6 +33,14 @@ Utilities to convert various simple file formats:
   - @ref heightfield2shading :  Renders a 2D heightfield image into a shading image.
   - @ref heightfield2vol : Transforms 2D heightfield into a volumetric file.
   - @ref img2freeman :  Extracts FreemanChains from thresholded image.
-  - @ref imgAddNoise: Adds noise (Kanungo's) to a binary 2D object.
-  
+  - @ref imgAddNoise : Adds noise (Kanungo's) to a binary 2D object.
+  - @ref itk2vol : Converts itk file into a volumetric file (.vol, .pgm3d).
+  - @ref longvol2vol : Converts a longvol (long int) to a vol file (unsigned char).
+  - @ref mesh2heightfield : Converts a mesh file into a 2D heightmap (from a normal direction N and from a starting point P).
+  - @ref ofs2off : Converts OFS file into OFF mesh format.
+  - @ref raw2HDF5 :  Converts a 3D 8-bit raw file to HDF5.
+  - @ref raw2vol : Converts a  8-bit raw file to vol.
+  - @ref sdp2vol : Converts digital set of points into a volumic file.
+  - @ref slice2vol : Converts set of 2D images into volumetric file  (pgm3d, vol, longvol).
+  - @ref volAddNoise : 
 */
