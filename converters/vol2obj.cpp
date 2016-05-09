@@ -15,7 +15,7 @@
  **/
 /**
  * @file vol2obj.cpp
- * @ingroup Examples
+ * @ingroup Converters
  * @author David Coeurjolly (\c david.coeurjolly@liris.cnrs.fr)
  *
  * @date 2013/10/13

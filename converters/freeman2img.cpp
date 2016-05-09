@@ -60,6 +60,7 @@ namespace po = boost::program_options;
 /**
  @page freeman2img freeman2img
  @brief transforms one or several freeman chains into a pgm file by filling their interior areas.
+
  The transformation can fill shapes with hole by using the freemanchain orientation. The interior is considered on the left according to a freeman chain move, i.e. a clockwise oriented contour represents a hole in the shape.
 
 @b Usage: freeman2img [input] [output]
