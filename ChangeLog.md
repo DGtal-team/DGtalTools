@@ -6,8 +6,9 @@
 
 - *visualisation*:
   - 3dSDPViewer: add the possibility to display a set of point by using
-    different sphere sizes (specified in the input sdp file) (B. Kerautret).
-   (Bertrand Kerautret, [#252](https://github.com/DGtal-team/DGtalTools/pul
+    different sphere sizes (specified in the input sdp file).
+   (Bertrand Kerautret, 
+   [#252](https://github.com/DGtal-team/DGtalTools/pull/252))
 
   - sliceViewer: fix bug when imported image domain doesn't contain (0,0,0) point.
     (Roland Denis, [#256](https://github.com/DGtal-team/DGtalTools/pull/256))
