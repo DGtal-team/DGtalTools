@@ -57,6 +57,39 @@ using namespace DGtal;
 ///////////////////////////////////////////////////////////////////////////////
 namespace po = boost::program_options;
 
+/**
+ @page freeman2img freeman2img
+ @brief transforms one or several freeman chains into a pgm file by filling their interior areas.
+ The transformation can fill shapes with hole by using the freemanchain orientation. The interior is considered on the left according to a freeman chain move, i.e. a clockwise oriented contour represents a hole in the shape.
+
+@b Usage: freeman2img [input] [output]
+
+@b Allowed @b options @b are:
+
+@code
+  -h [ --help ]                     display this message
+  -i [ --input ] arg                the input FreemanChain file name
+  -o [ --output ] arg (=result.pgm)  the output filename
+  -b [ --border ] arg (=0)           add a border in the resulting image (used 
+                                    only in the automatic mode i.e when --space
+                                    is not used.
+  -s [ --space ] arg                Define the space from its bounding box 
+                                    (lower and upper coordinates) else the 
+                                    space is automatically defined from the 
+                                    freemanchain bounding boxes.
+@endcode
+
+@b Example:
+@code
+  $freeman2img -i ${DGtal}/tests/samples/contourS.fc -o sample.pgm
+@endcode
+You will obtain such image:
+@image html  resFreeman2img.png "Resulting image"
+@see freeman2img.cpp
+
+*/
+
+
 int main( int argc, char** argv )
 {
   // parse command line ----------------------------------------------

@@ -42,6 +42,33 @@
 using namespace std;
 using namespace DGtal;
 
+/**
+ @page convertVol convertVol
+ @brief Convert volumetric file into volumetric file from different formats (pgm3d, vol, longvol).
+
+
+@b Usage: convertVol [input] [output]
+
+@b Allowed @b options @b are:
+
+@code
+ Usage: convertVol [input] [output]
+Convert volumetric  file into volumetric file from different formats (pgm3d, vol, longvol) Allowed options are: :
+  -h [ --help ]         display this message
+  -i [ --input ] arg    volumetric file (.pgm3d, .vol, .longvol) 
+  -o [ --output ] arg   volumetric file (.pgm3d, .vol, .longvol) 
+@endcode
+
+@b Example:
+@code 
+convertVol -i ${DGtal}/examples/samples/lobster.vol -o convertedVol.p3d 
+@endcode
+
+
+@see convertVol.cpp
+
+*/
+
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace po = boost::program_options;
@@ -70,7 +97,7 @@ int main( int argc, char** argv )
   if( !parseOK || vm.count("help")||argc<=1)
     {
       std::cout << "Usage: " << argv[0] << " [input] [output]\n"
-		<< "Convert volumetric  file into volumetric file from different formats (pgm3d, vol, longvol) "
+		<< "Convert volumetric file into volumetric file from different formats (pgm3d, vol, longvol) "
 		<< general_opt << "\n";
       std::cout << "Example:\n"
 		<< "convertVol -i ${DGtal}/examples/samples/lobster.vol -o convertedVol.p3d \n";

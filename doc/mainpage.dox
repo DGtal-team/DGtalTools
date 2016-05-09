@@ -1,10 +1,44 @@
 
 /**
-@mainpage DGtalTools - Digital Geometry Tools and Algorithms Library.
+ * @mainpage DGtalTools - Digital Geometry Tools and Algorithms Library.
+
+
+DGtalTools is a separate github project containing tools constructed
+using DGtal library. The main goal of this part is to gather simple
+and useful tools exploiting the structures and algorithms defined in
+DGtal. The resulting tools could be useful to:
+
+- Share and apply DGtal algorithms to various data from different domains.
+
+- Construct demonstration tools like online demonstrations (as for instance the one of the Image Processing Online (http://www.ipol.im)
+
+- Simplify comparisons of different algorithms with an single framework.
+
+- Provide useful tools of digital image related algorithms (extraction
+  of connected components, digital contour/surface extraction, simple
+  visualization tools ... etc).
 
 
 
-@section converters Converters
- - @ref vol2obj
+The source code of the tools can also be used to non DGtal familiar
+user to show how to include the DGtal library framework directly in their
+own source code (in complement of DGtal tutorial http://liris.cnrs.fr/dgtal/doc/nightly/packageTutorials.html).
+
+
+@section Organisation
+
+Actually the DGTal project is organized as follows:
+
+ - [Converters](\ref converters)
+
+ - [Estimators](#estimators)
+
+ - [ShapeGenerator](#shapegenerator)
+
+ - [Visualization](#visualization)
+
+ - [Volumetric](#volumetric)
+
+
 
 */
