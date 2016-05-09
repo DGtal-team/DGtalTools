@@ -3,6 +3,7 @@
 
 
 #include "DGtal/images/ImageContainerBySTLVector.h"
+
 #include "DGtal/images/ImageSelector.h"
 
 #include "DGtal/geometry/curves/FreemanChain.h"
