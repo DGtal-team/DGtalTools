@@ -59,7 +59,7 @@ Utilities to convert various simple file formats:
   - freeman2sdp: convert freeman chain towards a Sequence of Discrete Points.
   - HDF52vol: convert HDF5 to vol file format. 
   - heightfield2shading: Render a 2D heightfield image into a shading image from various reflectance models (lambertian, specular, custom reflectance map).
-  - heightfield2vol: a new tool to transform 2D heightmap into volumetric file.
+  - heightfield2vol: a new tool to transform 2D heightfield into volumetric file.
   - img2freeman: to extract a freeman chain contour from a grayscale image.
   - imgAddNoise: a new tool to add noise (Kanungo's) to a binary 2D object.
   - itk2vol: convert any image of itk format (mhd, mha, ...) to vol (available with the itk option in DGtal).
