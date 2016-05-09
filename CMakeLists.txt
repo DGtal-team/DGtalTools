@@ -20,16 +20,6 @@ LINK_DIRECTORIES(${DGTAL_LIBRARY_DIRS})
 SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 message(STATUS "DGtal found.")
 
-# -----------------------------------------------------------------------------
-# Documentation
-# -----------------------------------------------------------------------------
-message(STATUS "-------------------------------------------------------------------------------")
-message(STATUS "Checking if doxygen/dot is installed:")
-set(INSTALL_DOC_PATH ${CMAKE_INSTALL_PREFIX}/share/DGtalTools CACHE PATH "Installation directory for DGtal documentation files.")
-INCLUDE(doxygen)
-INCLUDE(TargetDoxygenDoc OPTIONAL)
-message(STATUS "-------------------------------------------------------------------------------")
-
 # -------------------------------------------------------------------------
 # This test is for instance used for ITK v3.x. ITK forces a limited
 # template depth. We remove this option.
@@ -70,6 +60,19 @@ if ( Boost_FOUND )
      ${Boost_PROGRAM_OPTIONS_LIBRARY})
    SET(DGtalLibInc ${Boost_INCLUDE_DIRS})
 endif( Boost_FOUND )
+
+
+
+
+# -----------------------------------------------------------------------------
+# Documentation
+# -----------------------------------------------------------------------------
+message(STATUS "-------------------------------------------------------------------------------")
+message(STATUS "Checking if doxygen/dot is installed:")
+set(INSTALL_DOC_PATH ${CMAKE_INSTALL_PREFIX}/share/DGtalTools CACHE PATH "Installation directory for DGtal documentation files.")
+INCLUDE(doxygen)
+INCLUDE(TargetDoxygenDoc OPTIONAL)
+message(STATUS "-------------------------------------------------------------------------------")
 
 #------Tools subdirectories ------
 add_subdirectory(volumetric)
