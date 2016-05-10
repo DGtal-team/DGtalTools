@@ -33,7 +33,8 @@ Actually the DGTal project is organized as follows:
 
  - [Estimators](#estimators)
 
- - [ShapeGenerator](#shapegenerator)
+ - [ShapeGenerator](\ref shapeGenerator)
+
 
  - [Visualization](#visualization)
 
