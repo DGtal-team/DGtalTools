@@ -68,12 +68,11 @@ using namespace DGtal;
 
 /**
  @page contourGenerator contourGenerator
- @brief  Generates contours of 2d digital shapes using DGtal library.
+ @brief  Generates multigrid contours of 2d digital shapes using DGtal library.
  
-The associated geometric information like contour, curvature can also be displayed.
- 
+ The associated geometric information like contour, curvature can also be displayed. 
 
- @b Usage: contourGenerator [input] [output]
+ @b Usage: 	contourGenerator --shape <shapeName> [requiredParam] [otherOptions]
  
  @b Allowed @b options @b are:
  
@@ -99,6 +98,27 @@ The associated geometric information like contour, curvature can also be display
  -o [ --outputGeometry ] arg      Base name of the file containing the shape
  geometry (points, tangents, curvature)
  @endcode
+
+ You can also list all possible shapes:
+ @code 
+ contourGenerator --list
+ 2D Shapes:
+	ball	Ball for the Euclidean metric.
+		Required parameter(s): --radius [-R]   
+	square	square (no signature).
+		Required parameter(s): --width [-w]   
+	lpball	Ball for the l_power metric (no signature).
+		Required parameter(s): --radius [-R], --power [-p]  
+	flower	Flower with k petals with radius ranging from R+/-v.
+		Required parameter(s): --radius [-R], --varsmallradius [-v], --k [-k], --phi
+	ngon	Regular k-gon.
+		Required parameter(s): --radius [-R], --k [-k], --phi 
+	accflower	Accelerated Flower with k petals.
+		Required parameter(s): --radius [-R], --varsmallradius [-v], --k [-k], --phi
+	ellipse	Ellipse.
+		Required parameter(s): --axis1 [-A], --axis2 [-a], --phi 
+ @endcode
+
  
  @b Example:
  @code
@@ -109,10 +129,12 @@ The associated geometric information like contour, curvature can also be display
  [gnuplot>  plot [][-5:2]'res.geom'  using 1:6 w l  t "curvature"
  [gnuplot>  plot 'res.geom'  using 2:3 w l  t "contour flower"
 @endcode
+
  
  You should obtain such a visualization:
  @image html resContourGenerator.png "resulting visualisation of generated contour (a) and curvature (b)."
  
+
  @ref contourGenerator.cpp
  
  */
