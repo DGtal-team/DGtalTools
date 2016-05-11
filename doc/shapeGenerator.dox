@@ -19,7 +19,7 @@
 @section shapeGenerator_Doc Shape Generator
 
 
-Utilities to convert various simple file formats:
+Utilities to generate various contours/shapes:
 
   - @ref contourGenerator :  Generates multigrid contours of 2d digital shapes using DGtal library.
   - @ref shapeGeneratorPrg : Generates shapes using DGtal library.

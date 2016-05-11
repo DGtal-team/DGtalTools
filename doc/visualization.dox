@@ -1,0 +1,28 @@
+/**
+ * @file visualization.dox
+ * @author Bertrand Kerautret 
+ * LORIA (CNRS, UMR 7503), University of Lorraine, France
+ *
+ * @date 2016/05/09
+ *
+ * Documentation file for visualization
+ *
+ * This file is part of the DGtal library.
+ */
+
+
+//----------------------------------------
+/*!
+@page visualization
+@writers Bertrand Kerautret
+
+@section visualization_Doc Visualization
+
+
+
+  - @ref CompSurfelData : computes generic scalar surfel data comparisons (squared error) ( given from an input data file and from a reference one). 
+  
+    
+
+
+*/

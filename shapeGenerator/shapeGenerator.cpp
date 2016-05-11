@@ -112,13 +112,11 @@ using namespace DGtal;
  @b Example:
  @code
  # generate an accflower shape with 6 petals of maximal radius 40 and small radius 10:
-
  shapeGenerator -s accflower -R 40 -v 10 -k 6   -f pgm  -o test2
-
-  @endcode
+ @endcode
  
  You should obtain such a resulting image:
- @image html resShapeGenerator.png "resulting visualisation of generated contour."
+ @image html resShapeGenerator.png "resulting visualisation of generated shape."
  
 
 
