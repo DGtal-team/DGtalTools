@@ -95,6 +95,7 @@ namespace po = boost::program_options;
 You should obtain such a visualization:
 @image html resVolBoundary2obj.png "resulting visualisation."
 
+@see
 @ref volBoundary2obj.cpp
 
 */

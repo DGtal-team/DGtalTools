@@ -74,6 +74,7 @@ namespace po = boost::program_options;
 You should obtain such a visualization:
 @image html resVol2sdp.png "resulting visualisation."
 
+@see
 @ref vol2sdp.cpp
 
 */

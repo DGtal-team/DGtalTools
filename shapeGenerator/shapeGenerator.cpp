@@ -119,9 +119,9 @@ using namespace DGtal;
  @image html resShapeGenerator.png "resulting visualisation of generated shape."
  
 
-
+ @see
  @ref shapeGenerator.cpp
- 
+ @ref contourGenerator
  */
 
 /**

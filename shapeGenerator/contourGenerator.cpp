@@ -134,9 +134,9 @@ using namespace DGtal;
  You should obtain such a visualization:
  @image html resContourGenerator.png "resulting visualisation of generated contour (a) and curvature (b)."
  
-
+ @see 
  @ref contourGenerator.cpp
- 
+ @ref shapeGenerator 
  */
 
 

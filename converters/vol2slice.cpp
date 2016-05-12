@@ -83,6 +83,7 @@ namespace po = boost::program_options;
 You should obtain such a visualization:
 @image html resVol2slice.png "resulting visualisation."
 
+@see
 @ref vol2slice.cpp
 
 */

@@ -21,8 +21,20 @@
 
 
   - @ref CompSurfelData : computes generic scalar surfel data comparisons (squared error) ( given from an input data file and from a reference one). 
+  - @ref Doc3DCurvatureViewer :  permits to compute and visualize mean or gaussian curvature of binary shapes.   
+  - @ref Doc3DCurvatureViewerNoise :  same as @ref Doc3DCurvatureViewer, but allows to add some noise to objects. 
+  - @ref Doc3dCurveViewer : displays a 3D curve given as the input filename (with possibly projections and/or tangent information) by using QGLviewer.
+  - @ref Doc3dDisplaySurfelData : displays surfel data from SDP file with color attributes given as scalar interpreted as color. 
+  - @ref Doc3dHeightMapViewer : displays 2D image as heightmap by using QGLviewer.
+  - @ref Doc3dImageViewer : displays volume file as a voxel set by using QGLviewer.
+  - @ref Doc3dImplicitSurfaceExtractorBy4DExtension : computes the zero level set of the given polynomial.
+  - @ref Doc3dImplicitSurfaceExtractorByThickening : computes the zero level set of the given polynomial.
+  - @ref Doc3DSDPViewer : displays sequence of 3d discrete points by using QGLviewer.
+  - @ref Doc3dVolBoundaryViewer : displays the boundary of a volume file by using QGLviewer. 
+  - @ref Doc3dVolViewer : displays volume file as a voxel set by using QGLviewer.
+  - @ref displayContours : displays discrete contours.
+  - @ref meshViewer : displays OFF mesh file by using QGLviewer.
+  - @ref patternTriangulation : draws the Delaunay triangulation of a pattern using DGtal library.
+  - @ref sliceViewer : displays volume file with slice image by using QT and QGLviewer.
   
-    
-
-
 */

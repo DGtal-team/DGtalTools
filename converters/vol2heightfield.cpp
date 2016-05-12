@@ -92,7 +92,7 @@ namespace po = boost::program_options;
 
 You should obtain such a resulting image:
 @image html resVol2heightfield.png "resulting image."
-
+@see
 @ref vol2heightfield.cpp
 
 */

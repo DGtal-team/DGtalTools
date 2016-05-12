@@ -65,7 +65,8 @@ using namespace DGtal;
   $ slice2vol -i slice1.pgm slice2.pgm slice3.pgm  -o out.vol
 @endcode
 
-@see slice2vol.cpp
+@see
+slice2vol.cpp
 
 */
 

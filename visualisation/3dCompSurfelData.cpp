@@ -66,11 +66,11 @@ namespace po = boost::program_options;
 /**
  @page CompSurfelData 3DCompSurfelData
 
- @brief  computes generic scalar surfel data comparisons (squared error) (given from an input data file and from a reference one). 
+ @brief  Computes generic scalar surfel data comparisons (squared error) (given from an input data file and from a reference one). 
  
  
 
- @b Usage:  Usage: 3dCompSurfelData [input] [reference]
+ @b Usage: 3dCompSurfelData [input] [reference]
  
 
  @b Allowed @b options @b are:
@@ -102,6 +102,7 @@ namespace po = boost::program_options;
  @endcode
 
  @b Example: 
+
  To use this tools  we need first to have two differents surfel set with an attribute to be compared. We can use for instance the curvature from the sample file of DGtal/examples/samples/cat10.vol: 
  @code
  # generate another input vol file using tutorial example:
@@ -119,9 +120,9 @@ namespace po = boost::program_options;
  @image html res3dCompSurfelData.png "resulting visualisation of curvature comparison."
  
 
-
+ @see
  @ref 3dCompSurfelData.cpp
- 
+ @ref 3dCurvatureViewer 
  */
 
 

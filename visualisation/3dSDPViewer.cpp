@@ -58,6 +58,87 @@ namespace po = boost::program_options;
 typedef Viewer3D<Z3i::Space, Z3i::KSpace> Viewer;
 
 
+/**
+ @page Doc3DSDPViewer 3DSDPViewer
+ 
+ @brief Display sequence of 3d discrete points by using QGLviewer.
+
+ @b Usage:  3DSDPViewer [options] input
+
+ @b Allowed @b options @b are :
+ 
+ @code
+  -h [ --help ]                         display this message
+  -i [ --input ] arg                    input file: sdp (sequence of discrete 
+                                        points)
+  --SDPindex arg                        specify the sdp index (by default 
+                                        0,1,2).
+  -c [ --pointColor ] arg               set the color of  points: r g b a 
+  -m [ --addMesh ] arg                  append a mesh (off/obj) to the point 
+                                        set visualization.
+  -l [ --lineColor ] arg                set the color of line: r g b a 
+  --importColors                        import point colors from the input file
+                                        (R G B colors should be by default at 
+                                        index 3, 4, 5).
+  --setColorsIndex arg                  customize the index of the imported 
+                                        colors in the source file (used by 
+                                        -importColor).
+  -f [ --filter ] arg (=100)            filter input file in order to display 
+                                        only the [arg] pourcent of the input 3D
+                                        points (uniformly selected).
+  --noPointDisplay                      usefull for instance to only display 
+                                        the lines between points.
+  --drawLines                           draw the line between discrete points.
+  -x [ --scaleX ] arg (=1)              set the scale value in the X direction 
+                                        (default 1.0)
+  -y [ --scaleY ] arg (=1)              set the scale value in the Y direction 
+                                        (default 1.0)
+  -z [ --scaleZ ] arg (=1)              set the scale value in the Z direction 
+                                        (default 1.0)
+  --sphereResolution arg (=30)          defines the sphere resolution (used 
+                                        when the primitive is set to the 
+                                        sphere). (default resolution: 30)
+  -s [ --sphereRadius ] arg (=0.20000000000000001)
+                                        defines the sphere radius (used when 
+                                        the primitive is set to the sphere). 
+                                        (default value 0.2)
+  --sphereRadiusFromInput               takes, as sphere radius, the 4th field 
+                                        of the sdp input file.
+  --lineSize arg (=0.20000000000000001) defines the line size (used when the 
+                                        --drawLines or --drawVectors option is 
+                                        selected). (default value 0.2))
+  -p [ --primitive ] arg (=voxel)       set the primitive to display the set of
+                                        points (can be sphere or voxel 
+                                        (default)
+  -v [ --drawVectors ] arg              SDP vector file: draw a set of vectors 
+                                        from the given file (each vector are 
+                                        determined by two consecutive point 
+                                        given, each point represented by its 
+                                        coordinates on a single line.
+  --interactiveDisplayVoxCoords         by using this option the pixel 
+                                        coordinates can be displayed after 
+                                        selection (shift+left click on voxel). 
+ @endcode
+
+
+ @b Example: 
+
+ You can display a set of 3D points with sphere primitive and lines:
+ @code
+    3DSDPViewer -i $DGtal/tests/samples/sinus3D.dat -p sphere -s 0.3 --drawLines --lineSize 5 
+ @endcode
+
+ You should obtain such a result:
+
+ @image html res3DSDPViewer.png "Resulting visualization."
+ 
+
+ @see
+ @ref 3DSDPViewer.cpp
+
+ */
+
+
 
 // call back function to display voxel coordinates
 int
@@ -79,7 +160,7 @@ int main( int argc, char** argv )
   
   
   // parse command line ----------------------------------------------
-  po::options_description general_opt("Allowed options are: ");
+  po::options_description general_opt(" Allowed options are");
   general_opt.add_options()
   ("help,h", "display this message")
   ("input,i", po::value<std::string>(), "input file: sdp (sequence of discrete points)" )
@@ -118,11 +199,6 @@ int main( int argc, char** argv )
     trace.error()<< "Error checking program options: "<< ex.what()<< endl;
   }
   po::notify(vm);
-  if(parseOK && ! vm.count("input"))
-  {
-    trace.error() << " The input file name was not defined" << endl;
-    cannotStart = true;
-  }
   std::string typePrimitive;
   double sphereRadius = 0.2;
   std::vector<double> vectSphereRadius;
