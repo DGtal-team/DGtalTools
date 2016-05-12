@@ -38,12 +38,59 @@ using namespace Z3i;
 namespace po = boost::program_options;
 
 ///////////////////////////////////////////////////////////////////////////////
+/**
+ @page Doc3dVolMarchingCubes 3dVolMarchingCubes
+ 
+ @brief Outputs the isosurface of the input volume  as an OFF file
+
+ @b Usage: 3dVolMarchingCubes [-i <fileName.vol>] [-t <threshold>] [-a <adjacency>] [-o <output.off>]
+
+Outputs the isosurface of value <threshold> of the volume
+<fileName.vol> as an OFF file <output.off>. The <adjacency> (0/1)
+allows to choose between interior (6,18) and exterior (18,6)
+adjacency.
+
+
+ @b Allowed @b options @b are :
+ 
+ @code
+  -h [ --help ]                         display this message
+  -i [ --input ] arg                    the volume file (.vol)
+  -t [ --threshold ] arg (=1)           the value that defines the isosurface 
+                                        in the image (an integer between 0 and 
+                                        255).
+  -a [ --adjacency ] arg (=0)           0: interior adjacency, 1: exterior 
+                                        adjacency
+  -o [ --output ] arg (=marching-cubes.off)
+                                        the output OFF file that represents the
+                                        geometry of the isosurface
+
+ @endcode
+
+
+ @b Example: 
+
+ @code
+ @endcode
+
+ You should obtain such a result:
+
+ @image html res3dVolMarchingCubes.png "Resulting visualization."
+ 
+
+ @see
+ @ref 3dVolMarchingCubes.cpp
+
+ */
+
+
+
 
 int main( int argc, char** argv )
 {
   //! [3dVolMarchingCubes-parseCommandLine]
   // parse command line ----------------------------------------------
-  po::options_description general_opt("Allowed options are: ");
+  po::options_description general_opt("Allowed options are ");
   general_opt.add_options()
     ("help,h", "display this message")
     ("input,i", po::value<std::string>(), "the volume file (.vol)" )
@@ -133,7 +180,11 @@ int main( int argc, char** argv )
   typedef ImageLinearCellEmbedder< KSpace, Image, MyEmbedder > CellEmbedder;
   CellEmbedder cellEmbedder;
   MyEmbedder trivialEmbedder;
-  cellEmbedder.init( ks, image, trivialEmbedder, threshold );
+
+  // The +0.5 is to avoid isosurface going exactly through a voxel
+  // center, especially for binary volumes.
+  cellEmbedder.init( ks, image, trivialEmbedder, 
+                     ( (double) threshold ) + 0.5 );
   std::ofstream out( outputFilename.c_str() );
   if ( out.good() )
     digSurf.exportEmbeddedSurfaceAs3DOFF( out, cellEmbedder );

@@ -1,0 +1,27 @@
+/**
+ * @file visualization.dox
+ * @author Bertrand Kerautret 
+ * LORIA (CNRS, UMR 7503), University of Lorraine, France
+ *
+ * @date 2016/05/12
+ *
+ * Documentation file for visualization
+ *
+ * This file is part of the DGtal library.
+ */
+
+
+//----------------------------------------
+/*!
+@page volumetric
+@writers Bertrand Kerautret
+
+@section volumetric_Doc Volumetric
+
+
+
+  - @ref Doc3dVolMarchingCubes : outputs the isosurface of the input volume  as an OFF file. 
+
+
+
+*/
