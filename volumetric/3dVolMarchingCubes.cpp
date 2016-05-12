@@ -38,6 +38,7 @@ using namespace Z3i;
 namespace po = boost::program_options;
 
 ///////////////////////////////////////////////////////////////////////////////
+
 /**
  @page Doc3dVolMarchingCubes 3dVolMarchingCubes
  
@@ -50,9 +51,7 @@ Outputs the isosurface of value <threshold> of the volume
 allows to choose between interior (6,18) and exterior (18,6)
 adjacency.
 
-
- @b Allowed @b options @b are :
- 
+ @b Allowed @b options @b are : 
  @code
   -h [ --help ]                         display this message
   -i [ --input ] arg                    the volume file (.vol)
@@ -64,25 +63,24 @@ adjacency.
   -o [ --output ] arg (=marching-cubes.off)
                                         the output OFF file that represents the
                                         geometry of the isosurface
-
  @endcode
-
 
  @b Example: 
 
  @code
+ $ volumetric/3dVolMarchingCubes -i $DGtal/examples/samples/lobster.vol -t 30
+ # we invert the default normol orientation to improve display (-n option):
+ $ meshViewer -i marching-cubes.off -n   
  @endcode
 
- You should obtain such a result:
 
+ You should obtain such a result:
  @image html res3dVolMarchingCubes.png "Resulting visualization."
  
-
  @see
  @ref 3dVolMarchingCubes.cpp
 
  */
-
 
 
 
