@@ -36,5 +36,39 @@
   - @ref meshViewer : displays OFF mesh file by using QGLviewer.
   - @ref patternTriangulation : draws the Delaunay triangulation of a pattern using DGtal library.
   - @ref sliceViewer : displays volume file with slice image by using QT and QGLviewer.
-  
+
+
+
+<center>
+<table>
+  <tr>
+        <td> <img height=200px src="res3dCurvatureViewer.png"> </td>
+        <td><img height=200px src="res3dCurvatureViewerNoise.png"></td>
+        <td><img height=200px src="res3dHeightMapViewer.png"></td>        
+        <td><img height=200px src="res3dImageViewer.png"></td>        
+</tr>
+<tr>
+        <td align = center>@ref Doc3DCurvatureViewer </td>
+        <td align = center>@ref Doc3DCurvatureViewerNoise </td>   
+        <td align = center>@ref Doc3dHeightMapViewer</td>
+        <td align = center>@ref Doc3dImageViewer</td>
+</tr>
+  <tr>
+        <td> <img height=200px src="res3dImplicitSurfaceExtractorByThickening.png"> </td>
+        <td><img height=200px src="res3dVolViewer.png"></td>
+        <td><img height=200px src="resDisplayContours.png"></td>        
+        <td><img height=200px src="resSliceViewer.png"></td>        
+</tr>
+<tr>
+        <td align = center>@ref Doc3dImplicitSurfaceExtractorByThickening </td>
+        <td align = center>@ref Doc3dVolViewer </td>   
+        <td align = center>@ref displayContours.</td>
+        <td align = center>@ref sliceViewer</td>
+</tr>
+
+
+</table>
+</center>
+
+
 */
