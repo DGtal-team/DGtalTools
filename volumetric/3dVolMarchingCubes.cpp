@@ -1,6 +1,21 @@
 /**
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU Lesser General Public License as
+ *  published by the Free Software Foundation, either version 3 of the
+ *  License, or  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ **/
+/**
  * @file 3dVolMarchingCubes.cpp
- * @ingroup Examples
+ * @ingroup volumetric
  * @author Jacques-Olivier Lachaud (\c jacques-olivier.lachaud@univ-savoie.fr )
  * Laboratory of Mathematics (CNRS, UMR 5127), University of Savoie, France
  *
@@ -44,10 +59,10 @@ namespace po = boost::program_options;
  
  @brief Outputs the isosurface of the input volume  as an OFF file
 
- @b Usage: 3dVolMarchingCubes [-i <fileName.vol>] [-t <threshold>] [-a <adjacency>] [-o <output.off>]
+ @b Usage: 3dVolMarchingCubes [-i \<fileName.vol\>] [-t \<threshold\>] [-a \<adjacency\>] [-o \<output.off\>]
 
-Outputs the isosurface of value <threshold> of the volume
-<fileName.vol> as an OFF file <output.off>. The <adjacency> (0/1)
+Outputs the isosurface of value \<threshold\> of the volume
+\<fileName.vol\> as an OFF file \<output.off\>. The \<adjacency\> (0/1)
 allows to choose between interior (6,18) and exterior (18,6)
 adjacency.
 
@@ -76,10 +91,18 @@ adjacency.
 
  You should obtain such a result:
  @image html res3dVolMarchingCubes.png "Resulting visualization."
- 
- @see
- @ref 3dVolMarchingCubes.cpp
 
+ You can test on other samples like http://www.tc18.org/code_data_set/3D_greyscale/bonsai.vol.bz2
+@code 
+volumetric/3dVolMarchingCubes -i bonsai.vol  -t 80
+@endcode 
+ You should obtain such a result:
+ @image html res3dVolMarchingCubes2.png "Resulting visualization."
+
+
+ @see
+ \ref 3dVolMarchingCubes.cpp
+ 
  */
 
 

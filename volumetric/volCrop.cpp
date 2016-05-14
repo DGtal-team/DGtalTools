@@ -46,6 +46,45 @@ using namespace Z3i;
 namespace po = boost::program_options;
 
 
+
+/**
+ @page volCrop volCrop
+ 
+ @brief  Crops a 3D vol image from domain coordinates.
+
+ @b Usage: 	 volCrop --input \<volFileName\> --o \<volOutputFileName\> (both files can be independently in vol, pgm3D, p3d format)
+
+
+
+ @b Allowed @b options @b are : 
+ @code
+  -h [ --help ]                     display this message.
+  -i [ --input ] arg                Input vol file.
+  --xMin arg (=0)                   x coordinate of lower point.
+  --yMin arg (=0)                   y coordinate of lower point.
+  --zMin arg (=0)                   z coordinate of lower point.
+  --xMax arg                        x coordinate of upper point.
+  --yMax arg                        y coordinate of upper point.
+  --zMax arg                        z coordinate of upper point.
+  -o [ --output ] arg (=output.vol) Output filename.
+ @endcode
+
+ @b Example: 
+
+ @code
+$ volCrop --xMin 50 --yMin 50 --zMin 10 --xMax 150 --yMax 150 --zMax 50 -i ${DGtal}/examples/samples/lobster.vol -o croppedLobster.vol 
+$ 3dImageViewer -i croppedLobster.vol
+ @endcode
+
+
+ You should obtain such a visualization:
+ @image html resVolCrop.png "Resulting visualization."
+ 
+ @see
+ @ref volCrop.cpp
+
+ */
+
 /**
  * Missing parameter error message.
  *
@@ -86,14 +125,14 @@ int main(int argc, char**argv)
     trace.info()<< "Error checking program options: "<< ex.what()<< endl;
   }
   po::notify ( vm );
-  if (!parseOK || vm.count ( "help" ))
+  if (!parseOK || vm.count ( "help" ) || !vm.count("input"))
     {
-      trace.info() << "Crop an 3D vol image from to points. It returns the interior of the shape"<<std::endl
+      trace.info() << " Crops a 3D vol image from domain coordinates."<<std::endl
                    << std::endl << "Basic usage: "<<std::endl
                    << "\t volCrop --input <volFileName> --o <volOutputFileName> (both files can be independently in vol, pgm3D, p3d format)"<<std::endl
                    << general_opt << "\n";
       std::cout << "Example:\n"
-		<< "volCrop --xMin 50 --yMin 50 --zMin 10 --xMax 150 --yMax 150 --zMax 50 -i ${DGtal}/examples/samples/lobster.vol -o croppedLobster.p3d \n";
+		<< "volCrop --xMin 50 --yMin 50 --zMin 10 --xMax 150 --yMax 150 --zMax 50 -i ${DGtal}/examples/samples/lobster.vol -o croppedLobster.vol \n";
       return 0;
     }
 

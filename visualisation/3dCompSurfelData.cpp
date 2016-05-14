@@ -105,7 +105,7 @@ namespace po = boost::program_options;
 
  To use this tools  we need first to have two differents surfel set with an attribute to be compared. We can use for instance the curvature from the sample file of DGtal/examples/samples/cat10.vol: 
  @code
- # generate another input vol file using tutorial example:
+ # generating another input vol file using tutorial example (eroded.vol):
  $ $DGtal/build/examples/tutorial-examples/FMMErosion
  # Estimate curvature using other DGtalTools program:
  $ 3dCurvatureViewer -i $DGtal/examples/samples/cat10.vol -r 3 --exportOnly -d curvatureCat10R3.dat

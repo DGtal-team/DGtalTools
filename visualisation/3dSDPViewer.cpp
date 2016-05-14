@@ -39,10 +39,10 @@
 #include "DGtal/topology/SurfelAdjacency.h"
 #include "DGtal/shapes/Mesh.h"
 #include "DGtal/io/Color.h"
-#include "DGtal/io/colormaps/GradientColorMap.h"
+#include "DGtal/io/colormaps/HueShadeColorMap.h"
 #include "DGtal/io/readers/GenericReader.h"
 #include "DGtal/io/DrawWithDisplay3DModifier.h"
-#include "DGtal/io/colormaps/GradientColorMap.h"
+
 
 #include <boost/program_options/options_description.hpp>
 #include <boost/program_options/parsers.hpp>
@@ -68,6 +68,8 @@ typedef Viewer3D<Z3i::Space, Z3i::KSpace> Viewer;
  @b Allowed @b options @b are :
  
  @code
+Usage: ./visualisation/3dSDPViewer [input]
+Display sequence of 3d discrete points by using QGLviewer. Allowed options are:
   -h [ --help ]                         display this message
   -i [ --input ] arg                    input file: sdp (sequence of discrete 
                                         points)
@@ -80,9 +82,15 @@ typedef Viewer3D<Z3i::Space, Z3i::KSpace> Viewer;
   --importColors                        import point colors from the input file
                                         (R G B colors should be by default at 
                                         index 3, 4, 5).
+  --importColorLabels                   import color labels from the input file
+                                        (label index  should be by default at 
+                                        index 3).
   --setColorsIndex arg                  customize the index of the imported 
                                         colors in the source file (used by 
                                         -importColor).
+  --setColorLabelIndex arg (=3)         customize the index of the imported 
+                                        color labels in the source file (used 
+                                        by -importColorLabels).
   -f [ --filter ] arg (=100)            filter input file in order to display 
                                         only the [arg] pourcent of the input 3D
                                         points (uniformly selected).
@@ -117,7 +125,8 @@ typedef Viewer3D<Z3i::Space, Z3i::KSpace> Viewer;
                                         coordinates on a single line.
   --interactiveDisplayVoxCoords         by using this option the pixel 
                                         coordinates can be displayed after 
-                                        selection (shift+left click on voxel). 
+                                        selection (shift+left click on voxel).
+
  @endcode
 
 
@@ -169,7 +178,9 @@ int main( int argc, char** argv )
   ("addMesh,m", po::value<std::string>(), "append a mesh (off/obj) to the point set visualization.")
   ("lineColor,l",po::value<std::vector <int> >()->multitoken(), "set the color of line: r g b a " )
   ("importColors", "import point colors from the input file (R G B colors should be by default at index 3, 4, 5).")
+  ("importColorLabels", "import color labels from the input file (label index  should be by default at index 3).")
   ("setColorsIndex", po::value<std::vector<unsigned int> >()->multitoken(), "customize the index of the imported colors in the source file (used by -importColor).")
+  ("setColorLabelIndex", po::value<unsigned int >()->default_value(3), "customize the index of the imported color labels in the source file (used by -importColorLabels).")
   ("filter,f",po::value<double>()->default_value(100.0), "filter input file in order to display only the [arg] pourcent of the input 3D points (uniformly selected)." )
   ("noPointDisplay", "usefull for instance to only display the lines between points.")
   ("drawLines", "draw the line between discrete points." )
@@ -188,7 +199,6 @@ int main( int argc, char** argv )
   bool parseOK=true;
   bool cannotStart= false;
   
-  typedef PointVector<1, int> Point1D;
   
   
   po::variables_map vm;
@@ -259,7 +269,8 @@ int main( int argc, char** argv )
   float sx = vm["scaleX"].as<float>();
   float sy = vm["scaleY"].as<float>();
   float sz = vm["scaleZ"].as<float>();
-  
+
+  bool importColorLabels = vm.count("importColorLabels");
   bool importColors = vm.count("importColors");
   bool interactiveDisplayVoxCoords = vm.count("interactiveDisplayVoxCoords");
   typedef Viewer3D<Z3i::Space, Z3i::KSpace> Viewer;
@@ -301,6 +312,17 @@ int main( int argc, char** argv )
       vectColors.push_back(Color(r[i], g[i], b[i]));
     }
   }
+
+  // Get vector of colors if imported.
+  std::vector< int> vectColorLabels;
+  unsigned int maxLabel = 1;
+  if(vm.count("importColorLabels"))
+  {
+    unsigned int index = vm["setColorLabelIndex"].as<unsigned int >();
+    vectColorLabels = TableReader< int>::getColumnElementsFromFile(inputFilename,index);
+    maxLabel = *(std::max_element(vectColorLabels.begin(), vectColorLabels.end()));
+  }
+  HueShadeColorMap<unsigned int> aColorMap(0, maxLabel);
   
   
   if(useMultiRad)
@@ -328,10 +350,16 @@ int main( int argc, char** argv )
     int step = max(1, (int) (100/percent));
     for(unsigned int i=0;i< vectVoxels.size(); i=i+step){
       if(importColors)
-      {
-        Color col = vectColors[i];
-        viewer.setFillColor(col);
-      }
+        {
+          Color col = vectColors[i];
+          viewer.setFillColor(col);
+        }
+      else if(importColorLabels)
+        {
+          unsigned int index = vectColorLabels[i];
+          Color col = aColorMap(index);
+          viewer.setFillColor(col);
+        }
       
       if(typePrimitive=="voxel"){
         if (interactiveDisplayVoxCoords)
