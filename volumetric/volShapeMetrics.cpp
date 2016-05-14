@@ -100,13 +100,13 @@ namespace po = boost::program_options;
 To test this tool, we need to generate a volumetric file to be compared to an original one:
  @code
 # generation of the file "eroded.vol" from DGtal examples:
-$  $DGtal/build/examples/tutorial-examples/FMMErosion
+$ $DGtal/build/examples/tutorial-examples/FMMErosion
  @endcode
 
 Then we can apply comparisons of the two shapes:
 
 @code
- volShapeMetrics -a eroded.vol --aMin 1 --aMax 255 -b $DGtal/examples/samples/cat10.vol --bMin 1 --bMax 255 --displayTFstats --exportSDP 
+$ volShapeMetrics -a eroded.vol --aMin 1 --aMax 255 -b $DGtal/examples/samples/cat10.vol --bMin 1 --bMax 255 --displayTFstats --exportSDP 
 @endcode
 
 You should obtain different comparison measures and you can display the set of voxels associated to the false positive ( falsePos.sdp ):

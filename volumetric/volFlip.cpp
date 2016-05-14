@@ -72,7 +72,7 @@ namespace po = boost::program_options;
  @b Example: 
 
  @code
-  volFlip --imagePlane 0 1 --flipDimension 0 -i ${DGtal}/examples/samples/lobster.vol -o flippedXxyLobster.vol 
+ $ volFlip --imagePlane 0 1 --flipDimension 0 -i ${DGtal}/examples/samples/lobster.vol -o flippedXxyLobster.vol 
  @endcode
 
 

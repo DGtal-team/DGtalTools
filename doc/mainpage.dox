@@ -31,7 +31,7 @@ Actually the DGTal project is organized as follows:
 
  - [Converters](\ref converters)
 
- - [Estimators](#estimators)
+ - [Estimators](\ref estimators_Doc)
 
  - [ShapeGenerator](\ref shapeGenerator_Doc)
 

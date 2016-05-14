@@ -1,5 +1,5 @@
 /**
- * @file visualization.dox
+ * @file volumetric.dox
  * @author Bertrand Kerautret 
  * LORIA (CNRS, UMR 7503), University of Lorraine, France
  *
@@ -52,12 +52,12 @@
 
 <tr>
 <td><img height=200px src="resVolTrValues.png"></td>        
-<td><img height=200px src="resVolCrop.png"></td>
+<td><img height=200px src="resVolSegment.png"></td>
 <td><img height=200px src="resVolSubSample.png"></td>        
 </tr>
 <tr>
 <td align = center>@ref volTrValues</td>
-<td align = center>@ref volCrop</td>
+<td align = center>@ref volSegment</td>
 <td align = center>@ref volSubSample</td>            
 </tr>
 </table>

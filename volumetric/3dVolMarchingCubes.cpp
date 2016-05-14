@@ -83,7 +83,7 @@ adjacency.
  @b Example: 
 
  @code
- $ volumetric/3dVolMarchingCubes -i $DGtal/examples/samples/lobster.vol -t 30
+ $ 3dVolMarchingCubes -i $DGtal/examples/samples/lobster.vol -t 30
  # we invert the default normol orientation to improve display (-n option):
  $ meshViewer -i marching-cubes.off -n   
  @endcode
@@ -94,7 +94,7 @@ adjacency.
 
  You can test on other samples like http://www.tc18.org/code_data_set/3D_greyscale/bonsai.vol.bz2
 @code 
-volumetric/3dVolMarchingCubes -i bonsai.vol  -t 80
+$ 3dVolMarchingCubes -i bonsai.vol  -t 80
 @endcode 
  You should obtain such a result:
  @image html res3dVolMarchingCubes2.png "Resulting visualization."

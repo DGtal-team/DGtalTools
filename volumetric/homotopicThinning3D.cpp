@@ -86,7 +86,7 @@ namespace po = boost::program_options;
  Usage by forcing point to be left by the thinning: 
  
 @code
-   homotopicThinning3D --input ${DGtal}/examples/samples/Al.100.vol  --fixedPoints 56 35 5  56 61 5  57 91 38  58 8 38  45 50 97 
+ $  homotopicThinning3D --input ${DGtal}/examples/samples/Al.100.vol  --fixedPoints 56 35 5  56 61 5  57 91 38  58 8 38  45 50 97 
  @endcode
 
 

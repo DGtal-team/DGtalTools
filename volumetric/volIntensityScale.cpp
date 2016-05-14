@@ -72,7 +72,7 @@ namespace po = boost::program_options;
  In this example, we select all intensities included in [0,100] and scale them into [0, 255]: 
 
  @code
-   volIntensityScale -i  ${DGtal}/examples/samples/lobster.vol  --inMin 0 --inMax 100 -o lobster0-100.vol 
+  $ volIntensityScale -i  ${DGtal}/examples/samples/lobster.vol  --inMin 0 --inMax 100 -o lobster0-100.vol 
 
  @endcode
 

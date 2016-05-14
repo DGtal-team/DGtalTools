@@ -67,7 +67,7 @@ namespace po = boost::program_options;
  @b Example: 
 
  @code
-  volCComponentCounter -i $DGtal/examples/samples/Al.100.vol 
+ $ volCComponentCounter -i $DGtal/examples/samples/Al.100.vol 
  @endcode
 
 
