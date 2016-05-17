@@ -252,12 +252,25 @@ Volumetric
 <center>
 <table>
 <tr>
-<td> <img width=300 src="https://cloud.githubusercontent.com/assets/772865/4140989/2b115d34-33aa-11e4-9141-749d02335a4d.png"> </td>
-<td> <img width=300 src="https://cloud.githubusercontent.com/assets/772865/4140972/f13c7fe4-33a9-11e4-8114-74e4925f0628.png"> </td>
+<td> <img width=300 src="https://cloud.githubusercontent.com/assets/772865/15342874/d79fc22e-1c98-11e6-922b-48f27f5cf586.png"> </td>
+<td> <img width=300 src="https://cloud.githubusercontent.com/assets/772865/15342814/828267ec-1c98-11e6-9080-a210bdd42b35.png"> </td>
+<td> <img width=300 src="https://cloud.githubusercontent.com/assets/772865/15342834/a6736bb0-1c98-11e6-9a42-9dc5a198800f.png"> </td>
 </tr>
 <tr>
+<td>3dVolMarchingCubes</td>
 <td>homotopicThinning3D</td>
 <td>volSubSample</td>
+</tr>
+<tr>
+<td> <img width=300 src="https://cloud.githubusercontent.com/assets/772865/15342933/2da32a80-1c99-11e6-9600-16a68f145bdd.png"> </td>
+<td> <img width=300 src="https://cloud.githubusercontent.com/assets/772865/15342979/8e2d2d4c-1c99-11e6-88b4-5835adb04eff.png"> </td>
+<td> <img width=300 src="https://cloud.githubusercontent.com/assets/772865/15343002/b2fdf4c6-1c99-11e6-986b-9f56299b4a16.png"> </td>
+</tr>
+<tr>
+<td>volReSample</td>
+<td>volTrValues</td>
+<td>volSegment</td>
+</tr>
 </table>
 </center>
 
