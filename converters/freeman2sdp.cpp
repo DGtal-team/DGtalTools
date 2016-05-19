@@ -53,7 +53,7 @@ using namespace DGtal;
 
 /**
  @page freeman2sdp freeman2sdp
- @brief Transform freeman chain into a Sequence of Discrete Points.
+ @brief Transforms Freeman chain into a Sequence of Discrete Points (.sdp).
 
  @b Usage: freeman2sdp [input] [output]
 
@@ -78,7 +78,7 @@ using namespace DGtal;
 @endcode
 You will obtain such result:
 @verbatim
-more contourS.sdp  
+$ more contourS.sdp  
 # grid curve 1/1 closed
 13 60
 14 60

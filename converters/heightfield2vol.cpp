@@ -51,7 +51,7 @@ namespace po = boost::program_options;
 
 /**
  @page heightfield2vol heightfield2vol
- @brief  Convert a 2D heightfield image into a volumetric file.
+ @brief  Converts a 2D heightfield image into a volumetric file.
 
 @b Usage: heightfield2vol [input] [output]
 

@@ -45,7 +45,7 @@ using namespace DGtal;
 
 /**
  @page itk2vol itk2vol
- @brief  Convert itk file into a volumetric file (.vol, .pgm3d).
+ @brief  Converts itk file into a volumetric file (.vol, .pgm3d).
 
 @b Usage: itk2vol [input] [output]
 
@@ -61,7 +61,7 @@ using namespace DGtal;
 
 @b Example:
 @code
-itk2vol -i image.mhd --dicomMin -500 --dicomMax -100 -o sample.vol 
+$itk2vol -i image.mhd --dicomMin -500 --dicomMax -100 -o sample.vol 
 @endcode
 
 @see itk2vol.cpp

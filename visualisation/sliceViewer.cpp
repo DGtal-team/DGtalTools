@@ -85,7 +85,7 @@ namespace po = boost::program_options;
  @b Example: 
 
  @code
-   	sliceViewer -i  $DGtal/examples/samples/lobster.vol
+ $ sliceViewer -i  $DGtal/examples/samples/lobster.vol
  @endcode
 
  @image html resSliceViewer.png " "

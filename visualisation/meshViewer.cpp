@@ -49,7 +49,7 @@ using namespace DGtal;
 /**
  @page meshViewer meshViewer
  
- @brief Display OFF mesh file by using QGLviewer.
+ @brief Displays OFF mesh file by using QGLviewer.
 
  @b Usage:   meshViewer [input]
 
@@ -95,7 +95,7 @@ using namespace DGtal;
 
 
  @code
-    meshViewer -i bunny.off
+ $ meshViewer -i bunny.off
     
  @endcode
 

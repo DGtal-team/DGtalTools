@@ -50,7 +50,7 @@ using namespace DGtal;
 /**
  @page volReSample volReSample
  
- @brief Re sample a 3D volumetric image (.vol, .longvol, .pgm3d)  with a given grid size.
+ @brief Re samples a 3D volumetric image (.vol, .longvol, .pgm3d)  with a given grid size.
 
  @b Usage: volReSample [input-files] [output-file]
 

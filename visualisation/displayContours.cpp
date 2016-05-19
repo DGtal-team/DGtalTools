@@ -88,7 +88,7 @@ using namespace DGtal;
  
  @code
   -h [ --help ]           display this message
-  -i [ --input ] arg      input FreemanChain file name
+  -i [ --input ] arg      input Freeman chain file name
   --SDP arg               Import a contour as a Sequence of Discrete Points 
                           (SDP format)
   --SFP arg               Import a contour as a Sequence of Floating Points 
@@ -103,7 +103,7 @@ using namespace DGtal;
                           displayed by drawPointofIndex option (default 2.0) 
   --noXFIGHeader           to exclude xfig header in the resulting output 
                           stream (no effect with option -outputFile).
-  --withProcessing arg    Processing (used only with --FreemanChain):
+  --withProcessing arg    Processing (used only when the input is a Freeman chain (--input)):
                            DSS segmentation {DSS}
                             Maximal segments {MS}
                            Faithful Polygon {FP}
@@ -173,7 +173,7 @@ int main( int argc, char** argv )
     ("drawPointOfIndex", po::value<int>(), "<index> Draw the contour point of index <index> (default 0) ") 
     ("pointSize", po::value<double>()->default_value(2.0), "<size> Set the display point size of the point displayed by drawPointofIndex option (default 2.0) ") 
     ("noXFIGHeader", " to exclude xfig header in the resulting output stream (no effect with option -outputFile).")
-    ("withProcessing", po::value<std::string>(), "Processing (used only with --FreemanChain):\n\t DSS segmentation {DSS}\n\t  Maximal segments {MS}\n\t Faithful Polygon {FP}\n\t Minimum Length Polygon {MLP}")   
+    ("withProcessing", po::value<std::string>(), "Processing (used only when the input is a Freeman chain (--input)):\n\t DSS segmentation {DSS}\n\t  Maximal segments {MS}\n\t Faithful Polygon {FP}\n\t Minimum Length Polygon {MLP}")   
     ("outputFile,o", po::value<std::string>(), " <filename> save output file automatically according the file format extension.")
     ("outputStreamEPS", " specify eps for output stream format.")
     ("outputStreamSVG", " specify svg for output stream format.")

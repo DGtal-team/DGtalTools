@@ -45,7 +45,7 @@ using namespace Z3i;
 
 /**
  @page vol2obj vol2obj
- @brief Convert any volumetric file to an OBJ one. Each grid point with value between
+ @brief Converts any volumetric file to an OBJ one. Each grid point with value between
  [@a thresholdMin,@a thresholdMax] is exported as a unit cube.
 
 

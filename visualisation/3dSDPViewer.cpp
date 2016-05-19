@@ -61,7 +61,7 @@ typedef Viewer3D<Z3i::Space, Z3i::KSpace> Viewer;
 /**
  @page Doc3DSDPViewer 3DSDPViewer
  
- @brief Display sequence of 3d discrete points by using QGLviewer.
+ @brief Displays a  sequence of 3d discrete points by using QGLviewer.
 
  @b Usage:  3DSDPViewer [options] input
 

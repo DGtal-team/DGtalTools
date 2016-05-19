@@ -48,7 +48,7 @@ namespace po = boost::program_options;
 /**
  @page volSubSample volSubSample
  
- @brief Brutally sub sample a vol file (division by 2 in each direction).
+ @brief Brutally sub samples a vol file (division by 2 in each direction).
 
 
  @b Usage: 	volSubSample --input <volFileName> --o <volOutputFileName>

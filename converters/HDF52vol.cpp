@@ -45,7 +45,7 @@ namespace po = boost::program_options;
 
 /**
  @page HDF52vol HDF52vol
- @brief Convert a 3D 8-bit HDF5 file to vol.
+ @brief Converts a 3D 8-bit HDF5 file to vol.
 
 @b Usage: HDF52vol [input] [output]
 

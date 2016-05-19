@@ -25,29 +25,29 @@ Utilities to convert various simple file formats:
   - @ref convertVol : a simple generic volume image converters (can process actually pgm3d, vol, longvol, raw (for writing)).
   
 
-  - @ref dicom2vol : Converts dicom file into a volumetric file (.vol, .longvol .pgm3d).
-  - @ref freeman2img : Transforms one or several freeman chains into a pgm file by filling their interior areas.
-  - @ref freeman2sdp :  Transform freeman chain into a Sequence of Discrete Points.
-  - @ref HDF52vol : Converts a 3D 8-bit HDF5 file to vol.
-  - @ref heightfield2shading :  Render a 2D heightfield image into a shading image.
-  - @ref heightfield2vol : Transforms 2D heightfield into a volumetric file.
-  - @ref img2freeman :  Extracts FreemanChains from thresholded image.
-  - @ref imgAddNoise : Adds noise (Kanungo's) to a binary 2D object.
-  - @ref itk2vol : Converts itk file into a volumetric file (.vol, .pgm3d).
-  - @ref longvol2vol : Converts a longvol (long int) to a vol file (unsigned char).
-  - @ref mesh2heightfield : Converts a mesh file into a 2D heightmap (from a normal direction N and from a starting point P).
-  - @ref ofs2off : Converts OFS file into OFF mesh format.
-  - @ref raw2HDF5 :  Converts a 3D 8-bit raw file to HDF5.
-  - @ref raw2vol : Converts a  8-bit raw file to vol.
-  - @ref sdp2vol : Converts digital set of points into a volumic file.
-  - @ref slice2vol : Converts set of 2D images into volumetric file  (pgm3d, vol, longvol).
-  - @ref volAddNoise : Adds Kanungo noise to a binary object with 0 values as background points and values >0 for the foreground ones.
-  - @ref vol2obj : Converts any volumetric file to an OBJ one. 
-  - @ref vol2raw : Converts a vol to a 8-bit raw file.
-  - @ref vol2sdp : Extracts digital points from 3d vol files.
-  - @ref vol2slice : Converts a volumetric file (.vol, .longvol, .pgm3d) into a set of 2D slice images.
-  - @ref volBoundary2obj : export the boundary of a volume file to OBJ format. 
-  - @ref vol2heightfield : Convert volumetric  file into a projected 2D image given from a normal direction N and from a starting point P.
+  - @ref dicom2vol : converts dicom file into a volumetric file (.vol, .longvol .pgm3d).
+  - @ref freeman2img : transforms one or several freeman chains into a pgm file by filling their interior areas.
+  - @ref freeman2sdp : transforms Freeman chain into a Sequence of Discrete Points.
+  - @ref HDF52vol : converts a 3D 8-bit HDF5 file to vol.
+  - @ref heightfield2shading :  renders a 2D heightfield image into a shading image.
+  - @ref heightfield2vol : transforms 2D heightfield into a volumetric file.
+  - @ref img2freeman :  extracts FreemanChains from thresholded image.
+  - @ref imgAddNoise : adds noise (Kanungo's) to a binary 2D object.
+  - @ref itk2vol : converts itk file into a volumetric file (.vol, .pgm3d).
+  - @ref longvol2vol : converts a longvol (long int) to a vol file (unsigned char).
+  - @ref mesh2heightfield : converts a mesh file into a 2D heightmap (from a normal direction N and from a starting point P).
+  - @ref ofs2off : converts OFS file into OFF mesh format.
+  - @ref raw2HDF5 :  converts a 3D 8-bit raw file to HDF5.
+  - @ref raw2vol : converts a  8-bit raw file to vol.
+  - @ref sdp2vol : converts digital set of points into a volumic file.
+  - @ref slice2vol : converts set of 2D images into volumetric file  (pgm3d, vol, longvol).
+  - @ref volAddNoise : adds Kanungo noise to a binary object with 0 values as background points and values >0 for the foreground ones.
+  - @ref vol2obj : converts any volumetric file to an OBJ one. 
+  - @ref vol2raw : converts a vol to a 8-bit raw file.
+  - @ref vol2sdp : extracts digital points from 3d vol files.
+  - @ref vol2slice : converts a volumetric file (.vol, .longvol, .pgm3d) into a set of 2D slice images.
+  - @ref volBoundary2obj : exports the boundary of a volume file to OBJ format. 
+  - @ref vol2heightfield : converts volumetric  file into a projected 2D image given from a normal direction N and from a starting point P.
 
 <center>
 <table>

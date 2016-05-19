@@ -147,8 +147,8 @@ using namespace functors;
 
  @b Example: 
  
- @endcode
- 3dCurvatureViewerNoise -i $DGtal/examples/samples/Al.100.vol -r 15 -m mean -k 0.5
+ @code
+$ 3dCurvatureViewerNoise -i $DGtal/examples/samples/Al.100.vol -r 15 -m mean -k 0.5
  @endcode
 
  You should obtain such a visualisation:

@@ -23,7 +23,7 @@
 using namespace DGtal;
 /**
  @page img2freeman img2freeman
- @brief Extracts FreemanChains from thresholded image
+ @brief Extracts Freeman chains from thresholded image.
 
 @b Usage: img2freeman [input] [output]
 

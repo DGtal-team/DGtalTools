@@ -86,7 +86,7 @@ using namespace Z3i;
 
 
  @code
-    3dVolViewer -i $DGtal/examples/samples/lobster.vol -m 60 -t 10
+ $ 3dVolViewer -i $DGtal/examples/samples/lobster.vol -m 60 -t 10
  @endcode
 
  You should obtain such a result:

@@ -62,7 +62,7 @@ using namespace DGtal;
 /**
  @page  Doc3dImplicitSurfaceExtractorByThickening 3dImplicitSurfaceExtractorByThickening
  
- @brief Displays volume file as a voxel set by using QGLviewer.
+ @brief Computes the zero level set of the given polynomial.
 
  @b Usage:  3dImplicitSurfaceExtractorByThickening [options] input
 

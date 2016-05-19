@@ -143,7 +143,6 @@ using namespace functors;
 
  @b Example: 
  
- @endcode
  Now we compare the different curvature values from the two shapes:
  @code
    3dCurvatureViewer -i $DGtal/examples/samples/lobster.vol -r 10 -l 40 -u 255 -m mean

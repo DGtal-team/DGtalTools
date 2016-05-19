@@ -46,14 +46,14 @@ using namespace DGtal;
 
 /**
  @page dicom2vol dicom2vol
- @brief Convert dicom file into a volumetric file (.vol, .longvol .pgm3d).
+ @brief Converts dicom file into a volumetric file (.vol, .longvol .pgm3d).
 
 @b Usage: dicom2vol [input] [output]
 
 @b Allowed @b options @b are:
 
 @code
- -h [ --help ]           display this message
+  -h [ --help ]           display this message
   -i [ --input ] arg      dicom image  (.dcm) 
   -o [ --output ] arg     volumetric file (.vol, .longvol .pgm3d) 
   --dicomMin arg (=-1000) set minimum density threshold on Hounsfield scale
@@ -61,7 +61,8 @@ using namespace DGtal;
 @endcode
 
 @b Example:
-@code  $dicom2vol -i ${DGtal}/tests/samples/dicomSample/1629.dcm --dicomMin -500 --dicomMax -100 -o sample.vol
+@code  
+$ dicom2vol -i ${DGtal}/tests/samples/dicomSample/1629.dcm --dicomMin -500 --dicomMax -100 -o sample.vol
 @endcode
 
 @see dicom2vol.cpp

@@ -45,7 +45,7 @@ namespace po = boost::program_options;
 
 /**
  @page vol2raw vol2raw
- @brief converts a vol to a 8-bit raw file.
+ @brief Converts a vol to a 8-bit raw file.
 
 @b Usage: vol2raw [input] [output]
 

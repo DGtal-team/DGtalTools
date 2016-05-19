@@ -86,7 +86,7 @@ namespace po = boost::program_options;
 
 
  @code
-   	patternTriangulation -a 5 -b 8 
+ $ patternTriangulation -a 5 -b 8 
  @endcode
 
  @b Result:

@@ -65,7 +65,7 @@ namespace po = boost::program_options;
 /**
  @page Doc3dDisplaySurfelData 3dDisplaySurfelData
  
- @brief  Display surfel data from SDP file with color attributes given as scalar interpreted as color. 
+ @brief  Displays surfel data from SDP file with color attributes given as scalar interpreted as color. 
 
  @b Usage:  3dDisplaySurfelData [options] input
  
@@ -94,12 +94,12 @@ namespace po = boost::program_options;
  
  To test this program we have first to generate a file containing a set of surfels with, for instance, their associated curvature values:
  @code
- 3dCurvatureViewer -i $DGtal/examples/samples/cat10.vol -r 3 --exportOnly -d curvatureCat10R3.dat
+$ 3dCurvatureViewer -i $DGtal/examples/samples/cat10.vol -r 3 --exportOnly -d curvatureCat10R3.dat
  @endcode
 
  Then, we can use this tool to display the set of surfel with their associated values:
  @code
- 3dDisplaySurfelData -i curvatureCat10R3.dat 
+$ 3dDisplaySurfelData -i curvatureCat10R3.dat 
  @endcode 
  You should obtain such a result:
 

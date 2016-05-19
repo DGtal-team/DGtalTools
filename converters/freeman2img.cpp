@@ -59,7 +59,7 @@ namespace po = boost::program_options;
 
 /**
  @page freeman2img freeman2img
- @brief transforms one or several freeman chains into a pgm file by filling their interior areas.
+ @brief Transforms one or several freeman chains into a pgm file by filling their interior areas.
 
  The transformation can fill shapes with hole by using the freemanchain orientation. The interior is considered on the left according to a freeman chain move, i.e. a clockwise oriented contour represents a hole in the shape.
 
@@ -86,7 +86,23 @@ namespace po = boost::program_options;
 @endcode
 You will obtain such image:
 @image html  resFreeman2img.png "Resulting image"
-@see freeman2img.cpp
+
+
+@b Example @b with @b several @b contours:
+
+The file located in $DGtal/examples/samples/contourS2.fc contains different contours with some ones corresponds to hole.  We can apply the same conversion as the previous example:
+
+@code
+$ freeman2img -i  $DGtal/examples/samples/contourS2.fc  -o sample2.pgm
+@endcode
+
+You will obtain such image:
+@image html  resFreeman2img2.png "Resulting image"
+
+
+
+@see @ref img2freeman
+@ref freeman2img.cpp
 
 */
 
@@ -176,11 +192,12 @@ else the space is automatically defined from the freemanchain bounding boxes.");
       FreemanChain fc = *it;
       FreemanChain::getInterPixelLinels(aKSpace, fc, boundarySCell, true);
     }
-
+    
     Image2D imageResult (Z2i::Domain(Z2i::Point(minx, miny), Z2i::Point(maxx, maxy))); 
-    Surfaces<KSpace>::uFillInterior(aKSpace, functors::SurfelSetPredicate<std::set<SCell>,SCell>(boundarySCell), imageResult, 255, false, true );  
+    Surfaces<KSpace>::uFillInterior(aKSpace, functors::SurfelSetPredicate<std::set<SCell>,SCell>(boundarySCell), imageResult, 255, false, false );  
     imageResult >> vm["output"].as<std::string>();
   }
 
 }
+
 

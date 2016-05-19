@@ -52,7 +52,7 @@ namespace po = boost::program_options;
 
 /**
  @page vol2heightfield vol2heightfield
- @brief  Convert volumetric  file into a projected 2D image given from a normal direction N and from a starting point P.
+ @brief  Converts volumetric  file into a projected 2D image given from a normal direction N and from a starting point P.
 
  The 3D volume is scanned in this normal direction N starting from P with a step 1. If the intensity of the 3d point is inside the given thresholds its 2D gray values are set to the current scan number.
 
@@ -87,7 +87,7 @@ namespace po = boost::program_options;
 
 @b Example:
 @code 
-   $  vol2heightfield -i ${DGtal}/examples/samples/lobster.vol -m 60 -M 500  --nx 0 --ny 0.7 --nz -1 -x 150 -y 0 -z 150 --width 300 --height 300 --heightFieldMaxScan 350  -o resultingHeightMap.pgm 
+$ vol2heightfield -i ${DGtal}/examples/samples/lobster.vol -m 60 -M 500  --nx 0 --ny 0.7 --nz -1 -x 150 -y 0 -z 150 --width 300 --height 300 --heightFieldMaxScan 350  -o resultingHeightMap.pgm 
 @endcode
 
 You should obtain such a resulting image:

@@ -50,9 +50,9 @@ namespace po = boost::program_options;
 /**
  @page volFlip volFlip
  
- @brief  flips 2D slice image of an 3D vol image (mirror transformation).
+ @brief  Flips 2D slice image of an 3D vol image (mirror transformation).
 
- @b Usage: 	 volFlip --input \<volFileName\> --imagePlane 0 1 --flipDimension 0 --o \<volOutputFileName\> (vol, longvol, p3d format)
+ @b Usage:  volFlip --input \<volFileName\> --imagePlane 0 1 --flipDimension 0 --o \<volOutputFileName\> (vol, longvol, p3d format)
 
 
 

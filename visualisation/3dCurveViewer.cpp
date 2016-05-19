@@ -32,7 +32,7 @@
 /**
  @page Doc3dCurveViewer 3dCurveViewer
  
- @brief  Display a 3D curve given as the input filename (with possibly projections and/or tangent information) by using QGLviewer.
+ @brief  Displays a 3D curve given as the input filename (with possibly projections and/or tangent information) by using QGLviewer.
  
 
  @b Usage:  3dCurveViewer [options] input
@@ -68,7 +68,7 @@
  @b Example: 
  
  @code
-   3dCurveViewer -C -b 1 -3 -2 -c ${DGtal}/examples/samples/sinus.dat
+ $  3dCurveViewer -C -b 1 -3 -2 -c ${DGtal}/examples/samples/sinus.dat
  @endcode
 
  You should obtain such a visualisation:

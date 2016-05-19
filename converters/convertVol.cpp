@@ -44,7 +44,7 @@ using namespace DGtal;
 
 /**
  @page convertVol convertVol
- @brief Convert volumetric file into volumetric file from different formats (pgm3d, vol, longvol).
+ @brief Converts volumetric file into volumetric file from different formats (pgm3d, vol, longvol).
 
 
 @b Usage: convertVol [input] [output]
@@ -52,8 +52,6 @@ using namespace DGtal;
 @b Allowed @b options @b are:
 
 @code
- Usage: convertVol [input] [output]
-Convert volumetric  file into volumetric file from different formats (pgm3d, vol, longvol) Allowed options are: :
   -h [ --help ]         display this message
   -i [ --input ] arg    volumetric file (.pgm3d, .vol, .longvol) 
   -o [ --output ] arg   volumetric file (.pgm3d, .vol, .longvol) 
@@ -61,7 +59,7 @@ Convert volumetric  file into volumetric file from different formats (pgm3d, vol
 
 @b Example:
 @code 
-convertVol -i ${DGtal}/examples/samples/lobster.vol -o convertedVol.p3d 
+$ convertVol -i ${DGtal}/examples/samples/lobster.vol -o convertedVol.p3d 
 @endcode
 
 
