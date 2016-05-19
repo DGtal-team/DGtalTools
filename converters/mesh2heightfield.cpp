@@ -52,7 +52,10 @@ namespace po = boost::program_options;
 
 /**
  @page mesh2heightfield mesh2heightfield
- @brief  Adds noise (Kanungo's) to a binary 2D object.
+ @brief  Converts a mesh file into a projected 2D image given from a normal direction N and from a starting point P.
+
+ The 3D mesh is discretized and scanned in the normal direction N, starting from P with a step 1. 
+
 
 @b Usage: mesh2heightfield [input] [output]
 
@@ -153,7 +156,7 @@ int main( int argc, char** argv )
                                    Image3D::Value,  DGtal::functors::Identity >  ImageAdapterExtractor;
   
   // parse command line ----------------------------------------------
-  po::options_description general_opt("Allowed options are: ");
+  po::options_description general_opt("\nAllowed options are");
   general_opt.add_options()
     ("help,h", "display this message")
     ("input,i", po::value<std::string>(), "mesh file (.off) " )
