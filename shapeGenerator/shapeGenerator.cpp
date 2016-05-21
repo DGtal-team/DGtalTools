@@ -56,7 +56,7 @@ using namespace DGtal;
 
 
 /**
- @page shapeGeneratorPrg shapeGenerator
+ @page shapeGenerator shapeGenerator
  @brief  Generates shapes using DGtal library.
  
  
