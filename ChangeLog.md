@@ -1,6 +1,7 @@
 # DGtalTools 0.9.2
 
 - *global*:
+  - doxygen documentation added for all tools. (David Coeurjolly, Bertrand Kerautret, [#258]((https://github.com/DGtal-team/DGtalTools/pull/258))
   - fix uses of temporaries when ConstAlias is needed.
     (Roland Denis, [#253](https://github.com/DGtal-team/DGtalTools/pull/253))
 
@@ -141,7 +142,7 @@
   - pgm2freeman: add new possibility to set automatically a threshold from the otsu algorithm.
   - HDF52vol: convert HDF5 to vol file format.
   - raw2HDF5: convert raw image to HDF5.
- 
+
 - *volumetric*:
   - homotopicThinning3D exploits now the GenericReader class and is no more limited to vol format.
   - volFlip: tool to flip all volume slice images according a given dimension.
@@ -154,7 +155,7 @@
   - 2dLocalEstimators: Improvement of 2dLocalEstimators + possibility to compare with noised data.
   - 3dLocalEstimators: Adding possibility to compare curvature (mean, gaussian and principal curvatures)
      with Integral Invariant and Monge via Jet Fitting + possibility to compare with noised data.
- 
+
 - *volumetric*:
   - volTools directory moved into volumetric.
 
@@ -222,4 +223,3 @@
   - volAddBorder: add a 1 voxel boundary with value 0 to a vol file.
   - volCComponentCounter: a simple program to count the number of connected components in a 3D image.
   - volSubSample: sub sample a vol file (division by 2 in each direction).
-
