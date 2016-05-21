@@ -49,6 +49,43 @@ using namespace Z3i;
 namespace po = boost::program_options;
 
 
+/**
+ @page volCComponentCounter volCComponentCounter
+ 
+ @brief Counts the number of connected component (same values) in a  volume (Vol) file image.
+
+ @b Usage:  volCComponentCounter [input]
+
+
+ @b Allowed @b options @b are : 
+ @code
+  -h [ --help ]                  display this message
+  -c [ --connectivity ] arg (=6) object connectivity (6,18,26) (default: 6 )
+  -i [ --input ] arg             volume file (Vol) (default: standard input)
+ @endcode
+
+ @b Example: 
+
+ @code
+ $ volCComponentCounter -i $DGtal/examples/samples/Al.100.vol 
+ @endcode
+
+
+ You should obtain:
+@verbatim
+New Block [Initial disjoint sets construction]
+EndBlock [Initial disjoint sets construction] (515.602 ms)
+New Block [Merging neighboring sets]
+EndBlock [Merging neighboring sets] (1672.21 ms)
+Number of disjoint 6-components = 2
+@endverbatim
+
+ 
+ @see
+ @ref volCComponentCounter.cpp
+
+ */
+
 
 template <typename Rank, typename Parent, typename Image>
 void CCCounter(Rank& r, Parent& p, const Image& elements, const unsigned int connectivity)
@@ -134,7 +171,8 @@ int main( int argc, char** argv )
     {
       std::cout << "Usage: " << argv[0] << " [input]\n"
                 << "Count the number of connected component (same values) in a  volume (Vol) file image\n"
-                << general_opt << "\n";
+                << general_opt << "\n"
+                << "Example : \n \t volCComponentCounter -i $DGtal/examples/samples/Al.100.vol ";
       return 0;
     }
   string inputFilename = vm["input"].as<std::string>();

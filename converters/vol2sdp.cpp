@@ -15,7 +15,7 @@
  **/
 /**
  * @file vol2sdp.cpp
- * @ingroup conerters
+ * @ingroup Converters
  * @author Bertrand Kerautret (\c kerautre@loria.fr )
  * LORIA (CNRS, UMR 7503), University of Nancy, France
  *
@@ -44,6 +44,40 @@ using namespace DGtal;
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace po = boost::program_options;
+
+
+/**
+ @page vol2sdp vol2sdp
+ @brief  Extracts digital points from 3d vol files.
+
+@b Usage: vol2sdp [input] [output]
+
+@b Allowed @b options @b are:
+
+@code
+  -h [ --help ]                    display this message
+  -i [ --input ] arg               volumetric file (.vol) 
+  -o [ --output ] arg              sequence of discrete point file (.sdp) 
+  -e [ --exportImageValues ]       option to export also the image value of the
+                                   voxel in a fourth field.
+  -m [ --thresholdMin ] arg (=128) min threshold (default 128)
+  -M [ --thresholdMax ] arg (=255) max threshold (default 255)
+@endcode
+
+@b Example:
+@code 
+   $ vol2sdp -i ${DGtal}/examples/samples/lobster.vol -o volumeList.sdp -m 70
+   # Visualisation:
+   $ 3dSDPViewer -i volumeList.sdp
+@endcode
+
+You should obtain such a visualization:
+@image html resVol2sdp.png "resulting visualisation."
+
+@see
+@ref vol2sdp.cpp
+
+*/
 
 int main( int argc, char** argv )
 {
@@ -75,7 +109,7 @@ int main( int argc, char** argv )
 		<< "Convert volumetric  file into a digital set of points from a given threshold."
 		<< general_opt << "\n";
       std::cout << "Example:\n"
-		<< "vol2sdp -i ${DGtal}/examples/samples/lobster.vol -o volumeList.p3d \n";
+		<< "vol2sdp -i ${DGtal}/examples/samples/lobster.vol -o volumeList.sdp \n";
       return 0;
     }
   

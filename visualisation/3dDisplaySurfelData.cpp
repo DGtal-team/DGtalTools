@@ -61,6 +61,58 @@ using namespace Z3i;
 ///////////////////////////////////////////////////////////////////////////////
 namespace po = boost::program_options;
 
+
+/**
+ @page Doc3dDisplaySurfelData 3dDisplaySurfelData
+ 
+ @brief  Displays surfel data from SDP file with color attributes given as scalar interpreted as color. 
+
+ @b Usage:  3dDisplaySurfelData [options] input
+ 
+
+ @b Allowed @b options @b are :
+ 
+ @code
+  -h [ --help ]                  display this message
+  -i [ --input ] arg             input file: sdp (sequence of discrete points 
+                                 with attribute)
+  -n [ --noWindows ]             Don't display Viewer windows.
+  -d [ --doSnapShotAndExit ] arg save display snapshot into file.
+  --fixMaxColorValue arg         fix the maximal color value for the scale 
+                                 error display (else the scale is set from the 
+                                 maximal value)
+  --fixMinColorValue arg         fix the minimal color value for the scale 
+                                 error display (else the scale is set from the 
+                                 minimal value)
+  --labelIndex arg               set the index of the label (by default set to 
+                                 3)  
+  --SDPindex arg                 specify the sdp index (by default 0,1,2).
+ @endcode
+
+
+ @b Example: 
+ 
+ To test this program we have first to generate a file containing a set of surfels with, for instance, their associated curvature values:
+ @code
+$ 3dCurvatureViewer -i $DGtal/examples/samples/cat10.vol -r 3 --exportOnly -d curvatureCat10R3.dat
+ @endcode
+
+ Then, we can use this tool to display the set of surfel with their associated values:
+ @code
+$ 3dDisplaySurfelData -i curvatureCat10R3.dat 
+ @endcode 
+ You should obtain such a result:
+
+ @image html res3dDisplaySurfelData.png "resulting visualisation of surfel with their associated values."
+ 
+
+ @see
+ @ref 3dDisplaySurfelData.cpp, @ref CompSurfelData
+
+ */
+
+
+
 template < typename Space = DGtal::Z3i::Space, typename KSpace = DGtal::Z3i::KSpace>
 struct ViewerSnap: DGtal::Viewer3D <Space, KSpace>
 {
@@ -146,7 +198,7 @@ int main( int argc, char** argv )
   if( !parseOK || cannotStart ||  vm.count("help")||argc<=1)
     {
       trace.info() << "Usage: " << argv[0] << " [input]\n"
-    << "Display surfel data from SDP file with color attributes given as scalar interpreted as color."
+    << "Display surfel data from SDP file with color attributes given as scalar interpreted as color. "
     << general_opt << "\n";
       return 0;
     }

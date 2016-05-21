@@ -42,6 +42,48 @@ using namespace Z3i;
 namespace po = boost::program_options;
 
 
+
+
+/**
+ @page eulerCharacteristic eulerCharacteristic
+ 
+ @brief Computes the Euleur Characteristic of  a vol to a 8-bit raw file.
+
+ The vol file is first binarized using interval [m,M[ thresholds and
+ the Eucler characteristic is given from the cubical complex.
+
+ @b Usage: 	 eulerCharacteristic --input <volFileName> -m <minlevel> -M <maxlevel> 
+
+
+ @b Allowed @b options @b are : 
+ @code
+  -h [ --help ]                    display this message.
+  -i [ --input ] arg               Input vol file.
+  -m [ --thresholdMin ] arg (=0)   threshold min (excluded) to define binary 
+                                   shape
+  -M [ --thresholdMax ] arg (=255) threshold max (included) to define binary 
+ @endcode
+
+ @b Example: 
+
+ @code
+eulerCharacteristic -i $DGtal/examples/samples/cat10.vol -m 0
+ @endcode
+
+
+ You should obtain such a result:
+@verbatim
+Got 72479 cells
+Got 10128 pointels 28196 linels  26112 surfels and 8043  bells
+Volumetric Euler Characteristic = 1
+@endverbatim
+ 
+ @see
+ @ref eulerCharacteristic.cpp
+
+ */
+
+
 /**
  * Missing parameter error message.
  *
@@ -79,9 +121,9 @@ int main(int argc, char**argv)
   po::notify ( vm );
   if (!parseOK || vm.count ( "help" ) ||argc<=1 )
     {
-      trace.info() << "Compute the Euleur Characteristic of  a vol to a 8-bit raw file. The vol file is first binarized using interval [m,M[ thresholds and the Eucler characteristic is given from the cubical complex"<<std::endl
+      trace.info() << "Compute the Euleur Characteristic of  a vol to a 8-bit raw file. The vol file is first binarized using interval [m,M[ thresholds and the Eucler characteristic is given from the cubical complex."<<std::endl
                    << std::endl << "Basic usage: "<<std::endl
-                   << "\eulerCharacteristic --input <volFileName> -m <minlevel> -M <maxlevel> "<<std::endl
+                   << "\t eulerCharacteristic --input <volFileName> -m <minlevel> -M <maxlevel> "<<std::endl
                    << general_opt << "\n";
       return 0;
     }

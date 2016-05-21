@@ -52,6 +52,55 @@ using namespace std;
 using namespace DGtal;
 using namespace Z3i;
 
+
+/**
+ @page Doc3dVolViewer 3dVolViewer
+ 
+ @brief Displays volume file as a voxel set by using QGLviewer.
+
+ The mode  specifies if you wish to see surface elements (BDRY), the inner
+ voxels (INNER) or the outer voxels (OUTER) that touch the boundary.
+
+ @b Usage:   3dVolViewer [input]
+
+ @b Allowed @b options @b are :
+ 
+ @code
+  -h [ --help ]                      display this message
+  -i [ --input ] arg                 vol file (.vol) , pgm3d (.p3d or .pgm3d, 
+                                     pgm (with 3 dims)) file or sdp (sequence 
+                                     of discrete points)
+  -m [ --thresholdMin ] arg (=0)     threshold min to define binary shape
+  -M [ --thresholdMax ] arg (=255)   threshold max to define binary shape
+  -n [ --numMaxVoxel ] arg (=500000) set the maximal voxel number to be 
+                                     displayed.
+  --dicomMin arg (=-1000)            set minimum density threshold on 
+                                     Hounsfield scale
+  --dicomMax arg (=3000)             set maximum density threshold on 
+                                     Hounsfield scale
+  -t [ --transparency ] arg (=255)   transparency
+ @endcode
+
+
+ @b Example: 
+
+
+ @code
+ $ 3dVolViewer -i $DGtal/examples/samples/lobster.vol -m 60 -t 10
+ @endcode
+
+ You should obtain such a result:
+
+ @image html res3dVolViewer.png "Resulting visualization."
+ 
+
+ @see
+ @ref 3dVolViewer.cpp
+
+ */
+
+
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace po = boost::program_options;
 
@@ -84,7 +133,9 @@ int main( int argc, char** argv )
     {
       std::cout << "Usage: " << argv[0] << " [input]\n"
                 << "Display volume file as a voxel set by using QGLviewer"<< endl
-                << general_opt << "\n";
+                << general_opt << "\n"
+                << "Example: "<< std::endl
+                << "    \t 3dVolViewer -i $DGtal/examples/samples/lobster.vol -m 60 -t 10" << endl;
       return 0;
     }
 

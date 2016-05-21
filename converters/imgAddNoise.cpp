@@ -46,6 +46,37 @@ using namespace DGtal;
 ///////////////////////////////////////////////////////////////////////////////
 namespace po = boost::program_options;
 
+
+/**
+ @page imgAddNoise imgAddNoise
+ @brief  Adds noise (Kanungo's) to a binary 2D object.
+
+@b Usage: imgAddNoise [input] [output]
+
+@b Allowed @b options @b are:
+
+@code
+  -h [ --help ]             display this message
+  -i [ --input ] arg        input image file name (any 2D image format accepted
+                            by DGtal::GenericReader)
+  -o [ --output ] arg       output image file name (any 2D image format 
+                            accepted by DGtal::GenericWriter)
+  -n [ --noise ] arg (=0.5) Kanungo noise level in ]0,1[ (default 0.5)
+                                      resulting volumetric file.
+@endcode
+
+@b Example:
+@code
+  $ imgAddNoise -i ${DGtal}/examples/samples/klokan.pgm -o noise.pgm 
+
+@endcode
+You will obtain such image:
+@image html  resImgAddNoise.png "Resulting image."
+@see imgAddNoise.cpp
+
+*/
+
+
 /**
  * Missing parameter error message.
  *
@@ -82,9 +113,16 @@ int main( int argc, char** argv )
   po::notify(vm);    
   if(vm.count("help")||argc<=1|| !parseOK)
     {
-      trace.info()<< "Add Kanungo noise to a binary object with 0 values as background points and values >0 for the foreground ones." <<std::endl << "Basic usage: "<<std::endl
-      << "\t imgAddNoi0se [options] --input <imageName> --output <outputImage> -noise 0.3"<<std::endl
-      << general_opt << "\n";
+      trace.info()<< "Add Kanungo noise to a binary object with 0 values "
+                  << "as background points and values >0 for the foreground ones."
+                  <<std::endl << "Basic usage: "<<std::endl
+                  << "\t imgAddNoi0se [options] --input <imageName> --output <outputImage>"
+                  << "-noise 0.3" <<std::endl
+                  << general_opt << "\n"
+                  << "Example: \n"
+                  << "imgAddNoise -i ${DGtal}/examples/samples/klokan.pgm -o noise.pgm "
+                  << std::endl;
+
       return 0;
     }
   

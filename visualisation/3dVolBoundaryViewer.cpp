@@ -53,7 +53,55 @@
 
 using namespace std;
 using namespace DGtal;
-//using namespace Z3i;
+
+
+/**
+ @page Doc3dVolBoundaryViewer 3dVolBoundaryViewer
+ 
+ @brief  Display the boundary of a volume file by using QGLviewer.
+
+ The mode  specifies if you wish to see surface elements (BDRY), the inner
+ voxels (INNER) or the outer voxels (OUTER) that touch the boundary.
+
+ @b Usage:   3dVolBoundaryViewer -i [input]
+
+ @b Allowed @b options @b are :
+ 
+ @code
+  -h [ --help ]                    display this message
+  -i [ --input ] arg               vol file (.vol) , pgm3d (.p3d or .pgm3d, pgm
+                                   (with 3 dims)) file or sdp (sequence of 
+                                   discrete points)
+  -m [ --thresholdMin ] arg (=0)   threshold min (excluded) to define binary 
+                                   shape
+  -M [ --thresholdMax ] arg (=255) threshold max (included) to define binary 
+                                   shape
+  --dicomMin arg (=-1000)          set minimum density threshold on Hounsfield 
+                                   scale
+  --dicomMax arg (=3000)           set maximum density threshold on Hounsfield 
+                                   scale
+  --mode arg (=INNER)              set mode for display: INNER: inner voxels, 
+                                   OUTER: outer voxels, BDRY: surfels
+
+ @endcode
+
+
+ @b Example: 
+
+
+ @code
+    3dVolBoundaryViewer  -i $DGtal/examples/samples/lobster.vol -m 60
+ @endcode
+
+ You should obtain such a result:
+
+ @image html res3dVolBoundaryViewer.png "Resulting visualization."
+ 
+
+ @see
+ @ref 3dVolBoundaryViewer.cpp
+
+ */
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace po = boost::program_options;

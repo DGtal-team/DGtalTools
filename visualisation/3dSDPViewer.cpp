@@ -39,10 +39,10 @@
 #include "DGtal/topology/SurfelAdjacency.h"
 #include "DGtal/shapes/Mesh.h"
 #include "DGtal/io/Color.h"
-#include "DGtal/io/colormaps/GradientColorMap.h"
+#include "DGtal/io/colormaps/HueShadeColorMap.h"
 #include "DGtal/io/readers/GenericReader.h"
 #include "DGtal/io/DrawWithDisplay3DModifier.h"
-#include "DGtal/io/colormaps/GradientColorMap.h"
+
 
 #include <boost/program_options/options_description.hpp>
 #include <boost/program_options/parsers.hpp>
@@ -56,6 +56,114 @@ using namespace Z3i;
 ///////////////////////////////////////////////////////////////////////////////
 namespace po = boost::program_options;
 typedef Viewer3D<Z3i::Space, Z3i::KSpace> Viewer;
+
+
+/**
+ @page Doc3DSDPViewer 3DSDPViewer
+ 
+ @brief Displays a  sequence of 3d discrete points by using QGLviewer.
+
+ @b Usage:  3DSDPViewer [options] input
+
+ @b Allowed @b options @b are :
+ 
+ @code
+ -h [ --help ]                         display this message
+  -i [ --input ] arg                    input file: sdp (sequence of discrete 
+                                        points)
+  --SDPindex arg                        specify the sdp index (by default 
+                                        0,1,2).
+  -c [ --pointColor ] arg               set the color of  points: r g b a 
+  -l [ --lineColor ] arg                set the color of line: r g b a 
+  -m [ --addMesh ] arg                  append a mesh (off/obj) to the point 
+                                        set visualization.
+  --customColorMesh arg                 set the R, G, B, A components of the 
+                                        colors of the mesh faces (mesh added 
+                                        with option --addMesh). 
+  --importColors                        import point colors from the input file
+                                        (R G B colors should be by default at 
+                                        index 3, 4, 5).
+  --importColorLabels                   import color labels from the input file
+                                        (label index  should be by default at 
+                                        index 3).
+  --setColorsIndex arg                  customize the index of the imported 
+                                        colors in the source file (used by 
+                                        -importColor).
+  --setColorLabelIndex arg (=3)         customize the index of the imported 
+                                        color labels in the source file (used 
+                                        by -importColorLabels).
+  -f [ --filter ] arg (=100)            filter input file in order to display 
+                                        only the [arg] pourcent of the input 3D
+                                        points (uniformly selected).
+  --noPointDisplay                      usefull for instance to only display 
+                                        the lines between points.
+  --drawLines                           draw the line between discrete points.
+  -x [ --scaleX ] arg (=1)              set the scale value in the X direction 
+                                        (default 1.0)
+  -y [ --scaleY ] arg (=1)              set the scale value in the Y direction 
+                                        (default 1.0)
+  -z [ --scaleZ ] arg (=1)              set the scale value in the Z direction 
+                                        (default 1.0)
+  --sphereResolution arg (=30)          defines the sphere resolution (used 
+                                        when the primitive is set to the 
+                                        sphere). (default resolution: 30)
+  -s [ --sphereRadius ] arg (=0.20000000000000001)
+                                        defines the sphere radius (used when 
+                                        the primitive is set to the sphere). 
+                                        (default value 0.2)
+  --sphereRadiusFromInput               takes, as sphere radius, the 4th field 
+                                        of the sdp input file.
+  --lineSize arg (=0.20000000000000001) defines the line size (used when the 
+                                        --drawLines or --drawVectors option is 
+                                        selected). (default value 0.2))
+  -p [ --primitive ] arg (=voxel)       set the primitive to display the set of
+                                        points (can be sphere, voxel (default),
+                                        or glPoints (opengl points).
+  -v [ --drawVectors ] arg              SDP vector file: draw a set of vectors 
+                                        from the given file (each vector are 
+                                        determined by two consecutive point 
+                                        given, each point represented by its 
+                                        coordinates on a single line.
+  --interactiveDisplayVoxCoords         by using this option the pixel 
+                                        coordinates can be displayed after 
+                                        selection (shift+left click on voxel). 
+@endcode
+
+
+ @b Basic @b example: 
+
+ You can display a set of 3D points with sphere primitive and lines:
+ @code
+ $  3DSDPViewer -i $DGtal/tests/samples/sinus3D.dat -p sphere -s 0.3 --drawLines --lineSize 5 
+ @endcode
+
+ You should obtain such a result:
+
+ @image html res3DSDPViewer.png "Resulting visualization."
+
+
+@b Example @b with @b interactive @b selection :
+
+This tool can be useful to recover coordinates from a set of voxels. To do it, you have to add the option allowing to activate the interactive selection (with --interactiveDisplayVoxCoords), for instance if you apply:
+@code 
+$ 3DSDPViewer -i $DGtal/tests/samples/Al100.sdp  --interactiveDisplayVoxCoords 
+@endcode 
+you should be able to select a voxel by using the SHIFT key and by clicking on a voxel:
+  @image html res3DSDPViewerInteractive.png " "
+
+ 
+@b Visualization @b of @b large @b  point @b set
+
+If you need to display an important number of points, you can use the primitive @e glPoints instead @e voxel or @e sphere (-p glPoints). You will obtain such type of a visualization:
+
+  @image html res3DSDPViewerGLPoints.png " "
+
+
+
+ @see
+ @ref 3DSDPViewer.cpp
+
+ */
 
 
 
@@ -79,16 +187,19 @@ int main( int argc, char** argv )
   
   
   // parse command line ----------------------------------------------
-  po::options_description general_opt("Allowed options are: ");
+  po::options_description general_opt(" Allowed options are");
   general_opt.add_options()
   ("help,h", "display this message")
   ("input,i", po::value<std::string>(), "input file: sdp (sequence of discrete points)" )
   ("SDPindex", po::value<std::vector <unsigned int> >()->multitoken(), "specify the sdp index (by default 0,1,2).")
   ("pointColor,c", po::value<std::vector <int> >()->multitoken(), "set the color of  points: r g b a " )
-  ("addMesh,m", po::value<std::string>(), "append a mesh (off/obj) to the point set visualization.")
   ("lineColor,l",po::value<std::vector <int> >()->multitoken(), "set the color of line: r g b a " )
+  ("addMesh,m", po::value<std::string>(), "append a mesh (off/obj) to the point set visualization.")
+  ("customColorMesh",po::value<std::vector<unsigned int> >()->multitoken(), "set the R, G, B, A components of the colors of the mesh faces (mesh added with option --addMesh). " )   
   ("importColors", "import point colors from the input file (R G B colors should be by default at index 3, 4, 5).")
+  ("importColorLabels", "import color labels from the input file (label index  should be by default at index 3).")
   ("setColorsIndex", po::value<std::vector<unsigned int> >()->multitoken(), "customize the index of the imported colors in the source file (used by -importColor).")
+  ("setColorLabelIndex", po::value<unsigned int >()->default_value(3), "customize the index of the imported color labels in the source file (used by -importColorLabels).")
   ("filter,f",po::value<double>()->default_value(100.0), "filter input file in order to display only the [arg] pourcent of the input 3D points (uniformly selected)." )
   ("noPointDisplay", "usefull for instance to only display the lines between points.")
   ("drawLines", "draw the line between discrete points." )
@@ -99,7 +210,7 @@ int main( int argc, char** argv )
   ("sphereRadius,s",  po::value<double>()->default_value(0.2), "defines the sphere radius (used when the primitive is set to the sphere). (default value 0.2)")
   ("sphereRadiusFromInput", "takes, as sphere radius, the 4th field of the sdp input file.")
   ("lineSize",  po::value<double>()->default_value(0.2), "defines the line size (used when the --drawLines or --drawVectors option is selected). (default value 0.2))")
-  ("primitive,p", po::value<std::string>()->default_value("voxel"), "set the primitive to display the set of points (can be sphere or voxel (default)")
+  ("primitive,p", po::value<std::string>()->default_value("voxel"), "set the primitive to display the set of points (can be sphere, voxel (default), or glPoints (opengl points).")
   ("drawVectors,v", po::value<std::string>(), "SDP vector file: draw a set of vectors from the given file (each vector are determined by two consecutive point given, each point represented by its coordinates on a single line.")
   ("interactiveDisplayVoxCoords", "by using this option the pixel coordinates can be displayed after selection (shift+left click on voxel)." );
   
@@ -107,7 +218,6 @@ int main( int argc, char** argv )
   bool parseOK=true;
   bool cannotStart= false;
   
-  typedef PointVector<1, int> Point1D;
   
   
   po::variables_map vm;
@@ -118,11 +228,6 @@ int main( int argc, char** argv )
     trace.error()<< "Error checking program options: "<< ex.what()<< endl;
   }
   po::notify(vm);
-  if(parseOK && ! vm.count("input"))
-  {
-    trace.error() << " The input file name was not defined" << endl;
-    cannotStart = true;
-  }
   std::string typePrimitive;
   double sphereRadius = 0.2;
   std::vector<double> vectSphereRadius;
@@ -139,7 +244,9 @@ int main( int argc, char** argv )
     lineSize = vm["lineSize"].as<double>();
   }
   
-  if (parseOK && typePrimitive !="voxel" && typePrimitive  != "sphere" )
+  if (parseOK && typePrimitive !="voxel"
+      && typePrimitive !="glPoints" 
+      && typePrimitive  != "sphere" )
   {
     trace.error() << " The primitive should be sphere or voxel (primitive: "
     << typePrimitive << " not implemented)" << std::endl;
@@ -183,7 +290,8 @@ int main( int argc, char** argv )
   float sx = vm["scaleX"].as<float>();
   float sy = vm["scaleY"].as<float>();
   float sz = vm["scaleZ"].as<float>();
-  
+
+  bool importColorLabels = vm.count("importColorLabels");
   bool importColors = vm.count("importColors");
   bool interactiveDisplayVoxCoords = vm.count("interactiveDisplayVoxCoords");
   typedef Viewer3D<Z3i::Space, Z3i::KSpace> Viewer;
@@ -225,6 +333,17 @@ int main( int argc, char** argv )
       vectColors.push_back(Color(r[i], g[i], b[i]));
     }
   }
+
+  // Get vector of colors if imported.
+  std::vector< int> vectColorLabels;
+  unsigned int maxLabel = 1;
+  if(vm.count("importColorLabels"))
+  {
+    unsigned int index = vm["setColorLabelIndex"].as<unsigned int >();
+    vectColorLabels = TableReader< int>::getColumnElementsFromFile(inputFilename,index);
+    maxLabel = *(std::max_element(vectColorLabels.begin(), vectColorLabels.end()));
+  }
+  HueShadeColorMap<unsigned int> aColorMap(0, maxLabel);
   
   
   if(useMultiRad)
@@ -248,16 +367,27 @@ int main( int argc, char** argv )
   }
   int name = 0;
   if(!vm.count("noPointDisplay")){
+    if (typePrimitive == "glPoints")
+      {
+        viewer.setUseGLPointForBalls(true);
+      }
+
     double percent = vm["filter"].as<double>();
     int step = max(1, (int) (100/percent));
     for(unsigned int i=0;i< vectVoxels.size(); i=i+step){
       if(importColors)
-      {
-        Color col = vectColors[i];
-        viewer.setFillColor(col);
-      }
+        {
+          Color col = vectColors[i];
+          viewer.setFillColor(col);
+        }
+      else if(importColorLabels)
+        {
+          unsigned int index = vectColorLabels[i];
+          Color col = aColorMap(index);
+          viewer.setFillColor(col);
+        }
       
-      if(typePrimitive=="voxel"){
+      if(typePrimitive=="voxel" ){
         if (interactiveDisplayVoxCoords)
         {
           viewer << SetName3D( name++ ) ;
@@ -265,9 +395,11 @@ int main( int argc, char** argv )
         viewer << Z3i::Point((int)vectVoxels.at(i)[0],
                              (int)vectVoxels.at(i)[1],
                              (int)vectVoxels.at(i)[2]);
-      }else{
-        viewer.addBall(vectVoxels.at(i), sphereRadius, sphereResolution);
       }
+      else
+        {
+          viewer.addBall(vectVoxels.at(i), sphereRadius, sphereResolution);
+        }
     }
     
     viewer << CustomColors3D(lineColor, lineColor);
@@ -296,7 +428,17 @@ int main( int argc, char** argv )
     }
     if(vm.count("addMesh"))
     {
-      viewer.setFillColor(DGtal::Color::White);
+      DGtal::Color meshColor = DGtal::Color::White;
+      if(vm.count("customColorMesh")){
+        std::vector<unsigned int > vectCol = vm["customColorMesh"].as<std::vector<unsigned int> >();
+        if(vectCol.size()!=4){
+          trace.error() << "colors specification should contain R,G,B and Alpha values"<< std::endl;
+        }
+        meshColor = DGtal::Color(vectCol[0], vectCol[1], vectCol[2], vectCol[3]);
+       }
+      viewer.setFillColor(meshColor);
+
+
       std::string meshName = vm["addMesh"].as<std::string>();
       Mesh<Z3i::RealPoint> mesh;
       mesh << meshName ;

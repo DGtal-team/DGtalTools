@@ -61,6 +61,42 @@ using namespace Z3i;
 namespace po = boost::program_options;
 
 
+
+/**
+ @page sliceViewer sliceViewer
+ 
+ @brief  Displays volume file with slice image by using QT and QGLviewer.
+
+ @b Usage:   sliceViewer [input]
+
+ @b Allowed @b options @b are :
+ 
+ @code
+  -h [ --help ]           display this message
+  -i [ --input ] arg      vol file (.vol) , pgm3d (.p3d or .pgm3d, pgm (with 3 
+                          dims)) file or sdp (sequence of discrete points)
+  --hueColorMap           use hue color map to display images.
+  --gradHotColorMap       use hot gradient color map to display images.
+  --gradCoolColorMap      use cool gradient color map to display images.
+  --dicomMin arg (=-1000) set minimum density threshold on Hounsfield scale
+  --dicomMax arg (=3000)  set maximum density threshold on Hounsfield scale
+ @endcode
+
+ @b Example: 
+
+ @code
+ $ sliceViewer -i  $DGtal/examples/samples/lobster.vol
+ @endcode
+
+ @image html resSliceViewer.png " "
+
+@see
+ @ref sliceViewer.cpp
+
+ */
+
+
+
 // Set to define slider int value and grid size
 
 static const int MIN_ZOOM_FACTOR = 10.0;
@@ -407,7 +443,7 @@ int main( int argc, char** argv )
   if( !parseOK || vm.count("help")||argc<=1)
     {
       std::cout << "Usage: " << argv[0] << " [input]\n"
-                << "Display volume file as a voxel set by using QGLviewer"<< endl
+                << "Displays volume file with slice image by using QT and QGLviewer"<< endl
                 << general_opt << "\n";
       return 0;
     }

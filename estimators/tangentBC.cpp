@@ -52,13 +52,60 @@ using namespace DGtal;
 ///////////////////////////////////////////////////////////////////////////////
 namespace po = boost::program_options;
 
+
+
+/**
+ @page tangentBC tangentBC
+ 
+ @brief  Estimates tangent using a binomial convolver.
+
+ @b Usage:  tangentBC [options] --input  <fileName> 
+
+
+ @b Allowed @b options @b are : 
+ @code
+  -h [ --help ]              display this message
+  -i [ --input ] arg         input FreemanChain file name
+  -s [ --GridStep ] arg (=1) Grid step
+ @endcode
+
+@note The file may contain several freeman chains.
+
+
+ @b Example: 
+
+We consider as input shape the freeman chain of the DGtal/examples/sample directory. The contour can be displayed with @ref displayContours : 
+ @code
+$  displayContours -i $DGtal/examples/samples/contourS.fc -o contourS.png  --drawPointOfIndex 0
+ @endcode
+
+The tangents can be computed as follows:
+@code 
+$ tangentBC -i $DGtal/examples/samples/contourS.fc  > tangentsBC.dat
+$ gnuplot 
+gnuplot> plot [] [-1.2:1.2]'tangentsBC.dat' using 1:3  w lines title "tangents with Binomial Convolution estimator"
+@endcode
+
+ You should obtain such a result:
+
+ | contour  | curvature  | 
+ | :------: | :--------: |   
+ | ![ ](resCurvatureBCcontour.png)  | ![ ](resTangentBC.png)  |
+ | CCW oriented (index 0=blue pt)| resulting tangent (angle) |
+ 
+ @see
+ @ref tangentBC.cpp
+
+ */
+
+
 int main( int argc, char** argv )
 {
   // parse command line ----------------------------------------------
   po::options_description general_opt("Allowed options are: ");
   general_opt.add_options()
     ("help,h", "display this message")
-    ("FreemanChain,f", po::value<std::string>(), "FreemanChain file name")
+    ("input,i", po::value<std::string>(), "input FreemanChain file name")
     ("GridStep,step", po::value<double>()->default_value(1.0), "Grid step");
   
   
@@ -72,10 +119,10 @@ int main( int argc, char** argv )
   }
 
   po::notify(vm);    
-  if(!parseOK || vm.count("help")||argc<=1 || (!(vm.count("FreemanChain"))) )
+  if(!parseOK || vm.count("help")||argc<=1 || (!(vm.count("input"))) )
     {
       trace.info()<< "Tangent using a binomial convolver " <<std::endl << "Basic usage: "<<std::endl
-      << "\t tangentBC [options] --FreemanChain  <fileName> "<<std::endl
+      << "\t tangentBC [options] --input  <fileName> "<<std::endl
       << general_opt << "\n"
       << "NB: the file may contain several freeman chains." << "\n";
       return 0;
@@ -86,8 +133,8 @@ int main( int argc, char** argv )
 
 
  
-  if(vm.count("FreemanChain")){
-    std::string fileName = vm["FreemanChain"].as<std::string>();
+  if(vm.count("input")){
+    std::string fileName = vm["input"].as<std::string>();
 
     typedef Z2i::Space Space; 
     typedef Space::Point Point; 

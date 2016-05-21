@@ -45,6 +45,32 @@ using namespace DGtal;
 using namespace Z3i;
 
 namespace po = boost::program_options;
+/**
+ @page raw2vol raw2vol
+ @brief  Converts a  8-bit raw file to vol.
+
+@b Usage: raw2vol [input] [output]
+
+@b Allowed @b options @b are:
+
+@code
+  -h [ --help ]         display this message.
+  -i [ --input ] arg    Input raw file.
+  -o [ --output ] arg   Output vol filename.
+  -x [ --x ] arg        x extent.
+  -y [ --y ] arg        y extent.
+  -z [ --z ] arg        z extent.  
+@endcode
+
+@b Example:
+@code
+  $ raw2vol -x 128 -y 128 -z 128  -i input.raw  -o output.vol 
+
+@endcode
+
+@see raw2vol.cpp
+
+*/
 
 
 /**
@@ -85,7 +111,7 @@ int main(int argc, char**argv)
   po::notify ( vm );
   if (!parseOK || vm.count ( "help" ) ||argc<=1 )
     {
-      trace.info() << "Convert a  8-bit raw file to  vol."<<std::endl
+      trace.info() << "Converts a  8-bit raw file to  vol."<<std::endl
                    << std::endl << "Basic usage: "<<std::endl
                    << "\traw2vol -x 128 -y 128 -z 128 --input <RawFileName> --output <VolOutputFileName> "<<std::endl
                    << general_opt << "\n";

@@ -61,6 +61,72 @@ using namespace Z3i;
 ///////////////////////////////////////////////////////////////////////////////
 namespace po = boost::program_options;
 
+
+
+/**
+ @page CompSurfelData 3DCompSurfelData
+
+ @brief  Computes generic scalar surfel data comparisons (squared error) (given from an input data file and from a reference one). 
+ 
+ 
+
+ @b Usage: 3dCompSurfelData [input] [reference]
+ 
+
+ @b Allowed @b options @b are:
+ 
+ @code
+  -h [ --help ]                    display this message
+  -i [ --input ] arg               input file: sdp (sequence of discrete 
+                                   points with attribute)
+  -r [ --reference ] arg           input reference file: sdp (sequence of 
+                                   discrete points with attribute)
+  -l [ --compAccordingLabels ]     apply the comparisons only on points with 
+                                   same labels (by default fifth colomn)
+  -a [ --drawSurfelAssociations ]  Draw the surfel association.
+  -o [ --fileMeasureOutput ] arg   specify the output file to store (append) 
+                                   the error stats else the result is given to 
+                                   std output. 
+  -n [ --noWindows ]               Don't display Viewer windows.
+  -d [ --doSnapShotAndExit ] arg   save display snapshot into file. Notes that 
+                                   the camera setting is set by default 
+                                   according the last saved configuration (use 
+                                   SHIFT+Key_M to save current camera setting 
+                                   in the Viewer3D).
+  --fixMaxColorValue arg           fix the maximal color value for the scale 
+                                   error display (else the scale is set from 
+                                   the maximal value)
+  --labelIndex arg                 set the index of the label (by default set 
+                                   to 4)  
+  --SDPindex arg                   specify the sdp index (by default 0,1,2,3).
+ @endcode
+
+ @b Example: 
+
+ To use this tools  we need first to have two differents surfel set with an attribute to be compared. We can use for instance the curvature from the sample file of DGtal/examples/samples/cat10.vol: 
+ @code
+ # generating another input vol file using tutorial example (eroded.vol):
+ $ $DGtal/build/examples/tutorial-examples/FMMErosion
+ # Estimate curvature using other DGtalTools program:
+ $ 3dCurvatureViewer -i $DGtal/examples/samples/cat10.vol -r 3 --exportOnly -d curvatureCat10R3.dat
+ $ 3dCurvatureViewer -i eroded.vol -r 3 --exportOnly -d curvatureCat10ErodedR3.dat
+ @endcode
+ Now we compare the different curvature values from the two shapes:
+ @code
+  ./visualisation/3dCompSurfelData -i curvatureCat10ErodedR3.dat -r curvatureCat10R3.dat --fixMaxColorValue 1.0  -o  statMeasures.dat                       
+ @endcode
+
+ You should obtain such a visualisation:
+ @image html res3dCompSurfelData.png "resulting visualisation of curvature comparison."
+ 
+
+ @see
+ @ref 3dCompSurfelData.cpp
+ @ref 3dCurvatureViewer 
+ */
+
+
+
 template < typename Space = DGtal::Z3i::Space, typename KSpace = DGtal::Z3i::KSpace>
 struct ViewerSnap: DGtal::Viewer3D <Space, KSpace>
 {
@@ -121,7 +187,7 @@ int main( int argc, char** argv )
     ("drawSurfelAssociations,a", "Draw the surfel association." )
     ("fileMeasureOutput,o", po::value<std::string>(), "specify the output file to store (append) the error stats else the result is given to std output. " )
     ("noWindows,n", "Don't display Viewer windows." )
-    ("doSnapShotAndExit,d", po::value<std::string>(), "save display snapshot into file." )
+    ("doSnapShotAndExit,d", po::value<std::string>(), "save display snapshot into file. Notes that  the camera setting is set by default according the last saved configuration (use SHIFT+Key_M to save current camera setting in the Viewer3D)." )
     ("fixMaxColorValue", po::value<double>(), "fix the maximal color value for the scale error display (else the scale is set from the maximal value)" )
     ("labelIndex", po::value<unsigned int>(), "set the index of the label (by default set to 4)  " )
     ("SDPindex", po::value<std::vector <unsigned int> >()->multitoken(), "specify the sdp index (by default 0,1,2,3).");
@@ -149,7 +215,7 @@ int main( int argc, char** argv )
   if( !parseOK || cannotStart ||  vm.count("help")||argc<=1)
     {
       trace.info() << "Usage: " << argv[0] << " [input]\n"
-                   << "It computes generic scalar surfel data comparisons (squared error) ( given from an input data file and from a reference one. \n \n"
+                   << "It computes generic scalar surfel data comparisons (squared error) ( given from an input data file and from a reference one). \n \n"
                    << "Each surfels are associated to the nearest one of the reference surfels (computed by a 'brut force' search) "
                    << "This association can also be limited to surfel of same label (if available in the data and by using the --compAccordingLabels option  )."
                    << "The comparison and surfel association can be displayed and result statistics are saved on output file (--fileMeasureOutput)."
@@ -274,7 +340,6 @@ int main( int argc, char** argv )
   }
   viewer.setWindowTitle("3dCompSurfel Viewer");
   viewer.show();
-  viewer.restoreStateFromFile();
 
   Statistic<double> statErrors(true);
   std::ofstream outputStatStream;
@@ -304,18 +369,15 @@ int main( int argc, char** argv )
 
   //trace.info() << "Maximal error:" << maxSqError << std::endl;
   // Hack waiting issue #899 if maxSqError =0, don't use gradientColorMap
-  bool useGrad = maxSqError!=0.0;
+  //bool useGrad = maxSqError!=0.0;
 
   viewer << SetMode3D(vectSurfelsInput.at(0).className(), "Basic");
   for(unsigned int i=0; i <surfelAndScalarInput.size(); i++){
     double scalarInput = surfelAndScalarInput.at(i)[3];
     double scalarRef = surfelAndScalarReference.at(vectIndexMinToReference.at(i))[3];
     double sqError = (scalarRef-scalarInput)*(scalarRef-scalarInput);
-    if(useGrad){
-      viewer.setFillColor(gradientColorMap(sqError));
-    }else{
-      viewer.setFillColor(Color::White);
-    }
+    viewer.setFillColor(gradientColorMap(sqError));
+    
     viewer << vectSurfelsInput.at(i);
     if(vm.count("drawSurfelAssociations")){
       viewer.addLine(embeder(vectSurfelsInput.at(i)),embeder(vectSurfelsReference.at(vectIndexMinToReference.at(i))));
@@ -330,8 +392,10 @@ int main( int argc, char** argv )
     trace.info()  << statErrors;
   }
   viewer << Viewer::updateDisplay;
+  
   if(vm.count("doSnapShotAndExit")){
     // Appy cleaning just save the last snap
+    viewer.restoreStateFromFile();
     std::string name = vm["doSnapShotAndExit"].as<std::string>();
     std::string extension = name.substr(name.find_last_of(".") + 1);
     std::string basename = name.substr(0, name.find_last_of("."));

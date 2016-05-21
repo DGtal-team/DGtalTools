@@ -69,6 +69,84 @@
 using namespace DGtal;
 using namespace std;
 
+
+
+
+/**
+ @page Doc3dCurveTangentEstimator 3dCurveTangentEstimator
+ 
+ @brief This program estimates the tangent vector to a set of 3D integer points, which are supposed to approximate a 3D curve.
+
+ @b Usage: ./estimators/3dCurveTangentEstimator [options] --input <filename>
+
+
+This program estimates the tangent vector to a set of 3D integer points, which are supposed to approximate a 3D curve. This set of points is given as a list of points in file <input>.
+The tangent estimator uses either the digital Voronoi Covariance Measure (VCM) or the 3D lambda-Maximal Segment Tangent (L-MST).
+This program can also displays the curve and tangent estimations, and it can also extract maximal digital straight segments (2D and 3D).
+
+@note It is not compulsory for the points to be ordered in sequence, except if you wish to compute maximal digital straight segments. In this case, you can select the connectivity of your curve between 6 (standard) or 26 (naive).
+
+
+@b Allowed @b options are :
+
+ @code
+  -h [ --help ]                         display this message
+  -i [ --input ] arg                    the name of the text file containing 
+                                        the list of 3D points: (x y z) per 
+                                        line.
+  -V [ --view ] arg (=OFF)              toggles display ON/OFF
+  -b [ --box ] arg (=0)                 specifies the the tightness of the 
+                                        bounding box around the curve with a 
+                                        given integer displacement <arg> to 
+                                        enlarge it (0 is tight)
+  -v [ --viewBox ] arg (=WIRED)         displays the bounding box, <arg>=WIRED 
+                                        means that only edges are displayed, 
+                                        <arg>=COLORED adds colors for planes 
+                                        (XY is red, XZ green, YZ, blue).
+  -T [ --connectivity ] arg (=6)        specifies whether it is a 6-connected 
+                                        curve or a 26-connected curve: arg=6 | 
+                                        26.
+  -C [ --curve3d ]                      displays the 3D curve
+  -c [ --curve2d ]                      displays the 2D projections of the 3D 
+                                        curve on the bounding box
+  -3 [ --cover3d ]                      displays the 3D tangential cover of the
+                                        curve
+  -2 [ --cover2d ]                      displays the 2D projections of the 3D 
+                                        tangential cover of the curve
+  -n [ --nbColors ] arg (=3)            sets the number of successive colors 
+                                        used for displaying 2d and 3d maximal 
+                                        segments (default is 3: red, green, 
+                                        blue)
+  -t [ --tangent ]                      displays the tangents to the curve
+  -R [ --big-radius ] arg (=10)         the radius parameter R in the VCM 
+                                        estimator.
+  -r [ --small-radius ] arg (=3)        the radius parameter r in the VCM 
+                                        estimator.
+  -m [ --method ] arg (=VCM)            the method of tangent computation: VCM 
+                                        (default), L-MST.
+  -o [ --output ] arg (=3d-curve-tangent-estimations)
+                                        the basename of the output text file 
+                                        which will contain points and tangent 
+                                        vectors: (x y z tx ty tz) per line
+
+ @endcode
+
+ @b Example: 
+ This command line show an example of tangent estimation with the VCM estimator.
+ @code
+  3dCurveTangentEstimator -i ${DGtal}/examples/samples/sinus.dat -V ON -c -R 20 -r 3 -T 6
+ @endcode
+
+
+ You should obtain such a result:
+ @image html res3dCurveTangentEstimator.png "Resulting tangent vectors (red) obtained with the VCM estimator."
+ 
+ @see
+ @ref 3dCurveTangentEstimator.cpp
+
+ */
+
+
 const Color  AXIS_COLOR( 0, 0, 0, 255 );
 const double AXIS_LINESIZE = 0.1;
 const Color  XY_COLOR( 0, 0, 255, 50 );
@@ -613,7 +691,7 @@ int main(int argc, char **argv)
   
   // specify command line ----------------------------------------------
   QApplication application(argc,argv); // remove Qt arguments.
-  po::options_description general_opt("Specific allowed options (for Qt options, see Qt official site) are: ");
+  po::options_description general_opt("Specific allowed options are ");
   general_opt.add_options()
   ("help,h", "display this message")
   ("input,i", po::value<string>(), "the name of the text file containing the list of 3D points: (x y z) per line." )
@@ -652,7 +730,7 @@ int main(int argc, char **argv)
   po::notify( vm );
   if( !parseOK || vm.count("help")||argc<=1)
   {
-    cout << "Usage: " << argv[0] << " [options] input\n"
+    cout << "Usage: " << argv[0] << " [options] --input  <filename>\n"
     << "This program estimates the tangent vector to a set of 3D integer points, which are supposed to approximate a 3D curve. "
     << "This set of points is given as a list of points in file <input>."
     << endl 
