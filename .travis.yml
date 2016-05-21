@@ -10,8 +10,11 @@ compiler:
 
 
 env:
-  - DGTALTYPE="-DBUILD_EXAMPLES=OFF -DDGTAL_BUILD_TESTING=OFF -DCMAKE_BUILD_TYPE=Debug -DWITH_QGLVIEWER=true -DWITH_ITK=false"
+  - CONFIG="Debug,QGLVIEWER"
+  - CONFIR="Debug"
+  DGTALTYPE="-DBUILD_EXAMPLES=OFF -DDGTAL_BUILD_TESTING=OFF -DCMAKE_BUILD_TYPE=Debug -DWITH_QGLVIEWER=true -DWITH_ITK=false"
   - DGTALTYPE="-DBUILD_EXAMPLES=OFF -DDGTAL_BUILD_TESTING=OFF -DCMAKE_BUILD_TYPE=Debug -DWITH_QGLVIEWER=false -DWITH_ITK=false"
+  - DGTALTYPE="DOCUMENTATION"
 
 addons:
   apt:
@@ -50,6 +53,8 @@ before_install:
   - if [ ! -f "$BOOST_ROOT/b2" ]; then cd "$BOOST_ROOT"; ./bootstrap.sh --with-toolset="$BOOST_TOOLSET" --with-libraries=program_options; fi
 
 before_script:
+  - DGTALTYPE="-DBUILD_EXAMPLES=OFF -DDGTAL_BUILD_TESTING=OFF -DCMAKE_BUILD_TYPE=Debug -DWITH_QGLVIEWER=false -DWITH_ITK=false"
+  - if [ $CONFIG="Debug,QGLVIEWER"]; then DGTALTYPE="-DBUILD_EXAMPLES=OFF -DDGTAL_BUILD_TESTING=OFF -DCMAKE_BUILD_TYPE=Debug -DWITH_QGLVIEWER=false -DWITH_ITK=false"; fi
   - ccache -V && ccache --show-stats && ccache --zero-stats
   - 'echo "using gcc : : ccache $CXX : <cflags>-std=c11 <cxxflags>-std=c++11 ;" > ~/user-config.jam'
   - 'echo "using clang : : ccache $CXX : <cflags>-std=c11 <cxxflags>-std=c++11 ;" >> ~/user-config.jam'
@@ -63,4 +68,7 @@ before_script:
 
 script:
    - cmake . -DDGtal_DIR=$PWD/DGtal -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_COMPILER=$CXXCOMPILER -DCMAKE_C_COMPILER=$CCOMPILER -DBOOST_ROOT=$BOOST_ROOT
-   - make
+   - if [ $CONFIG == "DOCUMENTATION" ]; then  make doc; fi
+   - if [ $CONFIG == "DOCUMENTATION" ]; then rsync -azv --delete --delete-after -e 'ssh -oStrictHostKeyChecking=no -i  .travis/dgtal_rsa' html/ dgtal@liris.cnrs.fr:/home/dgtal/public_html/doc/tools/nightly/;  fi
+   - if [ $CONFIG == "Debug"]; then make; fi
+   - if [ $CONFIG == "Debug,QGLVIEWER"]; then make; fi
