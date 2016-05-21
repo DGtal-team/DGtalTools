@@ -43,6 +43,30 @@ using namespace Z3i;
 
 namespace po = boost::program_options;
 
+/**
+ @page vol2raw vol2raw
+ @brief Converts a vol to a 8-bit raw file.
+
+@b Usage: vol2raw [input] [output]
+
+@b Allowed @b options @b are:
+
+@code
+    -h [ --help ]         display this message.
+    -i [ --input ] arg    Input vol file.
+    -o [ --output ] arg   Output filename.
+@endcode
+
+@b Example:
+@code 
+   vol2raw -i input.vol -o out.raw
+@endcode
+
+@see
+@ref vol2raw.cpp
+
+*/
+
 
 /**
  * Missing parameter error message.

@@ -14,7 +14,7 @@
  *
  **/
 /**
- * @file imgAddNoise
+ * @file volAddNoise
  * @ingroup converters
  * @author David Coeurjolly (\c david.coeurjolly@liris.cnrs.fr)
  *
@@ -45,6 +45,42 @@ using namespace DGtal;
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace po = boost::program_options;
+
+/**
+ @page volAddNoise volAddNoise
+ @brief  Adds Kanungo noise to a binary object with 0 values as background points and values >0 for the foreground ones.
+
+@b Usage: volAddNoise [input] [output]
+
+@b Allowed @b options @b are:
+
+@code
+  -h [ --help ]             display this message
+  -i [ --input ] arg        input image file name (any 3D image format accepted
+                            by DGtal::GenericReader)
+  -o [ --output ] arg       output image file name (any 3D image format 
+                            accepted by DGtal::GenericWriter)
+  -n [ --noise ] arg (=0.5) Kanungo noise level in ]0,1[ (default 0.5)
+@endcode
+
+@b Example:
+@code
+  $ volAddNoise -i $DGtal/examples/samples/Al.100.vol -o AlNoisy0.4.vol  -n 0.4
+  # Converting in sdp to display:
+  $ vol2sdp -i AlNoisy0.4.vol -o AlNoisy0.4.sdp 
+  # displaying sequence of points:
+  $ 3dSDPViewer -i tmp.sdp
+@endcode
+
+You should obtain such a visualization:
+
+@image html resVolAddnoise.png "Resuling visualisation with 3dSDPViewer." 
+
+@see volAddNoise.cpp
+
+*/
+
+
 
 /**
  * Missing parameter error message.
@@ -82,7 +118,7 @@ int main( int argc, char** argv )
   po::notify(vm);    
   if(vm.count("help")||argc<=1|| !parseOK)
     {
-      trace.info()<< "Add Kanungo noise to a binary object with 0 values as background points and values >0 for the foreground ones." <<std::endl << "Basic usage: "<<std::endl
+      trace.info()<< "Adds Kanungo noise to a binary object with 0 values as background points and values >0 for the foreground ones." <<std::endl << "Basic usage: "<<std::endl
       << "\t volAddNoi0se [options] --input <imageName> --output <outputImage> -noise 0.3"<<std::endl
       << general_opt << "\n";
       return 0;

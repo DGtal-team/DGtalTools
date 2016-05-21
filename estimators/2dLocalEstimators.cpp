@@ -86,6 +86,86 @@
 using namespace DGtal;
 
 
+
+/**
+ @page Doc2dLocalEstimators 2dLocalEstimators
+ 
+ @brief Compares local estimators on implicit shapes using DGtal library.
+
+ @b Usage: 	2dlocalEstimators --output <output> --shape <shapeName> [required parameters] --estimators <binaryWord> --properties <binaryWord>
+
+Below are the different available families of estimators: 
+	 - True estimators
+	 - Maximal DSS based estimators
+	 - Maximal DCA based estimators
+	 - Binomial convolver based estimators
+	 - Integral Invariants based estimators
+
+The i-th family of estimators is enabled if the i-th character of the binary word is not 0. The default binary word is '10000'. This means that the first family of estimators, ie. true estimators, is enabled, whereas the next ones are disabled. 
+Below are the different available properties: 
+	 - Tangent
+	 - Curvature
+
+
+
+
+ @b Allowed @b options @b are : 
+ @code
+  -h [ --help ]                      display this message
+  -l [ --list ]                      List all available shapes
+  -o [ --output ] arg                Output
+  -s [ --shape ] arg                 Shape name
+  -R [ --radius ] arg                Radius of the shape
+  -K [ --kernelradius ] arg (=0)     Radius of the convolution kernel (Integral
+                                     invariants estimators)
+  --alpha arg (=0.33333333333333331) Alpha parameter for Integral Invariant 
+                                     computation
+  -A [ --axis1 ] arg                 Half big axis of the shape (ellipse)
+  -a [ --axis2 ] arg                 Half small axis of the shape (ellipse)
+  -r [ --smallradius ] arg (=5)      Small radius of the shape
+  -v [ --varsmallradius ] arg (=5)   Variable small radius of the shape
+  -k [ --k ] arg (=3)                Number of branches or corners the shape
+  --phi arg (=0)                     Phase of the shape (in radian)
+  -w [ --width ] arg (=10)           Width of the shape
+  -p [ --power ] arg (=2)            Power of the metric (double)
+  -x [ --center_x ] arg (=0)         x-coordinate of the shape center (double)
+  -y [ --center_y ] arg (=0)         y-coordinate of the shape center (double)
+  -g [ --gridstep ] arg (=1)         Grid step for the digitization
+  -n [ --noise ] arg (=0)            Level of noise to perturb the shape
+  --properties arg (=11)             the i-th property is disabled iff there is
+                                     a 0 at position i
+  -e [ --estimators ] arg (=10000)   the i-th estimator is disabled iff there 
+                                     is a 0 at position i
+  -l [ --lambda ] arg (=0)           Use the shape to get a better 
+                                     approximation of the surface (optional)
+ @endcode
+
+ @b Example: 
+ With this tool you can easely compare several estimator with the real value:
+ @code
+$  2dlocalEstimators --output curvature --shape flower --radius 15 -v 5  --gridstep 1  --estimators 11100 --properties 01
+ @endcode
+
+You can display the result by using gnuplot:
+
+@code
+$ gnuplot
+gnuplot> plot [][-0.4:0.35] 'curvature_True_curvature.dat' w lines title "true curvature" , 'curvature_MDCA_curvature.dat' w lines  title "Maximal DCA curvature estimator", 'curvature_MDSSl_curvature.dat' w lines title "Maximal DSS based estimators"
+@endcode
+
+
+You should obtain such a graph:
+
+
+ @image html res2dLocalEstimators.png "Resulting visualization."
+ 
+ @see
+ @ref 2dLocalEstimators.cpp
+
+ */
+
+
+
 /**
  * Global vectors to describe the available shapes and their
  * parameters.

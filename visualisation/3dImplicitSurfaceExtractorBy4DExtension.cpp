@@ -58,6 +58,70 @@
 using namespace std;
 using namespace DGtal;
 
+/**
+ @page Doc3dImplicitSurfaceExtractorBy4DExtension 3dImplicitSurfaceExtractorBy4DExtension
+ 
+ @brief Computes the zero level set of the given polynomial.
+
+ @b Usage:  3dImplicitSurfaceExtractorBy4DExtension [options] input
+
+ @b Allowed @b options @b are :
+ 
+ @code
+  -h [ --help ]                         display this message
+  -p [ --polynomial ] arg               the implicit polynomial whose 
+                                        zero-level defines the shape of 
+                                        interest.
+  -a [ --minAABB ] arg (=-10)           the min value of the AABB bounding box 
+                                        (domain)
+  -A [ --maxAABB ] arg (=10)            the max value of the AABB bounding box 
+                                        (domain)
+  -g [ --gridstep ] arg (=1)            the gridstep that defines the 
+                                        digitization (often called h). 
+  -t [ --timestep ] arg (=9.9999999999999995e-07)
+                                        the gridstep that defines the 
+                                        digitization in the 4th dimension 
+                                        (small is generally a good idea, 
+                                        default is 1e-6). 
+  -P [ --project ] arg (=Newton)        defines the projection: either No or 
+                                        Newton.
+  -e [ --epsilon ] arg (=9.9999999999999995e-08)
+                                        the maximum precision relative to the 
+                                        implicit surface.
+  -n [ --max_iter ] arg (=500)          the maximum number of iteration in the 
+                                        Newton approximation of F=0.
+  -v [ --view ] arg (=Normal)           specifies if the surface is viewed as 
+                                        is (Normal) or if places close to 
+                                        singularities are highlighted 
+                                        (Singular).
+ @endcode
+
+
+ @b Example: 
+
+ @code
+   3dImplicitSurfaceExtractorBy4DExtension -p "-0.9*(y^2+z^2-1)^2-(x^2+y^2-1)^3" -g 0.06125 -a -2 -A 2 -v Singular -t 0.02
+ @endcode
+ You could also use other implicit surfaces:
+ - whitney  : x^2-y*z^2
+ - 4lines   : x*y*(y-x)*(y-z*x)
+ - cone     : z^2-x^2-y^2
+ - simonU   : x^2-z*y^2+x^4+y^4
+ - cayley3  : 4*(x^2 + y^2 + z^2) + 16*x*y*z - 1
+ - crixxi   : -0.9*(y^2+z^2-1)^2-(x^2+y^2-1)^3
+
+
+ You should obtain such a result:
+
+ @image html res3dImplicitSurfaceExtractorBy4DExtension.png "resulting visualisation."
+ 
+
+ @see
+ @ref 3dImplicitSurfaceExtractorBy4DExtension.cpp
+
+ */
+
+
 
 /**
  * This 4D extension of a 3D implicit function transforms f(x,y,z) as:

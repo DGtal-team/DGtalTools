@@ -26,6 +26,46 @@
  * This file is part of the DGtal library.
  */
 
+
+/**
+ @page volImageMetrics volImageMetrics
+ 
+ @brief  Applies basic image measures (RMSE, PSNR) between two volumetric images A and B.
+
+ @b Usage:  volImageMetrics --volA \<volAFilename\> --volB \<volBFilename\> 
+
+
+ @b Allowed @b options @b are : 
+ @code
+  -h [ --help ]         display this message.
+  -a [ --volA ] arg     Input filename of volume A (vol format, and other pgm3d
+                        can also be used).
+  -b [ --volB ] arg     Input filename of volume B (vol format, and other pgm3d
+                        can also be used).
+ @endcode
+
+ @b Example: 
+
+ @code
+ # generating another input vol file using tutorial example (eroded.vol):
+ $DGtal/build/examples/tutorial-examples/FMMErosion
+ # compare the two images:
+ $ volImageMetrics -a eroded.vol -b $DGtal/examples/samples/cat10.vol 
+ @endcode
+
+
+ You should obtain such an output:
+@verbatim
+# Image based measures (generated with volImageMetrics) given with the image A: eroded.voland the image B: /Users/kerautre/EnCours/DGtal/examples/samples/cat10.vol
+#  RMSE PSNR 
+ 33.9411 171.331
+@endverbatim
+ 
+ @see  \ref volImageMetrics.cpp
+
+ */
+
+
 #include <iostream>
 #include <DGtal/base/Common.h>
 #include <DGtal/io/readers/GenericReader.h>
@@ -114,7 +154,7 @@ int main(int argc, char**argv)
   Image3D imageB = GenericReader<Image3D>::import(volBFilename);
  
   
-  std::cout << "# Image based measures (generated with volImageMetrics) given with the image A: "<< volAFilename<< "and the image B: "<< volBFilename << endl;
+  std::cout << "# Image based measures (generated with volImageMetrics) given with the image A: "<< volAFilename<< " and the image B: "<< volBFilename << endl;
   std::cout << "#  RMSE PSNR "<< endl;    
   
   double rmse= getRMSE(imageA, imageB);

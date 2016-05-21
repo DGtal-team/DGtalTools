@@ -1,6 +1,21 @@
 /**
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU Lesser General Public License as
+ *  published by the Free Software Foundation, either version 3 of the
+ *  License, or  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ **/
+/**
  * @file 3dVolMarchingCubes.cpp
- * @ingroup Examples
+ * @ingroup volumetric
  * @author Jacques-Olivier Lachaud (\c jacques-olivier.lachaud@univ-savoie.fr )
  * Laboratory of Mathematics (CNRS, UMR 5127), University of Savoie, France
  *
@@ -39,11 +54,64 @@ namespace po = boost::program_options;
 
 ///////////////////////////////////////////////////////////////////////////////
 
+/**
+ @page Doc3dVolMarchingCubes 3dVolMarchingCubes
+ 
+ @brief Outputs the isosurface of the input volume  as an OFF file
+
+ @b Usage: 3dVolMarchingCubes [-i \<fileName.vol\>] [-t \<threshold\>] [-a \<adjacency\>] [-o \<output.off\>]
+
+Outputs the isosurface of value \<threshold\> of the volume
+\<fileName.vol\> as an OFF file \<output.off\>. The \<adjacency\> (0/1)
+allows to choose between interior (6,18) and exterior (18,6)
+adjacency.
+
+ @b Allowed @b options @b are : 
+ @code
+  -h [ --help ]                         display this message
+  -i [ --input ] arg                    the volume file (.vol)
+  -t [ --threshold ] arg (=1)           the value that defines the isosurface 
+                                        in the image (an integer between 0 and 
+                                        255).
+  -a [ --adjacency ] arg (=0)           0: interior adjacency, 1: exterior 
+                                        adjacency
+  -o [ --output ] arg (=marching-cubes.off)
+                                        the output OFF file that represents the
+                                        geometry of the isosurface
+ @endcode
+
+ @b Example: 
+
+ @code
+ $ 3dVolMarchingCubes -i $DGtal/examples/samples/lobster.vol -t 30
+ # we invert the default normol orientation to improve display (-n option):
+ $ meshViewer -i marching-cubes.off -n   
+ @endcode
+
+
+ You should obtain such a result:
+ @image html res3dVolMarchingCubes.png "Resulting visualization."
+
+ You can test on other samples like http://www.tc18.org/code_data_set/3D_greyscale/bonsai.vol.bz2
+@code 
+$ 3dVolMarchingCubes -i bonsai.vol  -t 80
+@endcode 
+ You should obtain such a result:
+ @image html res3dVolMarchingCubes2.png "Resulting visualization."
+
+
+ @see
+ \ref 3dVolMarchingCubes.cpp
+ 
+ */
+
+
+
 int main( int argc, char** argv )
 {
   //! [3dVolMarchingCubes-parseCommandLine]
   // parse command line ----------------------------------------------
-  po::options_description general_opt("Allowed options are: ");
+  po::options_description general_opt("Allowed options are ");
   general_opt.add_options()
     ("help,h", "display this message")
     ("input,i", po::value<std::string>(), "the volume file (.vol)" )
@@ -133,7 +201,11 @@ int main( int argc, char** argv )
   typedef ImageLinearCellEmbedder< KSpace, Image, MyEmbedder > CellEmbedder;
   CellEmbedder cellEmbedder;
   MyEmbedder trivialEmbedder;
-  cellEmbedder.init( ks, image, trivialEmbedder, threshold );
+
+  // The +0.5 is to avoid isosurface going exactly through a voxel
+  // center, especially for binary volumes.
+  cellEmbedder.init( ks, image, trivialEmbedder, 
+                     ( (double) threshold ) + 0.5 );
   std::ofstream out( outputFilename.c_str() );
   if ( out.good() )
     digSurf.exportEmbeddedSurfaceAs3DOFF( out, cellEmbedder );

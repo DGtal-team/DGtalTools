@@ -59,6 +59,75 @@ using namespace DGtal;
 
 
 
+/**
+ @page  Doc3dImplicitSurfaceExtractorByThickening 3dImplicitSurfaceExtractorByThickening
+ 
+ @brief Computes the zero level set of the given polynomial.
+
+ @b Usage:  3dImplicitSurfaceExtractorByThickening [options] input
+
+ @b Allowed @b options @b are :
+ 
+ @code
+  -h [ --help ]                         display this message
+  -p [ --polynomial ] arg               the implicit polynomial whose 
+                                        zero-level defines the shape of 
+                                        interest.
+  -a [ --minAABB ] arg (=-10)           the min value of the AABB bounding box 
+                                        (domain)
+  -A [ --maxAABB ] arg (=10)            the max value of the AABB bounding box 
+                                        (domain)
+  -g [ --gridstep ] arg (=1)            the gridstep that defines the 
+                                        digitization (often called h). 
+  -t [ --thickness ] arg (=0.01)        the thickening parameter for the 
+                                        implicit surface.
+  -P [ --project ] arg (=Newton)        defines the projection: either No or 
+                                        Newton.
+  -e [ --epsilon ] arg (=9.9999999999999995e-07)
+                                        the maximum precision relative to the 
+                                        implicit surface in the Newton 
+                                        approximation of F=0.
+  -n [ --max_iter ] arg (=500)          the maximum number of iteration in the 
+                                        Newton approximation of F=0.
+  -v [ --view ] arg (=Normal)           specifies if the surface is viewed as 
+                                        is (Normal) or if places close to 
+                                        singularities are highlighted 
+                                        (Singular), or if unsure places should 
+                                        not be displayed (Hide). @endcode
+
+ @endcode
+ 
+ @b Example: 
+ @code
+ 3dImplicitSurfaceExtractorByThickening -p "x^2-y*z^2" -g 0.1 -a -2 -A 2 -v Singular
+ @endcode
+
+
+ You should obtain such a result:
+
+ @image html res3dImplicitSurfaceExtractorByThickening.png "resulting visualisation."
+
+
+ You could also use other implicit surfaces:
+ - whitney  : x^2-y*z^2
+ - 4lines   : x*y*(y-x)*(y-z*x)
+ - cone     : z^2-x^2-y^2
+ - simonU   : x^2-z*y^2+x^4+y^4
+ - cayley3  : 4*(x^2 + y^2 + z^2) + 16*x*y*z - 1
+ - crixxi   : -0.9*(y^2+z^2-1)^2-(x^2+y^2-1)^3
+
+Some other examples (more difficult):
+@code 
+3dImplicitSurfaceExtractorByThickening -a -2 -A 2 -p "((y^2+z^2-1)^2-(x^2+y^2-1)^3)*(y*(x-1)^2-z*(x+1))^2" -g 0.025 -e 1e-6 -n 50000 -v Singular -t 0.5 -P Newton
+3dImplicitSurfaceExtractorByThickening -a -2 -A 2 -p "(x^5-4*z^3*y^2)*((x+y)^2-(z-x)^3)" -g 0.025 -e 1e-6 -n 50000 -v Singular -t 0.05 -P Newton
+ 
+ @endcode
+ @see
+ @ref 3dImplicitSurfaceExtractorByThickening.cpp
+
+ */
+
+
 template <typename CellOutputIterator, typename DigitalSurface>
 void
 analyzeSurface( CellOutputIterator itSure, CellOutputIterator itUnsure, DigitalSurface surface )

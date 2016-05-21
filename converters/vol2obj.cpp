@@ -15,7 +15,7 @@
  **/
 /**
  * @file vol2obj.cpp
- * @ingroup Examples
+ * @ingroup Converters
  * @author David Coeurjolly (\c david.coeurjolly@liris.cnrs.fr)
  *
  * @date 2013/10/13
@@ -45,7 +45,7 @@ using namespace Z3i;
 
 /**
  @page vol2obj vol2obj
- @brief Convert any volumetric file to an OBJ one. Each grid point with value between
+ @brief Converts any volumetric file to an OBJ one. Each grid point with value between
  [@a thresholdMin,@a thresholdMax] is exported as a unit cube.
 
 
@@ -63,7 +63,8 @@ using namespace Z3i;
    -M [ --thresholdMax ] arg (=255) threshold max to define binary shape
 @endcode
 
-@see vol2obj.cpp
+@see
+vol2obj.cpp
 
 */
 ///////////////////////////////////////////////////////////////////////////////

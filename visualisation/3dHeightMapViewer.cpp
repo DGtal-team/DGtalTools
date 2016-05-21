@@ -58,12 +58,51 @@ using namespace Z3i;
 namespace po = boost::program_options;
 
 
+/**
+ @page Doc3dHeightMapViewer 3dHeightMapViewer
+ 
+ @brief  Displays 2D image as heightmap by using QGLviewer.
+
+ @b Usage:  3dImageViewer [options] input
+ 
+
+ @b Allowed @b options @b are :
+ 
+ @code
+  -h [ --help ]                  display this message
+  -s [ --scale ] arg (=1)        set the scale of the maximal level. (default 
+                                 1.0)
+  -c [ --colorMap ]              define the heightmap color with a pre-defined 
+                                 colormap (GradientColorMap)
+  -t [ --colorTextureImage ] arg define the heightmap color from a given color 
+                                 image (32 bits image).
+  -i [ --input-file ] arg        2d input image representing the height map 
+                                 (given as grayscape image cast into 8 bits).
+
+ @endcode
+
+
+ @b Example: 
+ 
+ @code
+ $ visualisation/3dHeightMapViewer -i ${DGtal}/examples/samples/church.pgm -s 0.2
+ @endcode 
+
+ You should obtain such a result:
+
+ @image html res3dHeightMapViewer.png "resulting heightmap visualisation."
+ 
+
+ @see
+ @ref 3dHeightMapViewer.cpp
+
+ */
 
 template < typename Space = DGtal::Z3i::Space, typename KSpace = DGtal::Z3i::KSpace>
 struct Viewer3DImageSpec: public DGtal::Viewer3D <Space, KSpace>
 {
-  Viewer3DImageSpec(RealPoint pup, RealPoint plow): myZScale(1.0), myZposClipping(10.0),
-                                                    myPUpper(pup), myPLower(plow){
+  Viewer3DImageSpec(Z2i::RealPoint pup, Z2i::RealPoint plow): myZScale(1.0), myZposClipping(10.0),
+                                                              myPUpper(pup), myPLower(plow){
     DGtal::Viewer3D<>::update();
   };
 
@@ -81,7 +120,7 @@ init(){
 protected:
   double myZScale;
   double myZposClipping;
-  RealPoint myPUpper, myPLower;
+  Z2i::RealPoint myPUpper, myPLower;
 
   virtual void draw (  ){
     DGtal::Viewer3D<>::draw();
@@ -193,7 +232,7 @@ int main( int argc, char** argv )
   if( !parseOK || vm.count("help")||argc<=1)
     {
       std::cout << "Usage: " << argv[0] << " [input-file]\n"
-                << "Display a 2D image as heightmap by using QGLviewer"<< endl
+                << "Displays 2D image as heightmap by using QGLviewer. "<< endl
                 << general_opt << "\n" <<
                 "Exemple of use:  visualisation/3dHeightMapViewer -i ${DGtal}/examples/samples/church.pgm -s 0.2" << std::endl;
 
@@ -224,12 +263,12 @@ int main( int argc, char** argv )
   }
 
   QApplication application(argc,argv);
-  RealPoint plow (image.domain().lowerBound()[0]-0.5,
-                  image.domain().lowerBound()[1]-0.5,
-                  image.domain().lowerBound()[2]-0.5);
-  RealPoint pup (image.domain().upperBound()[0]+0.5,
-                 image.domain().upperBound()[1]+0.5,
-                 image.domain().upperBound()[2]+0.5);
+  Z2i::RealPoint plow (image.domain().lowerBound()[0]-0.5,
+                       image.domain().lowerBound()[1]-0.5);
+  
+  Z2i::RealPoint pup (image.domain().upperBound()[0]+0.5,
+                      image.domain().upperBound()[1]+0.5);
+  
   Viewer3DImageSpec<> viewer(plow, pup) ;
   viewer.setWindowTitle("Height Map Viewer");
   viewer.show();

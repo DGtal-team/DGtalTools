@@ -50,6 +50,66 @@ using namespace DGtal;
 ///////////////////////////////////////////////////////////////////////////////
 namespace po = boost::program_options;
 
+/**
+ @page mesh2heightfield mesh2heightfield
+ @brief  Converts a mesh file into a projected 2D image given from a normal direction N and from a starting point P.
+
+ The 3D mesh is discretized and scanned in the normal direction N, starting from P with a step 1. 
+
+
+@b Usage: mesh2heightfield [input] [output]
+
+@b Allowed @b options @b are:
+
+@code
+  -h [ --help ]                   display this message
+  -i [ --input ] arg              mesh file (.off) 
+  -s [ --meshScale ] arg (=1)     change the default mesh scale (each vertex 
+                                  multiplied by the scale) 
+  -o [ --output ] arg             sequence of discrete point file (.sdp) 
+  --orientAutoFrontX              automatically orients the camera in front 
+                                  according the x axis.
+  --orientAutoFrontY              automatically orients the camera in front 
+                                  according the y axis.
+  --orientAutoFrontZ              automatically orients the camera in front 
+                                  according the z axis.
+  --orientBack                    change the camera direction to back instead 
+                                  front as given in  orientAutoFront{X,Y,Z} 
+                                  options.
+  --nx arg (=0)                   set the x component of the projection 
+                                  direction.
+  --ny arg (=0)                   set the y component of the projection 
+                                  direction.
+  --nz arg (=1)                   set the z component of the projection 
+                                  direction.
+  -x [ --centerX ] arg (=0)       choose x center of the projected image.
+  -y [ --centerY ] arg (=0)       choose y center of the projected image.
+  -z [ --centerZ ] arg (=1)       choose z center of the projected image.
+  --width arg (=100)              set the width of the area to be extracted as 
+                                  an height field image.
+  --height arg (=100)             set the height of the area to extracted  as 
+                                  an height field image.
+  --heightFieldMaxScan arg (=255) set the maximal scan deep.
+  --exportNormals                 export mesh normal vectors (given in the 
+                                  image height field basis).
+  --backgroundNormalBack          set the normals of background in camera 
+                                  opposite direction (to obtain a black 
+                                  background in rendering). 
+  --setBackgroundLastDepth        change the default background (black with the
+                                  last filled intensity).
+
+@endcode
+
+@b Example:
+@code
+  $ mesh2heightfield -i ${DGtal}/examples/samples/tref.off --orientAutoFrontZ --width 25 --height 25 -o heighfield.pgm -s 10  
+
+@endcode
+You will obtain such image:
+@image html  resMesh2heightfield.png "Resulting heightfield."
+@see mesh2heightfield.cpp
+
+*/
 
 
 template<typename TPoint, typename TEmbeder>
@@ -96,7 +156,7 @@ int main( int argc, char** argv )
                                    Image3D::Value,  DGtal::functors::Identity >  ImageAdapterExtractor;
   
   // parse command line ----------------------------------------------
-  po::options_description general_opt("Allowed options are: ");
+  po::options_description general_opt("\nAllowed options are");
   general_opt.add_options()
     ("help,h", "display this message")
     ("input,i", po::value<std::string>(), "mesh file (.off) " )

@@ -14,8 +14,8 @@
  *
  **/
 /**
- * @file slice2vol.cpp
- * @ingroup surfaceTools
+ * @file vol2slice.cpp
+ * @ingroup Converters
  * @author Bertrand Kerautret (\c kerautre@loria.fr )
  * LORIA (CNRS, UMR 7503), University of Nancy, France
  *
@@ -49,6 +49,46 @@ using namespace DGtal;
 ///////////////////////////////////////////////////////////////////////////////
 namespace po = boost::program_options;
 
+/**
+ @page vol2slice vol2slice
+ @brief  Convert a volumetric file (.vol, .longvol, .pgm3d) into a set of 2D slice  images.
+
+@b Usage: vol2slice [input] [output]
+
+@b Allowed @b options @b are:
+
+@code
+  -h [ --help ]                      display this message
+  -i [ --input ] arg                 input volumetric file (.vol, .longvol, 
+                                     .pgm3d) 
+  -o [ --output ] arg                base_name.extension:  extracted 2D slice 
+                                     volumetric files (will result n files 
+                                     base_name_xxx.extension) 
+  -f [ --setFirstSlice ] arg (=0)    Set the first slice index to be extracted.
+  -l [ --setLastSlice ] arg          Set the last slice index to be extracted 
+                                     (by default set to maximal value according
+                                     to the given volume).
+  -s [ --sliceOrientation ] arg (=2) specify the slice orientation for which 
+                                     the slice are defined (by default =2 (Z 
+                                     direction))
+
+@endcode
+
+@b Example:
+@code 
+   # Export Z slice images (-s 2): 
+   $ vol2slice -i ${DGtal}/examples/samples/lobster.vol -o slice.pgm  -f 10 -l 15 -s 2
+@endcode
+
+You should obtain such a visualization:
+@image html resVol2slice.png "resulting visualisation."
+
+@see
+@ref vol2slice.cpp
+
+*/
+
+
 int main( int argc, char** argv )
 {
   typedef ImageContainerBySTLVector < Z3i::Domain, unsigned char > Image3D;
@@ -79,7 +119,7 @@ int main( int argc, char** argv )
   po::notify(vm);
 
 
-  if( !parseOK || vm.count("help"))
+  if( !parseOK || !  vm.count("input")||! vm.count("output") || vm.count("help"))
     {
       std::cout << "Usage: " << argv[0] << " [inputs] [output]\n"
 		<< "Convert a volumetric file (.vol, .longvol, .pgm3d) into a set of 2D slice  images."

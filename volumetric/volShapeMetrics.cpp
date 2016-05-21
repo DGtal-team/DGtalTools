@@ -49,6 +49,80 @@ using namespace Z3i;
 
 namespace po = boost::program_options;
 
+
+
+/**
+ @page volShapeMetrics volShapeMetrics
+ 
+ @brief Applies shape measures for comparing two volumetric images A and B (shape defined from thresholds).
+
+ Usefull to determine classical statistics like false positive related stats.
+ 
+
+
+ @b Usage: volShapeMetrics --volA \<volAFilename\> --volB \<volBFilename\> 
+
+
+ @b Allowed @b options @b are : 
+ @code
+  -h [ --help ]               display this message.
+  -a [ --volA ] arg           Input filename of volume A (vol format, and other
+                              pgm3d can also be used).
+  -b [ --volB ] arg           Input filename of volume B (vol format, and other
+                              pgm3d can also be used).
+  --aMin arg (=0)             min threshold for a voxel to be considered as 
+                              belonging to the object of volume A. (default 0)
+  --aMax arg (=128)           max threshold for a voxel to be considered as 
+                              belonging to the object of volume A. (default 
+                              128)
+  --bMin arg (=0)             min threshold for a voxel to be considered as 
+                              belonging to the object of volume B. (default 0)
+  --bMax arg (=128)           max threshold for a voxel to be considered as 
+                              belonging to the object of volume B. (default 
+                              128)
+  --noDistanceComparisons     to avoid to apply distance map computation if the
+                              distance comparaison are not needed.
+  --distancesFromBnotInAOnly  apply distance map measures only for voxels of B 
+                              which are not in A (else the measure are given 
+                              from all distances of the object B).
+  --displayTFstats            Change the comparison diplay by using the  
+                              true/false/positive/negative notation and 
+                              considering the shape A as reference. It also 
+                              display precision/recall/f-mean statistics.
+  --exportSDP                 Export voxels belonging to each categorie (voxels
+                              of ( B in A) , (NOT in B and NOT in A),   (B and 
+                              NOT in A) and (Voxels of NOT in B and in A)). 
+
+ @endcode
+
+ @b Example: 
+
+To test this tool, we need to generate a volumetric file to be compared to an original one:
+ @code
+# generation of the file "eroded.vol" from DGtal examples:
+$ $DGtal/build/examples/tutorial-examples/FMMErosion
+ @endcode
+
+Then we can apply comparisons of the two shapes:
+
+@code
+$ volShapeMetrics -a eroded.vol --aMin 1 --aMax 255 -b $DGtal/examples/samples/cat10.vol --bMin 1 --bMax 255 --displayTFstats --exportSDP 
+@endcode
+
+You should obtain different comparison measures and you can display the set of voxels associated to the false positive ( falsePos.sdp ):
+@code 
+$ 3dSDPViewer -i falsePos.sdp -c 250 40 40 5
+@endcode
+
+ @image html resVolShapeMetrics.png "Resulting False positive set of voxels."
+ 
+ @see
+ @ref volShapeMetrics.cpp
+
+ */
+
+
+
 typedef ImageContainerBySTLVector < Z3i::Domain,  int > Image3D;
 typedef ImageContainerBySTLVector < Z2i::Domain,  int > Image2D;
 
@@ -229,14 +303,14 @@ int main(int argc, char**argv)
   
   if ( !parseOK || vm.count ( "help" ) || ! vm.count("volA")||! vm.count("volB") )
     {
-      trace.info() << "Apply shape measures for comparing two volumetric images A and B (shape defined from thresholds) " << std::endl
-		   << "      - voxel count from voxel partition (number of voxel from (B-A), (A-B) ...). Usefull to determine classical statistics like false positive related stats."<<std::endl
-		   << "      - Euclidean distance between two volumetric images A and B " << std::endl
-		   << "apply shape measure: euclidean distance between two volumetric images A and B (shape defined from thresholds)" << std::endl
+      trace.info() << "Apply shape measures for comparing two volumetric images A and B (shape defined from thresholds). " << std::endl
+                   << "It can compute:" << std::endl
+                   << "      - voxel count from voxel partition (number of voxel from (B-A), (A-B) ...): usefull to determine classical statistics like false positive related stats."<<std::endl
+		   << "      - euclidean distance between two volumetric images A and B " << std::endl
 		   << std::endl << "Basic usage: "<< std::endl
 		   << "\t volShapeMetrics --volA <volAFilename> --volB <volBFilename> "<< std::endl
 		   << general_opt << "\n"
-		   << "Typical use :\n  volShapeMetrics -a imageA.vol --aMin 128 --aMax 255 -b imageB.vol --bMin 128 --bMax 255 --distanceFromBnotInAOnly \n" ;
+		   << "Typical use :\n  volShapeMetrics -a imageA.vol --aMin 128 --aMax 255 -b imageB.vol --bMin 128 --bMax 255 --distancesFromBnotInAOnly \n" ;
  
       return 0;
     }

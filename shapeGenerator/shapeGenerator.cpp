@@ -56,6 +56,75 @@ using namespace DGtal;
 
 
 /**
+ @page shapeGeneratorPrg shapeGenerator
+ @brief  Generates shapes using DGtal library.
+ 
+ 
+
+ @b Usage:  shapeGenerator [options] --shape <shapeName> --output <outputBasename>
+ 
+ @b Allowed @b options @b are:
+ 
+ @code
+  -h [ --help ]                    display this message
+  -s [ --shape ] arg               Shape name
+  -l [ --list ]                    List all available shapes
+  -R [ --radius ] arg              Radius of the shape
+  -A [ --axis1 ] arg               Half big axis of the shape (ellipse)
+  -a [ --axis2 ] arg               Half small axis of the shape (ellipse)
+  -r [ --smallradius ] arg (=5)    Small radius of the shape
+  -v [ --varsmallradius ] arg (=5) Variable small radius of the shape
+  -k [ --k ] arg (=3)              Number of branches or corners the shape
+  --phi arg (=0)                   Phase of the shape (in radian)
+  -w [ --width ] arg (=10)         Width of the shape
+  -p [ --power ] arg (=2)          Power of the metric (double)
+  -o [ --output ] arg              Basename of the output file
+  --signature                      Display to the standard output the signature
+                                   (normal, curvature) at each point of the 
+                                   specified shape contour (middle point of 
+                                   each contour linel)
+  -f [ --format ] arg (=pgm)       Output format:
+                                     Bitmap {pgm, raw}
+                                     Vector {svg} (+ {png,pdf} if libCairo 
+                                   installed)
+ @endcode
+ You can list the potential shapes:
+ @code 
+ $ contourGenerator --list
+ 2D Shapes:
+	ball	Ball for the Euclidean metric.
+		Required parameter(s): --radius [-R]   
+	square	square (no signature).
+		Required parameter(s): --width [-w]   
+	lpball	Ball for the l_power metric (no signature).
+		Required parameter(s): --radius [-R], --power [-p]  
+	flower	Flower with k petals with radius ranging from R+/-v.
+		Required parameter(s): --radius [-R], --varsmallradius [-v], --k [-k], --phi
+	ngon	Regular k-gon.
+		Required parameter(s): --radius [-R], --k [-k], --phi 
+	accflower	Accelerated Flower with k petals.
+		Required parameter(s): --radius [-R], --varsmallradius [-v], --k [-k], --phi
+	ellipse	Ellipse.
+		Required parameter(s): --axis1 [-A], --axis2 [-a], --phi 
+
+ @endcode 
+
+ @b Example:
+ @code
+ # generate an accflower shape with 6 petals of maximal radius 40 and small radius 10:
+ shapeGenerator -s accflower -R 40 -v 10 -k 6   -f pgm  -o test2
+ @endcode
+ 
+ You should obtain such a resulting image:
+ @image html resShapeGenerator.png "resulting visualisation of generated shape."
+ 
+
+ @see
+ @ref shapeGenerator.cpp
+ @ref contourGenerator
+ */
+
+/**
  * Global vectors to describe the available shapes and their
  * parameters.
  */

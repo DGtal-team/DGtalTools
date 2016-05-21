@@ -45,6 +45,32 @@ using namespace std;
 using namespace DGtal;
 
 
+/**
+ @page slice2vol slice2vol
+ @brief  Converts set of 2D images into volumetric file  (pgm3d, vol, longvol).
+
+@b Usage: slice2vol [input] [output]
+
+@b Allowed @b options @b are:
+
+@code
+  -h [ --help ]                      display this message
+  -s [ --sliceOrientation ] arg (=2) specify the slice orientation for which the slice are considered (by default =2 (Z direction))
+  -i [ --input ] arg                 input 2D files (.pgm) 
+  -o [ --output ] arg                volumetric file (.vol, .longvol .pgm3d) 
+@endcode
+
+@b Example:
+@code
+  $ slice2vol -i slice1.pgm slice2.pgm slice3.pgm  -o out.vol
+@endcode
+
+@see
+slice2vol.cpp
+
+*/
+
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace po = boost::program_options;
 
@@ -74,13 +100,13 @@ int main( int argc, char** argv )
   po::notify(vm);    
   
 
-  if( !parseOK || vm.count("help"))
+  if( ! vm.count("input") || ! vm.count("output") || !parseOK || vm.count("help"))
     {
       std::cout << "Usage: " << argv[0] << " [input-files] [output]\n"
-		<< "Convert set of 2D images into volumetric file  (pgm3d, vol, longvol) "
+		<< "Converts set of 2D images into volumetric file  (pgm3d, vol, longvol). "
 		<< general_opt << "\n";
       std::cout << "Example:\n"
-                << "slice2vol -i slice1.pgm slice2.pgm slice3.pgm  -o vol.p3d \n"
+                << "slice2vol -i slice1.pgm slice2.pgm slice3.pgm  -o out.vol \n"
                 << "see vol2slice"<<endl; 
        
       return 0;

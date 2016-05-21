@@ -41,6 +41,38 @@
 using namespace std;
 using namespace DGtal;
 
+/**
+ @page sdp2vol sdp2vol
+ @brief  Converts digital set of points into a volumic file.
+
+@b Usage: sdp2vol [input] [output]
+
+@b Allowed @b options @b are:
+
+@code
+  -h [ --help ]                     display this message
+  -i [ --input ] arg                Sequence of 3d Discrete points (.sdp) 
+  -o [ --output ] arg               Vol file  (.vol, .longvol, .pgm3d) 
+  -f [ --foregroundVal ] arg (=128) value which will represent the foreground 
+                                    object in the resulting image (default 128)
+  --invertY                         Invert the Y axis (image flip in the y 
+                                    direction)
+  -b [ --backgroundVal ] arg (=0)   value which will represent the background 
+                                    outside the  object in the resulting image 
+                                    (default 0)
+  -d [ --domain ] arg               The domain of the resulting image xmin ymin
+                                    zmin xmax ymax zmax 
+@endcode
+
+@b Example:
+@code
+  $ sdp2vol -i volumePoints.sdp -o volume.vol -d 0 0 0 10 10 10
+@endcode
+
+@see sdp2vol.cpp
+
+*/
+
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace po = boost::program_options;
@@ -71,9 +103,9 @@ int main( int argc, char** argv )
   po::notify(vm);    
   if( !parseOK || vm.count("help"))
     {
-      std::cout << "Usage: " << argv[0] << " [input-file] [output]\n"
-		<< "Convert digital set of points into a volumic file."
-		<< general_opt << "\n";
+      std::cout      << "Convert digital set of points into a volumic file.\n";
+      std::cout << "Usage: " << argv[0] << " [input] [output]\n"
+                << general_opt << "\n";
       std::cout << "Example:\n"
 		<< "sdp2vol -i volumePoints.sdp -o volume.vol -d 0 0 0 10 10 10 \n";
       return 0;
