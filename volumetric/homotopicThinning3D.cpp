@@ -60,6 +60,45 @@ namespace po = boost::program_options;
 ///////////////////////////////////////////////////////////////////////////////
 
 /**
+ @page homotopicThinning3D homotopicThinning3D
+ 
+ @brief Applies an homotopic thinning of a 3d image file (vol,longvol,pgm3d...) with 3D viewer.
+
+ @b Usage: homotopicThinning3d [options] --input <3dImageFileName>  {vol,longvol,pgm3d...}
+
+
+ @b Allowed @b options @b are : 
+ @code
+  -h [ --help ]              display this message.
+  -i [ --input ] arg         Input volumetric file (.vol, .pgm3d or p3d)
+  -m [ --min ] arg (=0)      Minimum (excluded) value for threshold.
+  -M [ --max ] arg (=255)    Maximum (included) value for threshold.
+  -e [ --exportSDP ] arg     Export the resulting set of points in a simple 
+                             (sequence of discrete point (sdp)).
+  --fixedPoints arg          defines the coordinates of points which should not
+                             be removed.
+  -s [ --fixedPointSDP ] arg use fixed points from a file.
+
+ @endcode
+
+ @b Example: 
+ 
+ Usage by forcing point to be left by the thinning: 
+ 
+@code
+ $  homotopicThinning3D --input ${DGtal}/examples/samples/Al.100.vol  --fixedPoints 56 35 5  56 61 5  57 91 38  58 8 38  45 50 97 
+ @endcode
+
+
+ You should obtain such a result:
+ @image html resHomotopicThinning3D.png "Resulting visualization."
+ 
+ @see
+ @ref homotopicThinning3D.cpp
+
+ */
+
+/**
  * Missing parameter error message.
  *
  * @param param
@@ -142,7 +181,7 @@ int main( int argc, char** argv )
       for( unsigned int i=0; i < vectC.size()-2; i=i+3)
         {
           Z3i::Point pt(vectC.at(i), vectC.at(i+1), vectC.at(i+2));
-        // FIXME: xedSet.insertNew(pt);
+          fixedSet.insertNew(pt);
         }
     }else{
       trace.error()<< " The coordinates should be 3d coordinates, ignoring fixedPoints option." << std::endl;
@@ -153,7 +192,7 @@ int main( int argc, char** argv )
       std::vector<Z3i::Point> vPt = PointListReader<Z3i::Point>::getPointsFromFile(vm["fixedPointSDP"].as<std::string>());
       for( auto &p: vPt)
         {
-          // FIXME: xedSet.insert(p);
+          fixedSet.insert(p);
         }
     }
   

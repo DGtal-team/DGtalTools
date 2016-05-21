@@ -45,6 +45,52 @@
 
 using namespace DGtal;
 
+
+/**
+ @page statisticsEstimators statisticsEstimators
+ 
+ @brief   Computes satistics (L1, L2, Loo) from results of two estimators.
+
+ @b Usage: 	statisticsEstimators --file1 <file1> --column1 <column1> --file2 <file2> --column2 <column2> --output <output>
+
+
+ @b Allowed @b options @b are : 
+ @code
+  -h [ --help ]           display this message
+  -f [ --file1 ] arg      File 1
+  -F [ --file2 ] arg      File 2
+  -c [ --column1 ] arg    Column of file 1
+  -C [ --column2 ] arg    Column of file 2
+  -o [ --output ] arg     Output file
+  -m [ --monge ] arg (=0) Is from Monge mean computation (optional)
+ @endcode
+
+ @b Example: 
+
+ This tool can be used in association to other estimator with for instance the @ref Doc2dLocalEstimators which gives as output a file containing the curvature:
+
+ @code
+ ./estimators/2dlocalEstimators --output curvature --shape flower --radius 15 -v 5  --gridstep 1  --estimators 11100 --properties 01
+ @endcode
+
+Then you can use this tool as follows:
+@code 
+ ./estimators/statisticsEstimators --file1 curvature_True_curvature.dat --column1 0 --file2 curvature_II_curvature.dat --column2 0 -o result.dat
+@endcode
+
+
+The resulting file  result.dat should contains:
+@verbatim
+# h | L1 Mean Error | L2 Mean Error | Loo Mean Error
+1 0.0844106 0.0108399 0.519307
+@endverbatim
+ 
+ @see
+ @ref statisticsEstimators.cpp
+
+ */
+
+
 /**
  * @brief LoadingStringFromFile Load the current line from an open file, and go to the next line.
  *
@@ -114,7 +160,7 @@ int ComputeStatistics ( const std::string & inputdata1,
     {
         while ( s1[ 0 ] == '#' )
         {
-            unsigned int p = s1.find( "# h = " );
+            std::size_t  p = s1.find( "# h = " );
             if ( p != std::string::npos )
             {
                 h = atof((s1.erase( p, 5 )).c_str());
@@ -183,7 +229,7 @@ int ComputeStatistics ( const std::string & inputdata1,
 
     double meanL1 = L1 / (double)nb_elements;
     double meanL2 = ( sqrt ( L2 )) / (double)nb_elements;
-
+    
     output << h << " "
            << meanL1 << " "
            << meanL2 << " "
@@ -234,10 +280,11 @@ int main( int argc, char** argv )
     po::notify( vm );
     if( !parseOK || vm.count("help") || argc <= 1 )
     {
-        trace.info()<< "Compute satistics (L1, L2, Loo) from results of two extimators" <<std::endl
+        trace.info()<< "Compute satistics (L1, L2, Loo) from results of two estimators" <<std::endl
                     << "Basic usage: "<<std::endl
-                    << "\tstatisticsEstimators_0memory --file1 <file1> --column1 <column1> --file2 <file2> --column2 <column2> --output <output>"<<std::endl
-                    << std::endl;
+                    << "\tstatisticsEstimators --file1 <file1> --column1 <column1> --file2 <file2> --column2 <column2> --output <output>"<<std::endl
+                    << std::endl
+                    << general_opt << std::endl;
 
         return 0;
     }
@@ -256,9 +303,11 @@ int main( int argc, char** argv )
     std::string output_filename = vm["output"].as< std::string >();
     bool isMongeMean = vm["monge"].as< bool >();
 
+    std::ifstream inFileEmptyTest; inFileEmptyTest.open(output_filename.c_str());
+    bool isNew = inFileEmptyTest.peek() == std::ifstream::traits_type::eof(); inFileEmptyTest.close();
     std::ofstream file( output_filename.c_str(), std::ofstream::out | std::ofstream::app );
 
-    if( file.eof() )
+    if( isNew )
     {
         file << "# h | "
              << "L1 Mean Error | "

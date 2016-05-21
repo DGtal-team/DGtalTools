@@ -1,0 +1,47 @@
+/**
+ * @file shapeGenerator.dox
+ * @author Bertrand Kerautret 
+ * LORIA (CNRS, UMR 7503), University of Lorraine, France
+ *
+ * @date 2016/05/09
+ *
+ * Documentation file for shapeGenerator
+ *
+ * This file is part of the DGtal library.
+ */
+
+
+//----------------------------------------
+/*!
+@page shapeGenerator
+@writers Bertrand Kerautret
+
+@section shapeGenerator_Doc Shape Generator
+
+
+Utilities to generate various contours/shapes:
+
+  - @ref contourGenerator :  generates multigrid contours of 2d digital shapes using DGtal library.
+  - @ref shapeGeneratorPrg : generates shapes using DGtal library.
+  
+
+
+
+<center>
+<table>
+
+  <tr>
+        <td><img height=200px src="resContourGenerator.png"></td>             
+        <td><img height=200px src="resShapeGenerator.png"></td>        
+  </tr>
+  <tr>
+  <td align=center>@ref contourGenerator</td>
+  <td align=center>@ref shapeGeneratorPrg </td>
+  </tr>
+ 
+
+
+</table>
+</center>
+
+*/

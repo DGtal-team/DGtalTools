@@ -49,6 +49,37 @@ using namespace DGtal;
 ///////////////////////////////////////////////////////////////////////////////
 namespace po = boost::program_options;
 
+/**
+ @page heightfield2vol heightfield2vol
+ @brief  Converts a 2D heightfield image into a volumetric file.
+
+@b Usage: heightfield2vol [input] [output]
+
+@b Allowed @b options @b are:
+
+@code
+  -h [ --help ]                       display this message
+  -i [ --input ] arg                  heightfield file.
+  -o [ --output ] arg                 volumetric file 
+  -s [ --scale ] arg (=1)             set the scale factor on height values. 
+                                      (default 1.0)
+  -z [ --volZ ] arg (=255)            set the Z max value of domain.
+  -f [ --foregroundValue ] arg (=128) specify the foreground value of the 
+                                      resulting voxel.
+  -b [ --backgroundValue ] arg (=0)   specify the background value of the 
+                                      resulting volumetric file.
+@endcode
+
+@b Example:
+@code
+  $ heightfield2vol -i ${DGtal}/examples/samples/church.pgm -o volResu.vol -s 0.3 -z 50  
+
+@endcode
+You will obtain such image:
+@image html  resHeightfield2vol.png "Resulting image."
+@see heightfield2vol.cpp
+
+*/
 
 
 
@@ -121,7 +152,7 @@ int main( int argc, char** argv )
   if( !parseOK || vm.count("help")||argc<=1)
     {
       std::cout << "Usage: " << argv[0] << " [input] [output]\n"
-		<< "Convert a 2D heightfield image into a volumetric file."
+		<< "Convert a 2D heightfield image into a volumetric file. "
 		<< general_opt << "\n";
       std::cout << "Example:\n"
 		<< "heightfield2vol -i ${DGtal}/examples/samples/church.pgm -o volResu.vol -s 0.3 -z 50  \n";

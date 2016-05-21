@@ -46,6 +46,55 @@ using namespace std;
 using namespace DGtal;
 
 
+
+/**
+ @page volReSample volReSample
+ 
+ @brief Re samples a 3D volumetric image (.vol, .longvol, .pgm3d)  with a given grid size.
+
+ @b Usage: volReSample [input-files] [output-file]
+
+
+ @b Allowed @b options @b are : 
+ @code
+  -h [ --help ]         display this message
+  -i [ --input ] arg    input volumetric file (.vol, .longvol, .pgm3d) 
+  -o [ --output ] arg   the new volumetric file (.vol, .longvol, .pgm3d) 
+  -g [ --gridSize ] arg size_x size_y size_z : the grid size of the re sampling
+ @endcode
+
+ @b Example: 
+
+Here is an example of re sampling with different grid sizes 2, 4 and 8:
+
+ @code
+ $ volReSample -i $DGtal/examples/samples/Al.100.vol -g 2 2 2  -o AlRS2.vol
+ $ volReSample -i $DGtal/examples/samples/Al.100.vol -g 4 4 4  -o AlRS4.vol
+ $ volReSample -i $DGtal/examples/samples/Al.100.vol -g 8 8 8  -o AlRS8.vol
+ @endcode
+
+We can convert the resulting volumetric files into a sequence of discrete points with the tool  @ref vol2sdp :
+@code 
+$ vol2sdp -i $DGtal/examples/samples/Al.100.vol -m 1 -o AlRS1.sdp
+$ vol2sdp -i  AlRS2.vol -m 1 -o AlRS2.sdp
+$ vol2sdp -i  AlRS4.vol -m 1 -o AlRS4.sdp
+$ vol2sdp -i  AlRS8.vol -m 1 -o AlRS8.sdp
+$ cat AlRS{1,2,4,8}.sdp >> AlRS1_2_4_8.sdp
+# display the resulting file:
+3dSDPViewer -i  AlRS1_2_4_8.sdp    
+@endcode
+
+
+
+ You should obtain such a result:
+ @image html resVolReSample.png "Resulting of re sampling with grid size = 2, 4 and 8."
+ 
+ @see
+ @ref volReSample.cpp
+
+ */
+
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace po = boost::program_options;
 
@@ -78,19 +127,15 @@ int main( int argc, char** argv )
   po::notify(vm);
 
 
-  if(! vm.count("input")||! vm.count("output"))
-    {
-      trace.error() << " Input and output filename are needed to be defined" << endl;
-      parseOK=false;
-    }
 
-  if( !parseOK || vm.count("help") || !vm.count("gridSize") )
+  if( !parseOK || vm.count("help") || !vm.count("gridSize") || ! vm.count("input")||! vm.count("output") )
     {
       std::cout << "Usage: " << argv[0] << " [input-files] [output-file]\n"
-		<< "Re sample a 3D volumetric image (.vol, .longvol, .pgm3d)  with a given grid size."
+		<< "Re sample a 3D volumetric image (.vol, .longvol, .pgm3d)  with a given grid size. \n"
 		<< general_opt << "\n";
-      std::cout << "Example: to re sampling an image with scale x,y,z  0.98, 0.98, 5.0 you can obtain it by: \n"
-		<< "volResSample -i image3d.vol -g 1.02 1.02 0.2  -o imageReSampled.vol \n" << endl;
+      std::cout << "Example:\n to re sample an image with scale x,y,z  = 0.98, 0.98, 5.0,  you can do: \n"
+		<< "volResSample -i image3d.vol -g 1 1 2  -o imageReSampled.vol \n" << endl;
+      
       return 0;
     }
 

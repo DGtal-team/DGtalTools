@@ -15,7 +15,7 @@
  **/
 /**
  * @file vol2heightfield.cpp
- * @ingroup converters
+ * @ingroup Converters
  * @author Bertrand Kerautret (\c kerautre@loria.fr )
  * LORIA (CNRS, UMR 7503), University of Nancy, France
  *
@@ -48,6 +48,55 @@ using namespace DGtal;
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace po = boost::program_options;
+
+
+/**
+ @page vol2heightfield vol2heightfield
+ @brief  Converts volumetric  file into a projected 2D image given from a normal direction N and from a starting point P.
+
+ The 3D volume is scanned in this normal direction N starting from P with a step 1. If the intensity of the 3d point is inside the given thresholds its 2D gray values are set to the current scan number.
+
+
+@b Usage: vol2heightfield [input] [output]
+
+@b Allowed @b options @b are:
+
+@code
+  -h [ --help ]                    display this message
+  -i [ --input ] arg               volumetric file (.vol) 
+  -o [ --output ] arg              sequence of discrete point file (.sdp) 
+  -m [ --thresholdMin ] arg (=128) min threshold (default 128)
+  -M [ --thresholdMax ] arg (=255) max threshold (default 255)
+  --nx arg (=0)                    set the x component of the projection 
+                                   direction.
+  --ny arg (=0)                    set the y component of the projection 
+                                   direction.
+  --nz arg (=1)                    set the z component of the projection 
+                                   direction.
+  -x [ --centerX ] arg (=0)        choose x center of the projected image.
+  -y [ --centerY ] arg (=0)        choose y center of the projected image.
+  -z [ --centerZ ] arg (=1)        choose z center of the projected image.
+  --width arg (=100)               set the width of the resulting height Field 
+                                   image.
+  --height arg (=100)              set the height of the resulting height Field
+                                   image.
+  --heightFieldMaxScan arg (=255)  set the maximal scan deep.
+  --setBackgroundLastDepth         change the default background (black with 
+                                   the last filled intensity).
+@endcode
+
+@b Example:
+@code 
+$ vol2heightfield -i ${DGtal}/examples/samples/lobster.vol -m 60 -M 500  --nx 0 --ny 0.7 --nz -1 -x 150 -y 0 -z 150 --width 300 --height 300 --heightFieldMaxScan 350  -o resultingHeightMap.pgm 
+@endcode
+
+You should obtain such a resulting image:
+@image html resVol2heightfield.png "resulting image."
+@see
+@ref vol2heightfield.cpp
+
+*/
+
 
 int main( int argc, char** argv )
 {

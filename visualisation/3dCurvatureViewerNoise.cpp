@@ -14,24 +14,14 @@
  *
  **/
 /**
- * @file 3dCurvatureViewer.cpp
- * @ingroup surfaceTools
+ * @file 3dCurvatureViewerNoise.cpp
+ * @ingroup visualisation
+ *
  * @author Jérémy Levallois (\c jeremy.levallois@liris.cnrs.fr )
  * Laboratoire d'InfoRmatique en Image et Systèmes d'information - LIRIS (CNRS, UMR 5205), INSA-Lyon, France
  * LAboratoire de MAthématiques - LAMA (CNRS, UMR 5127), Université de Savoie, France
  *
  * @date 2013/01/10
- *
- * Vol file viewer, with curvature (mean or Gaussian, see parameters) information on surface.
- * Blue color means lowest curvature
- * Yellow color means highest curvature
- * Red means the in-between
- *
- * Uses IntegralInvariantCurvatureEstimation
- * @see related article:
- *       Coeurjolly, D.; Lachaud, J.O; Levallois, J., (2013). Integral based Curvature
- *       Estimators in Digital Geometry. DGCI 2013. Retrieved from
- *       https://liris.cnrs.fr/publis/?id=5866
  *
  * This file is part of the DGtalTools.
  */
@@ -78,6 +68,98 @@
 
 using namespace DGtal;
 using namespace functors;
+
+/**
+ @page Doc3DCurvatureViewerNoise 3DCurvatureViewerNoise
+ 
+ @brief  Same as @ref Doc3DCurvatureViewer, but allows to add some noise to objects.
+
+  Vol file viewer, with curvature (mean or Gaussian, see parameters) information on surface.
+  Blue color means lowest curvature
+  Yellow color means highest curvature
+  Red means the in-between
+ 
+  Uses IntegralInvariantCurvatureEstimation
+  @see related article:
+        Coeurjolly, D.; Lachaud, J.O; Levallois, J., (2013). Integral based Curvature
+        Estimators in Digital Geometry. DGCI 2013. Retrieved from
+        https://liris.cnrs.fr/publis/?id=5866
+
+
+ 
+
+ @b Usage:  3dCurvatureViewerNoise -i file.vol --radius 5 --mode mean --noise 0.5
+ 
+
+ @b Allowed @b options @b are:
+ 
+ @code
+  -h [ --help ]                         display this message
+  -i [ --input ] arg                    .vol file
+  -r [ --radius ] arg                   Kernel radius for IntegralInvariant
+  -k [ --noise ] arg (=0.5)             Level of Kanungo noise ]0;1[
+  -t [ --threshold ] arg (=8)           Min size of SCell boundary of an object
+  -l [ --minImageThreshold ] arg (=0)   set the minimal image threshold to 
+                                        define the image object (object defined
+                                        by the voxel with intensity belonging 
+                                        to ]minImageThreshold, 
+                                        maxImageThreshold ] ).
+  -u [ --maxImageThreshold ] arg (=255) set the minimal image threshold to 
+                                        define the image object (object defined
+                                        by the voxel with intensity belonging 
+                                        to ]minImageThreshold, 
+                                        maxImageThreshold] ).
+  -m [ --mode ] arg (=mean)             type of output : mean, gaussian, k1, 
+                                        k2, prindir1, prindir2 or 
+                                        normal(default mean)
+  -o [ --exportOBJ ] arg                Export the scene to specified OBJ/MTL 
+                                        filename (extensions added).
+  -d [ --exportDAT ] arg                Export resulting curvature (for mean, 
+                                        gaussian, k1 or k2 mode) in a simple 
+                                        data file each line representing a 
+                                        surfel. 
+  --exportOnly                          Used to only export the result without 
+                                        the 3d Visualisation (usefull for 
+                                        scripts).
+  -s [ --imageScale ] arg               scaleX, scaleY, scaleZ: re sample the 
+                                        source image according with a grid of 
+                                        size 1.0/scale (usefull to compute 
+                                        curvature on image defined on 
+                                        anisotropic grid). Set by default to 
+                                        1.0 for the three axis.  
+  -n [ --normalization ]                When exporting to OBJ, performs a 
+                                        normalization so that the geometry fits
+                                        in [-1/2,1/2]^3
+
+
+ @endcode
+
+ Below are the different available modes: 
+
+	 - "mean" for the mean curvature
+	 - "gaussian" for the Gaussian curvature
+	 - "k1" for the first principal curvature
+	 - "k2" for the second principal curvature
+	 - "prindir1" for the first principal curvature direction
+	 - "prindir2" for the second principal curvature direction
+	 - "normal" for the normal vector
+
+
+ @b Example: 
+ 
+ @code
+$ 3dCurvatureViewerNoise -i $DGtal/examples/samples/Al.100.vol -r 15 -m mean -k 0.5
+ @endcode
+
+ You should obtain such a visualisation:
+ @image html res3dCurvatureViewerNoise.png "resulting visualisation of mean curvature."
+ 
+
+ @see
+ @ref 3dCurvatureViewerNoise.cpp, 
+ @ref Doc3DCurvatureViewer 
+ */
+
 
 const Color  AXIS_COLOR_RED( 200, 20, 20, 255 );
 const Color  AXIS_COLOR_GREEN( 20, 200, 20, 255 );

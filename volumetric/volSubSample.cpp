@@ -44,6 +44,52 @@ using namespace Z3i;
 namespace po = boost::program_options;
 
 
+
+/**
+ @page volSubSample volSubSample
+ 
+ @brief Brutally sub samples a vol file (division by 2 in each direction).
+
+
+ @b Usage: 	volSubSample --input <volFileName> --o <volOutputFileName>
+
+
+ @b Allowed @b options @b are : 
+ @code
+  -h [ --help ]                 display this message.
+  -i [ --input ] arg            Input vol file.
+  -o [ --output ] arg           Output filename.
+  -f [ --function ] arg (=mean) Function used to the down-sampling: {none,max, min, mean}
+ @endcode
+
+ @b Example: 
+You can apply several sub sampling:
+ @code
+ $ volSubSample -i $DGtal/examples/samples/lobster.vol -o lobster2.vol -f mean 
+ $ volSubSample -i lobster2.vol -o lobster4.vol -f mean 
+ $ volSubSample -i lobster4.vol -o lobster8.vol -f mean 
+ @endcode
+
+You can  display the result by extracting the surface using \ref 3dVolMarchingCubes:
+
+@code 
+$ 3dVolMarchingCubes -i $DGtal/examples/samples/lobster.vol -o lobster.off -t 30
+$ 3dVolMarchingCubes -i lobster2.vol -t 30 -o lobster2.off
+$ 3dVolMarchingCubes -i lobster4.vol -t 30 -o lobster4.off
+$ 3dVolMarchingCubes -i lobster8.vol -t 30 -o lobster8.off
+$ meshViewer -i lobster.off lobster2.off  lobster4.off  lobster8.off -n
+@endcode
+
+ You should obtain such a result:
+ @image html  resVolSubSample.png "Resulting visualization."
+ 
+ @see
+ @ref volSubSample.cpp
+
+ */
+
+
+
 /**
  * Missing parameter error message.
  *

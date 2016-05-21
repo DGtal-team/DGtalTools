@@ -3,6 +3,7 @@
 
 
 #include "DGtal/images/ImageContainerBySTLVector.h"
+
 #include "DGtal/images/ImageSelector.h"
 
 #include "DGtal/geometry/curves/FreemanChain.h"
@@ -20,6 +21,73 @@
 
  
 using namespace DGtal;
+/**
+ @page img2freeman img2freeman
+ @brief Extracts Freeman chains from thresholded image.
+
+@b Usage: img2freeman [input] [output]
+
+@b Allowed @b options @b are:
+
+@code
+  -h [ --help ]                  display this message
+  -i [ --input ] arg             image file name
+  -m [ --min ] arg               min image threshold value (default 128)
+  -M [ --max ] arg               max image threshold value (default 255)
+  --sort                         to sort the resulting freemanchain by 
+                                 decreasing size.
+  -s [ --minSize ] arg           minSize of the extracted freeman chain 
+                                 (default 0)
+  -c [ --contourSelect ] arg     Select contour according reference point and 
+                                 maximal distance:  ex. --contourSelect X Y 
+                                 distanceMax
+  -r [ --thresholdRangeMin ] arg use a range interval as threshold (from min) :
+                                 --thresholdRangeMin min increment max : for 
+                                 each possible i, it define a digital sets 
+                                 [min, min+((i+1)*increment)] such that 
+                                 min+((i+1)*increment)< max  and extract their 
+                                 boundary. 
+  -R [ --thresholdRangeMax ] arg use a range interval as threshold (from max) :
+                                 --thresholdRangeMax min increment max : for 
+                                 each possible i, it define a digital sets [ 
+                                 max-((i)*increment), max] such that 
+                                 max-((i)*increment)>min  and extract their 
+                                 boundary. 
+@endcode
+
+@b Example:
+@code
+  $ img2freeman -i ${DGtal}/examples/samples/church.pgm -o contours.fc  
+
+@endcode
+You will obtain such results:
+@verbatim
+more contours.fc
+0 138 032
+0 155 032
+0 202 032
+0 265 010122
+0 268 0030100323232232
+0 300 01101003223303222
+0 395 012
+0 398 0001012111111111110111111011222232
+0 408 032
+0 425 012
+0 428 010323003301032330001032300030003030003003000032323033322332322332230333333322221222222223000000030000033323332323032230321233003323322300322223223032322121110011223232110012211111111112
+1 131 00100032322221
+1 277 103321
+2 393 112330
+2 288 00032221
+2 296 0321
+2 373 0321
+3 424 1230
+3 192 0321
+390 767 3303000000030030333333001011033333230003323223233030303010111003303233010332332233000333000010103033030330030101110030333230301003332321233223322222123233303322332333330030330303322321211212123222332330010003222332233010033232300030111011010032323032233333303301030010033033321221222332300033212....
+@endverbatim
+
+@see img2freeman.cpp
+
+*/
 
 
 
@@ -130,7 +198,7 @@ void saveSelContoursAsFC(std::vector< std::vector< Z2i::Point >  >  vectContours
 int main( int argc, char** argv )
 {
   // parse command line ----------------------------------------------
-  po::options_description general_opt("Allowed options are: ");
+  po::options_description general_opt("Allowed options are ");
   general_opt.add_options()
     ("help,h", "display this message")
     ("input,i", po::value<std::string>(), "image file name")
