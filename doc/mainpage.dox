@@ -48,7 +48,7 @@ Actually the DGTal project is organized as follows:
     <tr>
     <td> <img height=150px src="resVol2sdp.png"> </td>
         <td><img height=150px src="resMesh2heightfield.png"></td>
-        <td><img height=150px src="resVolAddNoise.png"></td>        
+        <td><img height=150px src="resVolAddnoise.png"></td>        
     </tr>
     <tr>
            <td align = center>@ref vol2sdp </td>
@@ -89,7 +89,7 @@ Actually the DGTal project is organized as follows:
     <td align = center colspan="3" vertical-align=middle> Example of tools of section @ref visualization_Doc : </td> 
    </tr>
    <tr>
-   <td><img height=150px src="res3DCurvatureViewerNoise.png"> </td>
+   <td><img height=150px src="res3dCurvatureViewerNoise.png"> </td>
    <td><img height=150px src="res3dVolViewer.png"></td>
    <td><img height=150px src="resSliceViewer.png"></td>
 
