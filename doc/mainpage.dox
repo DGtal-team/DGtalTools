@@ -81,7 +81,7 @@ Actually the DGTal project is organized as follows:
    </tr>
       <tr>
            <td align = center colspan="2">@ref  contourGenerator </td>   
-           <td align = center>@ref shapeGeneratorPrg</td>
+           <td align = center>@ref shapeGeneratorPrg </td>
    </tr>
 
 
