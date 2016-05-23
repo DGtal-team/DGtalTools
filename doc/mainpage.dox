@@ -42,7 +42,7 @@ Actually the DGTal project is organized as follows:
 
    <center>
     <table>
-    <tr bgcolor="#30D0B0">
+    <tr bgcolor="#FAFFFA">
     <td align = center colspan="3" vertical-align=middle> Example of tools of section  @ref converters : </td> 
     </tr>
     <tr>
@@ -56,7 +56,7 @@ Actually the DGTal project is organized as follows:
            <td align = center>@ref volAddNoise</td>
    </tr>   
 
-    <tr bgcolor="#30D0B0">
+    <tr bgcolor="#FAFFFA">
    <td align = center colspan="3" vertical-align=middle> Example of tools of section @ref estimators_Doc : </td> 
    </tr>
    <tr>
@@ -72,7 +72,7 @@ Actually the DGTal project is organized as follows:
 
 
 
-   <tr bgcolor="#30D0B0">
+   <tr bgcolor="#FAFFFA">
     <td align = center colspan="3" vertical-align=middle> Example of tools of section @ref shapeGenerator_Doc : </td> 
    </tr>
    <tr>
@@ -85,7 +85,7 @@ Actually the DGTal project is organized as follows:
    </tr>
 
 
-   <tr bgcolor="#30D0B0">
+   <tr bgcolor="#FAFFFA">
     <td align = center colspan="3" vertical-align=middle> Example of tools of section @ref visualization_Doc : </td> 
    </tr>
    <tr>
@@ -101,7 +101,7 @@ Actually the DGTal project is organized as follows:
 </tr>
 
 
-   <tr bgcolor="#30D0B0">
+   <tr bgcolor="#FAFFFA">
     <td align = center colspan="3" vertical-align=middle> Example of tools of section @ref volumetric_Doc : </td> 
    </tr>
    <tr>
