@@ -62,7 +62,7 @@
 <tr>
         <td align = center>@ref Doc3dImplicitSurfaceExtractorByThickening </td>
         <td align = center>@ref Doc3dVolViewer </td>   
-        <td align = center>@ref displayContours.</td>
+        <td align = center>@ref displayContours</td>
         <td align = center>@ref sliceViewer</td>
 </tr>
 
