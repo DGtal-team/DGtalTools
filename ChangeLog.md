@@ -4,7 +4,7 @@
   - doxygen documentation added for all tools. (David Coeurjolly, Bertrand Kerautret, [#258]((https://github.com/DGtal-team/DGtalTools/pull/258))
   - fix uses of temporaries when ConstAlias is needed.
     (Roland Denis, [#253](https://github.com/DGtal-team/DGtalTools/pull/253))
-  - renaming of the shapeGenerator folder to generators (David Coeurjolly, [#xx](https://github.com/DGtal-team/DGtalTools/pull/253)))
+  - renaming of the shapeGenerator folder to generators (David Coeurjolly, [#268](https://github.com/DGtal-team/DGtalTools/pull/268)))
 
 - *visualisation*:
   - 3dSDPViewer: add the possibility to display a set of point by using
