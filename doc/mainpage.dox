@@ -33,7 +33,7 @@ Actually the DGTal project is organized as follows:
 
  - [Estimators](\ref estimators_Doc)
 
- - [generators](\ref generators_Doc)
+ - [Generators](\ref generators)
 
  - [Visualization](\ref visualization)
 
@@ -73,15 +73,16 @@ Actually the DGTal project is organized as follows:
 
 
    <tr bgcolor="#FAFFFA">
-    <td align = center colspan="3" vertical-align=middle> Example of tools of section @ref generators_Doc : </td>
+    <td align = center colspan="3" vertical-align=middle> Example of tools of section @ref generators : </td>
    </tr>
    <tr>
-   <td center colspan="2">    <img height=150px src="resContourGenerator.png"> </td>
+   <td center colspan="2">
+           <img height=150px src="resContourGenerator.png"> </td>
            <td><img height=150px src="resShapeGenerator.png"></td>
    </tr>
       <tr>
-           <td align = center colspan="2">@ref  contourGenerator </td>
-           <td align = center>@ref shapeGeneratorPrg </td>
+           <td align = center colspan="2"> @ref  contourGenerator </td>
+           <td align = center> @ref shapeGenerator </td>
    </tr>
 
 
