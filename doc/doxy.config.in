@@ -778,7 +778,7 @@ INPUT                  = @top_srcdir@/doc \
                          @top_srcdir@/converters \
                          @top_srcdir@/visualisation \
                          @top_srcdir@/estimators \
-                         @top_srcdir@/shapeGenerator \
+                         @top_srcdir@/generators \
                          @top_srcdir@/geometricTransform \
                          @top_srcdir@/volumetric
 

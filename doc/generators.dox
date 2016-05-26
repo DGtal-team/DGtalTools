@@ -13,10 +13,10 @@
 
 //----------------------------------------
 /*!
-@page generators
+@page generators Generators
 @writers Bertrand Kerautret
 
-@section generators_Doc Shape Generators
+
 
 
 Utilities to generate various contours/shapes:
@@ -24,7 +24,7 @@ Utilities to generate various contours/shapes:
   - @ref contourGenerator :  generates multigrid contours of 2d digital shapes using DGtal library.
   - @ref shapeGenerator : generates shapes using DGtal library.
 
-
+  
 
 
 <center>
@@ -36,7 +36,7 @@ Utilities to generate various contours/shapes:
   </tr>
   <tr>
   <td align=center>@ref contourGenerator</td>
-  <td align=center>@ref shapeGeneratorPrg </td>
+  <td align=center>@ref shapeGenerator </td>
   </tr>
 
 
