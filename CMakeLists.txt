@@ -76,7 +76,7 @@ message(STATUS "----------------------------------------------------------------
 
 #------Tools subdirectories ------
 add_subdirectory(volumetric)
-add_subdirectory(shapeGenerator)
+add_subdirectory(generators)
 add_subdirectory(estimators)
 add_subdirectory(converters)
 add_subdirectory(visualisation)

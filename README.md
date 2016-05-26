@@ -41,7 +41,7 @@ Actually the DGTal project is organized as follows:
 
  - [Estimators](#estimators)
 
- - [ShapeGenerator](#shapegenerator)
+ - [Generators](#generators)
 
  - [Visualization](#visualization)
 
@@ -162,7 +162,7 @@ Estimators
 </tr>
 </table>
 
-ShapeGenerator
+Generators
 --------------
   - contourGenerator: generate multigrid shape contours.
   - shapeGenerator: generate multigrid shape.
@@ -177,7 +177,7 @@ ShapeGenerator
 <td> grid size = 1</td> <td> grid size= 0.1</td> <td> grid size = 0.01</td>
 </tr>
 <tr>
-<td colspan=3 > Illustration of the shapeGenerator tools </td>
+<td colspan=3 > Illustration of the Generators tools </td>
 </tr>
 </table>
 </center>
