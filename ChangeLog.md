@@ -1,6 +1,8 @@
 # DGtalTools 0.9.2
 
 - *global*:
+  - fix wrong Khalimsky space initialization in Freeman2Img.
+    (Roland Denis, [#271](https://github.com/DGtal-team/DGtalTools/pull/271))
   - doxygen documentation added for all tools. (David Coeurjolly, Bertrand Kerautret, [#258]((https://github.com/DGtal-team/DGtalTools/pull/258))
   - fix uses of temporaries when ConstAlias is needed.
     (Roland Denis, [#253](https://github.com/DGtal-team/DGtalTools/pull/253))
