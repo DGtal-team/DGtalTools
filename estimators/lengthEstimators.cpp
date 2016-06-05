@@ -73,6 +73,79 @@
 using namespace DGtal;
 
 
+
+/**
+ @page lengthEstimators lengthEstimators
+ 
+ @brief Generates multigrid length estimations of paramteric shapes using DGtal library.
+
+It will output length estimations (and timings) using several algorithms for decreasing grid steps.
+
+@b Usage: 	LengthEstimators [options] --shape <shapeName>
+
+
+
+ @b Allowed @b options @b are : 
+ @code
+  -h [ --help ]                    display this message
+  -s [ --shape ] arg               Shape name
+  -l [ --list ]                    List all available shapes
+  -R [ --radius ] arg              Radius of the shape
+  -A [ --axis1 ] arg               Half big axis of the shape (ellipse)
+  -a [ --axis2 ] arg               Half small axis of the shape (ellipse)
+  -r [ --smallradius ] arg (=5)    Small radius of the shape
+  -v [ --varsmallradius ] arg (=5) Variable small radius of the shape
+  -k [ --k ] arg (=3)              Number of branches or corners the shape
+  --phi arg (=0)                   Phase of the shape (in radian)
+  -w [ --width ] arg (=10)         Width of the shape
+  -p [ --power ] arg (=2)          Power of the metric (double)
+  --hMin arg (=0.0001)             Minimum value for the grid step h (double)
+  --steps arg (=32)                Number of multigrid steps between 1 and hMin
+                                   (integer)
+
+ @endcode
+
+ The list of 2D shape are :
+  -ball	Ball for the Euclidean metric.
+       	Required parameter(s): --radius [-R]   
+  - square	square (no signature).
+		Required parameter(s): --width [-w]   
+  - lpball	Ball for the l_power metric (no signature).
+		Required parameter(s): --radius [-R], --power [-p]  
+  - flower	Flower with k petals.
+		Required parameter(s): --radius [-R], --varsmallradius [-v], --k [-k], --phi
+  - ngon	Regular k-gon.
+		Required parameter(s): --radius [-R], --k [-k], --phi 
+  - accflower	Accelerated Flower with k petals.
+		Required parameter(s): --radius [-R], --varsmallradius [-v], --k [-k], --phi
+  - ellipse	Ellipse.
+		Required parameter(s): --axis1 [-A], --axis2 [-a], --phi 
+
+ @b Example: 
+
+Application of the multigrid length estimation on a flower shape with 5 petals and maximal radius 20 and min 5: 
+@code
+$ lengthEstimators -s flower -k 5 -R 20 -r 5  --steps 256 > length.dat 
+@endcode
+
+You can display using gnuplot:
+
+@code
+$ gnuplot 
+gnuplot> plot [0:][-0.5: 90] 'length.dat' using 1:(($7-$3)*($7-$3)) w l title  "squared error length estimation using DSS", 'length.dat' using 1:(($8-$3)*($8-$3)) w l title  "squared error length estimation using MLP", 'length.dat' using  1:(($9-$3)*($9-$3)) w l title  "squared error length estimation using FP" linewidth 2
+@endcode
+
+
+
+ You should obtain such a result:
+ @image html resLengthEstimators.png "Resulting visualization."
+ 
+ @see
+ @ref lengthEstimators.cpp
+
+ */
+
+
 /**
  * Global vectors to describe the available shapes and their
  * parameters.

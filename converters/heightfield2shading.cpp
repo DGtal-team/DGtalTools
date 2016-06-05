@@ -35,6 +35,7 @@
 #include "DGtal/io/readers/GenericReader.h"
 #include "DGtal/io/writers/GenericWriter.h"
 #include "DGtal/io/writers/PPMWriter.h"
+#include "DGtal/images/ImageSelector.h"
 #include "DGtal/io/readers/PointListReader.h"
 #include "DGtal/images/ConstImageAdapter.h"
 #include "DGtal/kernel/BasicPointFunctors.h"
@@ -46,6 +47,49 @@
 
 using namespace std;
 using namespace DGtal;
+
+/**
+ @page heightfield2shading heightfield2shading
+ @brief Renders a 2D heightfield image into a shading image. 
+ 
+ You can choose between lambertian model (diffuse reflectance) and
+ specular model (Nayar reflectance model). You can also choose between
+ a single directional light source (using -l{x,y,z} options) or use
+ light source which emits in all direction (by specifying the light
+ source position with -p{x,y,z} option). Another rendering mode is
+ given from a bitmap reflectance map which represents the rendering for
+ a normal vector value (mapped according the x/y coordinates).
+
+@b Usage: heightfield2shading [input] [output]
+
+@b Allowed @b options @b are:
+
+@code
+  -h [ --help ]               display this message
+  -i [ --input ] arg          heightfield file.
+  -o [ --output ] arg         output image.
+  --importNormal arg          import normals from file.
+  -s [ --specularModel ] arg  use specular Nayar model with 3 param Kdiff, 
+                              Kspec, sigma .
+  --lx arg                    x light source direction.
+  --ly arg                    y light source direction.
+  --lz arg                    z light source direction.
+  --px arg                    x light source position.
+  --py arg                    y light source position.
+  --pz arg                    z light source position.
+  -r [ --reflectanceMap ] arg specify a image as reflectance map.
+
+@endcode
+
+@b Example:
+@code
+  $ heightfield2shading -i ${DGtal}/examples/samples/bunnyHeightField.pgm -o shading.pgm --lx 0.0 --ly 1.0 --lz 1.0 --importNormal ${DGtal}/examples/samples/bunnyHeightField_normals.sdp -s 0.2 0.8
+@endcode
+You will obtain such image:
+@image html  resHeightfield2shading.png "Resulting image with a 90° ccw rotation"
+@see heightfield2shading.cpp
+
+*/
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -219,7 +263,9 @@ struct IdColor{
 
 int main( int argc, char** argv )
 {
-  typedef ImageContainerBySTLVector < Z2i::Domain, unsigned int> Image2D;
+  //  typedef ImageContainerBySTLVector < Z2i::Domain, unsigned int> Image2D;
+  typedef ImageSelector < Z2i::Domain, unsigned char>::Type Image2D;
+  //typedef ImageContainerBySTLVector < Z2i::Domain, char> Image2DChar;
   typedef ImageContainerBySTLVector < Z2i::Domain, Z3i::RealPoint> Image2DNormals;
   
   // parse command line ----------------------------------------------

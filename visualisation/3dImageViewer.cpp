@@ -14,8 +14,8 @@
  *
  **/
 /**
- * @file visuDistanceTransform.cpp
- * @ingroup Examples
+ * @file 3dImageViewer.cpp
+ * @ingroup visualisation
  * @author Bertrand Kerautret (\c kerautre@loria.fr )
  * LORIA (CNRS, UMR 7503), University of Nancy, France
  *
@@ -62,6 +62,70 @@ using namespace std;
 using namespace DGtal;
 using namespace Z3i;
 
+
+/**
+ @page Doc3dImageViewer 3dImageViewer
+ 
+ @brief Displays volume file as a voxel set by using QGLviewer.
+
+ @b Usage:  3dImageViewer [options] input
+
+ @b Allowed @b options @b are :
+ 
+ @code
+  -h [ --help ]                    display this message
+  -i [ --input ] arg               vol file (.vol) , pgm3d (.p3d or .pgm3d) 
+                                   file or sdp (sequence of discrete points)
+  --grid                           draw slice images using grid mode. 
+  --intergrid                      draw slice images using inter grid mode. 
+  --emptyMode                      remove the default boundingbox display 
+  --thresholdImage                 threshold the image to define binary shape
+  -m [ --thresholdMin ] arg (=0)   threshold min to define binary shape
+  -M [ --thresholdMax ] arg (=255) threshold max to define binary shape
+  -s [ --displaySDP ] arg          display a set of discrete points (.sdp)
+  --SDPindex arg                   specify the sdp index (by default 0,1,2).
+  --SDPball arg (=0.5)             use balls to display a set of discrete 
+                                   points (used with displaySDP option)
+  --displayMesh arg                display a Mesh given in OFF or OFS format. 
+  --displayDigitalSurface          display the digital surface instead of 
+                                   display all the set of voxels (used with 
+                                   thresholdImage or displaySDP options)
+  --colorizeCC                     colorize each Connected Components of the 
+                                   surface displayed by displayDigitalSurface 
+                                   option.
+  -c [ --colorSDP ] arg            set the color  discrete points: r g b a 
+  --colorMesh arg                  set the color of Mesh (given from 
+                                   displayMesh option) : r g b a 
+  -x [ --scaleX ] arg (=1)         set the scale value in the X direction 
+                                   (default 1.0)
+  -y [ --scaleY ] arg (=1)         set the scale value in the Y direction 
+                                   (default 1.0)
+  -z [ --scaleZ ] arg (=1)         set the scale value in the Z direction 
+                                   (default 1.0)
+  --dicomMin arg (=-1000)          set minimum density threshold on Hounsfield 
+                                   scale
+  --dicomMax arg (=3000)           set maximum density threshold on Hounsfield 
+                                   scale
+  -t [ --transparency ] arg (=255) transparency
+ @endcode
+
+
+ @b Example: 
+ With the image display you can also threshold the image and display a set of voxel:  
+ @code
+    3dImageViewer -i $DGtal/examples/samples/lobster.vol --thresholdImage -m 180
+ @endcode
+
+ You should obtain such a result:
+
+ @image html res3dImageViewer.png "resulting visualisation of 3d image with thresholded set of voxels."
+ 
+
+ @see
+ @ref 3dImageViewer.cpp
+
+ */
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace po = boost::program_options;
 
@@ -73,7 +137,7 @@ int main( int argc, char** argv )
 
 
   // parse command line ----------------------------------------------
-  po::options_description general_opt("Allowed options are: ");
+  po::options_description general_opt("Allowed options are ");
   general_opt.add_options()
     ("help,h", "display this message")
     ("input,i", po::value<std::string>(), "vol file (.vol) , pgm3d (.p3d or .pgm3d) file or sdp (sequence of discrete points)" )
@@ -112,7 +176,7 @@ int main( int argc, char** argv )
   if( !parseOK || vm.count("help")||argc<=1)
     {
       std::cout << "Usage: " << argv[0] << " [input]\n"
-    << "Display volume file as a voxel set by using QGLviewer"
+    << "Displays volume file as a voxel set by using QGLviewer"
     << general_opt << "\n";
       return 0;
     }

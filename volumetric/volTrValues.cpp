@@ -47,6 +47,49 @@ namespace po = boost::program_options;
 
 
 /**
+ @page volTrValues volTrValues
+ 
+ @brief  Applies basic vol image transform from the input values to output values.
+
+ @b Usage:  	 volTrValues --input <volFileName> --o <volOutputFileName> -s 1 99 -r 100 200  
+
+=> all voxels of values 1 (resp. 99) will be 100 (resp. 200) in the resulting image.   
+
+
+ @b Allowed @b options @b are : 
+ @code
+  -h [ --help ]                     display this message.
+  -i [ --input ] arg                Input vol file.
+  -o [ --output ] arg (=output.vol) Output filename.
+  -s [ --inputVals ] arg            specify the values which will be 
+                                    transformed with the output values (given 
+                                    with --outputVals).
+  -r [ --outputVals ] arg           specify the output values to transformed 
+                                    accordint the input values (given with 
+                                    --inputVals).
+ @endcode
+
+ @b Example: 
+
+ This tool can be useful to apply simple intensity transforms. For
+ instance if you want to transform all intensities starting from 0 to 50 into interval 200 250 you can do as follows:
+
+ @code
+ $ volTrValues -i $DGtal/examples/samples/lobster.vol -s {0..50} -r {200..250} -o lobsterTr.vol
+ $ 3dImageViewer -i  lobsterTr.vol
+ @endcode
+
+ By using  @ref Doc3dImageViewer ou should obtain such a result:
+ @image html resVolTrValues.png "Result visualization."
+ 
+ @see
+ @ref volTrValues.cpp
+
+ */
+
+
+
+/**
  * Missing parameter error message.
  *
  * @param param

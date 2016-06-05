@@ -41,7 +41,7 @@ Actually the DGTal project is organized as follows:
 
  - [Estimators](#estimators)
 
- - [ShapeGenerator](#shapegenerator)
+ - [Generators](#generators)
 
  - [Visualization](#visualization)
 
@@ -59,7 +59,7 @@ Utilities to convert various simple file formats:
   - freeman2sdp: convert freeman chain towards a Sequence of Discrete Points.
   - HDF52vol: convert HDF5 to vol file format. 
   - heightfield2shading: Render a 2D heightfield image into a shading image from various reflectance models (lambertian, specular, custom reflectance map).
-  - heightfield2vol: a new tool to transform 2D heightmap into volumetric file.
+  - heightfield2vol: a new tool to transform 2D heightfield into volumetric file.
   - img2freeman: to extract a freeman chain contour from a grayscale image.
   - imgAddNoise: a new tool to add noise (Kanungo's) to a binary 2D object.
   - itk2vol: convert any image of itk format (mhd, mha, ...) to vol (available with the itk option in DGtal).
@@ -82,24 +82,28 @@ Utilities to convert various simple file formats:
 <table>
 <tr>
 <td> <img height=150 src="https://cloud.githubusercontent.com/assets/772865/6706730/9bac9720-cd60-11e4-9819-81e536b21e97.gif"> </td>
-<td> <img height=150 src="https://cloud.githubusercontent.com/assets/772865/6706785/0ca0071e-cd61-11e4-9304-c6e168b1c6b2.png"> </td>
+<td> <img height=150 src="https://cloud.githubusercontent.com/assets/772865/15342702/d9999fd8-1c97-11e6-8f6a-6bbd114a5641.png"> </td>
 <td> <img height=150 src="https://cloud.githubusercontent.com/assets/772865/6914017/ccf433e4-d786-11e4-997b-f513f07f56f3.gif"> </td>
 <td> <img height=150 src="https://cloud.githubusercontent.com/assets/772865/6914104/6d25be78-d787-11e4-9433-2a834fc4a0af.png"> </td>
 </tr>
 <tr>
 <td>vol2heightmap</td>
-<td>heightmap2vol</td>
+<td>heightfield2vol</td>
 <td>imgAddNoise</td> 
 <td>volAddNoise</td>
 </tr>
 <tr>
 <td> <img height=150 src="https://cloud.githubusercontent.com/assets/772865/7106643/c09cb8d4-e148-11e4-8653-2d5bac5dc3c5.png"> 
-<td align=center> <img height=150 src= "https://cloud.githubusercontent.com/assets/772865/10265156/64aaad64-6a24-11e5-9773-628c661fa76c.png">
-</td>
+<td align=center> <img height=150 src="https://cloud.githubusercontent.com/assets/772865/10265156/64aaad64-6a24-11e5-9773-628c661fa76c.png"> </td>
+<td> <img height=150 src="https://cloud.githubusercontent.com/assets/772865/15342501/d80656d6-1c95-11e6-8461-2ec25ba5a864.png"></td>
+<td> <img height=150 src="https://cloud.githubusercontent.com/assets/772865/15342675/b17e505c-1c97-11e6-85c3-663550b3b39a.png"></td>
+
 </tr>
 <tr>
 <td>mesh2heightfield</td>
 <td>heightfield2shading</td>
+<td>vol2sdp</td>
+<td>vol2slice</td>
 </tr>
 
 <tr>
@@ -132,22 +136,33 @@ Estimators
 
 <table>
 <tr>
-<td colspan="2"><img height=130 src="https://cloud.githubusercontent.com/assets/772865/2646108/f515b0a2-bf39-11e3-96f8-c7606173f43b.png"></td>
+<td colspan="3"><img height=130 src="https://cloud.githubusercontent.com/assets/772865/2646108/f515b0a2-bf39-11e3-96f8-c7606173f43b.png"></td>
 </tr>
 <tr>
-<td colspan="2">Illustration of curvatureScaleSpaceBCC </td>
+<td colspan="3">Illustration of curvatureScaleSpaceBCC </td>
 </tr>
 <tr>
-<td align=center ><img height=130 src="https://cloud.githubusercontent.com/assets/793707/2996392/d3ee9e58-dced-11e3-98a0-72233927aaf6.jpg"> </td>
-<td align=center ><img height=130 src="https://cloud.githubusercontent.com/assets/772865/3311642/03f29044-f6c7-11e3-8981-120369b3e8bd.png"> </td>
+<td align=center ><img height=200 src="https://cloud.githubusercontent.com/assets/793707/2996392/d3ee9e58-dced-11e3-98a0-72233927aaf6.jpg"> </td>
+<td align=center ><img height=200 src="https://cloud.githubusercontent.com/assets/772865/15353086/8637153c-1ce7-11e6-9b64-45baaa954d98.png"> </td>
+<td align=center> <img height=200 src="https://cloud.githubusercontent.com/assets/772865/15352637/6cfde4a8-1ce5-11e6-8d36-a2a3be4744d1.png"> </td>
 </tr>
 <tr>
 <td colspan="2"> Illustration of generic3dNormalEstimators on VCM estimator applied on smooth and noisy shapes.</td>
+<td> 2dLocalEstimators </td>
 </tr>
-
+<tr> 
+<td> <img height=200 src="https://cloud.githubusercontent.com/assets/772865/15351379/5d2cd562-1cdf-11e6-81b6-8171b0e7f87f.png"></td>
+<td> <img height=200 src="https://cloud.githubusercontent.com/assets/772865/15351501/dbb860d6-1cdf-11e6-8d9f-df3356bb969c.png"></td>
+<td> <img height=200 src="https://cloud.githubusercontent.com/assets/772865/15352775/29e2fad6-1ce6-11e6-958c-34ca77175a90.png"></td>
+</tr>
+<tr> 
+<td> 3dCurveTangentEstimator </td>
+<td> vol2normalField </td>
+<td> lengthEstimators </td>
+</tr>
 </table>
 
-ShapeGenerator
+Generators
 --------------
   - contourGenerator: generate multigrid shape contours.
   - shapeGenerator: generate multigrid shape.
@@ -162,7 +177,7 @@ ShapeGenerator
 <td> grid size = 1</td> <td> grid size= 0.1</td> <td> grid size = 0.01</td>
 </tr>
 <tr>
-<td colspan=3 > Illustration of the shapeGenerator tools </td>
+<td colspan=3 > Illustration of the Generators tools </td>
 </tr>
 </table>
 </center>
@@ -248,12 +263,25 @@ Volumetric
 <center>
 <table>
 <tr>
-<td> <img width=300 src="https://cloud.githubusercontent.com/assets/772865/4140989/2b115d34-33aa-11e4-9141-749d02335a4d.png"> </td>
-<td> <img width=300 src="https://cloud.githubusercontent.com/assets/772865/4140972/f13c7fe4-33a9-11e4-8114-74e4925f0628.png"> </td>
+<td> <img width=300 src="https://cloud.githubusercontent.com/assets/772865/15342874/d79fc22e-1c98-11e6-922b-48f27f5cf586.png"> </td>
+<td> <img width=300 src="https://cloud.githubusercontent.com/assets/772865/15342814/828267ec-1c98-11e6-9080-a210bdd42b35.png"> </td>
+<td> <img width=300 src="https://cloud.githubusercontent.com/assets/772865/15342834/a6736bb0-1c98-11e6-9a42-9dc5a198800f.png"> </td>
 </tr>
 <tr>
+<td>3dVolMarchingCubes</td>
 <td>homotopicThinning3D</td>
 <td>volSubSample</td>
+</tr>
+<tr>
+<td> <img width=300 src="https://cloud.githubusercontent.com/assets/772865/15342933/2da32a80-1c99-11e6-9600-16a68f145bdd.png"> </td>
+<td> <img width=300 src="https://cloud.githubusercontent.com/assets/772865/15342979/8e2d2d4c-1c99-11e6-88b4-5835adb04eff.png"> </td>
+<td> <img width=300 src="https://cloud.githubusercontent.com/assets/772865/15343002/b2fdf4c6-1c99-11e6-986b-9f56299b4a16.png"> </td>
+</tr>
+<tr>
+<td>volReSample</td>
+<td>volTrValues</td>
+<td>volSegment</td>
+</tr>
 </table>
 </center>
 

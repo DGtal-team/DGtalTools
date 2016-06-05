@@ -3,15 +3,26 @@ language: cpp
 
 sudo: false
 
+os:
+  - linux
 
 compiler:
   - gcc
   - clang
 
-
 env:
-  - DGTALTYPE="-DBUILD_EXAMPLES=OFF -DDGTAL_BUILD_TESTING=OFF -DCMAKE_BUILD_TYPE=Debug -DWITH_QGLVIEWER=true -DWITH_ITK=false"
-  - DGTALTYPE="-DBUILD_EXAMPLES=OFF -DDGTAL_BUILD_TESTING=OFF -DCMAKE_BUILD_TYPE=Debug -DWITH_QGLVIEWER=false -DWITH_ITK=false"
+  - CONFIG="Debug,QGLVIEWER"
+  - CONFIG="Debug"
+  - CONFIG="DOCUMENTATION"
+
+matrix:
+  fast_finish: true
+  exclude:
+    - os: osx
+      env: CONFIG="DOCUMENTATION"
+    - compiler: gcc
+      os: linux
+      env: CONFIG="DOCUMENTATION"
 
 addons:
   apt:
@@ -35,6 +46,9 @@ addons:
 
 
 before_install:
+  - DOC="false"
+  - if [ $CONFIG == "DOCUMENTATION" ]; then if [ $OriginalRepo == "true" ];  then if [ $TRAVIS_PULL_REQUEST == "false" ]; then DOC="true"; fi; fi; fi
+  - if [ $DOC == true ];then   openssl aes-256-cbc -K $encrypted_a0b8e3011fca_key -iv $encrypted_a0b8e3011fca_iv -in .travis/dgtal_rsa.enc -out .travis/dgtal_rsa -d ; chmod 600 .travis/dgtal_rsa; fi
   - env
   - export SRC_DIR="`pwd`"
   - if [ $CXX == "g++" ]; then export CXX="g++-4.8"  CC="gcc-4.8" BOOST_TOOLSET=gcc CCOMPILER="gcc-4.8" CXXCOMPILER="g++-4.8"; fi
@@ -49,6 +63,8 @@ before_install:
   - if [ ! -f "$BOOST_ROOT/b2" ]; then cd "$BOOST_ROOT"; ./bootstrap.sh --with-toolset="$BOOST_TOOLSET" --with-libraries=program_options; fi
 
 before_script:
+  - DGTALTYPE="-DBUILD_EXAMPLES=OFF -DDGTAL_BUILD_TESTING=OFF -DCMAKE_BUILD_TYPE=Debug -DWITH_QGLVIEWER=false -DWITH_ITK=false"
+  - if [ $CONFIG="Debug,QGLVIEWER"]; then DGTALTYPE="-DBUILD_EXAMPLES=OFF -DDGTAL_BUILD_TESTING=OFF -DCMAKE_BUILD_TYPE=Debug -DWITH_QGLVIEWER=false -DWITH_ITK=false"; fi
   - ccache -V && ccache --show-stats && ccache --zero-stats
   - 'echo "using gcc : : ccache $CXX : <cflags>-std=c11 <cxxflags>-std=c++11 ;" > ~/user-config.jam'
   - 'echo "using clang : : ccache $CXX : <cflags>-std=c11 <cxxflags>-std=c++11 ;" >> ~/user-config.jam'
@@ -59,7 +75,15 @@ before_script:
   - cmake . $DGTALTYPE -DCMAKE_CXX_COMPILER=$CXXCOMPILER -DCMAKE_C_COMPILER=$CCOMPILER -DBOOST_ROOT=$BOOST_ROOT
   - make
   - cd ..
+  - if [ $DOC == "true" ]; then .travis/install_doxygen.sh;  BTYPE="-DDOXYGEN_EXECUTABLE=$HOME/doxygen/doxygen-1.8.10/bin/doxygen -DCMAKE_BUILD_TYPE=Debug -DWITH_CAIRO=true  -DWITH_GMP=true"; DOC="true"; fi
+  - if [ $DOC == "true"]; then wget http://http://dgtal.org/doc/tags/DGtal-tagfile; wget http://http://dgtal.org/doc/tags/Board-tagfile;fi
 
 script:
-   - cmake . -DDGtal_DIR=$PWD/DGtal -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_COMPILER=$CXXCOMPILER -DCMAKE_C_COMPILER=$CCOMPILER -DBOOST_ROOT=$BOOST_ROOT
-   - make
+   - cmake . -DDGtal_DIR=$PWD/DGtal -DDOXYGEN_EXECUTABLE=$HOME/doxygen/doxygen-1.8.10/bin/doxygen  -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_COMPILER=$CXXCOMPILER -DCMAKE_C_COMPILER=$CCOMPILER -DBOOST_ROOT=$BOOST_ROOT
+   - if [ $DOC == "true" ]; then  make doc;  rsync -azv --delete --delete-after -e 'ssh -oStrictHostKeyChecking=no -i  .travis/dgtal_rsa' html/ dgtal@liris.cnrs.fr:/home/dgtal/public_html/doc/tools/nightly/;  fi
+   - if [ $CONFIG == "Debug"]; then make; fi
+   - if [ $CONFIG == "Debug,QGLVIEWER"]; then make; fi
+
+after_success:
+  ## We publish the DGtalTools tags
+  - if [ $DOC == "true" ]; then scp -i  .travis/dgtal_rsa  DGtalTools-tagfile dgtal@liris.cnrs.fr:/home/dgtal/public_html/doc/tags; fi

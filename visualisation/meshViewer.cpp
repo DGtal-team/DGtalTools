@@ -46,6 +46,68 @@ using namespace std;
 using namespace DGtal;
 
 
+/**
+ @page meshViewer meshViewer
+ 
+ @brief Displays OFF mesh file by using QGLviewer.
+
+ @b Usage:   meshViewer [input]
+
+ @b Allowed @b options @b are :
+ 
+ @code
+  -h [ --help ]                    display this message
+  -i [ --input ] arg               off files (.off), or OFS file (.ofs) 
+  -x [ --scaleX ] arg (=1)         set the scale value in the X direction 
+                                   (default 1.0)
+  -y [ --scaleY ] arg (=1)         set the scale value in the Y direction 
+                                   (default 1.0)
+  -z [ --scaleZ ] arg (=1)         set the scale value in the Z direction 
+                                   (default 1.0)
+  -w [ --minLineWidth ] arg (=1.5) set the min line width of the mesh faces 
+                                   (default 1.5)
+  --customColorMesh arg            set the R, G, B, A components of the colors 
+                                   of the mesh faces and eventually the color 
+                                   R, G, B, A of the mesh edge lines (set by 
+                                   default to black). 
+  --customColorSDP arg             set the R, G, B, A components of the colors 
+                                   of  the sdp view
+  -f [ --displayVectorField ] arg  display a vector field from a simple sdp 
+                                   file (two points per line)
+  --vectorFieldIndex arg           specify special indices for the two point 
+                                   coordinates (instead usinf the default 
+                                   indices: 0 1, 2, 3, 4, 5)
+  --customLineColor arg            set the R, G, B components of the colors of 
+                                   the lines displayed from the 
+                                   --displayVectorField option (red by 
+                                   default). 
+  -s [ --displaySDP ] arg          Add the display of a set of discrete points 
+                                   as ball of radius 0.5.
+  --SDPradius arg (=0.5)           change the ball radius to display a set of 
+                                   discrete points (used with displaySDP 
+                                   option)
+  -n [ --invertNormal ]            threshold min to define binary shape
+  -v [ --drawVertex ]              draw the vertex of the mesh
+ @endcode
+
+
+ @b Example: 
+
+
+ @code
+ $ meshViewer -i bunny.off
+    
+ @endcode
+
+ You should obtain such a result:
+
+ @image html resMeshViewer.png "Resulting visualization."
+ 
+
+ @see
+ @ref meshViewer.cpp
+
+ */
 
 
 
@@ -71,7 +133,7 @@ int main( int argc, char** argv )
   ("customLineColor",po::value<std::vector<unsigned int> >()->multitoken(), "set the R, G, B components of the colors of the lines displayed from the --displayVectorField option (red by default). " )
   ("displaySDP,s", po::value<std::string>(), "Add the display of a set of discrete points as ball of radius 0.5.")
   ("SDPradius", po::value<double>()->default_value(0.5), "change the ball radius to display a set of discrete points (used with displaySDP option)")
-  ("invertNormal,n", "threshold min to define binary shape" )
+  ("invertNormal,n", "invert face normal vectors." )
   ("drawVertex,v", "draw the vertex of the mesh" );
   
   bool parseOK=true;

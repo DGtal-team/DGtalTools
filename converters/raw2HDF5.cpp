@@ -43,6 +43,33 @@ using namespace Z3i;
 
 namespace po = boost::program_options;
 
+/**
+ @page raw2HDF5 raw2HDF5
+ @brief  Converts a 3D 8-bit raw file to HDF5.
+
+@b Usage: raw2HDF5 [input] [output]
+
+@b Allowed @b options @b are:
+
+@code
+  -h [ --help ]             display this message
+  -i [ --input ] arg        Input raw file.
+  -o [ --output ] arg       Output HDF5 filename.
+  -x [ --x ] arg            x extent.
+  -y [ --y ] arg            y extent.
+  -z [ --z ] arg            z extent.
+
+@endcode
+
+@b Example:
+@code
+  $ raw2HDF5 -x 128 -y 128 -z 128 -i input.raw -o output.hd
+@endcode
+
+
+@see raw2HDF5.cpp
+
+*/
 
 /**
  * Missing parameter error message.
@@ -82,7 +109,7 @@ int main(int argc, char**argv)
   po::notify ( vm );
   if (!parseOK || vm.count ( "help" ) ||argc<=1 )
     {
-      trace.info() << "Convert a 3D 8-bit raw file to HDF5."<<std::endl
+      trace.info() << "Converts a 3D 8-bit raw file to HDF5."<<std::endl
                    << std::endl << "Basic usage: "<<std::endl
                    << "\traw2HDF5 -x 128 -y 128 -z 128 --input <RawFileName> --output <HDF5OutputFileName> "<<std::endl
                    << general_opt << "\n";

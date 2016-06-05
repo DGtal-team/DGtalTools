@@ -61,6 +61,42 @@ using namespace Z3i;
 namespace po = boost::program_options;
 
 
+
+/**
+ @page sliceViewer sliceViewer
+ 
+ @brief  Displays volume file with slice image by using QT and QGLviewer.
+
+ @b Usage:   sliceViewer [input]
+
+ @b Allowed @b options @b are :
+ 
+ @code
+  -h [ --help ]           display this message
+  -i [ --input ] arg      vol file (.vol) , pgm3d (.p3d or .pgm3d, pgm (with 3 
+                          dims)) file or sdp (sequence of discrete points)
+  --hueColorMap           use hue color map to display images.
+  --gradHotColorMap       use hot gradient color map to display images.
+  --gradCoolColorMap      use cool gradient color map to display images.
+  --dicomMin arg (=-1000) set minimum density threshold on Hounsfield scale
+  --dicomMax arg (=3000)  set maximum density threshold on Hounsfield scale
+ @endcode
+
+ @b Example: 
+
+ @code
+ $ sliceViewer -i  $DGtal/examples/samples/lobster.vol
+ @endcode
+
+ @image html resSliceViewer.png " "
+
+@see
+ @ref sliceViewer.cpp
+
+ */
+
+
+
 // Set to define slider int value and grid size
 
 static const int MIN_ZOOM_FACTOR = 10.0;
@@ -109,6 +145,31 @@ MainWindow::MainWindow(DGtal::Viewer3D<> *aViewer,
   ui->setupUi(this);
   ui->verticalLayout_5->addWidget(aViewer);
 
+
+  ui->_horizontalSliderZ->setMinimum(anImage->domain().lowerBound()[2]);
+  ui->_horizontalSliderZ->setMaximum(anImage->domain().upperBound()[2]);
+  ui->_horizontalSliderZ->setValue(anImage->domain().lowerBound()[2]);
+
+  ui->_horizontalSliderY->setMinimum(anImage->domain().lowerBound()[1]);
+  ui->_horizontalSliderY->setMaximum(anImage->domain().upperBound()[1]);
+  ui->_horizontalSliderY->setValue(anImage->domain().lowerBound()[1]);
+
+  ui->_horizontalSliderX->setMinimum(anImage->domain().lowerBound()[0]);
+  ui->_horizontalSliderX->setMaximum(anImage->domain().upperBound()[0]);
+  ui->_horizontalSliderX->setValue(anImage->domain().lowerBound()[0]);
+
+  ui->_zoomXSlider->setMinimum( MIN_ZOOM_FACTOR);
+  ui->_zoomXSlider->setMaximum( MAX_ZOOM_FACTOR);
+  ui->_zoomXSlider->setValue(INIT_SCALE1_ZOOM_FACTOR);
+
+  ui->_zoomYSlider->setMinimum(MIN_ZOOM_FACTOR);
+  ui->_zoomYSlider->setMaximum(MAX_ZOOM_FACTOR);
+  ui->_zoomYSlider->setValue(INIT_SCALE1_ZOOM_FACTOR);
+
+  ui->_zoomZSlider->setMinimum(MIN_ZOOM_FACTOR);
+  ui->_zoomZSlider->setMaximum(MAX_ZOOM_FACTOR);
+  ui->_zoomZSlider->setValue(INIT_SCALE1_ZOOM_FACTOR);
+
   QObject::connect(ui->_horizontalSliderX, SIGNAL(valueChanged(int)), this, SLOT(updateSliceImageX()));
   QObject::connect(ui->_horizontalSliderY, SIGNAL(valueChanged(int)), this, SLOT(updateSliceImageY()));
   QObject::connect(ui->_horizontalSliderZ, SIGNAL(valueChanged(int)), this, SLOT(updateSliceImageZ()));
@@ -124,28 +185,6 @@ MainWindow::MainWindow(DGtal::Viewer3D<> *aViewer,
   QObject::connect(ui->_HotButton, SIGNAL(clicked()), this, SLOT(changeHotColorMap()));
   QObject::connect(ui->_HueButton, SIGNAL(clicked()), this, SLOT(changeHueColorMap()));
   QObject::connect(ui->_NormalButton, SIGNAL(clicked()), this, SLOT(changeNormalColorMap()));
-
-  ui->_horizontalSliderZ->setMinimum(anImage->domain().lowerBound()[2]);
-  ui->_horizontalSliderZ->setMaximum(anImage->domain().upperBound()[2]);
-
-  ui->_horizontalSliderY->setMinimum(anImage->domain().lowerBound()[1]);
-  ui->_horizontalSliderY->setMaximum(anImage->domain().upperBound()[1]);
-
-  ui->_horizontalSliderX->setMinimum(anImage->domain().lowerBound()[0]);
-  ui->_horizontalSliderX->setMaximum(anImage->domain().upperBound()[0]);
-
-  ui->_zoomXSlider->setMinimum( MIN_ZOOM_FACTOR);
-  ui->_zoomXSlider->setMaximum( MAX_ZOOM_FACTOR);
-  ui->_zoomXSlider->setValue(INIT_SCALE1_ZOOM_FACTOR);
-
-  ui->_zoomYSlider->setMinimum(MIN_ZOOM_FACTOR);
-  ui->_zoomYSlider->setMaximum(MAX_ZOOM_FACTOR);
-  ui->_zoomYSlider->setValue(INIT_SCALE1_ZOOM_FACTOR);
-
-  ui->_zoomZSlider->setMinimum(MIN_ZOOM_FACTOR);
-  ui->_zoomZSlider->setMaximum(MAX_ZOOM_FACTOR);
-  ui->_zoomZSlider->setValue(INIT_SCALE1_ZOOM_FACTOR);
-
   
 
 }
@@ -248,7 +287,7 @@ void MainWindow::updateZoomImageZ(){
 }
 
 
-void MainWindow::updateZoomImageX(unsigned int sliceNumber, double gridSize){
+void MainWindow::updateZoomImageX(int sliceNumber, double gridSize){
   DGtal::functors::Projector<DGtal::Z2i::Space>  invFunctor; invFunctor.initRemoveOneDim(0);
   DGtal::Z2i::Domain domain2D(invFunctor(myImage3D->domain().lowerBound()),
                               invFunctor(myImage3D->domain().upperBound()));
@@ -259,7 +298,7 @@ void MainWindow::updateZoomImageX(unsigned int sliceNumber, double gridSize){
   setImageProjX(QPixmap::fromImage(anImage));
 }
 
-void MainWindow::updateZoomImageY(unsigned int sliceNumber, double gridSize){
+void MainWindow::updateZoomImageY(int sliceNumber, double gridSize){
   DGtal::functors::Projector<DGtal::Z2i::Space>  invFunctor; invFunctor.initRemoveOneDim(1);
   DGtal::Z2i::Domain domain2D(invFunctor(myImage3D->domain().lowerBound()),
                               invFunctor(myImage3D->domain().upperBound()));
@@ -272,7 +311,7 @@ void MainWindow::updateZoomImageY(unsigned int sliceNumber, double gridSize){
 }
 
 
-void MainWindow::updateZoomImageZ(unsigned int sliceNumber, double gridSize){
+void MainWindow::updateZoomImageZ(int sliceNumber, double gridSize){
   DGtal::functors::Projector<DGtal::Z2i::Space>  invFunctor; invFunctor.initRemoveOneDim(2);
   DGtal::Z2i::Domain domain2D(invFunctor(myImage3D->domain().lowerBound()),
                               invFunctor(myImage3D->domain().upperBound()));
@@ -404,7 +443,7 @@ int main( int argc, char** argv )
   if( !parseOK || vm.count("help")||argc<=1)
     {
       std::cout << "Usage: " << argv[0] << " [input]\n"
-                << "Display volume file as a voxel set by using QGLviewer"<< endl
+                << "Displays volume file with slice image by using QT and QGLviewer"<< endl
                 << general_opt << "\n";
       return 0;
     }
@@ -464,15 +503,15 @@ int main( int argc, char** argv )
                                                              usegc? MainWindow::GradientMapCool:
                                                              MainWindow::Id), 0,0);
     w.setWindowTitle ( QString("sliceViewer"));
-    w.updateSliceImageX(0, true);
-    w.updateSliceImageY(0, true);
-    w.updateSliceImageZ(0, true);
+    w.updateSliceImageX( image.domain().lowerBound()[0], true);
+    w.updateSliceImageY( image.domain().lowerBound()[1], true);
+    w.updateSliceImageZ( image.domain().lowerBound()[2], true);
     w.show();
     Z3i::Point size = image.domain().upperBound() - image.domain().lowerBound();
     Z3i::Point center = image.domain().lowerBound()+size/2;
     unsigned int maxDist = std::max(std::max(size[2], size[1]), size[2]);
     viewer->camera()->setPosition(qglviewer::Vec(center[0],center[1], 
-                                                 2.0*maxDist));
+                                                 center[2] + 2.0*maxDist));
     viewer->camera()->setSceneCenter(qglviewer::Vec(center[0],center[1],center[2]));
     application.exec();
     delete viewer;
