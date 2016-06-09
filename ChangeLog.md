@@ -9,6 +9,10 @@
   - renaming of the shapeGenerator folder to generators (David Coeurjolly, [#268](https://github.com/DGtal-team/DGtalTools/pull/268)))
 
 - *visualisation*:
+  - 3dSDPViewer: fix the mesh display which was not given with their original 
+   colors. (Bertrand Kerautret,
+   [#272](https://github.com/DGtal-team/DGtalTools/pull/272))
+
   - 3dSDPViewer: add the possibility to display a set of point by using
     different sphere sizes (specified in the input sdp file).
    (Bertrand Kerautret,
