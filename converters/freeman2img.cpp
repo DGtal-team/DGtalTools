@@ -185,7 +185,7 @@ else the space is automatically defined from the freemanchain bounding boxes.");
       maxy = vectSpace[3];      
     }
     KSpace aKSpace;
-    aKSpace.init(Z2i::Point(minx, miny), Z2i::Point(maxx, maxy), false);
+    aKSpace.init(Z2i::Point(minx, miny), Z2i::Point(maxx, maxy), true);
     std::set<SCell> boundarySCell;
     std::set<Cell> interiorCell;
     for(std::vector< FreemanChain >::const_iterator it = vectFcs.begin(); it!= vectFcs.end(); it++){
