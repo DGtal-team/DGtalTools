@@ -7,11 +7,14 @@
   - renaming of the shapeGenerator folder to generators (David Coeurjolly, [#268](https://github.com/DGtal-team/DGtalTools/pull/268)))
 
 - *visualisation*:
+  - meshViewer: add a key to display mesh information about number of 
+    vertex/faces.
+    (Bertrand Kerautret,
+    [#272](https://github.com/DGtal-team/DGtalTools/pull/272))
   - 3dSDPViewer: add the possibility to display a set of point by using
     different sphere sizes (specified in the input sdp file).
-   (Bertrand Kerautret,
-   [#252](https://github.com/DGtal-team/DGtalTools/pull/252))
-
+    (Bertrand Kerautret,
+    [#252](https://github.com/DGtal-team/DGtalTools/pull/252))
   - sliceViewer: fix bug when imported image domain doesn't contain (0,0,0) point.
     (Roland Denis, [#256](https://github.com/DGtal-team/DGtalTools/pull/256))
   - 3dSDPViewer: add an option to display on screen the selected voxel.
