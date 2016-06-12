@@ -110,14 +110,20 @@ using namespace DGtal;
  */
 
 
-
+/**
+ * Custom Viewer3D to override KeyPressEvent method and handle new key display.
+ * It also desactivate the double Rendering mode for more efficiency.
+ **/
 template<typename Space = SpaceND<3>, typename KSpace = KhalimskySpaceND<3> >
 class CustomViewer3D: public Viewer3D<Space, KSpace>
 {
 protected:
-  virtual void init(){
+  
+  virtual void init()
+  {
     Viewer3D<Space, KSpace>::init();
     Viewer3D<Space, KSpace>::setKeyDescription ( Qt::Key_I, "Display mesh informations about #faces, #vertices" );
+    Viewer3D<Space, KSpace>::setGLDoubleRenderingMode(false);
   }
   virtual void keyPressEvent(QKeyEvent *e){
     bool handled = false;
