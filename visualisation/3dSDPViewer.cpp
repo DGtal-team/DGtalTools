@@ -428,19 +428,16 @@ int main( int argc, char** argv )
     }
     if(vm.count("addMesh"))
     {
-      DGtal::Color meshColor = DGtal::Color::White;
-      if(vm.count("customColorMesh")){
+      bool customColorMesh =  vm.count("customColorMesh");
+      if(customColorMesh){
         std::vector<unsigned int > vectCol = vm["customColorMesh"].as<std::vector<unsigned int> >();
         if(vectCol.size()!=4){
           trace.error() << "colors specification should contain R,G,B and Alpha values"<< std::endl;
         }
-        meshColor = DGtal::Color(vectCol[0], vectCol[1], vectCol[2], vectCol[3]);
-       }
-      viewer.setFillColor(meshColor);
-
-
+        viewer.setFillColor(DGtal::Color(vectCol[0], vectCol[1], vectCol[2], vectCol[3]));
+      }
       std::string meshName = vm["addMesh"].as<std::string>();
-      Mesh<Z3i::RealPoint> mesh;
+      Mesh<Z3i::RealPoint> mesh(!customColorMesh);
       mesh << meshName ;
       viewer << mesh;
     }
