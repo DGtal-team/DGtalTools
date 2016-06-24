@@ -114,16 +114,15 @@ using namespace DGtal;
  * Custom Viewer3D to override KeyPressEvent method and handle new key display.
  * It also desactivate the double Rendering mode for more efficiency.
  **/
-template<typename Space = SpaceND<3>, typename KSpace = KhalimskySpaceND<3> >
-class CustomViewer3D: public Viewer3D<Space, KSpace>
+class CustomViewer3D: public Viewer3D<>
 {
 protected:
   
   virtual void init()
   {
-    Viewer3D<Space, KSpace>::init();
-    Viewer3D<Space, KSpace>::setKeyDescription ( Qt::Key_I, "Display mesh informations about #faces, #vertices" );
-    Viewer3D<Space, KSpace>::setGLDoubleRenderingMode(false);
+    Viewer3D<>::init();
+    Viewer3D<>::setKeyDescription ( Qt::Key_I, "Display mesh informations about #faces, #vertices" );
+    Viewer3D<>::setGLDoubleRenderingMode(false);
   }
   virtual void keyPressEvent(QKeyEvent *e){
     bool handled = false;
@@ -132,13 +131,13 @@ protected:
       handled=true;
       myIsDisplayingInfoMode = !myIsDisplayingInfoMode;
       std::stringstream sstring;
-      Viewer3D<Space, KSpace>::displayMessage(QString(myIsDisplayingInfoMode ?
+      Viewer3D<>::displayMessage(QString(myIsDisplayingInfoMode ?
                                                       myInfoDisplay.c_str() : " "), 1000000);
-      Viewer3D<Space, KSpace>::updateGL();
+      Viewer3D<>::updateGL();
     }
     if(!handled)
       {
-        Viewer3D<Space, KSpace>::keyPressEvent(e);        
+        Viewer3D<>::keyPressEvent(e);        
       }
   };
 
@@ -278,7 +277,7 @@ int main( int argc, char** argv )
   
   
   QApplication application(argc,argv);
-  CustomViewer3D<> viewer;
+  CustomViewer3D viewer;
   std::stringstream title;
   title  << "Simple Mesh Viewer: " << inputFilenameVect[0];
   viewer.setWindowTitle(title.str().c_str());
@@ -364,6 +363,6 @@ int main( int argc, char** argv )
   stringstream ss;
   ss << "# faces: " << std::fixed << nbFaces << "    #vertex: " <<  nbVertex;
   viewer.myInfoDisplay = ss.str();
-  viewer  << CustomViewer3D<>::updateDisplay;
+  viewer  << CustomViewer3D::updateDisplay;
   return application.exec();
 }
