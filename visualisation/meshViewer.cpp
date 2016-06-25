@@ -110,6 +110,44 @@ using namespace DGtal;
  */
 
 
+/**
+ * Custom Viewer3D to override KeyPressEvent method and handle new key display.
+ * It also desactivate the double Rendering mode for more efficiency.
+ **/
+class CustomViewer3D: public Viewer3D<>
+{
+protected:
+  
+  virtual void init()
+  {
+    Viewer3D<>::init();
+    Viewer3D<>::setKeyDescription ( Qt::Key_I, "Display mesh informations about #faces, #vertices" );
+    Viewer3D<>::setGLDoubleRenderingMode(false);
+  }
+  virtual void keyPressEvent(QKeyEvent *e){
+    bool handled = false;
+    if( e->key() == Qt::Key_I)
+    {
+      handled=true;
+      myIsDisplayingInfoMode = !myIsDisplayingInfoMode;
+      std::stringstream sstring;
+      Viewer3D<>::displayMessage(QString(myIsDisplayingInfoMode ?
+                                                      myInfoDisplay.c_str() : " "), 1000000);
+      Viewer3D<>::updateGL();
+    }
+    if(!handled)
+      {
+        Viewer3D<>::keyPressEvent(e);        
+      }
+  };
+
+public: 
+  std::string myInfoDisplay = "No information loaded...";
+  bool myIsDisplayingInfoMode = false;
+};
+
+
+  
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace po = boost::program_options;
@@ -239,7 +277,7 @@ int main( int argc, char** argv )
   
   
   QApplication application(argc,argv);
-  Viewer3D<> viewer;
+  CustomViewer3D viewer;
   std::stringstream title;
   title  << "Simple Mesh Viewer: " << inputFilenameVect[0];
   viewer.setWindowTitle(title.str().c_str());
@@ -314,11 +352,17 @@ int main( int argc, char** argv )
       viewer.setLineColor(vFieldLineColor);
       viewer.addLine(vectPt1[i], vectPt2[i]);
     }
-    
-    
   }
-  
-  
-  viewer << Viewer3D<>::updateDisplay;
+  unsigned int nbVertex = 0;
+  unsigned int nbFaces = 0;
+  for(auto const &m:  vectMesh)
+    {
+      nbVertex += m.nbVertex();
+      nbFaces +=m.nbFaces();
+    }
+  stringstream ss;
+  ss << "# faces: " << std::fixed << nbFaces << "    #vertex: " <<  nbVertex;
+  viewer.myInfoDisplay = ss.str();
+  viewer  << CustomViewer3D::updateDisplay;
   return application.exec();
 }
