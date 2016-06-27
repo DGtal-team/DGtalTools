@@ -32,258 +32,186 @@ More Information
 * [![Build Status](https://api.travis-ci.org/DGtal-team/DGtalTools.svg?branch=master)](https://travis-ci.org/DGtal-team/DGtalTools)
 
 
-Organisation
-============
+Documentation
+==============
+
+The description and documentation of the tools are available [here] (http://dgtal.org/doc/tools/nightly/). 
 
 Actually the DGTal project is organized as follows:
 
- - [Converters](#converters)
-
- - [Estimators](#estimators)
-
- - [Generators](#generators)
-
- - [Visualization](#visualization)
-
- - [Volumetric](#volumetric)
+ - [Converters](http://dgtal.org/doc/tools/nightly/converters.html#converters):
+   utilities to convert various simple file formats (for instance vol2raw, dicom2vol, mesh2heightfield ...)
+   
+ - [Estimators](http://dgtal.org/doc/tools/nightly/estimators.html#estimators_Doc):
+   different geometric estimators (like tangent, curvature 2D/3D...)
 
 
-Converters
-----------
+ - [Generators](http://dgtal.org/doc/tools/nightly/generators.html):
+   utilities to generate various contours/shapes
 
-Utilities to convert various simple file formats:
 
-  - convertVol: a simple generic volume image converters (can process actually pgm3d, vol, longvol, raw (for writing)).
-  - dicom2vol: convert dicom images into 3d volumic file.
-  - freeman2img: transform one or several freeman chains into a pgm file by filling their interior areas.
-  - freeman2sdp: convert freeman chain towards a Sequence of Discrete Points.
-  - HDF52vol: convert HDF5 to vol file format. 
-  - heightfield2shading: Render a 2D heightfield image into a shading image from various reflectance models (lambertian, specular, custom reflectance map).
-  - heightfield2vol: a new tool to transform 2D heightfield into volumetric file.
-  - img2freeman: to extract a freeman chain contour from a grayscale image.
-  - imgAddNoise: a new tool to add noise (Kanungo's) to a binary 2D object.
-  - itk2vol: convert any image of itk format (mhd, mha, ...) to vol (available with the itk option in DGtal).
-  - longvol2vol: convert longvol to vol file using different conversion policies.  
-  - mesh2heightfield: a tool to convert a mesh file into a 2D heightmap (from a normal direction N and from a starting point P).
-  - ofs2off: convert OFS mesh format towards a OFF variant.
-  - raw2HDF5: convert raw image to HDF5.
-  - raw2vol and vol2raw: transform 3D volumes files from (resp. to) raw to vol.
-  - sdp2vol: a simple tool to create a 3d vol image from 3d digital points.
-  - slice2vol: tool to merge slices into one 3d volumic file.
-  - volAddNoise: a new tool to add noise (Kanungo's) to a binary 3D object.
-  - vol2obj: convert a volume file into OBJ format (all voxels belonging to threshold interval)   
-  - vol2raw: convert a vol to a 8-bit raw file.
-  - vol2sdp: a simple tools to extract digital points from 3d vol files.
-  - vol2slice: tool to extract all slices from 3d volumic images.
-  - volBoundary2obj: export the boundary of a volume file to OBJ format.
-  - vol2heightfield: a new tool to transform volumetric file into 2D heightmap.
+ - [Visualization](http://dgtal.org/doc/tools/nightly/visualization.html#visualization_Doc):
+   various tools to visualize digital data (set of voxels, vol file, heightmap ... )
+   
 
-<center>
-<table>
-<tr>
-<td> <img height=150 src="https://cloud.githubusercontent.com/assets/772865/6706730/9bac9720-cd60-11e4-9819-81e536b21e97.gif"> </td>
-<td> <img height=150 src="https://cloud.githubusercontent.com/assets/772865/15342702/d9999fd8-1c97-11e6-8f6a-6bbd114a5641.png"> </td>
-<td> <img height=150 src="https://cloud.githubusercontent.com/assets/772865/6914017/ccf433e4-d786-11e4-997b-f513f07f56f3.gif"> </td>
-<td> <img height=150 src="https://cloud.githubusercontent.com/assets/772865/6914104/6d25be78-d787-11e4-9433-2a834fc4a0af.png"> </td>
-</tr>
-<tr>
-<td>vol2heightmap</td>
-<td>heightfield2vol</td>
-<td>imgAddNoise</td> 
-<td>volAddNoise</td>
-</tr>
-<tr>
-<td> <img height=150 src="https://cloud.githubusercontent.com/assets/772865/7106643/c09cb8d4-e148-11e4-8653-2d5bac5dc3c5.png"> 
-<td align=center> <img height=150 src="https://cloud.githubusercontent.com/assets/772865/10265156/64aaad64-6a24-11e5-9773-628c661fa76c.png"> </td>
-<td> <img height=150 src="https://cloud.githubusercontent.com/assets/772865/15342501/d80656d6-1c95-11e6-8461-2ec25ba5a864.png"></td>
-<td> <img height=150 src="https://cloud.githubusercontent.com/assets/772865/15342675/b17e505c-1c97-11e6-85c3-663550b3b39a.png"></td>
-
-</tr>
-<tr>
-<td>mesh2heightfield</td>
-<td>heightfield2shading</td>
-<td>vol2sdp</td>
-<td>vol2slice</td>
-</tr>
-
-<tr>
-
-</table>
-
-</center>
+ - [Volumetric](http://dgtal.org/doc/tools/nightly/volumetric.html#volumetric_Doc): 
+   tools to manipulate volumetric files (marching cube, sub sampling, thinning)
 
 
 
+Galleries
+---------
 
-Estimators
-----------
+ - [Converters](http://dgtal.org/doc/tools/nightly/converters.html#converters) :
+   <center>
+   <table>
+   <tr>
+   <td> <img height=150 src="https://cloud.githubusercontent.com/assets/772865/6706730/9bac9720-cd60-11e4-9819-81e536b21e97.gif"> </td>
+   <td> <img height=150 src="https://cloud.githubusercontent.com/assets/772865/15342702/d9999fd8-1c97-11e6-8f6a-6bbd114a5641.png"> </td>
+   <td> <img height=150 src="https://cloud.githubusercontent.com/assets/772865/6914017/ccf433e4-d786-11e4-997b-f513f07f56f3.gif"> </td>
+   <td> <img height=150 src="https://cloud.githubusercontent.com/assets/772865/6914104/6d25be78-d787-11e4-9433-2a834fc4a0af.png"> </td>
+   </tr>
+   <tr>
+   <td align=center > <a href="http://dgtal.org/doc/tools/nightly/vol2heightfield.html">vol2heightmap</a></td>
+   <td align=center ><a href="http://dgtal.org/doc/tools/nightly/heightfield2vol.html">heightfield2vol</a></td>
+   <td align=center ><a href="http://dgtal.org/doc/tools/nightly/imgAddNoise.html">imgAddNoise</a></td> 
+   <td align=center ><a href="http://dgtal.org/doc/tools/nightly/volAddNoise.html">volAddNoise</a></td>
+   </tr>
+   <tr>
+   <td> <img height=150 src="https://cloud.githubusercontent.com/assets/772865/7106643/c09cb8d4-e148-11e4-8653-2d5bac5dc3c5.png"> 
+   <td align=center> <img height=150 src="https://cloud.githubusercontent.com/assets/772865/10265156/64aaad64-6a24-11e5-9773-628c661fa76c.png"> </td>
+   <td> <img height=150 src="https://cloud.githubusercontent.com/assets/772865/15342501/d80656d6-1c95-11e6-8461-2ec25ba5a864.png"></td>
+   <td> <img height=150 src="https://cloud.githubusercontent.com/assets/772865/15342675/b17e505c-1c97-11e6-85c3-663550b3b39a.png"></td>
+   </tr>
+   <tr>
+   <td align=center ><a href="http://dgtal.org/doc/tools/nightly/mesh2heightfield.html"> mesh2heightfield</a></td>
+   <td align=center ><a href="http://dgtal.org/doc/tools/nightly/heightfield2shading.html"> heightfield2shading</a></td>
+   <td align=center ><a href="http://dgtal.org/doc/tools/nightly/vol2sdp.html"> vol2sdp</a></td>
+   <td align=center ><a href="http://dgtal.org/doc/tools/nightly/vol2slice.html"> vol2slice</a></td>
+   </tr>
+   <tr>
+   </table>
+   </center>
+ 
+ 
+ - [Estimators](http://dgtal.org/doc/tools/nightly/estimators.html#estimators_Doc) :
+   <center>
+   <table>
+   <tr>
+   <td colspan="3"><img height=130 src="https://cloud.githubusercontent.com/assets/772865/2646108/f515b0a2-bf39-11e3-96f8-c7606173f43b.png"></td>
+   </tr>
+   <tr>
+   <td colspan="3" align=center >Illustration of <a href="http://dgtal.org/doc/tools/nightly/curvatureScaleSpaceBCC.html"> curvatureScaleSpaceBCC</a> </td>
+   </tr>
+   <tr>
+   <td align=center ><img height=200 src="https://cloud.githubusercontent.com/assets/793707/2996392/d3ee9e58-dced-11e3-98a0-72233927aaf6.jpg"> </td>
+   <td align=center ><img height=200 src="https://cloud.githubusercontent.com/assets/772865/15353086/8637153c-1ce7-11e6-9b64-45baaa954d98.png"> </td>
+   <td align=center> <img height=200 src="https://cloud.githubusercontent.com/assets/772865/15352637/6cfde4a8-1ce5-11e6-8d36-a2a3be4744d1.png"> </td>
+   </tr>
+   <tr>
+   <td colspan="2"> Illustration of <a href="http://dgtal.org/doc/tools/nightly/generic3dNormalEstimators.html">generic3dNormalEstimators</a> on VCM estimator applied on smooth and noisy shapes.</td>
+   <td> <a align=center >href="http://dgtal.org/doc/tools/nightly/Doc2dLocalEstimators.html"> 2dLocalEstimators </a> </td>
+   </tr>
+   <tr> 
+   <td> <img height=200 src="https://cloud.githubusercontent.com/assets/772865/15351379/5d2cd562-1cdf-11e6-81b6-8171b0e7f87f.png"></td>
+   <td> <img height=200 src="https://cloud.githubusercontent.com/assets/772865/15351501/dbb860d6-1cdf-11e6-8d9f-df3356bb969c.png"></td>
+   <td> <img height=200 src="https://cloud.githubusercontent.com/assets/772865/15352775/29e2fad6-1ce6-11e6-958c-34ca77175a90.png"></td>
+   </tr>
+   <tr> 
+   <td align=center > <a href="http://dgtal.org/doc/tools/nightly/Doc3dCurveTangentEstimator.html"> 3dCurveTangentEstimator</a> </td>
+   <td align=center > <a href="http://dgtal.org/doc/tools/nightly/vol2normalField.html"> vol2normalField</a> </td>
+   <td align=center > <a href="http://dgtal.org/doc/tools/nightly/lengthEstimators.html"> lengthEstimators</a> </td>
+   </tr>
+   </table>
+   </center>
 
-  - 2dLocalEstimators: program to compare local curvature/tangent estimators on implicit shapes
-    - Maximal DSS based estimators
-    - Maximal DCA based estimators
-    - Binomial convolver based estimators
-    - Integral Invariants based estimators
-  - 3dLocalEstimators: program to compare  3D local curvature (mean or gaussian) estimators on 3D implicit shapes.
-  - curvatureBC: curvature estimator using the Binomial convolver.
-  - curvatureMCMS: curvature estimator using the maximal segments cover  (to be updated for current DGtal version).
-  - curvatureScaleSpaceBCC: a tool to display the curvature scale space of a given contour with the Binomial Convolver Curvature Estimator
-  - eulerCharacteristic: bruteforce tool to extract (volumetric) Euler characteristic from volumetric binary object.
-  - generic3dNormalEstimators: computes a normal vector field over a digitized 3D implicit surface for several estimators (II|VCM|Trivial|True).
-  - lengthEstimators: generate multigrid length estimations of paramteric shapes using DGtal library.
-  - statisticsEstimators: compute satistics (L1, L2, Loo) from results of two extimators.
-  - tangentBC: tangent estimator using the Binomial convolver.
-  - vol2normalField: compute the normal vector field of a given vol file.
-
-<table>
-<tr>
-<td colspan="3"><img height=130 src="https://cloud.githubusercontent.com/assets/772865/2646108/f515b0a2-bf39-11e3-96f8-c7606173f43b.png"></td>
-</tr>
-<tr>
-<td colspan="3">Illustration of curvatureScaleSpaceBCC </td>
-</tr>
-<tr>
-<td align=center ><img height=200 src="https://cloud.githubusercontent.com/assets/793707/2996392/d3ee9e58-dced-11e3-98a0-72233927aaf6.jpg"> </td>
-<td align=center ><img height=200 src="https://cloud.githubusercontent.com/assets/772865/15353086/8637153c-1ce7-11e6-9b64-45baaa954d98.png"> </td>
-<td align=center> <img height=200 src="https://cloud.githubusercontent.com/assets/772865/15352637/6cfde4a8-1ce5-11e6-8d36-a2a3be4744d1.png"> </td>
-</tr>
-<tr>
-<td colspan="2"> Illustration of generic3dNormalEstimators on VCM estimator applied on smooth and noisy shapes.</td>
-<td> 2dLocalEstimators </td>
-</tr>
-<tr> 
-<td> <img height=200 src="https://cloud.githubusercontent.com/assets/772865/15351379/5d2cd562-1cdf-11e6-81b6-8171b0e7f87f.png"></td>
-<td> <img height=200 src="https://cloud.githubusercontent.com/assets/772865/15351501/dbb860d6-1cdf-11e6-8d9f-df3356bb969c.png"></td>
-<td> <img height=200 src="https://cloud.githubusercontent.com/assets/772865/15352775/29e2fad6-1ce6-11e6-958c-34ca77175a90.png"></td>
-</tr>
-<tr> 
-<td> 3dCurveTangentEstimator </td>
-<td> vol2normalField </td>
-<td> lengthEstimators </td>
-</tr>
-</table>
-
-Generators
---------------
-  - contourGenerator: generate multigrid shape contours.
-  - shapeGenerator: generate multigrid shape.
- <center>
-<table>
-<tr>
-<td><img height=130 src="https://f.cloud.github.com/assets/772865/684690/eff46c16-da02-11e2-861e-ddc366b247e8.png"></td>
-<td><img height=130 src="https://f.cloud.github.com/assets/772865/684694/39a9cc2a-da03-11e2-9f49-3aff0e886c35.png"></td>
-<td><img height=130 src="https://f.cloud.github.com/assets/772865/684695/42b657ca-da03-11e2-985e-e468084b5c01.png"></td>
-</tr>
-<tr>
-<td> grid size = 1</td> <td> grid size= 0.1</td> <td> grid size = 0.01</td>
-</tr>
-<tr>
-<td colspan=3 > Illustration of the Generators tools </td>
-</tr>
-</table>
-</center>
-
-Visualization
--------------
-  - 3dCompSurfelData: it computes generic scalar surfel data comparisons with display with surfel association.
-  - 3dCurvatureViewer: permits to compute and visualize mean or gaussian curvature of binary shapes.
-  - 3dCurvatureViewerNoise: Same as 3dCurvatureViewer, but allow to add some noise to objects.
-  - 3dCurveViewer: displays 3D curves with tangential cover and projections onto bounding box.
-  - 3dDisplaySurfelData: displays surfel data from SDP file with color attributes given as scalar interpreted as color.
-  - 3dHeightMapViewer: display a 2D image as heightmap by using QGLviewer.
-  - 3dImageViewer: tools to display 3d slice images (.vol, .pgm3d and  dicom with ITK) with QGLViewer.
-  - 3dImplicitSurfaceExtractorBy4DExtension: a tool to visualize 3d polynomial implicit surface defined as some f(x,y,z)=0.
-  - 3dImplicitSurfaceExtractorByThickening: a tool to visualize 3d polynomial implicit surface defined as some f(x,y,z)=0.
-  - 3dSDPViewer: basic display of a sequence of 3d points (as voxel or sphere) and vectors by using QGLviewer.
-  - 3dVolBoundaryViewer: Display the boundary of a volume file by using QGLviewer. 
-  - 3dVolViewer: volume file (.vol, .pgm3d and dicom with ITK ) viewer with QGLViewer.
-  - displayContours: display discrete contours from various format (.fc (freemanchain), .sdp).
-  - meshViewer: display 3D mesh from OFS or OFF format.
-  - patternTriangulation: a new tool that draws with Board2D the convex hull, the closest-point Delaunay triangulation or the farthest-point Delaunay triangulation of a pattern.
-  - sliceViewer: a new 2D and 3D slice viewer from 3D volumic files ( pgm3d, vol, longvol, and DICOM with ITK).
-
-Here are some illustrations of such a tools:
-<center>
-<table>
-<tr>
-<td><img height=130 src="https://f.cloud.github.com/assets/772865/684607/450c064e-da00-11e2-8830-76eb90a5efd7.png"></td>
-<td><img height=130 src="https://f.cloud.github.com/assets/772865/685853/d96a5252-da44-11e2-9872-7f0160be8f5d.png"></td>
-<td><img height=130 src="https://f.cloud.github.com/assets/772865/684569/59a2f6fa-d9fe-11e2-84ba-a48842f4aafb.png" ></td>
-<td><img height=130 src="https://f.cloud.github.com/assets/772865/684590/778bea9a-d9ff-11e2-8e04-6e3e8a39ae3c.png"></td>
-</tr>
-<tr>
-<td>3dCurvatureViewer</td>
-<td>3dCurveViewer </td>
-<td>3dImageViewer</td>
-<td>3dVolViewer</td>
-</tr>
-
-<tr>
-<td><img height=130 src="https://f.cloud.github.com/assets/772865/684598/c3adcf4c-d9ff-11e2-8c3f-e67c8abd0c76.png"></td>
-<td><img height=130 src="https://f.cloud.github.com/assets/772865/684622/d698405a-da00-11e2-8aa0-19212a58ce23.png"></td>
-<td><img width=300 src="https://cloud.githubusercontent.com/assets/772865/2720141/6c42a0e0-c56b-11e3-8328-a6d88242f21e.png"> </td>
-<td><img  width=300 src="https://cloud.githubusercontent.com/assets/772865/10269635/8678ca02-6add-11e5-9d83-fbcf3608612f.png"></td>
-</tr>
-<tr>
-<td>displayContours</td>
-<td>meshViewer</td>
-<td>3dSDPViewer</td>
-<td>sliceViewer</td>
-</tr>
-
-<tr>
-<td><img  width=300 src="https://cloud.githubusercontent.com/assets/772865/3486505/6edb2144-043e-11e4-81c4-2c20f272a119.png" </td>
-<td><img width=300 src="https://cloud.githubusercontent.com/assets/772865/4118303/5f53f61c-329f-11e4-9629-23c53afd9eff.png" </td>
-<td align="center" colspan="2"><img width=250 src="https://cloud.githubusercontent.com/assets/772865/12538898/00459c06-c2e6-11e5-91f6-d14494ab05da.png"</td>
-</tr>
-<tr>
-<td>3dHeightMapViewer</td>
-<td>3dCompSurfelData</td>
-<td  align="center" colspan="2">3dImplicitSurfaceExtractorByThickening </td>
-</tr>
+ - [Generators](http://dgtal.org/doc/tools/nightly/generators.html) :
+   <center>
+   <table>
+   <tr>
+   <td><img height=130 src="https://f.cloud.github.com/assets/772865/684690/eff46c16-da02-11e2-861e-ddc366b247e8.png"></td>
+   <td><img height=130 src="https://f.cloud.github.com/assets/772865/684694/39a9cc2a-da03-11e2-9f49-3aff0e886c35.png"></td>
+   <td><img height=130 src="https://f.cloud.github.com/assets/772865/684695/42b657ca-da03-11e2-985e-e468084b5c01.png"></td>
+   </tr>
+   <tr>
+   <td> grid size = 1</td> <td> grid size= 0.1</td> <td> grid size = 0.01</td>
+   </tr>
+   <tr>
+   <td colspan="3" align=center> <a href="http://dgtal.org/doc/tools/nightly/shapeGenerator.html">shapeGenerator</a>  
+   </tr>
+   </table>
+   </center>
+   
+ - [Visualization](http://dgtal.org/doc/tools/nightly/visualization.html#visualization_Doc) :
+   <center>
+   <table>
+   <tr>
+   <td><img height=130 src="https://f.cloud.github.com/assets/772865/684607/450c064e-da00-11e2-8830-76eb90a5efd7.png"></td>
+   <td><img height=130 src="https://f.cloud.github.com/assets/772865/685853/d96a5252-da44-11e2-9872-7f0160be8f5d.png"></td>
+   <td><img height=130 src="https://f.cloud.github.com/assets/772865/684569/59a2f6fa-d9fe-11e2-84ba-a48842f4aafb.png" ></td>
+   <td><img height=130 src="https://f.cloud.github.com/assets/772865/684590/778bea9a-d9ff-11e2-8e04-6e3e8a39ae3c.png"></td>
+   </tr>
+   <tr>
+   <td align=center > <a href="http://dgtal.org/doc/tools/nightly/Doc3DCurvatureViewer.html" > 3dCurvatureViewer</a></td>
+   <td align=center > <a href="http://dgtal.org/doc/tools/nightly/Doc3dCurveViewer.html" > 3dCurveViewer</a> </td>
+   <td align=center > <a href="http://dgtal.org/doc/tools/nightly/Doc3dImageViewer.html" > 3dImageViewer</a></td>
+   <td align=center > <a href="http://dgtal.org/doc/tools/nightly/Doc3dVolViewer.html" > 3dVolViewer</a></td>
+   </tr>
+   <tr>
+   <td><img height=130 src="https://f.cloud.github.com/assets/772865/684598/c3adcf4c-d9ff-11e2-8c3f-e67c8abd0c76.png"></td>
+   <td><img height=130 src="https://f.cloud.github.com/assets/772865/684622/d698405a-da00-11e2-8aa0-19212a58ce23.png"></td>
+   <td><img width=300 src="https://cloud.githubusercontent.com/assets/772865/2720141/6c42a0e0-c56b-11e3-8328-a6d88242f21e.png"> </td>
+   <td><img  width=300 src="https://cloud.githubusercontent.com/assets/772865/10269635/8678ca02-6add-11e5-9d83-fbcf3608612f.png"></td>
+   </tr>
+   <tr>
+   <td align=center > <a href="http://dgtal.org/doc/tools/nightly/displayContours.html"> displayContours</a></td>
+   <td align=center > <a href="http://dgtal.org/doc/tools/nightly/meshViewer.html"> meshViewer</a></td>
+   <td align=center > <a href="http://dgtal.org/doc/tools/nightly/Doc3DSDPViewer.html"> 3dSDPViewer</a></td>
+   <td align=center > <a href="http://dgtal.org/doc/tools/nightly/sliceViewer.html"> sliceViewer</a></td>
+   </tr>
+   <tr>
+   <td><img  width=300 src="https://cloud.githubusercontent.com/assets/772865/3486505/6edb2144-043e-11e4-81c4-2c20f272a119.png" </td>
+   <td><img width=300 src="https://cloud.githubusercontent.com/assets/772865/4118303/5f53f61c-329f-11e4-9629-23c53afd9eff.png" </td>
+   <td align="center" colspan="2"><img width=250 src="https://cloud.githubusercontent.com/assets/772865/12538898/00459c06-c2e6-11e5-91f6-d14494ab05da.png"</td>
+   </tr>
+   <tr>
+   <td align=center ><a href="http://dgtal.org/doc/tools/nightly/Doc3dHeightMapViewer.html" > 3dHeightMapViewer</a></td>
+   <td align=center  ><a href="http://dgtal.org/doc/tools/nightly/CompSurfelData.html" > 3dCompSurfelData</a></td>
+   <td  align="center" colspan="2"><a href="http://dgtal.org/doc/tools/nightly/Doc3dImplicitSurfaceExtractorByThickening.html" > 3dImplicitSurfaceExtractorByThickening</a> </td>
+   </tr>
+   </table>
+   </center>
 
 
 
-</table>
-</center>
-Volumetric
-----------
-  - 3dVolMarchingCubes: marching cubes form a Vol file.
-  - homotopicThinning3D: ultimate skeleton from vol file.
-  - volAddBorder: add a 1 voxel boundary with value 0 to a vol file.
-  - volCComponentCounter: a simple program to count the number of connected components in a 3D image.
-  - volCrop: Crop an 3D vol image from to points.
-  - volFlip: tool to flip all volume slice images according a given dimension.
-  - volImageMetrics: apply basic statistics on comparaison between two volumetric images (shape defined from thresholds): computes true/false -+, precision, recall f-mean RMSE, PSNR. 
-  - volReSample: apply a basic  re sampling of a 3D volumetric image (.vol, .longvol, .pgm3d)  with a given grid size. 
-  - volSegment: Segment volumetric file from a simple threshold which can be set automatically from the otsu estimation.
-  - volShapeMetrics: apply euclidean distance comparisons between two shapes  (shape defined from thresholds).
-  - volSubSample: sub sample a vol file (division by 2 in each direction).
-  - volTrValues: apply basic vol image transform from the input values to output values.
 
-<center>
-<table>
-<tr>
-<td> <img width=300 src="https://cloud.githubusercontent.com/assets/772865/15342874/d79fc22e-1c98-11e6-922b-48f27f5cf586.png"> </td>
-<td> <img width=300 src="https://cloud.githubusercontent.com/assets/772865/15342814/828267ec-1c98-11e6-9080-a210bdd42b35.png"> </td>
-<td> <img width=300 src="https://cloud.githubusercontent.com/assets/772865/15342834/a6736bb0-1c98-11e6-9a42-9dc5a198800f.png"> </td>
-</tr>
-<tr>
-<td>3dVolMarchingCubes</td>
-<td>homotopicThinning3D</td>
-<td>volSubSample</td>
-</tr>
-<tr>
-<td> <img width=300 src="https://cloud.githubusercontent.com/assets/772865/15342933/2da32a80-1c99-11e6-9600-16a68f145bdd.png"> </td>
-<td> <img width=300 src="https://cloud.githubusercontent.com/assets/772865/15342979/8e2d2d4c-1c99-11e6-88b4-5835adb04eff.png"> </td>
-<td> <img width=300 src="https://cloud.githubusercontent.com/assets/772865/15343002/b2fdf4c6-1c99-11e6-986b-9f56299b4a16.png"> </td>
-</tr>
-<tr>
-<td>volReSample</td>
-<td>volTrValues</td>
-<td>volSegment</td>
-</tr>
-</table>
-</center>
+
+ - [Volumetric](http://dgtal.org/doc/tools/nightly/volumetric.html#volumetric_Doc) :
+   <center>
+   <table>
+   <tr>
+   <td> <img width=300 src="https://cloud.githubusercontent.com/assets/772865/15342874/d79fc22e-1c98-11e6-922b-48f27f5cf586.png"> </td>
+   <td> <img width=300 src="https://cloud.githubusercontent.com/assets/772865/15342814/828267ec-1c98-11e6-9080-a210bdd42b35.png"> </td>
+   <td> <img width=300 src="https://cloud.githubusercontent.com/assets/772865/15342834/a6736bb0-1c98-11e6-9a42-9dc5a198800f.png"> </td>
+   </tr>
+   <tr>
+   <td align=center  ><a href="http://dgtal.org/doc/tools/nightly/Doc3dVolMarchingCubes.html"> 3dVolMarchingCubes </a> </td>
+   <td align=center  ><a href="http://dgtal.org/doc/tools/nightly/homotopicThinning3D.html"> homotopicThinning3D </a> </td>
+   <td align=center  ><a href="http://dgtal.org/doc/tools/nightly/volSubSample.html"> volSubSample </a> </td>
+   </tr>
+   <tr>
+   <td align=center > <img width=300 src="https://cloud.githubusercontent.com/assets/772865/15342933/2da32a80-1c99-11e6-9600-16a68f145bdd.png"> </td>
+   <td align=center > <img width=300 src="https://cloud.githubusercontent.com/assets/772865/15342979/8e2d2d4c-1c99-11e6-88b4-5835adb04eff.png"> </td>
+   <td align=center > <img width=300 src="https://cloud.githubusercontent.com/assets/772865/15343002/b2fdf4c6-1c99-11e6-986b-9f56299b4a16.png"> </td>
+   </tr>
+   <tr>
+   <td align=center ><a href="http://dgtal.org/doc/tools/nightly/volReSample.html"> volReSample </a> </td>
+   <td align=center ><a href="http://dgtal.org/doc/tools/nightly/volTrValues.html"> volTrValues </a> </td>
+   <td align=center ><a href="http://dgtal.org/doc/tools/nightly/volSegment.html"> volSegment </a> </td>
+   </tr>
+   </table>
+   </center>
+
 
 
 
