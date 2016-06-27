@@ -50,8 +50,8 @@ Actually the DGTal project is organized as follows:
     <td> <img height=150 src="https://cloud.githubusercontent.com/assets/772865/6914104/6d25be78-d787-11e4-9433-2a834fc4a0af.png"> </td>
     </tr>
     <tr>
-    <td>[vol2heightmap]( http://dgtal.org/doc/tools/nightly/vol2heightfield.html )</td>
-    <td> heightfield2vol http://dgtal.org/doc/tools/nightly/heightfield2vol.html </td>
+    <td> <a href="http://dgtal.org/doc/tools/nightly/vol2heightfield.html">vol2heightmap</a></td>
+    <td>[heightfield2vol](http://dgtal.org/doc/tools/nightly/heightfield2vol.html)</td>
     <td>[imgAddNoise](http://dgtal.org/doc/tools/nightly/imgAddNoise.html)</td> 
     <td>[volAddNoise](http://dgtal.org/doc/tools/nightly/volAddNoise.html)</td>
     </tr>
