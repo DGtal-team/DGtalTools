@@ -51,9 +51,9 @@ Actually the DGTal project is organized as follows:
     </tr>
     <tr>
     <td> <a href="http://dgtal.org/doc/tools/nightly/vol2heightfield.html">vol2heightmap</a></td>
-    <td>[heightfield2vol](http://dgtal.org/doc/tools/nightly/heightfield2vol.html)</td>
-    <td>[imgAddNoise](http://dgtal.org/doc/tools/nightly/imgAddNoise.html)</td> 
-    <td>[volAddNoise](http://dgtal.org/doc/tools/nightly/volAddNoise.html)</td>
+    <td><a href="http://dgtal.org/doc/tools/nightly/heightfield2vol.html">heightfield2vol</a></td>
+    <td><a href="http://dgtal.org/doc/tools/nightly/imgAddNoise.html">imgAddNoise</a></td> 
+    <td><a href="http://dgtal.org/doc/tools/nightly/volAddNoise.html">volAddNoise</a></td>
     </tr>
     <tr>
     <td> <img height=150 src="https://cloud.githubusercontent.com/assets/772865/7106643/c09cb8d4-e148-11e4-8653-2d5bac5dc3c5.png"> 
@@ -62,10 +62,10 @@ Actually the DGTal project is organized as follows:
     <td> <img height=150 src="https://cloud.githubusercontent.com/assets/772865/15342675/b17e505c-1c97-11e6-85c3-663550b3b39a.png"></td>
     </tr>
     <tr>
-    <td>[mesh2heightfield](http://dgtal.org/doc/tools/nightly/mesh2heightfield.html)</td>
-    <td>[heightfield2shading](http://dgtal.org/doc/tools/nightly/heightfield2shading.html)</td>
-    <td>[vol2sdp](http://dgtal.org/doc/tools/nightly/vol2sdp.html)</td>
-    <td>[vol2slice](http://dgtal.org/doc/tools/nightly/vol2slice.html)</td>
+    <td><a href="http://dgtal.org/doc/tools/nightly/mesh2heightfield.html"> mesh2heightfield</a></td>
+    <td><a href="http://dgtal.org/doc/tools/nightly/heightfield2shading.html"> heightfield2shading</a></td>
+    <td><a href="http://dgtal.org/doc/tools/nightly/vol2sdp.html"> vol2sdp</a></td>
+    <td><a href="http://dgtal.org/doc/tools/nightly/vol2slice.html"> vol2slice</a></td>
     </tr>
     <tr>
     </table>
@@ -95,9 +95,9 @@ Actually the DGTal project is organized as follows:
     <td> <img height=200 src="https://cloud.githubusercontent.com/assets/772865/15352775/29e2fad6-1ce6-11e6-958c-34ca77175a90.png"></td>
     </tr>
     <tr> 
-    <td> [3dCurveTangentEstimator](http://dgtal.org/doc/tools/nightly/Doc3dCurveTangentEstimator.html) </td>
-    <td> [vol2normalField](http://dgtal.org/doc/tools/nightly/vol2normalField.html) </td>
-    <td> [lengthEstimators](http://dgtal.org/doc/tools/nightly/lengthEstimators.html) </td>
+    <td> <a href"http://dgtal.org/doc/tools/nightly/Doc3dCurveTangentEstimator.html"> 3dCurveTangentEstimator</a> </td>
+    <td> <a href="http://dgtal.org/doc/tools/nightly/vol2normalField.html"> vol2normalField</a> </td>
+    <td> <a href="http://dgtal.org/doc/tools/nightly/lengthEstimators.html"> lengthEstimators</a> </td>
     </tr>
     </table>
 
