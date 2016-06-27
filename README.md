@@ -195,19 +195,19 @@ Galleries
    <td> <img width=300 src="https://cloud.githubusercontent.com/assets/772865/15342834/a6736bb0-1c98-11e6-9a42-9dc5a198800f.png"> </td>
    </tr>
    <tr>
-   <td><a href="http://dgtal.org/doc/tools/nightly/Doc3dVolMarchingCubes.html"> 3dVolMarchingCubes </a> </td>
-   <td><a href="http://dgtal.org/doc/tools/nightly/homotopicThinning3D.html"> homotopicThinning3D </a> </td>
-   <td><a href="http://dgtal.org/doc/tools/nightly/volSubSample.html"> volSubSample </a> </td>
+   <td align=center  ><a href="http://dgtal.org/doc/tools/nightly/Doc3dVolMarchingCubes.html"> 3dVolMarchingCubes </a> </td>
+   <td align=center  ><a href="http://dgtal.org/doc/tools/nightly/homotopicThinning3D.html"> homotopicThinning3D </a> </td>
+   <td align=center  ><a href="http://dgtal.org/doc/tools/nightly/volSubSample.html"> volSubSample </a> </td>
    </tr>
    <tr>
-   <td> <img width=300 src="https://cloud.githubusercontent.com/assets/772865/15342933/2da32a80-1c99-11e6-9600-16a68f145bdd.png"> </td>
-   <td> <img width=300 src="https://cloud.githubusercontent.com/assets/772865/15342979/8e2d2d4c-1c99-11e6-88b4-5835adb04eff.png"> </td>
-   <td> <img width=300 src="https://cloud.githubusercontent.com/assets/772865/15343002/b2fdf4c6-1c99-11e6-986b-9f56299b4a16.png"> </td>
+   <td align=center > <img width=300 src="https://cloud.githubusercontent.com/assets/772865/15342933/2da32a80-1c99-11e6-9600-16a68f145bdd.png"> </td>
+   <td align=center > <img width=300 src="https://cloud.githubusercontent.com/assets/772865/15342979/8e2d2d4c-1c99-11e6-88b4-5835adb04eff.png"> </td>
+   <td align=center > <img width=300 src="https://cloud.githubusercontent.com/assets/772865/15343002/b2fdf4c6-1c99-11e6-986b-9f56299b4a16.png"> </td>
    </tr>
    <tr>
-   <td><a href="http://dgtal.org/doc/tools/nightly/volReSample.html"> volReSample </a> </td>
-   <td><a href="http://dgtal.org/doc/tools/nightly/volTrValues.html"> volTrValues </a> </td>
-   <td><a href="http://dgtal.org/doc/tools/nightly/volSegment.html"> volSegment </a> </td>
+   <td align=center ><a href="http://dgtal.org/doc/tools/nightly/volReSample.html"> volReSample </a> </td>
+   <td align=center ><a href="http://dgtal.org/doc/tools/nightly/volTrValues.html"> volTrValues </a> </td>
+   <td align=center ><a href="http://dgtal.org/doc/tools/nightly/volSegment.html"> volSegment </a> </td>
    </tr>
    </table>
    </center>
