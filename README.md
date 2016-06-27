@@ -26,6 +26,7 @@ own source code (in complement of DGtal tutorial http://liris.cnrs.fr/dgtal/doc/
 More Information
 ----------------
 * Related DGtalTools-contrib: https://github.com/DGtal-team/DGtalTools-contrib
+* Release 0.9.2 DOI [![DOI](https://zenodo.org/badge/doi/10.5281/zenodo.56432.svg)](http://dx.doi.org/10.5281/zenodo.56432)
 * Release 0.9.1 DOI [![DOI](https://zenodo.org/badge/doi/10.5281/zenodo.45130.svg)](http://dx.doi.org/10.5281/zenodo.45130)
 * Release 0.9 DOI [![DOI](https://zenodo.org/badge/doi/10.5281/zenodo.31882.svg)](http://dx.doi.org/10.5281/zenodo.31882)
 * Release 0.8 DOI [![DOI](https://zenodo.org/badge/doi/10.5281/zenodo.11587.svg)](http://dx.doi.org/10.5281/zenodo.11587)
@@ -58,9 +59,16 @@ Actually the DGTal project is organized as follows:
    tools to manipulate volumetric files (marching cube, sub sampling, thinning)
 
 
+How to build the tools
+======================
+  - use cmake tool to generate a build script (MakeFile, VS project,..) from the CMakeLists.txt
+  - DGtal must be installed in your system. Concerning DGtal dependencies (boost, Qt,...), all the dependencies used to compile your DGtal library must be present to build the DGtalTools.
+  
+  
+
 
 Galleries
----------
+=========
 
  - [Converters](http://dgtal.org/doc/tools/nightly/converters.html#converters) :
    <center>
@@ -110,7 +118,7 @@ Galleries
    </tr>
    <tr>
    <td colspan="2"> Illustration of <a href="http://dgtal.org/doc/tools/nightly/generic3dNormalEstimators.html">generic3dNormalEstimators</a> on VCM estimator applied on smooth and noisy shapes.</td>
-   <td> <a align=center >href="http://dgtal.org/doc/tools/nightly/Doc2dLocalEstimators.html"> 2dLocalEstimators </a> </td>
+   <td> <a align=center href="http://dgtal.org/doc/tools/nightly/Doc2dLocalEstimators.html"> 2dLocalEstimators </a> </td>
    </tr>
    <tr> 
    <td> <img height=200 src="https://cloud.githubusercontent.com/assets/772865/15351379/5d2cd562-1cdf-11e6-81b6-8171b0e7f87f.png"></td>
@@ -214,10 +222,3 @@ Galleries
 
 
 
-
-How to build the tools
-======================
-  - use cmake tool to generate a build script (MakeFile, VS project,..) from the CMakeLists.txt
-  - DGtal must be installed in your system. Concerning DGtal dependencies (boost, Qt,...), all the dependencies used to compile your DGtal library must be present to build the DGtalTools.
-  
-  
