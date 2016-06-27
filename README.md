@@ -110,7 +110,7 @@ Galleries
    </tr>
    <tr>
    <td colspan="2"> Illustration of <a href="http://dgtal.org/doc/tools/nightly/generic3dNormalEstimators.html">generic3dNormalEstimators</a> on VCM estimator applied on smooth and noisy shapes.</td>
-   <td> <a href="http://dgtal.org/doc/tools/nightly/Doc2dLocalEstimators.html"> 2dLocalEstimators </a> </td>
+   <td> <a align=center >href="http://dgtal.org/doc/tools/nightly/Doc2dLocalEstimators.html"> 2dLocalEstimators </a> </td>
    </tr>
    <tr> 
    <td> <img height=200 src="https://cloud.githubusercontent.com/assets/772865/15351379/5d2cd562-1cdf-11e6-81b6-8171b0e7f87f.png"></td>
@@ -137,7 +137,7 @@ Galleries
    <td> grid size = 1</td> <td> grid size= 0.1</td> <td> grid size = 0.01</td>
    </tr>
    <tr>
-   <td colspan="3"> <a href="http://dgtal.org/doc/tools/nightly/shapeGenerator.html">shapeGenerator</a>  
+   <td colspan="3" align=center> <a href="http://dgtal.org/doc/tools/nightly/shapeGenerator.html">shapeGenerator</a>  
    </tr>
    </table>
    </center>
