@@ -132,10 +132,10 @@ Actually the DGTal project is organized as follows:
     <td><img height=130 src="https://f.cloud.github.com/assets/772865/684590/778bea9a-d9ff-11e2-8e04-6e3e8a39ae3c.png"></td>
     </tr>
     <tr>
-    <td>[3dCurvatureViewer](http://dgtal.org/doc/tools/nightly/Doc3DCurvatureViewer.html)</td>
-    <td>[3dCurveViewer](http://dgtal.org/doc/tools/nightly/Doc3dCurveViewer.html) </td>
-    <td>[3dImageViewer](http://dgtal.org/doc/tools/nightly/Doc3dImageViewer.html)</td>
-    <td>[3dVolViewer](http://dgtal.org/doc/tools/nightly/Doc3dVolViewer.html)</td>
+    <td> <a href="http://dgtal.org/doc/tools/nightly/Doc3DCurvatureViewer.html" > 3dCurvatureViewer</a></td>
+    <td> <a href="http://dgtal.org/doc/tools/nightly/Doc3dCurveViewer.html" > 3dCurveViewer</a> </td>
+    <td> <a href="http://dgtal.org/doc/tools/nightly/Doc3dImageViewer.html" > 3dImageViewer</a></td>
+    <td> <a href="http://dgtal.org/doc/tools/nightly/Doc3dVolViewer.html" > 3dVolViewer</a></td>
     </tr>
 
     <tr>
@@ -145,10 +145,10 @@ Actually the DGTal project is organized as follows:
     <td><img  width=300 src="https://cloud.githubusercontent.com/assets/772865/10269635/8678ca02-6add-11e5-9d83-fbcf3608612f.png"></td>
     </tr>
     <tr>
-    <td>[displayContours](http://dgtal.org/doc/tools/nightly/displayContours.html)</td>
-    <td>[meshViewer](http://dgtal.org/doc/tools/nightly/meshViewer.html)</td>
-    <td>[3dSDPViewer](http://dgtal.org/doc/tools/nightly/Doc3DSDPViewer.html)</td>
-    <td>[sliceViewer](http://dgtal.org/doc/tools/nightly/sliceViewer.html)</td>
+    <td> <a href="http://dgtal.org/doc/tools/nightly/displayContours.html"> displayContours</a></td>
+    <td> <a href="http://dgtal.org/doc/tools/nightly/meshViewer.html"> meshViewer</a></td>
+    <td> <a href="http://dgtal.org/doc/tools/nightly/Doc3DSDPViewer.html"> 3dSDPViewer</a></td>
+    <td> <a href="http://dgtal.org/doc/tools/nightly/sliceViewer.html"> sliceViewer</a></td>
     </tr>
 
     <tr>
@@ -157,9 +157,9 @@ Actually the DGTal project is organized as follows:
     <td align="center" colspan="2"><img width=250 src="https://cloud.githubusercontent.com/assets/772865/12538898/00459c06-c2e6-11e5-91f6-d14494ab05da.png"</td>
     </tr>
     <tr>
-    <td>[3dHeightMapViewer](http://dgtal.org/doc/tools/nightly/Doc3dHeightMapViewer.html)</td>
-    <td>[3dCompSurfelData](http://dgtal.org/doc/tools/nightly/CompSurfelData.html)</td>
-    <td  align="center" colspan="2">[3dImplicitSurfaceExtractorByThickening](http://dgtal.org/doc/tools/nightly/Doc3dImplicitSurfaceExtractorByThickening.html) </td>
+    <td><a href="http://dgtal.org/doc/tools/nightly/Doc3dHeightMapViewer.html" > 3dHeightMapViewer</a></td>
+    <td><a href="http://dgtal.org/doc/tools/nightly/CompSurfelData.html" > 3dCompSurfelData</a></td>
+    <td  align="center" colspan="2"><a href="http://dgtal.org/doc/tools/nightly/Doc3dImplicitSurfaceExtractorByThickening.html" > 3dImplicitSurfaceExtractorByThickening</a> </td>
     </tr>
     </table>
     </center>
