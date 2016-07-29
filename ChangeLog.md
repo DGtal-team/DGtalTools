@@ -1,3 +1,10 @@
+# DGtalTools 0.9.3
+
+- *converters*:
+   - fix tool itk2vol which was not able to read and convert int type image.
+   (Bertrand Kerautret, [#276](https://github.com/DGtal-team/DGtalTools/pull/271))
+
+
 # DGtalTools 0.9.2
 
 - *global*:
