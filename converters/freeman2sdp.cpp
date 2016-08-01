@@ -154,10 +154,14 @@ int main( int argc, char** argv )
       std::vector<Z2i::Point> vectPts; 
       FreemanChain::getContourPoints( vectFcs.at(i), vectPts ); 
       for(unsigned int k=0; k < vectPts.size(); k++){
-        std::cout << vectPts.at(k)[0] << " "<< vectPts.at(k)[1];
+        std::cout << vectPts.at(k)[0] << " "<< vectPts.at(k)[1] ;
 	if(!oneline){
           std::cout << std::endl;
-	}
+	}else
+          {
+            std::cout << " "; 
+          }
+          
       }
       std::cout << std::endl;
     }
