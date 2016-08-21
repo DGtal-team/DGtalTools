@@ -53,23 +53,19 @@ using namespace DGtal;
 
 /**
  @page freeman2sdp freeman2sdp
- @brief Transforms Freeman chain into a Sequence of Discrete Points (.sdp).
+ @brief Transform freeman chain into a Sequence of Discrete Points. Result is given to std output.
 
- @b Usage: freeman2sdp [input] [output]
+ @b Usage: freeman2sdp [input] > output.sdp
 
 @b Allowed @b options @b are:
 
 @code
-  -h [ --help ]                     display this message
-  -i [ --input ] arg                the input FreemanChain file name
-  -o [ --output ] arg (=result.pgm)  the output filename
-  -b [ --border ] arg (=0)           add a border in the resulting image (used 
-                                    only in the automatic mode i.e when --space
-                                    is not used.
-  -s [ --space ] arg                Define the space from its bounding box 
-                                    (lower and upper coordinates) else the 
-                                    space is automatically defined from the 
-                                    freemanchain bounding boxes.
+  -h [ --help ]         display this message
+  -i [ --input ] arg    Input freeman chain file name.
+  --info                adds some info as comments at the beginning of the 
+                        file.
+  -o [ --oneLine ]       output the digital contour in one line like: X0 Y0 X1 
+                        Y1 ... XN YN
 @endcode
 
 @b Example:
@@ -130,7 +126,7 @@ int main( int argc, char** argv )
   po::notify(vm);    
   if(!parseOK||vm.count("help")||argc<=1 || (!(vm.count("input")) ) )
     {
-      trace.info()<< "Transform freeman chain into a Sequence of Discrete Points. Result is given to std output " <<std::endl << "Basic usage: "<<std::endl
+      trace.info()<< "Transform freeman chain into a Sequence of Discrete Points. Result is given to std output. " <<std::endl << "Basic usage: "<<std::endl
 		  << "\t freeman2sdp [input] > out.sdp  "<<std::endl
 		  << general_opt << "\n";
       trace.info() << "Example:\n"
@@ -154,10 +150,14 @@ int main( int argc, char** argv )
       std::vector<Z2i::Point> vectPts; 
       FreemanChain::getContourPoints( vectFcs.at(i), vectPts ); 
       for(unsigned int k=0; k < vectPts.size(); k++){
-        std::cout << vectPts.at(k)[0] << " "<< vectPts.at(k)[1];
+        std::cout << vectPts.at(k)[0] << " "<< vectPts.at(k)[1] ;
 	if(!oneline){
           std::cout << std::endl;
-	}
+	}else
+          {
+            std::cout << " "; 
+          }
+          
       }
       std::cout << std::endl;
     }
