@@ -1,0 +1,159 @@
+/**
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU Lesser General Public License as
+ *  published by the Free Software Foundation, either version 3 of the
+ *  License, or  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ **/
+
+/**
+ * @file
+ * @author Jacques-Olivier Lachaud (\c jacques-olivier.lachaud@univ-savoie.fr )
+ * Laboratory of Mathematics (CNRS, UMR 5127), University of Savoie, France
+ *
+ * @date 2016/10/12
+ *
+ * Implementation of inline methods defined in ATu0v1.h
+ *
+ * This file is part of the DGtal library.
+ */
+
+
+//////////////////////////////////////////////////////////////////////////////
+#include <cstdlib>
+//////////////////////////////////////////////////////////////////////////////
+
+///////////////////////////////////////////////////////////////////////////////
+// IMPLEMENTATION of inline methods.
+///////////////////////////////////////////////////////////////////////////////
+
+///////////////////////////////////////////////////////////////////////////////
+// ----------------------- Standard services ------------------------------
+template <typename TKSpace, typename TLinearAlgebra>
+DGtal::ATu0v1<TKSpace, TLinearAlgebra>::
+ATu0v1()
+  : calculus(), 
+    primal_D0( calculus ), primal_D1( calculus ), primal_AD1( calculus ), primal_AD2( calculus ),
+    v1( calculus ), primal_L1( calculus ), alpha_Id0( calculus )
+{}
+
+template <typename TKSpace, typename TLinearAlgebra>
+void
+DGtal::ATu0v1<TKSpace, TLinearAlgebra>::
+init( Clone<KSpace> aKSpace )
+{
+  calculus.myKSpace = aKSpace;
+  const KSpace & K  = calculus.myKSpace;
+  domain            = Domain( K.lowerBound(), K.upperBound() );
+  Point  p0         = K.uKCoords( K.lowerCell() );
+  Point  p1         = K.uKCoords( K.upperCell() );
+  cell_domain       = Domain( p0, p1 );
+
+  trace.beginBlock("building AT functionnals");
+  // Adds all the cell
+  for ( typename Domain::ConstIterator it = cell_domain.begin(), itE = cell_domain.end(); it != itE; ++it )
+    calculus.insertSCell( K.sCell( *it ) ); // ajoute toutes les cellules de Khalimsky.
+  calculus.updateIndexes();
+  trace.info() << calculus << std::endl;
+  // Precomputes operators.
+  trace.info() << "primal_D0" << std::endl;
+  primal_D0 = calculus.template derivative<0,PRIMAL>();
+  trace.info() << "primal_D1" << std::endl;
+  primal_D1 = calculus.template derivative<1,PRIMAL>();
+  trace.info() << "primal_AD1" << std::endl;
+  primal_AD1 = calculus.template antiderivative<1,PRIMAL>();
+  trace.info() << "primal_AD2" << std::endl;
+  primal_AD2 = calculus.template antiderivative<2,PRIMAL>();
+  trace.info() << "primal_L1" << std::endl;
+  primal_L1  = -1.0 * ( primal_D0 * primal_AD1 + primal_AD2 * primal_D1 );
+    // = -1.0 * ( invG1 * primal_D0 * G0 * dual_h2 * dual_D1 * primal_h1 * invG1
+    //            + dual_h1 * dual_D0 * primal_h2 * invG2 * primal_D1 );
+  trace.endBlock();
+}
+
+//-----------------------------------------------------------------------------
+template <typename TKSpace, typename TLinearAlgebra>
+template <typename Image>
+void 
+DGtal::ATu0v1<TKSpace, TLinearAlgebra>::
+addInput( const Image& image, std::function< Scalar( typename Image::Value ) > f )
+{
+  g0.push_back( PrimalForm0( calculus ) );
+  PrimalForm0& g  = g0.back();
+  const KSpace& K = calculus.myKSpace; 
+  for ( Index index = 0; index < g.myContainer.rows(); index++)
+    {
+      SCell cell = g.getSCell( index );
+      g.myContainer( index ) = f( image( K.sCoords( cell ) ) );
+    }
+}
+
+//-----------------------------------------------------------------------------
+template <typename TKSpace, typename TLinearAlgebra>
+void 
+DGtal::ATu0v1<TKSpace, TLinearAlgebra>::
+setAlpha( Scalar _alpha )
+{
+  alpha = _alpha;
+  // Building alpha_Id0
+  alpha_Id0   = _alpha * calculus.template identity<0, PRIMAL>();
+  alpha_g0.clear();
+  for ( unsigned int i = 0; i < g0.size(); i++ )
+    alpha_g0.push_back( alpha_Id0 * g0[ i ] );
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Interface - public :
+
+/**
+ * Writes/Displays the object on an output stream.
+ * @param out the output stream where the object is written.
+ */
+template <typename TKSpace, typename TLinearAlgebra>
+inline
+void
+DGtal::ATu0v1<TKSpace, TLinearAlgebra>::selfDisplay ( std::ostream & out ) const
+{
+  out << "[ ATu0v1 #g=" << g0.size() << " dec=" << calculus << " ]";
+}
+
+/**
+ * Checks the validity/consistency of the object.
+ * @return 'true' if the object is valid, 'false' otherwise.
+ */
+template <typename TKSpace, typename TLinearAlgebra>
+inline
+bool
+DGtal::ATu0v1<TKSpace, TLinearAlgebra>::isValid() const
+{
+    return true;
+}
+
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Implementation of inline functions                                        //
+
+template <typename TKSpace, typename TLinearAlgebra>
+inline
+std::ostream&
+DGtal::operator<< ( std::ostream & out,
+                  const ATu0v1<TKSpace, TLinearAlgebra> & object )
+{
+  object.selfDisplay( out );
+  return out;
+}
+
+//                                                                           //
+///////////////////////////////////////////////////////////////////////////////
+
+

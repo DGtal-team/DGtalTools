@@ -1,0 +1,275 @@
+/**
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU Lesser General Public License as
+ *  published by the Free Software Foundation, either version 3 of the
+ *  License, or  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ **/
+
+#pragma once
+
+/**
+ * @file
+ * @author Jacques-Olivier Lachaud (\c jacques-olivier.lachaud@univ-savoie.fr )
+ * Laboratory of Mathematics (CNRS, UMR 5127), University of Savoie, France
+ *
+ * @date 2016/10/12
+ *
+ * Header file for module ATu0v1.cpp
+ *
+ * This file is part of the DGtal library.
+ */
+
+#if defined(ATu0v1_RECURSES)
+#error Recursive header files inclusion detected in ATu0v1.h
+#else // defined(ATu0v1_RECURSES)
+/** Prevents recursive inclusion of headers. */
+#define ATu0v1_RECURSES
+
+#if !defined ATu0v1_h
+/** Prevents repeated inclusion of headers. */
+#define ATu0v1_h
+
+//////////////////////////////////////////////////////////////////////////////
+// Inclusions
+#include <iostream>
+// always include EigenSupport.h before any other Eigen headers
+#include "DGtal/math/linalg/EigenSupport.h"
+#include "DGtal/base/Common.h"
+#include "DGtal/dec/DiscreteExteriorCalculus.h"
+#include "DGtal/dec/DiscreteExteriorCalculusSolver.h"
+#include "DGtal/dec/DiscreteExteriorCalculusFactory.h"
+
+//////////////////////////////////////////////////////////////////////////////
+
+namespace DGtal
+{
+
+  /////////////////////////////////////////////////////////////////////////////
+  // template class ATu0v1
+  /**
+  * Description of template class 'ATu0v1' <p> \brief Aim: This class
+  * solves Ambrosio-Tortorelli functional in a plane for \a u a
+  * (vector of) 0-form(s) and \a v a 1-form. \a u is a regularized
+  * approximation of an input data \a g, while \a v represents the
+  * set of discontinuities of \a u.
+  *
+  */
+  template < typename TKSpace,
+             typename TLinearAlgebra = EigenLinearAlgebraBackend >
+  struct ATu0v1 {
+    typedef TKSpace                                        KSpace;
+    typedef TLinearAlgebra                                 LinearAlgebra;
+    typedef typename KSpace::Space                         Space;
+    typedef typename Space::Point                          Point;
+    typedef typename Space::RealVector                     RealVector;
+    typedef typename RealVector::Component                 Scalar;
+    typedef typename KSpace::SCell                         SCell;
+    typedef typename KSpace::Cell                          Cell;
+    typedef typename KSpace::Surfel                        Surfel;
+    typedef HyperRectDomain<Space>                         Domain;
+    typedef std::map<Cell, Scalar>                         SmallestEpsilonMap;
+    typedef DiscreteExteriorCalculus<2,2, LinearAlgebra>   Calculus;
+    typedef DiscreteExteriorCalculusFactory<LinearAlgebra> CalculusFactory;
+    typedef typename Calculus::Index                       Index;
+    typedef typename Calculus::PrimalForm0                 PrimalForm0;
+    typedef typename Calculus::PrimalForm1                 PrimalForm1;
+    typedef typename Calculus::PrimalForm2                 PrimalForm2;
+    typedef typename Calculus::PrimalIdentity0             PrimalIdentity0;
+    typedef typename Calculus::PrimalIdentity1             PrimalIdentity1;
+    typedef typename Calculus::PrimalIdentity2             PrimalIdentity2;
+    typedef typename Calculus::PrimalDerivative0           PrimalDerivative0;
+    typedef typename Calculus::PrimalDerivative1           PrimalDerivative1;
+    typedef typename Calculus::PrimalAntiderivative1       PrimalAntiderivative1;
+    typedef typename Calculus::PrimalAntiderivative2       PrimalAntiderivative2;
+    typedef typename Calculus::PrimalHodge0                PrimalHodge0;
+    typedef typename Calculus::PrimalHodge1                PrimalHodge1;
+    typedef typename Calculus::PrimalHodge2                PrimalHodge2;
+
+    BOOST_STATIC_ASSERT(( KSpace::dimension == 2 ));
+
+    // ----------------------- Standard services ------------------------------
+  public:
+
+    /**
+     * Destructor.
+     */
+    ~ATu0v1() = default;
+
+    /**
+     * Default constructor. The object needs to be initialized with \ref init.
+     */
+    ATu0v1();
+    
+    /**
+    * Constructor from Khalimsky space, which specifies the domain of calculus.
+    */
+    void init( Clone<KSpace> K );
+
+    /**
+     * Copy constructor.
+     * @param other the object to clone.
+     */
+    ATu0v1 ( const ATu0v1 & other ) = delete;
+
+    /**
+     * Move constructor.
+     * @param other the object to move.
+     */
+    ATu0v1 ( ATu0v1 && other ) = delete;
+
+    /**
+     * Copy assignment operator.
+     * @param other the object to copy.
+     * @return a reference on 'this'.
+     */
+    ATu0v1 & operator= ( const ATu0v1 & other ) = delete;
+
+    /**
+     * Move assignment operator.
+     * @param other the object to move.
+     * @return a reference on 'this'.
+     */
+    ATu0v1 & operator= ( ATu0v1 && other ) = delete;
+
+    /**
+    * Adds an input 0-form by filtering an \a image values.
+    * @param image any image such that the domain of this space is included in the domain of the image.
+    * @param f any functor associated a scalar to an image value.
+    *
+    * @note For a grey-level image stored with values `unsigned char`, should be called as
+    * @code
+    * AT.addInput( image, [] (unsigned char c ) { return (double) c / 255.0; } );
+    * @endcode
+    *
+    * @note For a color image stored with values `Color`, should be called as
+    * @code
+    * AT.addInput( image, [] ( Color c ) { return (double) c.red()   / 255.0; } );
+    * AT.addInput( image, [] ( Color c ) { return (double) c.green() / 255.0; } );
+    * AT.addInput( image, [] ( Color c ) { return (double) c.blue()  / 255.0; } );
+    * @endcode
+    */
+    template <typename Image>
+    void addInput( const Image& image, std::function< Scalar( typename Image::Value ) > f );
+
+    /** 
+    * Sets the parameter \f$ alpha \f$ as global to the image.
+    *
+    * @param _alpha the \f$ \alpha \f$ parameter in AT functional ( in term \f$
+    * \alpha | u - g |^2 \f$ ). Dimension theory tells that it is in
+    * 1/area unit, the lower the smoother will be the output.
+    */
+    void setAlpha( Scalar _alpha );
+
+    // ----------------------- Interface --------------------------------------
+  public:
+
+    /**
+     * Writes/Displays the object on an output stream.
+     * @param out the output stream where the object is written.
+     */
+    void selfDisplay ( std::ostream & out ) const;
+
+    /**
+     * Checks the validity/consistency of the object.
+     * @return 'true' if the object is valid, 'false' otherwise.
+     */
+    bool isValid() const;
+
+
+    // ------------------------- Public Datas ------------------------------
+  public:
+
+    /// The discrete exterior calculus instance.
+    Calculus calculus;
+
+    /// The image domain (i.e. all the pixels)
+    Domain   domain;
+    
+    /// The cell domain (i.e. all the cells)
+    Domain   cell_domain;
+
+    /// primal derivative: 0-form -> 1-form
+    PrimalDerivative0   primal_D0;
+    /// primal derivative: 1-form -> 2-form
+    PrimalDerivative1   primal_D1;
+    /// primal anti-derivative: 1-form -> 0-form
+    PrimalAntiderivative1 primal_AD1;
+    /// primal anti-derivative: 2-form -> 1-form
+    PrimalAntiderivative2 primal_AD2;
+    /// edge laplacien
+    PrimalIdentity1 primal_L1;
+
+    // ------------------------- Protected Datas ------------------------------
+  protected:
+
+    /// The g 0-forms
+    std::vector< PrimalForm0 > g0;
+
+    /// The u 0-forms
+    std::vector< PrimalForm0 > u0;
+
+    /// The v 1-form
+    PrimalForm1 v1;
+
+    /// Smoothness parameter alpha of AT (in 1/area unit)
+    double              alpha;
+
+    /// Amount of discontinuity parameter lambda (in 1/length unit).
+    double              lambda;
+    
+    /// Thickness of discontinuity set (in length unit).
+    double              epsilon;
+
+    /// alpha Id0
+    PrimalIdentity0 alpha_Id0;
+
+    /// alpha g0
+    std::vector< PrimalForm0 > alpha_g0;
+
+
+    // ------------------------- Private Datas --------------------------------
+  private:
+
+    // ------------------------- Hidden services ------------------------------
+  protected:
+
+    // ------------------------- Internals ------------------------------------
+  private:
+
+  }; // end of class ATu0v1
+
+
+  /**
+   * Overloads 'operator<<' for displaying objects of class 'ATu0v1'.
+   * @param out the output stream where the object is written.
+   * @param object the object of class 'ATu0v1' to write.
+   * @return the output stream after the writing.
+   */
+  template <typename TKSpace, typename TLinearAlgebra>
+  std::ostream&
+  operator<< ( std::ostream & out, const ATu0v1<TKSpace, TLinearAlgebra> & object );
+
+} // namespace DGtal
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Includes inline functions.
+//#include "DGtal/dec/ATu0v1.ih"
+#include "ATu0v1.ih"
+
+//                                                                           //
+///////////////////////////////////////////////////////////////////////////////
+
+#endif // !defined ATu0v1_h
+
+#undef ATu0v1_RECURSES
+#endif // else defined(ATu0v1_RECURSES)
