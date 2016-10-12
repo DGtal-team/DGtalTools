@@ -155,7 +155,13 @@ int main( int argc, char* argv[] )
     }
   //---------------------------------------------------------------------------
   AT.setAlpha( a );
+  AT.setUFromInput();
   trace.info() << AT << std::endl;
-
+  while ( l1 >= l2 )
+    {
+      trace.info() << "************ lambda = " << l1 << " **************" << endl;
+      AT.setLambda( l1 );
+      l1 /= lr;
+    }
   return 0;
 }

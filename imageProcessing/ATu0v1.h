@@ -93,6 +93,11 @@ namespace DGtal
     typedef typename Calculus::PrimalHodge0                PrimalHodge0;
     typedef typename Calculus::PrimalHodge1                PrimalHodge1;
     typedef typename Calculus::PrimalHodge2                PrimalHodge2;
+    typedef typename LinearAlgebra::SolverSimplicialLLT    LinearAlgebraSolver;
+    typedef DiscreteExteriorCalculusSolver<Calculus, LinearAlgebraSolver, 0, PRIMAL, 0, PRIMAL> 
+                                                           SolverU;
+    typedef DiscreteExteriorCalculusSolver<Calculus, LinearAlgebraSolver, 1, PRIMAL, 1, PRIMAL> 
+                                                           SolverV;
 
     BOOST_STATIC_ASSERT(( KSpace::dimension == 2 ));
 
@@ -164,10 +169,24 @@ namespace DGtal
     * Sets the parameter \f$ alpha \f$ as global to the image.
     *
     * @param _alpha the \f$ \alpha \f$ parameter in AT functional ( in term \f$
-    * \alpha | u - g |^2 \f$ ). Dimension theory tells that it is in
+    * \int \alpha | u - g |^2 \f$ ). Dimension theory tells that it is in
     * 1/area unit, the lower the smoother will be the output.
     */
     void setAlpha( Scalar _alpha );
+
+    /**
+    * Sets the parameter \f$ \lambda \f$ of AT functional.
+    *
+    * @param _lambda the \f$ \lambda \f$ parameter in AT functional (
+    * in terms \f$ \int \lambda \epsilon | v \grad u |^2 + \int
+    * \frac{\lambda}{4\epsilon} |1-v|^2 \f$ ). Dimension theory tells
+    * that it is in 1/length unit, the lower the longer is the set of
+    * discontinuities.
+    */
+    void setLambda( Scalar _lambda );
+
+    /// Sets approximation \a u to be equal to the input. Used for initializating \a u.
+    void setUFromInput();
 
     // ----------------------- Interface --------------------------------------
   public:
@@ -198,15 +217,19 @@ namespace DGtal
     Domain   cell_domain;
 
     /// primal derivative: 0-form -> 1-form
-    PrimalDerivative0   primal_D0;
+    PrimalDerivative0     D0;
     /// primal derivative: 1-form -> 2-form
-    PrimalDerivative1   primal_D1;
+    PrimalDerivative1     D1;
     /// primal anti-derivative: 1-form -> 0-form
-    PrimalAntiderivative1 primal_AD1;
+    PrimalAntiderivative1 AD1;
     /// primal anti-derivative: 2-form -> 1-form
-    PrimalAntiderivative2 primal_AD2;
+    PrimalAntiderivative2 AD2;
     /// edge laplacien
-    PrimalIdentity1 primal_L1;
+    PrimalIdentity1       L1;
+    /// lambda * edge laplacien
+    PrimalIdentity1       l_L1;
+    /// lambda 1/4 1
+    PrimalForm1           l_1_over_4;
 
     // ------------------------- Protected Datas ------------------------------
   protected:
@@ -235,6 +258,11 @@ namespace DGtal
     /// alpha g0
     std::vector< PrimalForm0 > alpha_g0;
 
+    /// The solver for every 0-form u[i]
+    SolverU solver_u;
+
+    /// The solver for 1-form v
+    SolverV solver_v;
 
     // ------------------------- Private Datas --------------------------------
   private:

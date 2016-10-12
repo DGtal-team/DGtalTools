@@ -41,8 +41,9 @@ template <typename TKSpace, typename TLinearAlgebra>
 DGtal::ATu0v1<TKSpace, TLinearAlgebra>::
 ATu0v1()
   : calculus(), 
-    primal_D0( calculus ), primal_D1( calculus ), primal_AD1( calculus ), primal_AD2( calculus ),
-    v1( calculus ), primal_L1( calculus ), alpha_Id0( calculus )
+    D0( calculus ), D1( calculus ), AD1( calculus ), AD2( calculus ),
+    v1( calculus ), L1( calculus ), alpha_Id0( calculus ),
+    l_L1( calculus ), l_1_over_4( calculus )
 {}
 
 template <typename TKSpace, typename TLinearAlgebra>
@@ -65,15 +66,15 @@ init( Clone<KSpace> aKSpace )
   trace.info() << calculus << std::endl;
   // Precomputes operators.
   trace.info() << "primal_D0" << std::endl;
-  primal_D0 = calculus.template derivative<0,PRIMAL>();
+  D0 = calculus.template derivative<0,PRIMAL>();
   trace.info() << "primal_D1" << std::endl;
-  primal_D1 = calculus.template derivative<1,PRIMAL>();
+  D1 = calculus.template derivative<1,PRIMAL>();
   trace.info() << "primal_AD1" << std::endl;
-  primal_AD1 = calculus.template antiderivative<1,PRIMAL>();
+  AD1 = calculus.template antiderivative<1,PRIMAL>();
   trace.info() << "primal_AD2" << std::endl;
-  primal_AD2 = calculus.template antiderivative<2,PRIMAL>();
+  AD2 = calculus.template antiderivative<2,PRIMAL>();
   trace.info() << "primal_L1" << std::endl;
-  primal_L1  = -1.0 * ( primal_D0 * primal_AD1 + primal_AD2 * primal_D1 );
+  L1  = -1.0 * ( D0 * AD1 + AD2 * D1 );
     // = -1.0 * ( invG1 * primal_D0 * G0 * dual_h2 * dual_D1 * primal_h1 * invG1
     //            + dual_h1 * dual_D0 * primal_h2 * invG2 * primal_D1 );
   trace.endBlock();
@@ -108,6 +109,29 @@ setAlpha( Scalar _alpha )
   alpha_g0.clear();
   for ( unsigned int i = 0; i < g0.size(); i++ )
     alpha_g0.push_back( alpha_Id0 * g0[ i ] );
+}
+
+//-----------------------------------------------------------------------------
+template <typename TKSpace, typename TLinearAlgebra>
+void 
+DGtal::ATu0v1<TKSpace, TLinearAlgebra>::
+setLambda( Scalar _lambda )
+{
+  lambda = _lambda;
+  l_L1 = lambda * L1;
+  for ( Index index = 0; index < l_1_over_4.myContainer.rows(); index++)
+    l_1_over_4.myContainer( index ) = lambda/4.0;
+}
+
+//-----------------------------------------------------------------------------
+template <typename TKSpace, typename TLinearAlgebra>
+void 
+DGtal::ATu0v1<TKSpace, TLinearAlgebra>::
+setUFromInput()
+{
+  u0.clear();
+  for ( unsigned int i = 0; i < g0.size(); i++ )
+    u0.push_back( g0[ i ] );
 }
 
 
