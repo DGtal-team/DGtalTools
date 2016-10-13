@@ -65,9 +65,9 @@ int main( int argc, char* argv[] )
     ("lambda-2,2", po::value<double>()->default_value( 0.00005 ), "the final parameter lambda (l2)." )
     ("lambda-ratio,q", po::value<double>()->default_value( sqrt(2) ), "the division ratio for lambda from l1 to l2." )
     ("alpha,a", po::value<double>()->default_value( 1.0 ), "the parameter alpha." )
-    ("epsilon,e", po::value<double>()->default_value( 1.0 ), "the initial and final parameter epsilon of AT functional at the same time." )
-    ("epsilon-1", po::value<double>(), "the initial parameter epsilon." )
-    ("epsilon-2", po::value<double>(), "the final parameter epsilon." )
+    ("epsilon,e", po::value<double>(), "the initial and final parameter epsilon of AT functional at the same time." )
+    ("epsilon-1", po::value<double>()->default_value( 2.0 ), "the initial parameter epsilon." )
+    ("epsilon-2", po::value<double>()->default_value( 0.25 ), "the final parameter epsilon." )
     ("epsilon-r", po::value<double>()->default_value( 2.0 ), "sets the ratio between two consecutive epsilon values of AT functional." )
     ("nbiter,n", po::value<int>()->default_value( 10 ), "the maximum number of iterations." )
     ("snr", "force computation of SNR." )
@@ -114,13 +114,14 @@ int main( int argc, char* argv[] )
   if ( vm.count( "lambda" ) ) l1 = l2 = vm[ "lambda" ].as<double>();
   if ( l2 > l1 ) l2 = l1;
   if ( lr <= 1.0 ) lr = sqrt(2);
-  double a  = vm[ "alpha" ].as<double>();
-  double e  = vm[ "epsilon" ].as<double>();
-  double e1 = vm.count( "epsilon-1" ) ? vm[ "epsilon-1" ].as<double>() : e;
-  double e2 = vm.count( "epsilon-2" ) ? vm[ "epsilon-2" ].as<double>() : e;
-  double er = vm[ "epsilon-r" ].as<double>();
-  int  verb = vm[ "verbose" ].as<int>();
-
+  double a   = vm[ "alpha" ].as<double>();
+  double e1  = vm[ "epsilon-1" ].as<double>();
+  double e2  = vm[ "epsilon-2" ].as<double>();
+  if ( vm.count( "epsilon" ) )
+    e1 = e2 = vm[ "epsilon" ].as<double>();
+  double er  = vm[ "epsilon-r" ].as<double>();
+  int  verb  = vm[ "verbose" ].as<int>();
+  int nbiter = vm[ "nbiter" ].as<int>();
   bool color_image = f1.size() > 4 && f1.compare( f1.size() - 4, 4, ".ppm" ) == 0;
   bool grey_image  = f1.size() > 4 && f1.compare( f1.size() - 4, 4, ".pgm" ) == 0;
   if ( ! color_image && ! grey_image ) 
@@ -164,19 +165,26 @@ int main( int argc, char* argv[] )
   AT.setAlpha( a );
   trace.info() << AT << std::endl;
   double n_v = 0.0;
+  double eps = 0.0;
   while ( l1 >= l2 )
     {
       trace.info() << "************ lambda = " << l1 << " **************" << endl;
       AT.setLambda( l1 );
-      AT.setEpsilon( e );
-      do {
-        AT.solveU();
-        AT.solveV();
-        AT.checkV();
-        n_v = AT.computeVariation();
-        trace.info() << "- Variation = " << n_v << endl;
-      } while ( n_v > 0.0001 );
-
+      for ( eps = e1; eps >= e2; eps /= er )
+        {
+          trace.info() << "  ======= epsilon = " << eps << " ========" << endl;
+          AT.setEpsilon( eps );
+          int n = 0;
+          do {
+            trace.progressBar( n, nbiter );
+            AT.solveU();
+            AT.solveV();
+            AT.checkV();
+            n_v = AT.computeVariation();
+          } while ( ( n_v > 0.0001 ) && ( ++n < nbiter ) );
+          trace.progressBar( n, nbiter );
+          trace.info() << "[#### last variation = " << n_v << " " << endl;
+        }
       if ( grey_image ) 
         {
           if ( verb > 0 ) trace.beginBlock("Writing u as PGM image");
