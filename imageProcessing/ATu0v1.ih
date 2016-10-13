@@ -43,7 +43,11 @@ DGtal::ATu0v1<TKSpace, TLinearAlgebra>::
 ATu0v1( int _verbose )
   : verbose( _verbose ), 
     calculus(), 
-    D0( calculus ), D1( calculus ), AD1( calculus ), AD2( calculus ),
+    D0( calculus ), D1( calculus ), 
+    // AD1( calculus ), AD2( calculus ),
+    dual_D0( calculus ), dual_D1( calculus ),
+    primal_h1( calculus ), primal_h2( calculus ),
+    dual_h1( calculus ), dual_h2( calculus ),
     v1( calculus ), former_v1( calculus ), 
     L1( calculus ), alpha_Id0( calculus ),
     l_L1( calculus ), l_1_over_4( calculus ), 
@@ -73,12 +77,27 @@ init( Clone<KSpace> aKSpace )
   D0 = calculus.template derivative<0,PRIMAL>();
   if ( verbose > 1 ) trace.info() << "primal_D1" << std::endl;
   D1 = calculus.template derivative<1,PRIMAL>();
-  if ( verbose > 1 ) trace.info() << "primal_AD1" << std::endl;
-  AD1 = calculus.template antiderivative<1,PRIMAL>();
-  if ( verbose > 1 ) trace.info() << "primal_AD2" << std::endl;
-  AD2 = calculus.template antiderivative<2,PRIMAL>();
+  // if ( verbose > 1 ) trace.info() << "primal_AD1" << std::endl;
+  // AD1 = calculus.template antiderivative<1,PRIMAL>();
+  // if ( verbose > 1 ) trace.info() << "primal_AD2" << std::endl;
+  // AD2 = calculus.template antiderivative<2,PRIMAL>();
+  if ( verbose > 1 ) trace.info() << "dual_D0" << std::endl;
+  dual_D0   = calculus.template derivative<0,DUAL>();
+  if ( verbose > 1 ) trace.info() << "dual_D1" << std::endl;
+  dual_D1   = calculus.template derivative<1,DUAL>();
+  if ( verbose > 1 ) trace.info() << "primal_h1" << std::endl;
+  primal_h1 = calculus.template hodge<1,PRIMAL>();
+  if ( verbose > 1 ) trace.info() << "primal_h2" << std::endl;
+  primal_h2 = calculus.template hodge<2,PRIMAL>();
+  if ( verbose > 1 ) trace.info() << "dual_h1" << std::endl;
+  dual_h1   = calculus.template hodge<1,DUAL>();
+  if ( verbose > 1 ) trace.info() << "dual_h2" << std::endl;
+  dual_h2   = calculus.template hodge<2,DUAL>();
   if ( verbose > 1 ) trace.info() << "primal_L1" << std::endl;
-  L1  = -1.0 * ( D0 * AD1 + AD2 * D1 );
+  L1 = -1.0 * ( D0 * dual_h2 * dual_D1 * primal_h1
+                + dual_h1 * dual_D0 * primal_h2 * D1 );
+  // JOL: Does not work ! Sign problem ?
+  // L1  = -1.0 * ( D0 * AD1 + AD2 * D1 ); 
   if ( verbose > 1 ) trace.info() << "v1" << std::endl;
   v1 = KForm<Calculus, 1, PRIMAL>::ones( calculus );
   if ( verbose > 0 ) trace.endBlock();
@@ -136,7 +155,8 @@ setEpsilon( Scalar _epsilon )
 {
   ASSERT( _epsilon > 0.0 );
   epsilon     = _epsilon;
-  left_V1     = epsilon * l_L1 + ( lambda/(4.0*epsilon) ) * calculus.template identity<1, PRIMAL>();
+  left_V1     = epsilon * l_L1 + 
+    ( lambda/(4.0*epsilon) ) * calculus.template identity<1, PRIMAL>();
   l_1_over_4e = (1.0/epsilon) * l_1_over_4;
 }
  
@@ -184,25 +204,38 @@ solveV()
 {
   former_v1 = v1;
   if ( verbose > 0 ) trace.beginBlock("Solving for v");
-  if ( verbose > 1 ) trace.info() << "- building matrix N := l/4e Id1 + le (tA' A' + tB B) + sum Diag(Au_i)^2" << endl;
-  PrimalIdentity0 U2 = functions::dec::squaredDiagonal( u0[ 0 ] );
-  for ( Dimension i = 1; i < u0.size(); ++i )
-    U2 += functions::dec::squaredDiagonal( u0[ i ] );
-  PrimalIdentity1 N  = left_V1 + D0.transpose() * U2 * D0;
-  if ( verbose > 1 ) trace.info() << "- prefactoring matrix N" << endl;
+  if ( verbose > 1 ) trace.info() << "- building matrix N := l/4e Id1 + le (tA' A' + tB B) + sum Diag(Au_i)^2" << std::endl;
+  PrimalIdentity1 N  = left_V1;
+  for ( Dimension i = 0; i < u0.size(); ++i )
+    {
+      PrimalIdentity1 U2 = functions::dec::squaredDiagonal( D0 * u0[ i ] );
+      N.myContainer += U2.myContainer;
+    }
+  // PrimalIdentity0 U2 = functions::dec::squaredDiagonal( u0[ 0 ] );
+  // for ( Dimension i = 1; i < u0.size(); ++i )
+  //   U2.myContainer += functions::dec::squaredDiagonal( u0[ i ] ).myContainer;
+  // PrimalIdentity1 N  = left_V1 + D0 * U2 * D0.transpose();
+  typedef typename PrimalIdentity1::Container Matrix; 
+  const Matrix & M = N.myContainer;
+  if ( verbose > 2 )
+    for (int k = 0; k < M.outerSize(); ++k)
+      for ( typename Matrix::InnerIterator it( M, k ); it; ++it )
+        if ( ( verbose > 3 ) || ( it.row() == it.col() ) )
+          trace.info() << "[" << it.row() << "," << it.col() << "] = " << it.value() << std::endl;
+  if ( verbose > 1 ) trace.info() << "- prefactoring matrix N" << std::endl;
   solver_v.compute( N );
-  if ( verbose > 1 ) trace.info() << "- solving N v = l/4e 1" << endl;
+  if ( verbose > 1 ) trace.info() << "- solving N v = l/4e 1" << std::endl;
   v1 = solver_v.solve( l_1_over_4e );
   if ( verbose > 1 ) trace.info() << ( solver_v.isValid() ? "OK" : "ERROR" )
                                   << " " << solver_v.myLinearAlgebraSolver.info()
-                                  << endl;
+                                  << std::endl;
   if ( verbose > 0 ) trace.endBlock();
   return solver_v.isValid();
 }
 
 //-----------------------------------------------------------------------------
 template <typename TKSpace, typename TLinearAlgebra>
-double
+typename DGtal::ATu0v1<TKSpace, TLinearAlgebra>::Scalar
 DGtal::ATu0v1<TKSpace, TLinearAlgebra>::
 computeVariation()
 {
@@ -212,8 +245,8 @@ computeVariation()
   delta_v_loo = 0.0;
   for ( Index index = 0; index < size1(); index++)
     {
-      delta_v_loo = max( delta_v_loo, fabs( v1.myContainer( index )
-                                            - former_v1.myContainer( index ) ) );
+      delta_v_loo = std::max( delta_v_loo, std::fabs( v1.myContainer( index )
+                                                      - former_v1.myContainer( index ) ) );
       delta_v_l2 += ( v1.myContainer( index ) - former_v1.myContainer( index ) )
         * ( v1.myContainer( index ) - former_v1.myContainer( index ) );
       delta_v_l1 += fabs( v1.myContainer( index )
@@ -222,11 +255,38 @@ computeVariation()
   delta_v_l1 /= size1();
   delta_v_l2  = sqrt( delta_v_l2 / size1() );
   if ( verbose > 0 ) {
-    trace.info() << "Variation |v^k+1 - v^k|_oo = " << delta_v_loo << endl;
-    trace.info() << "Variation |v^k+1 - v^k|_2  = " << delta_v_l2  << endl;
-    trace.info() << "Variation |v^k+1 - v^k|_1  = " << delta_v_l1  << endl;
+    trace.info() << "Variation |v^k+1 - v^k|_oo = " << delta_v_loo << std::endl;
+    trace.info() << "Variation |v^k+1 - v^k|_2  = " << delta_v_l2  << std::endl;
+    trace.info() << "Variation |v^k+1 - v^k|_1  = " << delta_v_l1  << std::endl;
   }
   if ( verbose > 0 ) trace.endBlock();
+  return delta_v_loo;
+}
+
+//-----------------------------------------------------------------------------
+template <typename TKSpace, typename TLinearAlgebra>
+typename DGtal::ATu0v1<TKSpace, TLinearAlgebra>::Scalar
+DGtal::ATu0v1<TKSpace, TLinearAlgebra>::
+checkV()
+{
+  if ( verbose > 0 ) trace.beginBlock("Checking v");
+  Scalar m1 = 1.0;
+  Scalar m2 = 0.0;
+  Scalar ma = 0.0;
+  for ( Index index = 0; index < size1(); index++)
+    {
+      Scalar val = v1.myContainer( index );
+      m1 = std::min( m1, val );
+      m2 = std::max( m2, val );
+      ma += val;
+    }
+  if ( verbose > 0 ) 
+    trace.info() << "1-form v: min=" << m1 << " avg=" << ( ma / size1() )
+                 << " max=" << m2 << std::endl;
+  // for ( Index index = 0; index < size1(); index++)
+  //   v1.myContainer( index ) = std::min( std::max(v1.myContainer( index ), 0.0) , 1.0 );
+  if ( verbose > 0 ) trace.endBlock();
+  return std::max( std::fabs( m1 ), std::fabs( m2 - 1.0 ) );
 }
 
 

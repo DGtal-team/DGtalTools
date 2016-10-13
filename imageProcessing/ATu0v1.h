@@ -88,11 +88,16 @@ namespace DGtal
     typedef typename Calculus::PrimalIdentity2             PrimalIdentity2;
     typedef typename Calculus::PrimalDerivative0           PrimalDerivative0;
     typedef typename Calculus::PrimalDerivative1           PrimalDerivative1;
+    typedef typename Calculus::DualDerivative0             DualDerivative0;
+    typedef typename Calculus::DualDerivative1             DualDerivative1;
     typedef typename Calculus::PrimalAntiderivative1       PrimalAntiderivative1;
     typedef typename Calculus::PrimalAntiderivative2       PrimalAntiderivative2;
     typedef typename Calculus::PrimalHodge0                PrimalHodge0;
     typedef typename Calculus::PrimalHodge1                PrimalHodge1;
     typedef typename Calculus::PrimalHodge2                PrimalHodge2;
+    typedef typename Calculus::DualHodge0                  DualHodge0;
+    typedef typename Calculus::DualHodge1                  DualHodge1;
+    typedef typename Calculus::DualHodge2                  DualHodge2;
     typedef typename LinearAlgebra::SolverSimplicialLLT    LinearAlgebraSolver;
     typedef DiscreteExteriorCalculusSolver<Calculus, LinearAlgebraSolver, 0, PRIMAL, 0, PRIMAL> 
                                                            SolverU;
@@ -227,6 +232,20 @@ namespace DGtal
     /// @return 'true' iff the solver worked.
     bool solveU();
 
+    /// Computes a solution to function \a v given the input \a g and current \a u.
+    /// @return 'true' iff the solver worked.
+    bool solveV();
+
+    /// Computes the variation of \a v after a call to \ref
+    /// solveV. @see delta_v_l1, delta_v_l2, delta_v_loo.
+    ///
+    /// @return the max of all variations (i.e. delta_v_loo).
+    Scalar computeVariation();
+
+    /// Checks that form \a v is between 0 and 1 and forces \v to be in-between.
+    /// @return the max of the deviation wrt 0 and 1.
+    Scalar checkV();
+
     // ----------------------- Interface --------------------------------------
   public:
 
@@ -263,10 +282,24 @@ namespace DGtal
     PrimalDerivative0     D0;
     /// primal derivative: 1-form -> 2-form
     PrimalDerivative1     D1;
-    /// primal anti-derivative: 1-form -> 0-form
-    PrimalAntiderivative1 AD1;
-    /// primal anti-derivative: 2-form -> 1-form
-    PrimalAntiderivative2 AD2;
+    // /// primal anti-derivative: 1-form -> 0-form
+    // PrimalAntiderivative1 AD1;
+    // /// primal anti-derivative: 2-form -> 1-form
+    // PrimalAntiderivative2 AD2;
+
+    /// dual derivative dual 0-form -> dual 1-form
+    DualDerivative0 dual_D0;
+    /// dual derivative dual 1-form -> dual 2-form
+    DualDerivative1 dual_D1;
+    /// hodge star: 1-form -> dual 1-form
+    PrimalHodge1 primal_h1;
+    /// hodge star: 2-form -> dual 2-form
+    PrimalHodge2 primal_h2;
+    /// hodge star: dual 1-form -> 1-form
+    DualHodge1   dual_h1;
+    /// hodge star: dual 2-form -> 2-form
+    DualHodge2   dual_h2;
+
     /// edge laplacien
     PrimalIdentity1       L1;
     /// lambda * edge laplacien

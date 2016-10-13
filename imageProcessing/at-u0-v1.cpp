@@ -141,9 +141,9 @@ int main( int argc, char* argv[] )
       ColorImage image = PPMReader<ColorImage>::importPPM( f1 );
       K.init( image.domain().lowerBound(), image.domain().upperBound(), true );
       AT.init( K );
-      AT.addInput( image, [] ( Color c ) { return (double) c.red()   / 255.0; } );
-      AT.addInput( image, [] ( Color c ) { return (double) c.green() / 255.0; } );
-      AT.addInput( image, [] ( Color c ) { return (double) c.blue()  / 255.0; } );
+      AT.addInput( image, [] ( Color c ) { return ((double) c.red())   / 255.0; } );
+      AT.addInput( image, [] ( Color c ) { return ((double) c.green()) / 255.0; } );
+      AT.addInput( image, [] ( Color c ) { return ((double) c.blue())  / 255.0; } );
       trace.endBlock();
     }
   else if ( grey_image ) 
@@ -152,19 +152,26 @@ int main( int argc, char* argv[] )
       GreyLevelImage image = PGMReader<GreyLevelImage>::importPGM( f1 );
       K.init( image.domain().lowerBound(), image.domain().upperBound(), true );
       AT.init( K );
-      AT.addInput( image, [] (unsigned char c ) { return (double) c / 255.0; } );
+      AT.addInput( image, [] (unsigned char c ) { return ((double) c) / 255.0; } );
       trace.endBlock();
     }
   //---------------------------------------------------------------------------
   AT.setUFromInput();
   AT.setAlpha( a );
   trace.info() << AT << std::endl;
+  double n_v = 0.0;
   while ( l1 >= l2 )
     {
       trace.info() << "************ lambda = " << l1 << " **************" << endl;
       AT.setLambda( l1 );
       AT.setEpsilon( e );
-      AT.solveU();
+      do {
+        AT.solveU();
+        AT.solveV();
+        AT.checkV();
+        n_v = AT.computeVariation();
+        trace.info() << "- Variation = " << n_v << endl;
+      } while ( n_v > 0.0001 );
       l1 /= lr;
     }
   return 0;
