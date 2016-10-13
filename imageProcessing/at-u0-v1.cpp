@@ -46,6 +46,127 @@
 
 #include "ATu0v1.h"
 
+/**
+@page DocATu0v1 at-u0-v1 
+
+@brief Computes a piecewise smooth approximation of an image, by optimizing the Ambrosio-Tortorelli functional.
+
+@writers Marion Foare, Jacques-Olivier Lachaud
+
+@b Usage: at-u0-v1 -i [input.pgm]
+
+@b Usage: at-u0-v1 -i [input.ppm]
+
+Computes the Ambrosio-Tortorelli reconstruction/segmentation of an input image, either grey-level (.pgm) or color image (.ppm).
+
+\f$ AT_e = \int a.(u-g)^2 + v^2 |grad u|^2 + le.|grad v|^2 + (l/4e).(1-v)^2 \f$
+ 
+Discretized as (u 0-form, v 1-form, A vertex-edge bdry, B edge-face bdy)
+
+\f$ E(u,v) = a(u-g)^t (u-g) +  u^t A^t diag(v)^2 A^t u + l e v^t (A A^t + B^t B) v + l/(4e) (1-v)^t (1-v) \f$
+
+\b Allowed \b options \b are:
+
+\code
+  -h [ --help ]                         display this message
+  -i [ --input ] arg                    the input image PGM or PPM filename.
+  -o [ --output ] arg (=AT)             the output image basename.
+  -l [ --lambda ] arg                   the parameter lambda.
+  -1 [ --lambda-1 ] arg (=0.3125)       the initial parameter lambda (l1).
+  -2 [ --lambda-2 ] arg (=5.0000000000000002e-05)
+                                        the final parameter lambda (l2).
+  -q [ --lambda-ratio ] arg (=1.4142135623730951)
+                                        the division ratio for lambda from l1 
+                                        to l2.
+  -a [ --alpha ] arg (=1)               the parameter alpha.
+  -e [ --epsilon ] arg                  the initial and final parameter epsilon
+                                        of AT functional at the same time.
+  --epsilon-1 arg (=2)                  the initial parameter epsilon.
+  --epsilon-2 arg (=0.25)               the final parameter epsilon.
+  --epsilon-r arg (=2)                  sets the ratio between two consecutive 
+                                        epsilon values of AT functional.
+  -n [ --nbiter ] arg (=10)             the maximum number of iterations.
+  --snr                                 force computation of SNR.
+  --image-snr arg                       the input image without deterioration.
+  -v [ --verbose ] arg (=0)             the verbose level (0: silent, 1: less 
+                                        silent, etc).
+\endcode
+
+@b example:
+
+\code
+./at-u0-v1 -i ../Images/cerclesTriangle64b02.pgm -o AT -a 0.05 -e 1 --lambda-1 0.1 --lambda-2 0.00001
+\endcode
+
+@section at_Doc AT
+
+
+<center>
+<table>
+epsilon scale space
+<tr>
+  <td> <img height=100px src="resATu0v1-cb2-e2_0-a0_10000-l0_0062092-u0-v1.png"/> </td>
+  <td> <img height=100px src="resATu0v1-cb2-e1_0-a0_10000-l0_0062092-u0-v1.png"/> </td>
+  <td> <img height=100px src="resATu0v1-cb2-e0_5-a0_10000-l0_0062092-u0-v1.png"/> </td>
+  <td> <img height=100px src="resATu0v1-cb2-e0_25-a0_10000-l0_0062092-u0-v1.png"/> </td>
+</tr>
+<tr>
+      <td align = center rowspan="4"> ./build/at-u0-v1 -i Images/carre2Degradesb02.pgm -o cb2 -a 0.1 --lambda 0.006 --epsilon-1 2.0 --epsilon-2 2.0</td>
+</tr>
+<tr>
+      <td align = center rowspan="4"> ./build/at-u0-v1 -i Images/carre2Degradesb02.pgm -o cb2 -a 0.1 --lambda 0.006 --epsilon-1 2.0 --epsilon-2 1.0</td>
+</tr>
+<tr>
+      <td align = center rowspan="4"> ./build/at-u0-v1 -i Images/carre2Degradesb02.pgm -o cb2 -a 0.1 --lambda 0.006 --epsilon-1 2.0 --epsilon-2 0.5</td>
+</tr>
+<tr>
+      <td align = center rowspan="4"> ./build/at-u0-v1 -i Images/carre2Degradesb02.pgm -o cb2 -a 0.1 --lambda 0.006 --epsilon-1 2.0 --epsilon-2 0.25</td>
+</tr>
+
+alpha scale space
+<tr>
+    <td> <img height=200px src="resATu0v1-cb2-a1_00000-l1_0000000-u.png"/> </td>
+    <td> <img height=200px src="resATu0v1-cb2-a0_50000-l1_0000000-u.png"/> </td>
+    <td> <img height=200px src="resATu0v1-cb2-a0_10000-l1_0000000-u.png"/> </td>
+    <td> <img height=200px src="resATu0v1-cb2-a0_05000-l1_0000000-u.png"/> </td>
+    <td> <img height=200px src="resATu0v1-cb2-a0_01000-l1_0000000-u.png"/> </td>
+</tr>
+<tr>
+        <td align = center rowspan="5"> ./build/at-u0-v1 -i Images/carre2Degradesb02.pgm -o cb2 -a 1.0 --lambda 1.0 --epsilon-1 2.0 --epsilon-2 0.25</td>
+</tr>
+<tr>
+        <td align = center rowspan="5"> ./build/at-u0-v1 -i Images/carre2Degradesb02.pgm -o cb2 -a 0.5 --lambda 1.0 --epsilon-1 2.0 --epsilon-2 0.25</td>
+</tr>
+<tr>
+        <td align = center rowspan="5"> ./build/at-u0-v1 -i Images/carre2Degradesb02.pgm -o cb2 -a 0.1 --lambda 1.0 --epsilon-1 2.0 --epsilon-2 0.25</td>
+</tr>
+<tr>
+        <td align = center rowspan="5"> ./build/at-u0-v1 -i Images/carre2Degradesb02.pgm -o cb2 -a 0.05 --lambda 1.0 --epsilon-1 2.0 --epsilon-2 0.25</td>
+</tr>
+<tr>
+        <td align = center rowspan="5"> ./build/at-u0-v1 -i Images/carre2Degradesb02.pgm -o cb2 -a 0.01 --lambda 1.0 --epsilon-1 2.0 --epsilon-2 0.25</td>
+</tr>
+
+
+
+lambda scale space (lena)
+<tr>
+<td> <img height=200px src="resATu0v1-lena-370-b02-a0_48000-l0_2000000-u0-v1.png"/> </td>
+<td> <img height=200px src="resATu0v1-lena-370-b02-a0_48000-l0_1000000-u0-v1.png"/> </td>
+<td> <img height=200px src="resATu0v1-lena-370-b02-a0_48000-l0_0500000-u0-v1.png"/> </td>
+<td> <img height=200px src="resATu0v1-lena-370-b02-a0_48000-l0_0250000-u0-v1.png"/> </td>
+<td> <img height=200px src="resATu0v1-lena-370-b02-a0_48000-l0_0125000-u0-v1.png"/> </td>
+</tr>
+<tr>
+        <td align = center rowspan="5"> ./build/at-u0-v1 -i Images/lena-370-b02.ppm -o lena -a 0.48 --lambda-1 0.15 --lambda-2 0.0125 -- lambda-ratio 2.0 --epsilon-1 2.0 --epsilon-2 0.25</td>
+</tr>
+</table>
+</center>
+
+
+*/
+
+
 using namespace std;
 using namespace DGtal;
 
