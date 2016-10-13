@@ -135,6 +135,57 @@ namespace DGtal {
             image.setValue( calculus.myKSpace.sCoords( cell ), functor( w ) );
           }
       }
+
+      template <typename Calculus, typename Image>
+      void threePrimalForms0ToImage
+      ( const Calculus& calculus, 
+        const typename Calculus::PrimalForm0& u0, 
+        const typename Calculus::PrimalForm0& u1, 
+        const typename Calculus::PrimalForm0& u2, 
+        Image& image,
+        std::function< typename Image::Value( double, double, double ) > functor,
+        double cut_low = 0.0, double cut_up = 1.0 )
+      {
+        typedef typename Calculus::Index  Index;
+        typedef typename Calculus::SCell  SCell;
+        typedef typename Calculus::Scalar Scalar;
+        double min_u = NumberTraits<Scalar>::castToDouble( u0.myContainer[ 0 ] );
+        double max_u = min_u;
+        for ( Index index = 0; index < u0.myContainer.rows(); index++)
+          {
+            double v = NumberTraits<Scalar>::castToDouble( u0.myContainer[ index ] );
+            min_u = std::min( min_u, v );
+            max_u = std::max( max_u, v );
+          }
+        for ( Index index = 0; index < u1.myContainer.rows(); index++)
+          {
+            double v = NumberTraits<Scalar>::castToDouble( u1.myContainer[ index ] );
+            min_u = std::min( min_u, v );
+            max_u = std::max( max_u, v );
+          }
+        for ( Index index = 0; index < u2.myContainer.rows(); index++)
+          {
+            double v = NumberTraits<Scalar>::castToDouble( u2.myContainer[ index ] );
+            min_u = std::min( min_u, v );
+            max_u = std::max( max_u, v );
+          }
+        if ( min_u < cut_low ) min_u = cut_low;
+        if ( max_u > cut_up  ) max_u = cut_up;
+        for ( Index index = 0; index < u0.myContainer.rows(); index++)
+          {
+            SCell cell = u0.getSCell( index );
+            double v0 = NumberTraits<Scalar>::castToDouble( u0.myContainer[ index ] );
+            double w0 = std::min( cut_up, std::max( cut_low, v0 ) );
+            if ( min_u != max_u ) w0 = ( w0 - min_u ) / ( max_u - min_u );
+            double v1 = NumberTraits<Scalar>::castToDouble( u1.myContainer[ index ] );
+            double w1 = std::min( cut_up, std::max( cut_low, v1 ) );
+            if ( min_u != max_u ) w1 = ( w1 - min_u ) / ( max_u - min_u );
+            double v2 = NumberTraits<Scalar>::castToDouble( u2.myContainer[ index ] );
+            double w2 = std::min( cut_up, std::max( cut_low, v2 ) );
+            if ( min_u != max_u ) w2 = ( w2 - min_u ) / ( max_u - min_u );
+            image.setValue( calculus.myKSpace.sCoords( cell ), functor( w0, w1, w2 ) );
+          }
+      }
       
       /**
       * Standard method to output a 0-form into a grey-level image.
@@ -149,6 +200,27 @@ namespace DGtal {
         primalForm0ToImage( calculus, u, image,
                             [] ( double x ) { return (unsigned char) ( round( x * 255.0 ) ); },
                             cut_low, cut_up );
+      }
+
+      /**
+      * Standard method to output three 0-forms into a RGB Color image.
+      */
+      template <typename Calculus, typename Image>
+      void threePrimalForms0ToRGBColorImage
+      ( const Calculus& calculus, 
+        const typename Calculus::PrimalForm0& u0, 
+        const typename Calculus::PrimalForm0& u1, 
+        const typename Calculus::PrimalForm0& u2, 
+        Image& image,
+        double cut_low = 0.0, double cut_up = 1.0 )
+      {
+        threePrimalForms0ToImage
+          ( calculus, u0, u1, u2, image,
+            [] ( double r, double g, double b )
+            { return Color( (unsigned char) ( round( r * 255.0 ) ),
+                            (unsigned char) ( round( g * 255.0 ) ),
+                            (unsigned char) ( round( b * 255.0 ) ) ); },
+            cut_low, cut_up );
       }
 
     } // namespace dec
