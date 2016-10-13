@@ -253,6 +253,12 @@ namespace DGtal
     Domain   domain;
     /// The cell domain (i.e. all the cells)
     Domain   cell_domain;
+    /// The L1-norm of variation of v.
+    Scalar delta_v_l1;
+    /// The L2-norm of variation of v.
+    Scalar delta_v_l2;
+    /// The Linfinity-norm of variation of v.
+    Scalar delta_v_loo;
     /// primal derivative: 0-form -> 1-form
     PrimalDerivative0     D0;
     /// primal derivative: 1-form -> 2-form
@@ -281,6 +287,8 @@ namespace DGtal
     std::vector< PrimalForm0 > u0;
     /// The v 1-form
     PrimalForm1 v1;
+    /// The v 1-form at the previous iteration.
+    PrimalForm1 former_v1;
     /// Smoothness parameter alpha of AT (in 1/area unit)
     double alpha;
     /// Amount of discontinuity parameter lambda (in 1/length unit).

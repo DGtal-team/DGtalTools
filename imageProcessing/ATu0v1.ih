@@ -44,7 +44,8 @@ ATu0v1( int _verbose )
   : verbose( _verbose ), 
     calculus(), 
     D0( calculus ), D1( calculus ), AD1( calculus ), AD2( calculus ),
-    v1( calculus ), L1( calculus ), alpha_Id0( calculus ),
+    v1( calculus ), former_v1( calculus ), 
+    L1( calculus ), alpha_Id0( calculus ),
     l_L1( calculus ), l_1_over_4( calculus ), 
     left_V1( calculus ), l_1_over_4e( calculus )
 {}
@@ -173,6 +174,28 @@ solveU()
     }
   if ( verbose > 0 ) trace.endBlock();
   return ok;
+}
+
+//-----------------------------------------------------------------------------
+template <typename TKSpace, typename TLinearAlgebra>
+bool
+DGtal::ATu0v1<TKSpace, TLinearAlgebra>::
+solveV( int compute_delta )
+{
+  former_v1 = v1;
+  if ( verbose > 0 ) trace.beginBlock("Solving for v");
+  if ( verbose > 1 ) trace.info() << "- building matrix N := l/4e Id1 + le (tA' A' + tB B) + sum Diag(Au_i)^2" << endl;
+  PrimalIdentity0 U2 = functions::dec::squaredDiagonal( u0[ 0 ] );
+  for ( Dimension i = 1; i < u0.size(); ++i )
+    U2 += functions::dec::squaredDiagonal( u0[ i ] );
+  PrimalIdentity1 N  = left_V1 + D0.transpose() * U2 * D0;
+  if ( verbose > 1 ) trace.info() << "- prefactoring matrix N" << endl;
+  solver_v.compute( N );
+  if ( verbose > 1 ) trace.info() << "- solving N v = l/4e 1" << endl;
+  v = solver_v.solve( l_1_over_4e );
+  if ( verbose > 1 ) trace.info() << ( solver_v.isValid() ? "OK" : "ERROR" ) << " " << solver_v.myLinearAlgebraSolver.info() << endl;
+  if ( verbose > 0 ) trace.endBlock();
+  return solver_v.isValid();
 }
 
 
