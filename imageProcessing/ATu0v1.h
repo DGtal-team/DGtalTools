@@ -110,9 +110,10 @@ namespace DGtal
     ~ATu0v1() = default;
 
     /**
-     * Default constructor. The object needs to be initialized with \ref init.
-     */
-    ATu0v1();
+    * Default constructor. The object needs to be initialized with \ref init.
+    * @param _verbose specifies the verbose level (0: silent, 1: more info ... ). 
+    */
+    ATu0v1( int _verbose = 1 );
     
     /**
     * Constructor from Khalimsky space, which specifies the domain of calculus.
@@ -219,6 +220,13 @@ namespace DGtal
     /// @return the size of a 1-form vector
     unsigned int size1() const { return v1.myContainer.rows(); }
 
+    // ----------------------- Solver --------------------------------------
+  public:
+    
+    /// Computes a solution to function(s) \a u given the input \a g and current \a v.
+    /// @return 'true' iff the solver worked.
+    bool solveU();
+
     // ----------------------- Interface --------------------------------------
   public:
 
@@ -237,7 +245,8 @@ namespace DGtal
 
     // ------------------------- Public Datas ------------------------------
   public:
-
+    /// The verbose level (0: silent).
+    int verbose;
     /// The discrete exterior calculus instance.
     Calculus calculus;
     /// The image domain (i.e. all the pixels)

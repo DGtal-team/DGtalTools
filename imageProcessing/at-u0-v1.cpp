@@ -71,6 +71,7 @@ int main( int argc, char* argv[] )
     ("nbiter,n", po::value<int>()->default_value( 10 ), "the maximum number of iterations." )
     ("snr", "force computation of SNR." )
     ("image-snr", po::value<string>(), "the input image without deterioration." )
+    ("verbose,v", po::value<int>()->default_value( 0 ), "the verbose level (0: silent, 1: less silent, etc)." )
     ;
 
   bool parseOK=true;
@@ -117,6 +118,7 @@ int main( int argc, char* argv[] )
   double e1 = vm.count( "epsilon-1" ) ? vm[ "epsilon-1" ].as<double>() : e;
   double e2 = vm.count( "epsilon-2" ) ? vm[ "epsilon-2" ].as<double>() : e;
   double er = vm[ "epsilon-r" ].as<double>();
+  int  verb = vm[ "verbose" ].as<int>();
 
   bool color_image = f1.size() > 4 && f1.compare( f1.size() - 4, 4, ".ppm" ) == 0;
   bool grey_image  = f1.size() > 4 && f1.compare( f1.size() - 4, 4, ".pgm" ) == 0;
@@ -128,7 +130,7 @@ int main( int argc, char* argv[] )
     }
 
   KSpace K;
-  ATu0v1< KSpace > AT;
+  ATu0v1< KSpace > AT( verb );
 
   typedef ImageContainerBySTLVector<Domain, Color> ColorImage;
   typedef ImageContainerBySTLVector<Domain, unsigned char> GreyLevelImage;
@@ -154,13 +156,15 @@ int main( int argc, char* argv[] )
       trace.endBlock();
     }
   //---------------------------------------------------------------------------
-  AT.setAlpha( a );
   AT.setUFromInput();
+  AT.setAlpha( a );
   trace.info() << AT << std::endl;
   while ( l1 >= l2 )
     {
       trace.info() << "************ lambda = " << l1 << " **************" << endl;
       AT.setLambda( l1 );
+      AT.setEpsilon( e );
+      AT.solveU();
       l1 /= lr;
     }
   return 0;

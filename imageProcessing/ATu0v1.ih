@@ -29,6 +29,7 @@
 
 //////////////////////////////////////////////////////////////////////////////
 #include <cstdlib>
+#include "DECHelpers.h"
 //////////////////////////////////////////////////////////////////////////////
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -39,8 +40,9 @@
 // ----------------------- Standard services ------------------------------
 template <typename TKSpace, typename TLinearAlgebra>
 DGtal::ATu0v1<TKSpace, TLinearAlgebra>::
-ATu0v1()
-  : calculus(), 
+ATu0v1( int _verbose )
+  : verbose( _verbose ), 
+    calculus(), 
     D0( calculus ), D1( calculus ), AD1( calculus ), AD2( calculus ),
     v1( calculus ), L1( calculus ), alpha_Id0( calculus ),
     l_L1( calculus ), l_1_over_4( calculus ), 
@@ -59,26 +61,26 @@ init( Clone<KSpace> aKSpace )
   Point  p1         = K.uKCoords( K.upperCell() );
   cell_domain       = Domain( p0, p1 );
 
-  trace.beginBlock("building AT functionnals");
+  if ( verbose > 0 ) trace.beginBlock("building AT functionnals");
   // Adds all the cell
   for ( typename Domain::ConstIterator it = cell_domain.begin(), itE = cell_domain.end(); it != itE; ++it )
     calculus.insertSCell( K.sCell( *it ) ); // ajoute toutes les cellules de Khalimsky.
   calculus.updateIndexes();
-  trace.info() << calculus << std::endl;
+  if ( verbose > 1 ) trace.info() << calculus << std::endl;
   // Precomputes operators.
-  trace.info() << "primal_D0" << std::endl;
+  if ( verbose > 1 ) trace.info() << "primal_D0" << std::endl;
   D0 = calculus.template derivative<0,PRIMAL>();
-  trace.info() << "primal_D1" << std::endl;
+  if ( verbose > 1 ) trace.info() << "primal_D1" << std::endl;
   D1 = calculus.template derivative<1,PRIMAL>();
-  trace.info() << "primal_AD1" << std::endl;
+  if ( verbose > 1 ) trace.info() << "primal_AD1" << std::endl;
   AD1 = calculus.template antiderivative<1,PRIMAL>();
-  trace.info() << "primal_AD2" << std::endl;
+  if ( verbose > 1 ) trace.info() << "primal_AD2" << std::endl;
   AD2 = calculus.template antiderivative<2,PRIMAL>();
-  trace.info() << "primal_L1" << std::endl;
+  if ( verbose > 1 ) trace.info() << "primal_L1" << std::endl;
   L1  = -1.0 * ( D0 * AD1 + AD2 * D1 );
-    // = -1.0 * ( invG1 * primal_D0 * G0 * dual_h2 * dual_D1 * primal_h1 * invG1
-    //            + dual_h1 * dual_D0 * primal_h2 * invG2 * primal_D1 );
-  trace.endBlock();
+  if ( verbose > 1 ) trace.info() << "v1" << std::endl;
+  v1 = KForm<Calculus, 1, PRIMAL>::ones( calculus );
+  if ( verbose > 0 ) trace.endBlock();
 }
 
 //-----------------------------------------------------------------------------
@@ -148,6 +150,30 @@ setUFromInput()
     u0.push_back( g0[ i ] );
 }
 
+//-----------------------------------------------------------------------------
+template <typename TKSpace, typename TLinearAlgebra>
+bool
+DGtal::ATu0v1<TKSpace, TLinearAlgebra>::
+solveU()
+{
+  if ( verbose > 0 ) trace.beginBlock("Solving for u");
+  if ( verbose > 1 ) trace.info() << "- building matrix M : = alpha_Id0 - tA_Diag(v)^2_A" << std::endl;
+  
+  PrimalIdentity1 diag_vv = functions::dec::squaredDiagonal( v1 );
+  PrimalIdentity0 Av2A    = D0.transpose() * diag_vv * D0 +  alpha_Id0;
+  if ( verbose > 1 ) trace.info() << "- prefactoring matrix M" << std::endl;
+  solver_u.compute( Av2A );
+  bool ok = true;
+  for ( Dimension i = 0; i < u0.size(); ++i )
+    {
+      if ( verbose > 1 ) trace.info() << "- solving M u[" << i << "] = alpha g[" << i << "]" << std::endl;
+      u0[ i ] = solver_u.solve( alpha_g0[ i ] );
+      if ( verbose > 1 ) trace.info() << ( solver_u.isValid() ? "=> OK" : "ERROR" ) << " " << solver_u.myLinearAlgebraSolver.info() << std::endl;
+      ok = ok && solver_u.isValid();
+    }
+  if ( verbose > 0 ) trace.endBlock();
+  return ok;
+}
 
 
 
