@@ -141,7 +141,7 @@ void
 DGtal::ATu0v1<TKSpace, TLinearAlgebra>::
 setLambda( Scalar _lambda )
 {
-  ASSERT( _alpha >= 0.0 );
+  ASSERT( _lambda >= 0.0 );
   lambda     = _lambda;
   l_L1       = lambda * L1;
   l_1_over_4 = (lambda / 4.0 ) * KForm< Calculus, 1, PRIMAL >::ones( calculus );
@@ -205,12 +205,14 @@ solveV()
   former_v1 = v1;
   if ( verbose > 0 ) trace.beginBlock("Solving for v");
   if ( verbose > 1 ) trace.info() << "- building matrix N := l/4e Id1 + le (tA' A' + tB B) + sum Diag(Au_i)^2" << std::endl;
+  // Not the same result as below ! Seems the "good" way of doing it.
   PrimalIdentity1 N  = left_V1;
   for ( Dimension i = 0; i < u0.size(); ++i )
     {
       PrimalIdentity1 U2 = functions::dec::squaredDiagonal( D0 * u0[ i ] );
       N.myContainer += U2.myContainer;
     }
+  // Seems the "bad" way of doing it.
   // PrimalIdentity0 U2 = functions::dec::squaredDiagonal( u0[ 0 ] );
   // for ( Dimension i = 1; i < u0.size(); ++i )
   //   U2.myContainer += functions::dec::squaredDiagonal( u0[ i ] ).myContainer;

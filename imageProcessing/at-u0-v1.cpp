@@ -31,6 +31,7 @@
 
 #include <sstream>
 #include <string>
+#include <functional>
 #include <boost/format.hpp>
 
 #include <boost/program_options/options_description.hpp>
@@ -131,6 +132,7 @@ int main( int argc, char* argv[] )
 
   KSpace K;
   ATu0v1< KSpace > AT( verb );
+  Domain domain;
 
   typedef ImageContainerBySTLVector<Domain, Color> ColorImage;
   typedef ImageContainerBySTLVector<Domain, unsigned char> GreyLevelImage;
@@ -139,18 +141,20 @@ int main( int argc, char* argv[] )
     {
       trace.beginBlock("Reading PPM image");
       ColorImage image = PPMReader<ColorImage>::importPPM( f1 );
-      K.init( image.domain().lowerBound(), image.domain().upperBound(), true );
+      domain = image.domain();
+      K.init( domain.lowerBound(), domain.upperBound() - Point::diagonal( 1 ), true );
       AT.init( K );
-      AT.addInput( image, [] ( Color c ) { return ((double) c.red())   / 255.0; } );
-      AT.addInput( image, [] ( Color c ) { return ((double) c.green()) / 255.0; } );
-      AT.addInput( image, [] ( Color c ) { return ((double) c.blue())  / 255.0; } );
+      AT.addInput( image, [] ( Color c ) -> double { return ((double) c.red())   / 255.0; } );
+      AT.addInput( image, [] ( Color c ) -> double { return ((double) c.green()) / 255.0; } );
+      AT.addInput( image, [] ( Color c ) -> double { return ((double) c.blue())  / 255.0; } );
       trace.endBlock();
     }
   else if ( grey_image ) 
     {
       trace.beginBlock("Reading PGM image");
       GreyLevelImage image = PGMReader<GreyLevelImage>::importPGM( f1 );
-      K.init( image.domain().lowerBound(), image.domain().upperBound(), true );
+      domain = image.domain();
+      K.init( domain.lowerBound(), domain.upperBound() - Point::diagonal( 1 ), true );
       AT.init( K );
       AT.addInput( image, [] (unsigned char c ) { return ((double) c) / 255.0; } );
       trace.endBlock();
@@ -172,6 +176,19 @@ int main( int argc, char* argv[] )
         n_v = AT.computeVariation();
         trace.info() << "- Variation = " << n_v << endl;
       } while ( n_v > 0.0001 );
+
+      if ( grey_image ) 
+        {
+          if ( verb > 0 ) trace.beginBlock("Writing u as PGM image");
+          ostringstream ossU;
+          ossU << boost::format("%s-a%.5f-l%.7f-u.pgm") % f2 % a % l1;
+          string str_image_u = ossU.str();
+          GreyLevelImage image( domain );
+          functions::dec::primalForm0ToGreyLevelImage
+            ( AT.calculus, AT.getU( 0 ), image ); 
+          PGMWriter<GreyLevelImage>::exportPGM( str_image_u, image );
+          if ( verb > 0 ) trace.endBlock();
+        }
       l1 /= lr;
     }
   return 0;

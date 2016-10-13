@@ -219,6 +219,13 @@ namespace DGtal
     /// @return the epsilon parameter.
     Scalar getEpsilon() const { return epsilon; }
 
+    /// @param i an integer (between 0 and the number of input forms).
+    /// @return the \a i-th \a u 0-form.
+    const PrimalForm0& getU( int i ) const { return u0.at( i ); }
+
+    /// @return the \a v 1-form.
+    const PrimalForm1& getV() const { return v1; }
+
     /// @return the size of a 0-form vector
     unsigned int size0() const { return alpha_Id0.myContainer.columns(); }
 

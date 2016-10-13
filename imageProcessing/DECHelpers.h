@@ -105,6 +105,51 @@ namespace DGtal {
         return diagonal( v2 );
       }
 
+      template <typename Calculus, typename Image>
+      void primalForm0ToImage
+      ( const Calculus& calculus, 
+        const typename Calculus::PrimalForm0& u, 
+        Image& image,
+        std::function< typename Image::Value( double ) > functor,
+        double cut_low = 0.0, double cut_up = 1.0 )
+      {
+        typedef typename Calculus::Index  Index;
+        typedef typename Calculus::SCell  SCell;
+        typedef typename Calculus::Scalar Scalar;
+        double min_u = NumberTraits<Scalar>::castToDouble( u.myContainer[ 0 ] );
+        double max_u = min_u;
+        for ( Index index = 0; index < u.myContainer.rows(); index++)
+          {
+            double v = NumberTraits<Scalar>::castToDouble( u.myContainer[ index ] );
+            min_u = std::min( min_u, v );
+            max_u = std::max( max_u, v );
+          }
+        if ( min_u < cut_low ) min_u = cut_low;
+        if ( max_u > cut_up  ) max_u = cut_up;
+        for ( Index index = 0; index < u.myContainer.rows(); index++)
+          {
+            SCell cell = u.getSCell( index );
+            double v = NumberTraits<Scalar>::castToDouble( u.myContainer[ index ] );
+            double w = std::min( cut_up, std::max( cut_low, v ) );
+            if ( min_u != max_u ) w = ( w - min_u ) / ( max_u - min_u );
+            image.setValue( calculus.myKSpace.sCoords( cell ), functor( w ) );
+          }
+      }
+      
+      /**
+      * Standard method to output a 0-form into a grey-level image.
+      */
+      template <typename Calculus, typename Image>
+      void primalForm0ToGreyLevelImage
+      ( const Calculus& calculus, 
+        const typename Calculus::PrimalForm0& u, 
+        Image& image,
+        double cut_low = 0.0, double cut_up = 1.0 )
+      {
+        primalForm0ToImage( calculus, u, image,
+                            [] ( double x ) { return (unsigned char) ( round( x * 255.0 ) ); },
+                            cut_low, cut_up );
+      }
 
     } // namespace dec
   } // namespace functions
