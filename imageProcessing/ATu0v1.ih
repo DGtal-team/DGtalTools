@@ -43,7 +43,8 @@ ATu0v1()
   : calculus(), 
     D0( calculus ), D1( calculus ), AD1( calculus ), AD2( calculus ),
     v1( calculus ), L1( calculus ), alpha_Id0( calculus ),
-    l_L1( calculus ), l_1_over_4( calculus )
+    l_L1( calculus ), l_1_over_4( calculus ), 
+    left_V1( calculus ), l_1_over_4e( calculus )
 {}
 
 template <typename TKSpace, typename TLinearAlgebra>
@@ -103,6 +104,7 @@ void
 DGtal::ATu0v1<TKSpace, TLinearAlgebra>::
 setAlpha( Scalar _alpha )
 {
+  ASSERT( _alpha >= 0.0 );
   alpha = _alpha;
   // Building alpha_Id0
   alpha_Id0   = _alpha * calculus.template identity<0, PRIMAL>();
@@ -117,12 +119,24 @@ void
 DGtal::ATu0v1<TKSpace, TLinearAlgebra>::
 setLambda( Scalar _lambda )
 {
-  lambda = _lambda;
-  l_L1 = lambda * L1;
-  for ( Index index = 0; index < l_1_over_4.myContainer.rows(); index++)
-    l_1_over_4.myContainer( index ) = lambda/4.0;
+  ASSERT( _alpha >= 0.0 );
+  lambda     = _lambda;
+  l_L1       = lambda * L1;
+  l_1_over_4 = (lambda / 4.0 ) * KForm< Calculus, 1, PRIMAL >::ones( calculus );
 }
 
+//-----------------------------------------------------------------------------
+template <typename TKSpace, typename TLinearAlgebra>
+void 
+DGtal::ATu0v1<TKSpace, TLinearAlgebra>::
+setEpsilon( Scalar _epsilon )
+{
+  ASSERT( _epsilon > 0.0 );
+  epsilon     = _epsilon;
+  left_V1     = epsilon * l_L1 + ( lambda/(4.0*epsilon) ) * calculus.template identity<1, PRIMAL>();
+  l_1_over_4e = (1.0/epsilon) * l_1_over_4;
+}
+ 
 //-----------------------------------------------------------------------------
 template <typename TKSpace, typename TLinearAlgebra>
 void 
@@ -133,6 +147,8 @@ setUFromInput()
   for ( unsigned int i = 0; i < g0.size(); i++ )
     u0.push_back( g0[ i ] );
 }
+
+
 
 
 ///////////////////////////////////////////////////////////////////////////////

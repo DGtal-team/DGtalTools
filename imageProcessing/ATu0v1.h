@@ -165,8 +165,14 @@ namespace DGtal
     template <typename Image>
     void addInput( const Image& image, std::function< Scalar( typename Image::Value ) > f );
 
+    /// Sets approximation \a u to be equal to the input. Used for
+    /// initializating \a u. Should be called once all \ref addInput
+    /// have been called.
+    void setUFromInput();
+
     /** 
-    * Sets the parameter \f$ alpha \f$ as global to the image.
+    * Sets the parameter \f$ alpha \f$ as global to the image. Should be
+    * set \b before \ref \setLambda and \ref setEpsilon.
     *
     * @param _alpha the \f$ \alpha \f$ parameter in AT functional ( in term \f$
     * \int \alpha | u - g |^2 \f$ ). Dimension theory tells that it is in
@@ -175,7 +181,8 @@ namespace DGtal
     void setAlpha( Scalar _alpha );
 
     /**
-    * Sets the parameter \f$ \lambda \f$ of AT functional.
+    * Sets the parameter \f$ \lambda \f$ of AT functional. Should be
+    * set \b after \ref \setAlpha and \b before \ref setEpsilon.
     *
     * @param _lambda the \f$ \lambda \f$ parameter in AT functional (
     * in terms \f$ \int \lambda \epsilon | v \grad u |^2 + \int
@@ -185,8 +192,32 @@ namespace DGtal
     */
     void setLambda( Scalar _lambda );
 
-    /// Sets approximation \a u to be equal to the input. Used for initializating \a u.
-    void setUFromInput();
+    /**
+    * Sets the parameter \f$ \epsilon \f$ of AT functional. Should be
+    * set \b after \ref \setAlpha and \ref setLambda.
+    *
+    * @param _epsilon the \f$ \epsilon \f$ parameter in AT functional (
+    * in terms \f$ \int \lambda \epsilon | v \grad u |^2 + \int
+    * \frac{\lambda}{4\epsilon} |1-v|^2 \f$ ). Dimension theory tells
+    * that it is in length unit, the lower the thinner is the set of
+    * discontinuities.
+    */
+    void setEpsilon( Scalar _epsilon );
+
+    /// @return the (global) alpha parameter.
+    Scalar getAlpha() const { return alpha; }
+
+    /// @return the lambda parameter.
+    Scalar getLambda() const { return lambda; }
+
+    /// @return the epsilon parameter.
+    Scalar getEpsilon() const { return epsilon; }
+
+    /// @return the size of a 0-form vector
+    unsigned int size0() const { return alpha_Id0.myContainer.columns(); }
+
+    /// @return the size of a 1-form vector
+    unsigned int size1() const { return v1.myContainer.rows(); }
 
     // ----------------------- Interface --------------------------------------
   public:
@@ -209,13 +240,10 @@ namespace DGtal
 
     /// The discrete exterior calculus instance.
     Calculus calculus;
-
     /// The image domain (i.e. all the pixels)
     Domain   domain;
-    
     /// The cell domain (i.e. all the cells)
     Domain   cell_domain;
-
     /// primal derivative: 0-form -> 1-form
     PrimalDerivative0     D0;
     /// primal derivative: 1-form -> 2-form
@@ -230,37 +258,32 @@ namespace DGtal
     PrimalIdentity1       l_L1;
     /// lambda 1/4 1
     PrimalForm1           l_1_over_4;
+    /// epsilon * lambda * edge laplacien + (lambda / (4*epsilon)) * Id1
+    PrimalIdentity1       left_V1;
+    /// lambda 1/(4*epsilon) 1
+    PrimalForm1           l_1_over_4e;
 
     // ------------------------- Protected Datas ------------------------------
   protected:
 
     /// The g 0-forms
     std::vector< PrimalForm0 > g0;
-
     /// The u 0-forms
     std::vector< PrimalForm0 > u0;
-
     /// The v 1-form
     PrimalForm1 v1;
-
     /// Smoothness parameter alpha of AT (in 1/area unit)
-    double              alpha;
-
+    double alpha;
     /// Amount of discontinuity parameter lambda (in 1/length unit).
-    double              lambda;
-    
+    double lambda;
     /// Thickness of discontinuity set (in length unit).
-    double              epsilon;
-
+    double epsilon;
     /// alpha Id0
     PrimalIdentity0 alpha_Id0;
-
     /// alpha g0
     std::vector< PrimalForm0 > alpha_g0;
-
     /// The solver for every 0-form u[i]
     SolverU solver_u;
-
     /// The solver for 1-form v
     SolverV solver_v;
 
