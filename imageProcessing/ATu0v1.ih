@@ -180,7 +180,7 @@ solveU()
 template <typename TKSpace, typename TLinearAlgebra>
 bool
 DGtal::ATu0v1<TKSpace, TLinearAlgebra>::
-solveV( int compute_delta )
+solveV()
 {
   former_v1 = v1;
   if ( verbose > 0 ) trace.beginBlock("Solving for v");
@@ -192,12 +192,42 @@ solveV( int compute_delta )
   if ( verbose > 1 ) trace.info() << "- prefactoring matrix N" << endl;
   solver_v.compute( N );
   if ( verbose > 1 ) trace.info() << "- solving N v = l/4e 1" << endl;
-  v = solver_v.solve( l_1_over_4e );
-  if ( verbose > 1 ) trace.info() << ( solver_v.isValid() ? "OK" : "ERROR" ) << " " << solver_v.myLinearAlgebraSolver.info() << endl;
+  v1 = solver_v.solve( l_1_over_4e );
+  if ( verbose > 1 ) trace.info() << ( solver_v.isValid() ? "OK" : "ERROR" )
+                                  << " " << solver_v.myLinearAlgebraSolver.info()
+                                  << endl;
   if ( verbose > 0 ) trace.endBlock();
   return solver_v.isValid();
 }
 
+//-----------------------------------------------------------------------------
+template <typename TKSpace, typename TLinearAlgebra>
+double
+DGtal::ATu0v1<TKSpace, TLinearAlgebra>::
+computeVariation()
+{
+  if ( verbose > 0 ) trace.beginBlock( "Compute variation of v.");
+  delta_v_l1  = 0.0;
+  delta_v_l2  = 0.0;
+  delta_v_loo = 0.0;
+  for ( Index index = 0; index < size1(); index++)
+    {
+      delta_v_loo = max( delta_v_loo, fabs( v1.myContainer( index )
+                                            - former_v1.myContainer( index ) ) );
+      delta_v_l2 += ( v1.myContainer( index ) - former_v1.myContainer( index ) )
+        * ( v1.myContainer( index ) - former_v1.myContainer( index ) );
+      delta_v_l1 += fabs( v1.myContainer( index )
+                          - former_v1.myContainer( index ) );
+    }
+  delta_v_l1 /= size1();
+  delta_v_l2  = sqrt( delta_v_l2 / size1() );
+  if ( verbose > 0 ) {
+    trace.info() << "Variation |v^k+1 - v^k|_oo = " << delta_v_loo << endl;
+    trace.info() << "Variation |v^k+1 - v^k|_2  = " << delta_v_l2  << endl;
+    trace.info() << "Variation |v^k+1 - v^k|_1  = " << delta_v_l1  << endl;
+  }
+  if ( verbose > 0 ) trace.endBlock();
+}
 
 
 ///////////////////////////////////////////////////////////////////////////////
