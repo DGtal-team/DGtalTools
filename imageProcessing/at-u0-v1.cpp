@@ -163,7 +163,6 @@ lambda scale space (lena)
 </table>
 </center>
 
-
 */
 
 
