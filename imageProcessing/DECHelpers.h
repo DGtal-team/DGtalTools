@@ -342,6 +342,23 @@ namespace DGtal {
       }
 
       /**
+      * Standard method to output a 1-form into a color image.
+      */
+      template <typename Calculus, typename Image>
+      void dualForm1ToRGBColorImage
+      ( const Calculus& calculus, 
+        const typename Calculus::DualForm1& v, 
+        Image& image, Color color,
+        double cut_low = 0.0, double cut_up = 1.0,
+        int pixel_size = 1 )
+      {
+        dualForm1ToImage( calculus, v, image,
+                          [color] ( double x ) { return color; },
+                          [] ( double x ) { return x < 0.5; },
+                          cut_low, cut_up, pixel_size );
+      }
+
+      /**
       * Standard method to output three 0-forms into a RGB Color image.
       */
       template <typename Calculus, typename Image>

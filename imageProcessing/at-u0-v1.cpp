@@ -339,15 +339,18 @@ int main( int argc, char* argv[] )
       else if ( color_image )
         {
           if ( verb > 0 ) trace.beginBlock("Writing u[0,1,2] as PGM image");
-          ostringstream ossU;
+          ostringstream ossU, ossV;
           ossU << boost::format("%s-a%.5f-l%.7f-u.ppm") % f2 % a % l1;
-          string str_image_u = ossU.str();
+          ossV << boost::format("%s-a%.5f-l%.7f-u-v.ppm") % f2 % a % l1;
           ColorImage image( out_domain );
           functions::dec::threeDualForms2ToRGBColorImage
             ( AT.calculus, 
               AT.primal_h0 * AT.getU( 0 ), AT.primal_h0 * AT.getU( 1 ), AT.primal_h0 * AT.getU( 2 ),
               image, 0.0, 1.0, pix_sz ); 
-          PPMWriter<ColorImage, functors::Identity >::exportPPM( str_image_u, image );
+          PPMWriter<ColorImage, functors::Identity >::exportPPM( ossU.str(), image );
+          functions::dec::dualForm1ToRGBColorImage
+            ( AT.calculus, AT.primal_h1 * AT.getV(), image, Color::Red, 0.0, 1.0, pix_sz ); 
+          PPMWriter<ColorImage, functors::Identity >::exportPPM( ossV.str(), image );
           if ( verb > 0 ) trace.endBlock();
         }
       l1 /= lr;
