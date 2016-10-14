@@ -66,39 +66,48 @@ namespace DGtal
   */
   template < typename TKSpace,
              typename TLinearAlgebra = EigenLinearAlgebraBackend >
-  struct ATu0v1 {
+  struct ATu0v1 : public DECImage2D<TKSpace, TLinearAlgebra>
+  {
     typedef TKSpace                                        KSpace;
     typedef TLinearAlgebra                                 LinearAlgebra;
-    typedef typename KSpace::Space                         Space;
-    typedef typename Space::Point                          Point;
-    typedef typename Space::RealVector                     RealVector;
-    typedef typename RealVector::Component                 Scalar;
-    typedef typename KSpace::SCell                         SCell;
-    typedef typename KSpace::Cell                          Cell;
-    typedef typename KSpace::Surfel                        Surfel;
-    typedef HyperRectDomain<Space>                         Domain;
-    typedef std::map<Cell, Scalar>                         SmallestEpsilonMap;
-    typedef DiscreteExteriorCalculus<2,2, LinearAlgebra>   Calculus;
-    typedef DiscreteExteriorCalculusFactory<LinearAlgebra> CalculusFactory;
-    typedef typename Calculus::Index                       Index;
-    typedef typename Calculus::PrimalForm0                 PrimalForm0;
-    typedef typename Calculus::PrimalForm1                 PrimalForm1;
-    typedef typename Calculus::PrimalForm2                 PrimalForm2;
-    typedef typename Calculus::PrimalIdentity0             PrimalIdentity0;
-    typedef typename Calculus::PrimalIdentity1             PrimalIdentity1;
-    typedef typename Calculus::PrimalIdentity2             PrimalIdentity2;
-    typedef typename Calculus::PrimalDerivative0           PrimalDerivative0;
-    typedef typename Calculus::PrimalDerivative1           PrimalDerivative1;
-    typedef typename Calculus::DualDerivative0             DualDerivative0;
-    typedef typename Calculus::DualDerivative1             DualDerivative1;
-    typedef typename Calculus::PrimalAntiderivative1       PrimalAntiderivative1;
-    typedef typename Calculus::PrimalAntiderivative2       PrimalAntiderivative2;
-    typedef typename Calculus::PrimalHodge0                PrimalHodge0;
-    typedef typename Calculus::PrimalHodge1                PrimalHodge1;
-    typedef typename Calculus::PrimalHodge2                PrimalHodge2;
-    typedef typename Calculus::DualHodge0                  DualHodge0;
-    typedef typename Calculus::DualHodge1                  DualHodge1;
-    typedef typename Calculus::DualHodge2                  DualHodge2;
+    typedef DECImage2D<TKSpace, TLinearAlgebra>            Base;
+    using typename Base::Space;
+    using typename Base::Point;
+    using typename Base::RealVector;
+    using typename Base::Scalar;
+    using typename Base::SCell;
+    using typename Base::Domain;
+    using typename Base::Calculus;
+    using typename Base::Index;
+    using typename Base::PrimalForm0;
+    using typename Base::PrimalForm1;
+    using typename Base::PrimalForm2;
+    using typename Base::PrimalIdentity0;
+    using typename Base::PrimalIdentity1;
+    using typename Base::PrimalIdentity2;
+    using typename Base::PrimalDerivative0;
+    using typename Base::PrimalDerivative1;
+    using typename Base::DualDerivative0;
+    using typename Base::DualDerivative1;
+    using typename Base::PrimalHodge0;
+    using typename Base::PrimalHodge1;
+    using typename Base::PrimalHodge2;
+    using typename Base::DualHodge0;
+    using typename Base::DualHodge1;
+    using typename Base::DualHodge2;
+    using Base::calculus;
+    using Base::verbose;
+    using Base::D0;
+    using Base::D1;
+    using Base::dual_D0;
+    using Base::dual_D1;
+    using Base::primal_h0;
+    using Base::primal_h1;
+    using Base::primal_h2;
+    using Base::dual_h0;
+    using Base::dual_h1;
+    using Base::dual_h2;
+
     typedef typename LinearAlgebra::SolverSimplicialLLT    LinearAlgebraSolver;
     typedef DiscreteExteriorCalculusSolver<Calculus, LinearAlgebraSolver, 0, PRIMAL, 0, PRIMAL> 
                                                            SolverU;
@@ -293,43 +302,13 @@ namespace DGtal
 
     // ------------------------- Public Datas ------------------------------
   public:
-    /// The verbose level (0: silent).
-    int verbose;
-    /// The discrete exterior calculus instance.
-    Calculus calculus;
-    /// The image domain (i.e. all the pixels)
-    Domain   domain;
-    /// The cell domain (i.e. all the cells)
-    Domain   cell_domain;
+
     /// The L1-norm of variation of v.
     Scalar delta_v_l1;
     /// The L2-norm of variation of v.
     Scalar delta_v_l2;
     /// The Linfinity-norm of variation of v.
     Scalar delta_v_loo;
-    /// primal derivative: 0-form -> 1-form
-    PrimalDerivative0     D0;
-    /// primal derivative: 1-form -> 2-form
-    PrimalDerivative1     D1;
-    // /// primal anti-derivative: 1-form -> 0-form
-    // PrimalAntiderivative1 AD1;
-    // /// primal anti-derivative: 2-form -> 1-form
-    // PrimalAntiderivative2 AD2;
-
-    /// dual derivative dual 0-form -> dual 1-form
-    DualDerivative0 dual_D0;
-    /// dual derivative dual 1-form -> dual 2-form
-    DualDerivative1 dual_D1;
-    /// hodge star: 0-form -> dual 0-form
-    PrimalHodge0 primal_h0;
-    /// hodge star: 1-form -> dual 1-form
-    PrimalHodge1 primal_h1;
-    /// hodge star: 2-form -> dual 2-form
-    PrimalHodge2 primal_h2;
-    /// hodge star: dual 1-form -> 1-form
-    DualHodge1   dual_h1;
-    /// hodge star: dual 2-form -> 2-form
-    DualHodge2   dual_h2;
 
     /// edge laplacien
     PrimalIdentity1       L1;

@@ -382,6 +382,180 @@ namespace DGtal {
 
     } // namespace dec
   } // namespace functions
+
+  /////////////////////////////////////////////////////////////////////////////
+  // template class DECImage2D
+  /**
+  * Description of template class 'DECImage2D' <p> \brief Aim: This class
+  * simplifies the development of 2D image processing tools using discrete exterior calculus.
+  *
+  */
+  template < typename TKSpace,
+             typename TLinearAlgebra = EigenLinearAlgebraBackend >
+  struct DECImage2D {
+    typedef TKSpace                                        KSpace;
+    typedef TLinearAlgebra                                 LinearAlgebra;
+    typedef typename KSpace::Space                         Space;
+    typedef typename Space::Point                          Point;
+    typedef typename Space::RealVector                     RealVector;
+    typedef typename RealVector::Component                 Scalar;
+    typedef typename KSpace::SCell                         SCell;
+    typedef typename KSpace::Cell                          Cell;
+    typedef typename KSpace::Surfel                        Surfel;
+    typedef HyperRectDomain<Space>                         Domain;
+    typedef DiscreteExteriorCalculus<2,2, LinearAlgebra>   Calculus;
+    typedef DiscreteExteriorCalculusFactory<LinearAlgebra> CalculusFactory;
+    typedef typename Calculus::Index                       Index;
+    typedef typename Calculus::PrimalForm0                 PrimalForm0;
+    typedef typename Calculus::PrimalForm1                 PrimalForm1;
+    typedef typename Calculus::PrimalForm2                 PrimalForm2;
+    typedef typename Calculus::PrimalIdentity0             PrimalIdentity0;
+    typedef typename Calculus::PrimalIdentity1             PrimalIdentity1;
+    typedef typename Calculus::PrimalIdentity2             PrimalIdentity2;
+    typedef typename Calculus::PrimalDerivative0           PrimalDerivative0;
+    typedef typename Calculus::PrimalDerivative1           PrimalDerivative1;
+    typedef typename Calculus::DualDerivative0             DualDerivative0;
+    typedef typename Calculus::DualDerivative1             DualDerivative1;
+    typedef typename Calculus::PrimalAntiderivative1       PrimalAntiderivative1;
+    typedef typename Calculus::PrimalAntiderivative2       PrimalAntiderivative2;
+    typedef typename Calculus::PrimalHodge0                PrimalHodge0;
+    typedef typename Calculus::PrimalHodge1                PrimalHodge1;
+    typedef typename Calculus::PrimalHodge2                PrimalHodge2;
+    typedef typename Calculus::DualHodge0                  DualHodge0;
+    typedef typename Calculus::DualHodge1                  DualHodge1;
+    typedef typename Calculus::DualHodge2                  DualHodge2;
+    typedef typename LinearAlgebra::SolverSimplicialLLT    LinearAlgebraSolver;
+    typedef DiscreteExteriorCalculusSolver<Calculus, LinearAlgebraSolver, 0, PRIMAL, 0, PRIMAL> 
+                                                           SolverU;
+    typedef DiscreteExteriorCalculusSolver<Calculus, LinearAlgebraSolver, 1, PRIMAL, 1, PRIMAL> 
+                                                           SolverV;
+
+    BOOST_STATIC_ASSERT(( KSpace::dimension == 2 ));
+
+    // ----------------------- Standard services ------------------------------
+  public:
+
+    /**
+     * Destructor.
+     */
+    ~DECImage2D() = default;
+
+    /**
+    * Default constructor. The object needs to be initialized with \ref init.
+    * @param _verbose specifies the verbose level (0: silent, 1: more info ... ). 
+    */
+    DECImage2D( int _verbose = 1 )
+      : verbose( _verbose ), 
+        calculus(), 
+        D0( calculus ), D1( calculus ), 
+        dual_D0( calculus ), dual_D1( calculus ),
+        primal_h0( calculus ), primal_h1( calculus ), primal_h2( calculus ),
+        dual_h0( calculus ), dual_h1( calculus ), dual_h2( calculus )
+    {}
+    
+    /**
+    * Constructor from Khalimsky space, which specifies the domain of calculus.
+    */
+    void init( Clone<KSpace> aKSpace )
+    {
+      calculus.myKSpace = aKSpace;
+      const KSpace & K  = calculus.myKSpace;
+      domain            = Domain( K.lowerBound(), K.upperBound() );
+      Point  p0         = K.uKCoords( K.lowerCell() );
+      Point  p1         = K.uKCoords( K.upperCell() );
+      cell_domain       = Domain( p0, p1 );
+
+      if ( verbose > 0 ) trace.beginBlock("building AT functionnals");
+      // Adds all the cell
+      for ( typename Domain::ConstIterator it = cell_domain.begin(), itE = cell_domain.end(); 
+            it != itE; ++it )
+        calculus.insertSCell( K.sCell( *it ) ); // ajoute toutes les cellules de Khalimsky.
+      calculus.updateIndexes();
+      if ( verbose > 1 ) trace.info() << calculus << std::endl;
+      // Precomputes operators.
+      if ( verbose > 1 ) trace.info() << "primal_D0" << std::endl;
+      D0 = calculus.template derivative<0,PRIMAL>();
+      if ( verbose > 1 ) trace.info() << "primal_D1" << std::endl;
+      D1 = calculus.template derivative<1,PRIMAL>();
+      if ( verbose > 1 ) trace.info() << "dual_D0" << std::endl;
+      dual_D0   = calculus.template derivative<0,DUAL>();
+      if ( verbose > 1 ) trace.info() << "dual_D1" << std::endl;
+      dual_D1   = calculus.template derivative<1,DUAL>();
+      if ( verbose > 1 ) trace.info() << "primal_h1" << std::endl;
+      primal_h0 = calculus.template hodge<0,PRIMAL>();
+      if ( verbose > 1 ) trace.info() << "primal_h1" << std::endl;
+      primal_h1 = calculus.template hodge<1,PRIMAL>();
+      if ( verbose > 1 ) trace.info() << "primal_h2" << std::endl;
+      primal_h2 = calculus.template hodge<2,PRIMAL>();
+      if ( verbose > 1 ) trace.info() << "dual_h1" << std::endl;
+      dual_h0   = calculus.template hodge<0,DUAL>();
+      if ( verbose > 1 ) trace.info() << "dual_h1" << std::endl;
+      dual_h1   = calculus.template hodge<1,DUAL>();
+      if ( verbose > 1 ) trace.info() << "dual_h2" << std::endl;
+      dual_h2   = calculus.template hodge<2,DUAL>();
+      if ( verbose > 0 ) trace.endBlock();
+    }
+
+    /**
+     * Copy constructor.
+     * @param other the object to clone.
+     */
+    DECImage2D ( const DECImage2D & other ) = delete;
+
+    /**
+     * Move constructor.
+     * @param other the object to move.
+     */
+    DECImage2D ( DECImage2D && other ) = delete;
+
+    /**
+     * Copy assignment operator.
+     * @param other the object to copy.
+     * @return a reference on 'this'.
+     */
+    DECImage2D & operator= ( const DECImage2D & other ) = delete;
+
+    /**
+     * Move assignment operator.
+     * @param other the object to move.
+     * @return a reference on 'this'.
+     */
+    DECImage2D & operator= ( DECImage2D && other ) = delete;
+
+    // ------------------------- Public Datas ------------------------------
+  public:
+
+    /// The verbose level (0: silent).
+    int verbose;
+    /// The discrete exterior calculus instance.
+    Calculus calculus;
+    /// The image domain (i.e. all the pixels)
+    Domain   domain;
+    /// The cell domain (i.e. all the cells)
+    Domain   cell_domain;
+    /// primal derivative: 0-form -> 1-form
+    PrimalDerivative0 D0;
+    /// primal derivative: 1-form -> 2-form
+    PrimalDerivative1 D1;
+    /// dual derivative dual 0-form -> dual 1-form
+    DualDerivative0   dual_D0;
+    /// dual derivative dual 1-form -> dual 2-form
+    DualDerivative1   dual_D1;
+    /// hodge star: 0-form -> dual 0-form
+    PrimalHodge0      primal_h0;
+    /// hodge star: 1-form -> dual 1-form
+    PrimalHodge1      primal_h1;
+    /// hodge star: 2-form -> dual 2-form
+    PrimalHodge2      primal_h2;
+    /// hodge star: dual 0-form -> 0-form
+    DualHodge0        dual_h0;
+    /// hodge star: dual 1-form -> 1-form
+    DualHodge1        dual_h1;
+    /// hodge star: dual 2-form -> 2-form
+    DualHodge2        dual_h2;
+
+  };
+
 } // namespace DGtal
 
 ///////////////////////////////////////////////////////////////////////////////

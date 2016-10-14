@@ -40,13 +40,7 @@
 template <typename TKSpace, typename TLinearAlgebra>
 DGtal::ATu0v1<TKSpace, TLinearAlgebra>::
 ATu0v1( int _verbose )
-  : verbose( _verbose ), 
-    calculus(), 
-    D0( calculus ), D1( calculus ), 
-    // AD1( calculus ), AD2( calculus ),
-    dual_D0( calculus ), dual_D1( calculus ),
-    primal_h0( calculus ), primal_h1( calculus ), primal_h2( calculus ),
-    dual_h1( calculus ), dual_h2( calculus ),
+  : Base( _verbose ),
     v1( calculus ), former_v1( calculus ), 
     L1( calculus ), alpha_Id0( calculus ),
     l_L1( calculus ), l_1_over_4( calculus ), 
@@ -58,42 +52,8 @@ void
 DGtal::ATu0v1<TKSpace, TLinearAlgebra>::
 init( Clone<KSpace> aKSpace )
 {
-  calculus.myKSpace = aKSpace;
-  const KSpace & K  = calculus.myKSpace;
-  domain            = Domain( K.lowerBound(), K.upperBound() );
-  Point  p0         = K.uKCoords( K.lowerCell() );
-  Point  p1         = K.uKCoords( K.upperCell() );
-  cell_domain       = Domain( p0, p1 );
-
-  if ( verbose > 0 ) trace.beginBlock("building AT functionnals");
-  // Adds all the cell
-  for ( typename Domain::ConstIterator it = cell_domain.begin(), itE = cell_domain.end(); it != itE; ++it )
-    calculus.insertSCell( K.sCell( *it ) ); // ajoute toutes les cellules de Khalimsky.
-  calculus.updateIndexes();
-  if ( verbose > 1 ) trace.info() << calculus << std::endl;
-  // Precomputes operators.
-  if ( verbose > 1 ) trace.info() << "primal_D0" << std::endl;
-  D0 = calculus.template derivative<0,PRIMAL>();
-  if ( verbose > 1 ) trace.info() << "primal_D1" << std::endl;
-  D1 = calculus.template derivative<1,PRIMAL>();
-  // if ( verbose > 1 ) trace.info() << "primal_AD1" << std::endl;
-  // AD1 = calculus.template antiderivative<1,PRIMAL>();
-  // if ( verbose > 1 ) trace.info() << "primal_AD2" << std::endl;
-  // AD2 = calculus.template antiderivative<2,PRIMAL>();
-  if ( verbose > 1 ) trace.info() << "dual_D0" << std::endl;
-  dual_D0   = calculus.template derivative<0,DUAL>();
-  if ( verbose > 1 ) trace.info() << "dual_D1" << std::endl;
-  dual_D1   = calculus.template derivative<1,DUAL>();
-  if ( verbose > 1 ) trace.info() << "primal_h1" << std::endl;
-  primal_h0 = calculus.template hodge<0,PRIMAL>();
-  if ( verbose > 1 ) trace.info() << "primal_h1" << std::endl;
-  primal_h1 = calculus.template hodge<1,PRIMAL>();
-  if ( verbose > 1 ) trace.info() << "primal_h2" << std::endl;
-  primal_h2 = calculus.template hodge<2,PRIMAL>();
-  if ( verbose > 1 ) trace.info() << "dual_h1" << std::endl;
-  dual_h1   = calculus.template hodge<1,DUAL>();
-  if ( verbose > 1 ) trace.info() << "dual_h2" << std::endl;
-  dual_h2   = calculus.template hodge<2,DUAL>();
+  Base::init( aKSpace );
+  if ( verbose > 0 ) trace.beginBlock( "Initialize DEC specific operators" );
   if ( verbose > 1 ) trace.info() << "primal_L1" << std::endl;
   L1 = -1.0 * ( D0 * dual_h2 * dual_D1 * primal_h1
                 + dual_h1 * dual_D0 * primal_h2 * D1 );
