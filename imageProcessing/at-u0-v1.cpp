@@ -59,7 +59,7 @@
 
 Computes the Ambrosio-Tortorelli reconstruction/segmentation of an input image, either grey-level (.pgm) or color image (.ppm).
 
-\f$ AT_e = \int a.(u-g)^2 + v^2 |grad u|^2 + le.|grad v|^2 + (l/4e).(1-v)^2 \f$
+\f$ AT_e = \int a.(u-g)^2 + v^2 | \grad u|^2 + le.| \grad v|^2 + (l/4e).(1-v)^2 \f$
  
 Discretized as (u 0-form, v 1-form, A vertex-edge bdry, B edge-face bdy)
 
@@ -92,6 +92,8 @@ Discretized as (u 0-form, v 1-form, A vertex-edge bdry, B edge-face bdy)
                                         silent, etc).
 \endcode
 
+@image html resATu0v1-cb2-a1_00000-l1_0000000-u.png "AT alpha=1 lambda=1 on carre noise=0.2"
+
 @b example:
 
 \code
@@ -103,7 +105,11 @@ Discretized as (u 0-form, v 1-form, A vertex-edge bdry, B edge-face bdy)
 
 <center>
 <table>
+<tr>
+<td colspan=5>
 epsilon scale space
+</td>
+</tr>
 <tr>
   <td> <img height=100px src="resATu0v1-cb2-e2_0-a0_10000-l0_0062092-u0-v1.png"/> </td>
   <td> <img height=100px src="resATu0v1-cb2-e1_0-a0_10000-l0_0062092-u0-v1.png"/> </td>
@@ -122,8 +128,11 @@ epsilon scale space
 <tr>
       <td align = center rowspan="4"> ./build/at-u0-v1 -i Images/carre2Degradesb02.pgm -o cb2 -a 0.1 --lambda 0.006 --epsilon-1 2.0 --epsilon-2 0.25</td>
 </tr>
-
+<tr>
+<td colspan=5>
 alpha scale space
+</td>
+</tr>
 <tr>
     <td> <img height=200px src="resATu0v1-cb2-a1_00000-l1_0000000-u.png"/> </td>
     <td> <img height=200px src="resATu0v1-cb2-a0_50000-l1_0000000-u.png"/> </td>
@@ -146,10 +155,11 @@ alpha scale space
 <tr>
         <td align = center rowspan="5"> ./build/at-u0-v1 -i Images/carre2Degradesb02.pgm -o cb2 -a 0.01 --lambda 1.0 --epsilon-1 2.0 --epsilon-2 0.25</td>
 </tr>
-
-
-
+<tr>
+<td colspan=5>
 lambda scale space (lena)
+</td>
+</tr>
 <tr>
 <td> <img height=200px src="resATu0v1-lena-370-b02-a0_48000-l0_2000000-u0-v1.png"/> </td>
 <td> <img height=200px src="resATu0v1-lena-370-b02-a0_48000-l0_1000000-u0-v1.png"/> </td>

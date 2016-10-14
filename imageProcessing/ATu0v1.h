@@ -178,7 +178,7 @@ namespace DGtal
 
     /** 
     * Sets the parameter \f$ alpha \f$ as global to the image. Should be
-    * set \b before \ref \setLambda and \ref setEpsilon.
+    * set \b before \ref setLambda and \ref setEpsilon.
     *
     * @param _alpha the \f$ \alpha \f$ parameter in AT functional ( in term \f$
     * \int \alpha | u - g |^2 \f$ ). Dimension theory tells that it is in
@@ -188,7 +188,7 @@ namespace DGtal
 
     /**
     * Sets the parameter \f$ \lambda \f$ of AT functional. Should be
-    * set \b after \ref \setAlpha and \b before \ref setEpsilon.
+    * set \b after \ref setAlpha and \b before \ref setEpsilon.
     *
     * @param _lambda the \f$ \lambda \f$ parameter in AT functional (
     * in terms \f$ \int \lambda \epsilon | v \grad u |^2 + \int
@@ -200,7 +200,7 @@ namespace DGtal
 
     /**
     * Sets the parameter \f$ \epsilon \f$ of AT functional. Should be
-    * set \b after \ref \setAlpha and \ref setLambda.
+    * set \b after \ref setAlpha and \ref setLambda.
     *
     * @param _epsilon the \f$ \epsilon \f$ parameter in AT functional (
     * in terms \f$ \int \lambda \epsilon | v \grad u |^2 + \int
@@ -249,7 +249,7 @@ namespace DGtal
     /// @return the max of all variations (i.e. delta_v_loo).
     Scalar computeVariation();
 
-    /// Checks that form \a v is between 0 and 1 and forces \v to be in-between.
+    /// Checks that form \a v is between 0 and 1 and forces \a v to be in-between.
     /// @return the max of the deviation wrt 0 and 1.
     Scalar checkV();
 
