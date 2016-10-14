@@ -47,6 +47,7 @@
 #include "DGtal/dec/DiscreteExteriorCalculus.h"
 #include "DGtal/dec/DiscreteExteriorCalculusSolver.h"
 #include "DGtal/dec/DiscreteExteriorCalculusFactory.h"
+#include "DECImageHelpers.h"
 
 //////////////////////////////////////////////////////////////////////////////
 

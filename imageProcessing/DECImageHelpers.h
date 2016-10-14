@@ -23,20 +23,20 @@
  *
  * @date 2016/10/12
  *
- * Header file for module DECHelpers.cpp
+ * Header file for module DECImageHelpers.cpp
  *
  * This file is part of the DGtal library.
  */
 
-#if defined(DECHelpers_RECURSES)
-#error Recursive header files inclusion detected in DECHelpers.h
-#else // defined(DECHelpers_RECURSES)
+#if defined(DECImageHelpers_RECURSES)
+#error Recursive header files inclusion detected in DECImageHelpers.h
+#else // defined(DECImageHelpers_RECURSES)
 /** Prevents recursive inclusion of headers. */
-#define DECHelpers_RECURSES
+#define DECImageHelpers_RECURSES
 
-#if !defined DECHelpers_h
+#if !defined DECImageHelpers_h
 /** Prevents repeated inclusion of headers. */
-#define DECHelpers_h
+#define DECImageHelpers_h
 
 //////////////////////////////////////////////////////////////////////////////
 // Inclusions
@@ -390,7 +390,7 @@ namespace DGtal {
 //                                                                           //
 ///////////////////////////////////////////////////////////////////////////////
 
-#endif // !defined DECHelpers_h
+#endif // !defined DECImageHelpers_h
 
-#undef DECHelpers_RECURSES
-#endif // else defined(DECHelpers_RECURSES)
+#undef DECImageHelpers_RECURSES
+#endif // else defined(DECImageHelpers_RECURSES)
