@@ -23,20 +23,20 @@
  *
  * @date 2016/10/12
  *
- * Header file for module ATu0v1.cpp
+ * Header file for module ATu2v0.cpp
  *
  * This file is part of the DGtal library.
  */
 
-#if defined(ATu0v1_RECURSES)
-#error Recursive header files inclusion detected in ATu0v1.h
-#else // defined(ATu0v1_RECURSES)
+#if defined(ATu2v0_RECURSES)
+#error Recursive header files inclusion detected in ATu2v0.h
+#else // defined(ATu2v0_RECURSES)
 /** Prevents recursive inclusion of headers. */
-#define ATu0v1_RECURSES
+#define ATu2v0_RECURSES
 
-#if !defined ATu0v1_h
+#if !defined ATu2v0_h
 /** Prevents repeated inclusion of headers. */
-#define ATu0v1_h
+#define ATu2v0_h
 
 //////////////////////////////////////////////////////////////////////////////
 // Inclusions
@@ -55,18 +55,18 @@ namespace DGtal
 {
 
   /////////////////////////////////////////////////////////////////////////////
-  // template class ATu0v1
+  // template class ATu2v0
   /**
-  * Description of template class 'ATu0v1' <p> \brief Aim: This class
+  * Description of template class 'ATu2v0' <p> \brief Aim: This class
   * solves Ambrosio-Tortorelli functional in a plane for \a u a
-  * (vector of) 0-form(s) and \a v a 1-form. \a u is a regularized
-  * approximation of an input data \a g, while \a v represents the
-  * set of discontinuities of \a u.
+  * (vector of) 2-form(s) and \a v a 0-form. \a u is a regularized
+  * approximation of an input image data \a g (grey-level or color
+  * image), while \a v represents the set of discontinuities of \a u.
   *
   */
   template < typename TKSpace,
              typename TLinearAlgebra = EigenLinearAlgebraBackend >
-  struct ATu0v1 : public DECImage2D<TKSpace, TLinearAlgebra>
+  struct ATu2v0 : public DECImage2D<TKSpace, TLinearAlgebra>
   {
     typedef TKSpace                             KSpace;
     typedef TLinearAlgebra                      LinearAlgebra;
@@ -109,9 +109,9 @@ namespace DGtal
     using Base::dual_h2;
 
     typedef typename LinearAlgebra::SolverSimplicialLLT    LinearAlgebraSolver;
-    typedef DiscreteExteriorCalculusSolver<Calculus, LinearAlgebraSolver, 0, PRIMAL, 0, PRIMAL> 
+    typedef DiscreteExteriorCalculusSolver<Calculus, LinearAlgebraSolver, 2, PRIMAL, 2, PRIMAL> 
                                                            SolverU;
-    typedef DiscreteExteriorCalculusSolver<Calculus, LinearAlgebraSolver, 1, PRIMAL, 1, PRIMAL> 
+    typedef DiscreteExteriorCalculusSolver<Calculus, LinearAlgebraSolver, 0, PRIMAL, 0, PRIMAL> 
                                                            SolverV;
 
     BOOST_STATIC_ASSERT(( KSpace::dimension == 2 ));
@@ -122,13 +122,13 @@ namespace DGtal
     /**
      * Destructor.
      */
-    ~ATu0v1() = default;
+    ~ATu2v0() = default;
 
     /**
     * Default constructor. The object needs to be initialized with \ref init.
     * @param _verbose specifies the verbose level (0: silent, 1: more info ... ). 
     */
-    ATu0v1( int _verbose = 1 );
+    ATu2v0( int _verbose = 1 );
     
     /**
     * Constructor from Khalimsky space, which specifies the domain of calculus.
@@ -139,30 +139,30 @@ namespace DGtal
      * Copy constructor.
      * @param other the object to clone.
      */
-    ATu0v1 ( const ATu0v1 & other ) = delete;
+    ATu2v0 ( const ATu2v0 & other ) = delete;
 
     /**
      * Move constructor.
      * @param other the object to move.
      */
-    ATu0v1 ( ATu0v1 && other ) = delete;
+    ATu2v0 ( ATu2v0 && other ) = delete;
 
     /**
      * Copy assignment operator.
      * @param other the object to copy.
      * @return a reference on 'this'.
      */
-    ATu0v1 & operator= ( const ATu0v1 & other ) = delete;
+    ATu2v0 & operator= ( const ATu2v0 & other ) = delete;
 
     /**
      * Move assignment operator.
      * @param other the object to move.
      * @return a reference on 'this'.
      */
-    ATu0v1 & operator= ( ATu0v1 && other ) = delete;
+    ATu2v0 & operator= ( ATu2v0 && other ) = delete;
 
     /**
-    * Adds an input 0-form by filtering an \a image values.
+    * Adds an input 2-form by filtering an \a image values.
     * @param image any image such that the domain of this space is included in the domain of the image.
     * @param f any functor associated a scalar to an image value.
     *
@@ -211,7 +211,7 @@ namespace DGtal
     * @param m a 0-form that specifies which input data is significant
     * (1) or not be used (0).
     */
-    void setAlpha( Scalar _alpha, const PrimalForm0& m );
+    void setAlpha( Scalar _alpha, const PrimalForm2& m );
 
     /**
     * Sets the parameter \f$ \lambda \f$ of AT functional. Should be
@@ -247,21 +247,21 @@ namespace DGtal
     Scalar getEpsilon() const { return epsilon; }
 
     /// @param i an integer (between 0 and the number of input forms).
-    /// @return the \a i-th input \a g 0-form.
-    const PrimalForm0& getG( int i ) const { return g0.at( i ); }
+    /// @return the \a i-th input \a g 2-form.
+    const PrimalForm2& getG( int i ) const { return g2.at( i ); }
 
     /// @param i an integer (between 0 and the number of input forms).
-    /// @return the \a i-th \a u 0-form.
-    const PrimalForm0& getU( int i ) const { return u0.at( i ); }
+    /// @return the \a i-th \a u 2-form.
+    const PrimalForm2& getU( int i ) const { return u2.at( i ); }
 
-    /// @return the \a v 1-form.
-    const PrimalForm1& getV() const { return v1; }
+    /// @return the \a v 0-form.
+    const PrimalForm0& getV() const { return v0; }
 
     /// @return the size of a 0-form vector
-    unsigned int size0() const { return alpha_Id0.myContainer.columns(); }
+    unsigned int size0() const { return v0.myContainer.rows(); }
 
-    /// @return the size of a 1-form vector
-    unsigned int size1() const { return v1.myContainer.rows(); }
+    // /// @return the size of a 1-form vector
+    // unsigned int size1() const { return v1.myContainer.rows(); }
 
     // ----------------------- Solver --------------------------------------
   public:
@@ -324,14 +324,14 @@ namespace DGtal
     // ------------------------- Protected Datas ------------------------------
   protected:
 
-    /// The g 0-forms
-    std::vector< PrimalForm0 > g0;
-    /// The u 0-forms
-    std::vector< PrimalForm0 > u0;
-    /// The v 1-form
-    PrimalForm1 v1;
-    /// The v 1-form at the previous iteration.
-    PrimalForm1 former_v1;
+    /// The g 2-forms
+    std::vector< PrimalForm2 > g2;
+    /// The u 2-forms
+    std::vector< PrimalForm2 > u2;
+    /// The v 0-form
+    PrimalForm0 v1;
+    /// The v 0-form at the previous iteration.
+    PrimalForm0 former_v1;
     /// Smoothness parameter alpha of AT (in 1/area unit)
     double alpha;
     /// Amount of discontinuity parameter lambda (in 1/length unit).
@@ -356,31 +356,31 @@ namespace DGtal
     // ------------------------- Internals ------------------------------------
   private:
 
-  }; // end of class ATu0v1
+  }; // end of class ATu2v0
 
 
   /**
-   * Overloads 'operator<<' for displaying objects of class 'ATu0v1'.
+   * Overloads 'operator<<' for displaying objects of class 'ATu2v0'.
    * @param out the output stream where the object is written.
-   * @param object the object of class 'ATu0v1' to write.
+   * @param object the object of class 'ATu2v0' to write.
    * @return the output stream after the writing.
    */
   template <typename TKSpace, typename TLinearAlgebra>
   std::ostream&
-  operator<< ( std::ostream & out, const ATu0v1<TKSpace, TLinearAlgebra> & object );
+  operator<< ( std::ostream & out, const ATu2v0<TKSpace, TLinearAlgebra> & object );
 
 } // namespace DGtal
 
 
 ///////////////////////////////////////////////////////////////////////////////
 // Includes inline functions.
-//#include "DGtal/dec/ATu0v1.ih"
-#include "ATu0v1.ih"
+//#include "DGtal/dec/ATu2v0.ih"
+#include "ATu2v0.ih"
 
 //                                                                           //
 ///////////////////////////////////////////////////////////////////////////////
 
-#endif // !defined ATu0v1_h
+#endif // !defined ATu2v0_h
 
-#undef ATu0v1_RECURSES
-#endif // else defined(ATu0v1_RECURSES)
+#undef ATu2v0_RECURSES
+#endif // else defined(ATu2v0_RECURSES)
