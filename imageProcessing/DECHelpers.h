@@ -105,6 +105,16 @@ namespace DGtal {
         return diagonal( v2 );
       }
 
+      /**
+      * Considers an image \a image to have pixels of size \a
+      * pixel_size x \a pixel_size, and writes the value \a val at the
+      * specified pixel position \a pt.
+      *
+      * @param[in,out] any image of sufficient size.
+      * @param pt a pixel coordinate (which is multiplied by \a pixel_size within).
+      * @param val the value to write in \a pixel_size x \a pixel_size pixels.
+      * @param pixel_size the chosen pixel_size (when 1, this is the normal setValue of an image).
+      */
       template <typename Image>
       void writePixel( Image& image, typename Image::Point pt, typename Image::Value val,
                        int pixel_size = 1 )
@@ -119,11 +129,67 @@ namespace DGtal {
               image.setValue( pt + q, val );
             }
       }
+
+      /**
+      * Considers an image \a image to have pixels of size \a
+      * pixel_size x \a pixel_size, and writes the value \a val at the
+      * specified linel position \a pt.
+      *
+      * @param[in,out] any image of sufficient size.
+      * @param pt a linel Khalimsky coordinates.
+      * @param val the value to write in \a pixel_size x 1 pixels (if horizontal) or 1 x \a pixel_size pixels (if vertical).
+      * @param pixel_size the chosen pixel_size (when 1, this is the normal setValue of an image).
+      */
+      template <typename Image>
+      void writePrimalLinel( Image& image, typename Image::Point pt, typename Image::Value val,
+                       int pixel_size = 1 )
+      {
+        typedef typename Image::Point      Point;
+        typedef typename Point::Coordinate Coordinate;
+        int pixel_size_x = NumberTraits<Coordinate>::even( pt[ 0 ] ) ? 1 : pixel_size;
+        int pixel_size_y = NumberTraits<Coordinate>::even( pt[ 1 ] ) ? 1 : pixel_size;
+        pt /= 2;
+        pt *= pixel_size;
+        for ( int y = 0; y < pixel_size_y; y++ )
+          for ( int x = 0; x < pixel_size_x; x++ )
+            {
+              Point q( (Coordinate) x, (Coordinate) y );
+              image.setValue( pt + q, val );
+            }
+      }
+      
+      /**
+      * Considers an image \a image to have pixels of size \a
+      * pixel_size x \a pixel_size, and writes the value \a val at the
+      * specified linel position \a pt.
+      *
+      * @param[in,out] any image of sufficient size.
+      * @param pt a linel Khalimsky coordinates.
+      * @param val the value to write in \a pixel_size x 1 pixels (if horizontal) or 1 x \a pixel_size pixels (if vertical).
+      * @param pixel_size the chosen pixel_size (when 1, this is the normal setValue of an image).
+      */
+      template <typename Image>
+      void writeDualLinel( Image& image, typename Image::Point pt, typename Image::Value val,
+                           int pixel_size = 1 )
+      {
+        typedef typename Image::Point      Point;
+        typedef typename Point::Coordinate Coordinate;
+        int pixel_size_x = NumberTraits<Coordinate>::even( pt[ 0 ] ) ? 0 : pixel_size-1;
+        int pixel_size_y = NumberTraits<Coordinate>::even( pt[ 1 ] ) ? 0 : pixel_size-1;
+        pt /= 2;
+        pt *= pixel_size;
+        for ( int y = pixel_size_y; y < pixel_size; y++ )
+          for ( int x = pixel_size_x; x < pixel_size; x++ )
+            {
+              Point q( (Coordinate) x, (Coordinate) y );
+              image.setValue( pt + q, val );
+            }
+      }
       
       template <typename Calculus, typename Image>
-      void primalForm0ToImage
+      void dualForm2ToImage
       ( const Calculus& calculus, 
-        const typename Calculus::PrimalForm0& u, 
+        const typename Calculus::DualForm2& u, 
         Image& image,
         std::function< typename Image::Value( double ) > functor,
         double cut_low = 0.0, double cut_up = 1.0, int pixel_size = 1 )
@@ -155,11 +221,48 @@ namespace DGtal {
       }
 
       template <typename Calculus, typename Image>
-      void threePrimalForms0ToImage
+      void dualForm1ToImage
       ( const Calculus& calculus, 
-        const typename Calculus::PrimalForm0& u0, 
-        const typename Calculus::PrimalForm0& u1, 
-        const typename Calculus::PrimalForm0& u2, 
+        const typename Calculus::DualForm1& v, 
+        Image& image,
+        std::function< typename Image::Value( double ) > functor,
+        std::function< bool ( double ) > predicate,
+        double cut_low = 0.0, double cut_up = 1.0, int pixel_size = 1 )
+      {
+        typedef typename Calculus::Index  Index;
+        typedef typename Calculus::SCell  SCell;
+        typedef typename Calculus::Scalar Scalar;
+        typedef typename Calculus::KSpace KSpace;
+        typedef typename KSpace::Point    Point;
+        typedef typename KSpace::Integer  Integer;
+        double min_v = NumberTraits<Scalar>::castToDouble( v.myContainer[ 0 ] );
+        double max_v = min_v;
+        for ( Index index = 0; index < v.myContainer.rows(); index++)
+          {
+            double w = NumberTraits<Scalar>::castToDouble( v.myContainer[ index ] );
+            min_v = std::min( min_v, w );
+            max_v = std::max( max_v, w );
+          }
+        if ( min_v < cut_low ) min_v = cut_low;
+        if ( max_v > cut_up  ) max_v = cut_up;
+        for ( Index index = 0; index < v.myContainer.rows(); index++)
+          {
+            SCell cell = v.getSCell( index );
+            double u = NumberTraits<Scalar>::castToDouble( v.myContainer[ index ] );
+            if ( ! predicate( u ) ) continue; 
+            double w = std::min( cut_up, std::max( cut_low, u ) );
+            if ( min_v != max_v ) w = ( w - min_v ) / ( max_v - min_v );
+            Point kpt = calculus.myKSpace.sKCoords( cell );
+            writeDualLinel  ( image, kpt, functor( w ), pixel_size );
+          }
+      }
+
+      template <typename Calculus, typename Image>
+      void threeDualForms2ToImage
+      ( const Calculus& calculus, 
+        const typename Calculus::DualForm2& u0, 
+        const typename Calculus::DualForm2& u1, 
+        const typename Calculus::DualForm2& u2, 
         Image& image,
         std::function< typename Image::Value( double, double, double ) > functor,
         double cut_low = 0.0, double cut_up = 1.0, int pixel_size = 1 )
@@ -202,7 +305,6 @@ namespace DGtal {
             double w2 = std::min( cut_up, std::max( cut_low, v2 ) );
             if ( min_u != max_u ) w2 = ( w2 - min_u ) / ( max_u - min_u );
             writePixel( image, calculus.myKSpace.sCoords( cell ), functor( w0, w1, w2 ), pixel_size );
-            // image.setValue( calculus.myKSpace.sCoords( cell ), functor( w0, w1, w2 ) );
           }
       }
       
@@ -210,15 +312,32 @@ namespace DGtal {
       * Standard method to output a 0-form into a grey-level image.
       */
       template <typename Calculus, typename Image>
-      void primalForm0ToGreyLevelImage
+      void dualForm2ToGreyLevelImage
       ( const Calculus& calculus, 
-        const typename Calculus::PrimalForm0& u, 
+        const typename Calculus::DualForm2& u, 
         Image& image,
         double cut_low = 0.0, double cut_up = 1.0,
         int pixel_size = 1 )
       {
-        primalForm0ToImage( calculus, u, image,
+        dualForm2ToImage( calculus, u, image,
                             [] ( double x ) { return (unsigned char) ( round( x * 255.0 ) ); },
+                            cut_low, cut_up, pixel_size );
+      }
+
+      /**
+      * Standard method to output a 1-form into a grey-level image.
+      */
+      template <typename Calculus, typename Image>
+      void dualForm1ToGreyLevelImage
+      ( const Calculus& calculus, 
+        const typename Calculus::DualForm1& v, 
+        Image& image,
+        double cut_low = 0.0, double cut_up = 1.0,
+        int pixel_size = 1 )
+      {
+        dualForm1ToImage( calculus, v, image,
+                            [] ( double x ) { return (unsigned char) ( round( x * 255.0 ) ); },
+                            [] ( double x ) { return x < 0.5; },
                             cut_low, cut_up, pixel_size );
       }
 
@@ -226,16 +345,16 @@ namespace DGtal {
       * Standard method to output three 0-forms into a RGB Color image.
       */
       template <typename Calculus, typename Image>
-      void threePrimalForms0ToRGBColorImage
+      void threeDualForms2ToRGBColorImage
       ( const Calculus& calculus, 
-        const typename Calculus::PrimalForm0& u0, 
-        const typename Calculus::PrimalForm0& u1, 
-        const typename Calculus::PrimalForm0& u2, 
+        const typename Calculus::DualForm2& u0, 
+        const typename Calculus::DualForm2& u1, 
+        const typename Calculus::DualForm2& u2, 
         Image& image,
         double cut_low = 0.0, double cut_up = 1.0,
         int pixel_size = 1 )
       {
-        threePrimalForms0ToImage
+        threeDualForms2ToImage
           ( calculus, u0, u1, u2, image,
             [] ( double r, double g, double b )
             { return Color( (unsigned char) ( round( r * 255.0 ) ),

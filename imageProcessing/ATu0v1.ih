@@ -46,7 +46,7 @@ ATu0v1( int _verbose )
     D0( calculus ), D1( calculus ), 
     // AD1( calculus ), AD2( calculus ),
     dual_D0( calculus ), dual_D1( calculus ),
-    primal_h1( calculus ), primal_h2( calculus ),
+    primal_h0( calculus ), primal_h1( calculus ), primal_h2( calculus ),
     dual_h1( calculus ), dual_h2( calculus ),
     v1( calculus ), former_v1( calculus ), 
     L1( calculus ), alpha_Id0( calculus ),
@@ -85,6 +85,8 @@ init( Clone<KSpace> aKSpace )
   dual_D0   = calculus.template derivative<0,DUAL>();
   if ( verbose > 1 ) trace.info() << "dual_D1" << std::endl;
   dual_D1   = calculus.template derivative<1,DUAL>();
+  if ( verbose > 1 ) trace.info() << "primal_h1" << std::endl;
+  primal_h0 = calculus.template hodge<0,PRIMAL>();
   if ( verbose > 1 ) trace.info() << "primal_h1" << std::endl;
   primal_h1 = calculus.template hodge<1,PRIMAL>();
   if ( verbose > 1 ) trace.info() << "primal_h2" << std::endl;

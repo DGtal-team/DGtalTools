@@ -298,6 +298,8 @@ namespace DGtal
     DualDerivative0 dual_D0;
     /// dual derivative dual 1-form -> dual 2-form
     DualDerivative1 dual_D1;
+    /// hodge star: 0-form -> dual 0-form
+    PrimalHodge0 primal_h0;
     /// hodge star: 1-form -> dual 1-form
     PrimalHodge1 primal_h1;
     /// hodge star: 2-form -> dual 2-form

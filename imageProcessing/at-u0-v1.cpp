@@ -324,13 +324,16 @@ int main( int argc, char* argv[] )
       if ( grey_image ) 
         {
           if ( verb > 0 ) trace.beginBlock("Writing u[0] as PGM image");
-          ostringstream ossU;
+          ostringstream ossU, ossV;
           ossU << boost::format("%s-a%.5f-l%.7f-u.pgm") % f2 % a % l1;
-          string str_image_u = ossU.str();
+          ossV << boost::format("%s-a%.5f-l%.7f-u-v.pgm") % f2 % a % l1;
           GreyLevelImage image( out_domain );
-          functions::dec::primalForm0ToGreyLevelImage
-            ( AT.calculus, AT.getU( 0 ), image, 0.0, 1.0, pix_sz ); 
-          PGMWriter<GreyLevelImage>::exportPGM( str_image_u, image );
+          functions::dec::dualForm2ToGreyLevelImage
+            ( AT.calculus, AT.primal_h0 * AT.getU( 0 ), image, 0.0, 1.0, pix_sz ); 
+          PGMWriter<GreyLevelImage>::exportPGM( ossU.str(), image );
+          functions::dec::dualForm1ToGreyLevelImage
+            ( AT.calculus, AT.primal_h1 * AT.getV(), image, 0.0, 1.0, pix_sz ); 
+          PGMWriter<GreyLevelImage>::exportPGM( ossV.str(), image );
           if ( verb > 0 ) trace.endBlock();
         }
       else if ( color_image )
@@ -340,8 +343,10 @@ int main( int argc, char* argv[] )
           ossU << boost::format("%s-a%.5f-l%.7f-u.ppm") % f2 % a % l1;
           string str_image_u = ossU.str();
           ColorImage image( out_domain );
-          functions::dec::threePrimalForms0ToRGBColorImage
-            ( AT.calculus, AT.getU( 0 ), AT.getU( 1 ), AT.getU( 2 ), image, 0.0, 1.0, pix_sz ); 
+          functions::dec::threeDualForms2ToRGBColorImage
+            ( AT.calculus, 
+              AT.primal_h0 * AT.getU( 0 ), AT.primal_h0 * AT.getU( 1 ), AT.primal_h0 * AT.getU( 2 ),
+              image, 0.0, 1.0, pix_sz ); 
           PPMWriter<ColorImage, functors::Identity >::exportPPM( str_image_u, image );
           if ( verb > 0 ) trace.endBlock();
         }
