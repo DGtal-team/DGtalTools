@@ -131,7 +131,22 @@ setAlpha( Scalar _alpha )
   ASSERT( _alpha >= 0.0 );
   alpha = _alpha;
   // Building alpha_Id0
-  alpha_Id0   = _alpha * calculus.template identity<0, PRIMAL>();
+  alpha_Id0 = _alpha * calculus.template identity<0, PRIMAL>();
+  alpha_g0.clear();
+  for ( unsigned int i = 0; i < g0.size(); i++ )
+    alpha_g0.push_back( alpha_Id0 * g0[ i ] );
+}
+
+//-----------------------------------------------------------------------------
+template <typename TKSpace, typename TLinearAlgebra>
+void 
+DGtal::ATu0v1<TKSpace, TLinearAlgebra>::
+setAlpha( Scalar _alpha, const PrimalForm0& m )
+{
+  ASSERT( _alpha >= 0.0 );
+  alpha = _alpha;
+  // Building alpha_Id0
+  alpha_Id0 = _alpha * functions::dec::diagonal( m ) * calculus.template identity<0, PRIMAL>();
   alpha_g0.clear();
   for ( unsigned int i = 0; i < g0.size(); i++ )
     alpha_g0.push_back( alpha_Id0 * g0[ i ] );

@@ -186,6 +186,23 @@ namespace DGtal
     */
     void setAlpha( Scalar _alpha );
 
+    /** 
+    * Sets the parameter \f$ alpha \f$ of the image, as well as a
+    * weight for each input data as the primal 0-form m. Should be set
+    * \b before \ref setLambda and \ref setEpsilon.
+    *
+    * @note Useful for inpainting applications where you indicate with
+    * m=0 that the specified pixel data is useless.
+    *
+    * @param _alpha the \f$ \alpha \f$ parameter in AT functional ( in term \f$
+    * \int \alpha | u - g |^2 \f$ ). Dimension theory tells that it is in
+    * 1/area unit, the lower the smoother will be the output.
+    *
+    * @param m a 0-form that specifies which input data is significant
+    * (1) or not be used (0).
+    */
+    void setAlpha( Scalar _alpha, const PrimalForm0& m );
+
     /**
     * Sets the parameter \f$ \lambda \f$ of AT functional. Should be
     * set \b after \ref setAlpha and \b before \ref setEpsilon.
@@ -218,6 +235,10 @@ namespace DGtal
 
     /// @return the epsilon parameter.
     Scalar getEpsilon() const { return epsilon; }
+
+    /// @param i an integer (between 0 and the number of input forms).
+    /// @return the \a i-th input \a g 0-form.
+    const PrimalForm0& getG( int i ) const { return g0.at( i ); }
 
     /// @param i an integer (between 0 and the number of input forms).
     /// @return the \a i-th \a u 0-form.

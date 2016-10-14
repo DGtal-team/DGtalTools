@@ -189,10 +189,11 @@ int main( int argc, char* argv[] )
   general_opt.add_options()
     ("help,h", "display this message")
     ("input,i", po::value<string>(), "the input image PPM filename." )
+    ("inpainting-mask,m", po::value<string>(), "the input inpainting mask filename." )
     ("output,o", po::value<string>()->default_value( "AT" ), "the output image basename." )
     ("lambda,l", po::value<double>(), "the parameter lambda." )
-    ("lambda-1,1", po::value<double>()->default_value( 0.3125 ), "the initial parameter lambda (l1)." ) // 0.3125
-    ("lambda-2,2", po::value<double>()->default_value( 0.00005 ), "the final parameter lambda (l2)." )
+    ("lambda-1,1", po::value<double>()->default_value( 0.3125 ), "the initial parameter lambda (l1)." )
+    ("lambda-2,2", po::value<double>()->default_value( 0.0005 ), "the final parameter lambda (l2)." )
     ("lambda-ratio,q", po::value<double>()->default_value( sqrt(2) ), "the division ratio for lambda from l1 to l2." )
     ("alpha,a", po::value<double>()->default_value( 1.0 ), "the parameter alpha." )
     ("epsilon,e", po::value<double>(), "the initial and final parameter epsilon of AT functional at the same time." )
@@ -281,6 +282,8 @@ int main( int argc, char* argv[] )
     {
       trace.beginBlock("Reading PPM image");
       ColorImage image = PPMReader<ColorImage>::importPPM( f1 );
+      trace.endBlock();
+      trace.beginBlock("Building AT");
       domain = image.domain();
       K.init( domain.lowerBound(), domain.upperBound() - Point::diagonal( 1 ), true );
       AT.init( K );
@@ -293,19 +296,62 @@ int main( int argc, char* argv[] )
     {
       trace.beginBlock("Reading PGM image");
       GreyLevelImage image = PGMReader<GreyLevelImage>::importPGM( f1 );
+      trace.endBlock();
+      trace.beginBlock("Building AT");
       domain = image.domain();
       K.init( domain.lowerBound(), domain.upperBound() - Point::diagonal( 1 ), true );
       AT.init( K );
       AT.addInput( image, [] (unsigned char c ) { return ((double) c) / 255.0; } );
       trace.endBlock();
     }
+
   //---------------------------------------------------------------------------
-  // Prepare output domain
+  // Prepare zoomed output domain
   Domain out_domain( pix_sz * domain.lowerBound(), 
                      pix_sz * domain.upperBound() + Point::diagonal( pix_sz - 1) );
   //---------------------------------------------------------------------------
   AT.setUFromInput();
-  AT.setAlpha( a );
+
+  if ( vm.count( "inpainting-mask" ) )
+    {
+      string fm  = vm[ "inpainting-mask" ].as<string>();
+      trace.beginBlock("Reading inpainting mask");
+      GreyLevelImage mask = GenericReader<GreyLevelImage>::import( fm );
+      trace.endBlock();
+      Calculus::PrimalForm0 m( AT.calculus );
+      for ( Calculus::Index index = 0; index < m.myContainer.rows(); index++)
+        {
+          auto cell = m.getSCell( index );
+          double col = ((double) mask( K.sCoords( cell ) )) / 255.0;
+          m.myContainer( index ) = col > 0.5 ? 1.0 : 0.0;
+        }
+      AT.setAlpha( a, m );
+      if ( grey_image )
+        {
+          ostringstream ossGM;
+          ossGM << boost::format("%s-g-mask.pgm") %f2;
+          GreyLevelImage image_mg( domain );
+          Calculus::DualForm2 mg = AT.primal_h0 * functions::dec::diagonal( m ) * AT.getG( 0 );
+          functions::dec::dualForm2ToGreyLevelImage
+            ( AT.calculus, mg, image_mg, 0.0, 1.0, 1 ); 
+          PGMWriter<GreyLevelImage>::exportPGM( ossGM.str(), image_mg );
+        }
+      else if ( color_image )
+        {
+          ostringstream ossGM;
+          ossGM << boost::format("%s-g-mask.ppm") %f2;
+          ColorImage image_mg( domain );
+          Calculus::DualForm2 mg0 = AT.primal_h0 * functions::dec::diagonal( m ) * AT.getG( 0 );
+          Calculus::DualForm2 mg1 = AT.primal_h0 * functions::dec::diagonal( m ) * AT.getG( 1 );
+          Calculus::DualForm2 mg2 = AT.primal_h0 * functions::dec::diagonal( m ) * AT.getG( 2 );
+          functions::dec::threeDualForms2ToRGBColorImage
+            ( AT.calculus, mg0, mg1, mg2, image_mg, 0.0, 1.0, 1 ); 
+          PPMWriter<ColorImage, functors::Identity >::exportPPM( ossGM.str(), image_mg );
+        }
+    }
+  else 
+    AT.setAlpha( a );
+  
   trace.info() << AT << std::endl;
   double n_v = 0.0;
   double eps = 0.0;
@@ -335,15 +381,21 @@ int main( int argc, char* argv[] )
           ossU << boost::format("%s-a%.5f-l%.7f-u.pgm") % f2 % a % l1;
           ossV << boost::format("%s-a%.5f-l%.7f-u-v.pgm") % f2 % a % l1;
           ossW << boost::format("%s-a%.5f-l%.7f-u-v.ppm") % f2 % a % l1;
-          GreyLevelImage image( out_domain );
           Calculus::DualForm2 u = AT.primal_h0 * AT.getU( 0 );
           Calculus::DualForm1 v = AT.primal_h1 * AT.getV();
+          // Restored image
+          GreyLevelImage image_u( domain );
           functions::dec::dualForm2ToGreyLevelImage
-            ( AT.calculus, u, image, 0.0, 1.0, pix_sz ); 
-          PGMWriter<GreyLevelImage>::exportPGM( ossU.str(), image );
+            ( AT.calculus, u, image_u, 0.0, 1.0, 1 ); 
+          PGMWriter<GreyLevelImage>::exportPGM( ossU.str(), image_u );
+          // Zoomed restored image with discontinuities (in black).
+          GreyLevelImage image_uv( out_domain );
+          functions::dec::dualForm2ToGreyLevelImage
+            ( AT.calculus, u, image_uv, 0.0, 1.0, pix_sz ); 
           functions::dec::dualForm1ToGreyLevelImage
-            ( AT.calculus, v, image, 0.0, 1.0, pix_sz ); 
-          PGMWriter<GreyLevelImage>::exportPGM( ossV.str(), image );
+            ( AT.calculus, v, image_uv, 0.0, 1.0, pix_sz ); 
+          PGMWriter<GreyLevelImage>::exportPGM( ossV.str(), image_uv );
+          // Zoomed restored image with discontinuities (in specified color).
           ColorImage cimage( out_domain );
           functions::dec::threeDualForms2ToRGBColorImage
             ( AT.calculus, u, u, u, cimage, 0.0, 1.0, pix_sz ); 
@@ -358,15 +410,21 @@ int main( int argc, char* argv[] )
           ostringstream ossU, ossV;
           ossU << boost::format("%s-a%.5f-l%.7f-u.ppm") % f2 % a % l1;
           ossV << boost::format("%s-a%.5f-l%.7f-u-v.ppm") % f2 % a % l1;
-          ColorImage image( out_domain );
+          Calculus::DualForm2 u0 = AT.primal_h0 * AT.getU( 0 );
+          Calculus::DualForm2 u1 = AT.primal_h0 * AT.getU( 1 );
+          Calculus::DualForm2 u2 = AT.primal_h0 * AT.getU( 2 );
+          Calculus::DualForm1 v  = AT.primal_h1 * AT.getV();
+          // Restored image
+          ColorImage image_u( domain );
           functions::dec::threeDualForms2ToRGBColorImage
-            ( AT.calculus, 
-              AT.primal_h0 * AT.getU( 0 ), AT.primal_h0 * AT.getU( 1 ), AT.primal_h0 * AT.getU( 2 ),
-              image, 0.0, 1.0, pix_sz ); 
-          PPMWriter<ColorImage, functors::Identity >::exportPPM( ossU.str(), image );
+            ( AT.calculus, u0, u1, u2, image_u, 0.0, 1.0, 1 ); 
+          PPMWriter<ColorImage, functors::Identity >::exportPPM( ossU.str(), image_u );
+          ColorImage image_uv( out_domain );
+          functions::dec::threeDualForms2ToRGBColorImage
+            ( AT.calculus, u0, u1, u2, image_uv, 0.0, 1.0, pix_sz ); 
           functions::dec::dualForm1ToRGBColorImage
-            ( AT.calculus, AT.primal_h1 * AT.getV(), image, color_v, 0.0, 1.0, pix_sz ); 
-          PPMWriter<ColorImage, functors::Identity >::exportPPM( ossV.str(), image );
+            ( AT.calculus, v, image_uv, color_v, 0.0, 1.0, pix_sz ); 
+          PPMWriter<ColorImage, functors::Identity >::exportPPM( ossV.str(), image_uv );
           if ( verb > 0 ) trace.endBlock();
         }
       l1 /= lr;
