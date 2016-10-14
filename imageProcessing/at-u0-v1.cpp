@@ -202,6 +202,7 @@ int main( int argc, char* argv[] )
     ("nbiter,n", po::value<int>()->default_value( 10 ), "the maximum number of iterations." )
     ("snr", "force computation of SNR." )
     ("image-snr", po::value<string>(), "the input image without deterioration." )
+    ("pixel-size,p", po::value<int>()->default_value( 1 ), "the pixel size for outputing images (useful when one wants to see the discontinuities v on top of u)." )
     ("verbose,v", po::value<int>()->default_value( 0 ), "the verbose level (0: silent, 1: less silent, etc)." )
     ;
 
@@ -236,8 +237,8 @@ int main( int argc, char* argv[] )
        << endl;
       return 1;
     }
-  string f1 = vm[ "input" ].as<string>();
-  string f2 = vm[ "output" ].as<string>();
+  string f1  = vm[ "input" ].as<string>();
+  string f2  = vm[ "output" ].as<string>();
   double l1  = vm[ "lambda-1" ].as<double>();
   double l2  = vm[ "lambda-2" ].as<double>();
   double lr  = vm[ "lambda-ratio" ].as<double>();
@@ -248,10 +249,11 @@ int main( int argc, char* argv[] )
   double e1  = vm[ "epsilon-1" ].as<double>();
   double e2  = vm[ "epsilon-2" ].as<double>();
   if ( vm.count( "epsilon" ) )
-    e1 = e2 = vm[ "epsilon" ].as<double>();
+    e1 = e2 =  vm[ "epsilon" ].as<double>();
   double er  = vm[ "epsilon-r" ].as<double>();
   int  verb  = vm[ "verbose" ].as<int>();
   int nbiter = vm[ "nbiter" ].as<int>();
+  int pix_sz = vm[ "pixel-size" ].as<int>();
   bool color_image = f1.size() > 4 && f1.compare( f1.size() - 4, 4, ".ppm" ) == 0;
   bool grey_image  = f1.size() > 4 && f1.compare( f1.size() - 4, 4, ".pgm" ) == 0;
   if ( ! color_image && ! grey_image ) 
@@ -291,6 +293,10 @@ int main( int argc, char* argv[] )
       trace.endBlock();
     }
   //---------------------------------------------------------------------------
+  // Prepare output domain
+  Domain out_domain( pix_sz * domain.lowerBound(), 
+                     pix_sz * domain.upperBound() + Point::diagonal( pix_sz - 1) );
+  //---------------------------------------------------------------------------
   AT.setUFromInput();
   AT.setAlpha( a );
   trace.info() << AT << std::endl;
@@ -321,9 +327,9 @@ int main( int argc, char* argv[] )
           ostringstream ossU;
           ossU << boost::format("%s-a%.5f-l%.7f-u.pgm") % f2 % a % l1;
           string str_image_u = ossU.str();
-          GreyLevelImage image( domain );
+          GreyLevelImage image( out_domain );
           functions::dec::primalForm0ToGreyLevelImage
-            ( AT.calculus, AT.getU( 0 ), image ); 
+            ( AT.calculus, AT.getU( 0 ), image, 0.0, 1.0, pix_sz ); 
           PGMWriter<GreyLevelImage>::exportPGM( str_image_u, image );
           if ( verb > 0 ) trace.endBlock();
         }
@@ -333,9 +339,9 @@ int main( int argc, char* argv[] )
           ostringstream ossU;
           ossU << boost::format("%s-a%.5f-l%.7f-u.ppm") % f2 % a % l1;
           string str_image_u = ossU.str();
-          ColorImage image( domain );
+          ColorImage image( out_domain );
           functions::dec::threePrimalForms0ToRGBColorImage
-            ( AT.calculus, AT.getU( 0 ), AT.getU( 1 ), AT.getU( 2 ), image ); 
+            ( AT.calculus, AT.getU( 0 ), AT.getU( 1 ), AT.getU( 2 ), image, 0.0, 1.0, pix_sz ); 
           PPMWriter<ColorImage, functors::Identity >::exportPPM( str_image_u, image );
           if ( verb > 0 ) trace.endBlock();
         }

@@ -105,17 +105,35 @@ namespace DGtal {
         return diagonal( v2 );
       }
 
+      template <typename Image>
+      void writePixel( Image& image, typename Image::Point pt, typename Image::Value val,
+                       int pixel_size = 1 )
+      {
+        typedef typename Image::Point      Point;
+        typedef typename Point::Coordinate Coordinate;
+        pt *= pixel_size;
+        for ( int y = 0; y < pixel_size; y++ )
+          for ( int x = 0; x < pixel_size; x++ )
+            {
+              Point q( (Coordinate) x, (Coordinate) y );
+              image.setValue( pt + q, val );
+            }
+      }
+      
       template <typename Calculus, typename Image>
       void primalForm0ToImage
       ( const Calculus& calculus, 
         const typename Calculus::PrimalForm0& u, 
         Image& image,
         std::function< typename Image::Value( double ) > functor,
-        double cut_low = 0.0, double cut_up = 1.0 )
+        double cut_low = 0.0, double cut_up = 1.0, int pixel_size = 1 )
       {
         typedef typename Calculus::Index  Index;
         typedef typename Calculus::SCell  SCell;
         typedef typename Calculus::Scalar Scalar;
+        typedef typename Calculus::KSpace KSpace;
+        typedef typename KSpace::Point    Point;
+        typedef typename KSpace::Integer  Integer;
         double min_u = NumberTraits<Scalar>::castToDouble( u.myContainer[ 0 ] );
         double max_u = min_u;
         for ( Index index = 0; index < u.myContainer.rows(); index++)
@@ -132,7 +150,7 @@ namespace DGtal {
             double v = NumberTraits<Scalar>::castToDouble( u.myContainer[ index ] );
             double w = std::min( cut_up, std::max( cut_low, v ) );
             if ( min_u != max_u ) w = ( w - min_u ) / ( max_u - min_u );
-            image.setValue( calculus.myKSpace.sCoords( cell ), functor( w ) );
+            writePixel( image, calculus.myKSpace.sCoords( cell ), functor( w ), pixel_size );
           }
       }
 
@@ -144,7 +162,7 @@ namespace DGtal {
         const typename Calculus::PrimalForm0& u2, 
         Image& image,
         std::function< typename Image::Value( double, double, double ) > functor,
-        double cut_low = 0.0, double cut_up = 1.0 )
+        double cut_low = 0.0, double cut_up = 1.0, int pixel_size = 1 )
       {
         typedef typename Calculus::Index  Index;
         typedef typename Calculus::SCell  SCell;
@@ -183,7 +201,8 @@ namespace DGtal {
             double v2 = NumberTraits<Scalar>::castToDouble( u2.myContainer[ index ] );
             double w2 = std::min( cut_up, std::max( cut_low, v2 ) );
             if ( min_u != max_u ) w2 = ( w2 - min_u ) / ( max_u - min_u );
-            image.setValue( calculus.myKSpace.sCoords( cell ), functor( w0, w1, w2 ) );
+            writePixel( image, calculus.myKSpace.sCoords( cell ), functor( w0, w1, w2 ), pixel_size );
+            // image.setValue( calculus.myKSpace.sCoords( cell ), functor( w0, w1, w2 ) );
           }
       }
       
@@ -195,11 +214,12 @@ namespace DGtal {
       ( const Calculus& calculus, 
         const typename Calculus::PrimalForm0& u, 
         Image& image,
-        double cut_low = 0.0, double cut_up = 1.0 )
+        double cut_low = 0.0, double cut_up = 1.0,
+        int pixel_size = 1 )
       {
         primalForm0ToImage( calculus, u, image,
                             [] ( double x ) { return (unsigned char) ( round( x * 255.0 ) ); },
-                            cut_low, cut_up );
+                            cut_low, cut_up, pixel_size );
       }
 
       /**
@@ -212,7 +232,8 @@ namespace DGtal {
         const typename Calculus::PrimalForm0& u1, 
         const typename Calculus::PrimalForm0& u2, 
         Image& image,
-        double cut_low = 0.0, double cut_up = 1.0 )
+        double cut_low = 0.0, double cut_up = 1.0,
+        int pixel_size = 1 )
       {
         threePrimalForms0ToImage
           ( calculus, u0, u1, u2, image,
@@ -220,7 +241,7 @@ namespace DGtal {
             { return Color( (unsigned char) ( round( r * 255.0 ) ),
                             (unsigned char) ( round( g * 255.0 ) ),
                             (unsigned char) ( round( b * 255.0 ) ) ); },
-            cut_low, cut_up );
+            cut_low, cut_up, pixel_size );
       }
 
     } // namespace dec
