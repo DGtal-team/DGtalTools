@@ -203,6 +203,7 @@ int main( int argc, char* argv[] )
     ("snr", "force computation of SNR." )
     ("image-snr", po::value<string>(), "the input image without deterioration." )
     ("pixel-size,p", po::value<int>()->default_value( 1 ), "the pixel size for outputing images (useful when one wants to see the discontinuities v on top of u)." )
+    ("color-v,c", po::value<string>()->default_value( "0xff0000" ), "the color chosen for displaying the singularities v (e.g. red is 0xff0000)." )
     ("verbose,v", po::value<int>()->default_value( 0 ), "the verbose level (0: silent, 1: less silent, etc)." )
     ;
 
@@ -221,7 +222,9 @@ int main( int argc, char* argv[] )
      )
     {
       cerr << "Usage: " << argv[0] << " -i toto.pgm\n"
-       << "Computes the Ambrosio-Tortorelli reconstruction/segmentation of an input image."
+           << "Computes the Ambrosio-Tortorelli reconstruction/segmentation of an input image."
+           << "It outputs 2 or 3 images (of basename given by option --output) giving the"
+           << " reconstructed image u, and other images superposing u and the discontinuities v."
        << endl << endl
        << " / "
        << endl
@@ -254,6 +257,9 @@ int main( int argc, char* argv[] )
   int  verb  = vm[ "verbose" ].as<int>();
   int nbiter = vm[ "nbiter" ].as<int>();
   int pix_sz = vm[ "pixel-size" ].as<int>();
+  string scv = vm[ "color-v" ].as<string>();
+  Color color_v( (unsigned int) std::stoul( scv, nullptr, 16 ), 255 );
+
   bool color_image = f1.size() > 4 && f1.compare( f1.size() - 4, 4, ".ppm" ) == 0;
   bool grey_image  = f1.size() > 4 && f1.compare( f1.size() - 4, 4, ".pgm" ) == 0;
   if ( ! color_image && ! grey_image ) 
@@ -267,6 +273,7 @@ int main( int argc, char* argv[] )
   ATu0v1< KSpace > AT( verb );
   Domain domain;
 
+  typedef ATu0v1<KSpace>::Calculus Calculus;
   typedef ImageContainerBySTLVector<Domain, Color> ColorImage;
   typedef ImageContainerBySTLVector<Domain, unsigned char> GreyLevelImage;
   //---------------------------------------------------------------------------
@@ -324,16 +331,25 @@ int main( int argc, char* argv[] )
       if ( grey_image ) 
         {
           if ( verb > 0 ) trace.beginBlock("Writing u[0] as PGM image");
-          ostringstream ossU, ossV;
+          ostringstream ossU, ossV, ossW;
           ossU << boost::format("%s-a%.5f-l%.7f-u.pgm") % f2 % a % l1;
           ossV << boost::format("%s-a%.5f-l%.7f-u-v.pgm") % f2 % a % l1;
+          ossW << boost::format("%s-a%.5f-l%.7f-u-v.ppm") % f2 % a % l1;
           GreyLevelImage image( out_domain );
+          Calculus::DualForm2 u = AT.primal_h0 * AT.getU( 0 );
+          Calculus::DualForm1 v = AT.primal_h1 * AT.getV();
           functions::dec::dualForm2ToGreyLevelImage
-            ( AT.calculus, AT.primal_h0 * AT.getU( 0 ), image, 0.0, 1.0, pix_sz ); 
+            ( AT.calculus, u, image, 0.0, 1.0, pix_sz ); 
           PGMWriter<GreyLevelImage>::exportPGM( ossU.str(), image );
           functions::dec::dualForm1ToGreyLevelImage
-            ( AT.calculus, AT.primal_h1 * AT.getV(), image, 0.0, 1.0, pix_sz ); 
+            ( AT.calculus, v, image, 0.0, 1.0, pix_sz ); 
           PGMWriter<GreyLevelImage>::exportPGM( ossV.str(), image );
+          ColorImage cimage( out_domain );
+          functions::dec::threeDualForms2ToRGBColorImage
+            ( AT.calculus, u, u, u, cimage, 0.0, 1.0, pix_sz ); 
+          functions::dec::dualForm1ToRGBColorImage
+            ( AT.calculus, v, cimage, color_v, 0.0, 1.0, pix_sz ); 
+          PPMWriter<ColorImage, functors::Identity >::exportPPM( ossW.str(), cimage );
           if ( verb > 0 ) trace.endBlock();
         }
       else if ( color_image )
@@ -349,7 +365,7 @@ int main( int argc, char* argv[] )
               image, 0.0, 1.0, pix_sz ); 
           PPMWriter<ColorImage, functors::Identity >::exportPPM( ossU.str(), image );
           functions::dec::dualForm1ToRGBColorImage
-            ( AT.calculus, AT.primal_h1 * AT.getV(), image, Color::Red, 0.0, 1.0, pix_sz ); 
+            ( AT.calculus, AT.primal_h1 * AT.getV(), image, color_v, 0.0, 1.0, pix_sz ); 
           PPMWriter<ColorImage, functors::Identity >::exportPPM( ossV.str(), image );
           if ( verb > 0 ) trace.endBlock();
         }
