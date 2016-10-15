@@ -1,6 +1,7 @@
 
 SET(DGTAL_TOOLS_SRC
   at-u0-v1
+  at-u2-v0
 )
 
 

@@ -14,14 +14,14 @@
  *
  **/
 /**
- * @file at-u0-v1.cpp
+ * @file at-u2-v0.cpp
  * @ingroup Tools
  * @author Jacques-Olivier Lachaud (\c jacques-olivier.lachaud@univ-savoie.fr )
  * Laboratory of Mathematics (CNRS, UMR 5127), University of Savoie, France
  *
  * @date 2016/10/12
  *
- * A tool file named at-u0-v1.
+ * A tool file named at-u2-v0.
  *
  * This file is part of the DGtal library.
  */
@@ -44,18 +44,18 @@
 #include "DGtal/io/readers/GenericReader.h"
 #include "DGtal/io/writers/GenericWriter.h"
 
-#include "ATu0v1.h"
+#include "ATu2v0.h"
 
 /**
-@page DocATu0v1 at-u0-v1 
+@page DocATu0v1 at-u2-v0 
 
 @brief Computes a piecewise smooth approximation of an image, by optimizing the Ambrosio-Tortorelli functional.
 
 @writers Marion Foare, Jacques-Olivier Lachaud
 
-@b Usage: at-u0-v1 -i [input.pgm]
+@b Usage: at-u2-v0 -i [input.pgm]
 
-@b Usage: at-u0-v1 -i [input.ppm]
+@b Usage: at-u2-v0 -i [input.ppm]
 
 Computes the Ambrosio-Tortorelli reconstruction/segmentation of an input image, either grey-level (.pgm) or color image (.ppm).
 
@@ -97,7 +97,7 @@ Discretized as (u 0-form, v 1-form, A vertex-edge bdry, B edge-face bdy)
 @b example:
 
 \code
-./at-u0-v1 -i ../Images/cerclesTriangle64b02.pgm -o AT -a 0.05 -e 1 --lambda-1 0.1 --lambda-2 0.00001
+./at-u2-v0 -i ../Images/cerclesTriangle64b02.pgm -o AT -a 0.05 -e 1 --lambda-1 0.1 --lambda-2 0.00001
 \endcode
 
 @section at_Doc AT
@@ -117,16 +117,16 @@ epsilon scale space
   <td> <img height=100px src="resATu0v1-cb2-e0_25-a0_10000-l0_0062092-u0-v1.png"/> </td>
 </tr>
 <tr>
-      <td align = center rowspan="4"> ./build/at-u0-v1 -i Images/carre2Degradesb02.pgm -o cb2 -a 0.1 --lambda 0.006 --epsilon-1 2.0 --epsilon-2 2.0</td>
+      <td align = center rowspan="4"> ./build/at-u2-v0 -i Images/carre2Degradesb02.pgm -o cb2 -a 0.1 --lambda 0.006 --epsilon-1 2.0 --epsilon-2 2.0</td>
 </tr>
 <tr>
-      <td align = center rowspan="4"> ./build/at-u0-v1 -i Images/carre2Degradesb02.pgm -o cb2 -a 0.1 --lambda 0.006 --epsilon-1 2.0 --epsilon-2 1.0</td>
+      <td align = center rowspan="4"> ./build/at-u2-v0 -i Images/carre2Degradesb02.pgm -o cb2 -a 0.1 --lambda 0.006 --epsilon-1 2.0 --epsilon-2 1.0</td>
 </tr>
 <tr>
-      <td align = center rowspan="4"> ./build/at-u0-v1 -i Images/carre2Degradesb02.pgm -o cb2 -a 0.1 --lambda 0.006 --epsilon-1 2.0 --epsilon-2 0.5</td>
+      <td align = center rowspan="4"> ./build/at-u2-v0 -i Images/carre2Degradesb02.pgm -o cb2 -a 0.1 --lambda 0.006 --epsilon-1 2.0 --epsilon-2 0.5</td>
 </tr>
 <tr>
-      <td align = center rowspan="4"> ./build/at-u0-v1 -i Images/carre2Degradesb02.pgm -o cb2 -a 0.1 --lambda 0.006 --epsilon-1 2.0 --epsilon-2 0.25</td>
+      <td align = center rowspan="4"> ./build/at-u2-v0 -i Images/carre2Degradesb02.pgm -o cb2 -a 0.1 --lambda 0.006 --epsilon-1 2.0 --epsilon-2 0.25</td>
 </tr>
 <tr>
 <td colspan=5>
@@ -141,19 +141,19 @@ alpha scale space
     <td> <img height=200px src="resATu0v1-cb2-a0_01000-l1_0000000-u.png"/> </td>
 </tr>
 <tr>
-        <td align = center rowspan="5"> ./build/at-u0-v1 -i Images/carre2Degradesb02.pgm -o cb2 -a 1.0 --lambda 1.0 --epsilon-1 2.0 --epsilon-2 0.25</td>
+        <td align = center rowspan="5"> ./build/at-u2-v0 -i Images/carre2Degradesb02.pgm -o cb2 -a 1.0 --lambda 1.0 --epsilon-1 2.0 --epsilon-2 0.25</td>
 </tr>
 <tr>
-        <td align = center rowspan="5"> ./build/at-u0-v1 -i Images/carre2Degradesb02.pgm -o cb2 -a 0.5 --lambda 1.0 --epsilon-1 2.0 --epsilon-2 0.25</td>
+        <td align = center rowspan="5"> ./build/at-u2-v0 -i Images/carre2Degradesb02.pgm -o cb2 -a 0.5 --lambda 1.0 --epsilon-1 2.0 --epsilon-2 0.25</td>
 </tr>
 <tr>
-        <td align = center rowspan="5"> ./build/at-u0-v1 -i Images/carre2Degradesb02.pgm -o cb2 -a 0.1 --lambda 1.0 --epsilon-1 2.0 --epsilon-2 0.25</td>
+        <td align = center rowspan="5"> ./build/at-u2-v0 -i Images/carre2Degradesb02.pgm -o cb2 -a 0.1 --lambda 1.0 --epsilon-1 2.0 --epsilon-2 0.25</td>
 </tr>
 <tr>
-        <td align = center rowspan="5"> ./build/at-u0-v1 -i Images/carre2Degradesb02.pgm -o cb2 -a 0.05 --lambda 1.0 --epsilon-1 2.0 --epsilon-2 0.25</td>
+        <td align = center rowspan="5"> ./build/at-u2-v0 -i Images/carre2Degradesb02.pgm -o cb2 -a 0.05 --lambda 1.0 --epsilon-1 2.0 --epsilon-2 0.25</td>
 </tr>
 <tr>
-        <td align = center rowspan="5"> ./build/at-u0-v1 -i Images/carre2Degradesb02.pgm -o cb2 -a 0.01 --lambda 1.0 --epsilon-1 2.0 --epsilon-2 0.25</td>
+        <td align = center rowspan="5"> ./build/at-u2-v0 -i Images/carre2Degradesb02.pgm -o cb2 -a 0.01 --lambda 1.0 --epsilon-1 2.0 --epsilon-2 0.25</td>
 </tr>
 <tr>
 <td colspan=5>
@@ -168,7 +168,7 @@ lambda scale space (lena)
 <td> <img height=200px src="resATu0v1-lena-370-b02-a0_48000-l0_0125000-u0-v1.png"/> </td>
 </tr>
 <tr>
-        <td align = center rowspan="5"> ./build/at-u0-v1 -i Images/lena-370-b02.ppm -o lena -a 0.48 --lambda-1 0.15 --lambda-2 0.0125 -- lambda-ratio 2.0 --epsilon-1 2.0 --epsilon-2 0.25</td>
+        <td align = center rowspan="5"> ./build/at-u2-v0 -i Images/lena-370-b02.ppm -o lena -a 0.48 --lambda-1 0.15 --lambda-2 0.0125 -- lambda-ratio 2.0 --epsilon-1 2.0 --epsilon-2 0.25</td>
 </tr>
 </table>
 </center>
@@ -226,19 +226,19 @@ int main( int argc, char* argv[] )
            << "Computes the Ambrosio-Tortorelli reconstruction/segmentation of an input image."
            << "It outputs 2 or 3 images (of basename given by option --output) giving the"
            << " reconstructed image u, and other images superposing u and the discontinuities v."
-       << endl << endl
-       << " / "
-       << endl
-       << " | a.(u-g)^2 + v^2 |grad u|^2 + le.|grad v|^2 + (l/4e).(1-v)^2 "
-       << endl
-       << " / "
-       << endl
-       << "Discretized as (u 0-form, v 1-form, A vertex-edge bdry, B edge-face bdy)" << endl
-       << "E(u,v) = a(u-g)^t (u-g) +  u^t A^t diag(v)^2 A^t u + l e v^t (A A^t + B^t B) v + l/(4e) (1-v)^t (1-v)" << endl
-       << endl
-       << general_opt << "\n"
-       << "Example: ./at-u0-v1 -i ../Images/cerclesTriangle64b02.pgm -o tmp -a 0.05 -e 1 --lambda-1 0.1 --lambda-2 0.00001 -g"
-       << endl;
+           << endl << endl
+           << " / "
+           << endl
+           << " | a.(u-g)^2 + v^2 |grad u|^2 + le.|grad v|^2 + (l/4e).(1-v)^2 "
+           << endl
+           << " / "
+           << endl
+           << "Discretized as (u 2-form, v 0-form, A vertex-edge bdry, B edge-face bdy, M vertex-edge average)" << endl
+           << "E(u,v) = a(u-g)^t (u-g) +  u^t B diag(M v)^2 B^t u + l e v^t A^t A v + l/(4e) (1-v)^t (1-v)" << endl
+           << endl
+           << general_opt << "\n"
+           << "Example: ./at-u2-v0 -i ../Images/cerclesTriangle64b02.pgm -o tmp -a 0.05 -e 1 --lambda-1 0.1 --lambda-2 0.00001 -g"
+           << endl;
       return 1;
     }
   string f1  = vm[ "input" ].as<string>();
@@ -271,10 +271,10 @@ int main( int argc, char* argv[] )
     }
 
   KSpace K;
-  ATu0v1< KSpace > AT( verb );
+  ATu2v0< KSpace > AT( verb );
   Domain domain;
 
-  typedef ATu0v1<KSpace>::Calculus Calculus;
+  typedef ATu2v0<KSpace>::Calculus Calculus;
   typedef ImageContainerBySTLVector<Domain, Color> ColorImage;
   typedef ImageContainerBySTLVector<Domain, unsigned char> GreyLevelImage;
   //---------------------------------------------------------------------------
@@ -285,7 +285,7 @@ int main( int argc, char* argv[] )
       trace.endBlock();
       trace.beginBlock("Building AT");
       domain = image.domain();
-      K.init( domain.lowerBound(), domain.upperBound() - Point::diagonal( 1 ), true );
+      K.init( domain.lowerBound(), domain.upperBound(), true );
       AT.init( K );
       AT.addInput( image, [] ( Color c ) -> double { return ((double) c.red())   / 255.0; } );
       AT.addInput( image, [] ( Color c ) -> double { return ((double) c.green()) / 255.0; } );
@@ -299,7 +299,7 @@ int main( int argc, char* argv[] )
       trace.endBlock();
       trace.beginBlock("Building AT");
       domain = image.domain();
-      K.init( domain.lowerBound(), domain.upperBound() - Point::diagonal( 1 ), true );
+      K.init( domain.lowerBound(), domain.upperBound(), true );
       AT.init( K );
       AT.addInput( image, [] (unsigned char c ) { return ((double) c) / 255.0; } );
       trace.endBlock();
@@ -318,7 +318,7 @@ int main( int argc, char* argv[] )
       trace.beginBlock("Reading inpainting mask");
       GreyLevelImage mask = GenericReader<GreyLevelImage>::import( fm );
       trace.endBlock();
-      Calculus::PrimalForm0 m( AT.calculus );
+      Calculus::PrimalForm2 m( AT.calculus );
       for ( Calculus::Index index = 0; index < m.myContainer.rows(); index++)
         {
           auto cell = m.getSCell( index );
@@ -331,7 +331,7 @@ int main( int argc, char* argv[] )
           ostringstream ossGM;
           ossGM << boost::format("%s-g-mask.pgm") %f2;
           GreyLevelImage image_mg( domain );
-          Calculus::DualForm2 mg = AT.primal_h0 * functions::dec::diagonal( m ) * AT.getG( 0 );
+          const Calculus::PrimalForm2 mg = functions::dec::diagonal( m ) * AT.getG( 0 );
           functions::dec::form2ToGreyLevelImage
             ( AT.calculus, mg, image_mg, 0.0, 1.0, 1 ); 
           PGMWriter<GreyLevelImage>::exportPGM( ossGM.str(), image_mg );
@@ -341,9 +341,9 @@ int main( int argc, char* argv[] )
           ostringstream ossGM;
           ossGM << boost::format("%s-g-mask.ppm") %f2;
           ColorImage image_mg( domain );
-          Calculus::DualForm2 mg0 = AT.primal_h0 * functions::dec::diagonal( m ) * AT.getG( 0 );
-          Calculus::DualForm2 mg1 = AT.primal_h0 * functions::dec::diagonal( m ) * AT.getG( 1 );
-          Calculus::DualForm2 mg2 = AT.primal_h0 * functions::dec::diagonal( m ) * AT.getG( 2 );
+          const Calculus::PrimalForm2 mg0 = functions::dec::diagonal( m ) * AT.getG( 0 );
+          const Calculus::PrimalForm2 mg1 = functions::dec::diagonal( m ) * AT.getG( 1 );
+          const Calculus::PrimalForm2 mg2 = functions::dec::diagonal( m ) * AT.getG( 2 );
           functions::dec::threeForms2ToRGBColorImage
             ( AT.calculus, mg0, mg1, mg2, image_mg, 0.0, 1.0, 1 ); 
           PPMWriter<ColorImage, functors::Identity >::exportPPM( ossGM.str(), image_mg );
@@ -381,8 +381,8 @@ int main( int argc, char* argv[] )
           ossU << boost::format("%s-a%.5f-l%.7f-u.pgm") % f2 % a % l1;
           ossV << boost::format("%s-a%.5f-l%.7f-u-v.pgm") % f2 % a % l1;
           ossW << boost::format("%s-a%.5f-l%.7f-u-v.ppm") % f2 % a % l1;
-          Calculus::DualForm2 u = AT.primal_h0 * AT.getU( 0 );
-          Calculus::DualForm1 v = AT.primal_h1 * AT.getV();
+          const Calculus::PrimalForm2 u = AT.getU( 0 );
+          const Calculus::PrimalForm1 v = AT.M01 * AT.getV();
           // Restored image
           GreyLevelImage image_u( domain );
           functions::dec::form2ToGreyLevelImage
@@ -392,14 +392,14 @@ int main( int argc, char* argv[] )
           GreyLevelImage image_uv( out_domain );
           functions::dec::form2ToGreyLevelImage
             ( AT.calculus, u, image_uv, 0.0, 1.0, pix_sz ); 
-          functions::dec::dualForm1ToGreyLevelImage
+          functions::dec::primalForm1ToGreyLevelImage
             ( AT.calculus, v, image_uv, 0.0, 1.0, pix_sz ); 
           PGMWriter<GreyLevelImage>::exportPGM( ossV.str(), image_uv );
           // Zoomed restored image with discontinuities (in specified color).
           ColorImage cimage( out_domain );
           functions::dec::threeForms2ToRGBColorImage
             ( AT.calculus, u, u, u, cimage, 0.0, 1.0, pix_sz ); 
-          functions::dec::dualForm1ToRGBColorImage
+          functions::dec::primalForm1ToRGBColorImage
             ( AT.calculus, v, cimage, color_v, 0.0, 1.0, pix_sz ); 
           PPMWriter<ColorImage, functors::Identity >::exportPPM( ossW.str(), cimage );
           if ( verb > 0 ) trace.endBlock();
@@ -410,10 +410,10 @@ int main( int argc, char* argv[] )
           ostringstream ossU, ossV;
           ossU << boost::format("%s-a%.5f-l%.7f-u.ppm") % f2 % a % l1;
           ossV << boost::format("%s-a%.5f-l%.7f-u-v.ppm") % f2 % a % l1;
-          Calculus::DualForm2 u0 = AT.primal_h0 * AT.getU( 0 );
-          Calculus::DualForm2 u1 = AT.primal_h0 * AT.getU( 1 );
-          Calculus::DualForm2 u2 = AT.primal_h0 * AT.getU( 2 );
-          Calculus::DualForm1 v  = AT.primal_h1 * AT.getV();
+          const Calculus::PrimalForm2 u0 = AT.getU( 0 );
+          const Calculus::PrimalForm2 u1 = AT.getU( 1 );
+          const Calculus::PrimalForm2 u2 = AT.getU( 2 );
+          const Calculus::PrimalForm1 v  = AT.M01 * AT.getV();
           // Restored image
           ColorImage image_u( domain );
           functions::dec::threeForms2ToRGBColorImage
@@ -422,7 +422,7 @@ int main( int argc, char* argv[] )
           ColorImage image_uv( out_domain );
           functions::dec::threeForms2ToRGBColorImage
             ( AT.calculus, u0, u1, u2, image_uv, 0.0, 1.0, pix_sz ); 
-          functions::dec::dualForm1ToRGBColorImage
+          functions::dec::primalForm1ToRGBColorImage
             ( AT.calculus, v, image_uv, color_v, 0.0, 1.0, pix_sz ); 
           PPMWriter<ColorImage, functors::Identity >::exportPPM( ossV.str(), image_uv );
           if ( verb > 0 ) trace.endBlock();

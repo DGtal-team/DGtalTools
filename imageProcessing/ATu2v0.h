@@ -89,6 +89,10 @@ namespace DGtal
     using typename Base::PrimalDerivative1;
     using typename Base::DualDerivative0;
     using typename Base::DualDerivative1;
+    using typename Base::PrimalAntiderivative1;
+    using typename Base::PrimalAntiderivative2;
+    using typename Base::DualAntiderivative1;
+    using typename Base::DualAntiderivative2;
     using typename Base::PrimalHodge0;
     using typename Base::PrimalHodge1;
     using typename Base::PrimalHodge2;
@@ -343,7 +347,7 @@ namespace DGtal
     /// alpha Id2
     PrimalIdentity2 alpha_Id2;
     /// alpha g2
-    std::vector< PrimalForm0 > alpha_g2;
+    std::vector< PrimalForm2 > alpha_g2;
     /// (lambda / (4*epsilon)) * Id0 + lambda epsilon D0^t D0
     PrimalIdentity0       left_V0;
     /// lambda 1/4 1

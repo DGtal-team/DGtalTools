@@ -186,10 +186,10 @@ namespace DGtal {
             }
       }
       
-      template <typename Calculus, typename Image>
-      void dualForm2ToImage
+      template <typename Calculus, typename AnyForm2, typename Image>
+      void form2ToImage
       ( const Calculus& calculus, 
-        const typename Calculus::DualForm2& u, 
+        const AnyForm2& u, 
         Image& image,
         std::function< typename Image::Value( double ) > functor,
         double cut_low = 0.0, double cut_up = 1.0, int pixel_size = 1 )
@@ -220,10 +220,44 @@ namespace DGtal {
           }
       }
 
-      template <typename Calculus, typename Image>
-      void dualForm1ToImage
+      // template <typename Calculus, typename Image>
+      // void dualForm2ToImage
+      // ( const Calculus& calculus, 
+      //   const typename Calculus::DualForm2& u, 
+      //   Image& image,
+      //   std::function< typename Image::Value( double ) > functor,
+      //   double cut_low = 0.0, double cut_up = 1.0, int pixel_size = 1 )
+      // {
+      //   typedef typename Calculus::Index  Index;
+      //   typedef typename Calculus::SCell  SCell;
+      //   typedef typename Calculus::Scalar Scalar;
+      //   typedef typename Calculus::KSpace KSpace;
+      //   typedef typename KSpace::Point    Point;
+      //   typedef typename KSpace::Integer  Integer;
+      //   double min_u = NumberTraits<Scalar>::castToDouble( u.myContainer[ 0 ] );
+      //   double max_u = min_u;
+      //   for ( Index index = 0; index < u.myContainer.rows(); index++)
+      //     {
+      //       double v = NumberTraits<Scalar>::castToDouble( u.myContainer[ index ] );
+      //       min_u = std::min( min_u, v );
+      //       max_u = std::max( max_u, v );
+      //     }
+      //   if ( min_u < cut_low ) min_u = cut_low;
+      //   if ( max_u > cut_up  ) max_u = cut_up;
+      //   for ( Index index = 0; index < u.myContainer.rows(); index++)
+      //     {
+      //       SCell cell = u.getSCell( index );
+      //       double v = NumberTraits<Scalar>::castToDouble( u.myContainer[ index ] );
+      //       double w = std::min( cut_up, std::max( cut_low, v ) );
+      //       if ( min_u != max_u ) w = ( w - min_u ) / ( max_u - min_u );
+      //       writePixel( image, calculus.myKSpace.sCoords( cell ), functor( w ), pixel_size );
+      //     }
+      // }
+
+      template <typename Calculus, typename Form1, typename Image>
+      void form1ToImage
       ( const Calculus& calculus, 
-        const typename Calculus::DualForm1& v, 
+        const Form1& v, bool primal,
         Image& image,
         std::function< typename Image::Value( double ) > functor,
         std::function< bool ( double ) > predicate,
@@ -253,16 +287,43 @@ namespace DGtal {
             double w = std::min( cut_up, std::max( cut_low, u ) );
             if ( min_v != max_v ) w = ( w - min_v ) / ( max_v - min_v );
             Point kpt = calculus.myKSpace.sKCoords( cell );
-            writeDualLinel  ( image, kpt, functor( w ), pixel_size );
+            if ( primal ) writePrimalLinel( image, kpt, functor( w ), pixel_size );
+            else          writeDualLinel  ( image, kpt, functor( w ), pixel_size );
           }
       }
-
+      
       template <typename Calculus, typename Image>
-      void threeDualForms2ToImage
+      void dualForm1ToImage
       ( const Calculus& calculus, 
-        const typename Calculus::DualForm2& u0, 
-        const typename Calculus::DualForm2& u1, 
-        const typename Calculus::DualForm2& u2, 
+        const typename Calculus::DualForm1& v, 
+        Image& image,
+        std::function< typename Image::Value( double ) > functor,
+        std::function< bool ( double ) > predicate,
+        double cut_low = 0.0, double cut_up = 1.0, int pixel_size = 1 )
+      {
+        form1ToImage( calculus, v, false, image, functor, predicate,
+                      cut_low, cut_up, pixel_size );
+      }
+      
+      template <typename Calculus, typename Image>
+      void primalForm1ToImage
+      ( const Calculus& calculus, 
+        const typename Calculus::PrimalForm1& v, 
+        Image& image,
+        std::function< typename Image::Value( double ) > functor,
+        std::function< bool ( double ) > predicate,
+        double cut_low = 0.0, double cut_up = 1.0, int pixel_size = 1 )
+      {
+        form1ToImage( calculus, v, true, image, functor, predicate,
+                      cut_low, cut_up, pixel_size );
+      }
+
+      template <typename Calculus, typename AnyForm2, typename Image>
+      void threeForms2ToImage
+      ( const Calculus& calculus, 
+        const AnyForm2& u0, 
+        const AnyForm2& u1, 
+        const AnyForm2& u2, 
         Image& image,
         std::function< typename Image::Value( double, double, double ) > functor,
         double cut_low = 0.0, double cut_up = 1.0, int pixel_size = 1 )
@@ -309,23 +370,40 @@ namespace DGtal {
       }
       
       /**
-      * Standard method to output a 0-form into a grey-level image.
+      * Standard method to output a 2-form into a grey-level image.
       */
-      template <typename Calculus, typename Image>
-      void dualForm2ToGreyLevelImage
+      template <typename Calculus, typename AnyForm2, typename Image>
+      void form2ToGreyLevelImage
       ( const Calculus& calculus, 
-        const typename Calculus::DualForm2& u, 
+        const AnyForm2& u, 
         Image& image,
         double cut_low = 0.0, double cut_up = 1.0,
         int pixel_size = 1 )
       {
-        dualForm2ToImage( calculus, u, image,
-                            [] ( double x ) { return (unsigned char) ( round( x * 255.0 ) ); },
-                            cut_low, cut_up, pixel_size );
+        form2ToImage( calculus, u, image,
+                      [] ( double x ) { return (unsigned char) ( round( x * 255.0 ) ); },
+                      cut_low, cut_up, pixel_size );
       }
 
       /**
-      * Standard method to output a 1-form into a grey-level image.
+      * Standard method to output a primal 1-form into a grey-level image.
+      */
+      template <typename Calculus, typename Image>
+      void primalForm1ToGreyLevelImage
+      ( const Calculus& calculus, 
+        const typename Calculus::PrimalForm1& v, 
+        Image& image,
+        double cut_low = 0.0, double cut_up = 1.0,
+        int pixel_size = 1 )
+      {
+        primalForm1ToImage( calculus, v, image,
+                            [] ( double x ) { return (unsigned char) ( round( x * 255.0 ) ); },
+                            [] ( double x ) { return x < 0.5; },
+                            cut_low, cut_up, pixel_size );
+      }
+      
+      /**
+      * Standard method to output a dual 1-form into a grey-level image.
       */
       template <typename Calculus, typename Image>
       void dualForm1ToGreyLevelImage
@@ -336,13 +414,30 @@ namespace DGtal {
         int pixel_size = 1 )
       {
         dualForm1ToImage( calculus, v, image,
-                            [] ( double x ) { return (unsigned char) ( round( x * 255.0 ) ); },
-                            [] ( double x ) { return x < 0.5; },
-                            cut_low, cut_up, pixel_size );
+                          [] ( double x ) { return (unsigned char) ( round( x * 255.0 ) ); },
+                          [] ( double x ) { return x < 0.5; },
+                          cut_low, cut_up, pixel_size );
       }
 
       /**
-      * Standard method to output a 1-form into a color image.
+      * Standard method to output a primal 1-form into a color image.
+      */
+      template <typename Calculus, typename Image>
+      void primalForm1ToRGBColorImage
+      ( const Calculus& calculus, 
+        const typename Calculus::PrimalForm1& v, 
+        Image& image, Color color,
+        double cut_low = 0.0, double cut_up = 1.0,
+        int pixel_size = 1 )
+      {
+        primalForm1ToImage( calculus, v, image,
+                          [color] ( double x ) { return color; },
+                          [] ( double x ) { return x < 0.5; },
+                          cut_low, cut_up, pixel_size );
+      }
+
+      /**
+      * Standard method to output a dual 1-form into a color image.
       */
       template <typename Calculus, typename Image>
       void dualForm1ToRGBColorImage
@@ -359,19 +454,19 @@ namespace DGtal {
       }
 
       /**
-      * Standard method to output three 0-forms into a RGB Color image.
+      * Standard method to output three 2-forms into a RGB Color image.
       */
-      template <typename Calculus, typename Image>
-      void threeDualForms2ToRGBColorImage
+      template <typename Calculus, typename AnyForm2, typename Image>
+      void threeForms2ToRGBColorImage
       ( const Calculus& calculus, 
-        const typename Calculus::DualForm2& u0, 
-        const typename Calculus::DualForm2& u1, 
-        const typename Calculus::DualForm2& u2, 
+        const AnyForm2& u0, 
+        const AnyForm2& u1, 
+        const AnyForm2& u2, 
         Image& image,
         double cut_low = 0.0, double cut_up = 1.0,
         int pixel_size = 1 )
       {
-        threeDualForms2ToImage
+        threeForms2ToImage
           ( calculus, u0, u1, u2, image,
             [] ( double r, double g, double b )
             { return Color( (unsigned char) ( round( r * 255.0 ) ),
@@ -418,6 +513,8 @@ namespace DGtal {
     typedef typename Calculus::DualDerivative1             DualDerivative1;
     typedef typename Calculus::PrimalAntiderivative1       PrimalAntiderivative1;
     typedef typename Calculus::PrimalAntiderivative2       PrimalAntiderivative2;
+    typedef typename Calculus::DualAntiderivative1         DualAntiderivative1;
+    typedef typename Calculus::DualAntiderivative2         DualAntiderivative2;
     typedef typename Calculus::PrimalHodge0                PrimalHodge0;
     typedef typename Calculus::PrimalHodge1                PrimalHodge1;
     typedef typename Calculus::PrimalHodge2                PrimalHodge2;
