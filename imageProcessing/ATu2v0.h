@@ -17,7 +17,7 @@
 #pragma once
 
 /**
- * @file
+ * @file ATu2v0.h
  * @author Jacques-Olivier Lachaud (\c jacques-olivier.lachaud@univ-savoie.fr )
  * Laboratory of Mathematics (CNRS, UMR 5127), University of Savoie, France
  *
@@ -310,16 +310,12 @@ namespace DGtal
     /// The Linfinity-norm of variation of v.
     Scalar delta_v_loo;
 
-    /// edge laplacien
-    PrimalIdentity1       L1;
-    /// lambda * edge laplacien
-    PrimalIdentity1       l_L1;
-    /// lambda 1/4 1
-    PrimalForm1           l_1_over_4;
-    /// epsilon * lambda * edge laplacien + (lambda / (4*epsilon)) * Id1
-    PrimalIdentity1       left_V1;
-    /// lambda 1/(4*epsilon) 1
-    PrimalForm1           l_1_over_4e;
+    /// point_to_edge average operator
+    PrimalDerivative0     M01;
+    /// edge_to_face average operator
+    PrimalDerivative1     M12;
+    /// Antiderivative 2-form -> to 1-form
+    PrimalAntiderivative2 primal_AD2;
 
     // ------------------------- Protected Datas ------------------------------
   protected:
@@ -329,24 +325,34 @@ namespace DGtal
     /// The u 2-forms
     std::vector< PrimalForm2 > u2;
     /// The v 0-form
-    PrimalForm0 v1;
+    PrimalForm0 v0;
     /// The v 0-form at the previous iteration.
-    PrimalForm0 former_v1;
+    PrimalForm0 former_v0;
     /// Smoothness parameter alpha of AT (in 1/area unit)
     double alpha;
     /// Amount of discontinuity parameter lambda (in 1/length unit).
     double lambda;
     /// Thickness of discontinuity set (in length unit).
     double epsilon;
-    /// alpha Id0
-    PrimalIdentity0 alpha_Id0;
-    /// alpha g0
-    std::vector< PrimalForm0 > alpha_g0;
-    /// The solver for every 0-form u[i]
+
+    /// The solver for every 2-form u[i]
     SolverU solver_u;
-    /// The solver for 1-form v
+    /// The solver for 0-form v
     SolverV solver_v;
 
+    /// alpha Id2
+    PrimalIdentity2 alpha_Id2;
+    /// alpha g2
+    std::vector< PrimalForm0 > alpha_g2;
+    /// (lambda / (4*epsilon)) * Id0 + lambda epsilon D0^t D0
+    PrimalIdentity0       left_V0;
+    /// lambda 1/4 1
+    PrimalForm0           l_1_over_4;
+    /// lambda 1/(4*epsilon) 1
+    PrimalForm0           l_1_over_4e;
+    /// lambda 1/(4_epsilon) Id0
+    PrimalIdentity0       l_1_over_4e_Id0;    
+    
     // ------------------------- Private Datas --------------------------------
   private:
 

@@ -312,14 +312,6 @@ namespace DGtal
 
     /// edge laplacien
     PrimalIdentity1       L1;
-    /// lambda * edge laplacien
-    PrimalIdentity1       l_L1;
-    /// lambda 1/4 1
-    PrimalForm1           l_1_over_4;
-    /// epsilon * lambda * edge laplacien + (lambda / (4*epsilon)) * Id1
-    PrimalIdentity1       left_V1;
-    /// lambda 1/(4*epsilon) 1
-    PrimalForm1           l_1_over_4e;
 
     // ------------------------- Protected Datas ------------------------------
   protected:
@@ -338,14 +330,24 @@ namespace DGtal
     double lambda;
     /// Thickness of discontinuity set (in length unit).
     double epsilon;
-    /// alpha Id0
-    PrimalIdentity0 alpha_Id0;
-    /// alpha g0
-    std::vector< PrimalForm0 > alpha_g0;
+
     /// The solver for every 0-form u[i]
     SolverU solver_u;
     /// The solver for 1-form v
     SolverV solver_v;
+
+    /// alpha Id0
+    PrimalIdentity0 alpha_Id0;
+    /// alpha g0
+    std::vector< PrimalForm0 > alpha_g0;
+    /// lambda * edge laplacien
+    PrimalIdentity1       l_L1;
+    /// lambda 1/4 1
+    PrimalForm1           l_1_over_4;
+    /// epsilon * lambda * edge laplacien + (lambda / (4*epsilon)) * Id1
+    PrimalIdentity1       left_V1;
+    /// lambda 1/(4*epsilon) 1
+    PrimalForm1           l_1_over_4e;
 
     // ------------------------- Private Datas --------------------------------
   private:
