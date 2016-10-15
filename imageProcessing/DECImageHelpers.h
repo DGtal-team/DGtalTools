@@ -396,9 +396,12 @@ namespace DGtal {
         double cut_low = 0.0, double cut_up = 1.0,
         int pixel_size = 1 )
       {
+        // Threshold is 0.25 instead of 0.5 because an edge connecting
+        // two vertices with v=0 and v=1 should not belong to the
+        // discontinuity set.
         primalForm1ToImage( calculus, v, image,
                             [] ( double x ) { return (unsigned char) ( round( x * 255.0 ) ); },
-                            [] ( double x ) { return x < 0.5; },
+                            [] ( double x ) { return x < 0.25; },
                             cut_low, cut_up, pixel_size );
       }
       
@@ -413,9 +416,12 @@ namespace DGtal {
         double cut_low = 0.0, double cut_up = 1.0,
         int pixel_size = 1 )
       {
+        // Threshold is 0.25 instead of 0.5 because an edge connecting
+        // two vertices with v=0 and v=1 should not belong to the
+        // discontinuity set.
         dualForm1ToImage( calculus, v, image,
                           [] ( double x ) { return (unsigned char) ( round( x * 255.0 ) ); },
-                          [] ( double x ) { return x < 0.5; },
+                          [] ( double x ) { return x < 0.25; },
                           cut_low, cut_up, pixel_size );
       }
 
@@ -430,10 +436,13 @@ namespace DGtal {
         double cut_low = 0.0, double cut_up = 1.0,
         int pixel_size = 1 )
       {
+        // Threshold is 0.25 instead of 0.5 because an edge connecting
+        // two vertices with v=0 and v=1 should not belong to the
+        // discontinuity set.
         primalForm1ToImage( calculus, v, image,
-                          [color] ( double x ) { return color; },
-                          [] ( double x ) { return x < 0.5; },
-                          cut_low, cut_up, pixel_size );
+                            [color] ( double x ) { return color; },
+                            [] ( double x ) { return x < 0.25; },
+                            cut_low, cut_up, pixel_size );
       }
 
       /**
@@ -447,9 +456,12 @@ namespace DGtal {
         double cut_low = 0.0, double cut_up = 1.0,
         int pixel_size = 1 )
       {
+        // Threshold is 0.25 instead of 0.5 because an edge connecting
+        // two vertices with v=0 and v=1 should not belong to the
+        // discontinuity set.
         dualForm1ToImage( calculus, v, image,
                           [color] ( double x ) { return color; },
-                          [] ( double x ) { return x < 0.5; },
+                          [] ( double x ) { return x < 0.25; },
                           cut_low, cut_up, pixel_size );
       }
 

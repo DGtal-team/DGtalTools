@@ -308,7 +308,7 @@ int main( int argc, char* argv[] )
   //---------------------------------------------------------------------------
   // Prepare zoomed output domain
   Domain out_domain( pix_sz * domain.lowerBound(), 
-                     pix_sz * domain.upperBound() + Point::diagonal( pix_sz - 1) );
+                     pix_sz * domain.upperBound() + Point::diagonal( pix_sz ) );
   //---------------------------------------------------------------------------
   AT.setUFromInput();
 
