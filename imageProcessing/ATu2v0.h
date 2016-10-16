@@ -185,6 +185,9 @@ namespace DGtal
     template <typename Image>
     void addInput( const Image& image, std::function< Scalar( typename Image::Value ) > f );
 
+    /// Use metric average to smooth L1-metric effects.
+    void setMetricAverage( bool average );
+    
     /// Sets approximation \a u to be equal to the input. Used for
     /// initializating \a u. Should be called once all \ref addInput
     /// have been called.
@@ -356,6 +359,9 @@ namespace DGtal
     PrimalForm0           l_1_over_4e;
     /// lambda 1/(4_epsilon) Id0
     PrimalIdentity0       l_1_over_4e_Id0;    
+
+    /// When 'true', use metric average, otherwise use identity.
+    bool metric_average;
     
     // ------------------------- Private Datas --------------------------------
   private:

@@ -191,6 +191,7 @@ int main( int argc, char* argv[] )
     ("input,i", po::value<string>(), "the input image PPM filename." )
     ("inpainting-mask,m", po::value<string>(), "the input inpainting mask filename." )
     ("output,o", po::value<string>()->default_value( "AT" ), "the output image basename." )
+    ("metric-average,M", "use metric average to smooth L1-metric." )
     ("lambda,l", po::value<double>(), "the parameter lambda." )
     ("lambda-1,1", po::value<double>()->default_value( 0.3125 ), "the initial parameter lambda (l1)." )
     ("lambda-2,2", po::value<double>()->default_value( 0.0005 ), "the final parameter lambda (l2)." )
@@ -243,6 +244,7 @@ int main( int argc, char* argv[] )
     }
   string f1  = vm[ "input" ].as<string>();
   string f2  = vm[ "output" ].as<string>();
+  bool metric= vm.count( "metric-average" );
   double l1  = vm[ "lambda-1" ].as<double>();
   double l2  = vm[ "lambda-2" ].as<double>();
   double lr  = vm[ "lambda-ratio" ].as<double>();
@@ -273,7 +275,8 @@ int main( int argc, char* argv[] )
   KSpace K;
   ATu2v0< KSpace > AT( verb );
   Domain domain;
-
+  AT.setMetricAverage( metric );
+  
   typedef ATu2v0<KSpace>::Calculus Calculus;
   typedef ImageContainerBySTLVector<Domain, Color> ColorImage;
   typedef ImageContainerBySTLVector<Domain, unsigned char> GreyLevelImage;
@@ -323,7 +326,7 @@ int main( int argc, char* argv[] )
         {
           auto cell = m.getSCell( index );
           double col = ((double) mask( K.sCoords( cell ) )) / 255.0;
-          m.myContainer( index ) = col > 0.5 ? 1.0 : 0.0;
+          m.myContainer( index ) = col > 0.0 ? 1.0 : 0.0;
         }
       AT.setAlpha( a, m );
       if ( grey_image )

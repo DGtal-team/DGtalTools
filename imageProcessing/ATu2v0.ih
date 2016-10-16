@@ -45,7 +45,8 @@ ATu2v0( int _verbose )
     v0( calculus ), former_v0( calculus ), 
     alpha_Id2( calculus ), left_V0( calculus ), 
     l_1_over_4( calculus ), l_1_over_4e( calculus ), 
-    l_1_over_4e_Id0( calculus )
+    l_1_over_4e_Id0( calculus ),
+    metric_average( false )
 {}
 
 template <typename TKSpace, typename TLinearAlgebra>
@@ -89,6 +90,15 @@ addInput( const Image& image, std::function< Scalar( typename Image::Value ) > f
 template <typename TKSpace, typename TLinearAlgebra>
 void 
 DGtal::ATu2v0<TKSpace, TLinearAlgebra>::
+setMetricAverage( bool average )
+{
+  metric_average = average;
+}
+
+//-----------------------------------------------------------------------------
+template <typename TKSpace, typename TLinearAlgebra>
+void 
+DGtal::ATu2v0<TKSpace, TLinearAlgebra>::
 setAlpha( Scalar _alpha )
 {
   ASSERT( _alpha >= 0.0 );
@@ -123,7 +133,14 @@ setLambda( Scalar _lambda )
 {
   ASSERT( _lambda >= 0.0 );
   lambda     = _lambda;
-  l_1_over_4 = (lambda / 4.0 ) * KForm< Calculus, 0, PRIMAL >::ones( calculus );
+  if ( metric_average )
+    l_1_over_4 = (lambda / 4.0 )
+      * M01.transpose() * M12.transpose()
+      * M12 * M01
+      * KForm< Calculus, 0, PRIMAL >::ones( calculus );
+  else
+    l_1_over_4 = (lambda / 4.0 )
+      * KForm< Calculus, 0, PRIMAL >::ones( calculus );
 }
 
 //-----------------------------------------------------------------------------
@@ -134,8 +151,15 @@ setEpsilon( Scalar _epsilon )
 {
   ASSERT( _epsilon > 0.0 );
   epsilon     = _epsilon;
-  left_V0     = ( lambda/(4.0*epsilon) ) * calculus.template identity<0, PRIMAL>()
-    + (lambda*epsilon) * D0.transpose() * D0;
+  if ( metric_average )
+    left_V0     = ( lambda/(4.0*epsilon) )
+      * M01.transpose() * M12.transpose()
+      * M12 * M01
+      + (lambda*epsilon) * D0.transpose() * D0;
+  else
+    left_V0     = ( lambda/(4.0*epsilon) )
+      * calculus.template identity<0, PRIMAL>()
+      + (lambda*epsilon) * D0.transpose() * D0;
   l_1_over_4e = (1.0/epsilon) * l_1_over_4;
 }
  
