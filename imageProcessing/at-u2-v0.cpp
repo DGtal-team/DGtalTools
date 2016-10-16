@@ -223,10 +223,7 @@ int main( int argc, char* argv[] )
     cerr << "Error checking program options: "<< ex.what()<< endl;
   }
   po::notify(vm);
-  if ( ! parseOK || vm.count("help")
-                 || !vm.count("input")
-                 || (vm.count("snr") && !vm.count("image-snr"))
-     )
+  if ( ! parseOK || vm.count("help") || !vm.count("input") )
     {
       cerr << "Usage: " << argv[0] << " -i toto.pgm\n"
            << "Computes the Ambrosio-Tortorelli reconstruction/segmentation of an input image."
@@ -266,6 +263,8 @@ int main( int argc, char* argv[] )
   int nbiter = vm[ "nbiter" ].as<int>();
   int pix_sz = vm[ "pixel-size" ].as<int>();
   string scv = vm[ "color-v" ].as<string>();
+  bool snr   = vm.count( "image-snr" );
+  string isnr= snr ? vm[ "image-snr" ].as<string>() : "";
   Color color_v( (unsigned int) std::stoul( scv, nullptr, 16 ), 255 );
 
   bool color_image = f1.size() > 4 && f1.compare( f1.size() - 4, 4, ".ppm" ) == 0;
@@ -314,11 +313,30 @@ int main( int argc, char* argv[] )
     }
 
   //---------------------------------------------------------------------------
+  if ( snr && color_image ) 
+    {
+      trace.beginBlock("Reading ideal PPM image");
+      ColorImage image = PPMReader<ColorImage>::importPPM( isnr );
+      trace.endBlock();
+      AT.addInput( image, [] ( Color c ) -> double { return ((double) c.red())   / 255.0; }, true );
+      AT.addInput( image, [] ( Color c ) -> double { return ((double) c.green()) / 255.0; }, true );
+      AT.addInput( image, [] ( Color c ) -> double { return ((double) c.blue())  / 255.0; }, true );
+    }
+  else if ( snr && grey_image ) 
+    {
+      trace.beginBlock("Reading ideal PGM image");
+      GreyLevelImage image = PGMReader<GreyLevelImage>::importPGM( isnr );
+      trace.endBlock();
+      AT.addInput( image, [] (unsigned char c ) { return ((double) c) / 255.0; }, true );
+    }
+  
+  //---------------------------------------------------------------------------
   // Prepare zoomed output domain
   Domain out_domain( pix_sz * domain.lowerBound(), 
                      pix_sz * domain.upperBound() + Point::diagonal( pix_sz ) );
   //---------------------------------------------------------------------------
   AT.setUFromInput();
+  double g_snr = snr ? AT.computeSNR() : 0.0;
 
   if ( vm.count( "inpainting-mask" ) )
     {
@@ -434,6 +452,12 @@ int main( int argc, char* argv[] )
             ( AT.calculus, v, image_uv, color_v, 0.0, 1.0, pix_sz ); 
           PPMWriter<ColorImage, functors::Identity >::exportPPM( ossV.str(), image_uv );
           if ( verb > 0 ) trace.endBlock();
+        }
+      // Compute SNR if possible
+      if ( snr )
+        {
+          double u_snr = AT.computeSNR();
+          trace.info() << "- SNR of u = " << u_snr << "   SNR of g = " << g_snr << endl;
         }
       l1 /= lr;
     }

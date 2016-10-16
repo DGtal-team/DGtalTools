@@ -310,7 +310,7 @@ int main( int argc, char* argv[] )
     }
 
   //---------------------------------------------------------------------------
-  if ( color_image ) 
+  if ( snr && color_image ) 
     {
       trace.beginBlock("Reading ideal PPM image");
       ColorImage image = PPMReader<ColorImage>::importPPM( isnr );
@@ -319,7 +319,7 @@ int main( int argc, char* argv[] )
       AT.addInput( image, [] ( Color c ) -> double { return ((double) c.green()) / 255.0; }, true );
       AT.addInput( image, [] ( Color c ) -> double { return ((double) c.blue())  / 255.0; }, true );
     }
-  else if ( grey_image ) 
+  else if ( snr && grey_image ) 
     {
       trace.beginBlock("Reading ideal PGM image");
       GreyLevelImage image = PGMReader<GreyLevelImage>::importPGM( isnr );
@@ -334,6 +334,7 @@ int main( int argc, char* argv[] )
   //---------------------------------------------------------------------------
   AT.setUFromInput();
   double g_snr = snr ? AT.computeSNR() : 0.0;
+
   if ( vm.count( "inpainting-mask" ) )
     {
       string fm  = vm[ "inpainting-mask" ].as<string>();
