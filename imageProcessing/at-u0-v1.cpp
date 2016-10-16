@@ -18,6 +18,8 @@
  * @ingroup Tools
  * @author Jacques-Olivier Lachaud (\c jacques-olivier.lachaud@univ-savoie.fr )
  * Laboratory of Mathematics (CNRS, UMR 5127), University of Savoie, France
+ * @author Marion Foare (\c marion.foare@univ-savoie.fr )
+ * Laboratory of Mathematics (CNRS, UMR 5127), University of Savoie, France
  *
  * @date 2016/10/12
  *
@@ -69,11 +71,12 @@ Discretized as (u 0-form, v 1-form, A vertex-edge bdry, B edge-face bdy)
 
 \code
   -h [ --help ]                         display this message
-  -i [ --input ] arg                    the input image PGM or PPM filename.
+  -i [ --input ] arg                    the input image PPM filename.
+  -m [ --inpainting-mask ] arg          the input inpainting mask filename.
   -o [ --output ] arg (=AT)             the output image basename.
   -l [ --lambda ] arg                   the parameter lambda.
   -1 [ --lambda-1 ] arg (=0.3125)       the initial parameter lambda (l1).
-  -2 [ --lambda-2 ] arg (=5.0000000000000002e-05)
+  -2 [ --lambda-2 ] arg (=0.00050000000000000001)
                                         the final parameter lambda (l2).
   -q [ --lambda-ratio ] arg (=1.4142135623730951)
                                         the division ratio for lambda from l1 
@@ -86,8 +89,13 @@ Discretized as (u 0-form, v 1-form, A vertex-edge bdry, B edge-face bdy)
   --epsilon-r arg (=2)                  sets the ratio between two consecutive 
                                         epsilon values of AT functional.
   -n [ --nbiter ] arg (=10)             the maximum number of iterations.
-  --snr                                 force computation of SNR.
-  --image-snr arg                       the input image without deterioration.
+  --image-snr arg                       the input image without deterioration 
+                                        if you wish to compute the SNR.
+  -p [ --pixel-size ] arg (=1)          the pixel size for outputing images 
+                                        (useful when one wants to see the 
+                                        discontinuities v on top of u).
+  -c [ --color-v ] arg (=0xff0000)      the color chosen for displaying the 
+                                        singularities v (e.g. red is 0xff0000).
   -v [ --verbose ] arg (=0)             the verbose level (0: silent, 1: less 
                                         silent, etc).
 \endcode
@@ -201,8 +209,7 @@ int main( int argc, char* argv[] )
     ("epsilon-2", po::value<double>()->default_value( 0.25 ), "the final parameter epsilon." )
     ("epsilon-r", po::value<double>()->default_value( 2.0 ), "sets the ratio between two consecutive epsilon values of AT functional." )
     ("nbiter,n", po::value<int>()->default_value( 10 ), "the maximum number of iterations." )
-    ("snr", "force computation of SNR." )
-    ("image-snr", po::value<string>(), "the input image without deterioration." )
+    ("image-snr", po::value<string>(), "the input image without deterioration if you wish to compute the SNR." )
     ("pixel-size,p", po::value<int>()->default_value( 1 ), "the pixel size for outputing images (useful when one wants to see the discontinuities v on top of u)." )
     ("color-v,c", po::value<string>()->default_value( "0xff0000" ), "the color chosen for displaying the singularities v (e.g. red is 0xff0000)." )
     ("verbose,v", po::value<int>()->default_value( 0 ), "the verbose level (0: silent, 1: less silent, etc)." )
@@ -217,28 +224,25 @@ int main( int argc, char* argv[] )
     cerr << "Error checking program options: "<< ex.what()<< endl;
   }
   po::notify(vm);
-  if ( ! parseOK || vm.count("help")
-                 || !vm.count("input")
-                 || (vm.count("snr") && !vm.count("image-snr"))
-     )
+  if ( ! parseOK || vm.count("help") || !vm.count("input") )
     {
       cerr << "Usage: " << argv[0] << " -i toto.pgm\n"
            << "Computes the Ambrosio-Tortorelli reconstruction/segmentation of an input image."
            << "It outputs 2 or 3 images (of basename given by option --output) giving the"
            << " reconstructed image u, and other images superposing u and the discontinuities v."
-       << endl << endl
-       << " / "
-       << endl
-       << " | a.(u-g)^2 + v^2 |grad u|^2 + le.|grad v|^2 + (l/4e).(1-v)^2 "
-       << endl
-       << " / "
-       << endl
-       << "Discretized as (u 0-form, v 1-form, A vertex-edge bdry, B edge-face bdy)" << endl
-       << "E(u,v) = a(u-g)^t (u-g) +  u^t A^t diag(v)^2 A^t u + l e v^t (A A^t + B^t B) v + l/(4e) (1-v)^t (1-v)" << endl
-       << endl
-       << general_opt << "\n"
-       << "Example: ./at-u0-v1 -i ../Images/cerclesTriangle64b02.pgm -o tmp -a 0.05 -e 1 --lambda-1 0.1 --lambda-2 0.00001 -g"
-       << endl;
+           << endl << endl
+           << " / "
+           << endl
+           << " | a.(u-g)^2 + v^2 |grad u|^2 + le.|grad v|^2 + (l/4e).(1-v)^2 "
+           << endl
+           << " / "
+           << endl
+           << "Discretized as (u 0-form, v 1-form, A vertex-edge bdry, B edge-face bdy)" << endl
+           << "E(u,v) = a(u-g)^t (u-g) +  u^t A^t diag(v)^2 A^t u + l e v^t (A A^t + B^t B) v + l/(4e) (1-v)^t (1-v)" << endl
+           << endl
+           << general_opt << "\n"
+           << "Example: ./at-u0-v1 -i ../Images/cerclesTriangle64b02.pgm -o tmp -a 0.05 -e 1 --lambda-1 0.1 --lambda-2 0.00001 -g"
+           << endl;
       return 1;
     }
   string f1  = vm[ "input" ].as<string>();
@@ -259,6 +263,8 @@ int main( int argc, char* argv[] )
   int nbiter = vm[ "nbiter" ].as<int>();
   int pix_sz = vm[ "pixel-size" ].as<int>();
   string scv = vm[ "color-v" ].as<string>();
+  bool snr   = vm.count( "image-snr" );
+  string isnr= snr ? vm[ "image-snr" ].as<string>() : "";
   Color color_v( (unsigned int) std::stoul( scv, nullptr, 16 ), 255 );
 
   bool color_image = f1.size() > 4 && f1.compare( f1.size() - 4, 4, ".ppm" ) == 0;
@@ -306,12 +312,30 @@ int main( int argc, char* argv[] )
     }
 
   //---------------------------------------------------------------------------
+  if ( color_image ) 
+    {
+      trace.beginBlock("Reading ideal PPM image");
+      ColorImage image = PPMReader<ColorImage>::importPPM( isnr );
+      trace.endBlock();
+      AT.addInput( image, [] ( Color c ) -> double { return ((double) c.red())   / 255.0; }, true );
+      AT.addInput( image, [] ( Color c ) -> double { return ((double) c.green()) / 255.0; }, true );
+      AT.addInput( image, [] ( Color c ) -> double { return ((double) c.blue())  / 255.0; }, true );
+    }
+  else if ( grey_image ) 
+    {
+      trace.beginBlock("Reading ideal PGM image");
+      GreyLevelImage image = PGMReader<GreyLevelImage>::importPGM( isnr );
+      trace.endBlock();
+      AT.addInput( image, [] (unsigned char c ) { return ((double) c) / 255.0; }, true );
+    }
+
+  //---------------------------------------------------------------------------
   // Prepare zoomed output domain
   Domain out_domain( pix_sz * domain.lowerBound(), 
                      pix_sz * domain.upperBound() + Point::diagonal( pix_sz - 1) );
   //---------------------------------------------------------------------------
   AT.setUFromInput();
-
+  double g_snr = snr ? AT.computeSNR() : 0.0;
   if ( vm.count( "inpainting-mask" ) )
     {
       string fm  = vm[ "inpainting-mask" ].as<string>();
@@ -426,6 +450,12 @@ int main( int argc, char* argv[] )
             ( AT.calculus, v, image_uv, color_v, 0.0, 1.0, pix_sz ); 
           PPMWriter<ColorImage, functors::Identity >::exportPPM( ossV.str(), image_uv );
           if ( verb > 0 ) trace.endBlock();
+        }
+      // Compute SNR if possible
+      if ( snr )
+        {
+          double u_snr = AT.computeSNR();
+          trace.info() << "- SNR of u = " << u_snr << "   SNR of g = " << g_snr << endl;
         }
       l1 /= lr;
     }

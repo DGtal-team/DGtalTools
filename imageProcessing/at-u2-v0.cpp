@@ -18,6 +18,8 @@
  * @ingroup Tools
  * @author Jacques-Olivier Lachaud (\c jacques-olivier.lachaud@univ-savoie.fr )
  * Laboratory of Mathematics (CNRS, UMR 5127), University of Savoie, France
+ * @author Marion Foare (\c marion.foare@univ-savoie.fr )
+ * Laboratory of Mathematics (CNRS, UMR 5127), University of Savoie, France
  *
  * @date 2016/10/12
  *
@@ -69,11 +71,12 @@ Discretized as (u 0-form, v 1-form, A vertex-edge bdry, B edge-face bdy)
 
 \code
   -h [ --help ]                         display this message
-  -i [ --input ] arg                    the input image PGM or PPM filename.
+  -i [ --input ] arg                    the input image PPM filename.
+  -m [ --inpainting-mask ] arg          the input inpainting mask filename.
   -o [ --output ] arg (=AT)             the output image basename.
   -l [ --lambda ] arg                   the parameter lambda.
   -1 [ --lambda-1 ] arg (=0.3125)       the initial parameter lambda (l1).
-  -2 [ --lambda-2 ] arg (=5.0000000000000002e-05)
+  -2 [ --lambda-2 ] arg (=0.00050000000000000001)
                                         the final parameter lambda (l2).
   -q [ --lambda-ratio ] arg (=1.4142135623730951)
                                         the division ratio for lambda from l1 
@@ -86,8 +89,13 @@ Discretized as (u 0-form, v 1-form, A vertex-edge bdry, B edge-face bdy)
   --epsilon-r arg (=2)                  sets the ratio between two consecutive 
                                         epsilon values of AT functional.
   -n [ --nbiter ] arg (=10)             the maximum number of iterations.
-  --snr                                 force computation of SNR.
-  --image-snr arg                       the input image without deterioration.
+  --image-snr arg                       the input image without deterioration 
+                                        if you wish to compute the SNR.
+  -p [ --pixel-size ] arg (=1)          the pixel size for outputing images 
+                                        (useful when one wants to see the 
+                                        discontinuities v on top of u).
+  -c [ --color-v ] arg (=0xff0000)      the color chosen for displaying the 
+                                        singularities v (e.g. red is 0xff0000).
   -v [ --verbose ] arg (=0)             the verbose level (0: silent, 1: less 
                                         silent, etc).
 \endcode
@@ -202,8 +210,7 @@ int main( int argc, char* argv[] )
     ("epsilon-2", po::value<double>()->default_value( 0.25 ), "the final parameter epsilon." )
     ("epsilon-r", po::value<double>()->default_value( 2.0 ), "sets the ratio between two consecutive epsilon values of AT functional." )
     ("nbiter,n", po::value<int>()->default_value( 10 ), "the maximum number of iterations." )
-    ("snr", "force computation of SNR." )
-    ("image-snr", po::value<string>(), "the input image without deterioration." )
+    ("image-snr", po::value<string>(), "the input image without deterioration if you wish to compute the SNR." )
     ("pixel-size,p", po::value<int>()->default_value( 1 ), "the pixel size for outputing images (useful when one wants to see the discontinuities v on top of u)." )
     ("color-v,c", po::value<string>()->default_value( "0xff0000" ), "the color chosen for displaying the singularities v (e.g. red is 0xff0000)." )
     ("verbose,v", po::value<int>()->default_value( 0 ), "the verbose level (0: silent, 1: less silent, etc)." )

@@ -20,6 +20,8 @@
  * @file
  * @author Jacques-Olivier Lachaud (\c jacques-olivier.lachaud@univ-savoie.fr )
  * Laboratory of Mathematics (CNRS, UMR 5127), University of Savoie, France
+ * @author Marion Foare (\c marion.foare@univ-savoie.fr )
+ * Laboratory of Mathematics (CNRS, UMR 5127), University of Savoie, France
  *
  * @date 2016/10/12
  *
@@ -163,10 +165,18 @@ namespace DGtal
 
     /**
     * Adds an input 0-form by filtering an \a image values.
-    * @param image any image such that the domain of this space is included in the domain of the image.
+    *
+    * @param image any image such that the domain of this space is
+    * included in the domain of the image.
+    *
     * @param f any functor associated a scalar to an image value.
     *
-    * @note For a grey-level image stored with values `unsigned char`, should be called as
+    * @param perfect_data when 'false', this is normal input data,
+    * otherwise this is perfect data only used for SNR computation.
+    *
+    * @note For a grey-level image stored with values `unsigned char`,
+    * should be called as
+    *
     * @code
     * AT.addInput( image, [] (unsigned char c ) { return (double) c / 255.0; } );
     * @endcode
@@ -179,7 +189,9 @@ namespace DGtal
     * @endcode
     */
     template <typename Image>
-    void addInput( const Image& image, std::function< Scalar( typename Image::Value ) > f );
+    void addInput( const Image& image,
+                   std::function< Scalar( typename Image::Value ) > f,
+                   bool perfect_data = false );
 
     /// Sets approximation \a u to be equal to the input. Used for
     /// initializating \a u. Should be called once all \ref addInput
@@ -237,6 +249,9 @@ namespace DGtal
     */
     void setEpsilon( Scalar _epsilon );
 
+    /// Computes the SNR of u wrt ideal input (should have been given @see addInput).
+    Scalar computeSNR() const;
+    
     /// @return the (global) alpha parameter.
     Scalar getAlpha() const { return alpha; }
 
@@ -318,6 +333,8 @@ namespace DGtal
 
     /// The g 0-forms
     std::vector< PrimalForm0 > g0;
+    /// The ideal input 0-forms (for snr computation).
+    std::vector< PrimalForm0 > i0;
     /// The u 0-forms
     std::vector< PrimalForm0 > u0;
     /// The v 1-form

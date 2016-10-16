@@ -20,6 +20,8 @@
  * @file ATu2v0.h
  * @author Jacques-Olivier Lachaud (\c jacques-olivier.lachaud@univ-savoie.fr )
  * Laboratory of Mathematics (CNRS, UMR 5127), University of Savoie, France
+ * @author Marion Foare (\c marion.foare@univ-savoie.fr )
+ * Laboratory of Mathematics (CNRS, UMR 5127), University of Savoie, France
  *
  * @date 2016/10/12
  *
@@ -167,10 +169,18 @@ namespace DGtal
 
     /**
     * Adds an input 2-form by filtering an \a image values.
-    * @param image any image such that the domain of this space is included in the domain of the image.
+    *
+    * @param image any image such that the domain of this space is
+    * included in the domain of the image.
+    *
     * @param f any functor associated a scalar to an image value.
     *
-    * @note For a grey-level image stored with values `unsigned char`, should be called as
+    * @param perfect_data when 'false', this is normal input data,
+    * otherwise this is perfect data only used for SNR computation.
+    *
+    * @note For a grey-level image stored with values `unsigned char`,
+    * should be called as
+    *
     * @code
     * AT.addInput( image, [] (unsigned char c ) { return (double) c / 255.0; } );
     * @endcode
@@ -183,7 +193,9 @@ namespace DGtal
     * @endcode
     */
     template <typename Image>
-    void addInput( const Image& image, std::function< Scalar( typename Image::Value ) > f );
+    void addInput( const Image& image,
+                   std::function< Scalar( typename Image::Value ) > f,
+                   bool perfect_data = false );
 
     /// Use metric average to smooth L1-metric effects.
     void setMetricAverage( bool average );
@@ -244,6 +256,9 @@ namespace DGtal
     */
     void setEpsilon( Scalar _epsilon );
 
+    /// Computes the SNR of u wrt ideal input (should have been given @see addInput).
+    Scalar computeSNR() const;
+    
     /// @return the (global) alpha parameter.
     Scalar getAlpha() const { return alpha; }
 
@@ -329,6 +344,8 @@ namespace DGtal
 
     /// The g 2-forms
     std::vector< PrimalForm2 > g2;
+    /// The ideal input 2-forms (for snr computation).
+    std::vector< PrimalForm2 > i2;
     /// The u 2-forms
     std::vector< PrimalForm2 > u2;
     /// The v 0-form

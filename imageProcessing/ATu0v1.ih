@@ -18,6 +18,8 @@
  * @file
  * @author Jacques-Olivier Lachaud (\c jacques-olivier.lachaud@univ-savoie.fr )
  * Laboratory of Mathematics (CNRS, UMR 5127), University of Savoie, France
+ * @author Marion Foare (\c marion.foare@univ-savoie.fr )
+ * Laboratory of Mathematics (CNRS, UMR 5127), University of Savoie, France
  *
  * @date 2016/10/12
  *
@@ -69,16 +71,37 @@ template <typename TKSpace, typename TLinearAlgebra>
 template <typename Image>
 void 
 DGtal::ATu0v1<TKSpace, TLinearAlgebra>::
-addInput( const Image& image, std::function< Scalar( typename Image::Value ) > f )
+addInput( const Image& image, std::function< Scalar( typename Image::Value ) > f,
+          bool perfect_data )
 {
-  g0.push_back( PrimalForm0( calculus ) );
-  PrimalForm0& g  = g0.back();
+  if ( perfect_data ) i0.push_back( PrimalForm0( calculus ) );
+  else                g0.push_back( PrimalForm0( calculus ) );
+  PrimalForm0& g  = perfect_data ? i0.back() : g0.back();
   const KSpace& K = calculus.myKSpace; 
   for ( Index index = 0; index < g.myContainer.rows(); index++)
     {
       SCell cell = g.getSCell( index );
       g.myContainer( index ) = f( image( K.sCoords( cell ) ) );
     }
+}
+
+//-----------------------------------------------------------------------------
+template <typename TKSpace, typename TLinearAlgebra>
+typename DGtal::ATu0v1<TKSpace, TLinearAlgebra>::Scalar
+DGtal::ATu0v1<TKSpace, TLinearAlgebra>::
+computeSNR() const
+{
+  Scalar MSE = 0.0;
+  for ( Dimension i = 0; i < i0.size(); ++i )
+    {
+      Scalar MSEi = 0.0;
+      const PrimalForm0 u_minus_i_snr = u0[ i ] - i0[ i ];
+      for ( Index j = 0; j < u_minus_i_snr.length(); ++j )
+        MSEi += u_minus_i_snr.myContainer( j ) * u_minus_i_snr.myContainer( j );
+      MSE += MSEi / (Scalar) u_minus_i_snr.length();
+    }
+  MSE /= 3.0;
+  return 10.0 * log10(1.0 / MSE);
 }
 
 //-----------------------------------------------------------------------------
