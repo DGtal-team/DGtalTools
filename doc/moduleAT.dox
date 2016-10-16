@@ -1,0 +1,248 @@
+/**
+ * @file moduleAT.dox
+ * @author Jacques-Olivier Lachaud (\c jacques-olivier.lachaud@univ-savoie.fr )
+ * Laboratory of Mathematics (CNRS, UMR 5127), University of Savoie, France
+ *
+ * @date 2016/10/15
+ *
+ * Documentation file for imageProcessing
+ *
+ * This file is part of the DGtal library.
+ */
+
+/*!
+@page moduleAT Image restoration and inpainting with Ambrosio-Tortorelli functional
+
+@writers Marion Foare and Jacques-Olivier Lachaud
+
+  Part of tool \ref imageProcessing.
+  [TOC]
+
+@section AT1 The Ambrosio-Tortorelli functional  
+
+The Ambrosio-Tortorelli functional is a classical relaxation of the
+Mumford-Shah functional.
+
+Given an input grayscale image, defined in an open bounded domain
+\f$ \Omega \f$, we represent its gray levels by a function \f$ g
+\in L^{\infty}(\Omega) \f$. In the Ambrosio-Tortorelli functional [1],
+one wants to find a function \f$ u \in SBV(\Omega) \f$ which is a
+smooth approximation of the input image \f$ g \f$.
+The Ambrosio-Tortorelli functional [1] is defined by
+\f[
+  \displaystyle
+  AT_{\varepsilon}(u,v)	= \int_\Omega \alpha |u-g|^2 + v^2 |\nabla u|^2
+  + \lambda \varepsilon |\nabla v|^2 + \frac{\lambda}{4 \varepsilon} |1-v|^2 dx,
+\f]
+for functions \f$ u,v \in W^{1,2}(\Omega)\f$ with \f$ 0 \leq v \leq 1 \f$.
+
+
+In AT functional, function \f$ v \f$ is a smooth approximation
+of the set of discontinuities, and takes value close to 0 in this set,
+while being close to 1 outside discontinuities. A remarkable property
+of this functional is that it \f$ \Gamma \f$-converges to (a
+relaxation of) MS functional as \f$ \varepsilon \f$ tends to 0 (see [1]).
+The intuition is that a large \f$ \varepsilon \f$ induces a solution
+with a fuzzy set of discontinuities, which is then progressively
+narrowed to the crisp 1-dimensional set of discontinuites as
+\f$ \varepsilon \f$ goes to 0.
+
+
+@section AT2 Discretization of AT with discrete calculus
+
+Discrete calculus in a nutshell
+
+Formulations AT01 and AT20
+
+Solutions to AT01 and AT20
+
+@section AT3 Piecewise smooth approximation of images
+
+@subsection AT3_1 Some examples of restoration and discontinuity detections
+
+We display below the different resconstruction of image "lena" with
+noise approximately 20%, for varying parameter \f$ \lambda \f$. Note
+that a too big \f$ \lambda \f$ gives a fuzzy result, while a too small
+\f$ \lambda \f$ keeps noise.
+
+<center>
+<table>
+<tr>
+<td> Input \a g </td>
+<td> @image html lena-370-b02.png </td>
+<td> @image html lena-370-b02.png </td>
+<td> @image html lena-370-b02.png </td>
+<td> @image html lena-370-b02.png </td>
+<td> @image html lena-370-b02.png </td>
+</tr>
+<tr>
+<td> Approx. \a u </td>
+<td> @image html lena-370-b02-a0_48000-l0_2000000-u.png </td>
+<td> @image html lena-370-b02-a0_48000-l0_1000000-u.png </td>
+<td> @image html lena-370-b02-a0_48000-l0_0500000-u.png </td>
+<td> @image html lena-370-b02-a0_48000-l0_0250000-u.png </td>
+<td> @image html lena-370-b02-a0_48000-l0_0125000-u.png </td>
+</tr>
+<tr>
+<td> \f$ \alpha = 0.48, \epsilon = 4 \searrow 0.25 \f$ </td>
+<td> \f$ \lambda = 0.2 \f$ </td>
+<td> \f$ \lambda = 0.1 \f$ </td>
+<td> \f$ \lambda = 0.05 \f$ </td>
+<td> \f$ \lambda = 0.025 \f$ </td>
+<td> \f$ \lambda = 0.0125 \f$ </td>
+</table>
+</center>
+
+\code
+./imageProcessing/at-u2-v0 -i ../imageProcessing/Images/lena-370-b02.ppm -o lena-370-b02 -a 0.48 --lambda-1 0.2 --lambda-2 0.0125 --lambda-ratio 2.0 --epsilon-1 4.0 --epsilon-2 0.25 -p 2 -n 20
+\endcode
+
+
+@image html lena-370-b02-a0_48000-l0_0500000-u-v.png "Result of \a u and \a v for lambda=0.05, discontinuities are in a red."
+
+
+@subsection AT3_2 Influence of parameter epsilon
+
+<center>
+<table>
+<tr>
+  <td> @image html images/carre2Degradesb02.png </td>
+  <td> @image html images/cb2-e4_0-a0_10000-l0_0062092-u0-v1.png </td>
+  <td> @image html images/cb2-e2_0-a0_10000-l0_0062092-u0-v1.png </td>
+  <td> @image html images/cb2-e1_0-a0_10000-l0_0062092-u0-v1.png </td>
+  <td> @image html images/cb2-e0_5-a0_10000-l0_0062092-u0-v1.png </td>
+  <td> @image html images/cb2-e0_25-a0_10000-l0_0062092-u0-v1.png </td>
+</tr>
+<tr>
+  <td> Input image \a g </td>
+  <td> \f$ \epsilon = 4 \searrow 4 \f$ </td>
+  <td> \f$ \epsilon = 4 \searrow 2 \f$ </td>
+  <td> \f$ \epsilon = 4 \searrow 1 \f$ </td>
+  <td> \f$ \epsilon = 4 \searrow 0.5 \f$ </td>
+  <td> \f$ \epsilon = 4 \searrow 0.25 \f$ </td>
+</tr>
+<tr>
+  <td>Command lines are:</td>
+  <td align=center colspan="5">
+    at-u0-v1 -i Images/carre2Degradesb02.pgm -o cb2 -a 0.1 --lambda 0.006 --epsilon-1 4.0 --epsilon-2 4.0<br/>
+    at-u0-v1 -i Images/carre2Degradesb02.pgm -o cb2 -a 0.1 --lambda 0.006 --epsilon-1 4.0 --epsilon-2 2.0<br/>
+    at-u0-v1 -i Images/carre2Degradesb02.pgm -o cb2 -a 0.1 --lambda 0.006 --epsilon-1 4.0 --epsilon-2 1.0<br/>
+    at-u0-v1 -i Images/carre2Degradesb02.pgm -o cb2 -a 0.1 --lambda 0.006 --epsilon-1 4.0 --epsilon-2 0.5<br/>
+    at-u0-v1 -i Images/carre2Degradesb02.pgm -o cb2 -a 0.1 --lambda 0.006 --epsilon-1 2.0 --epsilon-2 0.25
+  </td>
+</tr>
+</table>
+
+
+
+
+<table>
+<tr>
+  <td> <img height=100px src="images/cb2-a1_00000-l1_0000000-u.png"/> </td>
+  <td> <img height=100px src="images/cb2-a0_50000-l1_0000000-u.png"/> </td>
+  <td> <img height=100px src="images/cb2-a0_10000-l1_0000000-u.png"/> </td>
+  <td> <img height=100px src="images/cb2-a0_05000-l1_0000000-u.png"/> </td>
+  <td> <img height=100px src="images/cb2-a0_01000-l1_0000000-u.png"/> </td>
+</tr>
+<tr>
+  <td align=center colspan="5">
+    ./build/at-u0-v1 -i Images/carre2Degradesb02.pgm -o cb2 -a 1.0 --lambda 1.0 --epsilon-1 2.0 --epsilon-2 0.25<br/>
+    ./build/at-u0-v1 -i Images/carre2Degradesb02.pgm -o cb2 -a 0.5 --lambda 1.0 --epsilon-1 2.0 --epsilon-2 0.25<br/>
+    ./build/at-u0-v1 -i Images/carre2Degradesb02.pgm -o cb2 -a 0.1 --lambda 1.0 --epsilon-1 2.0 --epsilon-2 0.25<br/>
+    ./build/at-u0-v1 -i Images/carre2Degradesb02.pgm -o cb2 -a 0.05 --lambda 1.0 --epsilon-1 2.0 --epsilon-2 0.25<br/>
+    ./build/at-u0-v1 -i Images/carre2Degradesb02.pgm -o cb2 -a 0.01 --lambda 1.0 --epsilon-1 2.0 --epsilon-2 0.25
+  </td>
+</tr>
+</table>
+
+
+
+<table>
+<tr>
+  <td> <img height=100px src="images/lena-370-b02-a0_48000-l0_2000000-u0-v1.png"/> </td>
+  <td> <img height=100px src="images/lena-370-b02-a0_48000-l0_1000000-u0-v1.png"/> </td>
+  <td> <img height=100px src="images/lena-370-b02-a0_48000-l0_0500000-u0-v1.png"/> </td>
+  <td> <img height=100px src="images/lena-370-b02-a0_48000-l0_0250000-u0-v1.png"/> </td>
+  <td> <img height=100px src="images/lena-370-b02-a0_48000-l0_0125000-u0-v1.png"/> </td>
+</tr>
+<tr>
+  <td align=center colspan="5"> ./build/at-u0-v1 -i Images/lena-370-b02.ppm -o lena -a 0.48 --lambda-1 0.2 --lambda-2 0.0125 --lambda-ratio 2.0 --epsilon-1 2.0 --epsilon-2 0.25</td>
+</tr>
+</table>
+
+
+<table>
+<tr>
+  <td> <img height=100px src="images/d-a0.10000-l0.0085000-u0-v1.png"/> </td>
+  <td>  </td>
+</tr>
+<tr>
+  <td align=center colspan="2"> ./build/at-u0-v1 -i Images/degrade-b01.pgm -o d  -a 0.1 --lambda 0.0085  --epsilon-1 1.0 --epsilon-2 0.25</td>
+</tr>
+</table>
+
+
+<table>
+<tr>
+  <td> <img height=100px src="images/d-a0.10000-l0.0085000-u2-v0.png"/> </td>
+  <td>  </td>
+</tr>
+<tr>
+  <td align=center colspan="2"> ./build/at-u2-v0 -i Images/degrade-b01.pgm -o d  -a 0.1 --lambda 0.0085  --epsilon-1 1.0 --epsilon-2 0.25</td>
+</tr>
+</table>
+
+
+<table>
+<tr>
+  <td> <img height=100px src="images/barbara-cropped-b01-l0.0054088-a1.0-u0-v1-u.png"/> </td>
+  <td> <img height=100px src="images/barbara-cropped-b01-l0.0054088-a1.0-u0-v1.png"/> </td>
+</tr>
+<tr>
+  <td align=center colspan="2"> ./build/at-u0-v1 -i Images/barbara-cropped-b01.pgm -o barbara  -a 1.0 --lambda 0.0054  --epsilon-1 1.0 --epsilon-2 0.25</td>
+</tr>
+</table>
+
+
+<table>
+<tr>
+  <td>  </td>
+</tr>
+<tr>
+  <td align=center> </td>
+</tr>
+</table>
+
+
+
+<table>
+<tr>
+  <td>  </td>
+</tr>
+<tr>
+  <td align=center> </td>
+</tr>
+</table>
+
+
+</center>
+
+@section AT4 Use of AT models for inpainting
+
+The AT20 model is much superior to the AT01 model for inpainting since
+it is less sensitive to L1-metrication artefacts. Indeed, for large
+\f$ \varepsilon \f$, the discontinuity set is averaged along points,
+not along edges. Hence AT20 is smoothed in all directions while AT01
+is smoothed along axes. This is illustrated on the inpainting
+quadruple angle below. AT01 finds the solution in the L1-metric sense
+for the length of discontinuities, while AT20 finds the correct two
+triple points in the L2-metric sense.
+
+@section References
+
+[1] Luigi Ambrosio and Vincenzo Maria Tortorelli. Approximation of functional de-
+pending on jumps by elliptic functional via t-convergence. Communications on
+Pure and Applied Mathematics , 43(8):9991036, 1990.
+
+
+*/

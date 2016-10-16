@@ -49,9 +49,9 @@
 #include "ATu2v0.h"
 
 /**
-@page DocATu0v1 at-u2-v0 
+@page DocATu2v0 imageProcessing/at-u2-v0 
 
-@brief Computes a piecewise smooth approximation of an image, by optimizing the Ambrosio-Tortorelli functional.
+@brief Computes a piecewise smooth approximation of an image, by optimizing the Ambrosio-Tortorelli functional (with u a 2-form and v a 0-form).
 
 @writers Marion Foare, Jacques-Olivier Lachaud
 
@@ -61,7 +61,7 @@
 
 Computes the Ambrosio-Tortorelli reconstruction/segmentation of an input image, either grey-level (.pgm) or color image (.ppm).
 
-\f$ AT_e = \int a.(u-g)^2 + v^2 | \grad u|^2 + le.| \grad v|^2 + (l/4e).(1-v)^2 \f$
+\f$ AT_e = \int a.(u-g)^2 + v^2 | \nabla u|^2 + le.| \nabla v|^2 + (l/4e).(1-v)^2 \f$
  
 Discretized as (u 0-form, v 1-form, A vertex-edge bdry, B edge-face bdy)
 
@@ -107,8 +107,6 @@ Discretized as (u 0-form, v 1-form, A vertex-edge bdry, B edge-face bdy)
 \code
 ./at-u2-v0 -i ../Images/cerclesTriangle64b02.pgm -o AT -a 0.05 -e 1 --lambda-1 0.1 --lambda-2 0.00001
 \endcode
-
-@section at_Doc AT
 
 
 <center>
