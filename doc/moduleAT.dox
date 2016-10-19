@@ -50,9 +50,40 @@ narrowed to the crisp 1-dimensional set of discontinuites as
 
 @section AT2 Discretization of AT with discrete calculus
 
-Discrete calculus in a nutshell
+@subsection AT2_1 Discrete Calculus
 
-@subsection AT2_1 Formulations AT01 and AT20
+The idea is to decompose the image domain \f$ \Omega \f$ into a cell
+complex \a K. Here, the faces of \a K are simply the pixels of the image,
+the edges of \a K are the sides shared by two pixels, while the
+vertices of \a K are the vertices shared by four pixels. For
+technical reasons, the dual complex \a K' of \a K is also needed and
+is defined in the usual way: a vertex of \a K is thus associated
+one-to-one to a face of \a K', etc. A discrete \f$ k \f$-form is a map
+that associates a scalar to a \f$ k \f$-dimensional cell.
+If the number of \f$ k \f$-dimensional cells of \a K is denoted by
+\f$ n_k \f$, then a discrete \f$ k \f$-form is simply represented by a
+column vector of size \f$ n_k \times 1 \f$.
+
+We denote by \f$ \mathbf{d_k} \f$ and \f$ \bar{\mathbf{d_k}} \f$ the
+standard discrete exterior primal and dual derivative operators. The
+derivative operator \f$ \mathbf{d_0} \f$ is the oriented vertex-edge
+incidence matrix of \a K. Similarly, the primal derivative
+\f$ \mathbf{d_1} \f$ is the oriented edge-face incidence matrix of \a K.
+
+Discrete Hodge star operators \f$ \mathbf{\star} \f$ send \f$ k \f$-forms
+of the primal complex \a K onto \f$ (n-k) \f$-forms of the dual complex
+\a K'.
+
+We define \f$ \mathbf{M} \f$ the matrix which transforms a 0-form into a
+1-form by averaging the values on the two edge extremities, i.e.
+\f$ \mathbf{M} = \frac{1}{2} |\mathbf{d_0}| \f$. Moreover, we use the
+edge laplacian defined in [5] by
+\f$ \bar{\mathbf{\star}} \bar{\mathbf{d_0}} \mathbf{\star} \mathbf{d_1}
++ \mathbf{d_0} \bar{\mathbf{\star}} \bar{\mathbf{d_1}} \mathbf{\star} \f$.
+
+
+
+@subsection AT2_2 Formulations AT01 and AT20
 
 We first set \f$ u \f$ and \f$ g \f$ to live on the faces and \f$ v \f$
 to live on the vertices and edges. Pixels are faces, so functions
@@ -94,7 +125,7 @@ is a dual 1-form in between \f$ u \f$. It follows:
 \f]
 
 
-@subsection AT2_2 Solutions to AT01 and AT20
+@subsection AT2_3 Solutions to AT01 and AT20
 
 Functionals AT20 and AT01 are both sums of quadratic terms, independently,
 but not simultaneously, convex in \f$ u \f$ and \f$ v \f$. They must have
@@ -338,5 +369,7 @@ calculus and application to image restoration and inpainting."
 discontinuity problems in the vectorial case." Mathematical Models
 and Methods in Applied Sciences 11.04 (2001): 663-684.
 
+[5] Leo J. Grady and Jonathan Polimeni. Discrete calculus: Applied analysis on graphs
+for computational science . Springer, 2010.
 
 */
