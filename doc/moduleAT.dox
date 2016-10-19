@@ -124,6 +124,8 @@ is a dual 1-form in between \f$ u \f$. It follows:
     + \frac{\lambda}{4\varepsilon} \langle 1 - v , 1 - v \rangle_1.
 \f]
 
+For more details about discrete formulations and numerical
+optimizationf of AT, we refer the reader to [2] and [3].
 
 @subsection AT2_3 Solutions to AT01 and AT20
 
@@ -315,6 +317,37 @@ below on image "barbara" with noise approximately 10%.
 
 
 
+@subsection AT3_4 Influence of parameter lambda
+
+<center>
+<table>
+<tr>
+  <td> @image html images/triple-spirale-b02.png </td>
+  <td> @image html images/Triangle_0_1.png </td>
+  <td> @image html images/Triangle_0_01.png </td>
+  <td> @image html images/Triangle_0_0048.png </td>
+  <td> @image html images/Triangle_0_0011.png </td>
+</tr>
+<tr align=center>
+  <td> Input image \a g </td>
+  <td> \f$ \lambda = 0.1 \f$ </td>
+  <td> \f$ \lambda = 0.01 \f$ </td>
+  <td> \f$ \lambda = 0.0048 \f$ </td>
+  <td> \f$ \lambda = 0.0011 \f$ </td>
+</tr>
+<tr>
+  <td>Command lines are:</td>
+  <td align=center colspan="4">
+  \code ./imageProcessing/at-u0-v1 -i ../imageProcessing/Images/triple-spirale-b02.pgm -o tb2 -a 0.162 --lambda 0.1 --epsilon-1 1.0 --epsilon-2 0.25\endcode
+  \code ./imageProcessing/at-u0-v1 -i ../imageProcessing/Images/triple-spirale-b02.pgm -o tb2 -a 0.162 --lambda 0.01 --epsilon-1 1.0 --epsilon-2 0.25\endcode
+  \code ./imageProcessing/at-u0-v1 -i ../imageProcessing/Images/triple-spirale-b02.pgm -o tb2 -a 0.162 --lambda 0.0048 --epsilon-1 1.0 --epsilon-2 0.25\endcode
+  \code ./imageProcessing/at-u0-v1 -i ../imageProcessing/Images/triple-spirale-b02.pgm -o tb2 -a 0.162 --lambda 0.0011 --epsilon-1 1.0 --epsilon-2 0.25\endcode
+  </td>
+</tr>
+</table>
+</center>
+
+
 @section AT4 Use of AT models for inpainting
 
 The AT20 model is much superior to the AT01 model for inpainting since
@@ -344,6 +377,13 @@ triple points in the L2-metric sense.
   <td> Inpainted \a u with AT01 </td>
   <td> Inpainted \a u with AT20 </td>
 </tr>
+<tr>
+  <td>Command lines are:</td>
+  <td align=center colspan="2">
+  \code ./imageProcessing/at-u0-v1 -i ../imageProcessing/Images/quadruple-color.ppm -o q2 -m ../imageProcessing/Images/ -a 0.162 --lambda 0.1 --epsilon-1 1.0 --epsilon-2 0.25\endcode
+  \code ./imageProcessing/at-u0-v1 -i ../imageProcessing/Images/quadruple-45-color.ppm -o tb2 -a 0.162 --lambda 0.01 --epsilon-1 1.0 --epsilon-2 0.25\endcode
+  </td>
+</tr>
 </table>
 </center>
 
@@ -363,7 +403,7 @@ In Proceedings of the IAPR International Conference on Pattern Recognition
 
 [3] Marion Foare, Jacques-Olivier Lachaud, and Hugues Talbot. "Numerical
 implementation of the Ambrosio-Tortorelli functional using discrete
-calculus and application to image restoration and inpainting."
+calculus and application to image restoration and inpainting." ????
 
 [4] Matteo Focardi. "On the variational approximation of free-
 discontinuity problems in the vectorial case." Mathematical Models
