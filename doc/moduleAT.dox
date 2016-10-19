@@ -380,8 +380,11 @@ triple points in the L2-metric sense.
 <tr>
   <td>Command lines are:</td>
   <td align=center colspan="2">
-  \code ./imageProcessing/at-u0-v1 -i ../imageProcessing/Images/quadruple-color.ppm -o q2 -m ../imageProcessing/Images/ -a 0.162 --lambda 0.1 --epsilon-1 1.0 --epsilon-2 0.25\endcode
-  \code ./imageProcessing/at-u0-v1 -i ../imageProcessing/Images/quadruple-45-color.ppm -o tb2 -a 0.162 --lambda 0.01 --epsilon-1 1.0 --epsilon-2 0.25\endcode
+  \code ./imageProcessing/at-u0-v1 -i ../imageProcessing/Images/quadruple-color.ppm -o q -m ../imageProcessing/Images/mask-big-disc.pgm -a 1.0 --lambda 0.01 --epsilon-1 4.0 --epsilon-2 0.25\endcode
+  \code ./imageProcessing/at-u0-v1 -i ../imageProcessing/Images/quadruple-45-color.ppm -o q -m ../imageProcessing/Images/mask-disc.pgm -a 1.0 --lambda 0.025 --epsilon-1 4.0 --epsilon-2 0.25\endcode
+
+  \code ./imageProcessing/at-u2-v0 -i ../imageProcessing/Images/quadruple-color.ppm -o q -m ../imageProcessing/Images/mask-big-disc.pgm -a 1.0 --lambda 0.01 --epsilon-1 4.0 --epsilon-2 0.25\endcode
+  \code ./imageProcessing/at-u2-v0 -i ../imageProcessing/Images/quadruple-45-color.ppm -o q -m ../imageProcessing/Images/mask-disc.pgm -a 1.0 --lambda 0.025 --epsilon-1 4.0 --epsilon-2 0.25\endcode
   </td>
 </tr>
 </table>
