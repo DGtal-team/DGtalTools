@@ -51,21 +51,66 @@
 /**
 @page DocATu2v0 imageProcessing/at-u2-v0 
 
-@brief Computes a piecewise smooth approximation of an image, by optimizing the Ambrosio-Tortorelli functional (with u a 2-form and v a 0-form).
+@brief Computes a piecewise smooth approximation of a grey-level or color image, by optimizing the Ambrosio-Tortorelli functional (with u a 2-form and v a 0-form).
 
 @writers Marion Foare, Jacques-Olivier Lachaud
 
 @b Usage: at-u2-v0 -i [input.pgm]
 
+(for grey-level image restoration)
+
 @b Usage: at-u2-v0 -i [input.ppm]
 
-Computes the Ambrosio-Tortorelli reconstruction/segmentation of an input image, either grey-level (.pgm) or color image (.ppm).
+(for color image restoration)
 
-\f$ AT_e = \int a.(u-g)^2 + v^2 | \nabla u|^2 + le.| \nabla v|^2 + (l/4e).(1-v)^2 \f$
- 
-Discretized as (u 0-form, v 1-form, A vertex-edge bdry, B edge-face bdy)
+The Ambrosio-Tortorelli functional is a classical relaxation of the
+Mumford-Shah functional.
 
-\f$ E(u,v) = a(u-g)^t (u-g) +  u^t A^t diag(v)^2 A^t u + l e v^t (A A^t + B^t B) v + l/(4e) (1-v)^t (1-v) \f$
+Given an input grayscale image, defined in an open bounded domain
+\f$ \Omega \f$, we represent its gray levels by a function \f$ g
+\in L^{\infty}(\Omega) \f$. In the Ambrosio-Tortorelli functional [1],
+one wants to find a function \f$ u \in SBV(\Omega) \f$ which is a
+smooth approximation of the input image \f$ g \f$.
+The Ambrosio-Tortorelli functional [1] is defined by
+\f[
+  \displaystyle
+  AT_{\varepsilon}(u,v)	= \int_\Omega \alpha |u-g|^2 + v^2 |\nabla u|^2
+  + \lambda \varepsilon |\nabla v|^2 + \frac{\lambda}{4 \varepsilon} |1-v|^2 dx,
+\f]
+for functions \f$ u,v \in W^{1,2}(\Omega)\f$ with \f$ 0 \leq v \leq 1 \f$.
+
+
+In AT functional, function \f$ v \f$ is a smooth approximation
+of the set of discontinuities, and takes value close to 0 in this set,
+while being close to 1 outside discontinuities. A remarkable property
+of this functional is that it \f$ \Gamma \f$-converges to (a
+relaxation of) MS functional as \f$ \varepsilon \f$ tends to 0 (see [1]).
+The intuition is that a large \f$ \varepsilon \f$ induces a solution
+with a fuzzy set of discontinuities, which is then progressively
+narrowed to the crisp 1-dimensional set of discontinuites as
+\f$ \varepsilon \f$ goes to 0.
+
+We discretize AT with discrete calculus and we set \f$ u \f$ and \f$ g
+\f$ to live on the faces and \f$ v \f$ to live on the vertices and
+edges. Pixels are faces, so functions \f$ u \f$ and \f$ g \f$ are
+2-forms since they represent the gray levels of each pixel. On the
+contrary, we set \f$ v \f$ in-between cells of non null measure, so in
+this case on vertices as a 0-form, and on edges by averaging with \f$
+\mathbf{M} \f$. We call this formulation AT20. The DEC reformulation
+is straightforward, except for the second term, where we use matrix
+\f$ \mathbf{M} \f$ to transport the 0-form \f$ v \f$ onto edges :
+
+\f[
+  \displaystyle
+  AT20(u,v) = \Sigma_{i=1}^n
+      \alpha \langle u_i - g_i , u_i - g_i \rangle_2
+    + \langle \mathbf{M} v , \bar{\mathbf{\star}} \bar{\mathbf{d_0}}
+      \mathbf{\star} u_i \rangle_1 ^2 \\
+    + \lambda \varepsilon \langle \mathbf{d_0} v , \mathbf{d_0} v \rangle_1
+    + \frac{\lambda}{4\varepsilon} \langle 1 - v , 1 - v \rangle_0.
+\f]
+
+For more details, see \ref moduleAT
 
 \b Allowed \b options \b are:
 
@@ -76,10 +121,8 @@ Discretized as (u 0-form, v 1-form, A vertex-edge bdry, B edge-face bdy)
   -o [ --output ] arg (=AT)             the output image basename.
   -l [ --lambda ] arg                   the parameter lambda.
   -1 [ --lambda-1 ] arg (=0.3125)       the initial parameter lambda (l1).
-  -2 [ --lambda-2 ] arg (=0.00050000000000000001)
-                                        the final parameter lambda (l2).
-  -q [ --lambda-ratio ] arg (=1.4142135623730951)
-                                        the division ratio for lambda from l1 
+  -2 [ --lambda-2 ] arg (=0.0005)       the final parameter lambda (l2).
+  -q [ --lambda-ratio ] arg (=1.414213) the division ratio for lambda from l1 
                                         to l2.
   -a [ --alpha ] arg (=1)               the parameter alpha.
   -e [ --epsilon ] arg                  the initial and final parameter epsilon
@@ -100,84 +143,36 @@ Discretized as (u 0-form, v 1-form, A vertex-edge bdry, B edge-face bdy)
                                         silent, etc).
 \endcode
 
-@image html resATu0v1-cb2-a1_00000-l1_0000000-u.png "AT alpha=1 lambda=1 on carre noise=0.2"
+@b example:
 
 @b example:
 
 \code
-./at-u2-v0 -i ../Images/cerclesTriangle64b02.pgm -o AT -a 0.05 -e 1 --lambda-1 0.1 --lambda-2 0.00001
+./imageProcessing/at-u2-v0 -i ../imageProcessing/Images/degrade-b04.pgm --image-snr ../imageProcessing/Images/degrade.pgm -a 0.05 --epsilon-1 4 --epsilon-2 0.25 -l 0.0075 -p 2 -c 0xff0000 -o degrade
 \endcode
-
 
 <center>
 <table>
 <tr>
-<td colspan=5>
-epsilon scale space
-</td>
+<td> Input image \a g </td>
+<td> Reconstructed image \a u </td>
+<td> Perfect image </td>
 </tr>
 <tr>
-  <td> <img height=100px src="resATu0v1-cb2-e2_0-a0_10000-l0_0062092-u0-v1.png"/> </td>
-  <td> <img height=100px src="resATu0v1-cb2-e1_0-a0_10000-l0_0062092-u0-v1.png"/> </td>
-  <td> <img height=100px src="resATu0v1-cb2-e0_5-a0_10000-l0_0062092-u0-v1.png"/> </td>
-  <td> <img height=100px src="resATu0v1-cb2-e0_25-a0_10000-l0_0062092-u0-v1.png"/> </td>
+<td>@image html degrade-b04.png "Input image (noise = 0.4)"</td>
+<td>@image html degrade-a0.05000-l0.0075000-u2.png "AT20 alpha=0.05 lambda=0.0075 "</td>
+<td>@image html degrade.png "Perfect image"</td>
 </tr>
 <tr>
-      <td align = center rowspan="4"> ./build/at-u2-v0 -i Images/carre2Degradesb02.pgm -o cb2 -a 0.1 --lambda 0.006 --epsilon-1 2.0 --epsilon-2 2.0</td>
-</tr>
-<tr>
-      <td align = center rowspan="4"> ./build/at-u2-v0 -i Images/carre2Degradesb02.pgm -o cb2 -a 0.1 --lambda 0.006 --epsilon-1 2.0 --epsilon-2 1.0</td>
-</tr>
-<tr>
-      <td align = center rowspan="4"> ./build/at-u2-v0 -i Images/carre2Degradesb02.pgm -o cb2 -a 0.1 --lambda 0.006 --epsilon-1 2.0 --epsilon-2 0.5</td>
-</tr>
-<tr>
-      <td align = center rowspan="4"> ./build/at-u2-v0 -i Images/carre2Degradesb02.pgm -o cb2 -a 0.1 --lambda 0.006 --epsilon-1 2.0 --epsilon-2 0.25</td>
-</tr>
-<tr>
-<td colspan=5>
-alpha scale space
-</td>
-</tr>
-<tr>
-    <td> <img height=200px src="resATu0v1-cb2-a1_00000-l1_0000000-u.png"/> </td>
-    <td> <img height=200px src="resATu0v1-cb2-a0_50000-l1_0000000-u.png"/> </td>
-    <td> <img height=200px src="resATu0v1-cb2-a0_10000-l1_0000000-u.png"/> </td>
-    <td> <img height=200px src="resATu0v1-cb2-a0_05000-l1_0000000-u.png"/> </td>
-    <td> <img height=200px src="resATu0v1-cb2-a0_01000-l1_0000000-u.png"/> </td>
-</tr>
-<tr>
-        <td align = center rowspan="5"> ./build/at-u2-v0 -i Images/carre2Degradesb02.pgm -o cb2 -a 1.0 --lambda 1.0 --epsilon-1 2.0 --epsilon-2 0.25</td>
-</tr>
-<tr>
-        <td align = center rowspan="5"> ./build/at-u2-v0 -i Images/carre2Degradesb02.pgm -o cb2 -a 0.5 --lambda 1.0 --epsilon-1 2.0 --epsilon-2 0.25</td>
-</tr>
-<tr>
-        <td align = center rowspan="5"> ./build/at-u2-v0 -i Images/carre2Degradesb02.pgm -o cb2 -a 0.1 --lambda 1.0 --epsilon-1 2.0 --epsilon-2 0.25</td>
-</tr>
-<tr>
-        <td align = center rowspan="5"> ./build/at-u2-v0 -i Images/carre2Degradesb02.pgm -o cb2 -a 0.05 --lambda 1.0 --epsilon-1 2.0 --epsilon-2 0.25</td>
-</tr>
-<tr>
-        <td align = center rowspan="5"> ./build/at-u2-v0 -i Images/carre2Degradesb02.pgm -o cb2 -a 0.01 --lambda 1.0 --epsilon-1 2.0 --epsilon-2 0.25</td>
-</tr>
-<tr>
-<td colspan=5>
-lambda scale space (lena)
-</td>
-</tr>
-<tr>
-<td> <img height=200px src="resATu0v1-lena-370-b02-a0_48000-l0_2000000-u0-v1.png"/> </td>
-<td> <img height=200px src="resATu0v1-lena-370-b02-a0_48000-l0_1000000-u0-v1.png"/> </td>
-<td> <img height=200px src="resATu0v1-lena-370-b02-a0_48000-l0_0500000-u0-v1.png"/> </td>
-<td> <img height=200px src="resATu0v1-lena-370-b02-a0_48000-l0_0250000-u0-v1.png"/> </td>
-<td> <img height=200px src="resATu0v1-lena-370-b02-a0_48000-l0_0125000-u0-v1.png"/> </td>
-</tr>
-<tr>
-        <td align = center rowspan="5"> ./build/at-u2-v0 -i Images/lena-370-b02.ppm -o lena -a 0.48 --lambda-1 0.15 --lambda-2 0.0125 -- lambda-ratio 2.0 --epsilon-1 2.0 --epsilon-2 0.25</td>
+<td> SNR of \a g = 21.9183 </td>
+<td> SNR of \a u = 34.3655 </td>
+<td> Perfect image </td>
 </tr>
 </table>
 </center>
+
+@note Other restoration examples, parameter analysis, and image
+inpainting examples may be found in \ref moduleAT.
 
 */
 

@@ -120,10 +120,8 @@ For more details, see \ref moduleAT
   -o [ --output ] arg (=AT)             the output image basename.
   -l [ --lambda ] arg                   the parameter lambda.
   -1 [ --lambda-1 ] arg (=0.3125)       the initial parameter lambda (l1).
-  -2 [ --lambda-2 ] arg (=0.00050000000000000001)
-                                        the final parameter lambda (l2).
-  -q [ --lambda-ratio ] arg (=1.4142135623730951)
-                                        the division ratio for lambda from l1 
+  -2 [ --lambda-2 ] arg (=0.0005)       the final parameter lambda (l2).
+  -q [ --lambda-ratio ] arg (=1.414213) the division ratio for lambda from l1 
                                         to l2.
   -a [ --alpha ] arg (=1)               the parameter alpha.
   -e [ --epsilon ] arg                  the initial and final parameter epsilon
@@ -169,6 +167,9 @@ For more details, see \ref moduleAT
 </tr>
 </table>
 </center>
+
+@note Other restoration examples, parameter analysis, and image
+inpainting examples may be found in \ref moduleAT.
 
 */
 
