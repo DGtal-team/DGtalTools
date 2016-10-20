@@ -73,10 +73,11 @@ init( Clone<KSpace> aKSpace )
 
 //-----------------------------------------------------------------------------
 template <typename TKSpace, typename TLinearAlgebra>
-template <typename Image>
+template <typename Image, typename Function>
 void 
 DGtal::ATu2v0<TKSpace, TLinearAlgebra>::
-addInput( const Image& image, std::function< Scalar( typename Image::Value ) > f,
+addInput( const Image& image, 
+          const Function& f,
           bool perfect_data )
 {
   if ( perfect_data ) i2.push_back( PrimalForm2( calculus ) );

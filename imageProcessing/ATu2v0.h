@@ -191,10 +191,13 @@ namespace DGtal
     * AT.addInput( image, [] ( Color c ) { return (double) c.green() / 255.0; } );
     * AT.addInput( image, [] ( Color c ) { return (double) c.blue()  / 255.0; } );
     * @endcode
+    *
+    * @tparam Image any Image type.
+    * @tparam Function any function type ( typename Image::Value ) -> Scalar.
     */
-    template <typename Image>
+    template <typename Image, typename Function>
     void addInput( const Image& image,
-                   std::function< Scalar( typename Image::Value ) > f,
+                   const Function& f,
                    bool perfect_data = false );
 
     /// Use metric average to smooth L1-metric effects.

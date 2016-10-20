@@ -18,6 +18,11 @@
   Part of tool \ref imageProcessing.
   [TOC]
 
+- related tools: \ref DocATu2v0, \ref DocATu0v1
+- related classes: \ref DGtal::ATu0v1, \ref DGtal::ATu2v0, \ref DGtal::DECImage2D
+- related namespace: \ref DGtal::functions::dec
+- related functions: \ref DGtal::functions::dec::diagonal, \ref DGtal::functions::dec::squares, \ref DGtal::functions::dec::squaredDiagonal, \ref DGtal::functions::dec::writePixel, \ref DGtal::functions::dec::writePrimalLinel, \ref DGtal::functions::dec::writeDualLinel, \ref DGtal::functions::dec::form2ToImage, \ref DGtal::functions::dec::form1ToImage, \ref DGtal::functions::dec::dualForm1ToImage, \ref DGtal::functions::dec::primalForm1ToImage, \ref DGtal::functions::dec::threeForms2ToImage, \ref DGtal::functions::dec::form2ToGreyLevelImage, \ref DGtal::functions::dec::primalForm1ToGreyLevelImage, \ref DGtal::functions::dec::dualForm1ToGreyLevelImage, \ref DGtal::functions::dec::primalForm1ToRGBColorImage, \ref DGtal::functions::dec::dualForm1ToRGBColorImage, \ref DGtal::functions::dec::threeForms2ToRGBColorImage.
+
 @section AT1 The Ambrosio-Tortorelli functional  
 
 The Ambrosio-Tortorelli functional is a classical relaxation of the
@@ -406,7 +411,8 @@ In Proceedings of the IAPR International Conference on Pattern Recognition
 
 [3] Marion Foare, Jacques-Olivier Lachaud, and Hugues Talbot. "Numerical
 implementation of the Ambrosio-Tortorelli functional using discrete
-calculus and application to image restoration and inpainting." ????
+calculus and application to image restoration and inpainting." In Proc. Reproducible Research in Pattern Recognition (RRPR 2016), satellite Workshop of  International Conference on Pattern Recognition
+(ICPR2016), Cancun, Mexico. 2016. \a Submitted.
 
 [4] Matteo Focardi. "On the variational approximation of free-
 discontinuity problems in the vectorial case." Mathematical Models
@@ -416,3 +422,4 @@ and Methods in Applied Sciences 11.04 (2001): 663-684.
 for computational science . Springer, 2010.
 
 */
+

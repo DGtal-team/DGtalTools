@@ -169,7 +169,7 @@ namespace DGtal
     * @param image any image such that the domain of this space is
     * included in the domain of the image.
     *
-    * @param f any functor associated a scalar to an image value.
+    * @param f any functor associating a scalar to an image value.
     *
     * @param perfect_data when 'false', this is normal input data,
     * otherwise this is perfect data only used for SNR computation.
@@ -187,10 +187,13 @@ namespace DGtal
     * AT.addInput( image, [] ( Color c ) { return (double) c.green() / 255.0; } );
     * AT.addInput( image, [] ( Color c ) { return (double) c.blue()  / 255.0; } );
     * @endcode
+    *
+    * @tparam Image any Image type.
+    * @tparam Function any function type ( typename Image::Value ) -> Scalar.
     */
-    template <typename Image>
+    template <typename Image, typename Function >
     void addInput( const Image& image,
-                   std::function< Scalar( typename Image::Value ) > f,
+                   const Function& f,
                    bool perfect_data = false );
 
     /// Sets approximation \a u to be equal to the input. Used for

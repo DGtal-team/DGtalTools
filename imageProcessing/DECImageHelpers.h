@@ -44,6 +44,9 @@
 // Inclusions
 #include <iostream>
 #include "DGtal/base/Common.h"
+#include "DGtal/images/CImage.h"
+#include "DGtal/topology/CCellularGridSpaceND.h"
+#include "DGtal/math/linalg/CLinearAlgebra.h"
 #include "DGtal/dec/DiscreteExteriorCalculus.h"
 
 //////////////////////////////////////////////////////////////////////////////
@@ -59,6 +62,10 @@ namespace DGtal {
       *
       * @param[in] kform any kform w.
       * @return the corresponding linear operator diag(w)
+      *
+      * @tparam Calculus any discrete exterior calculus.
+      * @tparam dim the dimension of the form.
+      * @tparam duality either PRIMAL for a primal form or DUAL for a dual form.
       */
       template <typename Calculus, DGtal::Dimension dim, DGtal::Duality duality> 
       DGtal::LinearOperator<Calculus, dim, duality, dim, duality> 
@@ -82,6 +89,10 @@ namespace DGtal {
       * Squares the given k-form.
       *
       * @param[in,out] kform any kform.
+      *
+      * @tparam Calculus any discrete exterior calculus.
+      * @tparam dim the dimension of the form.
+      * @tparam duality either PRIMAL for a primal form or DUAL for a dual form.
       */
       template <typename Calculus, DGtal::Dimension dim, DGtal::Duality duality> 
       void
@@ -97,6 +108,10 @@ namespace DGtal {
       *
       * @param[in] kform any kform v
       * @return the corresponding linear operator diag(v^2)
+      *
+      * @tparam Calculus any discrete exterior calculus.
+      * @tparam dim the dimension of the form.
+      * @tparam duality either PRIMAL for a primal form or DUAL for a dual form.
       */
       template <typename Calculus, DGtal::Dimension dim, DGtal::Duality duality> 
       DGtal::LinearOperator<Calculus, dim, duality, dim, duality> 
@@ -112,15 +127,18 @@ namespace DGtal {
       * pixel_size x \a pixel_size, and writes the value \a val at the
       * specified pixel position \a pt.
       *
-      * @param[in,out] any image of sufficient size.
+      * @param[in,out] image any image of sufficient size.
       * @param pt a pixel coordinate (which is multiplied by \a pixel_size within).
       * @param val the value to write in \a pixel_size x \a pixel_size pixels.
       * @param pixel_size the chosen pixel_size (when 1, this is the normal setValue of an image).
+      *
+      * @tparam Image any image type (see concepts::CImage).
       */
       template <typename Image>
       void writePixel( Image& image, typename Image::Point pt, typename Image::Value val,
                        int pixel_size = 1 )
       {
+        BOOST_CONCEPT_ASSERT(( concepts::CImage<Image> ));
         typedef typename Image::Point      Point;
         typedef typename Point::Coordinate Coordinate;
         pt *= pixel_size;
@@ -137,15 +155,18 @@ namespace DGtal {
       * pixel_size x \a pixel_size, and writes the value \a val at the
       * specified linel position \a pt.
       *
-      * @param[in,out] any image of sufficient size.
+      * @param[in,out] image any image of sufficient size.
       * @param pt a linel Khalimsky coordinates.
       * @param val the value to write in \a pixel_size x 1 pixels (if horizontal) or 1 x \a pixel_size pixels (if vertical).
       * @param pixel_size the chosen pixel_size (when 1, this is the normal setValue of an image).
+      *
+      * @tparam Image any image type (see concepts::CImage).
       */
       template <typename Image>
       void writePrimalLinel( Image& image, typename Image::Point pt, typename Image::Value val,
                        int pixel_size = 1 )
       {
+        BOOST_CONCEPT_ASSERT(( concepts::CImage<Image> ));
         typedef typename Image::Point      Point;
         typedef typename Point::Coordinate Coordinate;
         int pixel_size_x = NumberTraits<Coordinate>::even( pt[ 0 ] ) ? 1 : pixel_size;
@@ -165,15 +186,18 @@ namespace DGtal {
       * pixel_size x \a pixel_size, and writes the value \a val at the
       * specified linel position \a pt.
       *
-      * @param[in,out] any image of sufficient size.
+      * @param[in,out] image any image of sufficient size.
       * @param pt a linel Khalimsky coordinates.
       * @param val the value to write in \a pixel_size x 1 pixels (if horizontal) or 1 x \a pixel_size pixels (if vertical).
       * @param pixel_size the chosen pixel_size (when 1, this is the normal setValue of an image).
+      *
+      * @tparam Image any image type (see concepts::CImage).
       */
       template <typename Image>
       void writeDualLinel( Image& image, typename Image::Point pt, typename Image::Value val,
                            int pixel_size = 1 )
       {
+        BOOST_CONCEPT_ASSERT(( concepts::CImage<Image> ));
         typedef typename Image::Point      Point;
         typedef typename Point::Coordinate Coordinate;
         int pixel_size_x = NumberTraits<Coordinate>::even( pt[ 0 ] ) ? 0 : pixel_size-1;
@@ -188,14 +212,36 @@ namespace DGtal {
             }
       }
       
-      template <typename Calculus, typename AnyForm2, typename Image>
+      /**
+      * Displays the 2-form \a u in the given \a image. Scalar values
+      * of \a u are first cut up and low according to \a cut_low and
+      * \a cut_up, and then rescaled according to max and min
+      * value. Then these values are transformed to image values with
+      * the function \a functor. They are written in the image as
+      * "pixels" of size \a pixel_size x \a pixel_size.
+      *
+      * @param calculus the discrete exterior calculus containing the 2-form \a u.
+      * @param u any primal or dual 2-form defined in \a calculus.
+      * @param[in,out] image the image where \a u is written.
+      * @param functor the function transforming scalar values to image values.
+      * @param cut_low every value of \a u below is set to \a cut_low.
+      * @param cut_up  every value of \a u above is set to \a cut_up.
+      * @param pixel_size every value of a 2-form is mapped into \a image as \a pixel_size x \a pixel_size pixels.
+      *
+      * @tparam Calculus any discrete exterior calculus type.
+      * @tparam AnyForm2 either a primal 2-form type or a dual 2-form type of the given Calculus.
+      * @tparam Image any image type (see concepts::CImage).
+      * @tparam Function any function type (double) -> typename Image::Value to convert form value to Image value.
+      */
+      template <typename Calculus, typename AnyForm2, typename Image, typename Function>
       void form2ToImage
       ( const Calculus& calculus, 
         const AnyForm2& u, 
         Image& image,
-        std::function< typename Image::Value( double ) > functor,
+        const Function& functor,
         double cut_low = 0.0, double cut_up = 1.0, int pixel_size = 1 )
       {
+        BOOST_CONCEPT_ASSERT(( concepts::CImage<Image> ));
         typedef typename Calculus::Index  Index;
         typedef typename Calculus::SCell  SCell;
         typedef typename Calculus::Scalar Scalar;
@@ -222,49 +268,41 @@ namespace DGtal {
           }
       }
 
-      // template <typename Calculus, typename Image>
-      // void dualForm2ToImage
-      // ( const Calculus& calculus, 
-      //   const typename Calculus::DualForm2& u, 
-      //   Image& image,
-      //   std::function< typename Image::Value( double ) > functor,
-      //   double cut_low = 0.0, double cut_up = 1.0, int pixel_size = 1 )
-      // {
-      //   typedef typename Calculus::Index  Index;
-      //   typedef typename Calculus::SCell  SCell;
-      //   typedef typename Calculus::Scalar Scalar;
-      //   typedef typename Calculus::KSpace KSpace;
-      //   typedef typename KSpace::Point    Point;
-      //   typedef typename KSpace::Integer  Integer;
-      //   double min_u = NumberTraits<Scalar>::castToDouble( u.myContainer[ 0 ] );
-      //   double max_u = min_u;
-      //   for ( Index index = 0; index < u.myContainer.rows(); index++)
-      //     {
-      //       double v = NumberTraits<Scalar>::castToDouble( u.myContainer[ index ] );
-      //       min_u = std::min( min_u, v );
-      //       max_u = std::max( max_u, v );
-      //     }
-      //   if ( min_u < cut_low ) min_u = cut_low;
-      //   if ( max_u > cut_up  ) max_u = cut_up;
-      //   for ( Index index = 0; index < u.myContainer.rows(); index++)
-      //     {
-      //       SCell cell = u.getSCell( index );
-      //       double v = NumberTraits<Scalar>::castToDouble( u.myContainer[ index ] );
-      //       double w = std::min( cut_up, std::max( cut_low, v ) );
-      //       if ( min_u != max_u ) w = ( w - min_u ) / ( max_u - min_u );
-      //       writePixel( image, calculus.myKSpace.sCoords( cell ), functor( w ), pixel_size );
-      //     }
-      // }
-
-      template <typename Calculus, typename Form1, typename Image>
+      /**
+      * Displays the primal or dual 1-form \a v in the given \a
+      * image. Scalar values of \a v are first cut up and low
+      * according to \a cut_low and \a cut_up, and then rescaled
+      * according to max and min value. Then these values are
+      * transformed to image values with the function \a functor. They
+      * are written in the image as "lines" of size \a pixel_size x \a
+      * 1 or \a 1 x \a pixel_size, depending on position and duality.
+      *
+      * @param calculus the discrete exterior calculus containing the 1-form \a v.
+      * @param v any primal 1-form defined in \a calculus if \a primal is true, otherwise a dual 1-form.
+      * @param primal tells if \a v is a primal 1-form (true), or a dual 1-form (false).
+      * @param[in,out] image the image where \a v is written.
+      * @param functor the function transforming scalar values to image values.
+      * @param predicate the predicate telling for a value if it must be displayed (returns true in this case).
+      * @param cut_low every value of \a u below is set to \a cut_low.
+      * @param cut_up  every value of \a u above is set to \a cut_up.
+      * @param pixel_size every value of a 1-form is mapped into \a image as \a pixel_size x \a 1 pixels or \a 1 x \a pixel_size pixels.
+      *
+      * @tparam Calculus any discrete exterior calculus type.
+      * @tparam Form1 either a primal 1-form if primal is true, or dual 1-form is primal is false.
+      * @tparam Image any image type (see concepts::CImage).
+      * @tparam Function any function type (double) -> typename Image::Value to convert form value to Image value.
+      * @tparam Predicate any function type (double) -> bool to select 1-forms to display.
+      */
+      template <typename Calculus, typename Form1, typename Image, typename Function, typename Predicate>
       void form1ToImage
       ( const Calculus& calculus, 
         const Form1& v, bool primal,
         Image& image,
-        std::function< typename Image::Value( double ) > functor,
-        std::function< bool ( double ) > predicate,
+        const Function& functor,
+        const Predicate& predicate,
         double cut_low = 0.0, double cut_up = 1.0, int pixel_size = 1 )
       {
+        BOOST_CONCEPT_ASSERT(( concepts::CImage<Image> ));
         typedef typename Calculus::Index  Index;
         typedef typename Calculus::SCell  SCell;
         typedef typename Calculus::Scalar Scalar;
@@ -294,42 +332,114 @@ namespace DGtal {
           }
       }
       
-      template <typename Calculus, typename Image>
+      /**
+      * Displays the dual 1-form \a v in the given \a image. Scalar
+      * values of \a v are first cut up and low according to \a
+      * cut_low and \a cut_up, and then rescaled according to max and
+      * min value. Then these values are transformed to image values
+      * with the function \a functor. They are written in the image as
+      * "lines" of size \a pixel_size x \a 1 or \a 1 x \a pixel_size,
+      * depending on position and duality.
+      *
+      * @param calculus the discrete exterior calculus containing the 1-form \a v.
+      * @param v any dual 1-form defined in \a calculus.
+      * @param[in,out] image the image where \a v is written.
+      * @param functor the function transforming scalar values to image values.
+      * @param predicate the predicate telling for a value if it must be displayed (returns true in this case).
+      * @param cut_low every value of \a u below is set to \a cut_low.
+      * @param cut_up  every value of \a u above is set to \a cut_up.
+      * @param pixel_size every value of a 1-form is mapped into \a image as \a pixel_size x \a 1 pixels or \a 1 x \a pixel_size pixels.
+      *
+      * @tparam Calculus any discrete exterior calculus type.
+      * @tparam Image any image type (see concepts::CImage).
+      * @tparam Function any function type (double) -> typename Image::Value to convert form value to Image value.
+      * @tparam Predicate any function type (double) -> bool to select 1-forms to display.
+      */
+      template <typename Calculus, typename Image, typename Function, typename Predicate>
       void dualForm1ToImage
       ( const Calculus& calculus, 
         const typename Calculus::DualForm1& v, 
         Image& image,
-        std::function< typename Image::Value( double ) > functor,
-        std::function< bool ( double ) > predicate,
+        const Function& functor,
+        const Predicate& predicate,
         double cut_low = 0.0, double cut_up = 1.0, int pixel_size = 1 )
       {
+        BOOST_CONCEPT_ASSERT(( concepts::CImage<Image> ));
         form1ToImage( calculus, v, false, image, functor, predicate,
                       cut_low, cut_up, pixel_size );
       }
       
-      template <typename Calculus, typename Image>
+      /**
+      * Displays the primal 1-form \a v in the given \a image. Scalar
+      * values of \a v are first cut up and low according to \a
+      * cut_low and \a cut_up, and then rescaled according to max and
+      * min value. Then these values are transformed to image values
+      * with the function \a functor. They are written in the image as
+      * "lines" of size \a pixel_size x \a 1 or \a 1 x \a pixel_size,
+      * depending on position and duality.
+      *
+      * @param calculus the discrete exterior calculus containing the 1-form \a v.
+      * @param v any primal 1-form defined in \a calculus.
+      * @param[in,out] image the image where \a v is written.
+      * @param functor the function transforming scalar values to image values.
+      * @param predicate the predicate telling for a value if it must be displayed (returns true in this case).
+      * @param cut_low every value of \a u below is set to \a cut_low.
+      * @param cut_up  every value of \a u above is set to \a cut_up.
+      * @param pixel_size every value of a 1-form is mapped into \a image as \a pixel_size x \a 1 pixels or \a 1 x \a pixel_size pixels.
+      *
+      * @tparam Calculus any discrete exterior calculus type.
+      * @tparam Image any image type (see concepts::CImage).
+      * @tparam Function any function type (double) -> typename Image::Value to convert form value to Image value.
+      * @tparam Predicate any function type (double) -> bool to select 1-forms to display.
+      */
+      template <typename Calculus, typename Image, typename Function, typename Predicate>
       void primalForm1ToImage
       ( const Calculus& calculus, 
         const typename Calculus::PrimalForm1& v, 
         Image& image,
-        std::function< typename Image::Value( double ) > functor,
-        std::function< bool ( double ) > predicate,
+        const Function& functor,
+        const Predicate& predicate,
         double cut_low = 0.0, double cut_up = 1.0, int pixel_size = 1 )
       {
+        BOOST_CONCEPT_ASSERT(( concepts::CImage<Image> ));
         form1ToImage( calculus, v, true, image, functor, predicate,
                       cut_low, cut_up, pixel_size );
       }
 
-      template <typename Calculus, typename AnyForm2, typename Image>
+      /**
+      * Displays the three 2-forms \a u0, \a u1, \a u2 in the given \a image. Scalar values
+      * of \a u0, \a u1, \a u2 are first cut up and low according to \a cut_low and
+      * \a cut_up, and then rescaled according to max and min
+      * value. Then these values are transformed to image values with
+      * the function \a functor. They are written in the image as
+      * "pixels" of size \a pixel_size x \a pixel_size.
+      *
+      * @param calculus the discrete exterior calculus containing the 2-forms \a u0, \a u1, \a u2.
+      * @param u0 any primal or dual 2-form defined in \a calculus.
+      * @param u1 any primal or dual 2-form defined in \a calculus.
+      * @param u2 any primal or dual 2-form defined in \a calculus.
+      * @param[in,out] image the image where \a u is written.
+      * @param functor the function transforming three scalar values to image values.
+      * @param cut_low every value of \a u0, \a u1, \a u2 below is set to \a cut_low.
+      * @param cut_up  every value of \a u0, \a u1, \a u2 above is set to \a cut_up.
+      * @param pixel_size every value of 2-forms is mapped into \a image as \a pixel_size x \a pixel_size pixels.
+      *
+      * @tparam Calculus any discrete exterior calculus type.
+      * @tparam AnyForm2 either a primal 2-form type or a dual 2-form type of the given Calculus.
+      * @tparam Image any image type (see concepts::CImage).
+      * @tparam Function any function type (double,double,double) -> typename Image::Value to convert form value to Image value.
+      */
+      template <typename Calculus, typename AnyForm2, typename Image, typename Function>
       void threeForms2ToImage
       ( const Calculus& calculus, 
         const AnyForm2& u0, 
         const AnyForm2& u1, 
         const AnyForm2& u2, 
         Image& image,
-        std::function< typename Image::Value( double, double, double ) > functor,
+        const Function& functor,
         double cut_low = 0.0, double cut_up = 1.0, int pixel_size = 1 )
       {
+        BOOST_CONCEPT_ASSERT(( concepts::CImage<Image> ));
         typedef typename Calculus::Index  Index;
         typedef typename Calculus::SCell  SCell;
         typedef typename Calculus::Scalar Scalar;
@@ -373,6 +483,23 @@ namespace DGtal {
       
       /**
       * Standard method to output a 2-form into a grey-level image.
+      *
+      * Displays the 2-form \a u in the given \a image. Scalar values
+      * of \a u are first cut up and low according to \a cut_low and
+      * \a cut_up, and then rescaled according to max and min
+      * value. They are written in the image as
+      * grey-level "pixels" of size \a pixel_size x \a pixel_size.
+      *
+      * @param calculus the discrete exterior calculus containing the 2-form \a u.
+      * @param u any primal or dual 2-form defined in \a calculus.
+      * @param[in,out] image the image where \a u is written.
+      * @param cut_low every value of \a u below is set to \a cut_low.
+      * @param cut_up  every value of \a u above is set to \a cut_up.
+      * @param pixel_size every value of a 2-form is mapped into \a image as \a pixel_size x \a pixel_size pixels.
+      *
+      * @tparam Calculus any discrete exterior calculus type.
+      * @tparam AnyForm2 either a primal 2-form type or a dual 2-form type of the given Calculus.
+      * @tparam Image any image type (see concepts::CImage).
       */
       template <typename Calculus, typename AnyForm2, typename Image>
       void form2ToGreyLevelImage
@@ -382,6 +509,7 @@ namespace DGtal {
         double cut_low = 0.0, double cut_up = 1.0,
         int pixel_size = 1 )
       {
+        BOOST_CONCEPT_ASSERT(( concepts::CImage<Image> ));
         form2ToImage( calculus, u, image,
                       [] ( double x ) { return (unsigned char) ( round( x * 255.0 ) ); },
                       cut_low, cut_up, pixel_size );
@@ -389,6 +517,23 @@ namespace DGtal {
 
       /**
       * Standard method to output a primal 1-form into a grey-level image.
+      *
+      * Displays the primal 1-form \a v in the given \a image. Scalar
+      * values of \a v are first cut up and low according to \a
+      * cut_low and \a cut_up, and then rescaled according to max and
+      * min value. If this value is belows 0.25, it is written in the image as
+      * a "line" of size \a pixel_size x \a 1 or \a 1 x \a pixel_size,
+      * depending on position.
+      *
+      * @param calculus the discrete exterior calculus containing the 1-form \a v.
+      * @param v any primal 1-form defined in \a calculus.
+      * @param[in,out] image the image where \a v is written.
+      * @param cut_low every value of \a u below is set to \a cut_low.
+      * @param cut_up  every value of \a u above is set to \a cut_up.
+      * @param pixel_size every value of a 1-form is mapped into \a image as \a pixel_size x \a 1 pixels or \a 1 x \a pixel_size pixels.
+      *
+      * @tparam Calculus any discrete exterior calculus type.
+      * @tparam Image any image type (see concepts::CImage).
       */
       template <typename Calculus, typename Image>
       void primalForm1ToGreyLevelImage
@@ -398,6 +543,7 @@ namespace DGtal {
         double cut_low = 0.0, double cut_up = 1.0,
         int pixel_size = 1 )
       {
+        BOOST_CONCEPT_ASSERT(( concepts::CImage<Image> ));
         // Threshold is 0.25 instead of 0.5 because an edge connecting
         // two vertices with v=0 and v=1 should not belong to the
         // discontinuity set.
@@ -409,6 +555,23 @@ namespace DGtal {
       
       /**
       * Standard method to output a dual 1-form into a grey-level image.
+      *
+      * Displays the dual 1-form \a v in the given \a image. Scalar
+      * values of \a v are first cut up and low according to \a
+      * cut_low and \a cut_up, and then rescaled according to max and
+      * min value. If this value is belows 0.25, it is written in the
+      * image as a "line" of size \a pixel_size x \a 1 or \a 1 x \a
+      * pixel_size, depending on position.
+      *
+      * @param calculus the discrete exterior calculus containing the 1-form \a v.
+      * @param v any dual 1-form defined in \a calculus.
+      * @param[in,out] image the image where \a v is written.
+      * @param cut_low every value of \a u below is set to \a cut_low.
+      * @param cut_up  every value of \a u above is set to \a cut_up.
+      * @param pixel_size every value of a 1-form is mapped into \a image as \a pixel_size x \a 1 pixels or \a 1 x \a pixel_size pixels.
+      *
+      * @tparam Calculus any discrete exterior calculus type.
+      * @tparam Image any image type (see concepts::CImage).
       */
       template <typename Calculus, typename Image>
       void dualForm1ToGreyLevelImage
@@ -418,6 +581,7 @@ namespace DGtal {
         double cut_low = 0.0, double cut_up = 1.0,
         int pixel_size = 1 )
       {
+        BOOST_CONCEPT_ASSERT(( concepts::CImage<Image> ));
         // Threshold is 0.25 instead of 0.5 because an edge connecting
         // two vertices with v=0 and v=1 should not belong to the
         // discontinuity set.
@@ -429,6 +593,24 @@ namespace DGtal {
 
       /**
       * Standard method to output a primal 1-form into a color image.
+      *
+      * Displays the primal 1-form \a v in the given \a image. Scalar
+      * values of \a v are first cut up and low according to \a
+      * cut_low and \a cut_up, and then rescaled according to max and
+      * min value. If this value is belows 0.25, it is written in the image as
+      * a "line" of size \a pixel_size x \a 1 or \a 1 x \a pixel_size,
+      * depending on position, and of color \a color.
+      *
+      * @param calculus the discrete exterior calculus containing the 1-form \a v.
+      * @param v any primal 1-form defined in \a calculus.
+      * @param[in,out] image the image where \a v is written.
+      * @param color the color for displaying 1-forms below 0.25.
+      * @param cut_low every value of \a u below is set to \a cut_low.
+      * @param cut_up  every value of \a u above is set to \a cut_up.
+      * @param pixel_size every value of a 1-form is mapped into \a image as \a pixel_size x \a 1 pixels or \a 1 x \a pixel_size pixels.
+      *
+      * @tparam Calculus any discrete exterior calculus type.
+      * @tparam Image any image type (see concepts::CImage).
       */
       template <typename Calculus, typename Image>
       void primalForm1ToRGBColorImage
@@ -438,6 +620,7 @@ namespace DGtal {
         double cut_low = 0.0, double cut_up = 1.0,
         int pixel_size = 1 )
       {
+        BOOST_CONCEPT_ASSERT(( concepts::CImage<Image> ));
         // Threshold is 0.25 instead of 0.5 because an edge connecting
         // two vertices with v=0 and v=1 should not belong to the
         // discontinuity set.
@@ -449,6 +632,24 @@ namespace DGtal {
 
       /**
       * Standard method to output a dual 1-form into a color image.
+      *
+      * Displays the dual 1-form \a v in the given \a image. Scalar
+      * values of \a v are first cut up and low according to \a
+      * cut_low and \a cut_up, and then rescaled according to max and
+      * min value. If this value is belows 0.25, it is written in the image as
+      * a "line" of size \a pixel_size x \a 1 or \a 1 x \a pixel_size,
+      * depending on position, and of color \a color.
+      *
+      * @param calculus the discrete exterior calculus containing the 1-form \a v.
+      * @param v any dual 1-form defined in \a calculus.
+      * @param[in,out] image the image where \a v is written.
+      * @param color the color for displaying 1-forms below 0.25.
+      * @param cut_low every value of \a u below is set to \a cut_low.
+      * @param cut_up  every value of \a u above is set to \a cut_up.
+      * @param pixel_size every value of a 1-form is mapped into \a image as \a pixel_size x \a 1 pixels or \a 1 x \a pixel_size pixels.
+      *
+      * @tparam Calculus any discrete exterior calculus type.
+      * @tparam Image any image type (see concepts::CImage).
       */
       template <typename Calculus, typename Image>
       void dualForm1ToRGBColorImage
@@ -458,6 +659,7 @@ namespace DGtal {
         double cut_low = 0.0, double cut_up = 1.0,
         int pixel_size = 1 )
       {
+        BOOST_CONCEPT_ASSERT(( concepts::CImage<Image> ));
         // Threshold is 0.25 instead of 0.5 because an edge connecting
         // two vertices with v=0 and v=1 should not belong to the
         // discontinuity set.
@@ -469,6 +671,28 @@ namespace DGtal {
 
       /**
       * Standard method to output three 2-forms into a RGB Color image.
+      *
+      * Displays the three 2-forms \a u0, \a u1, \a u2 in the given \a
+      * image as RGB colors. Scalar values of \a u0, \a u1, \a u2 are first cut up
+      * and low according to \a cut_low and \a cut_up, and then
+      * rescaled according to max and min value. Then these values are
+      * transformed to RGB color image values (\a u0 defines the
+      * intensity of the red channel, \a u1 the green channel, \a u2,
+      * the blue channel). They are written in the image as "pixels"
+      * of size \a pixel_size x \a pixel_size.
+      *
+      * @param calculus the discrete exterior calculus containing the 2-forms \a u0, \a u1, \a u2.
+      * @param u0 any primal or dual 2-form defined in \a calculus.
+      * @param u1 any primal or dual 2-form defined in \a calculus.
+      * @param u2 any primal or dual 2-form defined in \a calculus.
+      * @param[in,out] image the image where \a u is written.
+      * @param cut_low every value of \a u0, \a u1, \a u2 below is set to \a cut_low.
+      * @param cut_up  every value of \a u0, \a u1, \a u2 above is set to \a cut_up.
+      * @param pixel_size every value of 2-forms is mapped into \a image as \a pixel_size x \a pixel_size pixels.
+      *
+      * @tparam Calculus any discrete exterior calculus type.
+      * @tparam AnyForm2 either a primal 2-form type or a dual 2-form type of the given Calculus.
+      * @tparam Image any image type (see concepts::CImage).
       */
       template <typename Calculus, typename AnyForm2, typename Image>
       void threeForms2ToRGBColorImage
@@ -480,6 +704,7 @@ namespace DGtal {
         double cut_low = 0.0, double cut_up = 1.0,
         int pixel_size = 1 )
       {
+        BOOST_CONCEPT_ASSERT(( concepts::CImage<Image> ));
         threeForms2ToImage
           ( calculus, u0, u1, u2, image,
             [] ( double r, double g, double b )
@@ -492,11 +717,23 @@ namespace DGtal {
     } // namespace dec
   } // namespace functions
 
+
   /////////////////////////////////////////////////////////////////////////////
   // template class DECImage2D
   /**
-  * Description of template class 'DECImage2D' <p> \brief Aim: This class
-  * simplifies the development of 2D image processing tools using discrete exterior calculus.
+  * Description of template class 'DECImage2D' <p> \brief Aim: This
+  * class simplifies the development of 2D image processing tools
+  * using discrete exterior calculus. Most notably it take care of
+  * initializing correctly a discrete exterior calculus in some 2D
+  * domain, and precomputes derivative and Hodge star operators.  You
+  * may have a look at module \ref moduleAT for such image processing
+  * tools and more explanation on discrete calculus.
+  *
+  * @tparam TKSpace any model of CCellularGridSpaceND, e.g KhalimskySpaceND
+  * @tparam TLinearAlgebra any back-end for performing linear algebra, default is EigenLinearAlgebraBackend.
+  *
+  * @see ATu0v1
+  * @see ATu2v0
   *
   */
   template < typename TKSpace,
@@ -504,6 +741,7 @@ namespace DGtal {
   struct DECImage2D {
     typedef TKSpace                                        KSpace;
     typedef TLinearAlgebra                                 LinearAlgebra;
+    BOOST_CONCEPT_ASSERT(( concepts::CCellularGridSpaceND< KSpace > )); 
     typedef typename KSpace::Space                         Space;
     typedef typename Space::Point                          Point;
     typedef typename Space::RealVector                     RealVector;
@@ -565,7 +803,11 @@ namespace DGtal {
     {}
     
     /**
-    * Constructor from Khalimsky space, which specifies the domain of calculus.
+    * Constructor from cellular grid space, which specifies the domain of calculus.
+    *
+    * @param aKSpace the cellular grid space specifies the domain of
+    * calculus (i.e. all the cells and incidence), which is cloned
+    * inside the class.
     */
     void init( Clone<KSpace> aKSpace )
     {
