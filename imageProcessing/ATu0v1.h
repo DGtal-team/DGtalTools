@@ -65,6 +65,9 @@ namespace DGtal
   * approximation of an input data \a g, while \a v represents the
   * set of discontinuities of \a u.
   *
+  * @tparam TKSpace any model of CCellularGridSpaceND, e.g KhalimskySpaceND
+  * @tparam TLinearAlgebra any back-end for performing linear algebra, default is EigenLinearAlgebraBackend.
+  *
   */
   template < typename TKSpace,
              typename TLinearAlgebra = EigenLinearAlgebraBackend >
