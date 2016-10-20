@@ -205,6 +205,13 @@ namespace DGtal
     /// have been called.
     void setUFromInput();
 
+    /// Sets approximation \a u to be equal to the input. Used for
+    /// initializating \a u. Should be called once all \ref addInput
+    /// have been called. Note that it initializes \a u with random
+    /// values wherever an inpainting mask was applied.
+    /// @see setAlpha( Scalar _alpha, const PrimalForm2& m )
+    void setUFromInputAndMask();
+
     /** 
     * Sets the parameter \f$ alpha \f$ as global to the image. Should be
     * set \b before \ref setLambda and \ref setEpsilon.

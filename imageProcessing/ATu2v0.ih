@@ -197,6 +197,24 @@ setUFromInput()
 
 //-----------------------------------------------------------------------------
 template <typename TKSpace, typename TLinearAlgebra>
+void 
+DGtal::ATu2v0<TKSpace, TLinearAlgebra>::
+setUFromInputAndMask()
+{
+  setUFromInput();
+  for ( int i = 0; i < u2.size(); ++i )
+    {
+      const Index nb = u2[ i ].length();
+      for ( Index index = 0; index < nb; index++)
+        {
+          if ( alpha_g2[ i ].myContainer( index ) == 0.0 )
+            u2[ i ].myContainer( index ) = ((double) rand()) / (double) RAND_MAX;
+        }      
+    }
+}
+
+//-----------------------------------------------------------------------------
+template <typename TKSpace, typename TLinearAlgebra>
 bool
 DGtal::ATu2v0<TKSpace, TLinearAlgebra>::
 solveU()

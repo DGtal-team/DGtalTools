@@ -352,6 +352,7 @@ int main( int argc, char* argv[] )
           m.myContainer( index ) = col > 0.0 ? 1.0 : 0.0;
         }
       AT.setAlpha( a, m );
+      AT.setUFromInputAndMask();
       if ( grey_image )
         {
           ostringstream ossGM;
