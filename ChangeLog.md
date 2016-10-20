@@ -1,3 +1,10 @@
+# DGtalTools 0.9.3
+
+- *imageProcessing*:
+ - Creates imageProcessing directory. Add tools for doing image restoration and inpainting with Ambrosio-Tortorelli functional and discrete calculus. (Jacques-Olivier Lachaud, Marion Foare
+    [#280](https://github.com/DGtal-team/DGtalTools/pull/280))
+
+
 # DGtalTools 0.9.2
 
 - *global*:
