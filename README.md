@@ -58,6 +58,9 @@ Actually the DGTal project is organized as follows:
  - [Volumetric](http://dgtal.org/doc/tools/nightly/volumetric.html#volumetric_Doc): 
    tools to manipulate volumetric files (marching cube, sub sampling, thinning)
 
+ - [ImageProcessing](http://dgtal.org/doc/tools/nightly/imageProcessing.html): 
+   tools to process images (image restoration, image inpainting)
+
 
 How to build the tools
 ======================
