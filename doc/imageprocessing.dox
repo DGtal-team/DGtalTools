@@ -30,10 +30,15 @@
 <center>
 <table>
   <tr>
-        <td> <img height=200px src="res3dVolMarchingCubes2.png"> </td>
+        <td> 
+        <img height=200px src="lena-370-b02.png"> 
+        </td>
+        <td>
+        <img height=200px src="lena-370-b02-a0_48000-l0_0250000-u.png">
+        </td>
 </tr>
 <tr>
-        <td align = center>@ref Doc3dVolMarchingCubes </td>
+        <td colspan=2 align = center>@ref DocATu2v0, @ref DocATu0v1 </td>
 </tr>
 </table>
 </center>
