@@ -74,8 +74,8 @@ namespace po = boost::program_options;
 
 int main( int argc, char** argv )
 {
-  typedef ImageContainerBySTLVector < Z3i::Domain, unsigned char > Image3D;
-
+  typedef ImageContainerBySTLVector < Z3i::Domain, unsigned char > Image3DChar;
+  typedef ImageContainerBySTLVector < Z3i::Domain,  int > Image3D;
   
   // parse command line ----------------------------------------------
   po::options_description general_opt("Allowed options are ");
@@ -103,7 +103,7 @@ int main( int argc, char** argv )
 		<< "Converts itk file into a volumetric file (.vol, .pgm3d). "
 		<< general_opt << "\n";
       std::cout << "Example:\n"
-		<< "itk2vol -i image.mhd --dicomMin -500 --dicomMax -100 -o sample.vol \n";
+		<< "itk2vol -i image.mhd --inputMin -500 --inputMax -100 -o sample.vol \n";
       return 0;
     }
   
@@ -121,12 +121,14 @@ int main( int argc, char** argv )
   typedef DGtal::functors::Rescaling<int ,unsigned char > RescalFCT;
   
   trace.info() << "Reading input input file " << inputFilename ; 
-  Image3D inputImage = ITKReader< Image3D,  RescalFCT  >::importITK(inputFilename, 
-                                                                      RescalFCT(inputMin, 
-                                                                                inputMax, 0, 255) );
+  Image3D inputImage = ITKReader< Image3D  >::importITK(inputFilename);
   trace.info() << " [done] " << std::endl ; 
   trace.info() << " converting into vol file... " ; 
-  inputImage >> outputFilename; 
+  RescalFCT rescaleCustom(inputMin, inputMax, 0, 255);
+
+  DGtal::GenericWriter<Image3D, 3, unsigned char, RescalFCT>::exportFile(outputFilename, inputImage, "UInt8Array3D", rescaleCustom);
+  
+
   trace.info() << " [done] " << std::endl ;   
 
 
