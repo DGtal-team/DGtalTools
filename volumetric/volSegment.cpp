@@ -55,6 +55,58 @@ using namespace DGtal;
 namespace po = boost::program_options;
 
 
+/**
+ @page volSegment volSegment
+ 
+ @brief Segments volumetric file from a simple threshold which can be set automatically from the otsu estimation.
+
+
+ @b Usage: volSegment [input] [output]
+
+
+ @b Allowed @b options @b are : 
+ @code
+  -h [ --help ]                  display this message
+  -i [ --input ] arg             volumetric input file (.vol, .pgm, .pgm3d, 
+                                 .longvol) 
+  -o [ --output ] arg            volumetric output file (.vol, .pgm, .pgm3d, 
+                                 .longvol) 
+  --labelBackground              option to define a label to regions associated
+                                 to object background. 
+  -m [ --thresholdMin ] arg (=0) min threshold (if not given the max threshold 
+                                 is computed with Otsu algorithm).
+  -M [ --thresholdMax ] arg      max threshold (default 255)
+ @endcode
+
+ @b Example: 
+ 
+ You can test the segmentation in the lobster volume file:
+
+ @code
+ $ volSegment -i ${DGtal}/examples/samples/lobster.vol  -o segmentation.vol  -m 70 -M 255
+ @endcode
+
+You will obtain a volumetric file representing for each voxel a label associated to a connected component. You can display this segmentation results by extracting it in SDP format with the @ref vol2sdp tool (with option -e to export also the image labels): 
+@code
+ $ vol2sdp -i segmentation.vol -o segmentation.sdp  -e -m 1 -M 255
+@endcode
+
+and display them with @ref Doc3DSDPViewer :
+
+ @code
+ $ 3dSDPViewer -i segmentation.sdp  --importColorLabels
+ @endcode
+
+
+ You should obtain such a result:
+ @image html resVolSegment.png "Segmentation result displayed with colors representing the segmentation labels."
+ 
+  @see
+  @ref volSegment.cpp
+ */
+
+
+
 typedef ImageContainerBySTLVector < Z3i::Domain, unsigned char > Image3D;
 
 std::vector<unsigned int> getHistoFromImage(const Image3D &image){
@@ -115,14 +167,14 @@ int main( int argc, char** argv )
   typedef DigitalSurface< MySetOfSurfels > MyDigitalSurface;
   
   // parse command line ----------------------------------------------
-  po::options_description general_opt("Allowed options are: ");
+  po::options_description general_opt(" \n Allowed options are ");
   general_opt.add_options()
     ("help,h", "display this message")
     ("input,i", po::value<std::string>(), "volumetric input file (.vol, .pgm, .pgm3d, .longvol) " )
     ("output,o", po::value<std::string>(), "volumetric output file (.vol, .pgm, .pgm3d, .longvol) " )
     ("labelBackground", "option to define a label to regions associated to object background. ")
-    ("thresholdMin,m", po::value<int>()->default_value(0), "min threshold (default 0)." )
-    ("thresholdMax,M", po::value<int>(), "max threshold (if not given the max threshold is computed with Otsu algorithm)?" );
+    ("thresholdMin,m", po::value<int>()->default_value(0), "min threshold (if not given the max threshold is computed with Otsu algorithm)." )
+    ("thresholdMax,M", po::value<int>(), "max threshold (default 255)" );
   
   
   bool parseOK=true;
@@ -170,8 +222,7 @@ int main( int argc, char** argv )
     trace.info() << "maximal threshold value not specified, using Otsu value: "  << maxTh << std::endl;
   }else{
    maxTh =  vm["thresholdMax"].as<int>();
-  }
-  
+  }  
   trace.info() << "Processing image to output file " << outputFilename << std::endl; 
 
   functors::IntervalForegroundPredicate<Image3D> simplePredicate ( inputImage, minTh, maxTh );
@@ -234,7 +285,4 @@ int main( int argc, char** argv )
   GenericWriter<Image3D>::exportFile(outputFilename, imageResuSegmentation);   
   return 0;
 }
-
-
-
 

@@ -59,6 +59,48 @@ using namespace DGtal;
 ///////////////////////////////////////////////////////////////////////////////
 namespace po = boost::program_options;
 
+/**
+ @page volBoundary2obj volBoundary2obj
+ @brief  Extracts digital points from 3d vol files.
+
+@b Usage: volBoundary2obj [input] [output]
+
+@b Allowed @b options @b are:
+
+@code
+  -h [ --help ]                    display this message
+  -i [ --input ] arg               vol file (.vol) , pgm3d (.p3d or .pgm3d, pgm
+                                   (with 3 dims)) file or sdp (sequence of 
+                                   discrete points)
+  -o [ --output ] arg              output obj file (.obj)
+  -m [ --thresholdMin ] arg (=0)   threshold min (excluded) to define binary 
+                                   shape
+  -M [ --thresholdMax ] arg (=255) threshold max (included) to define binary 
+                                   shape
+  --dicomMin arg (=-1000)          set minimum density threshold on Hounsfield 
+                                   scale
+  --dicomMax arg (=3000)           set maximum density threshold on Hounsfield 
+                                   scale
+  --mode arg (=INNER)              set mode for display: INNER: inner voxels, 
+                                   OUTER: outer voxels, BDRY: surfels
+  -n [ --normalization ]           Normalization so that the geometry fits in 
+                                   [-1/2,1/2]^3
+@endcode
+
+@b Example:
+@code 
+   $ volBoundary2obj -i $DGtal/examples/samples/lobster.vol -m 80 -o out.obj
+@endcode
+
+You should obtain such a visualization:
+@image html resVolBoundary2obj.png "resulting visualisation."
+
+@see
+@ref volBoundary2obj.cpp
+
+*/
+
+
 int main( int argc, char** argv )
 {
   typedef SpaceND<3,int> Space;

@@ -61,6 +61,43 @@ using namespace std;
 
 namespace po = boost::program_options;
 ///////////////////////////////////////////////////////////////////////////////
+/**
+ @page patternTriangulation patternTriangulation
+ 
+ @brief Draws the Delaunay triangulation of a pattern using DGtal library.
+
+ @b Usage:   	patternTriangulation -a 5 -b 8 
+
+ @b Allowed @b options @b are :
+ 
+ @code
+  -h [ --help ]                    display this message
+  -a [ --aparam ] arg              pattern a parameter
+  -b [ --bparam ] arg              pattern b parameter
+  -d [ --delta ] arg (=1)          number of repetitions
+  -t [ --triangulation ] arg (=CH) output:
+                                   Closest-point Delaunay triangulation {CDT}
+                                   Farthest-point Delaunay triangulation {FDT}
+                                   Convex hull {CH}
+ @endcode
+
+
+ @b Example: 
+
+
+ @code
+ $ patternTriangulation -a 5 -b 8 
+ @endcode
+
+ @b Result:
+   a=5, b=8, d=1
+ 
+@see
+ @ref patternTriangulation.cpp
+
+ */
+
+
 
 /** 
  * @brief

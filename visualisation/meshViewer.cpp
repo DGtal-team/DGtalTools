@@ -28,15 +28,14 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 #include <iostream>
-#include <QtGui/qapplication.h>
+#include <sstream>
 #include "DGtal/base/Common.h"
 
-
-#include <QtGui/qapplication.h>
 #include "DGtal/io/Display3D.h"
 #include "DGtal/io/viewers/Viewer3D.h"
 #include "DGtal/io/readers/MeshReader.h"
 #include "DGtal/helpers/StdDefs.h"
+#include "DGtal/io/readers/PointListReader.h"
 
 #include <boost/program_options/options_description.hpp>
 #include <boost/program_options/parsers.hpp>
@@ -47,25 +46,134 @@ using namespace std;
 using namespace DGtal;
 
 
+/**
+ @page meshViewer meshViewer
+ 
+ @brief Displays OFF mesh file by using QGLviewer.
+
+ @b Usage:   meshViewer [input]
+
+ @b Allowed @b options @b are :
+ 
+ @code
+  -h [ --help ]                    display this message
+  -i [ --input ] arg               off files (.off), or OFS file (.ofs) 
+  -x [ --scaleX ] arg (=1)         set the scale value in the X direction 
+                                   (default 1.0)
+  -y [ --scaleY ] arg (=1)         set the scale value in the Y direction 
+                                   (default 1.0)
+  -z [ --scaleZ ] arg (=1)         set the scale value in the Z direction 
+                                   (default 1.0)
+  -w [ --minLineWidth ] arg (=1.5) set the min line width of the mesh faces 
+                                   (default 1.5)
+  --customColorMesh arg            set the R, G, B, A components of the colors 
+                                   of the mesh faces and eventually the color 
+                                   R, G, B, A of the mesh edge lines (set by 
+                                   default to black). 
+  --customColorSDP arg             set the R, G, B, A components of the colors 
+                                   of  the sdp view
+  -f [ --displayVectorField ] arg  display a vector field from a simple sdp 
+                                   file (two points per line)
+  --vectorFieldIndex arg           specify special indices for the two point 
+                                   coordinates (instead usinf the default 
+                                   indices: 0 1, 2, 3, 4, 5)
+  --customLineColor arg            set the R, G, B components of the colors of 
+                                   the lines displayed from the 
+                                   --displayVectorField option (red by 
+                                   default). 
+  -s [ --displaySDP ] arg          Add the display of a set of discrete points 
+                                   as ball of radius 0.5.
+  --SDPradius arg (=0.5)           change the ball radius to display a set of 
+                                   discrete points (used with displaySDP 
+                                   option)
+  -n [ --invertNormal ]            threshold min to define binary shape
+  -v [ --drawVertex ]              draw the vertex of the mesh
+ @endcode
+
+
+ @b Example: 
+
+
+ @code
+ $ meshViewer -i bunny.off
+    
+ @endcode
+
+ You should obtain such a result:
+
+ @image html resMeshViewer.png "Resulting visualization."
+ 
+
+ @see
+ @ref meshViewer.cpp
+
+ */
+
+
+/**
+ * Custom Viewer3D to override KeyPressEvent method and handle new key display.
+ * It also desactivate the double Rendering mode for more efficiency.
+ **/
+class CustomViewer3D: public Viewer3D<>
+{
+protected:
+  
+  virtual void init()
+  {
+    Viewer3D<>::init();
+    Viewer3D<>::setKeyDescription ( Qt::Key_I, "Display mesh informations about #faces, #vertices" );
+    Viewer3D<>::setGLDoubleRenderingMode(false);
+  }
+  virtual void keyPressEvent(QKeyEvent *e){
+    bool handled = false;
+    if( e->key() == Qt::Key_I)
+    {
+      handled=true;
+      myIsDisplayingInfoMode = !myIsDisplayingInfoMode;
+      std::stringstream sstring;
+      Viewer3D<>::displayMessage(QString(myIsDisplayingInfoMode ?
+                                                      myInfoDisplay.c_str() : " "), 1000000);
+      Viewer3D<>::updateGL();
+    }
+    if(!handled)
+      {
+        Viewer3D<>::keyPressEvent(e);        
+      }
+  };
+
+public: 
+  std::string myInfoDisplay = "No information loaded...";
+  bool myIsDisplayingInfoMode = false;
+};
+
+
+  
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace po = boost::program_options;
 
 int main( int argc, char** argv )
 {
+  
   // parse command line ----------------------------------------------
   po::options_description general_opt("Allowed options are: ");
   general_opt.add_options()
-    ("help,h", "display this message")
-    ("input,i", po::value<std::string>(), "off file (.off), or OFS file (.ofs) " )
-    ("scaleX,x",  po::value<float>()->default_value(1.0), "set the scale value in the X direction (default 1.0)" )
-    ("scaleY,y",  po::value<float>()->default_value(1.0), "set the scale value in the Y direction (default 1.0)" )
-    ("scaleZ,z",  po:: value<float>()->default_value(1.0), "set the scale value in the Z direction (default 1.0)")
-    ("customColorMesh",po::value<std::vector<unsigned int> >()->multitoken(), "set the R, G, B, A components of the colors of the mesh view" )
-    ("customColorSDP",po::value<std::vector<unsigned int> >()->multitoken(), "set the R, G, B, A components of the colors of the sdp view" )
-    ("displaySDP,s", po::value<std::string>(), "Add the display of a set of discrete points as ball of radius 0.5.")
-    ("invertNormal,n", "threshold min to define binary shape" )
-    ("drawVertex,v", "draw the vertex of the mesh" );
-
+  ("help,h", "display this message")
+  ("input,i", po::value<std::vector<string> >()->multitoken(), "off files (.off), or OFS file (.ofs) " )
+  ("scaleX,x",  po::value<float>()->default_value(1.0), "set the scale value in the X direction (default 1.0)" )
+  ("scaleY,y",  po::value<float>()->default_value(1.0), "set the scale value in the Y direction (default 1.0)" )
+  ("scaleZ,z",  po:: value<float>()->default_value(1.0), "set the scale value in the Z direction (default 1.0)")
+  ("minLineWidth,w",  po:: value<float>()->default_value(1.5), "set the min line width of the mesh faces (default 1.5)")
+  ("customColorMesh",po::value<std::vector<unsigned int> >()->multitoken(), "set the R, G, B, A components of the colors of the mesh faces and eventually the color R, G, B, A of the mesh edge lines (set by default to black). " )
+  ("customColorSDP",po::value<std::vector<unsigned int> >()->multitoken(), "set the R, G, B, A components of the colors of  the sdp view" )
+  ("displayVectorField,f",po::value<std::string>(),  "display a vector field from a simple sdp file (two points per line)" )
+  ("vectorFieldIndex",po::value<std::vector<unsigned int> >()->multitoken(), "specify special indices for the two point coordinates (instead usinf the default indices: 0 1, 2, 3, 4, 5)" )
+  ("customLineColor",po::value<std::vector<unsigned int> >()->multitoken(), "set the R, G, B components of the colors of the lines displayed from the --displayVectorField option (red by default). " )
+  ("displaySDP,s", po::value<std::string>(), "Add the display of a set of discrete points as ball of radius 0.5.")
+  ("SDPradius", po::value<double>()->default_value(0.5), "change the ball radius to display a set of discrete points (used with displaySDP option)")
+  ("invertNormal,n", "invert face normal vectors." )
+  ("drawVertex,v", "draw the vertex of the mesh" );
+  
   bool parseOK=true;
   po::variables_map vm;
   try{
@@ -76,22 +184,22 @@ int main( int argc, char** argv )
   }
   po::notify(vm);
   if( !parseOK || vm.count("help")||argc<=1)
-    {
-      std::cout << "Usage: " << argv[0] << " [input]\n"
-		<< "Display OFF mesh file by using QGLviewer"
+  {
+    std::cout << "Usage: " << argv[0] << " [input]\n"
+    << "Display OFF mesh file by using QGLviewer"
     << general_opt << "\n";
-      return 0;
-    }
-
-  if(! vm.count("input"))
-    {
-      trace.error() << " The file name was defined" << endl;
-      return 0;
-    }
-
-
+    return 0;
+  }
   
-  string inputFilename = vm["input"].as<std::string>();
+  if(! vm.count("input"))
+  {
+    trace.error() << " The file name was defined" << endl;
+    return 0;
+  }
+  
+  
+  
+  std::vector<std::string> inputFilenameVect = vm["input"].as<std::vector<std::string > >();
   float sx = vm["scaleX"].as<float>();
   float sy = vm["scaleY"].as<float>();
   float sz = vm["scaleZ"].as<float>();
@@ -100,23 +208,60 @@ int main( int argc, char** argv )
   unsigned int  meshColorG = 240;
   unsigned int  meshColorB = 240;
   unsigned int  meshColorA = 255;
-
-
+  
+  unsigned int  meshColorRLine = 0;
+  unsigned int  meshColorGLine = 0;
+  unsigned int  meshColorBLine = 0;
+  unsigned int  meshColorALine = 255;
+  
+  
   unsigned int  sdpColorR = 240;
   unsigned int  sdpColorG = 240;
   unsigned int  sdpColorB = 240;
   unsigned int  sdpColorA = 255;
-    
+  
+  
+  bool displayVectorField = vm.count("displayVectorField");
+  std::vector<unsigned int> vectFieldIndices = {0,1,2,3,4,5};
+  
+  if (displayVectorField) {
+    if(vm.count("vectorFieldIndex")){
+      vectFieldIndices = vm["vectorFieldIndex"].as<std::vector<unsigned int> >();
+      if (vectFieldIndices.size() != 6) {
+        trace.warning() << "you should specify indices for each of the 6 fields of the two coordinates." << std::endl;
+        vectFieldIndices = {0,1,2,3,4,5};
+      }
+    }
+  }
+  
+  float lineWidth = vm["minLineWidth"].as<float>();
+  
+  DGtal::Color vFieldLineColor = DGtal::Color::Red;
+  if(vm.count("customLineColor")){
+    std::vector<unsigned int > vectCol = vm["customLineColor"].as<std::vector<unsigned int> >();
+    if(vectCol.size()!=3 ){
+      trace.error() << "colors specification should contain R,G,B values (using default red)."<< std::endl;
+    }
+    vFieldLineColor.setRGBi(vectCol[0], vectCol[1], vectCol[2], 255);
+  }
   
   if(vm.count("customColorMesh")){
     std::vector<unsigned int > vectCol = vm["customColorMesh"].as<std::vector<unsigned int> >();
-    if(vectCol.size()!=4){
+    if(vectCol.size()!=4 && vectCol.size()!=8 ){
       trace.error() << "colors specification should contain R,G,B and Alpha values"<< std::endl;
     }
     meshColorR = vectCol[0];
     meshColorG = vectCol[1];
     meshColorB = vectCol[2];
     meshColorA = vectCol[3];
+    if(vectCol.size() == 8){
+      meshColorRLine = vectCol[4];
+      meshColorGLine = vectCol[5];
+      meshColorBLine = vectCol[6];
+      meshColorALine = vectCol[7];
+      
+    }
+    
   }
   if(vm.count("customColorSDP")){
     std::vector<unsigned int > vectCol = vm["customColorSDP"].as<std::vector<unsigned int> >();
@@ -128,56 +273,96 @@ int main( int argc, char** argv )
     sdpColorB = vectCol[2];
     sdpColorA = vectCol[3];
   }
-
-
-
+  
+  
+  
   QApplication application(argc,argv);
-  Viewer3D<> viewer;
-  viewer.setWindowTitle("simple Volume Viewer");
+  CustomViewer3D viewer;
+  std::stringstream title;
+  title  << "Simple Mesh Viewer: " << inputFilenameVect[0];
+  viewer.setWindowTitle(title.str().c_str());
   viewer.show();
-  viewer.setGLScale(sx, sy, sz);  
+  viewer.myGLLineMinWidth = lineWidth;
+  viewer.setGLScale(sx, sy, sz);
   bool invertNormal= vm.count("invertNormal");
-
-
-
+  
+  
+  double ballRadius = vm["SDPradius"].as<double>();
+  
   trace.info() << "Importing mesh... ";
-
-  Mesh<DGtal::Z3i::RealPoint> anImportedMesh(!vm.count("customColorMesh"));
-  bool import = anImportedMesh << inputFilename;
+  
+  std::vector<Mesh<DGtal::Z3i::RealPoint> >  vectMesh;
+  for(unsigned int i = 0; i< inputFilenameVect.size(); i++){
+    Mesh<DGtal::Z3i::RealPoint> aMesh(!vm.count("customColorMesh"));
+    aMesh << inputFilenameVect[i];
+    vectMesh.push_back(aMesh);
+  }
+  
+  
+  bool import = vectMesh.size()==inputFilenameVect.size();
   if(!import){
     trace.info() << "File import failed. " << std::endl;
     return 0;
   }
-
+  
   trace.info() << "[done]. "<< std::endl;
   if(vm.count("displaySDP")){
     std::string filenameSDP = vm["displaySDP"].as<std::string>();
     vector<Z3i::RealPoint> vectPoints;
     vectPoints = PointListReader<Z3i::RealPoint>::getPointsFromFile(filenameSDP);
-     viewer << CustomColors3D(Color(sdpColorR, sdpColorG, sdpColorB, sdpColorA), 
-                              Color(sdpColorR, sdpColorG, sdpColorB, sdpColorA)); 
+    viewer << CustomColors3D(Color(sdpColorR, sdpColorG, sdpColorB, sdpColorA),
+                             Color(sdpColorR, sdpColorG, sdpColorB, sdpColorA));
     for(unsigned int i=0;i< vectPoints.size(); i++){
-      viewer.addBall(vectPoints.at(i), 0.5);    
+      viewer.addBall(vectPoints.at(i), ballRadius);
     }
   }
   if(invertNormal){
-    anImportedMesh.invertVertexFaceOrder();
+    for(unsigned int i=0; i<vectMesh.size(); i++){
+      vectMesh[i].invertVertexFaceOrder();
+    }
   }
-
-  viewer << CustomColors3D(Color(meshColorR, meshColorG, meshColorB, meshColorA), 
-                           Color(meshColorR, meshColorG, meshColorB, meshColorA));  
-  viewer << anImportedMesh;
-
+  
+  viewer << CustomColors3D(Color(meshColorRLine, meshColorGLine, meshColorBLine, meshColorALine),
+                           Color(meshColorR, meshColorG, meshColorB, meshColorA));
+  for(unsigned int i=0; i<vectMesh.size(); i++){
+    viewer << vectMesh[i];
+  }
+  
   if(vm.count("drawVertex")){
-    for( Mesh<DGtal::Z3i::RealPoint>::VertexStorage::const_iterator it = anImportedMesh.cVertexBegin();
-  	 it!=anImportedMesh.cVertexEnd(); ++it){
-      DGtal::Z3i::Point pt;
-      pt[0]=(*it)[0]; pt[1]=(*it)[1]; pt[2]=(*it)[2];
-      viewer << pt;
+    for(unsigned int i=0; i<vectMesh.size(); i++){
+      for( Mesh<DGtal::Z3i::RealPoint>::VertexStorage::const_iterator it = vectMesh[i].vertexBegin();
+          it!=vectMesh[i].vertexEnd(); ++it){
+        DGtal::Z3i::Point pt;
+        pt[0]=(*it)[0]; pt[1]=(*it)[1]; pt[2]=(*it)[2];
+        viewer << pt;
+      }
     }
   }
 
   
-  viewer << Viewer3D<>::updateDisplay;
+  if (displayVectorField) {
+    std::vector<unsigned int > vectFieldIndices1 = {vectFieldIndices[0],vectFieldIndices[1], vectFieldIndices[2]};
+    std::vector<unsigned int > vectFieldIndices2 = {vectFieldIndices[3],vectFieldIndices[4], vectFieldIndices[5]};
+    
+    std::vector<DGtal::Z3i::RealPoint> vectPt1 = PointListReader<DGtal::Z3i::RealPoint>::getPointsFromFile(vm["displayVectorField"].as<std::string>(), vectFieldIndices1);
+    std::vector<DGtal::Z3i::RealPoint> vectPt2 = PointListReader<DGtal::Z3i::RealPoint>::getPointsFromFile(vm["displayVectorField"].as<std::string>(), vectFieldIndices2);
+    viewer.createNewLineList();
+    for (unsigned int i = 0; i < vectPt1.size(); i++) {
+    
+      viewer.setLineColor(vFieldLineColor);
+      viewer.addLine(vectPt1[i], vectPt2[i]);
+    }
+  }
+  unsigned int nbVertex = 0;
+  unsigned int nbFaces = 0;
+  for(auto const &m:  vectMesh)
+    {
+      nbVertex += m.nbVertex();
+      nbFaces +=m.nbFaces();
+    }
+  stringstream ss;
+  ss << "# faces: " << std::fixed << nbFaces << "    #vertex: " <<  nbVertex;
+  viewer.myInfoDisplay = ss.str();
+  viewer  << CustomViewer3D::updateDisplay;
   return application.exec();
 }

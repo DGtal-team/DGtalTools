@@ -1,5 +1,7 @@
 
 SET(DGTAL_TOOLS_SRC
+  volAddNoise
+  imgAddNoise
   img2freeman
   freeman2img
   freeman2sdp
@@ -13,7 +15,11 @@ SET(DGTAL_TOOLS_SRC
   vol2obj
   longvol2vol
   sdp2vol
-  volBoundary2obj)
+  volBoundary2obj
+  vol2heightfield
+  heightfield2vol
+  heightfield2shading
+  mesh2heightfield)
 
 if( WITH_HDF5 )
 SET(DGTAL_TOOLS_SRC ${DGTAL_TOOLS_SRC}
@@ -33,7 +39,8 @@ ENDFOREACH(FILE)
 
 if (  WITH_ITK )
   SET(DGTAL_TOOLS_ITK
-    dicom2vol)
+    dicom2vol
+    itk2vol)
   FOREACH(FILE ${DGTAL_TOOLS_ITK})
      add_executable(${FILE} ${FILE})
      target_link_libraries (${FILE} ${DGTAL_LIBRARIES} ${DGtalToolsLibDependencies} )

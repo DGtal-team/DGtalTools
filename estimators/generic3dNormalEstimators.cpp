@@ -36,10 +36,6 @@
 #include <boost/program_options/parsers.hpp>
 #include <boost/program_options/variables_map.hpp>
 
-#ifdef WITH_VISU3D_QGLVIEWER
-#include <QtGui/qapplication.h>
-#endif
-
 #include "DGtal/base/Common.h"
 #include "DGtal/base/CountedPtr.h"
 #include "DGtal/base/CountedConstPtrOrConstPtr.h"
@@ -73,6 +69,174 @@ using namespace DGtal;
 namespace po = boost::program_options;
 
 
+
+/**
+ @page generic3dNormalEstimators generic3dNormalEstimators
+ 
+ @brief  computes a normal vector field over a digitized 3D implicit surface for several estimators.
+
+ @b Usage:  ./estimators/generic3dNormalEstimators -p <polynomial> [options]
+
+Computes a normal vector field over a digitized 3D implicit surface
+for several estimators (II|VCM|Trivial|True), specified with -e. You
+may add Kanungo noise with option -N. These estimators are compared
+with ground truth. You may then: 1) visualize the normals or the angle
+deviations with -V (if WITH_QGL_VIEWER is enabled), 2) outputs them as
+a list of cells/estimations with -n, 3) outputs them as a ImaGene file
+with -O, 4) outputs them as a NOFF file with -O, 5) computes
+estimation statistics with option -S.
+
+ 
+ @b Allowed @b options @b are : 
+
+ @code
+  -h [ --help ]                    display this message
+  -p [ --polynomial ] arg          the implicit polynomial whose zero-level 
+                                   defines the shape of interest.
+  -N [ --noise ] arg (=0)          the Kanungo noise level l=arg, with l^d the 
+                                   probability that a point at distance d is 
+                                   flipped inside/outside.
+  -a [ --minAABB ] arg (=-10)      the min value of the AABB bounding box 
+                                   (domain)
+  -A [ --maxAABB ] arg (=10)       the max value of the AABB bounding box 
+                                   (domain)
+  -g [ --gridstep ] arg (=1)       the gridstep that defines the digitization 
+                                   (often called h). 
+  -e [ --estimator ] arg (=True)   the chosen normal estimator: True | VCM | II
+                                   | Trivial
+  -R [ --R-radius ] arg (=5)       the constant for parameter R in R(h)=R 
+                                   h^alpha (VCM).
+  -r [ --r-radius ] arg (=3)       the constant for parameter r in r(h)=r 
+                                   h^alpha (VCM,II,Trivial).
+  -k [ --kernel ] arg (=hat)       the function chi_r, either hat or ball.
+  --alpha arg (=0)                 the parameter alpha in r(h)=r h^alpha (VCM).
+  -t [ --trivial-radius ] arg (=3) the parameter t defining the radius for the 
+                                   Trivial estimator. Also used for reorienting
+                                   the VCM.
+  -E [ --embedding ] arg (=0)      the surfel -> point embedding for VCM 
+                                   estimator: 0: Pointels, 1: InnerSpel, 2: 
+                                   OuterSpel.
+  -o [ --output ] arg (=output)    the output basename. All generated files 
+                                   will have the form <arg>-*, for instance 
+                                   <arg>-angle-deviation-<gridstep>.txt, 
+                                   <arg>-normals-<gridstep>.txt, 
+                                   <arg>-cells-<gridstep>.txt, 
+                                   <arg>-noff-<gridstep>.off.
+  -S [ --angle-deviation-stats ]   computes angle deviation error and outputs 
+                                   them in file <basename>-angle-deviation-<gri
+                                   dstep>.txt, as specified by -o <basename>.
+  -x [ --export ] arg (=None)      exports surfel normals which can be viewed 
+                                   with ImaGene tool 'viewSetOfSurfels' in file
+                                   <basename>-cells-<gridstep>.txt, as 
+                                   specified by -o <basename>. Parameter <arg> 
+                                   is None|Normals|AngleDeviation. The color 
+                                   depends on the angle deviation in degree: 0 
+                                   metallic blue, 5 light cyan, 10 light green,
+                                   15 light yellow, 20 yellow, 25 orange, 30 
+                                   red, 35, dark red, 40- grey
+  -n [ --normals ]                 outputs every surfel, its estimated normal, 
+                                   and the ground truth normal in file 
+                                   <basename>-normals-<gridstep>.txt, as 
+                                   specified by -o <basename>.
+  -O [ --noff ]                    exports the digital surface with normals as 
+                                   NOFF file <basename>-noff-<gridstep>.off, as
+                                   specified by -o <basename>..
+  -V [ --view ] arg (=None)        view the digital surface with normals.  
+                                   Parameter <arg> is None|Normals|AngleDeviati
+                                   on. The color depends on the angle deviation
+                                   in degree: 0 metallic blue, 5 light cyan, 10
+                                   light green, 15 light yellow, 20 yellow, 25 
+                                   orange, 30 red, 35, dark red, 40- grey.
+ @endcode
+
+
+@b Example @b of @b implicit @b surface (specified by -p):
+ - ellipse  : 90-3*x^2-2*y^2-z^2 
+ - torus    : -1*(x^2+y^2+z^2+6*6-2*2)^2+4*6*6*(x^2+y^2) 
+ - rcube    : 6561-x^4-y^4-z^4
+ - goursat  : 8-0.03*x^4-0.03*y^4-0.03*z^4+2*x^2+2*y^2+2*z^2
+ - distel   : 10000-(x^2+y^2+z^2+1000*(x^2+y^2)*(x^2+z^2)*(y^2+z^2))
+ - leopold  : 100-(x^2*y^2*z^2+4*x^2+4*y^2+3*z^2)
+ - diabolo  : x^2-(y^2+z^2)^2
+ - heart    : -1*(x^2+2.25*y^2+z^2-1)^3+x^2*z^3+0.1125*y^2*z^3
+ - crixxi   : -0.9*(y^2+z^2-1)^2-(x^2+y^2-1)^3
+
+
+@b Implemented @b estimators (specified by -e):
+ - True     : supposed to be the ground truth for computations. Of course, it is only approximations.
+ - VCM      : normal estimator by digital Voronoi Covariance Matrix. Radii parameters are given by -R, -r.
+ - II       : normal estimator by Integral Invariants. Radius parameter is given by -r.
+ - Trivial  : the normal obtained by average trivial surfel normals in a ball neighborhood. Radius parameter is given by -r.
+
+@note :
+     - This is a normal *direction* evaluator more than a normal vector evaluator. Orientations of normals are deduced from ground truth. This is due to the fact that II and VCM only estimates normal directions.
+     - This tool only analyses one surface component, and one that contains at least as many surfels as the width of the digital bounding box. This is required when analysing noisy data, where a lot of the small components are spurious. The drawback is that you cannot analyse the normals on a surface with several components.
+
+
+
+ @b Example: 
+
+ - @b Example @b of @b normal @b comparisons:
+ You can estimate the normal vectors and compare the error with the true normals (option  -V AngleDeviation):
+  @code
+ # apply the Integral Invariant estimator  (options  -e II  -r 8 ):
+ $ generic3dNormalEstimators -p "10000-(x^2+y^2+z^2+1000*(x^2+y^2)*(x^2+z^2)*(y^2+z^2))" -a -10 -A 10 -e II  -r 8  -V AngleDeviation -g 0.05 
+ # apply the Voronoi Covariance Measure based estimator  (options  -e VCM  -r 8 ): 
+ $ generic3dNormalEstimators -p "10000-(x^2+y^2+z^2+1000*(x^2+y^2)*(x^2+z^2)*(y^2+z^2))"  -a -10 -A 10 -e VCM   -R 20 -r 8 -V AngleDeviation -g 0.05 
+ # to display source digital surface  :  visualize the normals and tape Key E to export surface (in  exportedMesh.off) 
+ $ generic3dNormalEstimators -p "10000-(x^2+y^2+z^2+1000*(x^2+y^2)*(x^2+z^2)*(y^2+z^2))"  -a -10 -A 10 -e VCM   -R 20 -r 8 -V Normals -g 0.05 
+ # visualize generated file:
+ $ meshViewer -i  exportedMesh.off
+
+  @endcode
+  You should obtain such a result:
+  |type                   |  visualization                                 | 
+  | :----:                | :-------------:                                |
+  | digital surface       | ![ ](resGeneric3dNormalEstimatorsDiscrete.png) |
+  |  VCM angle-deviation  | ![ ](resGeneric3dNormalEstimatorsVCM.png)      |
+  | II angle-deviation    | ![ ](resGeneric3dNormalEstimatorsII.png)       |
+
+
+
+
+ - @b Example @b of @b normal @b visualization with noise add:
+ This tool allows to add some noise on initial shape (option -N) and it is also possiblt to  visualize the source shape by using the resulting normals:
+ @code 
+ # apply the Integral Invariant estimator  (options  -e II  -r 6 ): 
+  generic3dNormalEstimators -p "100-(x^2*y^2*z^2+4*x^2+4*y^2+3*z^2)"  -a -10 -A 10 -e II  -r 6 -V Normals -g 0.1 -N 0.3
+ # apply the Voronoi Covariance Measure based estimator  (options  -e VCM  -r 8 ):  
+   generic3dNormalEstimators -p "100-(x^2*y^2*z^2+4*x^2+4*y^2+3*z^2)"  -a -10 -A 10 -e VCM   -R 10 -r 5 -V Normals -g 0.1 -N 0.3
+ # apply the true normals:
+ ./estimators/generic3dNormalEstimators -p "100-(x^2*y^2*z^2+4*x^2+4*y^2+3*z^2)"  -a -10 -A 10 -e True  -V Normals -g 0.1 -N 0.3
+ # to display source digital surface  :  tape Key E on previous displays to export surface (in  exportedMesh.off) 
+ # visualize generated file:
+ $ meshViewer -i  exportedMesh.off
+
+ @endcode 
+
+ You should obtain such a result:
+  |type                   |  visualization                                 | 
+  | :----:                | :-------------:                                |
+  | digital surface       | ![ ](resGeneric3dNormalEstimatorsNoiseDiscrete.png) |
+  |  VCM estimator  | ![ ](resGeneric3dNormalEstimatorsNoiseVCM.png)      |
+  | II estimator    | ![ ](resGeneric3dNormalEstimatorsNoiseII.png)       |
+  | True Normals    | ![ ](resGeneric3dNormalEstimatorsNoiseTrue.png)       |
+
+
+
+
+ @see
+ @ref generic3dNormalEstimators.cpp
+
+
+
+ 
+
+ */
+
+
+
+
 template <typename SCell, typename RealVector>
 struct GradientMapAdapter {
   typedef std::map<SCell,RealVector> SCell2RealVectorMap;
@@ -103,11 +267,11 @@ struct SCellEmbedderWithNormal : public SCellEmbedder
   typedef std::map<SCell,RealVector> SCell2RealVectorMap;
   typedef GradientMapAdapter<SCell,RealVector> GradientMap;
 
-  SCellEmbedderWithNormal( ConstAlias<SCellEmbedder> embedder, 
+  SCellEmbedderWithNormal( ConstAlias<SCellEmbedder> embedder,
                            ConstAlias<SCell2RealVectorMap> map )
     : SCellEmbedder( embedder ), myMap( map )
   {}
-  
+
   GradientMap gradientMap() const
   {
     return GradientMap( myMap );
@@ -116,7 +280,7 @@ struct SCellEmbedderWithNormal : public SCellEmbedder
   CountedConstPtrOrConstPtr<SCell2RealVectorMap> myMap;
 };
 
-template <typename DigitalSurface, 
+template <typename DigitalSurface,
           typename Estimator>
 void exportNOFFSurface( const DigitalSurface& surface,
                         const Estimator& estimator,
@@ -164,7 +328,7 @@ void computeEstimation
   typedef DepthFirstVisitor< Surface > Visitor;
   typedef GraphVisitorRange< Visitor > VisitorRange;
   typedef typename VisitorRange::ConstIterator VisitorConstIterator;
-  
+
   std::string fname = vm[ "output" ].as<std::string>();
   string nameEstimator = vm[ "estimator" ].as<string>();
   trace.beginBlock( "Computing " + nameEstimator + "estimations." );
@@ -205,8 +369,8 @@ void computeEstimation
     {
       trace.beginBlock( "Computing angle deviation error stats." );
       std::ostringstream adev_sstr;
-      adev_sstr << fname << "-" << nameEstimator << "-angle-deviation-" 
-                << estimator.h() << ".txt"; 
+      adev_sstr << fname << "-" << nameEstimator << "-angle-deviation-"
+                << estimator.h() << ".txt";
       DGtal::Statistic<Scalar> adev_stat;
       unsigned int i = 0;
       range = CountedPtr<VisitorRange>( new VisitorRange( new Visitor( surface, *(surface.begin()) )) );
@@ -221,7 +385,7 @@ void computeEstimation
       std::ofstream adev_output( adev_sstr.str().c_str() );
       adev_output << "# Average error X of the absolute angle between two vector estimations." << std::endl;
       adev_output << "# h L1 L2 Loo E[X] Var[X] Min[X] Max[X] Nb[X]" << std::endl;
-      adev_output << estimator.h() 
+      adev_output << estimator.h()
                   << " " << adev_stat.mean() // L1
                   << " " << sqrt( adev_stat.unbiasedVariance()
                                   + adev_stat.mean()*adev_stat.mean() ) // L2
@@ -239,8 +403,8 @@ void computeEstimation
     {
       trace.beginBlock( "Exporting cell geometry." );
       std::ostringstream export_sstr;
-      export_sstr << fname << "-" << nameEstimator << "-cells-" 
-                  << estimator.h() << ".txt"; 
+      export_sstr << fname << "-" << nameEstimator << "-cells-"
+                  << estimator.h() << ".txt";
       std::ofstream export_output( export_sstr.str().c_str() );
       export_output << "# ImaGene viewer (viewSetOfSurfels) file format for displaying cells." << std::endl;
       bool adev =  vm[ "export" ].as<string>() == "AngleDeviation";
@@ -253,7 +417,7 @@ void computeEstimation
           Scalar angle_error = acos( n_est.dot( n_true_est ) )*180.0 / 3.14159625;
           Surfel s = *it;
           export_output
-            << "CellN" 
+            << "CellN"
             << " " << min( 1023, max( 512+K.sKCoord( s, 0 ), 0 ) )
             << " " << min( 1023, max( 512+K.sKCoord( s, 1 ), 0 ) )
             << " " << min( 1023, max( 512+K.sKCoord( s, 2 ), 0 ) )
@@ -263,7 +427,7 @@ void computeEstimation
           export_output << " " << ((double) c.red() / 255.0 )
                         << " " << ((double) c.green() / 255.0 )
                         << " " << ((double) c.blue() / 255.0 );
-          export_output << " " << n_est[ 0 ] << " " << n_est[ 1 ] 
+          export_output << " " << n_est[ 0 ] << " " << n_est[ 1 ]
                         << " " << n_est[ 2 ] << std::endl;
         }
       export_output.close();
@@ -273,8 +437,8 @@ void computeEstimation
     {
       trace.beginBlock( "Exporting cells normals." );
       std::ostringstream export_sstr;
-      export_sstr << fname << "-" << nameEstimator << "-normals-" 
-                  << estimator.h() << ".txt"; 
+      export_sstr << fname << "-" << nameEstimator << "-normals-"
+                  << estimator.h() << ".txt";
       std::ofstream export_output( export_sstr.str().c_str() );
       export_output << "# kx ky kz sign n_est[0] n_est[1] n_est[2] n_true[0] n_true[1] n_true[2]" << std::endl;
       unsigned int i = 0;
@@ -285,7 +449,7 @@ void computeEstimation
           Quantity n_true_est = n_true_estimations[ i ];
           Surfel s = *it;
           export_output
-            << K.sKCoord( s, 0 ) << " " << K.sKCoord( s, 1 ) << " " << K.sKCoord( s, 2 ) 
+            << K.sKCoord( s, 0 ) << " " << K.sKCoord( s, 1 ) << " " << K.sKCoord( s, 2 )
             << " " << K.sSign( s )
             << " " << n_est[ 0 ] << " " << n_est[ 1 ] << " " << n_est[ 2 ]
             << " " << n_true_est[ 0 ] << " " << n_true_est[ 1 ] << " " << n_true_est[ 2 ]
@@ -298,8 +462,8 @@ void computeEstimation
     {
       trace.beginBlock( "Exporting NOFF file." );
       std::ostringstream export_sstr;
-      export_sstr << fname << "-" << nameEstimator << "-noff-" 
-                  << estimator.h() << ".off"; 
+      export_sstr << fname << "-" << nameEstimator << "-noff-"
+                  << estimator.h() << ".off";
       std::ofstream export_output( export_sstr.str().c_str() );
       std::map<Surfel,Quantity> normals;
       unsigned int i = 0;
@@ -370,7 +534,7 @@ void chooseEstimator
 {
   string nameEstimator = vm[ "estimator" ].as<string>();
   double h = vm["gridstep"].as<double>();
-  typedef ShapeGeometricFunctors::ShapeNormalVectorFunctor<ImplicitShape> NormalFunctor;
+  typedef functors::ShapeGeometricFunctors::ShapeNormalVectorFunctor<ImplicitShape> NormalFunctor;
   typedef TrueDigitalSurfaceLocalEstimator<KSpace, ImplicitShape, NormalFunctor> TrueEstimator;
   TrueEstimator true_estimator;
   true_estimator.attach( shape );
@@ -400,7 +564,7 @@ void chooseEstimator
                                               KernelFunction, NormalFunctor> VCMNormalEstimator;
       int embedding = vm["embedding"].as<int>();
       Surfel2PointEmbedding embType = embedding == 0 ? Pointels :
-                                      embedding == 1 ? InnerSpel : OuterSpel;     
+                                      embedding == 1 ? InnerSpel : OuterSpel;
       double R = vm["R-radius"].as<double>();
       double r = vm["r-radius"].as<double>();
       double t = vm["trivial-radius"].as<double>();
@@ -506,7 +670,7 @@ int chooseSurface
       }
       SurfaceContainer* surfaceContainer = new SurfaceContainer( K, dshape, surfAdj, bel );
       CountedPtr<Surface> ptrSurface( new Surface( surfaceContainer ) ); // acquired
-      trace.info() << "- surface component has " << ptrSurface->size() << " surfels." << std::endl; 
+      trace.info() << "- surface component has " << ptrSurface->size() << " surfels." << std::endl;
       trace.endBlock();
       chooseKernel( vm, K, shape, *ptrSurface, dshape );
     }
@@ -520,7 +684,8 @@ int chooseSurface
       typedef typename Surface::Surfel Surfel;
       SurfelAdjacency< KSpace::dimension > surfAdj( true );
       Surfel bel;
-      KanungoPredicate* noisified_dshape = new KanungoPredicate( dshape, dshape.getDomain(), noiseLevel );
+      const Domain shapeDomain = dshape.getDomain();
+      KanungoPredicate* noisified_dshape = new KanungoPredicate( dshape, shapeDomain, noiseLevel );
       // We have to search for a big connected component.
       CountedPtr<Surface> ptrSurface;
       double minsize = dshape.getUpperBound()[0] - dshape.getLowerBound()[0];
@@ -542,7 +707,7 @@ int chooseSurface
           trace.error() << "ERROR cannot find a proper bel in a big enough component." << std::endl;
           return 4;
         }
-      trace.info() << "- surface component has " << nb_surfels << " surfels." << std::endl; 
+      trace.info() << "- surface component has " << nb_surfels << " surfels." << std::endl;
       trace.endBlock();
       chooseKernel( vm, K, shape, *ptrSurface, *noisified_dshape );
     }
@@ -578,27 +743,28 @@ int main( int argc, char** argv )
 #ifdef WITH_VISU3D_QGLVIEWER
     ("view,V", po::value<string>()->default_value( "None" ),"view the digital surface with normals.  Parameter <arg> is None|Normals|AngleDeviation. The color depends on the angle deviation in degree: 0 metallic blue, 5 light cyan, 10 light green, 15 light yellow, 20 yellow, 25 orange, 30 red, 35, dark red, 40- grey." )
 #endif
-    ;  
+    ;
   bool parseOK=true;
   po::variables_map vm;
   try{
-    po::store(po::parse_command_line(argc, argv, general_opt), vm);  
+    po::store(po::parse_command_line(argc, argv, general_opt), vm);
   }catch(const exception& ex){
     parseOK=false;
     cerr << "Error checking program options: "<< ex.what()<< endl;
   }
-  po::notify(vm);    
+  po::notify(vm);
   if( ! parseOK || vm.count("help") || ! vm.count( "polynomial" ) )
     {
-      if ( ! vm.count( "polynomial" ) ) 
+      if ( ! vm.count( "polynomial" ) )
         cerr << "Need parameter --polynomial / -p" << endl;
 
       cerr << "Usage: " << argv[0] << " -p <polynomial> [options]\n"
-		<< "Computes a normal vector field over a digitized 3D implicit surface for several estimators (II|VCM|Trivial|True), specified with -e. You may add Kanungo noise with option -N. These estimators are compared with ground truth. You may then: 1) visualize the normals or the angle deviations with -V (if WITH_QGL_VIEWER is enabled), 2) outputs them as a list of cells/estimations with -n, 3) outputs them as a ImaGene file with -O, 4) outputs them as a NOFF file with -O, 5) computes estimation statistics with option -S." 
+    << "Computes a normal vector field over a digitized 3D implicit surface for several estimators (II|VCM|Trivial|True), specified with -e. You may add Kanungo noise with option -N. These estimators are compared with ground truth. You may then: 1) visualize the normals or the angle deviations with -V (if WITH_QGL_VIEWER is enabled), 2) outputs them as a list of cells/estimations with -n, 3) outputs them as a ImaGene file with -O, 4) outputs them as a NOFF file with -O, 5) computes estimation statistics with option -S."
                 << endl
-		<< general_opt << "\n";
-      cerr << "Example:\n"
-           << "./generic3dNormalEstimator -p \"90-3*x^2-2*y^2-z^2\" -o VCM-ellipse -a -10 -A 10 -e VCM -R 3 -r 3 -t 2 -E 0 -x Normals" << endl
+    << general_opt << "\n";
+      cerr << "Example of use:\n"
+           << "./generic3dNormalEstimator -p \"90-3*x^2-2*y^2-z^2\" -o VCM-ellipse -a -10 -A 10 -e VCM -R 3 -r 3 -t 2 -E 0 -x Normals" << endl << endl
+           << "Example of implicit surfaces (specified by -p):" << endl
            << " - ellipse  : 90-3*x^2-2*y^2-z^2 " << endl
            << " - torus    : -1*(x^2+y^2+z^2+6*6-2*2)^2+4*6*6*(x^2+y^2) " << endl
            << " - rcube    : 6561-x^4-y^4-z^4" << endl
@@ -608,7 +774,7 @@ int main( int argc, char** argv )
            << " - diabolo  : x^2-(y^2+z^2)^2" << endl
            << " - heart    : -1*(x^2+2.25*y^2+z^2-1)^3+x^2*z^3+0.1125*y^2*z^3" << endl
            << " - crixxi   : -0.9*(y^2+z^2-1)^2-(x^2+y^2-1)^3" << endl << endl;
-      cerr << "Estimators (specified by -e):" << endl
+      cerr << "Implemented estimators (specified by -e):" << endl
            << " - True     : supposed to be the ground truth for computations. Of course, it is only approximations." << endl
            << " - VCM      : normal estimator by digital Voronoi Covariance Matrix. Radii parameters are given by -R, -r." << endl
            << " - II       : normal estimator by Integral Invariants. Radius parameter is given by -r." << endl

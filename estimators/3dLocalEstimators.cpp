@@ -503,9 +503,16 @@ compareShapeEstimators( const std::string & filename,
                     CanonicSCellEmbedder<KSpace> embedder( K );
                     FunctorMean estimatorH( embedder, h );
                     ConvFunctor convFunc(1.0);
-                    ReporterH reporterH( surf, Z3i::l2Metric, estimatorH, convFunc);
+                    ReporterH reporterH;
+                    reporterH.attach( surf );
+                    reporterH.setParams( Z3i::l2Metric, estimatorH, convFunc, re/h );
+
                     c.startClock();
-                    reporterH.init( h , re / h  );
+                    range = new VisitorRange( new Visitor( surf, *surf.begin() ));
+                    ibegin = range->begin();
+                    iend = range->end();
+
+                    reporterH.init( h , ibegin, iend );
 
                     char full_filename[360];
                     sprintf( full_filename, "%s%s", filename.c_str(), "_MongeJetFitting_mean.dat" );
@@ -515,6 +522,7 @@ compareShapeEstimators( const std::string & filename,
                     file << "# computed kernel radius = " << re << std::endl;
                     std::ostream_iterator< double > out_it_monge_mean( file, "\n" );
 
+                    delete range;
                     range = new VisitorRange( new Visitor( surf, *surf.begin() ));
                     ibegin = range->begin();
                     iend = range->end();
@@ -541,13 +549,21 @@ compareShapeEstimators( const std::string & filename,
                     CanonicSCellEmbedder<KSpace> embedder( K );
                     FunctorGaussian estimatorK( embedder, h );
                     ConvFunctor convFunc(1.0);
-                    ReporterK reporterK(surf, Z3i::l2Metric, estimatorK, convFunc);
+                    ReporterK reporterK;
+                    reporterK.attach( surf );
+                    reporterK.setParams( Z3i::l2Metric, estimatorK, convFunc, re/h );
                     c.startClock();
-                    reporterK.init( h , re / h  );
+
+                    range = new VisitorRange( new Visitor( surf, *surf.begin() ));
+                    ibegin = range->begin();
+                    iend = range->end();
+
+                    reporterK.init( h , ibegin, iend );
 
                     //typename ReporterK::SurfelConstIterator aaabegin = surf.begin();
                     //typename ReporterK::SurfelConstIterator aaaend = surf.end();
 
+                    delete range;
                     range = new VisitorRange( new Visitor( surf, *surf.begin() ));
                     ibegin = range->begin();
                     iend = range->end();
@@ -580,13 +596,16 @@ compareShapeEstimators( const std::string & filename,
                     CanonicSCellEmbedder<KSpace> embedder( K );
                     FunctorPrincCurv estimatorK( embedder, h );
                     ConvFunctor convFunc(1.0);
-                    ReporterK reporterK(surf, Z3i::l2Metric, estimatorK, convFunc);
+                    ReporterK reporterK;
+                    reporterK.attach( surf );
+                    reporterK.setParams( Z3i::l2Metric, estimatorK, convFunc, re/h );
+
                     c.startClock();
-                    reporterK.init( h , re / h  );
 
                     range = new VisitorRange( new Visitor( surf, *surf.begin() ));
                     ibegin = range->begin();
                     iend = range->end();
+                    reporterK.init( h , ibegin, iend  );
 
                     char full_filename[360];
                     sprintf( full_filename, "%s%s", filename.c_str(), "_MongeJetFitting_principal.dat" );
@@ -598,6 +617,11 @@ compareShapeEstimators( const std::string & filename,
 
                     std::vector<PrincipalCurvatures> v_results;
                     std::back_insert_iterator< std::vector<PrincipalCurvatures> > bkIt(v_results);
+
+                    delete range;
+                    range = new VisitorRange( new Visitor( surf, *surf.begin() ));
+                    ibegin = range->begin();
+                    iend = range->end();
 
                     reporterK.eval(ibegin, iend , bkIt);//out_it_monge_principal);
 
@@ -933,9 +957,15 @@ compareShapeEstimators( const std::string & filename,
                     CanonicSCellEmbedder<KSpace> embedder( K );
                     FunctorMean estimatorH( embedder, h );
                     ConvFunctor convFunc(1.0);
-                    ReporterH reporterH(surf, Z3i::l2Metric, estimatorH, convFunc);
+                    ReporterH reporterH;
+                    reporterH.attach( surf );
+                    reporterH.setParams( Z3i::l2Metric, estimatorH, convFunc, re/h );
                     c.startClock();
-                    reporterH.init( h , re / h  );
+
+                    range = new VisitorRange( new Visitor( surf, *surf.begin() ));
+                    ibegin = range->begin();
+                    iend = range->end();
+                    reporterH.init( h , ibegin, iend );
 
                     char full_filename[360];
                     sprintf( full_filename, "%s%s", filename.c_str(), "_MongeJetFitting_mean.dat" );
@@ -945,6 +975,7 @@ compareShapeEstimators( const std::string & filename,
                     file << "# computed kernel radius = " << re << std::endl;
                     std::ostream_iterator< double > out_it_monge_mean( file, "\n" );
 
+                    delete range;
                     range = new VisitorRange( new Visitor( surf, *surf.begin() ));
                     ibegin = range->begin();
                     iend = range->end();
@@ -970,10 +1001,18 @@ compareShapeEstimators( const std::string & filename,
                     CanonicSCellEmbedder<KSpace> embedder( K );
                     FunctorGaussian estimatorK( embedder, h );
                     ConvFunctor convFunc(1.0);
-                    ReporterK reporterK(surf, Z3i::l2Metric, estimatorK, convFunc);
-                    c.startClock();
-                    reporterK.init( h , re / h  );
+                    ReporterK reporterK;
+                    reporterK.attach( surf );
+                    reporterK.setParams( Z3i::l2Metric, estimatorK, convFunc, re/h );
 
+                    c.startClock();
+
+                    range = new VisitorRange( new Visitor( surf, *surf.begin() ));
+                    ibegin = range->begin();
+                    iend = range->end();
+                    reporterK.init( h , ibegin, iend );
+
+                    delete range;
                     range = new VisitorRange( new Visitor( surf, *surf.begin() ));
                     ibegin = range->begin();
                     iend = range->end();
@@ -1006,10 +1045,18 @@ compareShapeEstimators( const std::string & filename,
                     CanonicSCellEmbedder<KSpace> embedder( K );
                     FunctorPrincCurv estimatorK( embedder, h );
                     ConvFunctor convFunc(1.0);
-                    ReporterK reporterK(surf, Z3i::l2Metric, estimatorK, convFunc);
-                    c.startClock();
-                    reporterK.init( h , re / h  );
+                    ReporterK reporterK;
+                    reporterK.attach(surf);
+                    reporterK.setParams(Z3i::l2Metric, estimatorK, convFunc, re/h);
 
+                    c.startClock();
+
+                    range = new VisitorRange( new Visitor( surf, *surf.begin() ));
+                    ibegin = range->begin();
+                    iend = range->end();
+                    reporterK.init( h , ibegin, iend );
+
+                    delete range;
                     range = new VisitorRange( new Visitor( surf, *surf.begin() ));
                     ibegin = range->begin();
                     iend = range->end();

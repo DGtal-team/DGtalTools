@@ -31,7 +31,6 @@
 #include <boost/program_options/options_description.hpp>
 #include <boost/program_options/parsers.hpp>
 #include <boost/program_options/variables_map.hpp>
-#include <QtGui/qapplication.h>
 
 #include "DGtal/base/Common.h"
 #include "DGtal/base/BasicFunctors.h"
@@ -54,7 +53,55 @@
 
 using namespace std;
 using namespace DGtal;
-//using namespace Z3i;
+
+
+/**
+ @page Doc3dVolBoundaryViewer 3dVolBoundaryViewer
+ 
+ @brief  Display the boundary of a volume file by using QGLviewer.
+
+ The mode  specifies if you wish to see surface elements (BDRY), the inner
+ voxels (INNER) or the outer voxels (OUTER) that touch the boundary.
+
+ @b Usage:   3dVolBoundaryViewer -i [input]
+
+ @b Allowed @b options @b are :
+ 
+ @code
+  -h [ --help ]                    display this message
+  -i [ --input ] arg               vol file (.vol) , pgm3d (.p3d or .pgm3d, pgm
+                                   (with 3 dims)) file or sdp (sequence of 
+                                   discrete points)
+  -m [ --thresholdMin ] arg (=0)   threshold min (excluded) to define binary 
+                                   shape
+  -M [ --thresholdMax ] arg (=255) threshold max (included) to define binary 
+                                   shape
+  --dicomMin arg (=-1000)          set minimum density threshold on Hounsfield 
+                                   scale
+  --dicomMax arg (=3000)           set maximum density threshold on Hounsfield 
+                                   scale
+  --mode arg (=INNER)              set mode for display: INNER: inner voxels, 
+                                   OUTER: outer voxels, BDRY: surfels
+
+ @endcode
+
+
+ @b Example: 
+
+
+ @code
+    3dVolBoundaryViewer  -i $DGtal/examples/samples/lobster.vol -m 60
+ @endcode
+
+ You should obtain such a result:
+
+ @image html res3dVolBoundaryViewer.png "Resulting visualization."
+ 
+
+ @see
+ @ref 3dVolBoundaryViewer.cpp
+
+ */
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace po = boost::program_options;
@@ -131,9 +178,9 @@ int main( int argc, char** argv )
     int dicomMax = vm["dicomMax"].as<int>();
     typedef DGtal::functors::Rescaling<int ,unsigned char > RescalFCT;
     Image image = extension == "dcm" ? DicomReader< Image,  RescalFCT  >::importDicom( inputFilename,
-										       RescalFCT(dicomMin,
-												 dicomMax,
-												 0, 255) ) :
+                           RescalFCT(dicomMin,
+                         dicomMax,
+                         0, 255) ) :
       GenericReader<Image>::import( inputFilename );
 #else
     Image image = GenericReader<Image>::import (inputFilename );
@@ -148,8 +195,8 @@ int main( int argc, char** argv )
     bool space_ok = ks.init( domain.lowerBound(), domain.upperBound(), true );
     if (!space_ok)
       {
-	trace.error() << "Error in the Khamisky space construction."<<std::endl;
-	return 2;
+  trace.error() << "Error in the Khamisky space construction."<<std::endl;
+  return 2;
       }
     trace.endBlock();
     //! [3dVolBoundaryViewer-KSpace]
@@ -169,12 +216,12 @@ int main( int argc, char** argv )
     MySurfelAdjacency surfAdj( true ); // interior in all directions.
     MySetOfSurfels theSetOfSurfels( ks, surfAdj );
     Surfaces<KSpace>::sMakeBoundary( theSetOfSurfels.surfelSet(),
-				     ks, thresholdedImage,
-				     domain.lowerBound(),
-				     domain.upperBound() );
+             ks, thresholdedImage,
+             domain.lowerBound(),
+             domain.upperBound() );
     MyDigitalSurface digSurf( theSetOfSurfels );
     trace.info() << "Digital surface has " << digSurf.size() << " surfels."
-		 << std::endl;
+     << std::endl;
     trace.endBlock();
     //! [3dVolBoundaryViewer-ExtractingSurface]
 
@@ -187,13 +234,13 @@ int main( int argc, char** argv )
     if ( mode == "BDRY" ){
       viewer << SetMode3D(ks.unsigns( *(digSurf.begin()) ).className(), "Basic");
       for ( ConstIterator it = digSurf.begin(), itE = digSurf.end(); it != itE; ++it )
-	viewer << ks.unsigns( *it );
+  viewer << ks.unsigns( *it );
     }else if ( mode == "INNER" )
       for ( ConstIterator it = digSurf.begin(), itE = digSurf.end(); it != itE; ++it )
-	viewer << ks.sCoords( ks.sDirectIncident( *it, ks.sOrthDir( *it ) ) );
+  viewer << ks.sCoords( ks.sDirectIncident( *it, ks.sOrthDir( *it ) ) );
     else if ( mode == "OUTER" )
       for ( ConstIterator it = digSurf.begin(), itE = digSurf.end(); it != itE; ++it )
-	viewer << ks.sCoords( ks.sIndirectIncident( *it, ks.sOrthDir( *it ) ) );
+  viewer << ks.sCoords( ks.sIndirectIncident( *it, ks.sOrthDir( *it ) ) );
     else{
       trace.error() << "Warning display mode (" << mode << ") not implemented." << std::endl;
       trace.error() << "The display will be empty." << std::endl;

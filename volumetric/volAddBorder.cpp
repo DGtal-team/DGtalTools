@@ -44,6 +44,43 @@ using namespace Z3i;
 namespace po = boost::program_options;
 
 
+
+
+/**
+ @page volAddBorder volAddBorder
+ 
+ @brief Adds a border of one voxel with value 0 around a vol file.
+
+ @b Usage: 	volAddBorder --input \<volFileName\> --o \<volOutputFileName\> 
+
+
+ @b Allowed @b options @b are : 
+ @code
+  -h [ --help ]         display this message.
+  -i [ --input ] arg    Input vol file.
+  -o [ --output ] arg   Output filename.
+
+ @endcode
+
+ @b Example: 
+
+ @code
+ $  volAddBorder -i $DGtal/examples/samples/Al.100.vol -o Al.100border.vol
+ @endcode
+ 
+
+ You should obtain an resulting image with domain:
+-1, -1, -1 x 100, 100, 100 instead  0, 0, 0 x 99, 99, 99
+
+ 
+ @see
+ @ref volAddBorder.cpp
+
+ */
+
+
+
+
 /**
  * Missing parameter error message.
  *
@@ -61,7 +98,7 @@ int main(int argc, char**argv)
 {
 
   // parse command line ----------------------------------------------
-  po::options_description general_opt ( "Allowed options are: " );
+  po::options_description general_opt ( "Allowed options are " );
   general_opt.add_options()
     ( "help,h", "display this message." )
     ( "input,i", po::value<std::string>(), "Input vol file." )
@@ -80,7 +117,8 @@ int main(int argc, char**argv)
       trace.info() << "Add a border of one voxel with value 0 around a vol file."<<std::endl
                    << std::endl << "Basic usage: "<<std::endl
                    << "\tvolAddBorder --input <volFileName> --o <volOutputFileName> "<<std::endl
-                   << general_opt << "\n";
+                   << general_opt << "\n"
+                   << "Example: \n \t volAddBorder -i $DGtal/examples/samples/Al.100.vol -o Al.100border.vol";
       return 0;
     }
 
