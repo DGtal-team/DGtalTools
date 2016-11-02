@@ -82,8 +82,9 @@ namespace po = boost::program_options;
                                    scale
   --dicomMax arg (=3000)           set maximum density threshold on Hounsfield 
                                    scale
-  --mode arg (=INNER)              set mode for display: INNER: inner voxels, 
-                                   OUTER: outer voxels, BDRY: surfels
+  --mode arg (=BDRY)               set mode for display: INNER: inner voxels,
+                                   OUTER: outer voxels, BDRY: surfels, CLOSURE:
+                                   surfels with linels and pointels.
   -n [ --normalization ]           Normalization so that the geometry fits in 
                                    [-1/2,1/2]^3
 @endcode
