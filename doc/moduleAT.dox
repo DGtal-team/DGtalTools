@@ -146,13 +146,14 @@ and \f$ \mathbf{B'} := \bar{\mathbf{\star}} \bar{\mathbf{d_0}} \mathbf{\star} \f
 We get at optimum:
 \f[
   \displaystyle
-  \left\{ \begin{array}{r @{=} l}
+  \left\{ \begin{array}{r @{=} l c}
     \left[\alpha \mathbf{Id} - {\mathbf{B'}}^T diag(\mathbf{M} v)^2 \mathbf{B'} \right] u
-    &\alpha g, \\
+    &\alpha g & (1.1) \\
     \left[ \frac{\lambda}{4\varepsilon} \mathbf{Id}
           + \lambda \varepsilon \mathbf{A}^T \mathbf{A}
           + \mathbf{M}^T diag(\mathbf{B'} u)^2 \mathbf{M} \right] v
-    &\frac{\lambda}{4 \varepsilon} \mathbf{1}.
+    &\frac{\lambda}{4 \varepsilon} \mathbf{1}
+    & (1.2)
   \end{array}\right.
 \f]
 
@@ -160,14 +161,15 @@ for the derivative of AT20, and
 
 \f[
   \displaystyle
-  \left\{ \begin{array}{r @{=} l}
+  \left\{ \begin{array}{r @{=} l c}
     \left[\alpha \mathbf{Id} - \mathbf{A}^T diag(v)^2 \mathbf{A} \right] u
-    &\alpha g, \\
+    &\alpha g & (2.1) \\
     \left[ \frac{\lambda}{4\varepsilon} \mathbf{Id}
           + \lambda \varepsilon (\mathbf{A'}^T \mathbf{A'}
           + \mathbf{B}^T \mathbf{B})
           + diag(\mathbf{A} u)^2  \right] v
-    &\frac{\lambda}{4 \varepsilon} \mathbf{1}.
+    &\frac{\lambda}{4 \varepsilon} \mathbf{1}
+    & (2.2)
   \end{array}\right.
 \f]
 for the derivative of AT10. Since all matrices are
@@ -175,6 +177,38 @@ symmetric, definite and positive, we use a Cholesky factorization to
 solve alternatively the two equations of each system.
 
 
+@subsection AT2_4 Algorithm
+
+
+\f$
+OPTIMIZE-AT01( (g_1, ..., g_N ): 0-forms,
+(\alpha, \lambda, \varepsilon_1, \varepsilon_2, \varepsilon_r): reals );
+\f$
+
+\f$
+\begin{array}{l |l |l l}
+  \multicolumn{4}{l}{\mathbf{Var~} (u_1, ..., u_N): 0-forms, (v, v'): 1-forms, \varepsilon: real ; } \\
+  \multicolumn{3}{l}{\mathbf{begin}} &  \\
+  & \multicolumn{3}{l}{\mathbf{foreach~} i \in \{1, 2, 3\} \mathbf{~do~} u_i \leftarrow g_i;} \\
+  & \multicolumn{3}{l}{v \leftarrow 1, \varepsilon \leftarrow \varepsilon_1;} \\
+  & \multicolumn{3}{l}{\mathbf{while~} \varepsilon \geq \varepsilon_2 \mathbf{~do~}} \\
+  & & \multicolumn{2}{l}{\mathbf{repeat}} \\
+  & & & v' \leftarrow v; \\
+  & & & \hbox{Solve Eq.(1.1) for all } u_i ; \\
+  & & & \hbox{Solve Eq.(1.2) for } v ; \\
+  & & \multicolumn{2}{l}{\mathbf{until~} ||v - v'|| \hbox{~is small;}} \\
+  & & \multicolumn{2}{l}{\varepsilon \leftarrow \varepsilon / \varepsilon_r;} \\
+  & \multicolumn{3}{l}{\mathbf{end}} \\
+
+
+
+
+
+
+  \multicolumn{4}{l}{\mathbf{end}}
+\end{array}
+
+\f$
 
 @section AT3 Piecewise smooth approximation of images
 
@@ -411,8 +445,7 @@ In Proceedings of the IAPR International Conference on Pattern Recognition
 
 [3] Marion Foare, Jacques-Olivier Lachaud, and Hugues Talbot. "Numerical
 implementation of the Ambrosio-Tortorelli functional using discrete
-calculus and application to image restoration and inpainting." In Proc. Reproducible Research in Pattern Recognition (RRPR 2016), satellite Workshop of  International Conference on Pattern Recognition
-(ICPR2016), Cancun, Mexico. 2016. \a Submitted.
+calculus and application to image restoration and inpainting." ????
 
 [4] Matteo Focardi. "On the variational approximation of free-
 discontinuity problems in the vectorial case." Mathematical Models
@@ -422,4 +455,3 @@ and Methods in Applied Sciences 11.04 (2001): 663-684.
 for computational science . Springer, 2010.
 
 */
-
