@@ -6,6 +6,13 @@
    - add a CLOSURE export mode in volBoundary2obj. Default mode has been changed to "BDRY"
    (David Coeurjolly, [#281](https://github.com/DGtal-team/DGtalTools/pull/281))
 
+- *visualisation*: 
+   - Add SnapShot option for meshViewer and 3dVolViewer 
+     (useful to get visualisation without interaction like for scripting and/or 
+     online demonstration)
+   (Bertrand Kerautret, [#282](https://github.com/DGtal-team/DGtalTools/pull/282))
+
+
 # DGtalTools 0.9.2
 
 - *global*:
