@@ -29,6 +29,7 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 #include <iostream>
+#include <set>
 #include <boost/program_options/options_description.hpp>
 #include <boost/program_options/parsers.hpp>
 #include <boost/program_options/variables_map.hpp>
@@ -81,8 +82,9 @@ namespace po = boost::program_options;
                                    scale
   --dicomMax arg (=3000)           set maximum density threshold on Hounsfield 
                                    scale
-  --mode arg (=INNER)              set mode for display: INNER: inner voxels, 
-                                   OUTER: outer voxels, BDRY: surfels
+  --mode arg (=BDRY)               set mode for display: INNER: inner voxels,
+                                   OUTER: outer voxels, BDRY: surfels, CLOSURE:
+                                   surfels with linels and pointels.
   -n [ --normalization ]           Normalization so that the geometry fits in 
                                    [-1/2,1/2]^3
 @endcode
@@ -107,7 +109,6 @@ int main( int argc, char** argv )
   typedef KhalimskySpaceND<3,int> KSpace;
   typedef HyperRectDomain<Space> Domain;
   typedef ImageSelector<Domain, unsigned char>::Type Image;
-  typedef DigitalSetSelector< Domain, BIG_DS+HIGH_BEL_DS >::Type DigitalSet;
   typedef SurfelAdjacency<KSpace::dimension> MySurfelAdjacency;
 
   // parse command line ----------------------------------------------
@@ -122,7 +123,7 @@ int main( int argc, char** argv )
     ("dicomMin", po::value<int>()->default_value(-1000), "set minimum density threshold on Hounsfield scale")
     ("dicomMax", po::value<int>()->default_value(3000), "set maximum density threshold on Hounsfield scale")
 #endif
-    ("mode",  po::value<std::string>()->default_value("INNER"), "set mode for display: INNER: inner voxels, OUTER: outer voxels, BDRY: surfels") 
+    ("mode",  po::value<std::string>()->default_value("BDRY"), "set mode for display: INNER: inner voxels, OUTER: outer voxels, BDRY: surfels (default), CLOSURE: surfels with linels and pointels.")
    ("normalization,n", "Normalization so that the geometry fits in [-1/2,1/2]^3") ;
 
   bool parseOK=true;
@@ -224,7 +225,7 @@ int main( int argc, char** argv )
 		 << std::endl;
     trace.endBlock();
 
-    trace.beginBlock( "Displaying everything. " );
+    trace.beginBlock( "Exporting everything." );
     Board3D<Space,KSpace> board(ks);
 
     board << SetMode3D(  ks.unsigns( *digSurf.begin() ).className(), "Basic" );
@@ -232,14 +233,35 @@ int main( int argc, char** argv )
     typedef MyDigitalSurface::ConstIterator ConstIterator;
     if ( mode == "BDRY" )
       for ( ConstIterator it = digSurf.begin(), itE = digSurf.end(); it != itE; ++it )
-	board << ks.unsigns( *it );
+        board << ks.unsigns( *it );
     else if ( mode == "INNER" )
       for ( ConstIterator it = digSurf.begin(), itE = digSurf.end(); it != itE; ++it )
-	board << ks.sCoords( ks.sDirectIncident( *it, ks.sOrthDir( *it ) ) );
+        board << ks.sCoords( ks.sDirectIncident( *it, ks.sOrthDir( *it ) ) );
     else if ( mode == "OUTER" )
       for ( ConstIterator it = digSurf.begin(), itE = digSurf.end(); it != itE; ++it )
-	board << ks.sCoords( ks.sIndirectIncident( *it, ks.sOrthDir( *it ) ) );
-
+        board << ks.sCoords( ks.sIndirectIncident( *it, ks.sOrthDir( *it ) ) );
+    else  if (mode == "CLOSURE")
+    {
+        std::set<KSpace::Cell> container;
+        for ( ConstIterator it = digSurf.begin(), itE = digSurf.end(); it != itE; ++it )
+        {
+          container.insert( ks.unsigns( *it ) );
+          KSpace::SCells oneNeig = ks.sLowerIncident(*it);
+          //Processing linels
+          for(KSpace::SCells::ConstIterator itt = oneNeig.begin(), ittend = oneNeig.end(); itt != ittend; ++itt)
+          {
+            container.insert( ks.unsigns( *itt) );
+            KSpace::SCells oneNeig2 = ks.sLowerIncident(*itt);
+            //Processing pointels
+            for(KSpace::SCells::ConstIterator ittt = oneNeig2.begin(), itttend = oneNeig2.end(); ittt != itttend; ++ittt)
+              container.insert( ks.unsigns(*ittt) );
+          }
+        }
+      trace.info()<< "Exporting "<< container.size() << " cells"<<std::endl;
+      for(auto cell: container)
+        board << cell;
+    }
+    
     string outputFilename = vm["output"].as<std::string>();
 
     board.saveOBJ(outputFilename, normalization);

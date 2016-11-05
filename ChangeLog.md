@@ -3,7 +3,8 @@
 - *converters*:
    - fix tool itk2vol which was not able to read and convert int type image.
    (Bertrand Kerautret, [#276](https://github.com/DGtal-team/DGtalTools/pull/271))
-
+   - add a CLOSURE export mode in volBoundary2obj. Default mode has been changed to "BDRY"
+   (David Coeurjolly, [#281](https://github.com/DGtal-team/DGtalTools/pull/281))
 
 # DGtalTools 0.9.2
 
