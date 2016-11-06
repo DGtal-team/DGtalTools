@@ -30,8 +30,8 @@ More Information
 * Release 0.9.1 DOI [![DOI](https://zenodo.org/badge/doi/10.5281/zenodo.45130.svg)](http://dx.doi.org/10.5281/zenodo.45130)
 * Release 0.9 DOI [![DOI](https://zenodo.org/badge/doi/10.5281/zenodo.31882.svg)](http://dx.doi.org/10.5281/zenodo.31882)
 * Release 0.8 DOI [![DOI](https://zenodo.org/badge/doi/10.5281/zenodo.11587.svg)](http://dx.doi.org/10.5281/zenodo.11587)
-* [![Build Status](https://api.travis-ci.org/DGtal-team/DGtalTools.svg?branch=master)](https://travis-ci.org/DGtal-team/DGtalTools)
-
+* Linux/MacOS [![Build Status](https://api.travis-ci.org/DGtal-team/DGtalTools.svg?branch=master)](https://travis-ci.org/DGtal-team/DGtalTools)
+* Windows [![Build status](https://ci.appveyor.com/api/projects/status/o156pe96bd02sdr5/branch/master?svg=true)](https://ci.appveyor.com/project/kerautret/dgtaltools-7x999/branch/master)
 
 Documentation
 ==============
