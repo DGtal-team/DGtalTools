@@ -153,11 +153,11 @@ We get at optimum:
   \displaystyle
   \left\{ \begin{array}{r @{=} l c}
     \left[\alpha \mathbf{Id} - {\mathbf{B'}}^T diag(\mathbf{M} v)^2 \mathbf{B'} \right] u
-    &\alpha g & (1.1) \\
+    & = \quad \alpha g & (1.1) \\
     \left[ \frac{\lambda}{4\varepsilon} \mathbf{Id}
           + \lambda \varepsilon \mathbf{A}^T \mathbf{A}
           + \mathbf{M}^T diag(\mathbf{B'} u)^2 \mathbf{M} \right] v
-    &\frac{\lambda}{4 \varepsilon} \mathbf{1}
+    & = \quad \frac{\lambda}{4 \varepsilon} \mathbf{1}
     & (1.2)
   \end{array}\right.
 \f]
@@ -168,12 +168,12 @@ for the derivative of AT20, and
   \displaystyle
   \left\{ \begin{array}{r @{=} l c}
     \left[\alpha \mathbf{Id} - \mathbf{A}^T diag(v)^2 \mathbf{A} \right] u
-    &\alpha g & (2.1) \\
+    & = \quad \alpha g & (2.1) \\
     \left[ \frac{\lambda}{4\varepsilon} \mathbf{Id}
           + \lambda \varepsilon (\mathbf{A'}^T \mathbf{A'}
           + \mathbf{B}^T \mathbf{B})
           + diag(\mathbf{A} u)^2  \right] v
-    &\frac{\lambda}{4 \varepsilon} \mathbf{1}
+    & = \quad \frac{\lambda}{4 \varepsilon} \mathbf{1}
     & (2.2)
   \end{array}\right.
 \f]
