@@ -75,9 +75,14 @@ derivative operator \f$ \mathbf{d_0} \f$ is the oriented vertex-edge
 incidence matrix of \a K. Similarly, the primal derivative
 \f$ \mathbf{d_1} \f$ is the oriented edge-face incidence matrix of \a K.
 
-Discrete Hodge star operators \f$ \mathbf{\star} \f$ send \f$ k \f$-forms
-of the primal complex \a K onto \f$ (n-k) \f$-forms of the dual complex
-\a K'.
+Discrete Hodge star operators \f$ \mathbf{\star} \f$ send \f$ k
+\f$-forms of the primal complex \a K onto \f$ (n-k) \f$-forms of the
+dual complex \a K'. Of course, there are dual Hodge star operators \f$
+\bar{\mathbf{\star}} \f$ which send \f$ k \f$-forms of the dual
+complex \a K' onto \f$ (n-k) \f$-forms of the primal complex \a
+K'. The composition of \f$ \mathbf{\star} \f$ with its dual \f$
+\bar{\mathbf{\star}} \f$ is idempotent except for a sign change in
+some cases, i.e. \f$ \bar{\mathbf{\star}} \mathbf{\star} = (-1)^{k(n-k)} \mathbf{Id} \f$.
 
 We define \f$ \mathbf{M} \f$ the matrix which transforms a 0-form into a
 1-form by averaging the values on the two edge extremities, i.e.
@@ -113,12 +118,12 @@ second term, where we use matrix \f$ \mathbf{M} \f$ to transport the 0-form
 
 A second possibility is to define \f$ u \f$ and \f$ g \f$ on the vertices
 and \f$ v \f$ on the edges. We denote this formulation
-AT10. Gray levels are seen as point mass on the center of pixels, so
+AT01. Gray levels are seen as point mass on the center of pixels, so
 that functions \f$ u \f$ and \f$ g \f$ are both 0-forms, while \f$ v \f$
 is a dual 1-form in between \f$ u \f$. It follows:
 \f[
   \displaystyle
-  AT10(u,v) = \Sigma_{i=1}^n
+  AT01(u,v) = \Sigma_{i=1}^n
       \alpha \langle u_i - g_i , u_i - g_i \rangle_0
     + \langle v , \mathbf{d_0} u_i \rangle_1 \langle v ,
                                           \mathbf{d_0} u_i \rangle_1 \\
@@ -172,7 +177,7 @@ for the derivative of AT20, and
     & (2.2)
   \end{array}\right.
 \f]
-for the derivative of AT10. Since all matrices are
+for the derivative of AT01. Since all matrices are
 symmetric, definite and positive, we use a Cholesky factorization to
 solve alternatively the two equations of each system.
 
@@ -181,41 +186,31 @@ solve alternatively the two equations of each system.
 
 
 \f$
-OPTIMIZE-AT01( (g_1, ..., g_N ): 0-forms,
-(\alpha, \lambda, \varepsilon_1, \varepsilon_2, \varepsilon_r): reals );
-\f$
-
-\f$
-\begin{array}{l |l |l l}
-  \multicolumn{4}{l}{\mathbf{Var~} (u_1, ..., u_N): 0-forms, (v, v'): 1-forms, \varepsilon: real ; } \\
-  \multicolumn{3}{l}{\mathbf{begin}} &  \\
-  & \multicolumn{3}{l}{\mathbf{foreach~} i \in \{1, 2, 3\} \mathbf{~do~} u_i \leftarrow g_i;} \\
-  & \multicolumn{3}{l}{v \leftarrow 1, \varepsilon \leftarrow \varepsilon_1;} \\
-  & \multicolumn{3}{l}{\mathbf{while~} \varepsilon \geq \varepsilon_2 \mathbf{~do~}} \\
-  & & \multicolumn{2}{l}{\mathbf{repeat}} \\
+\begin{array}{l l l l}
+\rlap{OPTIMIZE-AT01( (g_1, ..., g_N ): 0-forms,
+(\alpha, \lambda, \varepsilon_1, \varepsilon_2, \varepsilon_r): reals );} \\
+  \rlap{\mathbf{Var~} (u_1, ..., u_N): 0-forms, (v, v'): 1-forms, \varepsilon: real ; } \\
+  \rlap{\mathbf{begin}} &  \\
+  & \rlap{\mathbf{foreach~} i \in \{1, 2, 3\} \mathbf{~do~} u_i \leftarrow g_i;} \\
+  & \rlap{v \leftarrow 1, \varepsilon \leftarrow \varepsilon_1;} \\
+  & \rlap{\mathbf{while~} \varepsilon \geq \varepsilon_2 \mathbf{~do~}} \\
+  & & \rlap{\mathbf{repeat}} \\
   & & & v' \leftarrow v; \\
   & & & \hbox{Solve Eq.(1.1) for all } u_i ; \\
   & & & \hbox{Solve Eq.(1.2) for } v ; \\
-  & & \multicolumn{2}{l}{\mathbf{until~} ||v - v'|| \hbox{~is small;}} \\
-  & & \multicolumn{2}{l}{\varepsilon \leftarrow \varepsilon / \varepsilon_r;} \\
-  & \multicolumn{3}{l}{\mathbf{end}} \\
-
-
-
-
-
-
-  \multicolumn{4}{l}{\mathbf{end}}
+  & & \rlap{\mathbf{until~} ||v - v'|| \hbox{~is small;}} \\
+  & & \rlap{\varepsilon \leftarrow \varepsilon / \varepsilon_r;} \\
+  & \rlap{\mathbf{end}} \\
+  \rlap{\mathbf{end}}
 \end{array}
-
 \f$
 
 @section AT3 Piecewise smooth approximation of images
 
 @subsection AT3_1 Some examples of restoration and discontinuity detections
 
-We display below the different resconstruction of image "lena" with
-noise approximately 20%, for varying parameter \f$ \lambda \f$. Note
+We display below the different resconstructions of image "lena" with
+approximately 20% noise, for varying parameter \f$ \lambda \f$. Note
 that a too big \f$ \lambda \f$ gives a fuzzy result, while a too small
 \f$ \lambda \f$ keeps noise.
 
@@ -443,9 +438,12 @@ and segmentation using the Ambrosio-Tortorelli functional and discrete calculus.
 In Proceedings of the IAPR International Conference on Pattern Recognition
 (ICPR2016), Cancun, Mexico, 2016.
 
-[3] Marion Foare, Jacques-Olivier Lachaud, and Hugues Talbot. "Numerical
-implementation of the Ambrosio-Tortorelli functional using discrete
-calculus and application to image restoration and inpainting." ????
+[3] Marion Foare, Jacques-Olivier Lachaud, and Hugues
+Talbot. "Numerical implementation of the Ambrosio-Tortorelli
+functional using discrete calculus and application to image
+restoration and inpainting."  In Proceedings of 1st Workshop on
+Reproducible Research In Pattern Recognition (RRPR 2016), Springer
+LNCS. To appear.
 
 [4] Matteo Focardi. "On the variational approximation of free-
 discontinuity problems in the vectorial case." Mathematical Models
