@@ -9,8 +9,9 @@
 - *visualisation*: 
    - Add SnapShot option for meshViewer and 3dVolViewer 
      (useful to get visualisation without interaction like for scripting and/or 
-     online demonstration)
-   (Bertrand Kerautret, [#282](https://github.com/DGtal-team/DGtalTools/pull/282))
+     online demonstration). It also contains a new option to display a mesh in 
+     3DvolViewer. 
+     (Bertrand Kerautret, [#282](https://github.com/DGtal-team/DGtalTools/pull/282))
 
 
 # DGtalTools 0.9.2

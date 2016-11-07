@@ -82,7 +82,7 @@ using namespace Z3i;
   --displayMesh arg                display a Mesh given in OFF or OFS format. 
   --colorMesh arg                  set the color of Mesh (given from 
                                    displayMesh option) : r g b a 
-  -d [ --doSnapShotAndExit]  arg,  save display snapshot into file. Notes that the camera setting is set by default according the last saved configuration (use SHIFT+Key_M to save current camera setting in the Viewer3D). If the camera setting was not saved it will use the default camera setting.
+  -d [ --doSnapShotAndExit]  filename,  save display snapshot into file. Notes that the camera setting is set by default according the last saved configuration (use SHIFT+Key_M to save current camera setting in the Viewer3D). If the camera setting was not saved it will use the default camera setting.
   -t [ --transparency ] arg (=255)   transparency
  @endcode
 
