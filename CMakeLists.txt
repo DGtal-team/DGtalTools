@@ -63,7 +63,6 @@ endif( Boost_FOUND )
 
 
 
-
 # -----------------------------------------------------------------------------
 # Documentation
 # -----------------------------------------------------------------------------
@@ -81,3 +80,4 @@ add_subdirectory(estimators)
 add_subdirectory(converters)
 add_subdirectory(visualisation)
 add_subdirectory(geometricTransform)
+add_subdirectory(imageProcessing)

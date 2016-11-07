@@ -780,7 +780,8 @@ INPUT                  = @top_srcdir@/doc \
                          @top_srcdir@/estimators \
                          @top_srcdir@/generators \
                          @top_srcdir@/geometricTransform \
-                         @top_srcdir@/volumetric
+                         @top_srcdir@/volumetric \
+                         @top_srcdir@/imageProcessing
 
 # This tag can be used to specify the character encoding of the source files
 # that doxygen parses. Internally doxygen uses the UTF-8 encoding. Doxygen uses
@@ -881,7 +882,8 @@ EXAMPLE_RECURSIVE      = YES
 # that contain images that are to be included in the documentation (see the
 # \image command).
 
-IMAGE_PATH             = @top_srcdir@/doc/images
+IMAGE_PATH             = @top_srcdir@/doc/images \
+                         @top_srcdir@/doc/images/AT
 
 # The INPUT_FILTER tag can be used to specify a program that doxygen should
 # invoke to filter for each input file. Doxygen will invoke the filter program

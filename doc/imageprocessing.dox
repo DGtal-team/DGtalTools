@@ -1,0 +1,47 @@
+/**
+ * @file imageprocessing.dox
+ * @author Jacques-Olivier Lachaud (\c jacques-olivier.lachaud@univ-savoie.fr )
+ * Laboratory of Mathematics (CNRS, UMR 5127), University of Savoie, France
+ *
+ * @date 2016/10/15
+ *
+ * Documentation file for imageProcessing
+ *
+ * This file is part of the DGtal library.
+ */
+
+
+//----------------------------------------
+/*!
+@page imageProcessing Image processing
+@writers Jacques-Olivier Lachaud
+
+@section imageprocessing_Modules Modules of package image processing
+
+ - \ref moduleAT (Marion Foare, Jacques-Olivier Lachaud)
+
+
+@section imageprocessing_Doc Image restoration
+
+  - @ref DocATu2v0 : Computes a piecewise smooth approximation of an image, by optimizing the Ambrosio-Tortorelli functional (with u a 2-form and v a 0-form).
+  - @ref DocATu0v1 : Computes a piecewise smooth approximation of an image, by optimizing the Ambrosio-Tortorelli functional (with u a 0-form and v a 1-form).
+
+
+<center>
+<table>
+  <tr>
+        <td> 
+        <img height=200px src="lena-370-b02.png"> 
+        </td>
+        <td>
+        <img height=200px src="lena-370-b02-a0_48000-l0_0250000-u.png">
+        </td>
+</tr>
+<tr>
+        <td colspan=2 align = center>@ref DocATu2v0, @ref DocATu0v1 </td>
+</tr>
+</table>
+</center>
+
+
+*/
