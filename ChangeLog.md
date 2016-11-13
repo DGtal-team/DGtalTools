@@ -17,7 +17,12 @@
      3DvolViewer. 
      (Bertrand Kerautret, [#282](https://github.com/DGtal-team/DGtalTools/pull/282))
 
-
+- *estimators*:
+    - 2dlocalEstimators: add an option to export the generated contour.
+     (Bertrand Kerautret, [#285](https://github.com/DGtal-team/DGtalTools/pull/285))
+    
+    
+    
 # DGtalTools 0.9.2
 
 - *global*:
