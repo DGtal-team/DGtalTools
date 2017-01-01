@@ -284,8 +284,7 @@ template <typename Pattern, typename Integer>
 void displayConvexHull(const Pattern& aP, const Integer& aD, bool withFDT = false)
 {
   typedef typename Pattern::Fraction Fraction; 
-  typedef typename Pattern::Quotient Quotient; 
-  typedef typename Pattern::Vector2I Vector;  
+  typedef typename Pattern::Vector2I Vector;
   typedef std::vector<Vector> Convergents; 
   typedef typename Pattern::Point2I Point;  
   
@@ -555,7 +554,6 @@ void displayCDT(const Pattern& aP, const Integer& aD)
   Board2D aBoard; 
 
   typedef typename Pattern::Point2I Point;  
-  typedef typename Pattern::Quotient Quotient;  
   typedef typename Pattern::Fraction Fraction;  
   Fraction zn = aP.slope(); 
 

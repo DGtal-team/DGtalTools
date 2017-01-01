@@ -164,7 +164,6 @@ int main( int argc, char** argv )
   
   typedef Z3i::KSpace::SurfelSet SurfelSet;
   typedef SetOfSurfels< Z3i::KSpace, SurfelSet > MySetOfSurfels;
-  typedef DigitalSurface< MySetOfSurfels > MyDigitalSurface;
   
   // parse command line ----------------------------------------------
   po::options_description general_opt(" \n Allowed options are ");

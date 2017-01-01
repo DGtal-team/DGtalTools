@@ -160,7 +160,6 @@ using namespace functors;
 const Color  AXIS_COLOR_RED( 200, 20, 20, 255 );
 const Color  AXIS_COLOR_GREEN( 20, 200, 20, 255 );
 const Color  AXIS_COLOR_BLUE( 20, 20, 200, 255 );
-const double AXIS_LINESIZE = 0.05;
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -335,7 +334,6 @@ int main( int argc, char** argv )
   typedef Z3i::KSpace KSpace;
   typedef KSpace::SCell SCell;
   typedef KSpace::Cell Cell;
-  typedef KSpace::Surfel Surfel;
 
   trace.beginBlock("Loading the file");
   std::string filename = vm["input"].as< std::string >();

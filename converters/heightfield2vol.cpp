@@ -98,7 +98,7 @@ struct Image3DPredicatFrom2DImage{
                              ):myImageRef(anImage), 
                                myScale(aScale),
                                myMaxHeight(maxHeight),
-                               myBG(bg), myFG(fg){    
+                               myFG(fg), myBG(bg) {
   }   
   inline
   unsigned int operator()(const Point3D &aPoint)  const {
@@ -123,12 +123,9 @@ struct Image3DPredicatFrom2DImage{
 
 int main( int argc, char** argv )
 {
-  typedef ImageContainerBySTLVector < Z3i::Domain, unsigned char > Image3D;
   typedef ImageContainerBySTLVector < Z2i::Domain, unsigned char> Image2D;
 
-  typedef DGtal::ConstImageAdapter<Image3D, Z2i::Domain, DGtal::functors::Point2DEmbedderIn3D<DGtal::Z3i::Domain>,
-                                   Image3D::Value,  DGtal::functors::Identity >  ImageAdapterExtractor;
-
+  
   // parse command line ----------------------------------------------
   po::options_description general_opt("Allowed options are: ");
   general_opt.add_options()

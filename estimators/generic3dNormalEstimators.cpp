@@ -289,7 +289,6 @@ void exportNOFFSurface( const DigitalSurface& surface,
   typedef typename DigitalSurface::KSpace KSpace;
   typedef typename DigitalSurface::ConstIterator ConstIterator;
   typedef typename DigitalSurface::Surfel Surfel;
-  typedef typename KSpace::SCell SCell;
   typedef typename Estimator::Quantity Quantity;
   const KSpace& ks = surface.container().space();
   std::map<Surfel,Quantity> normals;
@@ -321,7 +320,6 @@ void computeEstimation
   TrueEstimator& true_estimator,   //< "ground truth" estimator
   Estimator& estimator )           //< an initialized estimator
 {
-  typedef typename Surface::ConstIterator ConstIterator;
   typedef typename Surface::Surfel Surfel;
   typedef typename Estimator::Quantity Quantity;
   typedef double Scalar;
@@ -807,7 +805,6 @@ int main( int argc, char** argv )
 
   trace.beginBlock( "Make implicit digital shape..." );
   typedef Z3i::KSpace KSpace;
-  typedef KSpace::Point Point;
   typedef Space::RealPoint RealPoint;
   typedef GaussDigitizer< Space, ImplicitShape > ImplicitDigitalShape;
   typedef ImplicitDigitalShape::Domain Domain;
