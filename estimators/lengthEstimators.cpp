@@ -282,7 +282,6 @@ lengthEstimators( const std::string & /*name*/,
   // Types
   typedef typename Space::Point Point;
   typedef typename Space::Vector Vector;
-  typedef typename Space::RealPoint RealPoint;
   typedef typename Space::Integer Integer;
   typedef HyperRectDomain<Space> Domain;
   typedef KhalimskySpaceND<Space::dimension,Integer> KSpace;

@@ -68,14 +68,14 @@ using namespace functors;
 
 /**
  @page Doc3DCurvatureViewer 3DCurvatureViewer
- 
+
  @brief  Computes and visualizes mean or gaussian curvature of binary shapes.
 
   Vol file viewer, with curvature (mean or Gaussian, see parameters) information on surface.
   Blue color means lowest curvature
   Yellow color means highest curvature
   Red means the in-between
- 
+
   Uses IntegralInvariantCurvatureEstimation
   @see related article:
         Coeurjolly, D.; Lachaud, J.O; Levallois, J., (2013). Integral based Curvature
@@ -83,54 +83,54 @@ using namespace functors;
         https://liris.cnrs.fr/publis/?id=5866
 
 
- 
- 
+
+
 
  @b Usage:  3dCurvatureViewer -i file.vol --radius 5 --mode mean
- 
+
 
  @b Allowed @b options @b are:
- 
+
  @code
   -h [ --help ]                         display this message
   -i [ --input ] arg                    .vol file
   -r [ --radius ] arg                   Kernel radius for IntegralInvariant
   -t [ --threshold ] arg (=8)           Min size of SCell boundary of an object
-  -l [ --minImageThreshold ] arg (=0)   set the minimal image threshold to 
+  -l [ --minImageThreshold ] arg (=0)   set the minimal image threshold to
                                         define the image object (object defined
-                                        by the voxel with intensity belonging 
-                                        to ]minImageThreshold, 
+                                        by the voxel with intensity belonging
+                                        to ]minImageThreshold,
                                         maxImageThreshold ] ).
-  -u [ --maxImageThreshold ] arg (=255) set the minimal image threshold to 
+  -u [ --maxImageThreshold ] arg (=255) set the minimal image threshold to
                                         define the image object (object defined
-                                        by the voxel with intensity belonging 
-                                        to ]minImageThreshold, 
+                                        by the voxel with intensity belonging
+                                        to ]minImageThreshold,
                                         maxImageThreshold] ).
-  -m [ --mode ] arg (=mean)             type of output : mean, gaussian, k1, 
-                                        k2, prindir1, prindir2 or normal 
+  -m [ --mode ] arg (=mean)             type of output : mean, gaussian, k1,
+                                        k2, prindir1, prindir2 or normal
                                         (default mean)
-  -o [ --exportOBJ ] arg                Export the scene to specified OBJ/MTL 
+  -o [ --exportOBJ ] arg                Export the scene to specified OBJ/MTL
                                         filename (extensions added).
-  -d [ --exportDAT ] arg                Export resulting curvature (for mean, 
-                                        gaussian, k1 or k2 mode) in a simple 
-                                        data file each line representing a 
-                                        surfel. 
-  --exportOnly                          Used to only export the result without 
-                                        the 3d Visualisation (usefull for 
+  -d [ --exportDAT ] arg                Export resulting curvature (for mean,
+                                        gaussian, k1 or k2 mode) in a simple
+                                        data file each line representing a
+                                        surfel.
+  --exportOnly                          Used to only export the result without
+                                        the 3d Visualisation (usefull for
                                         scripts).
-  -s [ --imageScale ] arg               scaleX, scaleY, scaleZ: re sample the 
-                                        source image according with a grid of 
-                                        size 1.0/scale (usefull to compute 
-                                        curvature on image defined on 
-                                        anisotropic grid). Set by default to 
-                                        1.0 for the three axis.  
-  -n [ --normalization ]                When exporting to OBJ, performs a 
+  -s [ --imageScale ] arg               scaleX, scaleY, scaleZ: re sample the
+                                        source image according with a grid of
+                                        size 1.0/scale (usefull to compute
+                                        curvature on image defined on
+                                        anisotropic grid). Set by default to
+                                        1.0 for the three axis.
+  -n [ --normalization ]                When exporting to OBJ, performs a
                                         normalization so that the geometry fits
                                         in [-1/2,1/2]^3
 
  @endcode
 
- Below are the different available modes: 
+ Below are the different available modes:
 
 	 - "mean" for the mean curvature
 	 - "gaussian" for the Gaussian curvature
@@ -141,8 +141,8 @@ using namespace functors;
 	 - "normal" for the normal vector
 
 
- @b Example: 
- 
+ @b Example:
+
  Now we compare the different curvature values from the two shapes:
  @code
    3dCurvatureViewer -i $DGtal/examples/samples/lobster.vol -r 10 -l 40 -u 255 -m mean
@@ -150,18 +150,17 @@ using namespace functors;
 
  You should obtain such a visualisation:
  @image html res3dCurvatureViewer.png "resulting visualisation of mean curvature."
- 
+
 
  @see
- @ref 3dCurvatureViewer.cpp, 
- @ref Doc3DCurvatureViewerNoise 
+ @ref 3dCurvatureViewer.cpp,
+ @ref Doc3DCurvatureViewerNoise
  */
 
 const Color  AXIS_COLOR_RED( 200, 20, 20, 255 );
 const Color  AXIS_COLOR_GREEN( 20, 200, 20, 255 );
 const Color  AXIS_COLOR_BLUE( 20, 20, 200, 255 );
 const double AXIS_LINESIZE = 0.05;
-
 ///////////////////////////////////////////////////////////////////////////////
 
 /**
@@ -335,7 +334,6 @@ int main( int argc, char** argv )
   typedef Z3i::KSpace KSpace;
   typedef KSpace::SCell SCell;
   typedef KSpace::Cell Cell;
-  typedef KSpace::Surfel Surfel;
 
   trace.beginBlock("Loading the file");
   std::string filename = vm["input"].as< std::string >();

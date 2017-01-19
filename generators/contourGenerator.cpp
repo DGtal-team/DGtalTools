@@ -528,7 +528,6 @@ int main( int argc, char** argv )
   
   // standard types
   typedef Z2i::Space Space;
-  typedef Space::Point Point;
   typedef Space::RealPoint RealPoint;
   
   RealPoint center( vm["center_x"].as<double>(),

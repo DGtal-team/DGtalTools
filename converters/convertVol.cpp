@@ -44,7 +44,7 @@ using namespace DGtal;
 
 /**
  @page convertVol convertVol
- @brief Converts volumetric file into volumetric file from different formats (pgm3d, vol, longvol).
+ @brief Converts volumetric file into volumetric file from different formats (pgm3d, vol, longvol). This tool can also be used to upgrade a Version-2 Vol or Longvol file to the new (compressed) Version-3.
 
 
 @b Usage: convertVol [input] [output]
@@ -57,11 +57,16 @@ using namespace DGtal;
   -o [ --output ] arg   volumetric file (.pgm3d, .vol, .longvol) 
 @endcode
 
-@b Example:
+@b Examples:
 @code 
 $ convertVol -i ${DGtal}/examples/samples/lobster.vol -o convertedVol.p3d 
 @endcode
 
+ To upgrade a "Version-2" vol file to a "Version-3" (default Vol writer):
+ @code
+ $ convertVol -i ${DGtal}/examples/samples/lobster.vol -o ${DGtal}/examples/samples/lobster.vol
+ @endcode
+ 
 
 @see convertVol.cpp
 

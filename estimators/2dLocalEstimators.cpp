@@ -402,7 +402,6 @@ computeLocalEstimations( const std::string & filename,
                          double noiseLevel = 0.0 )
 {
   // Types
-  typedef typename Space::Point Point;
   typedef typename Space::Vector Vector;
   typedef typename Space::RealPoint RealPoint;
   typedef typename Space::Integer Integer;
@@ -1042,7 +1041,6 @@ int main( int argc, char** argv )
 
   // standard types
   typedef Z2i::Space Space;
-  typedef Space::Point Point;
   typedef Space::RealPoint RealPoint;
 
   RealPoint center( vm["center_x"].as<double>(),

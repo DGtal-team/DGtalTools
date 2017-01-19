@@ -169,7 +169,7 @@ int main(int argc, char**argv)
       vmin = *std::min_element(imageC.begin(), imageC.end());
       trace.info() << "Max value = "<< vmax<<std::endl;
       trace.info() << "Min value = "<< vmin<<std::endl;
-      res  = VolWriter<MyImageC , LinearFunctor>::exportVol(outputFileName, imageC, LinearFunctor(vmax,vmin));
+      res  = VolWriter<MyImageC , LinearFunctor>::exportVol(outputFileName, imageC, true, LinearFunctor(vmax,vmin));
     }
   if (mode == 2)
     res = VolWriter<MyImageC, CycleFunctor>::exportVol(outputFileName, imageC);

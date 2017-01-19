@@ -1,5 +1,9 @@
 # DGtalTools 0.9.3
 
+- *global*:
+   - Various fixes to enable the new Version3 (compressed) Vol/Longvol files.
+   (David Coeurjolly, [#287](https://github.com/DGtal-team/pull/287))
+
 - *imageProcessing*:
    - Creates imageProcessing directory. Add tools for doing image restoration and inpainting with Ambrosio-Tortorelli functional and discrete calculus. (Jacques-Olivier Lachaud, Marion Foare
    [#280](https://github.com/DGtal-team/DGtalTools/pull/280))
@@ -10,11 +14,11 @@
    - add a CLOSURE export mode in volBoundary2obj. Default mode has been changed to "BDRY"
    (David Coeurjolly, [#281](https://github.com/DGtal-team/DGtalTools/pull/281))
 
-- *visualisation*: 
-   - Add SnapShot option for meshViewer and 3dVolViewer 
-     (useful to get visualisation without interaction like for scripting and/or 
-     online demonstration). It also contains a new option to display a mesh in 
-     3DvolViewer. 
+- *visualisation*:
+   - Add SnapShot option for meshViewer and 3dVolViewer
+     (useful to get visualisation without interaction like for scripting and/or
+     online demonstration). It also contains a new option to display a mesh in
+     3DvolViewer.
      (Bertrand Kerautret, [#282](https://github.com/DGtal-team/DGtalTools/pull/282))
 
 - *estimators*:
@@ -34,12 +38,12 @@
   - renaming of the shapeGenerator folder to generators (David Coeurjolly, [#268](https://github.com/DGtal-team/DGtalTools/pull/268)))
 
 - *visualisation*:
- - meshViewer: add a key to display mesh information about number of 
+ - meshViewer: add a key to display mesh information about number of
     vertex/faces.
     (Bertrand Kerautret,
     [#273](https://github.com/DGtal-team/DGtalTools/pull/272))
 
-  - 3dSDPViewer: fix the mesh display which was not given with their original 
+  - 3dSDPViewer: fix the mesh display which was not given with their original
    colors. (Bertrand Kerautret,
    [#272](https://github.com/DGtal-team/DGtalTools/pull/272))
 
