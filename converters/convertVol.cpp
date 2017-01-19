@@ -64,7 +64,7 @@ $ convertVol -i ${DGtal}/examples/samples/lobster.vol -o convertedVol.p3d
 
  To upgrade a "Version-2" vol file to a "Version-3" (default Vol writer):
  @code
- $ convertVol -i lobster.vol -o lobster.vol
+ $ convertVol -i ${DGtal}/examples/samples/lobster.vol -o ${DGtal}/examples/samples/lobster.vol
  @endcode
  
 
