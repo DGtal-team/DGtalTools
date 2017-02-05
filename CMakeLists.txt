@@ -54,6 +54,7 @@ SET(Boost_FOUND FALSE)
 FIND_PACKAGE(Boost 1.46.0 REQUIRED COMPONENTS program_options)
 if ( Boost_FOUND )
   message(STATUS "Boost and boost_program_options found.")
+  ADD_DEFINITIONS(${BOOST_DEFINITIONS} -DBOOST_ALL_NO_LIB)    
   include_directories( ${Boost_INCLUDE_DIRS} )
   SET(DGtalToolsLibDependencies ${DGtalToolsLibDependencies}
      ${Boost_LIBRAIRIES}
