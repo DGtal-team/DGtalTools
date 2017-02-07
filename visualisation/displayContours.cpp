@@ -110,6 +110,17 @@ using namespace DGtal;
                            Minimum Length Polygon {MLP}
   -o [ --outputFile ] arg  <filename> save output file automatically according 
                           the file format extension.
+  -v [ --displayVectorField ] arg    Add the display of a vector field 
+                                     represented by two floating coordinates. 
+                                     Each vector is displayed starting from the
+                                     corresponding countour point coordinates.
+  -v [ --scaleVectorField ] arg (=1) set the scale of the vector field (default
+                                     1) (used with --displayVectorField).
+  --vectorFieldIndex arg             specify the vector field index (by default
+                                     0,1) (used with --displayVectorField).
+  --rotateVectorField                apply a CCW rotation of 90° (used with 
+                                     --displayVectorField).  
+
   --outputStreamEPS        specify eps for output stream format.
   --outputStreamSVG        specify svg for output stream format.
   --outputStreamFIG        specify fig for output stream format.
