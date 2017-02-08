@@ -181,7 +181,7 @@ void saveSelContoursAsFC(std::vector< std::vector< Z2i::Point >  >  vectContours
 
   for(unsigned int k=0; k<vectContoursBdryPointels.size(); k++){
     if(vectContoursBdryPointels.at(k).size()>minSize){
-      Z2i::Point ptMean = ContourHelper::getMeanPoint(vectContoursBdryPointels.at(k));
+      Z2i::Point ptMean = ContourHelper::getBarycenter(vectContoursBdryPointels.at(k));
       unsigned int distance = (unsigned int)ceil(sqrt((double)(ptMean[0]-refPoint[0])*(ptMean[0]-refPoint[0])+
 						      (ptMean[1]-refPoint[1])*(ptMean[1]-refPoint[1])));
       if(distance<=selectDistanceMax){
