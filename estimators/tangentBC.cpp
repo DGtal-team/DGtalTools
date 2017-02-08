@@ -198,7 +198,7 @@ int main( int argc, char** argv )
     double y = tangents[ j ][ 1 ];
     std::cout << j << std::setprecision( 15 )
               << " " << x << " " << y 
-              << " " << atan2( y, x ) << " " << (*it)[0] << (*it)[1]
+              << " " << atan2( y, x ) << " " << (*it)[0] << " " << (*it)[1]
               << std::endl;
   }
 
