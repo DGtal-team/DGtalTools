@@ -22,6 +22,8 @@
      online demonstration). It also contains a new option to display a mesh in
      3DvolViewer.
      (Bertrand Kerautret, [#282](https://github.com/DGtal-team/DGtalTools/pull/282))
+   - Add an option to display vector fields in displayContours
+     (Bertrand Kerautret, [#290](https://github.com/DGtal-team/DGtalTools/pull/290))
 
 - *estimators*:
     - 2dlocalEstimators: add an option to export the generated contour.
