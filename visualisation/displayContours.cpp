@@ -51,6 +51,7 @@
 #include "DGtal/images/ImageContainerBySTLVector.h"
 #include "DGtal/images/ImageSelector.h"
 #include "DGtal/io/readers/PointListReader.h"
+#include "DGtal/io/readers/TableReader.h"
 #include "DGtal/io/Color.h"
 
  #include "DGtal/io/readers/GenericReader.h"
@@ -118,6 +119,11 @@ using namespace DGtal;
                                      1) (used with --displayVectorField).
   --vectorFieldIndex arg             specify the vector field index (by default
                                      0,1) (used with --displayVectorField).
+  --vectorFromAngle arg              specify that the vectors are defined from 
+                                     an angle value represented at the given 
+                                     index  (by default 0) (used with 
+                                     --displayVectorField).
+
   --rotateVectorField                apply a CCW rotation of 90° (used with 
                                      --displayVectorField).  
 
@@ -189,6 +195,7 @@ int main( int argc, char** argv )
     ("displayVectorField,v", po::value<std::string>(), "Add the display of a vector field represented by two floating coordinates. Each vector is displayed starting from the corresponding contour point coordinates.")
     ("scaleVectorField,v", po::value<double>()->default_value(1.0), "set the scale of the vector field (default 1) (used with --displayVectorField).")
     ("vectorFieldIndex", po::value<std::vector <unsigned int> >()->multitoken(), "specify the vector field index (by default 0,1) (used with --displayVectorField)." )
+    ("vectorFromAngle", po::value<unsigned int>(), "specify that the vectors are defined from an angle value represented at the given index  (by default 0) (used with --displayVectorField)." )
     ("rotateVectorField", "apply a CCW rotation of 90° (used with --displayVectorField).  ") 
     ("outputStreamEPS", " specify eps for output stream format.")
     ("outputStreamSVG", " specify svg for output stream format.")
@@ -460,8 +467,20 @@ int main( int argc, char** argv )
             vIndex = vm["vectorFieldIndex"].as<std::vector<unsigned int>>();
           }
         std::string vname = vm["displayVectorField"].as<std::string>();
-        std::vector< PointVector<2,double>  >  vField = 
-          PointListReader<  PointVector<2,double>  >::getPointsFromFile(vname, vIndex); 
+        std::vector< PointVector<2,double>  >  vField;
+        if(vm.count("vectorFromAngle"))
+          {
+            unsigned int aIndex = vm["vectorFromAngle"].as<unsigned int>();
+            std::vector<double> vAngles  = TableReader<double>::getColumnElementsFromFile(vname, aIndex); 
+            for(unsigned int i = 0; i < vAngles.size(); i++)
+              {
+                vField.push_back(Z2i::RealPoint(cos(vAngles[i]),sin(vAngles[i])));
+              }
+          }
+        else
+          {
+            vField = PointListReader<  PointVector<2,double>  >::getPointsFromFile(vname, vIndex);
+          }
         for(unsigned int i = 0; i< contourPt.size(); i++)
           {
             vField[i] = vField[i].getNormalized();
