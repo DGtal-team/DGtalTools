@@ -188,7 +188,7 @@ int main( int argc, char** argv )
              tangents.begin() ); 
 
       // Output
-      std::cout << "# id tangent.x tangent.y angle(atan2(y,x))" << std::endl;  
+      std::cout << "# id tangent.x tangent.y angle(atan2(y,x)) x y" << std::endl;  
       unsigned int j = 0;
       for ( ConstIteratorOnPoints 
         it = vectPts.begin(), it_end = vectPts.end();
@@ -198,7 +198,7 @@ int main( int argc, char** argv )
     double y = tangents[ j ][ 1 ];
     std::cout << j << std::setprecision( 15 )
               << " " << x << " " << y 
-              << " " << atan2( y, x )
+              << " " << atan2( y, x ) << " " << (*it)[0] << (*it)[1]
               << std::endl;
   }
 
