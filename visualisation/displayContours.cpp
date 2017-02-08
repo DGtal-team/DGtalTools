@@ -113,7 +113,7 @@ using namespace DGtal;
   -v [ --displayVectorField ] arg    Add the display of a vector field 
                                      represented by two floating coordinates. 
                                      Each vector is displayed starting from the
-                                     corresponding countour point coordinates.
+                                     corresponding contour point coordinates.
   -v [ --scaleVectorField ] arg (=1) set the scale of the vector field (default
                                      1) (used with --displayVectorField).
   --vectorFieldIndex arg             specify the vector field index (by default
@@ -186,7 +186,7 @@ int main( int argc, char** argv )
     ("noXFIGHeader", " to exclude xfig header in the resulting output stream (no effect with option -outputFile).")
     ("withProcessing", po::value<std::string>(), "Processing (used only when the input is a Freeman chain (--input)):\n\t DSS segmentation {DSS}\n\t  Maximal segments {MS}\n\t Faithful Polygon {FP}\n\t Minimum Length Polygon {MLP}")   
     ("outputFile,o", po::value<std::string>(), " <filename> save output file automatically according the file format extension.")
-    ("displayVectorField,v", po::value<std::string>(), "Add the display of a vector field represented by two floating coordinates. Each vector is displayed starting from the corresponding countour point coordinates.")
+    ("displayVectorField,v", po::value<std::string>(), "Add the display of a vector field represented by two floating coordinates. Each vector is displayed starting from the corresponding contour point coordinates.")
     ("scaleVectorField,v", po::value<double>()->default_value(1.0), "set the scale of the vector field (default 1) (used with --displayVectorField).")
     ("vectorFieldIndex", po::value<std::vector <unsigned int> >()->multitoken(), "specify the vector field index (by default 0,1) (used with --displayVectorField)." )
     ("rotateVectorField", "apply a CCW rotation of 90° (used with --displayVectorField).  ") 
