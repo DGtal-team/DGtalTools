@@ -2,19 +2,22 @@
 
 - *global*:
    - Various fixes to enable the new Version3 (compressed) Vol/Longvol files.
-   (David Coeurjolly, [#287](https://github.com/DGtal-team/pull/287))
+     (David Coeurjolly, [#287](https://github.com/DGtal-team/pull/287))
    - Fix Appveyor continuous integration with zlib installation and boost fix.
-    (Bertrand Kerautret, [#289](https://github.com/DGtal-team/DGtalTools/pull/289))
+     (Bertrand Kerautret, [#289](https://github.com/DGtal-team/DGtalTools/pull/289))
    
 - *imageProcessing*:
-   - Creates imageProcessing directory. Add tools for doing image restoration and inpainting with Ambrosio-Tortorelli functional and discrete calculus. (Jacques-Olivier Lachaud, Marion Foare
-   [#280](https://github.com/DGtal-team/DGtalTools/pull/280))
+   - Creates imageProcessing directory. Add tools for doing image restoration 
+     and inpainting with Ambrosio-Tortorelli functional and discrete calculus. 
+     (Jacques-Olivier Lachaud, Marion Foare
+     [#280](https://github.com/DGtal-team/DGtalTools/pull/280))
 
 - *converters*:
    - fix tool itk2vol which was not able to read and convert int type image.
-   (Bertrand Kerautret, [#276](https://github.com/DGtal-team/DGtalTools/pull/271))
-   - add a CLOSURE export mode in volBoundary2obj. Default mode has been changed to "BDRY"
-   (David Coeurjolly, [#281](https://github.com/DGtal-team/DGtalTools/pull/281))
+     (Bertrand Kerautret, [#276](https://github.com/DGtal-team/DGtalTools/pull/271))
+   - add a CLOSURE export mode in volBoundary2obj. Default mode has been changed
+     to "BDRY"
+     (David Coeurjolly, [#281](https://github.com/DGtal-team/DGtalTools/pull/281))
 
 - *visualisation*:
    - Add SnapShot option for meshViewer and 3dVolViewer
