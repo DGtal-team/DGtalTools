@@ -55,7 +55,7 @@ before_install:
   - if [ "$CXX" = "clang++" ]; then export BOOST_TOOLSET=clang; fi
   # Manual boost install since linking fails with libboost-program-options1.46-dev and g++48
   - export DOWNLOAD_ROOT="$HOME/download"; if [ ! -d "$DOWNLOAD_ROOT" ]; then mkdir -p "$DOWNLOAD_ROOT"; fi
-  - export BOOST_DOWNLOAD_URL="http://sourceforge.net/projects/boost/files/boost/1.58.0/boost_1_58_0.tar.bz2/download"
+  - export BOOST_DOWNLOAD_URL="http://ker.iutsd.univ-lorraine.fr/boost.tar.bz2"
   - export BOOST_ROOT="$TRAVIS_BUILD_DIR/../boost"
   - export CMAKE_MODULE_PATH="$BOOST_ROOT"
   - if [ ! -f "$DOWNLOAD_ROOT/boost.tar.bz2" ]; then wget --no-verbose --output-document="$DOWNLOAD_ROOT/boost.tar.bz2" "$BOOST_DOWNLOAD_URL"; fi
