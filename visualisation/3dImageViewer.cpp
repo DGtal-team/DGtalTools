@@ -158,10 +158,8 @@ int main( int argc, char** argv )
     ("scaleX,x",  po::value<float>()->default_value(1.0), "set the scale value in the X direction (default 1.0)" )
     ("scaleY,y",  po::value<float>()->default_value(1.0), "set the scale value in the Y direction (default 1.0)" )
     ("scaleZ,z",  po::value<float>()->default_value(1.0), "set the scale value in the Z direction (default 1.0)")
-#ifdef WITH_ITK
-    ("dicomMin", po::value<int>()->default_value(-1000), "set minimum density threshold on Hounsfield scale")
-    ("dicomMax", po::value<int>()->default_value(3000), "set maximum density threshold on Hounsfield scale")
-#endif
+    ("rescaleInputMin", po::value<DGtal::int64_t>()->default_value(0), "min value used to rescale the input intensity (to avoid basic cast into 8  bits image).")
+    ("rescaleInputMax", po::value<DGtal::int64_t>()->default_value(255), "max value used to rescale the input intensity (to avoid basic cast into 8 bits image).")
     ("transparency,t",  po::value<uint>()->default_value(255), "transparency") ;
 
   bool parseOK=true;
@@ -199,7 +197,7 @@ int main( int argc, char** argv )
 
   double ballRadius = vm["SDPball"].as<double>();
   string extension = inputFilename.substr(inputFilename.find_last_of(".") + 1);
-  if(extension!="vol" && extension != "p3d" && extension != "pgm3D" && extension != "pgm3d" && extension != "sdp" && extension != "pgm"
+  if(extension!="vol" && extension!="longvol" && extension != "p3d" && extension != "pgm3D" && extension != "pgm3d" && extension != "sdp" && extension != "pgm"
 #ifdef WITH_ITK
      && extension !="dcm"
 #endif
@@ -222,19 +220,13 @@ int main( int argc, char** argv )
   viewer.show();
   viewer.setGLScale(sx, sy, sz);
 
-#ifdef WITH_ITK
-  int dicomMin = vm["dicomMin"].as<int>();
-  int dicomMax = vm["dicomMax"].as<int>();
-  typedef DGtal::functors::Rescaling<int ,unsigned char > RescalFCT;
+  DGtal::int64_t rescaleInputMin = vm["rescaleInputMin"].as<DGtal::int64_t>();
+  DGtal::int64_t rescaleInputMax = vm["rescaleInputMax"].as<DGtal::int64_t>();
 
-  Image3D image = extension == "dcm" ? DicomReader< Image3D,  RescalFCT  >::importDicom( inputFilename,
-                                                                                         RescalFCT(dicomMin,
-                                                                                                   dicomMax,
-                                                                                                   0, 255) ) :
-    GenericReader<Image3D>::import( inputFilename );
-#else
-  Image3D image = GenericReader<Image3D>::import( inputFilename );
-#endif
+  typedef DGtal::functors::Rescaling<DGtal::int64_t ,unsigned char > RescalFCT;
+  Image3D image =  GenericReader< Image3D >::importWithValueFunctor( inputFilename,RescalFCT(rescaleInputMin,
+                                                                                             rescaleInputMax,
+                                                                                             0, 255) );
   Domain domain = image.domain();
 
   trace.info() << "Image loaded: "<<image<< std::endl;
