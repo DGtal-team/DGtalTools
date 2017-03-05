@@ -39,6 +39,7 @@ template < typename Space, typename KSpace>
 void
 Viewer3DImage< Space, KSpace>::init(){
    DGtal::Viewer3D<>::init();
+
    QGLViewer::setKeyDescription ( Qt::Key_X, "Change the current axis to X for the current 2D image slice setting." );
    QGLViewer::setKeyDescription ( Qt::Key_Y, "Change the current axis to Y for the current 2D image slice setting." );
    QGLViewer::setKeyDescription ( Qt::Key_Z, "Change the current axis to Z for the current 2D image slice setting." );
@@ -117,9 +118,8 @@ Viewer3DImage< Space, KSpace>::setVolImage(Image3D * an3DImage){
   MyRotatorSliceImageAdapter sliceImageZ( *my3dImage, domain2DZ, aSliceFunctorZ, identityFunctor ); 
   (*this) << sliceImageZ;
   (*this) << DGtal::UpdateImagePosition< Space, KSpace > (2, DGtal::Viewer3D<>::zDirection, myImageOrigin[0], myImageOrigin[1], mySliceZPos);
-
-    
-  (*this) << DGtal::Viewer3D<>::updateDisplay;
+  (*this) << DGtal::Viewer3D<>::updateDisplay;    
+  
 }
 
 

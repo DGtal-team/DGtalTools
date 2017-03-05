@@ -64,67 +64,67 @@ using namespace Z3i;
 
 
 /**
- @page Doc3dImageViewer 3dImageViewer
+   @page Doc3dImageViewer 3dImageViewer
  
- @brief Displays volume file as a voxel set by using QGLviewer.
+   @brief Displays volume file as a voxel set by using QGLviewer.
 
- @b Usage:  3dImageViewer [options] input
+   @b Usage:  3dImageViewer [options] input
 
- @b Allowed @b options @b are :
+   @b Allowed @b options @b are :
  
- @code
-  -h [ --help ]                    display this message
-  -i [ --input ] arg               vol file (.vol) , pgm3d (.p3d or .pgm3d) 
-                                   file or sdp (sequence of discrete points)
-  --grid                           draw slice images using grid mode. 
-  --intergrid                      draw slice images using inter grid mode. 
-  --emptyMode                      remove the default boundingbox display 
-  --thresholdImage                 threshold the image to define binary shape
-  -m [ --thresholdMin ] arg (=0)   threshold min to define binary shape
-  -M [ --thresholdMax ] arg (=255) threshold max to define binary shape
-  -s [ --displaySDP ] arg          display a set of discrete points (.sdp)
-  --SDPindex arg                   specify the sdp index (by default 0,1,2).
-  --SDPball arg (=0.5)             use balls to display a set of discrete 
-                                   points (used with displaySDP option)
-  --displayMesh arg                display a Mesh given in OFF or OFS format. 
-  --displayDigitalSurface          display the digital surface instead of 
-                                   display all the set of voxels (used with 
-                                   thresholdImage or displaySDP options)
-  --colorizeCC                     colorize each Connected Components of the 
-                                   surface displayed by displayDigitalSurface 
-                                   option.
-  -c [ --colorSDP ] arg            set the color  discrete points: r g b a 
-  --colorMesh arg                  set the color of Mesh (given from 
-                                   displayMesh option) : r g b a 
-  -x [ --scaleX ] arg (=1)         set the scale value in the X direction 
-                                   (default 1.0)
-  -y [ --scaleY ] arg (=1)         set the scale value in the Y direction 
-                                   (default 1.0)
-  -z [ --scaleZ ] arg (=1)         set the scale value in the Z direction 
-                                   (default 1.0)
-  --dicomMin arg (=-1000)          set minimum density threshold on Hounsfield 
-                                   scale
-  --dicomMax arg (=3000)           set maximum density threshold on Hounsfield 
-                                   scale
-  -t [ --transparency ] arg (=255) transparency
- @endcode
+   @code
+   -h [ --help ]                    display this message
+   -i [ --input ] arg               vol file (.vol) , pgm3d (.p3d or .pgm3d) 
+   file or sdp (sequence of discrete points)
+   --grid                           draw slice images using grid mode. 
+   --intergrid                      draw slice images using inter grid mode. 
+   --emptyMode                      remove the default boundingbox display 
+   --thresholdImage                 threshold the image to define binary shape
+   -m [ --thresholdMin ] arg (=0)   threshold min to define binary shape
+   -M [ --thresholdMax ] arg (=255) threshold max to define binary shape
+   -s [ --displaySDP ] arg          display a set of discrete points (.sdp)
+   --SDPindex arg                   specify the sdp index (by default 0,1,2).
+   --SDPball arg (=0.5)             use balls to display a set of discrete 
+   points (used with displaySDP option)
+   --displayMesh arg                display a Mesh given in OFF or OFS format. 
+   --displayDigitalSurface          display the digital surface instead of 
+   display all the set of voxels (used with 
+   thresholdImage or displaySDP options)
+   --colorizeCC                     colorize each Connected Components of the 
+   surface displayed by displayDigitalSurface 
+   option.
+   -c [ --colorSDP ] arg            set the color  discrete points: r g b a 
+   --colorMesh arg                  set the color of Mesh (given from 
+   displayMesh option) : r g b a 
+   -x [ --scaleX ] arg (=1)         set the scale value in the X direction 
+   (default 1.0)
+   -y [ --scaleY ] arg (=1)         set the scale value in the Y direction 
+   (default 1.0)
+   -z [ --scaleZ ] arg (=1)         set the scale value in the Z direction 
+   (default 1.0)
+   --dicomMin arg (=-1000)          set minimum density threshold on Hounsfield 
+   scale
+   --dicomMax arg (=3000)           set maximum density threshold on Hounsfield 
+   scale
+   -t [ --transparency ] arg (=255) transparency
+   @endcode
 
 
- @b Example: 
- With the image display you can also threshold the image and display a set of voxel:  
- @code
-    3dImageViewer -i $DGtal/examples/samples/lobster.vol --thresholdImage -m 180
- @endcode
+   @b Example: 
+   With the image display you can also threshold the image and display a set of voxel:  
+   @code
+   3dImageViewer -i $DGtal/examples/samples/lobster.vol --thresholdImage -m 180
+   @endcode
 
- You should obtain such a result:
+   You should obtain such a result:
 
- @image html res3dImageViewer.png "resulting visualisation of 3d image with thresholded set of voxels."
+   @image html res3dImageViewer.png "resulting visualisation of 3d image with thresholded set of voxels."
  
 
- @see
- @ref 3dImageViewer.cpp
+   @see
+   @ref 3dImageViewer.cpp
 
- */
+*/
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace po = boost::program_options;
@@ -174,8 +174,8 @@ int main( int argc, char** argv )
   if( !parseOK || vm.count("help")||argc<=1)
     {
       std::cout << "Usage: " << argv[0] << " [input]\n"
-    << "Displays volume file as a voxel set by using QGLviewer"
-    << general_opt << "\n";
+                << "Displays volume file as a voxel set by using QGLviewer"
+                << general_opt << "\n";
       return 0;
     }
 
@@ -224,7 +224,7 @@ int main( int argc, char** argv )
 
   trace.info() << "Image loaded: "<<image<< std::endl;
   viewer.setVolImage(&image);
-  viewer << Z3i::Point(512, 512, 0);
+  
   // Used to display 3D surface
   Z3i::DigitalSet set3d(domain);
 
@@ -241,13 +241,13 @@ int main( int argc, char** argv )
       unsigned char  val= image( (*it) );
       Color c= gradient(val);
       if(val<=thresholdMax && val >=thresholdMin){
-  if(!vm.count("displayDigitalSurface")){
+        if(!vm.count("displayDigitalSurface")){
           viewer <<  CustomColors3D(Color((float)(c.red()), (float)(c.green()),(float)(c.blue()), transp),
                                     Color((float)(c.red()), (float)(c.green()),(float)(c.blue()), transp));
           viewer << *it;
-  }
+        }
       }else{
-  set3d.insert(*it);
+        set3d.insert(*it);
       }
     }
   }
@@ -325,22 +325,31 @@ int main( int argc, char** argv )
     viewer << DGtal::SetMode3D(vectConnectedSCell.at(0).at(0).className(), "Basic");
     for(unsigned int i= 0; i <vectConnectedSCell.size(); i++){
       for(unsigned int j= 0; j <vectConnectedSCell.at(i).size(); j++){
-  if(vm.count("colorizeCC")){
-    DGtal::Color c= gradient(i);
-    viewer << CustomColors3D(Color(250, 0,0, transp), Color(c.red(),
-                  c.green(),
-                  c.blue(), transp));
-  }else  if(vm.count("colorSDP")){
-    std::vector<int> vcol= vm["colorSDP"].as<std::vector<int > >();
-    Color c(vcol[0], vcol[1], vcol[2], vcol[3]);
-    viewer << CustomColors3D(c, c);
-  }
+        if(vm.count("colorizeCC")){
+          DGtal::Color c= gradient(i);
+          viewer << CustomColors3D(Color(250, 0,0, transp), Color(c.red(),
+                                                                  c.green(),
+                                                                  c.blue(), transp));
+        }else  if(vm.count("colorSDP")){
+          std::vector<int> vcol= vm["colorSDP"].as<std::vector<int > >();
+          Color c(vcol[0], vcol[1], vcol[2], vcol[3]);
+          viewer << CustomColors3D(c, c);
+        }
 
-  viewer << vectConnectedSCell.at(i).at(j);
+        viewer << vectConnectedSCell.at(i).at(j);
       }
     }
   }
   
   viewer << Viewer3D<>::updateDisplay;
+  DGtal::Z3i::Point size = image.domain().upperBound() - image.domain().lowerBound();
+  DGtal::Z3i::Point center = image.domain().lowerBound()+size/2;
+  unsigned int maxDist = std::max(std::max(size[2], size[1]), size[0]);
+  viewer.camera()->setPosition(qglviewer::Vec(center[0],center[1], 
+                                              center[2] + 2.0*maxDist));
+  viewer.camera()->setSceneCenter(qglviewer::Vec(center[0],center[1],center[2]));
+  
+
+
   return application.exec();
 }
