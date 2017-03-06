@@ -102,10 +102,12 @@ using namespace Z3i;
    (default 1.0)
    -z [ --scaleZ ] arg (=1)         set the scale value in the Z direction 
    (default 1.0)
-   --dicomMin arg (=-1000)          set minimum density threshold on Hounsfield 
-   scale
-   --dicomMax arg (=3000)           set maximum density threshold on Hounsfield 
-   scale
+  --rescaleInputMin arg (=0)       min value used to rescale the input 
+                                   intensity (to avoid basic cast into 8  bits 
+                                   image).
+  --rescaleInputMax arg (=255)     max value used to rescale the input 
+                                   intensity (to avoid basic cast into 8 bits 
+                                   image).
    -t [ --transparency ] arg (=255) transparency
    @endcode
 

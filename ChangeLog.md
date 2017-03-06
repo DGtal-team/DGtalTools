@@ -1,3 +1,12 @@
+# DGtalTools 0.9.4
+
+- *visualisation*:
+  - Improve visualisation tools (3dImageViewer, sliceViewer, 3dVolViewer, vol2sdp)
+    allowing to read longvol including rescaling.
+    (Bertrand Kerautret, [#296](https://github.com/DGtal-team/DGtalTools/pull/296))
+
+
+
 # DGtalTools 0.9.3
 
 - *global*:
