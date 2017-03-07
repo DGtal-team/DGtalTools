@@ -1,5 +1,12 @@
 # DGtalTools 0.9.3
 
+- *visualisation*:
+  - Add an option to filter vector displayed in 3dSDPViewer.
+  (Bertrand Kerautret, [#296](https://github.com/DGtal-team/pull/296)
+
+
+# DGtalTools 0.9.3
+
 - *global*:
    - Various fixes to enable the new Version3 (compressed) Vol/Longvol files.
      (David Coeurjolly, [#287](https://github.com/DGtal-team/pull/287))
