@@ -74,8 +74,9 @@ using namespace Z3i;
  
    @code
    -h [ --help ]                    display this message
-   -i [ --input ] arg               vol file (.vol) , pgm3d (.p3d or .pgm3d) 
-   file or sdp (sequence of discrete points)
+   -i [ --input ] arg               vol file (.vol, .longvol .p3d, .pgm3d and if
+                                    WITH_ITK is selected: dicom, dcm, mha, mhd) 
+                                    or sdp (sequence of discrete points).
    --grid                           draw slice images using grid mode. 
    --intergrid                      draw slice images using inter grid mode. 
    --emptyMode                      remove the default boundingbox display 
@@ -142,7 +143,7 @@ int main( int argc, char** argv )
   po::options_description general_opt("Allowed options are ");
   general_opt.add_options()
     ("help,h", "display this message")
-    ("input,i", po::value<std::string>(), "vol file (.vol) , pgm3d (.p3d or .pgm3d) file or sdp (sequence of discrete points)" )
+    ("input,i", po::value<std::string>(), "vol file (.vol, .longvol .p3d, .pgm3d and if WITH_ITK is selected: dicom, dcm, mha, mhd) or sdp (sequence of discrete points)" )
     ("grid", "draw slice images using grid mode. " )
     ("intergrid", "draw slice images using inter grid mode. " )
     ("emptyMode", "remove the default boundingbox display " )
