@@ -1,3 +1,51 @@
+/**
+ @page surfaceApprox surfaceApprox
+
+ @brief Approximates cubical complex as a smooth quadrangulated complex.
+
+This is done by minimizing a quadratic energy function as decribed in ??.
+
+ @b Usage:  surfaceApprox -input <volFileName> -o <vertexPositionCsvFileName>
+
+ @b Allowed @b options @b are :
+ @code
+File options:
+  -i [ --image-filename ] arg           input vol filename for image shape or
+                                        input cvs filename for surfels and
+                                        normals
+  -o [ --regularized-obj-filename ] arg output regularized obj
+  -n [ --cubical-obj-filename ] arg     output cubical obj
+  -k [ --shape-noise ] arg (=0)         noise shape parameter
+
+Normal field estimator options:
+  -r [ --normal-radius ] arg (=4) radius of normal estimator
+
+Surface approximation options:
+  -p [ --regularization-position ] arg (=1e-3)
+                                        vertex position regularization coeff
+  -c [ --regularization-center ] arg (=1e-2)
+                                        face center regularization coeff
+  -a [ --align ] arg (=1)               normal alignment coeff
+  -f [ --fairness ] arg (=0)            face fairness coeff
+  -b [ --barycenter ] arg (=1e-1)       barycenter fairness coeff
+ @endcode
+
+ @b Example:
+
+
+ @code
+ $ surfaceApprox -i bunny.vol -o bunny_smooth.csv
+ @endcode
+
+ You should obtain such a result:
+ @image html bunny_cubical.png "Input cubical complex."
+ @image html bunny_smooth.png "Smooth quadrangulated complex."
+
+ @see
+ @ref surfaceApprox.cpp
+
+ */
+
 #include <DGtal/base/Common.h>
 #include <DGtal/helpers/StdDefs.h>
 #include <boost/program_options/options_description.hpp>
@@ -54,7 +102,7 @@ parse_options(int argc, char* argv[])
         ("barycenter,b", po::value<double>(&options.barycenter)->default_value(1e-1, "1e-1"), "barycenter fairness coeff")
         ;
 
-    po::options_description po_options("dgtal_surface_approx [options]");
+    po::options_description po_options("surfaceApprox [options]");
     po_options.add(po_shape).add(po_normal).add(po_approx).add_options()
         ("help,h", "display this message")
         ;
