@@ -44,6 +44,7 @@
 #include <DGtal/topology/helpers/Surfaces.h>
 #include <DGtal/topology/DigitalSurface.h>
 #include <DGtal/topology/SetOfSurfels.h>
+#include <DGtal/geometry/volumes/KanungoNoise.h>
 //! [3dVolMarchingCubes-basicIncludes]
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -55,55 +56,58 @@ namespace po = boost::program_options;
 ///////////////////////////////////////////////////////////////////////////////
 
 /**
- @page Doc3dVolMarchingCubes 3dVolMarchingCubes
+   @page Doc3dVolMarchingCubes 3dVolMarchingCubes
  
- @brief Outputs the isosurface of the input volume  as an OFF file
+   @brief Outputs the isosurface of the input volume  as an OFF file
 
- @b Usage: 3dVolMarchingCubes [-i \<fileName.vol\>] [-t \<threshold\>] [-a \<adjacency\>] [-o \<output.off\>]
+   @b Usage: 3dVolMarchingCubes [-i \<fileName.vol\>] [-t \<threshold\>] [-a \<adjacency\>] [-o \<output.off\>]
 
-Outputs the isosurface of value \<threshold\> of the volume
-\<fileName.vol\> as an OFF file \<output.off\>. The \<adjacency\> (0/1)
-allows to choose between interior (6,18) and exterior (18,6)
-adjacency.
+   Outputs the isosurface of value \<threshold\> of the volume
+   \<fileName.vol\> as an OFF file \<output.off\>. The \<adjacency\> (0/1)
+   allows to choose between interior (6,18) and exterior (18,6)
+   adjacency.
 
- @b Allowed @b options @b are : 
- @code
-  -h [ --help ]                         display this message
-  -i [ --input ] arg                    the volume file (.vol)
-  -t [ --threshold ] arg (=1)           the value that defines the isosurface 
-                                        in the image (an integer between 0 and 
-                                        255).
-  -a [ --adjacency ] arg (=0)           0: interior adjacency, 1: exterior 
-                                        adjacency
-  -o [ --output ] arg (=marching-cubes.off)
-                                        the output OFF file that represents the
-                                        geometry of the isosurface
- @endcode
+   @b Allowed @b options @b are : 
+   @code
+   -h [ --help ]                         display this message
+   -i [ --input ] arg                    the volume file (.vol)
+   -t [ --threshold ] arg (=1)           the value that defines the isosurface 
+   in the image (an integer between 0 and 
+   255).
+   -a [ --adjacency ] arg (=0)           0: interior adjacency, 1: exterior 
+   adjacency
+   -o [ --output ] arg (=marching-cubes.off)
+   the output OFF file that represents the
+   geometry of the isosurface
+   -n [ --noise ] arg (=0.000001)        Kanungo noise level in ]0,1[
+   (default 0.5). Only the 
 
- @b Example: 
+   @endcode
 
- @code
- $ 3dVolMarchingCubes -i $DGtal/examples/samples/lobster.vol -t 30
- # we invert the default normol orientation to improve display (-n option):
- $ meshViewer -i marching-cubes.off -n   
- @endcode
+   @b Example: 
 
-
- You should obtain such a result:
- @image html res3dVolMarchingCubes.png "Resulting visualization."
-
- You can test on other samples like http://www.tc18.org/code_data_set/3D_greyscale/bonsai.vol.bz2
-@code 
-$ 3dVolMarchingCubes -i bonsai.vol  -t 80
-@endcode 
- You should obtain such a result:
- @image html res3dVolMarchingCubes2.png "Resulting visualization."
+   @code
+   $ 3dVolMarchingCubes -i $DGtal/examples/samples/lobster.vol -t 30
+   # we invert the default normol orientation to improve display (-n option):
+   $ meshViewer -i marching-cubes.off -n   
+   @endcode
 
 
- @see
- \ref 3dVolMarchingCubes.cpp
+   You should obtain such a result:
+   @image html res3dVolMarchingCubes.png "Resulting visualization."
+
+   You can test on other samples like http://www.tc18.org/code_data_set/3D_greyscale/bonsai.vol.bz2
+   @code 
+   $ 3dVolMarchingCubes -i bonsai.vol  -t 80
+   @endcode 
+   You should obtain such a result:
+   @image html res3dVolMarchingCubes2.png "Resulting visualization."
+
+
+   @see
+   \ref 3dVolMarchingCubes.cpp
  
- */
+*/
 
 
 
@@ -117,7 +121,10 @@ int main( int argc, char** argv )
     ("input,i", po::value<std::string>(), "the volume file (.vol)" )
     ("threshold,t",  po::value<unsigned int>()->default_value(1), "the value that defines the isosurface in the image (an integer between 0 and 255)." )
     ("adjacency,a",  po::value<unsigned int>()->default_value(0), "0: interior adjacency, 1: exterior adjacency")
-    ("output,o",  po::value<std::string>()->default_value( "marching-cubes.off" ), "the output OFF file that represents the geometry of the isosurface") ;
+    ("output,o",  po::value<std::string>()->default_value( "marching-cubes.off" ), "the output OFF file that represents the geometry of the isosurface") 
+    ("noise,n",  po::value<double>(), "Kanungo noise level in ]0,1[. Note that only the largest connected component is considered");
+  
+
   bool parseOK=true;
   po::variables_map vm;
   try{
@@ -144,6 +151,13 @@ int main( int argc, char** argv )
   unsigned int threshold = vm["threshold"].as<unsigned int>();
   bool intAdjacency = ( vm["adjacency"].as<unsigned int>() == 0 );
   std::string outputFilename = vm["output"].as<std::string>();
+  double noise ;
+  bool addNoise=false;
+  if (vm.count("noise") )
+    {
+      addNoise=true;
+      noise = vm["noise"].as<double>();
+    }
   //! [3dVolMarchingCubes-parseCommandLine]
 
   //! [3dVolMarchingCubes-readVol]
@@ -153,17 +167,15 @@ int main( int argc, char** argv )
 
   typedef functors::SimpleThresholdForegroundPredicate<Image> ThresholdedImage;
   ThresholdedImage thresholdedImage( image, threshold );
-  // DigitalSet set3d (image.domain());
-  // SetFromImage<DigitalSet>::append<Image>(set3d, image,
-  //                                         threshold, 255 );
   trace.endBlock();
   //! [3dVolMarchingCubes-readVol]
 
+  
   //! [3dVolMarchingCubes-KSpace]
   trace.beginBlock( "Construct the Khalimsky space from the image domain." );
   KSpace ks;
-  bool space_ok = ks.init( image.domain().lowerBound(),
-                           image.domain().upperBound(), true );
+  bool space_ok = ks.init( image.domain().lowerBound() - KSpace::Vector::diagonal(2),
+                           image.domain().upperBound() + KSpace::Vector::diagonal(2), true );
   if (!space_ok)
     {
       trace.error() << "Error in the Khamisky space construction."<<std::endl;
@@ -183,15 +195,47 @@ int main( int argc, char** argv )
   typedef SetOfSurfels< KSpace, SurfelSet > MySetOfSurfels;
   typedef DigitalSurface< MySetOfSurfels > MyDigitalSurface;
   MySetOfSurfels theSetOfSurfels( ks, surfAdj );
-  Surfaces<KSpace>::sMakeBoundary( theSetOfSurfels.surfelSet(),
-                                   ks, thresholdedImage,
-                                   image.domain().lowerBound(),
-                                   image.domain().upperBound() );
+
+  if (addNoise)
+    {
+      trace.info()<<"Adding some noise."<<std::endl;
+      KanungoNoise<ThresholdedImage, Z3i::Domain> kanungo(thresholdedImage, image.domain(), noise);
+      std::vector< std::vector<SCell > > vectConnectedSCell;
+      trace.info()<<"Extracting all connected components."<<std::endl;
+      Surfaces<KSpace>::extractAllConnectedSCell( vectConnectedSCell, ks, surfAdj,
+                                                 kanungo, false);
+      if( vectConnectedSCell.size() == 0 )
+        {
+          trace.error()<< "No surface component exists. Please check the vol file --min and --max parameters." << std::endl;
+          return 3;
+        }
+
+      int nb_surfels = 0;
+      trace.info()<<vectConnectedSCell.size()<<" components."<<std::endl;
+      
+      trace.info()<<"Extracting the largest one."<<std::endl;     
+      std::for_each( vectConnectedSCell.begin(), vectConnectedSCell.end(),
+                     [&] ( std::vector<SCell >& v ) { nb_surfels += v.size(); } );
+      int cc_max_size_idx = -1;
+      auto it_max         = std::max_element( vectConnectedSCell.begin(), vectConnectedSCell.end(),
+                                              [] (std::vector<SCell >& v1, std::vector<SCell >& v2)
+                                              { return v1.size() < v2.size(); } );
+      cc_max_size_idx = std::distance( vectConnectedSCell.begin(), it_max );
+      theSetOfSurfels.surfelSet().insert( vectConnectedSCell[ cc_max_size_idx ].begin(),
+                                          vectConnectedSCell[ cc_max_size_idx ].end() );
+    }
+  else
+    Surfaces<KSpace>::sMakeBoundary( theSetOfSurfels.surfelSet(),
+                                     ks, thresholdedImage,
+                                     image.domain().lowerBound() - KSpace::Vector::diagonal(2),
+                                     image.domain().upperBound() + KSpace::Vector::diagonal(2));
+
   MyDigitalSurface digSurf( theSetOfSurfels );
   trace.info() << "Digital surface has " << digSurf.size() << " surfels."
                << std::endl;
   trace.endBlock();
   //! [3dVolMarchingCubes-ExtractingSurface]
+
 
   //! [3dVolMarchingCubes-makingOFF]
   trace.beginBlock( "Making OFF surface. " );
@@ -204,11 +248,23 @@ int main( int argc, char** argv )
 
   // The +0.5 is to avoid isosurface going exactly through a voxel
   // center, especially for binary volumes.
-  cellEmbedder.init( ks, image, trivialEmbedder, 
-                     ( (double) threshold ) + 0.5 );
+
+  //Making sure that we probe inside the domain.
+  Image largerImage( Domain( image.domain().lowerBound() - KSpace::Vector::diagonal(2),
+                             image.domain().upperBound() + KSpace::Vector::diagonal(2)));
+      for(auto p: image.domain())
+        largerImage.setValue( p, image(p));
+            
+      cellEmbedder.init( ks, largerImage, trivialEmbedder, 
+                         ( (double) threshold ) + 0.5 );
+      //  }
+      //else
+      //cellEmbedder.init( ks, image, trivialEmbedder, 
+      //                 ( (double) threshold ) + 0.5 );
+  
   std::ofstream out( outputFilename.c_str() );
   if ( out.good() )
-    digSurf.exportEmbeddedSurfaceAs3DOFF( out, cellEmbedder );
+    digSurf.exportSurfaceAs3DOFF( out );
   out.close();
   trace.endBlock();
   //! [3dVolMarchingCubes-makingOFF]
