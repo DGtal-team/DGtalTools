@@ -11,6 +11,11 @@ SET(DGTAL_TOOLS_SRC
   eulerCharacteristic
 )
 
+if (WITH_EIGEN)
+    add_executable(surfaceApprox surfaceApprox.cpp surface_approx.cpp)
+    target_link_libraries(surfaceApprox ${DGTAL_LIBRARIES} ${DGtalToolsLibDependencies})
+endif()
+
 if ( WITH_VISU3D_QGLVIEWER )
   SET(VISU3D_TESTS_SRC
       3dCurveTangentEstimator
