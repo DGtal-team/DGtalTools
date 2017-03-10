@@ -210,6 +210,24 @@ int main( int argc, char ** argv )
     }
     trace.endBlock();
     
+    //counting
+    std::map<Z3i::Point, unsigned int> sizes;
+    for(auto p: result.domain())
+    {
+      Z3i::Point ref = dsets.find_set(p);
+      sizes[ref]++;
+    }
+    unsigned int maxElement=0;
+    for(auto i: sizes)
+    {
+      if (maxElement < i.second)
+      {
+        maxElement = i.second;
+        //refElement = i;
+      }
+    }
+    trace.info()<<"Largest component has " << maxElement<<" voxels."<<std::endl;
+      
     std::cout << "Number of disjoint 6-components = "
     <<dsets.count_sets(result.domain().begin(),
                        result.domain().end())
