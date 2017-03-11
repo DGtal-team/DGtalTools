@@ -35,9 +35,6 @@
 #include "DGtal/io/Color.h"
 #include "DGtal/io/DrawWithDisplay3DModifier.h"
 #endif
-#ifdef WITH_ITK
-#include "DGtal/io/readers/DicomReader.h"
-#endif
 
 #include "sliceViewer.h"
 #include "ui_sliceViewer.h"
@@ -72,17 +69,21 @@ namespace po = boost::program_options;
    @b Allowed @b options @b are :
  
    @code
-   -h [ --help ]           display this message
-   -i [ --input ] arg      vol file (.vol, .longvol .p3d, .pgm3d and if 
-                           WITH_ITK is selected: dicom, dcm, mha, mhd) or 
-                           sdp (sequence of discrete points). For longvol, 
-                           dicom, dcm, mha or mhd formats, the input values
-                           are linearly scaled between 0 and 255.
-   --hueColorMap           use hue color map to display images.
-   --gradHotColorMap       use hot gradient color map to display images.
-   --gradCoolColorMap      use cool gradient color map to display images.
-   --dicomMin arg (=-1000) set minimum density threshold on Hounsfield scale
-   --dicomMax arg (=3000)  set maximum density threshold on Hounsfield scale
+   -h [ --help ]                     display this message
+   -i [ --input ] arg                vol file (.vol, .longvol .p3d, .pgm3d and if 
+                                     WITH_ITK is selected: dicom, dcm, mha, mhd) or 
+                                     sdp (sequence of discrete points). For longvol, 
+                                     dicom, dcm, mha or mhd formats, the input values
+                                     are linearly scaled between 0 and 255.
+   --hueColorMap                     use hue color map to display images.
+   --gradHotColorMap                 use hot gradient color map to display images.
+   --gradCoolColorMap                use cool gradient color map to display images.
+   --rescaleInputMin arg (=0)        min value used to rescale the input 
+                                     intensity (to avoid basic cast into 8  
+                                     bits image).
+   --rescaleInputMax arg (=255)       max value used to rescale the input 
+                                     intensity (to avoid basic cast into 8 bits
+                                     image).
    @endcode
 
    @b Example: 
