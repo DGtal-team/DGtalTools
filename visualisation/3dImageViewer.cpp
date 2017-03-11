@@ -78,7 +78,7 @@ using namespace Z3i;
                                     WITH_ITK is selected: dicom, dcm, mha, mhd) 
                                     or sdp (sequence of discrete points). For 
                                     longvol, dicom, dcm, mha or mhd formats, the 
-                                    input values are scaled into 0 and 255.
+                                    input values are linearly scaled between 0 and 255.
    --grid                           draw slice images using grid mode. 
    --intergrid                      draw slice images using inter grid mode. 
    --emptyMode                      remove the default boundingbox display 
@@ -145,7 +145,7 @@ int main( int argc, char** argv )
   po::options_description general_opt("Allowed options are ");
   general_opt.add_options()
     ("help,h", "display this message")
-    ("input,i", po::value<std::string>(), "vol file (.vol, .longvol .p3d, .pgm3d and if WITH_ITK is selected: dicom, dcm, mha, mhd) or sdp (sequence of discrete points). For longvol, dicom, dcm, mha or mhd formats, the input values are scaled into 0 and 255." )
+    ("input,i", po::value<std::string>(), "vol file (.vol, .longvol .p3d, .pgm3d and if WITH_ITK is selected: dicom, dcm, mha, mhd) or sdp (sequence of discrete points). For longvol, dicom, dcm, mha or mhd formats, the input values are linearly scaled between 0 and 255." )
     ("grid", "draw slice images using grid mode. " )
     ("intergrid", "draw slice images using inter grid mode. " )
     ("emptyMode", "remove the default boundingbox display " )
