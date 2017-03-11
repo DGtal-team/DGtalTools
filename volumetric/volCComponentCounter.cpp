@@ -105,7 +105,7 @@ void CCCounter(Rank& r, Parent& p, const Image& elements, const unsigned int con
   
   //Merging process
   for(typename Image::Domain::ConstIterator e = elements.domain().begin();
-                  e !=elements.domain().end(); ++e)
+                     e !=elements.domain().end(); ++e)
 {
       if ( elements.domain().isInside(*e+decx) &&  
            (elements(*e) == elements(*e+decx)))
