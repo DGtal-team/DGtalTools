@@ -50,37 +50,39 @@ namespace po = boost::program_options;
 /**
  @page volAddNoise volAddNoise
  @brief  Adds Kanungo noise to a binary object with 0 values as background
-points and values >0 for the foreground ones.
-
-@b Usage: volAddNoise [input] [output]
-
-@b Allowed @b options @b are:
-
-@code
-  -h [ --help ]             display this message
-  -i [ --input ] arg        input image file name (any 3D image format accepted
-                            by DGtal::GenericReader)
-  -o [ --output ] arg       output image file name (any 3D image format
-                            accepted by DGtal::GenericWriter)
-  -n [ --noise ] arg (=0.5) Kanungo noise level in ]0,1[ (default 0.5)
-@endcode
-
-@b Example:
-@code
-  $ volAddNoise -i $DGtal/examples/samples/Al.100.vol -o AlNoisy0.4.vol  -n 0.4
-  # Converting in sdp to display:
-  $ vol2sdp -i AlNoisy0.4.vol -o AlNoisy0.4.sdp
-  # displaying sequence of points:
-  $ 3dSDPViewer -i tmp.sdp
-@endcode
-
-You should obtain such a visualization:
-
-@image html resVolAddnoise.png "Resuling visualisation with 3dSDPViewer."
-
-@see volAddNoise.cpp
-
-*/
+ points and values >0 for the foreground ones.
+ 
+ @b Usage: volAddNoise [input] [output]
+ 
+ @b Allowed @b options @b are:
+ 
+ @code
+ Allowed options are: :
+ -h [ --help ]             display this message
+ -i [ --input ] arg        input image file name (any 3D image format accepted
+ by DGtal::GenericReader)
+ -o [ --output ] arg       output image file name (any 3D image format
+ accepted by DGtal::GenericWriter)
+ -n [ --noise ] arg (=0.5) Kanungo noise level in ]0,1[ (default 0.5)
+ -m [ --max ]              Extract only the largest 6-connected component.
+ @endcode
+ 
+ @b Example:
+ @code
+ $ volAddNoise -i $DGtal/examples/samples/Al.100.vol -o AlNoisy0.4.vol  -n 0.4
+ # Converting in sdp to display:
+ $ vol2sdp -i AlNoisy0.4.vol -o AlNoisy0.4.sdp
+ # displaying sequence of points:
+ $ 3dSDPViewer -i tmp.sdp
+ @endcode
+ 
+ You should obtain such a visualization:
+ 
+ @image html resVolAddnoise.png "Resuling visualisation with 3dSDPViewer."
+ 
+ @see volAddNoise.cpp
+ 
+ */
 
 /**
  * Missing parameter error message.
@@ -102,13 +104,13 @@ int main( int argc, char ** argv )
   po::options_description general_opt( "Allowed options are: " );
   general_opt.add_options()( "help,h", "display this message" )
   ("input,i", po::value<std::string>(),"input image file name (any 3D image format accepted by "
-  "DGtal::GenericReader)" )
+   "DGtal::GenericReader)" )
   ( "output,o", po::value<std::string>(),
-                             "output image file name (any 3D image format "
-                             "accepted by DGtal::GenericWriter)" )
+   "output image file name (any 3D image format "
+   "accepted by DGtal::GenericWriter)" )
   ("noise,n", po::value<double>()->default_value( 0.5 ),"Kanungo noise level in ]0,1[ (default 0.5)" )
   ("max,m", "Extract only the largest 6-connected component." );
-
+  
   bool parseOK = true;
   po::variables_map vm;
   try
@@ -118,23 +120,23 @@ int main( int argc, char ** argv )
   catch ( const std::exception & ex )
   {
     trace.info() << "Error checking program options: " << ex.what()
-                 << std::endl;
+    << std::endl;
     parseOK = false;
   }
   po::notify( vm );
   if ( vm.count( "help" ) || argc <= 1 || !parseOK )
   {
     trace.info() << "Adds Kanungo noise to a binary object with 0 values as "
-                    "background points and values >0 for the foreground ones."
-                 << std::endl
-                 << "Basic usage: " << std::endl
-                 << "\t volAddNoi0se [options] --input <imageName> --output "
-                    "<outputImage> -noise 0.3"
-                 << std::endl
-                 << general_opt << "\n";
+    "background points and values >0 for the foreground ones."
+    << std::endl
+    << "Basic usage: " << std::endl
+    << "\t volAddNoi0se [options] --input <imageName> --output "
+    "<outputImage> -noise 0.3"
+    << std::endl
+    << general_opt << "\n";
     return 0;
   }
-
+  
   // Parameters
   bool MaxFlag=vm.count("max");
   
@@ -145,26 +147,26 @@ int main( int argc, char ** argv )
     missingParam( "--output" );
   const std::string output = vm[ "output" ].as<std::string>();
   const double noise       = vm[ "noise" ].as<double>();
-
+  
   typedef functors::IntervalForegroundPredicate<MyImage> Binarizer;
   MyImage image = GenericReader<MyImage>::import( input );
   trace.info() << "Input image: " << image << std::endl;
   Binarizer predicate( image, 0, 255 );
-
+  
   KanungoNoise<Binarizer, Z3i::Domain> kanungo( predicate, image.domain(),
-                                                noise );
-
+                                               noise );
+  
   MyImage result( image.domain() );
   for ( Z3i::Domain::ConstIterator it    = image.domain().begin(),
-                                   itend = image.domain().end();
-        it != itend; ++it )
+       itend = image.domain().end();
+       it != itend; ++it )
   {
     if ( kanungo( *it ) )
       result.setValue( *it, 255 );
     else
       result.setValue( *it, 0 );
   }
-
+  
   
   //Exporting
   if (! MaxFlag)
@@ -181,11 +183,14 @@ int main( int argc, char ** argv )
     boost::associative_property_map<Rank>   rankPMap(rankMap);
     boost::associative_property_map<Parent> parentPMap(parentMap);
     boost::disjoint_sets<boost::associative_property_map<Rank>,
-                         boost::associative_property_map<Parent>> dsets(rankPMap, parentPMap);
-   
+    boost::associative_property_map<Parent>> dsets(rankPMap, parentPMap);
+    
     trace.beginBlock("Initial disjoint sets construction");
-    for(auto p: result.domain())
-      dsets.make_set(p);
+    for(auto e: result.domain())
+    {
+      if ( result(e) != 0 )
+        dsets.make_set(e);
+    }
     trace.endBlock();
     
     trace.beginBlock("Merging neighboring sets");
@@ -196,44 +201,63 @@ int main( int argc, char ** argv )
     //Merging process
     for(auto e:result.domain())
     {
-      if ( result.domain().isInside(e+decx) &&
-          (result(e) == result(e+decx)))
-        dsets.union_set(e,e+decx);
-      
-      if ( result.domain().isInside(e+decy) &&
-          (result(e) == result(e+decy)))
-        dsets.union_set(e,e+decy);
-      
-      if ( result.domain().isInside(e+decz) &&
-          (result(e) == result(e+decz)))
-        dsets.union_set(e,e+decz);
+      if ( result(e) != 0 )
+      {
+        if ( result.domain().isInside(e+decx) &&
+            (result(e) == result(e+decx)))
+          dsets.union_set(e,e+decx);
+        
+        if ( result.domain().isInside(e+decy) &&
+            (result(e) == result(e+decy)))
+          dsets.union_set(e,e+decy);
+        
+        if ( result.domain().isInside(e+decz) &&
+            (result(e) == result(e+decz)))
+          dsets.union_set(e,e+decz);
+      }
     }
     trace.endBlock();
     
+    trace.beginBlock("Counting component sizes");
     //counting
     std::map<Z3i::Point, unsigned int> sizes;
     for(auto p: result.domain())
     {
-      Z3i::Point ref = dsets.find_set(p);
-      sizes[ref]++;
+      if (result(p) != 0)
+      {
+        Z3i::Point ref = dsets.find_set(p);
+        sizes[ref]++;
+      }
     }
     unsigned int maxElement=0;
-    for(auto i: sizes)
+    Z3i::Point maxP;
+    for(auto i : sizes)
     {
       if (maxElement < i.second)
       {
         maxElement = i.second;
-        //refElement = i;
+        maxP = i.first;
       }
     }
     trace.info()<<"Largest component has " << maxElement<<" voxels."<<std::endl;
-      
-    std::cout << "Number of disjoint 6-components = "
-    <<dsets.count_sets(result.domain().begin(),
-                       result.domain().end())
-            << std::endl;
-   
     trace.endBlock();
+    
+    trace.beginBlock("Cleaning up");
+    //Cleaning
+    //Merging process
+    Z3i::Point largest=dsets.find_set( maxP );
+    trace.info()<<"Largest ref point: "<< largest<<std::endl;
+    for(auto e:result.domain())
+    {
+      if (result(e) != 0)
+      {
+        if ( dsets.find_set( e ) != largest)
+          result.setValue(e,0);
+      }
+    }
+    trace.endBlock();
+    trace.endBlock();
+    result >> output;
   }
   return 0;
 }
