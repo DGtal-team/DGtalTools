@@ -73,8 +73,11 @@ namespace po = boost::program_options;
  
    @code
    -h [ --help ]           display this message
-   -i [ --input ] arg      vol file (.vol) , pgm3d (.p3d or .pgm3d, pgm (with 3 
-   dims)) file or sdp (sequence of discrete points)
+   -i [ --input ] arg      vol file (.vol, .longvol .p3d, .pgm3d and if 
+                           WITH_ITK is selected: dicom, dcm, mha, mhd) or 
+                           sdp (sequence of discrete points). For longvol, 
+                           dicom, dcm, mha or mhd formats, the input values
+                           are linearly scaled between 0 and 255.
    --hueColorMap           use hue color map to display images.
    --gradHotColorMap       use hot gradient color map to display images.
    --gradCoolColorMap      use cool gradient color map to display images.
