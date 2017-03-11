@@ -1,5 +1,4 @@
 SET(DGTAL_TOOLS_SRC
-  volSurfaceRegularization
   2dLocalEstimators
   lengthEstimators
   vol2normalField
@@ -13,8 +12,8 @@ SET(DGTAL_TOOLS_SRC
 )
 
 if (WITH_EIGEN)
-    add_executable(surfaceApprox surfaceApprox.cpp surface_approx.cpp)
-    target_link_libraries(surfaceApprox ${DGTAL_LIBRARIES} ${DGtalToolsLibDependencies})
+    add_executable(volSurfaceRegularization volSurfaceRegularization.cpp volSurfaceRegularization-details/surface_approx.cpp)
+    target_link_libraries(volSurfaceRegularization ${DGTAL_LIBRARIES} ${DGtalToolsLibDependencies})
 endif()
 
 if ( WITH_VISU3D_QGLVIEWER )

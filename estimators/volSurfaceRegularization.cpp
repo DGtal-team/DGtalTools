@@ -14,13 +14,16 @@
  *
  **/
 /**
- @page surfaceApprox surfaceApprox
+ @page volSurfaceRegularization volSurfaceRegularization
+ 
+ @brief Regularize a cubical complex into a smooth quadrangulated complex.
 
- @brief Approximates cubical complex as a smooth quadrangulated complex.
+This is done by minimizing a quadratic energy function as decribed in ??. The variational
+ formulation regularizes the position while aligning the regularized quads with an 
+ input normal vector field. In this tool, the input normal vector field can be either 
+ specified in the CSV input file, or computed using Integral Invariant (and -r option).
 
-This is done by minimizing a quadratic energy function as decribed in ??.
-
- @b Usage:  surfaceApprox -input <volFileName> -o <vertexPositionCsvFileName>
+ @b Usage:  volSurfaceRegularization -input <volFileName> -o <regularizedcomplex.obj>
 
  @b Allowed @b options @b are :
  @code
@@ -49,7 +52,7 @@ Surface approximation options:
 
 
  @code
- $ surfaceApprox -i bunny.vol -o bunny_smooth.csv
+ $ volSurfaceRegularization -i bunny.vol -o bunny_smooth.obj
  @endcode
 
  You should obtain such a result:
@@ -57,7 +60,7 @@ Surface approximation options:
  @image html bunny_smooth.png "Smooth quadrangulated complex."
 
  @see
- @ref surfaceApprox.cpp
+ @ref volSurfaceRegularization.cpp
 
  */
 
@@ -68,9 +71,15 @@ Surface approximation options:
 #include <boost/program_options/variables_map.hpp>
 #include <boost/program_options/parsers.hpp>
 #include <boost/program_options/errors.hpp>
+#include <DGtal/images/ImageSelector.h>
+#include <DGtal/io/readers/GenericReader.h>
 #include <random>
 #include <iomanip>
 #include <regex>
+#include "volSurfaceRegularization-details/surface_approx.h"
+#include "volSurfaceRegularization-details/surface_extract.h"
+#include "volSurfaceRegularization-details/shape.h"
+
 
 struct Options
 {
@@ -151,11 +160,6 @@ parse_options(int argc, char* argv[])
     return options;
 }
 
-#include <DGtal/images/ImageSelector.h>
-#include <DGtal/io/readers/GenericReader.h>
-#include "surface_approx.h"
-#include "surface_extract.h"
-#include "shape.h"
 
 int main(int argc, char* argv[])
 {
