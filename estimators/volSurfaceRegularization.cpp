@@ -238,15 +238,18 @@ int main(int argc, char* argv[])
     ASSERT( regularized_centers.size() == 3*calculus.kFormLength(2, PRIMAL) );
 
     {
-        trace.beginBlock("computing energies");
+      trace.beginBlock( "computing energies" );
 
-        {
-            double position_energy = 0;
-            double align_energy = 0;
-            std::tie(position_energy, align_energy) = approximateSurfaceEnergies(calculus, original_face_normals, original_positions);
-            align_energy *= options.align;
-            position_energy *= options.regularization_position;
-            trace.info() << "original_energies=" << position_energy << " " << align_energy << " " << position_energy+align_energy << endl;
+      {
+        double position_energy = 0;
+        double align_energy    = 0;
+        std::tie( position_energy, align_energy ) = approximateSurfaceEnergies(
+        calculus, original_face_normals, original_positions );
+        align_energy *= options.align;
+        position_energy *= options.regularization_position;
+        trace.info() << "original_energies=" << position_energy << " "
+                     << align_energy << " " << position_energy + align_energy
+                     << endl;
         }
 
         {
