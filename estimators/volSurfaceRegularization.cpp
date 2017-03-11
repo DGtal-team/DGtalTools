@@ -14,6 +14,24 @@
  *
  **/
 /**
+ * @file volSurfaceRegularization
+ * @ingroup Tools
+ * @author David Coeurjolly (\c david.coeurjolly@liris.cnrs.fr )
+ * @author Pierre Gueth (\c pierre.gueth@liris.cnrs.fr )
+ * @author Jacques-Olivier Lachaud (\c jacques-olivier.lachaud@univ-smb.fr )
+ * Laboratoire d'InfoRmatique en Image et Systèmes d'information - LIRIS (CNRS, UMR 5205), CNRS,
+ * France
+ *
+ *
+ * @date 2011/07/07
+ *
+ * DGtal tool for length estimations on implicit shapes
+ *
+ * This file is part of the DGtal library.
+ */
+
+
+/**
  @page volSurfaceRegularization volSurfaceRegularization
  
  @brief Regularize a cubical complex into a smooth quadrangulated complex.

@@ -30,7 +30,7 @@
   - @ref statisticsEstimators : computes satistics (L1, L2, Loo) from results of two estimators.
   - @ref tangentBC : estimates tangent using a binomial convolver.
   - @ref vol2normalField : generates normal vector field from a vol file using DGtal library.
-  - @ref surfaceApprox : approximates smooth cubical complex.
+  - @ref volSurfaceRegularization : regularizes a digital surface into a smooth cubical complex.
 
 
 <center>
