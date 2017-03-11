@@ -60,8 +60,11 @@ namespace po = boost::program_options;
 
 @code
   -h [ --help ]                      display this message
-  -i [ --input ] arg                 input volumetric file (.vol, .longvol, 
-                                     .pgm3d) 
+  -i [ --input ] arg                 vol file (.vol, .longvol .p3d, .pgm3d and 
+                                     if WITH_ITK is selected: dicom, dcm, mha, 
+                                     mhd). For longvol, dicom, dcm, mha or mhd 
+                                     formats, the input values are linearly 
+                                     scaled between 0 and 255.
   -o [ --output ] arg                base_name.extension:  extracted 2D slice 
                                      volumetric files (will result n files 
                                      base_name_xxx.extension) 
@@ -72,6 +75,12 @@ namespace po = boost::program_options;
   -s [ --sliceOrientation ] arg (=2) specify the slice orientation for which 
                                      the slice are defined (by default =2 (Z 
                                      direction))
+  --rescaleInputMin arg (=0)         min value used to rescale the input 
+                                     intensity (to avoid basic cast into 8  
+                                     bits image).
+  --rescaleInputMax arg (=255)       max value used to rescale the input 
+                                     intensity (to avoid basic cast into 8 bits
+                                     image).
 
 @endcode
 
@@ -102,11 +111,13 @@ int main( int argc, char** argv )
   po::options_description general_opt("Allowed options are: ");
   general_opt.add_options()
     ("help,h", "display this message")
-    ("input,i", po::value<std::string >(), "input volumetric file (.vol, .longvol, .pgm3d) " )
+    ("input,i", po::value<std::string>(), "vol file (.vol, .longvol .p3d, .pgm3d and if WITH_ITK is selected: dicom, dcm, mha, mhd). For longvol, dicom, dcm, mha or mhd formats, the input values are linearly scaled between 0 and 255." )
     ("output,o", po::value<std::string>(), "base_name.extension:  extracted 2D slice volumetric files (will result n files base_name_xxx.extension) " )
     ("setFirstSlice,f", po::value<unsigned int>()->default_value(0), "Set the first slice index to be extracted.") 
     ("setLastSlice,l", po::value<unsigned int>(), "Set the last slice index to be extracted (by default set to maximal value according to the given volume).") 
-    ("sliceOrientation,s", po::value<unsigned int>()->default_value(2), "specify the slice orientation for which the slice are defined (by default =2 (Z direction))" );
+    ("sliceOrientation,s", po::value<unsigned int>()->default_value(2), "specify the slice orientation for which the slice are defined (by default =2 (Z direction))" )
+    ("rescaleInputMin", po::value<DGtal::int64_t>()->default_value(0), "min value used to rescale the input intensity (to avoid basic cast into 8  bits image).")
+    ("rescaleInputMax", po::value<DGtal::int64_t>()->default_value(255), "max value used to rescale the input intensity (to avoid basic cast into 8 bits image).");
 
 
   bool parseOK=true;
@@ -145,10 +156,16 @@ int main( int argc, char** argv )
   std::string outputExt = outputFileName.substr(outputFileName.find_last_of(".")+1);
   std::string outputBasename = outputFileName.substr(0, outputFileName.find_last_of("."));
   unsigned int sliceOrientation = vm["sliceOrientation"].as<unsigned int>();
-  
+  DGtal::int64_t rescaleInputMin = vm["rescaleInputMin"].as<DGtal::int64_t>();
+  DGtal::int64_t rescaleInputMax = vm["rescaleInputMax"].as<DGtal::int64_t>();
+
   
   trace.info()<< "Importing volume file base name:  " << outputBasename << " extension: " << outputExt << " ..." ;
-  Image3D input3dImage = GenericReader<Image3D>::import(inputFileName);
+  typedef DGtal::functors::Rescaling<DGtal::int64_t ,unsigned char > RescalFCT;
+  Image3D input3dImage =  GenericReader< Image3D >::importWithValueFunctor( inputFileName,RescalFCT(rescaleInputMin,
+                                                                                                    rescaleInputMax,
+                                                                                                    0, 255) );
+  
   trace.info()<< "[done]" << endl;
   
   unsigned int startSlice=0;
