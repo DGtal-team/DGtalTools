@@ -2,15 +2,15 @@
 
 - *converters*
    - volAddNoise moved to ```volumetric/```. (David  Coeurjolly,
-   [#XXX](https://github.com/DGtal-team/pull/XXX))
+   [#300](https://github.com/DGtal-team/pull/300))
 
 - *volumetric*
    - new option to volAddNoise to extract the largest 6-connected
    component. (David  Coeurjolly,
-   [#XXX](https://github.com/DGtal-team/pull/XXX))
+   [#300](https://github.com/DGtal-team/pull/300))
    - new option to 3dVolMarchingCubes to add some Kanungo noise to the
    input vol file. (David  Coeurjolly,
-   [#XXX](https://github.com/DGtal-team/pull/XXX))
+   [#300](https://github.com/DGtal-team/pull/300))
    
 
 # DGtalTools 0.9.3
