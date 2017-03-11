@@ -55,12 +55,19 @@ using namespace Z3i;
 
 @code
    -h [ --help ]                    display this message
-   -i [ --input ] arg               vol file (.vol) , pgm3d (.p3d or .pgm3d, pgm
-                                    (with 3 dims)) file or sdp (sequence of
-                                    discrete points)
+   -i [ --input ] arg               vol file (.vol, .longvol .p3d, .pgm3d and if
+                                    WITH_ITK is selected: dicom, dcm, mha, mhd) 
+                                    or sdp (sequence of discrete points).
    -o [ --output ] arg              Output OBJ filename
    -m [ --thresholdMin ] arg (=0)   threshold min to define binary shape
    -M [ --thresholdMax ] arg (=255) threshold max to define binary shape
+
+   --rescaleInputMin arg (=0)       min value used to rescale the input 
+                                    intensity (to avoid basic cast into 8  bits 
+                                    image).
+   --rescaleInputMax arg (=255)     max value used to rescale the input 
+                                    intensity (to avoid basic cast into 8 bits 
+                                    image).
 @endcode
 
 @see
@@ -76,10 +83,12 @@ int main( int argc, char** argv )
   po::options_description general_opt("Allowed options are: ");
   general_opt.add_options()
     ("help,h", "display this message")
-    ("input,i", po::value<std::string>(), "vol file (.vol) , pgm3d (.p3d or .pgm3d, pgm (with 3 dims)) file or sdp (sequence of discrete points)" )
+    ("input,i", po::value<std::string>(), "vol file (.vol, .longvol .p3d, .pgm3d and if WITH_ITK is selected: dicom, dcm, mha, mhd) or sdp (sequence of discrete points).")
     ("output,o", po::value<std::string>(), "Output OBJ filename" )
     ("thresholdMin,m",  po::value<int>()->default_value(0), "threshold min to define binary shape" )
-    ("thresholdMax,M",  po::value<int>()->default_value(255), "threshold max to define binary shape" );
+    ("thresholdMax,M",  po::value<int>()->default_value(255), "threshold max to define binary shape" )
+    ("rescaleInputMin", po::value<DGtal::int64_t>()->default_value(0), "min value used to rescale the input intensity (to avoid basic cast into 8  bits image).")
+    ("rescaleInputMax", po::value<DGtal::int64_t>()->default_value(255), "max value used to rescale the input intensity (to avoid basic cast into 8 bits image).");
 
   bool parseOK=true;
   po::variables_map vm;
@@ -120,16 +129,16 @@ int main( int argc, char** argv )
 
   typedef ImageSelector<Domain, unsigned char>::Type Image;
   string extension = inputFilename.substr(inputFilename.find_last_of(".") + 1);
-  if(extension!="vol" && extension != "p3d" && extension != "pgm3D" &&
-     extension != "pgm3d" && extension != "sdp" && extension != "pgm")
-    {
-      trace.info() << "File extension not recognized: "<< extension << std::endl;
-      return 0;
-    }
 
-  if(extension=="vol" || extension=="pgm3d" || extension=="pgm3D")
+  if(extension!="sdp")
     {
-      Image image = GenericReader<Image>::import (inputFilename );
+      DGtal::int64_t rescaleInputMin = vm["rescaleInputMin"].as<DGtal::int64_t>();
+      DGtal::int64_t rescaleInputMax = vm["rescaleInputMax"].as<DGtal::int64_t>();
+      
+      typedef DGtal::functors::Rescaling<DGtal::int64_t ,unsigned char > RescalFCT;
+      Image image =  GenericReader< Image >::importWithValueFunctor( inputFilename,RescalFCT(rescaleInputMin,
+                                                                                             rescaleInputMax,
+                                                                                             0, 255) );
       trace.info() << "Image loaded: "<<image<< std::endl;
       Domain domain = image.domain();
       for(Domain::ConstIterator it = domain.begin(), itend=domain.end(); it!=itend; ++it){
