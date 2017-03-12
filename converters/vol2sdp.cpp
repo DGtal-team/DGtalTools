@@ -57,11 +57,11 @@ namespace po = boost::program_options;
    @code
    -h [ --help ]                    display this message
    -i [ --input ] arg               vol file (.vol, .longvol .p3d, .pgm3d and if
-   WITH_ITK is selected: dicom, dcm, mha, mhd) 
-   or sdp (sequence of discrete points). For 
-   longvol, dicom, dcm, mha or mhd formats, the
-   input values are linearly scaled between 0 
-   and 255.
+                                    WITH_ITK is selected: dicom, dcm, mha, mhd) 
+                                    or sdp (sequence of discrete points). For 
+                                    longvol, dicom, dcm, mha or mhd formats, the
+                                    input values are linearly scaled between 0 
+                                    and 255.
    -o [ --output ] arg              sequence of discrete point file (.sdp) 
    -e [ --exportImageValues ]       option to export also the image value of the
    voxel in a fourth field.
