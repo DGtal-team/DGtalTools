@@ -211,12 +211,9 @@ int main( int argc, char** argv )
       return 3;
     }
     
-    int nb_surfels = 0;
     trace.info()<<vectConnectedSCell.size()<<" components."<<std::endl;
     
     trace.info()<<"Extracting the largest one."<<std::endl;
-    std::for_each( vectConnectedSCell.begin(), vectConnectedSCell.end(),
-                  [&] ( std::vector<SCell >& v ) { nb_surfels += v.size(); } );
     int cc_max_size_idx = -1;
     auto it_max         = std::max_element( vectConnectedSCell.begin(), vectConnectedSCell.end(),
                                            [] (std::vector<SCell >& v1, std::vector<SCell >& v2)
