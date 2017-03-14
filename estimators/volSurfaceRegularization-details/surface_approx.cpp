@@ -391,15 +391,15 @@ approximateSurface(const Calculus& calculus, const FlatVector& normals, const Ap
                 std::set<Cell>::const_iterator aa = face_vertices.begin();
                 std::set<Cell>::const_iterator bb = face_vertices.begin();
                 ASSERT( bb != face_vertices.end() );
-                bb++;
+                ++bb;
                 ASSERT( bb != face_vertices.end() );
                 std::vector<double> lengths;
                 while (aa != face_vertices.end())
                 {
                     const double length = (kspace.uKCoords(*aa)-kspace.uKCoords(*bb)).norm();
                     lengths.push_back(length);
-                    aa++;
-                    bb++;
+                    ++aa;
+                    ++bb;
                     if (bb == face_vertices.end()) bb= face_vertices.begin();
                 }
                 ASSERT( lengths == std::vector<double>({2,sqrt(8),2,sqrt(8)}) );
