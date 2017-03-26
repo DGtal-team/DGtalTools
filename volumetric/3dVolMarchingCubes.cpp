@@ -175,8 +175,8 @@ int main( int argc, char** argv )
   //! [3dVolMarchingCubes-KSpace]
   trace.beginBlock( "Construct the Khalimsky space from the image domain." );
   KSpace ks;
-  bool space_ok = ks.init( image.domain().lowerBound(),
-                          image.domain().upperBound(), true );
+  bool space_ok =
+  ks.init( image.domain().lowerBound(), image.domain().upperBound(), true );
   if (!space_ok)
   {
     trace.error() << "Error in the Khamisky space construction."<<std::endl;
@@ -223,11 +223,10 @@ int main( int argc, char** argv )
                                        vectConnectedSCell[ cc_max_size_idx ].end() );
   }
   else
-    Surfaces<KSpace>::sMakeBoundary( theSetOfSurfels.surfelSet(),
-                                    ks, thresholdedImage,
-                                    image.domain().lowerBound(),
-                                    image.domain().upperBound());
-  
+    Surfaces<KSpace>::sMakeBoundary(
+    theSetOfSurfels.surfelSet(), ks, thresholdedImage,
+    image.domain().lowerBound(), image.domain().upperBound() );
+
   MyDigitalSurface digSurf( theSetOfSurfels );
   trace.info() << "Digital surface has " << digSurf.size() << " surfels."
   << std::endl;
