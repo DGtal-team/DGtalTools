@@ -65,7 +65,7 @@ namespace po = boost::program_options;
                                     transformed with the output values (given 
                                     with --outputVals).
   -r [ --outputVals ] arg           specify the output values to transformed 
-                                    accordint the input values (given with 
+                                    according to the input values (given with 
                                     --inputVals).
  @endcode
 
@@ -112,7 +112,7 @@ int main(int argc, char**argv)
     ( "input,i", po::value<std::string>(), "Input vol file." )
     ( "output,o", po::value<std::string>()->default_value("output.vol"),"Output filename." )
     ("inputVals,s", po::value<std::vector<unsigned int > >()->multitoken(), "specify the values which will be transformed with the output values (given with --outputVals)." ) 
-    ("outputVals,r", po::value<std::vector<unsigned int > >()->multitoken(), "specify the output values to transformed accordint the input values (given with --inputVals)." ) ;
+    ("outputVals,r", po::value<std::vector<unsigned int > >()->multitoken(), "specify the output values to transformed according to the input values (given with --inputVals)." ) ;
   bool parseOK=true;
   
   po::variables_map vm;
