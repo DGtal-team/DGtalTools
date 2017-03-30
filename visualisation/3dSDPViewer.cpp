@@ -93,7 +93,7 @@ typedef Viewer3D<Z3i::Space, Z3i::KSpace> Viewer;
                                         color labels in the source file (used 
                                         by -importColorLabels).
   -f [ --filter ] arg (=100)            filter input file in order to display 
-                                        only the [arg] pourcent of the input 3D
+                                        only the [arg] percentage of the input 3D
                                         points (uniformly selected).
   --noPointDisplay                      usefull for instance to only display 
                                         the lines between points.
@@ -124,6 +124,11 @@ typedef Viewer3D<Z3i::Space, Z3i::KSpace> Viewer;
                                         determined by two consecutive point 
                                         given, each point represented by its 
                                         coordinates on a single line.
+  --filterVectors arg (=100)            filters vector input file in order to 
+                                        display only the [arg] percentage of the 
+                                        input vectors (uniformly selected, to 
+                                        be used with option --drawVectors otherwise 
+                                        no effect). 
   --interactiveDisplayVoxCoords         by using this option the pixel 
                                         coordinates can be displayed after 
                                         selection (shift+left click on voxel). 
@@ -200,7 +205,7 @@ int main( int argc, char** argv )
   ("importColorLabels", "import color labels from the input file (label index  should be by default at index 3).")
   ("setColorsIndex", po::value<std::vector<unsigned int> >()->multitoken(), "customize the index of the imported colors in the source file (used by -importColor).")
   ("setColorLabelIndex", po::value<unsigned int >()->default_value(3), "customize the index of the imported color labels in the source file (used by -importColorLabels).")
-  ("filter,f",po::value<double>()->default_value(100.0), "filter input file in order to display only the [arg] pourcent of the input 3D points (uniformly selected)." )
+  ("filter,f",po::value<double>()->default_value(100.0), "filter input file in order to display only the [arg] percent of the input 3D points (uniformly selected)." )
   ("noPointDisplay", "usefull for instance to only display the lines between points.")
   ("drawLines", "draw the line between discrete points." )
   ("scaleX,x",  po::value<float>()->default_value(1.0), "set the scale value in the X direction (default 1.0)" )
@@ -212,7 +217,9 @@ int main( int argc, char** argv )
   ("lineSize",  po::value<double>()->default_value(0.2), "defines the line size (used when the --drawLines or --drawVectors option is selected). (default value 0.2))")
   ("primitive,p", po::value<std::string>()->default_value("voxel"), "set the primitive to display the set of points (can be sphere, voxel (default), or glPoints (opengl points).")
   ("drawVectors,v", po::value<std::string>(), "SDP vector file: draw a set of vectors from the given file (each vector are determined by two consecutive point given, each point represented by its coordinates on a single line.")
-  ("interactiveDisplayVoxCoords", "by using this option the pixel coordinates can be displayed after selection (shift+left click on voxel)." );
+  ("filterVectors",po::value<double>()->default_value(100.0), "filters vector input file in order to display only the [arg] percent of the input vectors (uniformly selected, to be used with option --drawVectors else no effect). " )
+ 
+    ("interactiveDisplayVoxCoords", "by using this option the pixel coordinates can be displayed after selection (shift+left click on voxel)." );
   
   
   bool parseOK=true;
@@ -420,7 +427,13 @@ int main( int argc, char** argv )
       {
         trace.info()<<"Warning the two set of points doesn't contains the same number of points, some vectors will be skipped." << std::endl;
       }
-      for(unsigned int i =0; i<vectorsPt.size()-1; i=i+2)
+      int step=1;
+      if(vm.count("filterVectors"))
+        {
+          double percentage = vm["filterVectors"].as<double>();
+          step = max(1, (int) (100/percentage));
+        }
+      for(unsigned int i =0; i<vectorsPt.size()-1; i=i+2*step)
       {
         viewer.addLine(vectorsPt.at(i),vectorsPt.at(i+1), lineSize);
       }
