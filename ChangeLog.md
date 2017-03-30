@@ -1,3 +1,12 @@
+# DGtalTools 0.9.4
+
+- *visualisation*:
+  - Improve visualisation tools (vol2heightfield, vol2obj, vol2raw, vol2sdp, vol2slice, volBoundary2obj, 3dImageViewer, 3dVolViewer, sliceViewer, Viewer3DImage)
+    allowing to read longvol including rescaling.
+    (Bertrand Kerautret, [#296](https://github.com/DGtal-team/DGtalTools/pull/296))
+
+
+
 # DGtalTools 0.9.3
 
 - *visualisation*:

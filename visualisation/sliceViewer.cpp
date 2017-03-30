@@ -35,9 +35,6 @@
 #include "DGtal/io/Color.h"
 #include "DGtal/io/DrawWithDisplay3DModifier.h"
 #endif
-#ifdef WITH_ITK
-#include "DGtal/io/readers/DicomReader.h"
-#endif
 
 #include "sliceViewer.h"
 #include "ui_sliceViewer.h"
@@ -63,37 +60,43 @@ namespace po = boost::program_options;
 
 
 /**
- @page sliceViewer sliceViewer
+   @page sliceViewer sliceViewer
  
- @brief  Displays volume file with slice image by using QT and QGLviewer.
+   @brief  Displays volume file with slice image by using QT and QGLviewer.
 
- @b Usage:   sliceViewer [input]
+   @b Usage:   sliceViewer [input]
 
- @b Allowed @b options @b are :
+   @b Allowed @b options @b are :
  
- @code
-  -h [ --help ]           display this message
-  -i [ --input ] arg      vol file (.vol) , pgm3d (.p3d or .pgm3d, pgm (with 3 
-                          dims)) file or sdp (sequence of discrete points)
-  --hueColorMap           use hue color map to display images.
-  --gradHotColorMap       use hot gradient color map to display images.
-  --gradCoolColorMap      use cool gradient color map to display images.
-  --dicomMin arg (=-1000) set minimum density threshold on Hounsfield scale
-  --dicomMax arg (=3000)  set maximum density threshold on Hounsfield scale
- @endcode
+   @code
+   -h [ --help ]                     display this message
+   -i [ --input ] arg                vol file (.vol, .longvol .p3d, .pgm3d and if 
+                                     WITH_ITK is selected: dicom, dcm, mha, mhd). 
+                                     For longvol, dicom, dcm, mha or mhd formats, the
+                                     input values are linearly scaled between 0 and 255.
+   --hueColorMap                     use hue color map to display images.
+   --gradHotColorMap                 use hot gradient color map to display images.
+   --gradCoolColorMap                use cool gradient color map to display images.
+   --rescaleInputMin arg (=0)        min value used to rescale the input 
+                                     intensity (to avoid basic cast into 8  
+                                     bits image).
+   --rescaleInputMax arg (=255)       max value used to rescale the input 
+                                     intensity (to avoid basic cast into 8 bits
+                                     image).
+   @endcode
 
- @b Example: 
+   @b Example: 
 
- @code
- $ sliceViewer -i  $DGtal/examples/samples/lobster.vol
- @endcode
+   @code
+   $ sliceViewer -i  $DGtal/examples/samples/lobster.vol
+   @endcode
 
- @image html resSliceViewer.png " "
+   @image html resSliceViewer.png " "
 
-@see
- @ref sliceViewer.cpp
+   @see
+   @ref sliceViewer.cpp
 
- */
+*/
 
 
 
@@ -117,7 +120,7 @@ getImage(const TImage &anImage, double gridSize, const MainWindow::ColorMapFunct
   scales.push_back(gridSize);
   scales.push_back(gridSize);  
   functors::BasicDomainSubSampler<typename TImage::Domain,  int, double> subSampler (anImage.domain(),
-                                                                                             scales, Z2i::Point(0,0));
+                                                                                     scales, Z2i::Point(0,0));
   typename TImage::Domain newDomain = subSampler.getSubSampledDomain();
   ConstImageAdapterForSubSampling  scaledImage (anImage, newDomain, subSampler, colFunctor );
   unsigned int height = scaledImage.domain().upperBound()[1]-scaledImage.domain().lowerBound()[1];
@@ -420,16 +423,12 @@ int main( int argc, char** argv )
   po::options_description general_opt("Allowed options are: ");
   general_opt.add_options()
     ("help,h", "display this message")
-    ("input,i", po::value<std::string>(), "vol file (.vol) , pgm3d (.p3d or .pgm3d, pgm (with 3 dims)) file or sdp (sequence of discrete points)" )
+    ("input,i", po::value<std::string>(), "vol file (.vol, .longvol .p3d, .pgm3d and if WITH_ITK is selected: dicom, dcm, mha, mhd). For longvol, dicom, dcm, mha or mhd formats, the input values are linearly scaled between 0 and 255." )
     ("hueColorMap", "use hue color map to display images." )
     ("gradHotColorMap", "use hot gradient color map to display images." )
     ("gradCoolColorMap", "use cool gradient color map to display images." )
-
-#ifdef WITH_ITK
-    ("dicomMin", po::value<int>()->default_value(-1000), "set minimum density threshold on Hounsfield scale")
-    ("dicomMax", po::value<int>()->default_value(3000), "set maximum density threshold on Hounsfield scale")
-#endif
-    ;
+    ("rescaleInputMin", po::value<DGtal::int64_t>()->default_value(0), "min value used to rescale the input intensity (to avoid basic cast into 8  bits image).")
+    ("rescaleInputMax", po::value<DGtal::int64_t>()->default_value(255), "max value used to rescale the input intensity (to avoid basic cast into 8 bits image).");
 
   bool parseOK=true;
   po::variables_map vm;
@@ -459,63 +458,42 @@ int main( int argc, char** argv )
   typedef ImageContainerBySTLVector < Z3i::Domain, unsigned char > Image3D;
   typedef ImageContainerBySTLVector < Z2i::Domain, unsigned char > Image2D;
 
-  string extension = inputFilename.substr(inputFilename.find_last_of(".") + 1);
-  if(extension!="vol" && extension != "p3d" && extension != "pgm3D" && extension != "pgm3d" && extension != "sdp" && extension != "pgm"
-#ifdef WITH_ITK
-     && extension !="dcm"
-#endif
-     ){
-    trace.info() << "File extension not recognized: "<< extension << std::endl;
-    return 0;
-  }
+  DGtal::int64_t rescaleInputMin = vm["rescaleInputMin"].as<DGtal::int64_t>();
+  DGtal::int64_t rescaleInputMax = vm["rescaleInputMax"].as<DGtal::int64_t>();
 
-  if(extension=="vol" || extension=="pgm3d" || extension=="pgm3D"
-#ifdef WITH_ITK
-     || extension =="dcm"
-#endif
-     ){
-
-#ifdef WITH_ITK
-    int dicomMin = vm["dicomMin"].as<int>();
-    int dicomMax = vm["dicomMax"].as<int>();
-    typedef functors::Rescaling<int ,unsigned char > RescalFCT;
-    Image3D image = extension == "dcm" ? DicomReader< Image3D,  RescalFCT  >::importDicom( inputFilename,
-                                                                                           RescalFCT(dicomMin,
-                                                                                                     dicomMax,
-                                                                                                     0, 255) ) :
-      GenericReader<Image3D>::import( inputFilename );
-    trace.info() << "Imported ITK..."<< std::endl;
-#else
-    Image3D image = GenericReader<Image3D>::import (inputFilename );
-    trace.info() << "Imported..."<< std::endl;
-#endif
+  typedef DGtal::functors::Rescaling<DGtal::int64_t ,unsigned char > RescalFCT;
+  Image3D image =  GenericReader< Image3D >::importWithValueFunctor( inputFilename,RescalFCT(rescaleInputMin,
+                                                                                             rescaleInputMax,
+                                                                                             0, 255) );
+  trace.info() << "Imported..."<< std::endl;
 
 
 
-    QApplication application(argc,argv);
-    Viewer3D<> *viewer = new Viewer3D<>();
-    bool usehm = vm.count("hueColorMap");
-    bool usegh = vm.count("gradHotColorMap");
-    bool usegc = vm.count("gradCoolColorMap");
-    
-    MainWindow w(viewer, &image, MainWindow::ColorMapFunctor(usehm? MainWindow::HueshadeCM:
-                                                             usegh? MainWindow::GradientMapHot:
-                                                             usegc? MainWindow::GradientMapCool:
-                                                             MainWindow::Id), 0,0);
-    w.setWindowTitle ( QString("sliceViewer"));
-    w.updateSliceImageX( image.domain().lowerBound()[0], true);
-    w.updateSliceImageY( image.domain().lowerBound()[1], true);
-    w.updateSliceImageZ( image.domain().lowerBound()[2], true);
-    w.show();
-    Z3i::Point size = image.domain().upperBound() - image.domain().lowerBound();
-    Z3i::Point center = image.domain().lowerBound()+size/2;
-    unsigned int maxDist = std::max(std::max(size[2], size[1]), size[2]);
-    viewer->camera()->setPosition(qglviewer::Vec(center[0],center[1], 
-                                                 center[2] + 2.0*maxDist));
-    viewer->camera()->setSceneCenter(qglviewer::Vec(center[0],center[1],center[2]));
-    application.exec();
-    delete viewer;
-  }
+  
+
+  QApplication application(argc,argv);
+  Viewer3D<> *viewer = new Viewer3D<>();
+  bool usehm = vm.count("hueColorMap");
+  bool usegh = vm.count("gradHotColorMap");
+  bool usegc = vm.count("gradCoolColorMap");
+  
+  MainWindow w(viewer, &image, MainWindow::ColorMapFunctor(usehm? MainWindow::HueshadeCM:
+                                                           usegh? MainWindow::GradientMapHot:
+                                                           usegc? MainWindow::GradientMapCool:
+                                                           MainWindow::Id), 0,0);
+  w.setWindowTitle ( QString("sliceViewer"));
+  w.updateSliceImageX( image.domain().lowerBound()[0], true);
+  w.updateSliceImageY( image.domain().lowerBound()[1], true);
+  w.updateSliceImageZ( image.domain().lowerBound()[2], true);
+  w.show();
+  Z3i::Point size = image.domain().upperBound() - image.domain().lowerBound();
+  Z3i::Point center = image.domain().lowerBound()+size/2;
+  unsigned int maxDist = std::max(std::max(size[2], size[1]), size[2]);
+  viewer->camera()->setPosition(qglviewer::Vec(center[0],center[1], 
+                                               center[2] + 2.0*maxDist));
+  viewer->camera()->setSceneCenter(qglviewer::Vec(center[0],center[1],center[2]));
+  application.exec();
+  delete viewer;
+
 }
-
 
