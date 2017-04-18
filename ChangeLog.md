@@ -4,8 +4,8 @@
   - Improve visualisation tools (vol2heightfield, vol2obj, vol2raw, vol2sdp, vol2slice, volBoundary2obj, 3dImageViewer, 3dVolViewer, sliceViewer, Viewer3DImage)
     allowing to read longvol including rescaling.
     (Bertrand Kerautret, [#296](https://github.com/DGtal-team/DGtalTools/pull/296))
-
-
+  - meshViewer: add an option to set the ambient light source.
+    (Bertrand Kerautret, [#301](https://github.com/DGtal-team/DGtalTools/pull/301))
 
 # DGtalTools 0.9.3
 
