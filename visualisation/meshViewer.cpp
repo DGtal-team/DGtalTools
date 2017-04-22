@@ -138,9 +138,13 @@ protected:
     {
       handled=true;
       myIsDisplayingInfoMode = !myIsDisplayingInfoMode;
-      std::stringstream sstring;
+      stringstream ss;
+      qglviewer::Vec camPos = camera()->position();
+      DGtal::Z3i::RealPoint c (camPos[0], camPos[1], camPos[2]);
+      ss << myInfoDisplay << "distance to camera: " << (c-centerMesh).norm();
       Viewer3D<>::displayMessage(QString(myIsDisplayingInfoMode ?
-                                                      myInfoDisplay.c_str() : " "), 1000000);
+                                         ss.str().c_str() : " "), 1000000);
+      
       Viewer3D<>::updateGL();
     }
     if(!handled)
@@ -153,6 +157,7 @@ public:
   std::string myInfoDisplay = "No information loaded...";
   bool myIsDisplayingInfoMode = false;
   bool mySaveSnap = false;
+  DGtal::Z3i::RealPoint centerMesh;
 };
 
 
@@ -317,8 +322,16 @@ int main( int argc, char** argv )
     aMesh << inputFilenameVect[i];
     vectMesh.push_back(aMesh);
   }
-  
-  
+  DGtal::Z3i::RealPoint centerMeshes;
+  unsigned int tot=0;
+  for(const auto & m: vectMesh)
+    {
+      for( auto p = m.vertexBegin(); p!=m.vertexEnd(); ++p)
+        centerMeshes += *p;
+      tot+=m.nbVertex();
+    }
+  centerMeshes /= tot;
+  viewer.centerMesh = centerMeshes;
   bool import = vectMesh.size()==inputFilenameVect.size();
   if(!import){
     trace.info() << "File import failed. " << std::endl;
@@ -381,7 +394,7 @@ int main( int argc, char** argv )
       nbFaces +=m.nbFaces();
     }
   stringstream ss;
-  ss << "# faces: " << std::fixed << nbFaces << "    #vertex: " <<  nbVertex;
+  ss << "# faces: " << std::fixed << nbFaces << "    #vertex: " <<  nbVertex ;
   viewer.myInfoDisplay = ss.str();
   viewer  << CustomViewer3D::updateDisplay;
   if(vm.count("doSnapShotAndExit")){
