@@ -141,7 +141,7 @@ protected:
       stringstream ss;
       qglviewer::Vec camPos = camera()->position();
       DGtal::Z3i::RealPoint c (camPos[0], camPos[1], camPos[2]);
-      ss << myInfoDisplay << "distance to camera: " << (c-centerMesh).norm();
+      ss << myInfoDisplay << " distance to camera: " << (c-centerMesh).norm();
       Viewer3D<>::displayMessage(QString(myIsDisplayingInfoMode ?
                                          ss.str().c_str() : " "), 1000000);
       
