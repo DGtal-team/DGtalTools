@@ -14,8 +14,8 @@
  *
  **/
 /**
- * @file vol2sdp.cpp
- * @ingroup conerters
+ * @file sdp2vol.cpp
+ * @ingroup converters
  * @author Bertrand Kerautret (\c kerautre@loria.fr )
  * LORIA (CNRS, UMR 7503), University of Nancy, France
  *
@@ -110,16 +110,13 @@ int main( int argc, char** argv )
 		<< "sdp2vol -i volumePoints.sdp -o volume.vol -d 0 0 0 10 10 10 \n";
       return 0;
     }
-  if(! vm.count("input") ||! vm.count("output") || !vm.count("domain") )
+  if(! vm.count("input") ||! vm.count("output")  )
     {
       trace.error() << " Input/ output filename and domain are needed to be defined" << endl;      
       return 0;
     }
   
-  std::vector<int> domainCoords= vm["domain"].as<std::vector <int> >();
-  Z3i::Point ptLower(domainCoords[0],domainCoords[1], domainCoords[2]);
-  Z3i::Point ptUpper(domainCoords[3],domainCoords[4], domainCoords[5]);
-  Image3D::Domain imageDomain(ptLower, ptUpper);
+
   
   string inputSDP = vm["input"].as<std::string>();
   string outputFilename = vm["output"].as<std::string>();
@@ -135,6 +132,32 @@ int main( int argc, char** argv )
   std::vector<Z3i::Point> vectPoints=  PointListReader<Z3i::Point>::getPointsFromFile(inputSDP, vPos); 
   trace.info() << " [done] " << std::endl ; 
 
+  Z3i::Point ptLower;
+  Z3i::Point ptUpper;
+
+ 
+  struct BBCompPoints
+  {
+    BBCompPoints(unsigned int d): myDim(d){};
+    bool operator() (const Z3i::Point &p1, const Z3i::Point &p2){return p1[myDim]<p2[myDim];};
+    unsigned int myDim;
+  };
+  unsigned int marge = 1;
+  if(!vm.count("domain")){
+
+    for(unsigned int i=0; i< 4; i++)
+      {
+        BBCompPoints cmp_points(i);
+        ptUpper[i] = (*(std::max_element(vectPoints.begin(), vectPoints.end(), cmp_points)))[i]+marge;
+        ptLower[i] = (*(std::min_element(vectPoints.begin(),  vectPoints.end(), cmp_points)))[i]-marge;
+      }
+  }else{
+    std::vector<int> domainCoords= vm["domain"].as<std::vector <int> >();
+    ptLower = Z3i::Point(domainCoords[3],domainCoords[4], domainCoords[5]);
+    ptUpper = Z3i::Point(domainCoords[0],domainCoords[1], domainCoords[2]);
+  }
+  Image3D::Domain imageDomain(ptLower, ptUpper);
+  trace.info() << "domain: "<<imageDomain<<std::endl;
   Image3D imageResult(imageDomain); 
   for(Image3D::Domain::ConstIterator iter = imageResult.domain().begin(); iter!= imageResult.domain().end();
       iter++){
