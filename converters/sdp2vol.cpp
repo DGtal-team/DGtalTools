@@ -60,8 +60,8 @@ using namespace DGtal;
   -b [ --backgroundVal ] arg (=0)   value which will represent the background 
                                     outside the  object in the resulting image 
                                     (default 0)
-  -d [ --domain ] arg               The domain of the resulting image xmin ymin
-                                    zmin xmax ymax zmax 
+  -d [ --domain ] arg               defines the domain of the resulting image 
+                                    xmin ymin zmin xmax ymax zmax 
 @endcode
 
 @b Example:
@@ -82,7 +82,7 @@ int main( int argc, char** argv )
   typedef ImageContainerBySTLVector < Z3i::Domain, unsigned char > Image3D;
   
   // parse command line ----------------------------------------------
-  po::options_description general_opt("Allowed options are: ");
+  po::options_description general_opt("Allowed options are");
   general_opt.add_options()
     ("help,h", "display this message")
     ("input,i", po::value<std::string>(), "Sequence of 3d Discrete points (.sdp) " )
@@ -90,7 +90,7 @@ int main( int argc, char** argv )
     ("foregroundVal,f", po::value<int>()->default_value(128), "value which will represent the foreground object in the resulting image (default 128)")
     ("invertY", "Invert the Y axis (image flip in the y direction)")
     ("backgroundVal,b", po::value<int>()->default_value(0), "value which will represent the background outside the  object in the resulting image (default 0)")
-    ("domain,d",  po::value<std::vector <int> >()->multitoken(), "The domain of the resulting image xmin ymin zmin xmax ymax zmax ");
+    ("domain,d",  po::value<std::vector <int> >()->multitoken(), "defines the domain of the resulting image xmin ymin zmin xmax ymax zmax ");
   
   bool parseOK=true;
   po::variables_map vm;
@@ -143,34 +143,44 @@ int main( int argc, char** argv )
     unsigned int myDim;
   };
   unsigned int marge = 1;
-  if(!vm.count("domain")){
-
+  if(!vm.count("domain"))
+  {
     for(unsigned int i=0; i< 4; i++)
-      {
-        BBCompPoints cmp_points(i);
-        ptUpper[i] = (*(std::max_element(vectPoints.begin(), vectPoints.end(), cmp_points)))[i]+marge;
-        ptLower[i] = (*(std::min_element(vectPoints.begin(),  vectPoints.end(), cmp_points)))[i]-marge;
-      }
-  }else{
+    {
+      BBCompPoints cmp_points(i);
+      ptUpper[i] = (*(std::max_element(vectPoints.begin(), vectPoints.end(), cmp_points)))[i]+marge;
+      ptLower[i] = (*(std::min_element(vectPoints.begin(),  vectPoints.end(), cmp_points)))[i]-marge;
+    }
+  }
+  else
+  {
     std::vector<int> domainCoords= vm["domain"].as<std::vector <int> >();
     ptLower = Z3i::Point(domainCoords[3],domainCoords[4], domainCoords[5]);
     ptUpper = Z3i::Point(domainCoords[0],domainCoords[1], domainCoords[2]);
   }
+  
   Image3D::Domain imageDomain(ptLower, ptUpper);
   trace.info() << "domain: "<<imageDomain<<std::endl;
   Image3D imageResult(imageDomain); 
-  for(Image3D::Domain::ConstIterator iter = imageResult.domain().begin(); iter!= imageResult.domain().end();
-      iter++){
+  for(Image3D::Domain::ConstIterator iter = imageResult.domain().begin();
+      iter!= imageResult.domain().end();
+      iter++)
+  {
     imageResult.setValue(*iter, backgroundVal);
   }    
   
-  for(unsigned int i=0; i<vectPoints.size(); i++){
-    if(vm.count("invertY")){
+  for(unsigned int i=0; i<vectPoints.size(); i++)
+  {
+    if(vm.count("invertY"))
+    {
       vectPoints[i][1]=ptUpper[1]-vectPoints[i][1];
     }
-    if(imageResult.domain().isInside(vectPoints[i])){
+    if(imageResult.domain().isInside(vectPoints[i]))
+    {
       imageResult.setValue(vectPoints[i], foregroundVal);
-    }else{
+    }
+    else
+    {
       trace.warning() << "point " << vectPoints[i] << " outside the domain (ignored in the resulting volumic image)" << std::endl;  
     }
   }
