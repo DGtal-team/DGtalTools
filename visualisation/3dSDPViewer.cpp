@@ -124,6 +124,12 @@ typedef Viewer3D<Z3i::Space, Z3i::KSpace> Viewer;
                                         determined by two consecutive point 
                                         given, each point represented by its 
                                         coordinates on a single line.
+  -u [ --unitVector ] arg (=1)          specifies that the SDP vector file 
+                                        format (of --drawVectors option) should
+                                        be interpreted as unit vectors (each 
+                                        vector position is be defined from the 
+                                        input point (with input order) with a 
+                                        constant norm defined by [arg]).
   --filterVectors arg (=100)            filters vector input file in order to 
                                         display only the [arg] percentage of the 
                                         input vectors (uniformly selected, to 
@@ -217,6 +223,8 @@ int main( int argc, char** argv )
   ("lineSize",  po::value<double>()->default_value(0.2), "defines the line size (used when the --drawLines or --drawVectors option is selected). (default value 0.2))")
   ("primitive,p", po::value<std::string>()->default_value("voxel"), "set the primitive to display the set of points (can be sphere, voxel (default), or glPoints (opengl points).")
   ("drawVectors,v", po::value<std::string>(), "SDP vector file: draw a set of vectors from the given file (each vector are determined by two consecutive point given, each point represented by its coordinates on a single line.")
+  ("unitVector,u", po::value<double>()->default_value(1.0), "specifies that the SDP vector file format (of --drawVectors option) should be interpreted as unit vectors (each vector position is be defined from the input point (with input order) with a constant norm defined by [arg]).")
+
   ("filterVectors",po::value<double>()->default_value(100.0), "filters vector input file in order to display only the [arg] percent of the input vectors (uniformly selected, to be used with option --drawVectors else no effect). " )
  
     ("interactiveDisplayVoxCoords", "by using this option the pixel coordinates can be displayed after selection (shift+left click on voxel)." );
@@ -301,6 +309,9 @@ int main( int argc, char** argv )
   bool importColorLabels = vm.count("importColorLabels");
   bool importColors = vm.count("importColors");
   bool interactiveDisplayVoxCoords = vm.count("interactiveDisplayVoxCoords");
+  bool useUnitVector = vm.count("unitVector");
+  double constantNorm = vm["unitVector"].as<double>();
+  
   typedef Viewer3D<Z3i::Space, Z3i::KSpace> Viewer;
   Z3i::KSpace K;
   Viewer viewer( K );
@@ -433,18 +444,30 @@ int main( int argc, char** argv )
           double percentage = vm["filterVectors"].as<double>();
           step = max(1, (int) (100/percentage));
         }
-      for(unsigned int i =0; i<vectorsPt.size()-1; i=i+2*step)
+      if(useUnitVector)
       {
-        viewer.addLine(vectorsPt.at(i),vectorsPt.at(i+1), lineSize);
+        for(unsigned int i =0; i< std::min(vectVoxels.size(), vectorsPt.size()); i=i+2*step)
+        {
+          viewer.addLine(vectVoxels.at(i), vectVoxels.at(i)+vectorsPt.at(i)*constantNorm, lineSize);
+        }
+      }
+      else
+      {
+        for(unsigned int i =0; i<vectorsPt.size()-1; i=i+2*step)
+        {
+          viewer.addLine(vectorsPt.at(i),vectorsPt.at(i+1), lineSize);
+        }
       }
       
     }
     if(vm.count("addMesh"))
     {
       bool customColorMesh =  vm.count("customColorMesh");
-      if(customColorMesh){
+      if(customColorMesh)
+      {
         std::vector<unsigned int > vectCol = vm["customColorMesh"].as<std::vector<unsigned int> >();
-        if(vectCol.size()!=4){
+        if(vectCol.size()!=4)
+        {
           trace.error() << "colors specification should contain R,G,B and Alpha values"<< std::endl;
         }
         viewer.setFillColor(DGtal::Color(vectCol[0], vectCol[1], vectCol[2], vectCol[3]));
