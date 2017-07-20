@@ -35,7 +35,7 @@
      (Bertrand Kerautret, [#285](https://github.com/DGtal-team/DGtalTools/pull/288))
     - volSurfaceRegularization: a tool to compute a regularized quadrangulation from
      from a digital surface.
-     (Pierre Gueth, David Coeurjolly, [#299](https://github.com/DGtal-team/DGtalTools/pull/299))
+     (Pierre Gueth, David Coeurjolly, [#306](https://github.com/DGtal-team/DGtalTools/pull/306))
 
 
 # DGtalTools 0.9.2
