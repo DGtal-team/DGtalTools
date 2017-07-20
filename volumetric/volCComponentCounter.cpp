@@ -104,42 +104,40 @@ void CCCounter(Rank& r, Parent& p, const Image& elements, const unsigned int con
   typename Image::Point decz(0,0,1);
   
   //Merging process
-  for(typename Image::Domain::ConstIterator e = elements.domain().begin();
-      e !=elements.domain().end(); ++e)
-    {
-      if ( elements.domain().isInside(*e+decx) &&  
-           (elements(*e) == elements(*e+decx)))
-        dsets.union_set(*e,*e+decx);
-      
-      if ( elements.domain().isInside(*e+decy) &&  
-           (elements(*e) == elements(*e+decy)))
-        dsets.union_set(*e,*e+decy);
-      
-      if ( elements.domain().isInside(*e+decz) &&  
-           (elements(*e) == elements(*e+decz)))
-        dsets.union_set(*e,*e+decz);
+  for ( typename Image::Domain::ConstIterator e = elements.domain().begin();
+        e != elements.domain().end(); ++e )
+  {
+    if ( elements.domain().isInside( *e + decx ) &&
+         ( elements( *e ) == elements( *e + decx ) ) )
+      dsets.union_set( *e, *e + decx );
 
-      if (connectivity > 6)
-        {
-          if ( elements.domain().isInside(*e+decx+decy) &&  
-               (elements(*e) == elements(*e+decx+decy)))
-            dsets.union_set(*e,*e+decx+decy);
-      
-          if ( elements.domain().isInside(*e+decx+decz) &&  
-               (elements(*e) == elements(*e+decx+decz)))
-            dsets.union_set(*e,*e+decx+decz);
-  
-          if ( elements.domain().isInside(*e+decy+decz) &&  
-               (elements(*e) == elements(*e+decy+decz)))
-            dsets.union_set(*e,*e+decy+decz);
-  
-          if (connectivity == 26)
-            if ( elements.domain().isInside(*e+decy+decz+decx) &&  
-                 (elements(*e) == elements(*e+decy+decz+decx)))
-              dsets.union_set(*e,*e+decy+decz+decx);
-    
-        }
-      
+    if ( elements.domain().isInside( *e + decy ) &&
+         ( elements( *e ) == elements( *e + decy ) ) )
+      dsets.union_set( *e, *e + decy );
+
+    if ( elements.domain().isInside( *e + decz ) &&
+         ( elements( *e ) == elements( *e + decz ) ) )
+      dsets.union_set( *e, *e + decz );
+
+    if ( connectivity > 6 )
+    {
+      if ( elements.domain().isInside( *e + decx + decy ) &&
+           ( elements( *e ) == elements( *e + decx + decy ) ) )
+        dsets.union_set( *e, *e + decx + decy );
+
+      if ( elements.domain().isInside( *e + decx + decz ) &&
+           ( elements( *e ) == elements( *e + decx + decz ) ) )
+        dsets.union_set( *e, *e + decx + decz );
+
+      if ( elements.domain().isInside( *e + decy + decz ) &&
+           ( elements( *e ) == elements( *e + decy + decz ) ) )
+        dsets.union_set( *e, *e + decy + decz );
+
+      if ( connectivity == 26 )
+        if ( elements.domain().isInside( *e + decy + decz + decx ) &&
+             ( elements( *e ) == elements( *e + decy + decz + decx ) ) )
+          dsets.union_set( *e, *e + decy + decz + decx );
+    }
     }
   trace.endBlock();
   std::cout << "Number of disjoint "<<connectivity<<"-components = "

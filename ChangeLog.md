@@ -52,6 +52,8 @@
      (Bertrand Kerautret, [#285](https://github.com/DGtal-team/DGtalTools/pull/285))
     - tangentBC: add an option to read sdp points as input.
      (Bertrand Kerautret, [#285](https://github.com/DGtal-team/DGtalTools/pull/288))
+    - surfaceApprox: cubical complex approximation tool.
+     (Pierre Gueth, [#299](https://github.com/DGtal-team/DGtalTools/pull/299))
     
     
 # DGtalTools 0.9.2
