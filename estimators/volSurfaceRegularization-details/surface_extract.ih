@@ -25,7 +25,6 @@ createCalculusFromShapeBorder(const KSpace& kspace, const Shape& shape)
     typedef KSpace::SurfelSet                         MySurfelSet;
     typedef DGtal::SurfelAdjacency<KSpace::dimension> MySurfelAdjacency;
     typedef DGtal::SetOfSurfels<KSpace, MySurfelSet>  MySetOfSurfels;
-    typedef DGtal::DigitalSurface<MySetOfSurfels>     MyDigitalSurface;
     typedef std::vector<SCell>                        MySCellsVector;
     typedef std::vector<MySCellsVector>               MyConnectedSCells;
 

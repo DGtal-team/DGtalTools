@@ -101,11 +101,11 @@ initCalculusAndNormalsFromSurfelNormalsCSV(const std::string& filename)
     const auto buildFlatVector = [&kspace, &calculus](const Normals& real_vectors)
     {
         ASSERT( real_vectors.size() == calculus.kFormLength(2, PRIMAL) );
-        const int nsurfels = real_vectors.size();
+        const int nsurfels = (const int)real_vectors.size();
         FlatVector vectors(3*real_vectors.size());
         for (const std::pair<SCell, RealVector>& cell_pair : real_vectors)
         {
-            const int index = calculus.getCellIndex(kspace.unsigns(cell_pair.first));
+            const int index = (const int)calculus.getCellIndex(kspace.unsigns(cell_pair.first));
             for (int dim=0; dim<3; dim++)
                 vectors[index+nsurfels*dim] = cell_pair.second[dim];
         }
@@ -126,7 +126,7 @@ exportOBJ(const Calculus& calculus, const FlatVector& positions, const std::stri
     ASSERT( !filename.empty() );
 
     const KSpace& kspace = calculus.myKSpace;
-    const int nvertices = calculus.kFormLength(0, PRIMAL);
+    const int nvertices = (const int)calculus.kFormLength(0, PRIMAL);
 
     ASSERT( positions.size() == 3*nvertices );
     typedef Calculus::Index Index;
@@ -181,8 +181,8 @@ vertexNormals(const Calculus& calculus, const FlatVector& face_normals)
     using DGtal::PRIMAL;
 
     const KSpace& kspace = calculus.myKSpace;
-    const int nfaces = calculus.kFormLength(2, PRIMAL);
-    const int nvertices = calculus.kFormLength(0, PRIMAL);
+    const int nfaces = (const int)calculus.kFormLength(2, PRIMAL);
+    const int nvertices = (const int)calculus.kFormLength(0, PRIMAL);
 
     ASSERT( face_normals.size() == 3*nfaces );
 
@@ -261,8 +261,8 @@ approximateSurfaceEnergies(const Calculus& calculus, const FlatVector& normals, 
 
     const KSpace& kspace = calculus.myKSpace;
     const CellEmbedder embedder(kspace);
-    const int nfaces = calculus.kFormLength(2, PRIMAL);
-    const int nvertices = calculus.kFormLength(0, PRIMAL);
+    const int nfaces = (const int)calculus.kFormLength(2, PRIMAL);
+    const int nvertices = (const int)calculus.kFormLength(0, PRIMAL);
 
     ASSERT( normals.size() == 3*nfaces );
     ASSERT( positions.size() == 3*nvertices );
@@ -345,9 +345,9 @@ approximateSurface(const Calculus& calculus, const FlatVector& normals, const Ap
     typedef std::vector<Triplet> Triplets;
 
     const KSpace& kspace = calculus.myKSpace;
-    const int nfaces = calculus.kFormLength(2, PRIMAL);
-    const int nedges = calculus.kFormLength(1, PRIMAL);
-    const int nvertices = calculus.kFormLength(0, PRIMAL);
+    auto nfaces = calculus.kFormLength(2, PRIMAL);
+    auto nedges = calculus.kFormLength(1, PRIMAL);
+    auto nvertices = calculus.kFormLength(0, PRIMAL);
     trace.info() << "nfaces=" << nfaces << endl;
     trace.info() << "nedges=" << nedges << endl;
     trace.info() << "nvertices=" << nvertices << endl;
@@ -516,7 +516,6 @@ approximateSurface(const Calculus& calculus, const FlatVector& normals, const Ap
                 {
                     ASSERT( neighbor_vertices.size() >= 3 ); // >= 3 if surface has no border
                     ASSERT( neighbor_vertices.size() <= 6 );
-                    //ASSERT( neighbor_vertices.size() == pair.second.dual_size*4 );
                     if (neighbor_vertices.size() != pair.second.dual_size*4) trace.warning() << "non 2-manifold!!!!" << endl; // only detect manifold problem when surface has no border
 
                     const double coeff = 1./neighbor_vertices.size();
