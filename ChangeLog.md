@@ -5,10 +5,10 @@
      (David Coeurjolly, [#287](https://github.com/DGtal-team/pull/287))
    - Fix Appveyor continuous integration with zlib installation and boost fix.
      (Bertrand Kerautret, [#289](https://github.com/DGtal-team/DGtalTools/pull/289))
-   
+
 - *imageProcessing*:
-   - Creates imageProcessing directory. Add tools for doing image restoration 
-     and inpainting with Ambrosio-Tortorelli functional and discrete calculus. 
+   - Creates imageProcessing directory. Add tools for doing image restoration
+     and inpainting with Ambrosio-Tortorelli functional and discrete calculus.
      (Jacques-Olivier Lachaud, Marion Foare
      [#280](https://github.com/DGtal-team/DGtalTools/pull/280))
 
@@ -33,10 +33,11 @@
      (Bertrand Kerautret, [#285](https://github.com/DGtal-team/DGtalTools/pull/285))
     - tangentBC: add an option to read sdp points as input.
      (Bertrand Kerautret, [#285](https://github.com/DGtal-team/DGtalTools/pull/288))
-    - surfaceApprox: cubical complex approximation tool.
-     (Pierre Gueth, [#299](https://github.com/DGtal-team/DGtalTools/pull/299))
-    
-    
+    - volSurfaceRegularization: a tool to compute a regularized quadrangulation from
+     from a digital surface.
+     (Pierre Gueth, David Coeurjolly, [#299](https://github.com/DGtal-team/DGtalTools/pull/299))
+
+
 # DGtalTools 0.9.2
 
 - *global*:
