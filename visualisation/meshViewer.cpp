@@ -87,6 +87,9 @@ using namespace DGtal;
                                    discrete points (used with displaySDP 
                                    option)
   -n [ --invertNormal ]            threshold min to define binary shape
+  -A [ --addAmbientLight ] arg(=0) add an ambient light for better display 
+                                   (between 0 and 1).
+
   -v [ --drawVertex ]              draw the vertex of the mesh
   -d [ --doSnapShotAndExit]  arg,  save display snapshot into file. Notes that the camera setting is set by default according the last saved configuration (use SHIFT+Key_M to save current camera setting in the Viewer3D). If the camera setting was not saved it will use the default camera setting.
 
@@ -135,9 +138,13 @@ protected:
     {
       handled=true;
       myIsDisplayingInfoMode = !myIsDisplayingInfoMode;
-      std::stringstream sstring;
+      stringstream ss;
+      qglviewer::Vec camPos = camera()->position();
+      DGtal::Z3i::RealPoint c (camPos[0], camPos[1], camPos[2]);
+      ss << myInfoDisplay << " distance to camera: " << (c-centerMesh).norm();
       Viewer3D<>::displayMessage(QString(myIsDisplayingInfoMode ?
-                                                      myInfoDisplay.c_str() : " "), 1000000);
+                                         ss.str().c_str() : " "), 1000000);
+      
       Viewer3D<>::updateGL();
     }
     if(!handled)
@@ -150,6 +157,7 @@ public:
   std::string myInfoDisplay = "No information loaded...";
   bool myIsDisplayingInfoMode = false;
   bool mySaveSnap = false;
+  DGtal::Z3i::RealPoint centerMesh;
 };
 
 
@@ -175,9 +183,10 @@ int main( int argc, char** argv )
   ("displayVectorField,f",po::value<std::string>(),  "display a vector field from a simple sdp file (two points per line)" )
   ("vectorFieldIndex",po::value<std::vector<unsigned int> >()->multitoken(), "specify special indices for the two point coordinates (instead usinf the default indices: 0 1, 2, 3, 4, 5)" )
   ("customLineColor",po::value<std::vector<unsigned int> >()->multitoken(), "set the R, G, B components of the colors of the lines displayed from the --displayVectorField option (red by default). " )
-  ("displaySDP,s", po::value<std::string>(), "Add the display of a set of discrete points as ball of radius 0.5.")
+  ("displaySDP,s", po::value<std::string>(), "add the display of a set of discrete points as ball of radius 0.5.")
   ("SDPradius", po::value<double>()->default_value(0.5), "change the ball radius to display a set of discrete points (used with displaySDP option)")
   ("invertNormal,n", "invert face normal vectors." )
+  ("addAmbientLight,A",po:: value<float>()->default_value(0.0), "add an ambient light for better display (between 0 and 1)." )
   ("drawVertex,v", "draw the vertex of the mesh" )
   ("doSnapShotAndExit,d", po::value<std::string>(), "save display snapshot into file. Notes that the camera setting is set by default according the last saved configuration (use SHIFT+Key_M to save current camera setting in the Viewer3D). If the camera setting was not saved it will use the default camera setting." );
   
@@ -289,16 +298,21 @@ int main( int argc, char** argv )
   if(vm.count("doSnapShotAndExit")){
     viewer.setSnapshotFileName(QString(vm["doSnapShotAndExit"].as<std::string>().c_str()));
   }
+
   std::stringstream title;
   title  << "Simple Mesh Viewer: " << inputFilenameVect[0];
   viewer.setWindowTitle(title.str().c_str());
   viewer.show();
   viewer.myGLLineMinWidth = lineWidth;
   viewer.setGLScale(sx, sy, sz);
-  bool invertNormal= vm.count("invertNormal");
-  
-  
+  bool invertNormal= vm.count("invertNormal");  
   double ballRadius = vm["SDPradius"].as<double>();
+  if(vm.count("addAmbientLight"))
+    {
+      float val = vm["addAmbientLight"].as<float>();
+      GLfloat lightAmbientCoeffs [4] = {val,val, val, 1.0f};
+      viewer.setGLLightAmbientCoefficients(lightAmbientCoeffs);
+    }
   
   trace.info() << "Importing mesh... ";
   
@@ -308,8 +322,16 @@ int main( int argc, char** argv )
     aMesh << inputFilenameVect[i];
     vectMesh.push_back(aMesh);
   }
-  
-  
+  DGtal::Z3i::RealPoint centerMeshes;
+  unsigned int tot=0;
+  for(const auto & m: vectMesh)
+    {
+      for( auto p = m.vertexBegin(); p!=m.vertexEnd(); ++p)
+        centerMeshes += *p;
+      tot+=m.nbVertex();
+    }
+  centerMeshes /= tot;
+  viewer.centerMesh = centerMeshes;
   bool import = vectMesh.size()==inputFilenameVect.size();
   if(!import){
     trace.info() << "File import failed. " << std::endl;
@@ -372,7 +394,7 @@ int main( int argc, char** argv )
       nbFaces +=m.nbFaces();
     }
   stringstream ss;
-  ss << "# faces: " << std::fixed << nbFaces << "    #vertex: " <<  nbVertex;
+  ss << "# faces: " << std::fixed << nbFaces << "    #vertex: " <<  nbVertex ;
   viewer.myInfoDisplay = ss.str();
   viewer  << CustomViewer3D::updateDisplay;
   if(vm.count("doSnapShotAndExit")){

@@ -32,7 +32,7 @@
 #include "DGtal/base/Common.h"
 #include "DGtal/helpers/StdDefs.h"
 #include "DGtal/images/ImageContainerBySTLVector.h"
-#include "DGtal/io/readers/VolReader.h"
+#include "DGtal/io/readers/GenericReader.h"
 
 #include <boost/program_options/options_description.hpp>
 #include <boost/program_options/parsers.hpp>
@@ -47,35 +47,48 @@ namespace po = boost::program_options;
 
 
 /**
- @page vol2sdp vol2sdp
- @brief  Extracts digital points from 3d vol files.
+   @page vol2sdp vol2sdp
+   @brief  Extracts digital points from 3d vol files.
 
-@b Usage: vol2sdp [input] [output]
+   @b Usage: vol2sdp [input] [output]
 
-@b Allowed @b options @b are:
+   @b Allowed @b options @b are:
 
-@code
-  -h [ --help ]                    display this message
-  -i [ --input ] arg               volumetric file (.vol) 
-  -o [ --output ] arg              sequence of discrete point file (.sdp) 
-  -e [ --exportImageValues ]       option to export also the image value of the
-                                   voxel in a fourth field.
-  -m [ --thresholdMin ] arg (=128) min threshold (default 128)
-  -M [ --thresholdMax ] arg (=255) max threshold (default 255)
-@endcode
+   @code
+   -h [ --help ]                    display this message
+   -i [ --input ] arg               vol file (.vol, .longvol .p3d, .pgm3d and if
+                                    WITH_ITK is selected: dicom, dcm, mha, mhd) 
+                                    or sdp (sequence of discrete points). For 
+                                    longvol, dicom, dcm, mha or mhd formats, the
+                                    input values are linearly scaled between 0 
+                                    and 255.
+   -o [ --output ] arg              sequence of discrete point file (.sdp) 
+   -e [ --exportImageValues ]       option to export also the image value of the
+   voxel in a fourth field.
+   -m [ --thresholdMin ] arg (=128) min threshold (default 128)
+   -M [ --thresholdMax ] arg (=255) max threshold (default 255)
+   --rescaleInputMin arg (=0)       min value used to rescale the input 
+   intensity (to avoid basic cast into 8  bits 
+   image).
+   --rescaleInputMax arg (=255)     max value used to rescale the input 
+   intensity (to avoid basic cast into 8 bits 
+   image).
 
-@b Example:
-@code 
+
+   @endcode
+
+   @b Example:
+   @code 
    $ vol2sdp -i ${DGtal}/examples/samples/lobster.vol -o volumeList.sdp -m 70
    # Visualisation:
    $ 3dSDPViewer -i volumeList.sdp
-@endcode
+   @endcode
 
-You should obtain such a visualization:
-@image html resVol2sdp.png "resulting visualisation."
+   You should obtain such a visualization:
+   @image html resVol2sdp.png "resulting visualisation."
 
-@see
-@ref vol2sdp.cpp
+   @see
+   @ref vol2sdp.cpp
 
 */
 
@@ -87,11 +100,13 @@ int main( int argc, char** argv )
   po::options_description general_opt("Allowed options are: ");
   general_opt.add_options()
     ("help,h", "display this message")
-    ("input,i", po::value<std::string>(), "volumetric file (.vol) " )
+    ("input,i", po::value<std::string>(), "vol file (.vol, .longvol .p3d, .pgm3d and if WITH_ITK is selected: dicom, dcm, mha, mhd) or sdp (sequence of discrete points). For longvol, dicom, dcm, mha or mhd formats, the input values are linearly scaled between 0 and 255." )
     ("output,o", po::value<std::string>(), "sequence of discrete point file (.sdp) " )
     ("exportImageValues,e","option to export also the image value of the voxel in a fourth field.")
     ("thresholdMin,m", po::value<int>()->default_value(128), "min threshold (default 128)" )
-    ("thresholdMax,M", po::value<int>()->default_value(255), "max threshold (default 255)" );
+    ("thresholdMax,M", po::value<int>()->default_value(255), "max threshold (default 255)" )
+    ("rescaleInputMin", po::value<DGtal::int64_t>()->default_value(0), "min value used to rescale the input intensity (to avoid basic cast into 8  bits image).")
+    ("rescaleInputMax", po::value<DGtal::int64_t>()->default_value(255), "max value used to rescale the input intensity (to avoid basic cast into 8 bits image).");
   
   
   bool parseOK=true;
@@ -124,7 +139,13 @@ int main( int argc, char** argv )
   string outputFilename = vm["output"].as<std::string>();
   
   trace.info() << "Reading input file " << inputFilename ; 
-  Image3D inputImage = DGtal::VolReader<Image3D>::importVol(inputFilename);
+  DGtal::int64_t rescaleInputMin = vm["rescaleInputMin"].as<DGtal::int64_t>();
+  DGtal::int64_t rescaleInputMax = vm["rescaleInputMax"].as<DGtal::int64_t>();
+
+  typedef DGtal::functors::Rescaling<DGtal::int64_t ,unsigned char > RescalFCT;
+  Image3D inputImage =  GenericReader< Image3D >::importWithValueFunctor( inputFilename,RescalFCT(rescaleInputMin,
+                                                                                                  rescaleInputMax,
+                                                                                                  0, 255) );
   trace.info() << " [done] " << std::endl ; 
   std::ofstream outStream;
   outStream.open(outputFilename.c_str());
@@ -151,7 +172,7 @@ int main( int argc, char** argv )
       outStream << std::endl;
     }
   }
- outStream.close();
+  outStream.close();
 
   trace.info() << " [done] " << std::endl ;   
 
