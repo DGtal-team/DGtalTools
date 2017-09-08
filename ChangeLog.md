@@ -7,6 +7,11 @@
   - meshViewer: add an option to set the ambient light source.
     (Bertrand Kerautret, [#301](https://github.com/DGtal-team/DGtalTools/pull/301))
 
+- *global*:
+   - Fix travis with boost installation which now use std package.
+     (Bertrand Kerautret, [#310](https://github.com/DGtal-team/pull/310))
+
+
 # DGtalTools 0.9.3
 
 - *visualisation*:
