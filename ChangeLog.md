@@ -6,12 +6,15 @@
     (Bertrand Kerautret, [#296](https://github.com/DGtal-team/DGtalTools/pull/296))
   - meshViewer: add an option to set the ambient light source.
     (Bertrand Kerautret, [#301](https://github.com/DGtal-team/DGtalTools/pull/301))
+  - 3dSDPViewer: new option to display vector field as unit vectors.
+    (Bertrand Kerautret, [#301](https://github.com/DGtal-team/DGtalTools/pull/304))
 
 - *global*:
-   - Fix travis with boost installation which now use std package.
-     (Bertrand Kerautret, [#310](https://github.com/DGtal-team/pull/310))
+  - Fix travis with boost installation which now use std package.
+    (Bertrand Kerautret, [#310](https://github.com/DGtal-team/pull/310))
 
-
+  
+  
 # DGtalTools 0.9.3
 
 - *visualisation*:
