@@ -111,13 +111,8 @@ void voxelizeAndExport(const std::string inputFilename,
   //Digitization step
   Z3i::DigitalSet mySet(aDomain);
   MeshVoxelizer<Z3i::DigitalSet, SEP> aVoxelizer;
-  
-  auto start = std::chrono::high_resolution_clock::now();
   aVoxelizer.voxelize(mySet, inputMesh, 1.0);
-  auto end = std::chrono::high_resolution_clock::now();
-  auto diff = end - start;
-
-  trace.info() << " [done] (" << std::chrono::duration <double, std::milli> (diff).count() << " ms)" << std::endl;
+  trace.info() << " [done] " << std::endl;
   trace.endBlock();
   
   trace.beginBlock("Exporting");
@@ -125,10 +120,7 @@ void voxelizeAndExport(const std::string inputFilename,
   trace.info()<<aDomain<<std::endl;
   ImageContainerBySTLVector<Domain, unsigned char> image(aDomain);
   for(auto p: mySet)
-  {
-    trace.info()<<"Adding "<<p<<std::endl;
     image.setValue(p, 128);
-  }
   image >> outputFilename.c_str();
   trace.endBlock();
 }
