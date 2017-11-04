@@ -221,6 +221,9 @@ Galleries
    <td align=center ><a href="http://dgtal.org/doc/tools/nightly/volTrValues.html"> volTrValues </a> </td>
    <td align=center ><a href="http://dgtal.org/doc/tools/nightly/volSegment.html"> volSegment </a> </td>
    </tr>
+   <tr>
+   <td align=center  ><a href="http://dgtal.org/doc/tools/nightly/criticalKernelsThinning3D.html"> criticalKernelsThinning3D </a> </td>
+   </tr>
    </table>
    </center>
 
