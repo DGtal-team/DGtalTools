@@ -1,25 +1,22 @@
 # DGtalTools 0.9.4
 
 - *visualisation*:
-  - Improve visualisation tools (vol2heightfield, vol2obj, vol2raw, vol2sdp, vol2slice, volBoundary2obj, 3dImageViewer, 3dVolViewer, sliceViewer, Viewer3DImage)
+  - Improve visualisation tools (vol2heightfield, vol2obj, vol2raw, vol2sdp, vol2slice, volBoundary2obj, 3dImageViewer,     	3dVolViewer, sliceViewer, Viewer3DImage)
     allowing to read longvol including rescaling.
     (Bertrand Kerautret, [#296](https://github.com/DGtal-team/DGtalTools/pull/296))
+  - Add an option to filter vector displayed in 3dSDPViewer.
+   (Bertrand Kerautret, [#297](https://github.com/DGtal-team/pull/297))
+
   - meshViewer: add an option to set the ambient light source.
     (Bertrand Kerautret, [#301](https://github.com/DGtal-team/DGtalTools/pull/301))
   - 3dSDPViewer: new option to display vector field as unit vectors.
-    (Bertrand Kerautret, [#301](https://github.com/DGtal-team/DGtalTools/pull/304))
+    (Bertrand Kerautret, [#301](https://github.com/DGtal-team/DGtalTools/pull/304)) 
+
+
 
 - *global*:
   - Fix travis with boost installation which now use std package.
     (Bertrand Kerautret, [#310](https://github.com/DGtal-team/pull/310))
-
-  
-  
-# DGtalTools 0.9.3
-
-- *visualisation*:
-  - Add an option to filter vector displayed in 3dSDPViewer.
-  (Bertrand Kerautret, [#296](https://github.com/DGtal-team/pull/296)
 
 
 # DGtalTools 0.9.3
