@@ -145,8 +145,9 @@ protected:
       Viewer3D<>::displayMessage(QString(myIsDisplayingInfoMode ?
                                          ss.str().c_str() : " "), 1000000);
       
-      Viewer3D<>::updateGL();
+      Viewer3D<>::update();
     }
+    
     if(!handled)
       {
         Viewer3D<>::keyPressEvent(e);        
@@ -401,7 +402,7 @@ int main( int argc, char** argv )
     // Appy cleaning just save the last snap
     if(!viewer.restoreStateFromFile())
       {
-        viewer.updateGL();
+        viewer.update();
       }    
     std::string name = vm["doSnapShotAndExit"].as<std::string>();
     std::string extension = name.substr(name.find_last_of(".") + 1);
@@ -412,6 +413,7 @@ int main( int argc, char** argv )
       trace.info() << "erase temp file: " << s.str() << std::endl;
       remove(s.str().c_str());
     }
+
     std::stringstream s;
     s << basename << "-"<< setfill('0') << setw(4)<<  viewer.snapshotCounter()-1 << "." << extension;
     rename(s.str().c_str(), name.c_str());

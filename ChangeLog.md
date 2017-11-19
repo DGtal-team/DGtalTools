@@ -17,6 +17,8 @@
 - *global*:
   - Fix travis with boost installation which now use std package.
     (Bertrand Kerautret, [#310](https://github.com/DGtal-team/pull/310))
+  - Fix for the last QGLViewer version (2.7).
+    (Bertrand Kerautret, [#310](https://github.com/DGtal-team/pull/308))
 
 
 # DGtalTools 0.9.3

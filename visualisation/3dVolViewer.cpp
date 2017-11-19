@@ -253,7 +253,7 @@ int main( int argc, char** argv )
     // Appy cleaning just save the last snap
     if(!viewer.restoreStateFromFile())
       {
-        viewer.updateGL();
+        viewer.update();
       }    
     std::string name = vm["doSnapShotAndExit"].as<std::string>();
     std::string extension = name.substr(name.find_last_of(".") + 1);
