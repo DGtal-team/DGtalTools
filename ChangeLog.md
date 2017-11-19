@@ -5,27 +5,27 @@
     allowing to read longvol including rescaling.
     (Bertrand Kerautret, [#296](https://github.com/DGtal-team/DGtalTools/pull/296))
   - Add an option to filter vector displayed in 3dSDPViewer.
-   (Bertrand Kerautret, [#297](https://github.com/DGtal-team/pull/297))
+   (Bertrand Kerautret, [#297](https://github.com/DGtal-team/DGtalTools/pull/297))
 
   - meshViewer: add an option to set the ambient light source.
     (Bertrand Kerautret, [#301](https://github.com/DGtal-team/DGtalTools/pull/301))
   - 3dSDPViewer: new option to display vector field as unit vectors.
-    (Bertrand Kerautret, [#301](https://github.com/DGtal-team/DGtalTools/pull/304)) 
+    (Bertrand Kerautret, [#304](https://github.com/DGtal-team/DGtalTools/pull/304)) 
 
 
 
 - *global*:
   - Fix travis with boost installation which now use std package.
-    (Bertrand Kerautret, [#310](https://github.com/DGtal-team/pull/310))
+    (Bertrand Kerautret, [#310](https://github.com/DGtal-team/DGtalTools/pull/310))
   - Fix for the last QGLViewer version (2.7).
-    (Bertrand Kerautret, [#310](https://github.com/DGtal-team/pull/308))
+    (Bertrand Kerautret, [#308](https://github.com/DGtal-team/DGtalTools/pull/308))
 
 
 # DGtalTools 0.9.3
 
 - *global*:
    - Various fixes to enable the new Version3 (compressed) Vol/Longvol files.
-     (David Coeurjolly, [#287](https://github.com/DGtal-team/pull/287))
+     (David Coeurjolly, [#287](https://github.com/DGtal-team/DGtalTools/pull/287))
    - Fix Appveyor continuous integration with zlib installation and boost fix.
      (Bertrand Kerautret, [#289](https://github.com/DGtal-team/DGtalTools/pull/289))
    
