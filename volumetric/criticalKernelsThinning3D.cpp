@@ -241,7 +241,7 @@ int main(int argc, char* const argv[]){
   DT dt(obj.domain(),obj.pointSet(), l3);
   trace.endBlock();
 
-  std::function< typename Complex::Cell(const Complex::Clique&) > Select ;
+  std::function< std::pair<typename Complex::Cell, typename Complex::Data>(const Complex::Clique&) > Select ;
   auto & sel = select_string;
   if (sel == "random") Select = selectRandom<Complex>;
   else if (sel == "first") Select = selectFirst<Complex>;
