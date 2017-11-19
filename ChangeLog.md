@@ -8,7 +8,7 @@
    (Bertrand Kerautret, [#297](https://github.com/DGtal-team/DGtalTools/pull/297))
 
   - meshViewer: add an option to set the ambient light source.
-    (Bertrand Kerautret, [#301](https://github.com/DGtal-team/DGtalTools/pull/301))
+    (Bertrand Kerautret, [#303](https://github.com/DGtal-team/DGtalTools/pull/303))
   - 3dSDPViewer: new option to display vector field as unit vectors.
     (Bertrand Kerautret, [#304](https://github.com/DGtal-team/DGtalTools/pull/304)) 
 
