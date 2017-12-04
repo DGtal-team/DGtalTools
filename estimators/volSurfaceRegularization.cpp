@@ -30,7 +30,6 @@
  * This file is part of the DGtal library.
  */
 
-
 /**
  @page volSurfaceRegularization volSurfaceRegularization
  
