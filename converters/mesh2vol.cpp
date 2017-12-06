@@ -74,8 +74,8 @@ namespace po = boost::program_options;
 */
 
 template< unsigned int SEP >
-void voxelizeAndExport(const std::string inputFilename,
-                       const std::string outputFilename,
+void voxelizeAndExport(const std::string& inputFilename,
+                       const std::string& outputFilename,
                        const unsigned int resolution)
 {
   using Domain   = Z3i::Domain;
