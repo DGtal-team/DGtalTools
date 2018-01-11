@@ -36,6 +36,7 @@ Utilities to convert various simple file formats:
   - @ref itk2vol : converts itk file into a volumetric file (.vol, .pgm3d).
   - @ref longvol2vol : converts a longvol (long int) to a vol file (unsigned char).
   - @ref mesh2heightfield : converts a mesh file into a 2D heightmap (from a normal direction N and from a starting point P).
+  - @ref mesh2vol : converts a mesh file into a 26-separated or 6-separated voxelization in a given resolution grid.
   - @ref ofs2off : converts OFS file into OFF mesh format.
   - @ref raw2HDF5 :  converts a 3D 8-bit raw file to HDF5.
   - @ref raw2vol : converts a  8-bit raw file to vol.
