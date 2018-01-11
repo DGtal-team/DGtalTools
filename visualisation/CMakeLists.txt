@@ -3,6 +3,7 @@ SET(DGTAL_TOOLS_SRC
         patternTriangulation
         3dCurvatureViewer
         3dCurvatureViewerNoise
+        2dCompImage
 )
 
 foreach (FILE ${DGTAL_TOOLS_SRC})
