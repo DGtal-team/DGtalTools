@@ -15,6 +15,8 @@
 
 
 - *global*:
+  - Fix travis Doxygen compilation for non Documention mode.
+    (Bertrand Kerautret, [#314](https://github.com/DGtal-team/DGtalTools/pull/314))
   - Fix travis with boost installation which now use std package.
     (Bertrand Kerautret, [#310](https://github.com/DGtal-team/DGtalTools/pull/310))
   - Fix for the last QGLViewer version (2.7).
