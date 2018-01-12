@@ -1,11 +1,13 @@
 # DGtalTools 0.9.4
 
 - *visualisation*:
+  - 2dCompImage : Computes and displays image comparisons (squared and absolute differences)
+  
   - Improve visualisation tools (vol2heightfield, vol2obj, vol2raw, vol2sdp, vol2slice, volBoundary2obj, 3dImageViewer,     	3dVolViewer, sliceViewer, Viewer3DImage)
     allowing to read longvol including rescaling.
     (Bertrand Kerautret, [#296](https://github.com/DGtal-team/DGtalTools/pull/296))
   - Add an option to filter vector displayed in 3dSDPViewer.
-   (Bertrand Kerautret, [#297](https://github.com/DGtal-team/DGtalTools/pull/297))
+   (Bertrand Kerautret, [#312](https://github.com/DGtal-team/DGtalTools/pull/312))
 
   - meshViewer: add an option to set the ambient light source.
     (Bertrand Kerautret, [#303](https://github.com/DGtal-team/DGtalTools/pull/303))
