@@ -58,12 +58,12 @@ namespace po = boost::program_options;
 
 
 /**
- @page 2dCompImage 2dCompImage
+ @page Doc2dCompImage 2dCompImage
  
  @brief Computes and displays image comparisons (squared and absolute differences). 
 
 
- @b Usage:  2dCompImage--imageA <imageA>.pgm --imageB <imageB>.pgm -imageError <name> 
+ @b Usage:  2dCompImage --imageA <imageA>.pgm --imageB <imageB>.pgm --imageError <name> 
 
  @b Allowed @b options @b are :
  
@@ -88,9 +88,12 @@ namespace po = boost::program_options;
        2dCompImage -a imageA.pgm -b imageB.pgm -e errorImage -S 100 
  @endcode
 
+You should obtain such a visualisation:
+ @image html res2dCompImage.png "resulting visualisation of absolute error between two images."
 
  @see
  @ref 2dCompImage.cpp
+
 
  */
 
