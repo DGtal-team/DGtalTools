@@ -10,6 +10,9 @@ compiler:
   - gcc
   - clang
 
+cache: apt
+
+
 env:
   - CONFIG="Debug,QGLVIEWER"
   - CONFIG="Debug"
@@ -32,8 +35,6 @@ addons:
    packages:
     - libhdf5-serial-dev
     - libcairo2-dev
-    - doxygen
-    - doxygen-latex
     - graphviz
     - libgmp-dev
     - libgdcm2-dev
@@ -48,7 +49,7 @@ addons:
 
 
 before_install:
-  - DOC="false"
+  - DOC="false"; BTYPE=""
   - if [ $CONFIG == "DOCUMENTATION" ]; then if [ $OriginalRepo == "true" ];  then if [ $TRAVIS_PULL_REQUEST == "false" ]; then DOC="true"; fi; fi; fi
   - if [ $DOC == true ];then   openssl aes-256-cbc -K $encrypted_a0b8e3011fca_key -iv $encrypted_a0b8e3011fca_iv -in .travis/dgtal_rsa.enc -out .travis/dgtal_rsa -d ; chmod 600 .travis/dgtal_rsa; fi
   - env
@@ -69,11 +70,13 @@ before_script:
   - cmake . $DGTALTYPE -DCMAKE_CXX_COMPILER=$CXXCOMPILER -DCMAKE_C_COMPILER=$CCOMPILER 
   - make
   - cd ..
-  - if [ $DOC == "true" ]; then .travis/install_doxygen.sh;  BTYPE="-DDOXYGEN_EXECUTABLE=$HOME/doxygen/doxygen-1.8.10/bin/doxygen -DCMAKE_BUILD_TYPE=Debug -DWITH_CAIRO=true  -DWITH_GMP=true"; DOC="true"; fi
+  - if [ $DOC == "true" ]; then .travis/install_doxygen.sh;  BTYPE="-DDOXYGEN_EXECUTABLE=$HOME/doxygen/doxygen-1.8.10/bin/doxygen -DCMAKE_BUILD_TYPE=Debug -DWITH_CAIRO=true  -DWITH_GMP=true";  fi
   - if [ $DOC == "true" ]; then wget http://http://dgtal.org/doc/tags/DGtal-tagfile; wget http://http://dgtal.org/doc/tags/Board-tagfile;fi
 
+
+
 script:
-   - cmake . -DDGtal_DIR=$PWD/DGtal -DDOXYGEN_EXECUTABLE=$HOME/doxygen/doxygen-1.8.10/bin/doxygen  -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_COMPILER=$CXXCOMPILER -DCMAKE_C_COMPILER=$CCOMPILER 
+   - cmake . -DDGtal_DIR=$PWD/DGtal $BTYPE  -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_COMPILER=$CXXCOMPILER -DCMAKE_C_COMPILER=$CCOMPILER 
    - if [ $DOC == "true" ]; then  make doc;  rsync -azv --delete --delete-after -e 'ssh -oStrictHostKeyChecking=no -i  .travis/dgtal_rsa' html/ dgtal@liris.cnrs.fr:/home/dgtal/public_html/doc/tools/nightly/;  fi
    - if [ $CONFIG == "Debug" ]; then make; fi
    - if [ $CONFIG == "Debug,QGLVIEWER" ]; then make; fi
