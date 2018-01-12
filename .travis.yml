@@ -77,7 +77,7 @@ before_script:
 
 script:
    - cmake . -DDGtal_DIR=$PWD/DGtal $BTYPE  -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_COMPILER=$CXXCOMPILER -DCMAKE_C_COMPILER=$CCOMPILER 
-   - if [ $DOC == "true" ]; then  make doc; 
+   - if [ $DOC == "true" ]; then  make doc;  fi
    - if [ $CONFIG == "Debug" ]; then make; fi
    - if [ $CONFIG == "Debug,QGLVIEWER" ]; then make; fi
 
