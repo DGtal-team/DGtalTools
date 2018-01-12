@@ -77,7 +77,7 @@ before_script:
 
 script:
    - cmake . -DDGtal_DIR=$PWD/DGtal $BTYPE  -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_COMPILER=$CXXCOMPILER -DCMAKE_C_COMPILER=$CCOMPILER 
-   - if [ $DOC == "true" ]; then  make doc;  rsync -azv --delete --delete-after -e 'ssh -oStrictHostKeyChecking=no -i  .travis/dgtal_rsa' html/ dgtal@liris.cnrs.fr:/home/dgtal/public_html/doc/tools/nightly/;  fi
+   - if [ $DOC == "true" ]; then  make doc; 
    - if [ $CONFIG == "Debug" ]; then make; fi
    - if [ $CONFIG == "Debug,QGLVIEWER" ]; then make; fi
 
