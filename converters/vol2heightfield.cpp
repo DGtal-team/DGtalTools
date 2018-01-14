@@ -33,7 +33,7 @@
 #include "DGtal/helpers/StdDefs.h"
 #include "DGtal/images/ImageContainerBySTLVector.h"
 #include "DGtal/io/writers/GenericWriter.h"
-#include "DGtal/io/readers/VolReader.h"
+#include "DGtal/io/readers/GenericReader.h"
 #include "DGtal/images/ConstImageAdapter.h"
 #include "DGtal/kernel/BasicPointFunctors.h"
 
@@ -63,7 +63,11 @@ namespace po = boost::program_options;
 
 @code
   -h [ --help ]                    display this message
-  -i [ --input ] arg               volumetric file (.vol) 
+  -i [ --input ] arg               vol file (.vol, .longvol .p3d, .pgm3d and if
+                                   WITH_ITK is selected: dicom, dcm, mha, mhd).
+                                   For longvol, dicom, dcm, mha or mhd formats,
+                                   the input values are linearly scaled between
+                                   0 and 255.
   -o [ --output ] arg              sequence of discrete point file (.sdp) 
   -m [ --thresholdMin ] arg (=128) min threshold (default 128)
   -M [ --thresholdMax ] arg (=255) max threshold (default 255)
@@ -83,6 +87,14 @@ namespace po = boost::program_options;
   --heightFieldMaxScan arg (=255)  set the maximal scan deep.
   --setBackgroundLastDepth         change the default background (black with 
                                    the last filled intensity).
+  --rescaleInputMin arg (=0)       min value used to rescale the input 
+                                   intensity (to avoid basic cast into 8  bits 
+                                   image).
+  --rescaleInputMax arg (=255)     max value used to rescale the input 
+                                   intensity (to avoid basic cast into 8 bits 
+                                   image).
+
+
 @endcode
 
 @b Example:
@@ -109,7 +121,7 @@ int main( int argc, char** argv )
   po::options_description general_opt("Allowed options are: ");
   general_opt.add_options()
     ("help,h", "display this message")
-    ("input,i", po::value<std::string>(), "volumetric file (.vol) " )
+     ("input,i", po::value<std::string>(), "vol file (.vol, .longvol .p3d, .pgm3d and if WITH_ITK is selected: dicom, dcm, mha, mhd). For longvol, dicom, dcm, mha or mhd formats, the input values are linearly scaled between 0 and 255." )
     ("output,o", po::value<std::string>(), "sequence of discrete point file (.sdp) ") 
     ("thresholdMin,m", po::value<int>()->default_value(128), "min threshold (default 128)" )
     ("thresholdMax,M", po::value<int>()->default_value(255), "max threshold (default 255)" )
@@ -122,7 +134,9 @@ int main( int argc, char** argv )
     ("width", po::value<unsigned int>()->default_value(100), "set the width of the resulting height Field image." )
     ("height", po::value<unsigned int>()->default_value(100), "set the height of the resulting height Field image." )
     ("heightFieldMaxScan", po::value<unsigned int>()->default_value(255), "set the maximal scan deep." )
-    ("setBackgroundLastDepth", "change the default background (black with the last filled intensity).");
+    ("setBackgroundLastDepth", "change the default background (black with the last filled intensity).")
+    ("rescaleInputMin", po::value<DGtal::int64_t>()->default_value(0), "min value used to rescale the input intensity (to avoid basic cast into 8  bits image).")
+    ("rescaleInputMax", po::value<DGtal::int64_t>()->default_value(255), "max value used to rescale the input intensity (to avoid basic cast into 8 bits image).");
   
   
   
@@ -153,9 +167,17 @@ int main( int argc, char** argv )
   
   string inputFilename = vm["input"].as<std::string>();
   string outputFilename = vm["output"].as<std::string>();
-  
+  DGtal::int64_t rescaleInputMin = vm["rescaleInputMin"].as<DGtal::int64_t>();
+  DGtal::int64_t rescaleInputMax = vm["rescaleInputMax"].as<DGtal::int64_t>();
+
   trace.info() << "Reading input file " << inputFilename ; 
-  Image3D inputImage = DGtal::VolReader<Image3D>::importVol(inputFilename);  
+
+  typedef DGtal::functors::Rescaling<DGtal::int64_t ,unsigned char > RescalFCT;
+  Image3D inputImage =  GenericReader< Image3D >::importWithValueFunctor( inputFilename,RescalFCT(rescaleInputMin,
+                                                                                                  rescaleInputMax,
+                                                                                                  0, 255) );
+
+
   trace.info() << " [done] " << std::endl ; 
   
   std::ofstream outStream;

@@ -14,14 +14,12 @@
  *
  **/
 /**
- * @file visuDistanceTransform.cpp
- * @ingroup Examples
+ * @file 3dVolViewer.cpp
  * @author Bertrand Kerautret (\c kerautre@loria.fr )
- * LORIA (CNRS, UMR 7503), University of Nancy, France
+ * LORIA (CNRS, UMR 7503), University of Lorraine, France
  *
  * @date 2011/01/04
  *
- * An example file named qglViewer.
  *
  * This file is part of the DGtal library.
  */
@@ -33,9 +31,6 @@
 #include "DGtal/base/BasicFunctors.h"
 #include "DGtal/helpers/StdDefs.h"
 #include "DGtal/io/readers/GenericReader.h"
-#ifdef WITH_ITK
-#include "DGtal/io/readers/DicomReader.h"
-#endif
 #include "DGtal/io/viewers/Viewer3D.h"
 #include "DGtal/io/DrawWithDisplay3DModifier.h"
 #include "DGtal/io/readers/PointListReader.h"
@@ -55,54 +50,60 @@ using namespace Z3i;
 
 
 /**
- @page Doc3dVolViewer 3dVolViewer
+   @page Doc3dVolViewer 3dVolViewer
  
- @brief Displays volume file as a voxel set by using QGLviewer.
+   @brief Displays volume file as a voxel set by using QGLviewer.
 
- The mode  specifies if you wish to see surface elements (BDRY), the inner
- voxels (INNER) or the outer voxels (OUTER) that touch the boundary.
+   The mode  specifies if you wish to see surface elements (BDRY), the inner
+   voxels (INNER) or the outer voxels (OUTER) that touch the boundary.
 
- @b Usage:   3dVolViewer [input]
+   @b Usage:   3dVolViewer [input]
 
- @b Allowed @b options @b are :
+   @b Allowed @b options @b are :
  
- @code
-  -h [ --help ]                      display this message
-  -i [ --input ] arg                 vol file (.vol) , pgm3d (.p3d or .pgm3d, 
-                                     pgm (with 3 dims)) file or sdp (sequence 
-                                     of discrete points)
-  -m [ --thresholdMin ] arg (=0)     threshold min to define binary shape
-  -M [ --thresholdMax ] arg (=255)   threshold max to define binary shape
-  -n [ --numMaxVoxel ] arg (=500000) set the maximal voxel number to be 
-                                     displayed.
-  --dicomMin arg (=-1000)            set minimum density threshold on 
-                                     Hounsfield scale
-  --dicomMax arg (=3000)             set maximum density threshold on 
-                                     Hounsfield scale
-  --displayMesh arg                display a Mesh given in OFF or OFS format. 
-  --colorMesh arg                  set the color of Mesh (given from 
-                                   displayMesh option) : r g b a 
-  -d [ --doSnapShotAndExit]  filename,  save display snapshot into file. Notes that the camera setting is set by default according the last saved configuration (use SHIFT+Key_M to save current camera setting in the Viewer3D). If the camera setting was not saved it will use the default camera setting.
-  -t [ --transparency ] arg (=255)   transparency
- @endcode
+   @code
+   -h [ --help ]                      display this message
+   -i [ --input ] arg                sdp (sequence of discrete points)  or vol
+                                     file (.vol, .longvol .p3d, .pgm3d and 
+                                     if WITH_ITK is selected: dicom, dcm, mha, 
+                                     mhd) or sdp (sequence of discrete points).
+                                     For longvol, dicom, dcm, mha or mhd 
+                                     formats, the input values are linearly 
+                                     scaled between 0 and 255.
+   -m [ --thresholdMin ] arg (=0)     threshold min to define binary shape
+   -M [ --thresholdMax ] arg (=255)   threshold max to define binary shape
+   -n [ --numMaxVoxel ] arg (=500000) set the maximal voxel number to be 
+   displayed.
+  --rescaleInputMin arg (=0)         min value used to rescale the input 
+                                     intensity (to avoid basic cast into 8  
+                                     bits image).
+  --rescaleInputMax arg (=255)       max value used to rescale the input 
+                                     intensity (to avoid basic cast into 8 bits
+                                     image).
+   --displayMesh arg                display a Mesh given in OFF or OFS format. 
+   --colorMesh arg                  set the color of Mesh (given from 
+   displayMesh option) : r g b a 
+   -d [ --doSnapShotAndExit]  filename,  save display snapshot into file. Notes that the camera setting is set by default according the last saved configuration (use SHIFT+Key_M to save current camera setting in the Viewer3D). If the camera setting was not saved it will use the default camera setting.
+   -t [ --transparency ] arg (=255)   transparency
+   @endcode
 
 
- @b Example: 
+   @b Example: 
 
 
- @code
- $ 3dVolViewer -i $DGtal/examples/samples/lobster.vol -m 60 -t 10
- @endcode
+   @code
+   $ 3dVolViewer -i $DGtal/examples/samples/lobster.vol -m 60 -t 10
+   @endcode
 
- You should obtain such a result:
+   You should obtain such a result:
 
- @image html res3dVolViewer.png "Resulting visualization."
+   @image html res3dVolViewer.png "Resulting visualization."
  
 
- @see
- @ref 3dVolViewer.cpp
+   @see
+   @ref 3dVolViewer.cpp
 
- */
+*/
 
 
 
@@ -134,17 +135,15 @@ int main( int argc, char** argv )
   po::options_description general_opt("Allowed options are: ");
   general_opt.add_options()
     ("help,h", "display this message")
-    ("input,i", po::value<std::string>(), "vol file (.vol) , pgm3d (.p3d or .pgm3d, pgm (with 3 dims)) file or sdp (sequence of discrete points)" )
+    ("input,i", po::value<std::string>(), "vol file (.vol, .longvol .p3d, .pgm3d and if WITH_ITK is selected: dicom, dcm, mha, mhd) or sdp (sequence of discrete points). For longvol, dicom, dcm, mha or mhd formats, the input values are linearly scaled between 0 and 255." )
     ("thresholdMin,m",  po::value<int>()->default_value(0), "threshold min to define binary shape" )
     ("thresholdMax,M",  po::value<int>()->default_value(255), "threshold max to define binary shape" )
     ("numMaxVoxel,n",  po::value<int>()->default_value(500000), "set the maximal voxel number to be displayed." )
     ("displayMesh", po::value<std::string>(), "display a Mesh given in OFF or OFS format. " )
     ("colorMesh", po::value<std::vector <int> >()->multitoken(), "set the color of Mesh (given from displayMesh option) : r g b a " )
     ("doSnapShotAndExit,d", po::value<std::string>(), "save display snapshot into file. Notes that the camera setting is set by default according the last saved configuration (use SHIFT+Key_M to save current camera setting in the Viewer3D). If the camera setting was not saved it will use the default camera setting." )
-#ifdef WITH_ITK
-    ("dicomMin", po::value<int>()->default_value(-1000), "set minimum density threshold on Hounsfield scale")
-    ("dicomMax", po::value<int>()->default_value(3000), "set maximum density threshold on Hounsfield scale")
-#endif
+    ("rescaleInputMin", po::value<DGtal::int64_t>()->default_value(0), "min value used to rescale the input intensity (to avoid basic cast into 8  bits image).")
+    ("rescaleInputMax", po::value<DGtal::int64_t>()->default_value(255), "max value used to rescale the input intensity (to avoid basic cast into 8 bits image).")
     ("transparency,t",  po::value<uint>()->default_value(255), "transparency") ;
 
   bool parseOK=true;
@@ -196,61 +195,44 @@ int main( int argc, char** argv )
 
   typedef ImageSelector<Domain, unsigned char>::Type Image;
   string extension = inputFilename.substr(inputFilename.find_last_of(".") + 1);
-  if(extension!="vol" && extension != "p3d" && extension != "pgm3D" && extension != "pgm3d" && extension != "sdp" && extension != "pgm"
- #ifdef WITH_ITK
-    && extension !="dcm"
-#endif
-){
-    trace.info() << "File extension not recognized: "<< extension << std::endl;
-    return 0;
-  }
-
-  if(extension=="vol" || extension=="pgm3d" || extension=="pgm3D"
-#ifdef WITH_ITK
-    || extension =="dcm"
-#endif
-){
-    unsigned int numDisplayed=0;
-
-#ifdef WITH_ITK
-   int dicomMin = vm["dicomMin"].as<int>();
-   int dicomMax = vm["dicomMax"].as<int>();
-   typedef DGtal::functors::Rescaling<int ,unsigned char > RescalFCT;
-   Image image = extension == "dcm" ? DicomReader< Image,  RescalFCT  >::importDicom( inputFilename,
-                        RescalFCT(dicomMin,
-                            dicomMax,
-                            0, 255) ) :
-     GenericReader<Image>::import( inputFilename );
-#else
-   Image image = GenericReader<Image>::import (inputFilename );
-#endif
-
-    trace.info() << "Image loaded: "<<image<< std::endl;
-    Domain domain = image.domain();
-    GradientColorMap<long> gradient( thresholdMin, thresholdMax);
-    gradient.addColor(Color::Blue);
-    gradient.addColor(Color::Green);
-    gradient.addColor(Color::Yellow);
-    gradient.addColor(Color::Red);
-    for(Domain::ConstIterator it = domain.begin(), itend=domain.end(); it!=itend; ++it){
-      unsigned char  val= image( (*it) );
-      if(limitDisplay && numDisplayed > numDisplayedMax)
-  break;
-      Color c= gradient(val);
-      if(val<=thresholdMax && val >=thresholdMin){
-  viewer <<  CustomColors3D(Color((float)(c.red()), (float)(c.green()),(float)(c.blue()), transp),
-          Color((float)(c.red()), (float)(c.green()),(float)(c.blue()), transp));
-  viewer << *it;
-  numDisplayed++;
+  if(extension != "sdp")
+    {
+      unsigned int numDisplayed=0;
+      DGtal::int64_t rescaleInputMin = vm["rescaleInputMin"].as<DGtal::int64_t>();
+      DGtal::int64_t rescaleInputMax = vm["rescaleInputMax"].as<DGtal::int64_t>();
+  
+      typedef DGtal::functors::Rescaling<DGtal::int64_t ,unsigned char > RescalFCT;
+      Image image =  GenericReader< Image >::importWithValueFunctor( inputFilename,RescalFCT(rescaleInputMin,
+                                                                                             rescaleInputMax,
+                                                                                             0, 255) );
+  
+  
+      trace.info() << "Image loaded: "<<image<< std::endl;
+      Domain domain = image.domain();
+      GradientColorMap<long> gradient( thresholdMin, thresholdMax);
+      gradient.addColor(Color::Blue);
+      gradient.addColor(Color::Green);
+      gradient.addColor(Color::Yellow);
+      gradient.addColor(Color::Red);
+      for(Domain::ConstIterator it = domain.begin(), itend=domain.end(); it!=itend; ++it){
+        unsigned char  val= image( (*it) );
+        if(limitDisplay && numDisplayed > numDisplayedMax)
+          break;
+        Color c= gradient(val);
+        if(val<=thresholdMax && val >=thresholdMin){
+          viewer <<  CustomColors3D(Color((float)(c.red()), (float)(c.green()),(float)(c.blue()), transp),
+                                    Color((float)(c.red()), (float)(c.green()),(float)(c.blue()), transp));
+          viewer << *it;
+          numDisplayed++;
+        }
       }
-    }
-  }else if(extension=="sdp"){
+    }else if(extension=="sdp"){
     vector<Z3i::RealPoint> vectVoxels = PointListReader<Z3i::RealPoint>::getPointsFromFile(inputFilename);
     for(unsigned int i=0;i< vectVoxels.size(); i++){
       viewer << vectVoxels.at(i);
     }
   }
-    if(vm.count("displayMesh")){
+  if(vm.count("displayMesh")){
     if(vm.count("colorMesh")){
       std::vector<int> vcol= vm["colorMesh"].as<std::vector<int > >();
       if(vcol.size()<4){
@@ -271,7 +253,7 @@ int main( int argc, char** argv )
     // Appy cleaning just save the last snap
     if(!viewer.restoreStateFromFile())
       {
-        viewer.updateGL();
+        viewer.update();
       }    
     std::string name = vm["doSnapShotAndExit"].as<std::string>();
     std::string extension = name.substr(name.find_last_of(".") + 1);

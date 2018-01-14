@@ -1,8 +1,43 @@
+# DGtalTools 0.9.4
+
+- *converters*
+   - volAddNoise moved to ```volumetric/```. (David  Coeurjolly,
+   [#300](https://github.com/DGtal-team/pull/300))
+
+- *volumetric*
+   - new option to volAddNoise to extract the largest 6-connected
+   component. (David  Coeurjolly,
+   [#300](https://github.com/DGtal-team/pull/300))
+   - new option to 3dVolMarchingCubes to add some Kanungo noise to the
+   input vol file. (David  Coeurjolly,
+   [#300](https://github.com/DGtal-team/pull/300))
+
+- *visualisation*:
+  - Improve visualisation tools (vol2heightfield, vol2obj, vol2raw, vol2sdp, vol2slice, volBoundary2obj, 3dImageViewer,     	3dVolViewer, sliceViewer, Viewer3DImage)
+    allowing to read longvol including rescaling.
+    (Bertrand Kerautret, [#296](https://github.com/DGtal-team/DGtalTools/pull/296))
+  - Add an option to filter vector displayed in 3dSDPViewer.
+   (Bertrand Kerautret, [#297](https://github.com/DGtal-team/DGtalTools/pull/297))
+
+  - meshViewer: add an option to set the ambient light source.
+    (Bertrand Kerautret, [#303](https://github.com/DGtal-team/DGtalTools/pull/303))
+  - 3dSDPViewer: new option to display vector field as unit vectors.
+    (Bertrand Kerautret, [#301](https://github.com/DGtal-team/DGtalTools/pull/304))
+
+- *global*:
+  - Fix travis Doxygen compilation for non Documention mode.
+    (Bertrand Kerautret, [#314](https://github.com/DGtal-team/DGtalTools/pull/314))
+  - Fix travis with boost installation which now use std package.
+    (Bertrand Kerautret, [#310](https://github.com/DGtal-team/DGtalTools/pull/310))
+  - Fix for the last QGLViewer version (2.7).
+    (Bertrand Kerautret, [#308](https://github.com/DGtal-team/DGtalTools/pull/308))
+
+
 # DGtalTools 0.9.3
 
 - *global*:
    - Various fixes to enable the new Version3 (compressed) Vol/Longvol files.
-     (David Coeurjolly, [#287](https://github.com/DGtal-team/pull/287))
+     (David Coeurjolly, [#287](https://github.com/DGtal-team/DGtalTools/pull/287))
    - Fix Appveyor continuous integration with zlib installation and boost fix.
      (Bertrand Kerautret, [#289](https://github.com/DGtal-team/DGtalTools/pull/289))
 
