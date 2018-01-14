@@ -1,6 +1,5 @@
 
 SET(DGTAL_TOOLS_SRC
-  volAddNoise
   imgAddNoise
   img2freeman
   freeman2img

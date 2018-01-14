@@ -1,5 +1,17 @@
 # DGtalTools 0.9.4
 
+- *converters*
+   - volAddNoise moved to ```volumetric/```. (David  Coeurjolly,
+   [#300](https://github.com/DGtal-team/pull/300))
+
+- *volumetric*
+   - new option to volAddNoise to extract the largest 6-connected
+   component. (David  Coeurjolly,
+   [#300](https://github.com/DGtal-team/pull/300))
+   - new option to 3dVolMarchingCubes to add some Kanungo noise to the
+   input vol file. (David  Coeurjolly,
+   [#300](https://github.com/DGtal-team/pull/300))
+
 - *visualisation*:
   - Improve visualisation tools (vol2heightfield, vol2obj, vol2raw, vol2sdp, vol2slice, volBoundary2obj, 3dImageViewer,     	3dVolViewer, sliceViewer, Viewer3DImage)
     allowing to read longvol including rescaling.
@@ -10,9 +22,7 @@
   - meshViewer: add an option to set the ambient light source.
     (Bertrand Kerautret, [#303](https://github.com/DGtal-team/DGtalTools/pull/303))
   - 3dSDPViewer: new option to display vector field as unit vectors.
-    (Bertrand Kerautret, [#304](https://github.com/DGtal-team/DGtalTools/pull/304)) 
-
-
+    (Bertrand Kerautret, [#301](https://github.com/DGtal-team/DGtalTools/pull/304))
 
 - *global*:
   - Fix travis Doxygen compilation for non Documention mode.
@@ -30,10 +40,10 @@
      (David Coeurjolly, [#287](https://github.com/DGtal-team/DGtalTools/pull/287))
    - Fix Appveyor continuous integration with zlib installation and boost fix.
      (Bertrand Kerautret, [#289](https://github.com/DGtal-team/DGtalTools/pull/289))
-   
+
 - *imageProcessing*:
-   - Creates imageProcessing directory. Add tools for doing image restoration 
-     and inpainting with Ambrosio-Tortorelli functional and discrete calculus. 
+   - Creates imageProcessing directory. Add tools for doing image restoration
+     and inpainting with Ambrosio-Tortorelli functional and discrete calculus.
      (Jacques-Olivier Lachaud, Marion Foare
      [#280](https://github.com/DGtal-team/DGtalTools/pull/280))
 
@@ -58,8 +68,8 @@
      (Bertrand Kerautret, [#285](https://github.com/DGtal-team/DGtalTools/pull/285))
     - tangentBC: add an option to read sdp points as input.
      (Bertrand Kerautret, [#285](https://github.com/DGtal-team/DGtalTools/pull/288))
-    
-    
+
+
 # DGtalTools 0.9.2
 
 - *global*:
