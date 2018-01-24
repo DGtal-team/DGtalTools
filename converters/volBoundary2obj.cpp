@@ -168,7 +168,8 @@ int main( int argc, char** argv )
   
   DGtal::int64_t rescaleInputMin = vm["rescaleInputMin"].as<DGtal::int64_t>();
   DGtal::int64_t rescaleInputMax = vm["rescaleInputMax"].as<DGtal::int64_t>();
-  
+
+  trace.beginBlock( "Loading file.." );
   typedef DGtal::functors::Rescaling<DGtal::int64_t ,unsigned char > RescalFCT;
   Image image =  GenericReader< Image >::importWithValueFunctor( inputFilename,RescalFCT(rescaleInputMin,
                                                                                          rescaleInputMax,
