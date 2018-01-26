@@ -82,21 +82,14 @@ int main( int argc, char** argv )
 {
   // parse command line ----------------------------------------------
   po::options_description general_opt("Allowed options are: ");
-  general_opt.add_options()( "help,h", "display this message" )(
-  "input,i", po::value<std::string>(),
-  "vol file (.vol, .longvol .p3d, .pgm3d and if WITH_ITK is selected: dicom, "
-  "dcm, mha, mhd) or sdp (sequence of discrete points)." )(
-  "output,o", po::value<std::string>(),
-  "Output OBJ filename (each grid point with value between
-  [ @a thresholdMin, @a thresholdMax ] is exported as a unit cube ) " )
-  ( "thresholdMin,m", po::value<int>()->default_value( 0 ),
-    "threshold min to define binary shape" )(
-  "thresholdMax,M", po::value<int>()->default_value( 255 ),
-  "threshold max to define binary shape" )(
-  "rescaleInputMin", po::value<DGtal::int64_t>()->default_value( 0 ),
-  "min value used to rescale the input intensity (to avoid basic cast into 8  "
-  "bits image)." )( "rescaleInputMax",
-                    po::value<DGtal::int64_t>()->default_value( 255 ),
+  general_opt.add_options()( "help,h", "display this message" )
+  ("input,i", po::value<std::string>(), "vol file (.vol, .longvol .p3d, .pgm3d and if WITH_ITK is selected: dicom, dcm, mha, mhd) or sdp (sequence of discrete points)." )
+  ("output,o", po::value<std::string>(),
+  "Output OBJ filename (each grid point with value between [ @a thresholdMin, @a thresholdMax ] is exported as a unit cube ) " )
+  ( "thresholdMin,m", po::value<int>()->default_value( 0 ),"threshold min to define binary shape" )
+  ("thresholdMax,M", po::value<int>()->default_value( 255 ),"threshold max to define binary shape" )
+  ("rescaleInputMin", po::value<DGtal::int64_t>()->default_value( 0 ), "min value used to rescale the input intensity (to avoid basic cast into 8 bits image)." )
+  ( "rescaleInputMax",po::value<DGtal::int64_t>()->default_value( 255 ),
                     "max value used to rescale the input intensity (to avoid "
                     "basic cast into 8 bits image)." );
 
