@@ -42,7 +42,27 @@ using namespace Z3i;
 
 namespace po = boost::program_options;
 
-
+/**
+ @page vox2vol
+ @brief  Converts a MagicaVoxel VOX file (https://ephtracy.github.io) to a vol file.
+ 
+ 
+ @b Usage: vox2vol -i [input] -o [output]
+ 
+ @b Allowed @b options @b are:
+ 
+ @code
+ -h [ --help ]                   display this message
+ -i [ --input ] arg              Input vox file.
+ -o [ --output ] arg             Ouput vol file.
+ @endcode
+ 
+ @b Example:
+ @code
+ $ vox2vol -i Al.100.vox -o Al.100.vol
+ 
+ @endcode
+ */
 /**
  * Missing parameter error message.
  *
