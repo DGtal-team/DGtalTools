@@ -1,6 +1,9 @@
 # DGtalTools 0.9.4
 
 - *converters*
+   - vol2vox/vox2vol: tools to convert vol file to a MagicaVoxel VOX file and
+   conversly. (David  Coeurjolly,
+   [#314](https://github.com/DGtal-team/pull/314))
    - volAddNoise moved to ```volumetric/```. (David  Coeurjolly,
    [#300](https://github.com/DGtal-team/pull/300))
 
