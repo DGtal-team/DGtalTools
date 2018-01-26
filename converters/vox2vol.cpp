@@ -106,15 +106,15 @@ std::ostream& write_word( std::ostream& outs, Word value )
   return outs;
 }
 
-uint32_t toInt(const char a,
+DGtal::uint32_t toInt(const char a,
                const char b,
                const char c,
                const char d)
 {
-  return (static_cast<uint32_t>((unsigned char)a) +
-          ((static_cast<uint32_t>((unsigned char) b)) <<8) +
-          ((static_cast<uint32_t>((unsigned char) c)) <<16) +
-          ((static_cast<uint32_t>((unsigned char) d)) <<24));
+  return (static_cast<DGtal::uint32_t>((unsigned char)a) +
+          ((static_cast<DGtal::uint32_t>((unsigned char) b)) <<8) +
+          ((static_cast<DGtal::uint32_t>((unsigned char) c)) <<16) +
+          ((static_cast<DGtal::uint32_t>((unsigned char) d)) <<24));
 }
 
 
@@ -211,7 +211,7 @@ int main(int argc, char**argv)
   }
   
   read_word(myfile, version);
-  uint32_t main = toInt('M','A','I','N');
+  DGtal::uint32_t main = toInt('M','A','I','N');
   trace.info()<< main << std::endl;
   trace.info() <<version <<std::endl;
   if ( version != main)
@@ -222,7 +222,7 @@ int main(int argc, char**argv)
     exit(2);
   }
   
-  uint32_t XYZI= toInt('X','Y','Z','I');
+  DGtal::uint32_t XYZI= toInt('X','Y','Z','I');
   read_word(myfile,version);
   while ( version != XYZI)
     read_word(myfile,version);
