@@ -3,6 +3,8 @@
 - *converters*
    - volAddNoise moved to ```volumetric/```. (David  Coeurjolly,
    [#300](https://github.com/DGtal-team/pull/300))
+   - segfault fix in volBoundary2obj (David Coeurjolly,
+   [#317](https://github.com/DGtal-team/pull/317))
 
 - *volumetric*
    - new option to volAddNoise to extract the largest 6-connected
