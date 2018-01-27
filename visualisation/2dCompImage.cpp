@@ -60,7 +60,7 @@ namespace po = boost::program_options;
 /**
  @page Doc2dCompImage 2dCompImage
  
- @brief Computes and displays image comparisons (squared and absolute differences). 
+ @brief Compare images and displays differences (squared and absolute differences). 
 
 
  @b Usage:  2dCompImage --imageA <imageA>.pgm --imageB <imageB>.pgm --imageError <name> 
@@ -74,10 +74,10 @@ namespace po = boost::program_options;
   -e [ --imageError ] arg          Output error image basename (will generate 
                                    two images <basename>MSE.ppm and 
                                    <basename>MAE.ppm).
-  -S [ --fixMaxColorValueMSE ] arg Fix the maximal color value for the scale 
+  -S [ --setMaxColorValueMSE ] arg Set the maximal color value for the scale 
                                    display of MSE (else the scale is set the 
                                    maximal MSE value).
-  -A [ --fixMaxColorValueMAE ] arg Fix the maximal color value for the scale 
+  -A [ --setMaxColorValueMAE ] arg Set the maximal color value for the scale 
                                    display of MAE (else the scale is set from 
                                    the maximal MAE value).
  @endcode
@@ -107,12 +107,11 @@ Statistic< int>
 getMAEstats(const Image2D & imageA, const Image2D &imageB, Image2DErr &imageMAE)
 {
   Statistic< int> stat(false);
-  for(Image2D::Domain::ConstIterator it = imageA.domain().begin();
-      it!=imageA.domain().end(); it++)
+  for(auto const &point imageA.domain())
   {
-    unsigned int error = abs((imageA(*it)-imageB(*it)));
+    unsigned int error = abs((imageA(point)-imageB(point)));
     stat.addValue(error);
-    imageMAE.setValue(*it, error);     
+    imageMAE.setValue(point, error);     
   }
   stat.terminate();
   return stat;
@@ -161,8 +160,8 @@ int main( int argc, char** argv )
     ("imageA,a", po::value<std::string >(), "Input filename of image A." )
     ("imageB,b", po::value<std::string >(), "Input filename of image B." )
     ("imageError,e", po::value<std::string >(), "Output error image basename (will generate two images <basename>MSE.ppm and <basename>MAE.ppm)." )
-    ("fixMaxColorValueMSE,S", po::value<int>(), "Fix the maximal color value for the scale display of MSE (else the scale is set the maximal MSE value)." )
-    ("fixMaxColorValueMAE,A", po::value<int>(), "Fix the maximal color value for the scale display of MAE (else the scale is set from the maximal MAE value).");
+    ("setMaxColorValueMSE,S", po::value<int>(), "Set the maximal color value for the scale display of MSE (else the scale is set the maximal MSE value)." )
+    ("setMaxColorValueMAE,A", po::value<int>(), "Set the maximal color value for the scale display of MAE (else the scale is set from the maximal MAE value).");
 
 
   bool parseOK=true;
@@ -214,11 +213,11 @@ int main( int argc, char** argv )
   //  Absolute Error between imageA and imageB -------------------------
   Statistic<int> statMA = getMAEstats(imageA, imageB, imageErr); 
   int maxVal = statMA.max();
-  if(vm.count("fixMaxColorValueMAE"))
+  if(vm.count("setMaxColorValueMAE"))
   {
-    maxVal = vm["fixMaxColorValueMAE"].as<int>();
+    maxVal = vm["setMaxColorValueMAE"].as<Set>();
   }
-  JetMap jmapMA(0, maxVal);
+  JetMap jmapMSet, maxVal);
   displayStats(statMA, "Absolute errror");
   stringstream maeName; maeName << basenameOutput;
   maeName << "MAE.ppm";
