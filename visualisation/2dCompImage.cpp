@@ -107,7 +107,7 @@ Statistic< int>
 getMAEstats(const Image2D & imageA, const Image2D &imageB, Image2DErr &imageMAE)
 {
   Statistic< int> stat(false);
-  for(auto const &point imageA.domain())
+  for(auto const &point: imageA.domain())
   {
     unsigned int error = abs((imageA(point)-imageB(point)));
     stat.addValue(error);
@@ -182,8 +182,8 @@ int main( int argc, char** argv )
   if( !parseOK || vm.count("help")|| argc<=1 || !vm.count("imageA")
       ||  !vm.count("imageB") )
     {
-      std::cout << "Usage: " << argv[0] << "--imageA <imageA>.pgm --imageB <imageB>.pgm -imageError <name> \n"
-                << "Computes and displays image comparisons (squared and absolute differences). \n"
+      std::cout << "Usage: " << argv[0] << " --imageA <imageA>.pgm --imageB <imageB>.pgm -imageError <name> \n"
+                << "Compare images and displays differences (squared and absolute differences).  \n"
                 << general_opt << "\n"
                 << "Typical use example:\n \t 2dCompImage -a imageA.pgm -b imageB.pgm -e errorImage -S 100 \n";
       return 0;
@@ -215,9 +215,9 @@ int main( int argc, char** argv )
   int maxVal = statMA.max();
   if(vm.count("setMaxColorValueMAE"))
   {
-    maxVal = vm["setMaxColorValueMAE"].as<Set>();
+    maxVal = vm["setMaxColorValueMAE"].as<int>();
   }
-  JetMap jmapMSet, maxVal);
+  JetMap jmapMA(0, maxVal);
   displayStats(statMA, "Absolute errror");
   stringstream maeName; maeName << basenameOutput;
   maeName << "MAE.ppm";
