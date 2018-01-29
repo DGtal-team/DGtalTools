@@ -46,22 +46,22 @@ namespace po = boost::program_options;
 /**
  @page vol2vox
  @brief  Converts a vol file to a MagicaVoxel VOX file (https://ephtracy.github.io).
- 
- 
+
+
  @b Usage: vo2vox -i [input] -o [output]
- 
+
  @b Allowed @b options @b are:
- 
+
  @code
  -h [ --help ]                   display this message
  -i [ --input ] arg              Input vol file.
  -o [ --output ] arg             Ouput vox file.
  @endcode
- 
+
  @b Example:
  @code
  $ vol2vox -i ${DGtal}/examples/samples/Al.100.vol -o Al.100.vox
- 
+
  @endcode
  */
 
@@ -72,7 +72,7 @@ namespace po = boost::program_options;
  *
  * @param param
  */
-void missingParam ( std::string param )
+void missingParam ( const std::string &param )
 {
   trace.error() <<" Parameter: "<<param<<" is required..";
   trace.info() <<std::endl;
@@ -91,7 +91,7 @@ std::ostream& write_word( std::ostream& outs, Word value )
 
 int main(int argc, char**argv)
 {
-  
+
   // parse command line ----------------------------------------------
   po::options_description general_opt ( "Allowed options are: " );
   general_opt.add_options()
@@ -115,66 +115,66 @@ int main(int argc, char**argv)
     << general_opt << "\n";
     return 0;
   }
-  
+
   //Parse options
   if ( ! ( vm.count ( "input" ) ) ) missingParam ( "--input" );
   std::string filename = vm["input"].as<std::string>();
   if ( ! ( vm.count ( "output" ) ) ) missingParam ( "--output" );
   std::string outputFileName = vm["output"].as<std::string>();
-  
+
   typedef ImageContainerBySTLVector<Z3i::Domain, unsigned char>  MyImageC;
-  
+
   trace.beginBlock("Loading..");
   MyImageC  imageL = VolReader< MyImageC >::importVol ( filename );
   trace.endBlock();
-  
+
   trace.beginBlock("Exporting...");
   ofstream myfile;
   myfile.open (outputFileName, ios::out | ios::binary);
-  
+
   DGtal::uint32_t cpt=0;
   for(auto it = imageL.range().begin(), itend = imageL.range().end();
       it!=itend; ++it)
     if (*it != 0)
       cpt++;
-  
+
   Point size = imageL.domain().upperBound() - imageL.domain().lowerBound();
-  
+
   /*
    * VOX file format:
    *
    4b VOX' '
    4b version (150)
-   
+
    4b MAIN (chunckid)
    4b size chucnk content (n)
    4b size chunck children (m)
-   
+
    4b SIZE (chunckid)
    4b chunck content
    4b chunck children
    4bx3  x,y,z
-   
+
    4b VOXEL (chunckid)
    4b chunck content
    4b chunck children
    4b number of voxels
    1b x 4 (x,y,z,idcol)  x numVoxels
-   
+
    */
-  
+
   trace.info()<<size<<std::endl;
-  
+
   //HEADER
   myfile <<'V'<<'O'<<'X'<<' ';
   //  version 150
   write_word(myfile, (DGtal::uint32_t)150);
-  
+
   //Chunck MAIN
   myfile <<'M'<<'A'<<'I'<<'N';
   write_word(myfile,DGtal::uint32_t(0)); //size content
   write_word(myfile,DGtal::uint32_t( (4+4+4 + 12 ) + ((4+ 4 + 4) + (4+ cpt*4)))); //size children
-  
+
   //Chunck SIZE
   myfile <<'S'<<'I'<<'Z'<<'E';
   write_word(myfile,DGtal::uint32_t(12)); //3x4
@@ -182,15 +182,15 @@ int main(int argc, char**argv)
   write_word(myfile,DGtal::uint32_t(size[0]+1));
   write_word(myfile,DGtal::uint32_t(size[1]+1));
   write_word(myfile,DGtal::uint32_t(size[2]+1));
-  
+
   //Chunck VOXEL
   myfile << 'X'<<'Y'<<'Z'<<'I';
   write_word(myfile, (DGtal::uint32_t)(4+cpt*4));  // 4 + numvoxel * 4
   write_word(myfile,DGtal::uint32_t(0));  //0 children
   write_word(myfile, DGtal::uint32_t(cpt)); //numvoxels
-  
+
   trace.info() << "Number of voxels= "<<cpt<<std::endl;
-  
+
   //Data
   for(auto it = imageL.domain().begin(), itend = imageL.domain().end();
       it!=itend; ++it)
@@ -202,9 +202,9 @@ int main(int argc, char**argv)
       myfile.put( (DGtal::uint8_t)p[2]);
       myfile.put(imageL(*it));
     }
-  
+
   myfile.close();
   trace.endBlock();
-  
+
   return 0;
 }

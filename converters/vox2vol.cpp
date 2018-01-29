@@ -45,22 +45,22 @@ namespace po = boost::program_options;
 /**
  @page vox2vol
  @brief  Converts a MagicaVoxel VOX file (https://ephtracy.github.io) to a vol file.
- 
- 
+
+
  @b Usage: vox2vol -i [input] -o [output]
- 
+
  @b Allowed @b options @b are:
- 
+
  @code
  -h [ --help ]                   display this message
  -i [ --input ] arg              Input vox file.
  -o [ --output ] arg             Ouput vol file.
  @endcode
- 
+
  @b Example:
  @code
  $ vox2vol -i Al.100.vox -o Al.100.vol
- 
+
  @endcode
  */
 /**
@@ -68,7 +68,7 @@ namespace po = boost::program_options;
  *
  * @param param
  */
-void missingParam ( std::string param )
+void missingParam ( const std::string &param )
 {
   trace.error() <<" Parameter: "<<param<<" is required..";
   trace.info() <<std::endl;
@@ -120,7 +120,7 @@ DGtal::uint32_t toInt(const char a,
 
 int main(int argc, char**argv)
 {
-  
+
   // parse command line ----------------------------------------------
   po::options_description general_opt ( "Allowed options are: " );
   general_opt.add_options()
@@ -144,57 +144,57 @@ int main(int argc, char**argv)
     << general_opt << "\n";
     return 0;
   }
-  
+
   //Parse options
   if ( ! ( vm.count ( "input" ) ) ) missingParam ( "--input" );
   std::string filename = vm["input"].as<std::string>();
   if ( ! ( vm.count ( "output" ) ) ) missingParam ( "--output" );
   std::string outputFileName = vm["output"].as<std::string>();
-  
-  
+
+
   trace.beginBlock("Loading...");
   ifstream myfile;
   myfile.open (filename, ios::in | ios::binary);
-  
+
   /* VOX file format:
    *
    4b VOX' '
    4b version (150)
-   
+
    4b MAIN (chunckid)
    4b size chucnk content (n)
    4b size chunck children (m)
-   
+
    4b SIZE (chunckid)
    4b chunck content
    4b chunck children
    4bx3  x,y,z
-   
+
    4b VOXEL (chunckid)
    4b chunck content
    4b chunck children
    4b number of voxels
    1b x 4 (x,y,z,idcol)  x numVoxels
-   
+
    */
-  
+
   //HEADER
   char a,b,c,d;
   myfile.get(a);
   myfile.get(b);
   myfile.get(c);
   myfile.get(d);
-  
-  
+
+
   if ( ( a != 'V' || (b != 'O') || (c!='X') || (d != ' ')))
   {
     trace.error() << "Magic number error"<<std::endl;
     trace.error() << (int)a<<" "<<(int)b<<" "<<(int) c<<" "<<(int)d<<std::endl;
     trace.error() << a<<" "<<b<<" "<< c<<" "<<d<<std::endl;
-    
+
     exit(2);
   }
-  
+
   myfile.get(a);
   myfile.get(b);
   myfile.get(c);
@@ -209,7 +209,7 @@ int main(int argc, char**argv)
     trace.error() << a<<" "<<b<<" "<< c<<" "<<d<<std::endl;
     exit(2);
   }
-  
+
   read_word(myfile, version);
   DGtal::uint32_t main = toInt('M','A','I','N');
   trace.info()<< main << std::endl;
@@ -221,18 +221,18 @@ int main(int argc, char**argv)
     trace.error() << a<<" "<<b<<" "<< c<<" "<<d<<std::endl;
     exit(2);
   }
-  
+
   DGtal::uint32_t XYZI= toInt('X','Y','Z','I');
   read_word(myfile,version);
   while ( version != XYZI)
     read_word(myfile,version);
-  
+
   //trash two ints
   read_word(myfile,version);
   read_word(myfile,version);
   uint32_t cpt;
   read_word(myfile,cpt);
-  
+
   Z3i::Domain domain(Z3i::Point(0,0,0), Z3i::Point(126,126,126));
   ImageContainerBySTLVector<Z3i::Domain, unsigned char>  image(domain);
   trace.info()<< "Number of voxels in this chunk = "<<version<<std::endl;
@@ -247,11 +247,10 @@ int main(int argc, char**argv)
                               (unsigned int)(unsigned char)c),
                               (unsigned char) d);
   }
-  
-  image >> outputFileName;
-  
-  
-  return 0;
-  
-}
 
+  image >> outputFileName;
+
+
+  return 0;
+
+}
