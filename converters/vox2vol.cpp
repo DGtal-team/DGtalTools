@@ -230,7 +230,7 @@ int main(int argc, char**argv)
   //trash two ints
   read_word(myfile,version);
   read_word(myfile,version);
-  uint32_t cpt;
+  DGtal::uint32_t cpt;
   read_word(myfile,cpt);
 
   Z3i::Domain domain(Z3i::Point(0,0,0), Z3i::Point(126,126,126));
