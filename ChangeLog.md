@@ -17,8 +17,9 @@
 - *visualisation*:
   - New tool for mesh voxelization from a mesh in input (.off)
     to a volumetric output (vol, pgm3d)
+    
   - 2dCompImage : Computes and displays image comparisons (squared and absolute 
-    differences) 
+    differences) (Monir Hadji [#279](https://github.com/DGtal-team/DGtalTools/pull/279)
     (Bertrand Kerautret, [#313](https://github.com/DGtal-team/DGtalTools/pull/313))
   - Improve visualisation tools (vol2heightfield, vol2obj, vol2raw, vol2sdp, 
     vol2slice,volBoundary2obj,3dImageViewer, 3dVolViewer, sliceViewer, Viewer3DImage) 
