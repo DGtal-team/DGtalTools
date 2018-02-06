@@ -3,6 +3,8 @@
 - *converters*
    - volAddNoise moved to ```volumetric/```. (David  Coeurjolly,
    [#300](https://github.com/DGtal-team/pull/300))
+   - segfault fix in volBoundary2obj (David Coeurjolly,
+   [#317](https://github.com/DGtal-team/pull/317))
 
 - *volumetric*
    - new option to volAddNoise to extract the largest 6-connected
@@ -15,10 +17,13 @@
 - *visualisation*:
   - New tool for mesh voxelization from a mesh in input (.off)
     to a volumetric output (vol, pgm3d)
-    [#279](https://github.com/DGtal-team/DGtalTools/pull/279)
-  - Improve visualisation tools (vol2heightfield, vol2obj, vol2raw, vol2sdp, vol2slice, volBoundary2obj, 3dImageViewer,     	3dVolViewer, sliceViewer, Viewer3DImage)
-    allowing to read longvol including rescaling.
-    (Bertrand Kerautret, [#296](https://github.com/DGtal-team/DGtalTools/pull/296))
+  - 2dCompImage : Computes and displays image comparisons (squared and absolute 
+    differences) 
+    (Bertrand Kerautret, [#313](https://github.com/DGtal-team/DGtalTools/pull/313))
+  - Improve visualisation tools (vol2heightfield, vol2obj, vol2raw, vol2sdp, 
+    vol2slice,volBoundary2obj,3dImageViewer, 3dVolViewer, sliceViewer, Viewer3DImage) 
+    allowing to read longvol including rescaling. (Bertrand Kerautret, 
+    [#296](https://github.com/DGtal-team/DGtalTools/pull/296))
   - Add an option to filter vector displayed in 3dSDPViewer.
    (Bertrand Kerautret, [#297](https://github.com/DGtal-team/DGtalTools/pull/297))
 
