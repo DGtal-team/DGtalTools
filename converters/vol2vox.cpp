@@ -130,7 +130,7 @@ int main(int argc, char**argv)
  
   if ( (imageL.domain().upperBound() - imageL.domain().lowerBound()).max() > 126 )
   {
-    trace.error() << "Vol file to large (width > 126)."<<std::endl;
+    trace.error() << "Vol file too large (width > 126)."<<std::endl;
     trace.info() << std::endl;
     exit(2);
   }
