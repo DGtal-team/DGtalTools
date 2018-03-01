@@ -109,7 +109,7 @@ int main(int argc, char**argv)
   po::notify ( vm );
   if ( !parseOK || vm.count ( "help" ) ||argc<=1 )
   {
-    trace.info() << "Convert a vol to a vox. The current exporter does not support custom colormaps, only the voxel values are exported." <<std::endl
+    trace.info() << "Convert a vol (up to [0,126]^3) to a vox. The current exporter does not support custom colormaps, only the voxel values are exported." <<std::endl
     << std::endl << "Basic usage: "<<std::endl
     << "\tvol2vox --input <volFileName> --o <volOutputFileName> "<<std::endl
     << general_opt << "\n";
@@ -127,7 +127,14 @@ int main(int argc, char**argv)
   trace.beginBlock("Loading..");
   MyImageC  imageL = VolReader< MyImageC >::importVol ( filename );
   trace.endBlock();
-
+ 
+  if ( (imageL.domain().upperBound() - imageL.domain().lowerBound()).max() > 126 )
+  {
+    trace.error() << "Vol file to large (width > 126)."<<std::endl;
+    trace.info() << std::endl;
+    exit(2);
+  }
+ 
   trace.beginBlock("Exporting...");
   ofstream myfile;
   myfile.open (outputFileName, ios::out | ios::binary);
