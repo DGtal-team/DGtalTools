@@ -71,7 +71,7 @@ before_script:
   - make
   - cd ..
   - if [ $DOC == "true" ]; then .travis/install_doxygen.sh;  BTYPE="-DDOXYGEN_EXECUTABLE=$HOME/doxygen/doxygen-1.8.10/bin/doxygen -DCMAKE_BUILD_TYPE=Debug -DWITH_CAIRO=true  -DWITH_GMP=true";  fi
-  - if [ $DOC == "true" ]; then wget http://dgtal.org/doc/tags/DGtal-tagfile;fi
+  - if [ $DOC == "true" ]; then wget http://dgtal.org/doc/tags/DGtal-tagfile --no-check-certificate ;fi
 
 
 
