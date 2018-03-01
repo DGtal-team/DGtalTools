@@ -20,7 +20,8 @@ SET(DGTAL_TOOLS_SRC
   heightfield2shading
   mesh2heightfield
   vox2vol
-  vol2vox)
+  vol2vox
+  mesh2vol)
 
 if( WITH_HDF5 )
 SET(DGTAL_TOOLS_SRC ${DGTAL_TOOLS_SRC}
