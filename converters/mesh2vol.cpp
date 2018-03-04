@@ -76,7 +76,8 @@ namespace po = boost::program_options;
 template< unsigned int SEP >
 void voxelizeAndExport(const std::string& inputFilename,
                        const std::string& outputFilename,
-                       const unsigned int resolution)
+                       const unsigned int resolution,
+                       const unsigned int margin)
 {
   using Domain   = Z3i::Domain;
   using PointR3  = Z3i::RealPoint;
@@ -105,7 +106,7 @@ void voxelizeAndExport(const std::string& inputFilename,
   
   trace.beginBlock("Voxelization");
   trace.info() << "Voxelization " << SEP << "-separated ; " << resolution << "^3 ";
-  Domain aDomain(PointZ3().diagonal(0), PointZ3().diagonal(resolution));
+  Domain aDomain(PointZ3().diagonal(-margin), PointZ3().diagonal(resolution+margin));
   
   //Digitization step
   Z3i::DigitalSet mySet(aDomain);
@@ -132,6 +133,7 @@ int main( int argc, char** argv )
     ("help,h", "display this message")
     ("input,i", po::value<std::string>(), "mesh file (.off) " )
     ("output,o", po::value<std::string>(), "filename of ouput volumetric file (vol, pgm3d, ...).")
+    ("margin,m", po::value<unsigned int>()->default_value(0), "add margin around bounding box shape.")
     ("separation,s", po::value<unsigned int>()->default_value(6), "voxelization 6-separated or 26-separated." )
     ("resolution,r", po::value<unsigned int>(), "digitization domain size (e.g. 128). The mesh will be scaled such that its bounding box maps to [0,resolution)^3." );
 
@@ -168,7 +170,7 @@ int main( int argc, char** argv )
     trace.error() << " Separation should be 6 or 26" << endl;
     return -1;
   }
-
+  unsigned int margin = vm["margin"].as<unsigned int>(); 
   unsigned int separation = vm["separation"].as<unsigned int>();
   unsigned int resolution;
   if (vm.count("resolution"))
@@ -192,9 +194,9 @@ int main( int argc, char** argv )
   
   
   if(separation == 6)
-    voxelizeAndExport<6>(inputFilename, outputFilename, resolution);
+    voxelizeAndExport<6>(inputFilename, outputFilename, resolution, margin);
   else if(separation == 26)
-    voxelizeAndExport<26>(inputFilename, outputFilename, resolution);
+    voxelizeAndExport<26>(inputFilename, outputFilename, resolution, margin);
 
   return 0;
 }
