@@ -8,7 +8,9 @@
    [#300](https://github.com/DGtal-team/pull/300))
    - segfault fix in volBoundary2obj (David Coeurjolly,
    [#317](https://github.com/DGtal-team/pull/317))
-
+   - Fix the bad surfel display of volBoundary2obj (issue #320)
+   (Bertrand Kerautret, [#321](https://github.com/DGtal-team/pull/321))
+   
 - *volumetric*
    - new option to volAddNoise to extract the largest 6-connected
    component. (David  Coeurjolly,
