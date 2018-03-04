@@ -1,6 +1,11 @@
 # DGtalTools 0.9.4
 
 - *converters*
+
+
+   - mesh2vol: add option to add margin in the generated volume
+     (to better extract the surfel boudary near domain limits).  
+     (Bertrand Kerautret, [#322](https://github.com/DGtal-team/pull/322))
    - vol2vox/vox2vol: tools to convert vol file to a MagicaVoxel VOX file and
    conversly. (David  Coeurjolly,
    [#314](https://github.com/DGtal-team/pull/314))
