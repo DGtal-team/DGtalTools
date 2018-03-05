@@ -193,8 +193,9 @@ int main(int argc, char* const argv[]){
 
   auto & sk = sk_string;
   KSpace ks;
-  ks.init(image.domain().lowerBound() ,
-      image.domain().upperBound() , true);
+  KSpace::Point d1( KSpace::Point::diagonal( 1 ) );
+  ks.init(image.domain().lowerBound() - d1 ,
+      image.domain().upperBound() + d1 , true);
 
   DigitalTopology::ForegroundAdjacency adjF;
   DigitalTopology::BackgroundAdjacency adjB;
