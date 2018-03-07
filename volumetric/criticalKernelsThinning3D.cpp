@@ -29,11 +29,9 @@
   -h [ --help ]           display this message.
   -i [ --input ] arg      Input volumetric file (.vol, .pgm3d or p3d)
   -s [ --skel] arg        Skeletonization: only keep certain voxels                              during thinning.
-                          Options: ulti,end,1is,is, 1isthmus, isthmus
+                          Options: ulti,end, 1isthmus, isthmus
 ulti: delete all voxels except those that change topology.
 end: keep voxels with only one neighbor.
-1is: keep voxels that are one-isthmus,
-is: keep voxels that are one-isthmus or two-isthmus.
 1isthmus: keep voxels that are one-isthmus (using LookUpTables) [faster]
 isthmus: keep voxels that are one-isthmus or two-isthmus (using LookUpTables) [faster]
   -c [ --select] arg      Select: order in which select voxels in the process.
@@ -68,9 +66,11 @@ random: Select voxel at random.
 #include <DGtal/base/Common.h>
 #include <DGtal/helpers/StdDefs.h>
 #include <DGtal/io/readers/GenericReader.h>
+#include <DGtal/io/writers/GenericWriter.h>
 #include "DGtal/images/imagesSetsUtils/SetFromImage.h"
 #include "DGtal/images/SimpleThresholdForegroundPredicate.h"
 #include "DGtal/images/ImageSelector.h"
+#include "DGtal/images/imagesSetsUtils/ImageFromSet.h"
 
 #include <DGtal/topology/SurfelAdjacency.h>
 #include <DGtal/io/boards/Board2D.h>
@@ -112,8 +112,9 @@ int main(int argc, char* const argv[]){
     ( "persistence,p",  po::value<int>()->default_value(0), "persistence value, implies use of persistence algorithm if p>=1" )
     ( "profile",  po::bool_switch()->default_value(false), "profile algorithm" )
     ( "verbose,v",  po::bool_switch()->default_value(false), "verbose output" )
+    ( "exportImage,o", po::value<std::string>(), "Export the resulting set of points to a image compatible with GenericWriter.")
     ( "exportSDP,e", po::value<std::string>(), "Export the resulting set of points in a simple (sequence of discrete point (sdp)).")
-    ( "view",  po::bool_switch()->default_value(false), "show result in viewer" );
+    ( "visualize,t",  po::bool_switch()->default_value(false), "visualize result in viewer" );
   bool parseOK=true;
   po::variables_map vm;
 
@@ -129,19 +130,20 @@ int main(int argc, char* const argv[]){
     trace.info() <<
     "Compute the thinning of a volume using the CriticalKernels framework"<< std::endl
     << std::endl << "Basic usage: "<< std::endl
-    << "criticalKernelsThinning3D --input <volFileName> --skel <ulti,end,1is,is, 1isthmus, isthmus> --select "
+    << "criticalKernelsThinning3D --input <volFileName> --skel <ulti,end, 1isthmus, isthmus> --select "
     " [ -f <white,black> -m <minlevel> -M <maxlevel> -v ] "
     " [--persistence <value> ]" << std::endl
-    << "options for --skel {ulti end 1is is}" << std::endl
+    << "options for --skel {ulti end 1isthmus isthmus}" << std::endl
     << "options for --select = {dmax random first}" << std::endl
     << general_opt << "\n"
     << " Example: \n"
-      << "criticalKernelsThinning3D --input ${DGtal}/examples/samples/Al.100.vol --select dmax --skel 1isthmus --persistence 1 --view \n";
+      << "criticalKernelsThinning3D --input ${DGtal}/examples/samples/Al.100.vol --select dmax --skel 1isthmus --persistence 1 --visualize --verbose --outputImage ./Al100_dmax_1isthmus_p1.vol \n";
     return 0;
   }
   //Parse options
   string filename = vm["input"].as<string>();
   bool verbose = vm["verbose"].as<bool>();
+  bool visualize = vm["visualize"].as<bool>();
   bool profile = vm["profile"].as<bool>();
   int thresholdMin = vm["thresholdMin"].as<int>();
   int thresholdMax = vm["thresholdMax"].as<int>();
@@ -156,7 +158,6 @@ int main(int argc, char* const argv[]){
   string sk_string = vm["skel"].as<string>();
   if (vm.count("skel") &&
      (!( sk_string == "ulti" || sk_string == "end" ||
-         sk_string == "1is" || sk_string == "is" ||
          sk_string == "isthmus" || sk_string == "1isthmus"))
      )
      throw po::validation_error(po::validation_error::invalid_option_value, "skel");
@@ -168,6 +169,12 @@ int main(int argc, char* const argv[]){
      throw po::validation_error(po::validation_error::invalid_option_value, "select");
   /*-------------- End of parse -----------------------------*/
 
+  if(verbose){
+    std::cout << "Skel: " << sk_string << std::endl;
+    std::cout << "Select: " << select_string << std::endl;
+    std::cout << "Persistence: " << persistence << std::endl;
+    std::cout << "Input: " << filename << std::endl;
+  }
   trace.beginBlock("Reading input");
   using Domain = Z3i::Domain ;
   using Image = ImageSelector < Z3i::Domain, unsigned char>::Type ;
@@ -220,8 +227,6 @@ int main(int argc, char* const argv[]){
   std::function< bool(const Complex&, const Cell&) > Skel ;
   if (sk == "ulti") Skel = skelUltimate<Complex>;
   else if (sk == "end") Skel = skelEnd<Complex>;
-  else if (sk == "is") Skel = skelIsthmus<Complex>;
-  else if (sk == "1is") Skel = oneIsthmus<Complex>;
   else if (sk == "isthmus" || sk == "1isthmus")
       Skel = [&isthmus_table, &pointMap](const Complex & fc,
                const Complex::Cell & c){
@@ -266,7 +271,38 @@ int main(int argc, char* const argv[]){
   auto end = std::chrono::system_clock::now();
   auto elapsed = std::chrono::duration_cast<std::chrono::seconds> (end - start) ;
   if (profile) std::cout <<"Time elapsed: " << elapsed.count() << std::endl;
-  // "visualize the cells"
+
+  const auto & thin_set = vc_new.objectSet();
+  const auto & all_set = obj.pointSet();
+
+  if (vm.count("exportSDP"))
+  {
+    std::ofstream out;
+    out.open(vm["exportSDP"].as<std::string>().c_str());
+    for (auto &p : thin_set)
+    {
+      out << p[0] << " " << p[1] << " " << p[2] << std::endl;
+    }
+  }
+
+  if (vm.count("exportImage"))
+  {
+    auto outputFilename = vm["exportImage"].as<std::string>();
+    if(verbose)
+      std::cout << "outputFilename" << outputFilename << std::endl;
+
+    unsigned int foreground_value = 255;
+    auto thin_image = ImageFromSet<Image>::create(thin_set, foreground_value);
+    thin_image >> outputFilename;
+    // // ITK output
+    // typedef itk::ImageFileWriter<Image::ITKImage> ITKImageWriter;
+    // typename ITKImageWriter::Pointer writer = ITKImageWriter::New();
+    // writer->SetFileName(outputFilename.c_str());
+    // writer->SetInput(thin_image.getITKImagePointer());
+    // writer->Update();
+  }
+
+  if(visualize)
   {
     int argc(1);
     char** argv(nullptr);
@@ -274,8 +310,6 @@ int main(int argc, char* const argv[]){
     Viewer3D<> viewer;
     viewer.setWindowTitle("criticalKernelsThinning3D");
     viewer.show();
-    const auto & thin_set = vc_new.objectSet();
-    const auto & all_set = obj.pointSet();
 
     viewer.setFillColor(Color(255, 255, 255, 255));
     viewer << thin_set;
@@ -286,15 +320,6 @@ int main(int argc, char* const argv[]){
 
     viewer << Viewer3D<>::updateDisplay;
 
-    if (vm.count("exportSDP"))
-    {
-      std::ofstream out;
-      out.open(vm["exportSDP"].as<std::string>().c_str());
-      for (auto &p : thin_set)
-      {
-        out << p[0] << " " << p[1] << " " << p[2] << std::endl;
-      }
-    }
     app.exec();
   }
 }
