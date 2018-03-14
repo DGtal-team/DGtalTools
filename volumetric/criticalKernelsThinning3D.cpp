@@ -153,7 +153,6 @@ int main(int argc, char* const argv[]){
   string foreground = vm["foreground"].as<string>();
   if (vm.count("foreground") && (!(foreground == "white" || foreground == "black")))
     throw po::validation_error(po::validation_error::invalid_option_value, "foreground");
-  bool invert_image = (foreground == "black") ? true : false ;
 
   string sk_string = vm["skel"].as<string>();
   if (vm.count("skel") &&
