@@ -23,6 +23,9 @@
    - new option to 3dVolMarchingCubes to add some Kanungo noise to the
    input vol file. (David  Coeurjolly,
    [#300](https://github.com/DGtal-team/pull/300))
+   - Add thinning based of Critical Kernels using VoxelComplex.
+   Based on [DGtal PR 1147](https://github.com/DGtal-team/DGtal/pull/1147)
+   (Pablo Hernandez, [#311](https://github.com/DGtal-team/pull/311))
 
 - *visualisation*:
   - New tool for mesh voxelization from a mesh in input (.off)
