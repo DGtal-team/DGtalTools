@@ -45,8 +45,8 @@ This is done by minimizing a quadratic energy function as decribed in ??. The va
  @b Allowed @b options @b are :
  @code
 File options:
-  -i [ --image-filename ] arg           input vol filename for image shape or
-                                        input cvs filename for surfels and
+  -i [ --image-filename ] arg           input vol filename for image shape (object voxels
+                                        have values > 0) or input cvs filename for surfels and
                                         normals
   -o [ --regularized-obj-filename ] arg output regularized obj
   -n [ --cubical-obj-filename ] arg     output cubical obj
@@ -123,7 +123,8 @@ parse_options(int argc, char* argv[])
     Options options;
     po::options_description po_shape("File options");
     po_shape.add_options()
-        ("image-filename,i", po::value<std::string>(&options.image_filename)->default_value(""), "input vol filename for image shape or input cvs filename for surfels and normals")
+        ("image-filename,i", po::value<std::string>(&options.image_filename)->default_value(""), "input vol filename for image shape (object voxels
+                                        have values > 0) or input cvs filename for surfels and normals")
         ("regularized-obj-filename,o", po::value<std::string>(&options.regularized_obj_filename)->default_value(""), "output regularized obj")
         ("cubical-obj-filename,n", po::value<std::string>(&options.cubical_obj_filename)->default_value(""), "output cubical obj")
         ("shape-noise,k", po::value<double>(&options.noise_level)->default_value(0), "noise shape parameter")
