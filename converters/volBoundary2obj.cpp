@@ -168,7 +168,8 @@ int main( int argc, char** argv )
   
   DGtal::int64_t rescaleInputMin = vm["rescaleInputMin"].as<DGtal::int64_t>();
   DGtal::int64_t rescaleInputMax = vm["rescaleInputMax"].as<DGtal::int64_t>();
-  
+
+  trace.beginBlock( "Loading file.." );
   typedef DGtal::functors::Rescaling<DGtal::int64_t ,unsigned char > RescalFCT;
   Image image =  GenericReader< Image >::importWithValueFunctor( inputFilename,RescalFCT(rescaleInputMin,
                                                                                          rescaleInputMax,
@@ -211,11 +212,32 @@ int main( int argc, char** argv )
   Board3D<Space,KSpace> board(ks);
 
   board << SetMode3D(  ks.unsigns( *digSurf.begin() ).className(), "Basic" );
+  board << SetMode3D(  (*digSurf.begin()).className(), "Basic" );
 
   typedef MyDigitalSurface::ConstIterator ConstIterator;
   if ( mode == "BDRY" )
     for ( ConstIterator it = digSurf.begin(), itE = digSurf.end(); it != itE; ++it )
-      board << ks.unsigns( *it );
+    { 
+      //board << ks.unsigns( *it );
+      bool indirectFilled = thresholdedImage(ks.sCoords( ks.sIndirectIncident( *it, ks.sOrthDir( *it ) ) ));
+      bool directFilled = thresholdedImage(ks.sCoords( ks.sDirectIncident( *it, ks.sOrthDir( *it ) ) ));
+      Z3i::RealPoint sc = board.embedKS(*it);
+      Z3i::RealPoint n (0,0,0);
+      auto ip = ks.sCoords( ks.sIndirectIncident( *it, ks.sOrthDir( *it ) ) );  
+      if (!indirectFilled)
+      {
+        ip = ks.sCoords( ks.sDirectIncident( *it, ks.sOrthDir( *it ) ) );
+      }
+      n = sc - Z3i::RealPoint(static_cast<Z3i::RealPoint::Component>(ip[0]),
+                              static_cast<Z3i::RealPoint::Component>(ip[1]),
+                              static_cast<Z3i::RealPoint::Component>(ip[2]));
+      bool xodd = ks.sIsOpen( *it, 0 );
+      bool yodd = ks.sIsOpen( *it, 1 );
+      bool zodd = ks.sIsOpen( *it, 2 );      
+      board.addQuadFromSurfelCenterWithNormal
+        ( Z3i::RealPoint( sc[0]+(xodd? 0:0.5 ), sc[1]+(yodd? 0:0.5 ), sc[2]+(zodd? 0:0.5 ) ),
+          ! xodd, ! yodd, ! zodd, n, true,  true, false );
+    }
   else if ( mode == "INNER" )
     for ( ConstIterator it = digSurf.begin(), itE = digSurf.end(); it != itE; ++it )
       board << ks.sCoords( ks.sDirectIncident( *it, ks.sOrthDir( *it ) ) );
@@ -223,8 +245,8 @@ int main( int argc, char** argv )
     for ( ConstIterator it = digSurf.begin(), itE = digSurf.end(); it != itE; ++it )
       board << ks.sCoords( ks.sIndirectIncident( *it, ks.sOrthDir( *it ) ) );
   else  if (mode == "CLOSURE")
-    {
-      std::set<KSpace::Cell> container;
+  {
+    std::set<KSpace::Cell> container;
       for ( ConstIterator it = digSurf.begin(), itE = digSurf.end(); it != itE; ++it )
         {
           container.insert( ks.unsigns( *it ) );

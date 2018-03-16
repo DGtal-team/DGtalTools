@@ -1,0 +1,196 @@
+
+#include <DGtal/topology/SurfelAdjacency.h>
+#include <DGtal/topology/helpers/Surfaces.h>
+#include <DGtal/topology/SetOfSurfels.h>
+#include <DGtal/topology/DigitalSurface.h>
+#include <DGtal/dec/DiscreteExteriorCalculusFactory.h>
+#include <DGtal/geometry/surfaces/estimation/IIGeometricFunctors.h>
+#include <DGtal/geometry/surfaces/estimation/IntegralInvariantCovarianceEstimator.h>
+#include <DGtal/geometry/surfaces/estimation/LocalEstimatorFromSurfelFunctorAdapter.h>
+#include <DGtal/geometry/surfaces/estimation/estimationFunctors/ElementaryConvolutionNormalVectorEstimator.h>
+#include <DGtal/geometry/volumes/KanungoNoise.h>
+#include <DGtal/math/ScalarFunctors.h>
+
+template <typename Shape>
+Calculus
+createCalculusFromShapeBorder(const KSpace& kspace, const Shape& shape)
+{
+    using DGtal::trace;
+    using std::endl;
+    using DGtal::PRIMAL;
+    using DGtal::DUAL;
+
+    trace.beginBlock("extracting surfels");
+
+    typedef KSpace::SurfelSet                         MySurfelSet;
+    typedef DGtal::SurfelAdjacency<KSpace::dimension> MySurfelAdjacency;
+    typedef DGtal::SetOfSurfels<KSpace, MySurfelSet>  MySetOfSurfels;
+    typedef std::vector<SCell>                        MySCellsVector;
+    typedef std::vector<MySCellsVector>               MyConnectedSCells;
+
+    const MySurfelAdjacency surfel_adjacency(true);
+    const MySetOfSurfels set_of_surfels(kspace, surfel_adjacency);
+    MyConnectedSCells connected_scells;
+    DGtal::Surfaces<KSpace>::extractAllConnectedSCell(connected_scells, kspace, surfel_adjacency, shape, false);
+    trace.info() << "connected_components_size=" << connected_scells.size() << endl;
+    ASSERT( !connected_scells.empty() );
+
+    const MyConnectedSCells::const_iterator max_connected_scells = std::max_element(connected_scells.begin(), connected_scells.end(),
+            [](const MySCellsVector& aa, const MySCellsVector& bb) { return aa.size() < bb.size(); });
+    ASSERT( max_connected_scells != connected_scells.end() );
+    trace.info() << "scells_size=" << max_connected_scells->size() << endl;
+
+    trace.endBlock();
+
+    trace.beginBlock("creating calculus");
+
+    typedef DGtal::DiscreteExteriorCalculusFactory<DGtal::EigenLinearAlgebraBackend> CalculusFactory;
+    const Calculus calculus = CalculusFactory::createFromNSCells<2>(max_connected_scells->begin(), max_connected_scells->end());
+    trace.info() << "calculus=" << calculus << endl;
+
+    {
+        const Calculus::PrimalForm2 primal_areas = calculus.hodge<0, DUAL>()*Calculus::DualForm0::ones(calculus);
+        const Calculus::DualForm2 dual_areas = calculus.hodge<0, PRIMAL>()*Calculus::PrimalForm0::ones(calculus);
+        const double primal_area = primal_areas.myContainer.array().sum();
+        const double dual_area = dual_areas.myContainer.array().sum();
+        trace.info() << "primal_area=" << primal_area << endl;
+        trace.info() << "dual_area=" << dual_area << endl;
+        ASSERT( primal_area == dual_area );
+    }
+
+    trace.endBlock();
+
+    return calculus;
+}
+
+template <typename Shape>
+FlatVector
+computeFaceNormals(const Calculus& calculus, const Shape& shape, const double radius)
+{
+    using DGtal::trace;
+    using std::endl;
+    using DGtal::PRIMAL;
+
+    trace.beginBlock("estimating normals");
+
+    typedef DGtal::Z3i::RealVector RealVector;
+    typedef std::vector<RealVector> RealVectors;
+
+    const KSpace& kspace = calculus.myKSpace;
+
+    const auto buildFlatVector = [&kspace, &calculus](const RealVectors& real_vectors)
+    {
+        ASSERT( real_vectors.size() == calculus.kFormLength(2, PRIMAL) );
+        const int nsurfels = real_vectors.size();
+        FlatVector vectors(3*real_vectors.size());
+        int index = 0;
+        for (const RealVector& real_vector : real_vectors)
+        {
+            for (int dim=0; dim<3; dim++)
+                vectors[index+nsurfels*dim] = real_vector[dim];
+            index ++;
+        }
+        return vectors;
+    };
+
+    const Calculus::SCells& surfels = calculus.getIndexedSCells<2, PRIMAL>();
+
+    trace.info() << "radius=" << radius << endl;
+
+    RealVectors nii_normals_estimations;
+    {
+        typedef DGtal::Z3i::Space Space;
+        typedef DGtal::functors::IINormalDirectionFunctor<Space> IINormalFunctor;
+        typedef DGtal::IntegralInvariantCovarianceEstimator<KSpace, Shape, IINormalFunctor> IINormalEstimator;
+
+        IINormalEstimator nii_estimator(kspace, shape);
+        nii_estimator.setParams(radius);
+        nii_estimator.init(1, surfels.begin(), surfels.end());
+
+        nii_estimator.eval(surfels.begin(), surfels.end(), std::back_inserter(nii_normals_estimations));
+        trace.info() << "nii_estimations_size=" << nii_normals_estimations.size() << endl;
+        ASSERT( nii_normals_estimations.size() == surfels.size() );
+    }
+
+    RealVectors nt_normals_estimations;
+    {
+        typedef DGtal::Z3i::Space Space;
+        typedef DGtal::SurfelAdjacency<KSpace::dimension> MySurfelAdjacency;
+        typedef KSpace::SurfelSet MySurfelSet;
+        typedef DGtal::SetOfSurfels<KSpace, MySurfelSet> MySetOfSurfels;
+        typedef DGtal::DigitalSurface<MySetOfSurfels> MyDigitalSurface;
+        typedef DGtal::ExactPredicateLpSeparableMetric<Space,2> MyMetric;
+        typedef DGtal::CanonicSCellEmbedder<KSpace> MyCanonicSCellEmbedder;
+        typedef DGtal::functors::ElementaryConvolutionNormalVectorEstimator<SCell, MyCanonicSCellEmbedder> MySurfelFunctor;
+        typedef RealVector::Component MyScalar;
+        typedef DGtal::functors::HatFunction<MyScalar> MyHatFunctor;
+        typedef DGtal::LocalEstimatorFromSurfelFunctorAdapter<MySetOfSurfels, MyMetric, MySurfelFunctor, MyHatFunctor> TrivialNormalEstimator;
+
+        const MySurfelAdjacency surfel_adjacency(true);
+        MySetOfSurfels surfels_set(kspace, surfel_adjacency);
+        std::copy(surfels.begin(), surfels.end(), std::inserter(surfels_set.surfelSet(), surfels_set.surfelSet().begin()));
+        const MyDigitalSurface digital_surface(surfels_set);
+        trace.info() << "digital_surface_size=" << digital_surface.size() << endl;
+
+        const MyHatFunctor hat_functor(1., radius);
+        const MyCanonicSCellEmbedder canonic_embedder(kspace);
+        MySurfelFunctor surfel_functor(canonic_embedder, 1.);
+        const MyMetric metric;
+
+        TrivialNormalEstimator nt_estimator;
+        nt_estimator.attach(digital_surface);
+        nt_estimator.setParams(metric, surfel_functor, hat_functor, radius);
+        nt_estimator.init(1, surfels.begin(), surfels.end());
+
+        nt_estimator.eval(surfels.begin(), surfels.end(), std::back_inserter(nt_normals_estimations));
+        trace.info() << "nt_estimations_size=" << nt_normals_estimations.size() << endl;
+        ASSERT( nt_normals_estimations.size() == surfels.size() );
+    }
+
+    RealVectors::iterator nt_normals_estimations_iter = nt_normals_estimations.begin();
+    for (RealVector& normal : nii_normals_estimations)
+    {
+        if (nt_normals_estimations_iter->dot(normal) > 0) normal = -normal;
+        nt_normals_estimations_iter++;
+    }
+
+    trace.endBlock();
+
+    return buildFlatVector(nii_normals_estimations);
+}
+
+template <typename Shape>
+std::tuple<Calculus, FlatVector>
+initCalculusAndNormalsWithNoise(const KSpace& kspace, const Shape& shape, const double radius, const double noise)
+{
+    using DGtal::trace;
+    using std::endl;
+
+    if (noise <= 0) return initCalculusAndNormals(kspace, shape, radius);
+
+    typedef DGtal::Z3i::Domain Domain;
+    const Domain domain(kspace.lowerBound(), kspace.upperBound());
+    trace.info() << "noise=" << noise << endl;
+    trace.info() << "domain=" << domain << endl;
+
+    typedef DGtal::KanungoNoise<Shape, Domain> KanungoPredicate;
+    typedef DGtal::functors::DomainPredicate<Domain> DomainPredicate;
+    typedef DGtal::functors::BinaryPointPredicate<DomainPredicate, KanungoPredicate, DGtal::functors::AndBoolFct2> NoisyShape;
+    const KanungoPredicate kanungo_pred(shape, domain, noise);
+    const DomainPredicate domain_pred(domain);
+    const DGtal::functors::AndBoolFct2 and_functor =  DGtal::functors::AndBoolFct2();
+    const NoisyShape noisy_shape(domain_pred, kanungo_pred, and_functor);
+
+    return initCalculusAndNormals(kspace, noisy_shape, radius);
+}
+
+template <typename Shape>
+std::tuple<Calculus, FlatVector>
+initCalculusAndNormals(const KSpace& kspace, const Shape& shape, const double radius)
+{
+    Calculus calculus = createCalculusFromShapeBorder(kspace, shape);
+    FlatVector normals = computeFaceNormals(calculus, shape, radius);
+    return std::make_tuple(calculus, normals);
+}
+
+

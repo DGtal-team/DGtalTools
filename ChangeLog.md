@@ -1,37 +1,78 @@
 # DGtalTools 0.9.4
 
+- *converters*
+
+
+   - mesh2vol: add option to add margin in the generated volume
+     (to better extract the surfel boudary near domain limits).  
+     (Bertrand Kerautret, [#322](https://github.com/DGtal-team/pull/322))
+   - vol2vox/vox2vol: tools to convert vol file to a MagicaVoxel VOX file and
+   conversly. (David  Coeurjolly,
+   [#314](https://github.com/DGtal-team/pull/314))
+   - volAddNoise moved to ```volumetric/```. (David  Coeurjolly,
+   [#300](https://github.com/DGtal-team/pull/300))
+   - segfault fix in volBoundary2obj (David Coeurjolly,
+   [#317](https://github.com/DGtal-team/pull/317))
+   - Fix the bad surfel display of volBoundary2obj (issue #320)
+   (Bertrand Kerautret, [#321](https://github.com/DGtal-team/pull/321))
+   
+- *volumetric*
+   - new option to volAddNoise to extract the largest 6-connected
+   component. (David  Coeurjolly,
+   [#300](https://github.com/DGtal-team/pull/300))
+   - new option to 3dVolMarchingCubes to add some Kanungo noise to the
+   input vol file. (David  Coeurjolly,
+   [#300](https://github.com/DGtal-team/pull/300))
+   - Add thinning based of Critical Kernels using VoxelComplex.
+   Based on [DGtal PR 1147](https://github.com/DGtal-team/DGtal/pull/1147)
+   (Pablo Hernandez, [#311](https://github.com/DGtal-team/pull/311))
+
 - *visualisation*:
-  - Improve visualisation tools (vol2heightfield, vol2obj, vol2raw, vol2sdp, vol2slice, volBoundary2obj, 3dImageViewer, 3dVolViewer, sliceViewer, Viewer3DImage)
-    allowing to read longvol including rescaling.
-    (Bertrand Kerautret, [#296](https://github.com/DGtal-team/DGtalTools/pull/296))
+  - New tool for mesh voxelization from a mesh in input (.off)
+    to a volumetric output (vol, pgm3d)
+    
+  - 2dCompImage : Computes and displays image comparisons (squared and absolute 
+    differences) (Monir Hadji [#279](https://github.com/DGtal-team/DGtalTools/pull/279)
+    (Bertrand Kerautret, [#313](https://github.com/DGtal-team/DGtalTools/pull/313))
+  - Improve visualisation tools (vol2heightfield, vol2obj, vol2raw, vol2sdp, 
+    vol2slice,volBoundary2obj,3dImageViewer, 3dVolViewer, sliceViewer, Viewer3DImage) 
+    allowing to read longvol including rescaling. (Bertrand Kerautret, 
+    [#296](https://github.com/DGtal-team/DGtalTools/pull/296))
+  - Add an option to filter vector displayed in 3dSDPViewer.
+   (Bertrand Kerautret, [#297](https://github.com/DGtal-team/DGtalTools/pull/297))
+
   - meshViewer: add an option to set the ambient light source.
-    (Bertrand Kerautret, [#301](https://github.com/DGtal-team/DGtalTools/pull/301))
-  - 3dSDPViewer: new option to display vector field as unit vector
+    (Bertrand Kerautret, [#303](https://github.com/DGtal-team/DGtalTools/pull/303))
+  - 3dSDPViewer: new option to display vector field as unit vectors.
     (Bertrand Kerautret, [#301](https://github.com/DGtal-team/DGtalTools/pull/304))
 
 - *converters*:
   - sdp2vol: add the automatic set of the domain according to the
     bouding box of the set of points.    (Bertrand Kerautret,
     [#305](https://github.com/DGtal-team/DGtalTools/pull/305))
-  
-# DGtalTools 0.9.3
 
-- *visualisation*:
-  - Add an option to filter vector displayed in 3dSDPViewer.
-  (Bertrand Kerautret, [#296](https://github.com/DGtal-team/pull/296)
+
+
+- *global*:
+  - Fix travis Doxygen compilation for non Documention mode.
+    (Bertrand Kerautret, [#314](https://github.com/DGtal-team/DGtalTools/pull/314))
+  - Fix travis with boost installation which now use std package.
+    (Bertrand Kerautret, [#310](https://github.com/DGtal-team/DGtalTools/pull/310))
+  - Fix for the last QGLViewer version (2.7).
+    (Bertrand Kerautret, [#308](https://github.com/DGtal-team/DGtalTools/pull/308))
 
 
 # DGtalTools 0.9.3
 
 - *global*:
    - Various fixes to enable the new Version3 (compressed) Vol/Longvol files.
-     (David Coeurjolly, [#287](https://github.com/DGtal-team/pull/287))
+     (David Coeurjolly, [#287](https://github.com/DGtal-team/DGtalTools/pull/287))
    - Fix Appveyor continuous integration with zlib installation and boost fix.
      (Bertrand Kerautret, [#289](https://github.com/DGtal-team/DGtalTools/pull/289))
-   
+
 - *imageProcessing*:
-   - Creates imageProcessing directory. Add tools for doing image restoration 
-     and inpainting with Ambrosio-Tortorelli functional and discrete calculus. 
+   - Creates imageProcessing directory. Add tools for doing image restoration
+     and inpainting with Ambrosio-Tortorelli functional and discrete calculus.
      (Jacques-Olivier Lachaud, Marion Foare
      [#280](https://github.com/DGtal-team/DGtalTools/pull/280))
 
@@ -56,8 +97,11 @@
      (Bertrand Kerautret, [#285](https://github.com/DGtal-team/DGtalTools/pull/285))
     - tangentBC: add an option to read sdp points as input.
      (Bertrand Kerautret, [#285](https://github.com/DGtal-team/DGtalTools/pull/288))
-    
-    
+    - volSurfaceRegularization: a tool to compute a regularized quadrangulation from
+     from a digital surface.
+     (Pierre Gueth, David Coeurjolly, [#306](https://github.com/DGtal-team/DGtalTools/pull/306))
+
+
 # DGtalTools 0.9.2
 
 - *global*:

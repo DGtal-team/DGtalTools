@@ -221,8 +221,12 @@ Galleries
    <td align=center ><a href="http://dgtal.org/doc/tools/nightly/volTrValues.html"> volTrValues </a> </td>
    <td align=center ><a href="http://dgtal.org/doc/tools/nightly/volSegment.html"> volSegment </a> </td>
    </tr>
+   <tr>
+   <td align=center > <img width=300 src="https://raw.github.com/phcerdan/DGtalTools/thin_criticalkernel/doc/images/resCriticalKernelsThinning3D_select-first_skel-1isthmus_persistence-1.png"> </td>
+   </tr>
+   <tr>
+   <!-- <td align=center  ><a href="https://raw.github.com/DGtal&#45;team/DGtalTools/master/doc/images/resCriticalKernelsThinning3D_select&#45;first_skel&#45;1isthmus_persistence&#45;1.png"> criticalKernelsThinning3D </a> </td> -->
+   <td align=center  ><a href="http://dgtal.org/doc/tools/nightly/criticalKernels3D.html"> criticalKernelsThinning3D </a> </td>
+   </tr>
    </table>
    </center>
-
-
-

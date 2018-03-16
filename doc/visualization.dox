@@ -19,7 +19,7 @@
 @section visualization_Doc Visualization
 
 
-
+  - @ref Doc2dCompImage : compare images and displays differences (squared and absolute differences). 
   - @ref CompSurfelData : computes generic scalar surfel data comparisons (squared error) ( given from an input data file and from a reference one). 
   - @ref Doc3DCurvatureViewer :  permits to compute and visualize mean or gaussian curvature of binary shapes.   
   - @ref Doc3DCurvatureViewerNoise :  same as @ref Doc3DCurvatureViewer, but allows to add some noise to objects. 

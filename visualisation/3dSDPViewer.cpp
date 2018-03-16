@@ -444,25 +444,30 @@ int main( int argc, char** argv )
           double percentage = vm["filterVectors"].as<double>();
           step = max(1, (int) (100/percentage));
         }
-      if(useUnitVector){
+      if(useUnitVector)
+      {
         for(unsigned int i =0; i< std::min(vectVoxels.size(), vectorsPt.size()); i=i+2*step)
-          {
-            viewer.addLine(vectVoxels.at(i), vectVoxels.at(i)+vectorsPt.at(i)*constantNorm, lineSize);
-          }
-      }else{
+        {
+          viewer.addLine(vectVoxels.at(i), vectVoxels.at(i)+vectorsPt.at(i)*constantNorm, lineSize);
+        }
+      }
+      else
+      {
         for(unsigned int i =0; i<vectorsPt.size()-1; i=i+2*step)
-          {
-            viewer.addLine(vectorsPt.at(i),vectorsPt.at(i+1), lineSize);
-          }
+        {
+          viewer.addLine(vectorsPt.at(i),vectorsPt.at(i+1), lineSize);
+        }
       }
       
     }
     if(vm.count("addMesh"))
     {
       bool customColorMesh =  vm.count("customColorMesh");
-      if(customColorMesh){
+      if(customColorMesh)
+      {
         std::vector<unsigned int > vectCol = vm["customColorMesh"].as<std::vector<unsigned int> >();
-        if(vectCol.size()!=4){
+        if(vectCol.size()!=4)
+        {
           trace.error() << "colors specification should contain R,G,B and Alpha values"<< std::endl;
         }
         viewer.setFillColor(DGtal::Color(vectCol[0], vectCol[1], vectCol[2], vectCol[3]));
