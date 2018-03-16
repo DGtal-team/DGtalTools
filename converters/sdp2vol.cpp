@@ -138,13 +138,13 @@ int main( int argc, char** argv )
  
   struct BBCompPoints
   {
-    BBCompPoints(unsigned int d): myDim(d){};
+    explicit BBCompPoints(unsigned int d): myDim(d){};
     bool operator() (const Z3i::Point &p1, const Z3i::Point &p2){return p1[myDim]<p2[myDim];};
     unsigned int myDim;
   };
-  unsigned int marge = 1;
   if(!vm.count("domain"))
   {
+    unsigned int marge = 1;
     for(unsigned int i=0; i< 4; i++)
     {
       BBCompPoints cmp_points(i);
