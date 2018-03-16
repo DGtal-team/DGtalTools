@@ -1,4 +1,6 @@
 language: cpp
+dist: trusty
+
 
 
 sudo: false
@@ -72,7 +74,6 @@ before_script:
   - if [ $DOC == "true" ]; then openssl aes-256-cbc -K $encrypted_47769ec71275_key -iv $encrypted_47769ec71275_iv -in .travis/dgtal_rsa.enc -out .travis/dgtal_rsa -d; chmod 600 .travis/dgtal_rsa; BUILD_DOC="true"; fi
   - if [ $DOC == "true" ]; then .travis/install_doxygen.sh;  BTYPE="-DDOXYGEN_EXECUTABLE=$HOME/doxygen/doxygen-1.8.10/bin/doxygen -DCMAKE_BUILD_TYPE=Debug -DWITH_CAIRO=true  -DWITH_GMP=true";  fi
   - if [ $DOC == "true" ]; then wget http://dgtal.org/doc/tags/DGtal-tagfile --no-check-certificate ;fi
-
 
 
 script:
