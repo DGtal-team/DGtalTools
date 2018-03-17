@@ -62,7 +62,7 @@ before_install:
 
 before_script:
   - DGTALTYPE="-DBUILD_EXAMPLES=OFF -DDGTAL_BUILD_TESTING=OFF -DCMAKE_BUILD_TYPE=Debug -DWITH_QGLVIEWER=false -DWITH_ITK=false"
-  - if [ $CONFIG=="Debug,QGLVIEWER"]; then export DGTALTYPE="-DBUILD_EXAMPLES=OFF -DDGTAL_BUILD_TESTING=OFF -DCMAKE_BUILD_TYPE=Debug -DWITH_QGLVIEWER=true -DWITH_ITK=false"; fi
+  - if [ $CONFIG == "Debug,QGLVIEWER" ]; then export DGTALTYPE="-DBUILD_EXAMPLES=OFF -DDGTAL_BUILD_TESTING=OFF -DCMAKE_BUILD_TYPE=Debug -DWITH_QGLVIEWER=true -DWITH_ITK=false"; fi
   - ccache -V && ccache --show-stats && ccache --zero-stats
   - 'echo "using gcc : : ccache $CXX : <cflags>-std=c11 <cxxflags>-std=c++11 ;" > ~/user-config.jam'
   - 'echo "using clang : : ccache $CXX : <cflags>-std=c11 <cxxflags>-std=c++11 ;" >> ~/user-config.jam'
@@ -77,6 +77,7 @@ before_script:
 
 
 script:
+   - echo "---- $DGTALTYPE ---$BUILD_DOC---$UPLOAD_DOC"
    - cmake . -DDGtal_DIR=$PWD/DGtal $DGTALTYPE  -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_COMPILER=$CXXCOMPILER -DCMAKE_C_COMPILER=$CCOMPILER 
    - if [ $DOC == "true" ]; then  make doc;  fi
    - if [ $CONFIG == "Debug" ]; then make; fi
