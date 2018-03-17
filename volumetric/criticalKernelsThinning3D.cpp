@@ -26,29 +26,42 @@
 
  @b Allowed @b options @b are :
  @code
-  -h [ --help ]           display this message.
-  -i [ --input ] arg      Input volumetric file (.vol, .pgm3d or p3d)
-  -s [ --skel] arg        Skeletonization: only keep certain voxels                              during thinning.
-                          Options: ulti,end, 1isthmus, isthmus
-ulti: delete all voxels except those that change topology.
-end: keep voxels with only one neighbor.
-1isthmus: keep voxels that are one-isthmus (using LookUpTables) [faster]
-isthmus: keep voxels that are one-isthmus or two-isthmus (using LookUpTables) [faster]
-  -c [ --select] arg      Select: order in which select voxels in the process.
-                          Options: dmax, first, random
-dmax: Use distance map, selecting voxel with max value.
-first: Select first pixel (lexicographical order)
-random: Select voxel at random.
-    --view              Display result using Qt viewer.
-    -e [ --exportSDP ] arg     Export the resulting set of points in a simple
-                             (sequence of discrete point (sdp)).
+  -h [ --help ]                    display this message.
+  -i [ --input ] arg               Input vol file.
+  -s [ --skel] arg                 Skeletonization: only keep certain voxels during thinning.
+                                   Options: ulti,end, 1isthmus, isthmusulti: delete all voxels except those that change topology.
+                                   end: keep voxels with only one neighbor.
+                                   1isthmus: keep voxels that are one-isthmus (using LookUpTables) [faster]
+                                   isthmus: keep voxels that are one-isthmus or two-isthmus (using LookUpTables) [faster]
+
+  -s [ --skel ] arg                type of skeletonization
+  -c [ --select] arg               Select: order in which select voxels in the process.
+                                   Options: dmax, first, random
+                                   dmax: Use distance map, selecting voxel with max value.
+                                   first: Select first pixel (lexicographical order)
+                                   random: Select voxel at random.
+  -f [ --foreground ] arg (=black) foreground color in binary image
+  -m [ --thresholdMin ] arg (=0)   threshold min (excluded) to define binary 
+                                   shape
+  -M [ --thresholdMax ] arg (=255) threshold max (included) to define binary 
+                                   shape
+  -p [ --persistence ] arg (=0)    persistence value, implies use of 
+                                   persistence algorithm if p>=1
+  --profile                        profile algorithm
+  -v [ --verbose ]                 verbose output
+  -o [ --exportImage ] arg         Export the resulting set of points to a 
+                                   image compatible with GenericWriter.
+  -e [ --exportSDP ] arg           Export the resulting set of points in a 
+                                   simple (sequence of discrete point (sdp)).
+  -t [ --visualize ]               visualize result in viewer
+
 
  @endcode
 
  @b Example:
 
 @code
- $  criticalKernelsThinning3D --input ${DGtal}/examples/samples/Al.100.vol --select dmax --skel 1isthmus --persistence 1 --view
+ $  criticalKernelsThinning3D --input ${DGtal}/examples/samples/Al.100.vol --select dmax --skel 1isthmus --persistence 1 -t
  @endcode
 
  You should obtain such a result:
