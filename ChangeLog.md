@@ -5,27 +5,27 @@
 
    - mesh2vol: add option to add margin in the generated volume
      (to better extract the surfel boudary near domain limits).  
-     (Bertrand Kerautret, [#322](https://github.com/DGtal-team/pull/322))
+     (Bertrand Kerautret, [#322](https://github.com/DGtal-team/DGtalTools/pull/322))
    - vol2vox/vox2vol: tools to convert vol file to a MagicaVoxel VOX file and
    conversly. (David  Coeurjolly,
-   [#314](https://github.com/DGtal-team/pull/314))
+   [#314](https://github.com/DGtal-team/DGtalTools/pull/314))
    - volAddNoise moved to ```volumetric/```. (David  Coeurjolly,
-   [#300](https://github.com/DGtal-team/pull/300))
+   [#300](https://github.com/DGtal-team/DGtalTools/pull/300))
    - segfault fix in volBoundary2obj (David Coeurjolly,
-   [#317](https://github.com/DGtal-team/pull/317))
+   [#317](https://github.com/DGtal-team/DGtalTools/pull/317))
    - Fix the bad surfel display of volBoundary2obj (issue #320)
-   (Bertrand Kerautret, [#321](https://github.com/DGtal-team/pull/321))
+   (Bertrand Kerautret, [#321](https://github.com/DGtal-team/DGtalTools/pull/321))
    
 - *volumetric*
    - new option to volAddNoise to extract the largest 6-connected
    component. (David  Coeurjolly,
-   [#300](https://github.com/DGtal-team/pull/300))
+   [#300](https://github.com/DGtal-team/DGtalTools/pull/300))
    - new option to 3dVolMarchingCubes to add some Kanungo noise to the
    input vol file. (David  Coeurjolly,
-   [#300](https://github.com/DGtal-team/pull/300))
+   [#300](https://github.com/DGtal-team/DGtalTools/pull/300))
    - Add thinning based of Critical Kernels using VoxelComplex.
    Based on [DGtal PR 1147](https://github.com/DGtal-team/DGtal/pull/1147)
-   (Pablo Hernandez, [#311](https://github.com/DGtal-team/pull/311))
+   (Pablo Hernandez, [#311](https://github.com/DGtal-team/DGtalTools/pull/311))
 
 - *visualisation*:
   - New tool for mesh voxelization from a mesh in input (.off)
