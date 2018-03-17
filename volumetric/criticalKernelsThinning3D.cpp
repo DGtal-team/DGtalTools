@@ -120,12 +120,13 @@ int main(int argc, char* const argv[]){
 
   try {
     po::store(po::parse_command_line(argc, argv, general_opt), vm);
+    po::notify ( vm );
   } catch(const exception& ex) {
     parseOK=false;
     trace.info()<< "Error checking program options: "<< ex.what()<< std::endl;
   }
-  po::notify ( vm );
-  if (!parseOK || vm.count ( "help" ) || argc<=1 )
+
+  if (!parseOK || vm.count ( "help" ) || !vm.count("input"))
   {
     trace.info() <<
     "Compute the thinning of a volume using the CriticalKernels framework"<< std::endl

@@ -19,6 +19,7 @@
 @section volumetric_Doc Volumetric
 
 
+  - @ref criticalKernelsThinning3D :  applies an criticalKernels thinning algorithm of a 3d image file (vol,longvol,pgm3d...) with 3D viewer.
   - @ref Doc3dVolMarchingCubes : outputs the isosurface of the input volume  as an OFF file. 
   - @ref homotopicThinning3D : applies an homotopic thinning of a 3d image file (vol,longvol,pgm3d...) with 3D viewer.
   - @ref volAddBorder : adds a border of one voxel with value 0 around a vol file.
