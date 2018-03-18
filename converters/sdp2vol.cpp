@@ -90,7 +90,7 @@ int main( int argc, char** argv )
     ("foregroundVal,f", po::value<int>()->default_value(128), "value which will represent the foreground object in the resulting image (default 128)")
     ("invertY", "Invert the Y axis (image flip in the y direction)")
     ("backgroundVal,b", po::value<int>()->default_value(0), "value which will represent the background outside the  object in the resulting image (default 0)")
-    ("domain,d",  po::value<std::vector <int> >()->multitoken(), "defines the domain of the resulting image xmin ymin zmin xmax ymax zmax ");
+    ("domain,d",  po::value<std::vector <int> >()->multitoken(), "customizes the domain of the resulting image xmin ymin zmin xmax ymax zmax (computed automatically by default) ");
   
   bool parseOK=true;
   po::variables_map vm;
