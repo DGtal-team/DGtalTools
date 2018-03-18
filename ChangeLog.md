@@ -46,6 +46,13 @@
   - 3dSDPViewer: new option to display vector field as unit vectors.
     (Bertrand Kerautret, [#301](https://github.com/DGtal-team/DGtalTools/pull/304))
 
+- *converters*:
+  - sdp2vol: add the automatic set of the domain according to the
+    bouding box of the set of points.    (Bertrand Kerautret,
+    [#305](https://github.com/DGtal-team/DGtalTools/pull/305))
+
+
+
 - *global*:
   - Fix travis Doxygen compilation for non Documention mode.
     (Bertrand Kerautret, [#314](https://github.com/DGtal-team/DGtalTools/pull/314))
