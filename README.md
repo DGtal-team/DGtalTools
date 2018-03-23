@@ -26,7 +26,8 @@ own source code (in complement of DGtal tutorial http://liris.cnrs.fr/dgtal/doc/
 More Information
 ----------------
 * Related DGtalTools-contrib: https://github.com/DGtal-team/DGtalTools-contrib
-* Release 0.9.3 DOI [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.290558.svg)](https://doi.org/10.5281/zenodo.290558)
+* Release 0.9.4 DOI [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.1203421.svg)](https://doi.org/10.5281/zenodo.1203421)
+* Release 0.9.3 DOI [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.290554.svg)](https://doi.org/10.5281/zenodo.290554)
 * Release 0.9.2 DOI [![DOI](https://zenodo.org/badge/doi/10.5281/zenodo.56432.svg)](http://dx.doi.org/10.5281/zenodo.56432)
 * Release 0.9.1 DOI [![DOI](https://zenodo.org/badge/doi/10.5281/zenodo.45130.svg)](http://dx.doi.org/10.5281/zenodo.45130)
 * Release 0.9 DOI [![DOI](https://zenodo.org/badge/doi/10.5281/zenodo.31882.svg)](http://dx.doi.org/10.5281/zenodo.31882)
@@ -226,7 +227,7 @@ Galleries
    </tr>
    <tr>
    <!-- <td align=center  ><a href="https://raw.github.com/DGtal&#45;team/DGtalTools/master/doc/images/resCriticalKernelsThinning3D_select&#45;first_skel&#45;1isthmus_persistence&#45;1.png"> criticalKernelsThinning3D </a> </td> -->
-   <td align=center  ><a href="http://dgtal.org/doc/tools/nightly/criticalKernels3D.html"> criticalKernelsThinning3D </a> </td>
+   <td align=center  ><a href="https://dgtal.org/doc/tools/nightly/criticalKernelsThinning3D.html"> criticalKernelsThinning3D </a> </td>
    </tr>
    </table>
    </center>

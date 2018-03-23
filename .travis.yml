@@ -77,9 +77,9 @@ before_script:
 
 
 script:
-   - echo "---- $DGTALTYPE ---$BUILD_DOC---$UPLOAD_DOC $DOC ----"
-   - cmake . -DDGtal_DIR=$PWD/DGtal $DGTALTYPE  -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_COMPILER=$CXXCOMPILER -DCMAKE_C_COMPILER=$CCOMPILER 
-   - if [ $DOC == "true" ]; then  make doc;  echo "doc" fi
+   - echo "---- $DGTALTYPE ---$BUILD_DOC---$UPLOAD_DOC--*$DOC*-$BTYPE---"
+   - cmake . -DDGtal_DIR=$PWD/DGtal $BTYPE $DGTALTYPE  -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_COMPILER=$CXXCOMPILER -DCMAKE_C_COMPILER=$CCOMPILER 
+   - if [ $DOC == "true" ]; then  make doc;  echo "doc"; fi
    - if [ $CONFIG == "Debug" ]; then make; fi
    - if [ $CONFIG == "Debug,QGLVIEWER" ]; then make; fi
 

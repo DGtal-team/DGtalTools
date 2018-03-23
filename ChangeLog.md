@@ -2,7 +2,6 @@
 
 - *converters*
 
-
    - mesh2vol: add option to add margin in the generated volume
      (to better extract the surfel boudary near domain limits).  
      (Bertrand Kerautret, [#322](https://github.com/DGtal-team/DGtalTools/pull/322))
@@ -30,9 +29,9 @@
 - *visualisation*:
   - New tool for mesh voxelization from a mesh in input (.off)
     to a volumetric output (vol, pgm3d)
-    
+    (Monir Hadji, [#279](https://github.com/DGtal-team/DGtalTools/pull/279)
   - 2dCompImage : Computes and displays image comparisons (squared and absolute 
-    differences) (Monir Hadji [#279](https://github.com/DGtal-team/DGtalTools/pull/279)
+    differences) 
     (Bertrand Kerautret, [#313](https://github.com/DGtal-team/DGtalTools/pull/313))
   - Improve visualisation tools (vol2heightfield, vol2obj, vol2raw, vol2sdp, 
     vol2slice,volBoundary2obj,3dImageViewer, 3dVolViewer, sliceViewer, Viewer3DImage) 
@@ -45,6 +44,13 @@
     (Bertrand Kerautret, [#303](https://github.com/DGtal-team/DGtalTools/pull/303))
   - 3dSDPViewer: new option to display vector field as unit vectors.
     (Bertrand Kerautret, [#301](https://github.com/DGtal-team/DGtalTools/pull/304))
+
+- *converters*:
+  - sdp2vol: add the automatic set of the domain according to the
+    bouding box of the set of points.    (Bertrand Kerautret,
+    [#305](https://github.com/DGtal-team/DGtalTools/pull/305))
+
+
 
 - *global*:
   - Fix travis Doxygen compilation for non Documention mode.
