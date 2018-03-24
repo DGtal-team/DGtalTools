@@ -1,12 +1,10 @@
 language: cpp
 dist: trusty
-
-
-
 sudo: false
 
 os:
   - linux
+  - osx
 
 compiler:
   - gcc
@@ -28,6 +26,8 @@ matrix:
     - compiler: gcc
       os: linux
       env: CONFIG="DOCUMENTATION"
+    - os: osx
+      compiler: gcc
 
 addons:
   apt:
@@ -57,22 +57,23 @@ before_install:
   - env
   - export SRC_DIR="`pwd`"
   - if [ $CXX == "g++" ]; then export CXX="g++-4.8"  CC="gcc-4.8"  CCOMPILER="gcc-4.8" CXXCOMPILER="g++-4.8"; fi
+  - source .travis/install_eigen.sh  ; cd $TRAVIS_BUILD_DIR;
 
-  # Manual boost install since linking fails with libboost-program-options1.46-dev and g++48
+# Manual boost install since linking fails with libboost-program-options1.46-dev and g++48
 
 before_script:
-  - DGTALTYPE="-DBUILD_EXAMPLES=OFF -DDGTAL_BUILD_TESTING=OFF -DCMAKE_BUILD_TYPE=Debug -DWITH_QGLVIEWER=false -DWITH_ITK=false"
-  - if [ $CONFIG == "Debug,QGLVIEWER" ]; then export DGTALTYPE="-DBUILD_EXAMPLES=OFF -DDGTAL_BUILD_TESTING=OFF -DCMAKE_BUILD_TYPE=Debug -DWITH_QGLVIEWER=true -DWITH_ITK=false"; fi
-  - ccache -V && ccache --show-stats && ccache --zero-stats
-  - 'echo "using gcc : : ccache $CXX : <cflags>-std=c11 <cxxflags>-std=c++11 ;" > ~/user-config.jam'
-  - 'echo "using clang : : ccache $CXX : <cflags>-std=c11 <cxxflags>-std=c++11 ;" >> ~/user-config.jam'
+  - if [ $TRAVIS_OS_NAME == linux ]; then echo "All done.";   fi
+  - if [ $TRAVIS_OS_NAME == osx ]; then source .travis/install_deps_macos.sh; fi
+  - DGTALTYPE="-DBUILD_EXAMPLES=OFF -DDGTAL_BUILD_TESTING=OFF -DCMAKE_BUILD_TYPE=Debug -DWITH_QGLVIEWER=false -DWITH_ITK=false -DWITH_EIGEN=true -DEIGEN3_INCLUDE_DIR='$EIGEN_ROOT/include/eigen3'"
+  - if [ $CONFIG == "Debug,QGLVIEWER" AND  $TRAVIS_OS_NAME == osx  ]; then export DGTALTYPE="-DBUILD_EXAMPLES=OFF -DDGTAL_BUILD_TESTING=OFF -DCMAKE_BUILD_TYPE=Debug -DWITH_QGLVIEWER=true -DWITH_QT5=true -DWITH_ITK=false -DWITH_EIGEN=true -DEIGEN3_INCLUDE_DIR='$EIGEN_ROOT/include/eigen3'"; fi
+  - if [ $CONFIG == "Debug,QGLVIEWER" AND  $TRAVIS_OS_NAME == linux  ]; then export DGTALTYPE="-DBUILD_EXAMPLES=OFF -DDGTAL_BUILD_TESTING=OFF -DCMAKE_BUILD_TYPE=Debug -DWITH_QGLVIEWER=true  -DWITH_ITK=false -DWITH_EIGEN=true -DEIGEN3_INCLUDE_DIR='$EIGEN_ROOT/include/eigen3'"; fi
   - cd $SRC_DIR
   - git clone --depth=1 git://github.com/DGtal-team/DGtal.git
   - cd DGtal
   - cmake . $DGTALTYPE -DCMAKE_CXX_COMPILER=$CXXCOMPILER -DCMAKE_C_COMPILER=$CCOMPILER 
   - make
   - cd ..
-  - if [ $DOC == "true" ]; then .travis/install_doxygen.sh;  BTYPE="-DDOXYGEN_EXECUTABLE=$HOME/doxygen/doxygen-1.8.10/bin/doxygen -DCMAKE_BUILD_TYPE=Debug -DWITH_CAIRO=true  -DWITH_GMP=true";  fi
+  - if [ $DOC == "true" ]; then .travis/install_doxygen.sh;  BTYPE="-DDOXYGEN_EXECUTABLE=$HOME/doxygen/doxygen-1.8.10/bin/doxygen -DCMAKE_BUILD_TYPE=Debug -DWITH_CAIRO=true  -DWITH_GMP=true -DWITH_EIGEN=true";  fi
   - if [ $DOC == "true" ]; then wget http://dgtal.org/doc/tags/DGtal-tagfile --no-check-certificate ;fi
 
 
