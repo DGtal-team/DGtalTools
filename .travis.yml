@@ -7,6 +7,7 @@ sudo: false
 
 os:
   - linux
+  - osx
 
 compiler:
   - gcc
@@ -28,6 +29,8 @@ matrix:
     - compiler: gcc
       os: linux
       env: CONFIG="DOCUMENTATION"
+    - os: osx
+      compiler: gcc
 
 addons:
   apt:
@@ -49,6 +52,9 @@ addons:
     - libboost-program-options-dev
     - libboost-system-dev
 
+before_script:
+  - if [ $TRAVIS_OS_NAME == linux ]; then echo "All done.";   fi
+  - if [ $TRAVIS_OS_NAME == osx ]; then source .travis/install_deps_macos.sh; fi
 
 before_install:
   - DOC="false"; BTYPE=""
