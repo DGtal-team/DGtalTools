@@ -65,7 +65,8 @@ before_script:
   - if [ $TRAVIS_OS_NAME == linux ]; then echo "All done.";   fi
   - if [ $TRAVIS_OS_NAME == osx ]; then source .travis/install_deps_macos.sh; fi
   - DGTALTYPE="-DBUILD_EXAMPLES=OFF -DDGTAL_BUILD_TESTING=OFF -DCMAKE_BUILD_TYPE=Debug -DWITH_QGLVIEWER=false -DWITH_ITK=false -DWITH_EIGEN=true -DEIGEN3_INCLUDE_DIR='$EIGEN_ROOT/include/eigen3'"
-  - if [ $CONFIG == "Debug,QGLVIEWER" ]; then export DGTALTYPE="-DBUILD_EXAMPLES=OFF -DDGTAL_BUILD_TESTING=OFF -DCMAKE_BUILD_TYPE=Debug -DWITH_QGLVIEWER=true -DWITH_QT5=true -DWITH_ITK=false -DWITH_EIGEN=true -DEIGEN3_INCLUDE_DIR='$EIGEN_ROOT/include/eigen3'"; fi
+  - if [ $CONFIG == "Debug,QGLVIEWER" AND  $TRAVIS_OS_NAME == osx  ]; then export DGTALTYPE="-DBUILD_EXAMPLES=OFF -DDGTAL_BUILD_TESTING=OFF -DCMAKE_BUILD_TYPE=Debug -DWITH_QGLVIEWER=true -DWITH_QT5=true -DWITH_ITK=false -DWITH_EIGEN=true -DEIGEN3_INCLUDE_DIR='$EIGEN_ROOT/include/eigen3'"; fi
+  - if [ $CONFIG == "Debug,QGLVIEWER" AND  $TRAVIS_OS_NAME == linux  ]; then export DGTALTYPE="-DBUILD_EXAMPLES=OFF -DDGTAL_BUILD_TESTING=OFF -DCMAKE_BUILD_TYPE=Debug -DWITH_QGLVIEWER=true  -DWITH_ITK=false -DWITH_EIGEN=true -DEIGEN3_INCLUDE_DIR='$EIGEN_ROOT/include/eigen3'"; fi
   - cd $SRC_DIR
   - git clone --depth=1 git://github.com/DGtal-team/DGtal.git
   - cd DGtal
