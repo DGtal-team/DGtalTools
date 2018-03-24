@@ -12,7 +12,6 @@ compiler:
 
 cache: apt
 
-
 env:
   - CONFIG="Debug,QGLVIEWER"
   - CONFIG="Debug"
