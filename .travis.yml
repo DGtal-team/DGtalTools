@@ -12,6 +12,7 @@ compiler:
 
 cache: apt
 
+
 env:
   - CONFIG="Debug,QGLVIEWER"
   - CONFIG="Debug"
@@ -48,9 +49,6 @@ addons:
     - libboost-program-options-dev
     - libboost-system-dev
 
-before_script:
-  - if [ $TRAVIS_OS_NAME == linux ]; then echo "All done.";   fi
-  - if [ $TRAVIS_OS_NAME == osx ]; then source .travis/install_deps_macos.sh; fi
 
 before_install:
   - DOC="false"; BTYPE=""
@@ -64,10 +62,10 @@ before_install:
 # Manual boost install since linking fails with libboost-program-options1.46-dev and g++48
 
 before_script:
+  - if [ $TRAVIS_OS_NAME == linux ]; then echo "All done.";   fi
+  - if [ $TRAVIS_OS_NAME == osx ]; then source .travis/install_deps_macos.sh; fi
   - DGTALTYPE="-DBUILD_EXAMPLES=OFF -DDGTAL_BUILD_TESTING=OFF -DCMAKE_BUILD_TYPE=Debug -DWITH_QGLVIEWER=false -DWITH_ITK=false -DWITH_EIGEN=true -DEIGEN3_INCLUDE_DIR='$EIGEN_ROOT/include/eigen3'"
-  - if [ $CONFIG == "Debug,QGLVIEWER" ]; then export DGTALTYPE="-DBUILD_EXAMPLES=OFF -DDGTAL_BUILD_TESTING=OFF -DCMAKE_BUILD_TYPE=Debug -DWITH_QGLVIEWER=true -DWITH_ITK=false -DWITH_EIGEN=true -DEIGEN3_INCLUDE_DIR='$EIGEN_ROOT/include/eigen3'"; fi
-  - ccache -V && ccache --show-stats && ccache --zero-stats
-  - if [ $TRAVIS_OS_NAME == linux ]; then echo "All done."; 'echo "using gcc : : ccache $CXX : <cflags>-std=c11 <cxxflags>-std=c++11 ;" > ~/user-config.jam'; 'echo "using clang : : ccache $CXX : <cflags>-std=c11 <cxxflags>-std=c++11 ;" >> ~/user-config.jam' fi
+  - if [ $CONFIG == "Debug,QGLVIEWER" ]; then export DGTALTYPE="-DBUILD_EXAMPLES=OFF -DDGTAL_BUILD_TESTING=OFF -DCMAKE_BUILD_TYPE=Debug -DWITH_QGLVIEWER=true -DWITH_QT5=true -DWITH_ITK=false -DWITH_EIGEN=true -DEIGEN3_INCLUDE_DIR='$EIGEN_ROOT/include/eigen3'"; fi
   - cd $SRC_DIR
   - git clone --depth=1 git://github.com/DGtal-team/DGtal.git
   - cd DGtal
