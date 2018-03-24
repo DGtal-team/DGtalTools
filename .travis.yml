@@ -61,8 +61,8 @@ before_install:
   # Manual boost install since linking fails with libboost-program-options1.46-dev and g++48
 
 before_script:
-  - DGTALTYPE="-DBUILD_EXAMPLES=OFF -DDGTAL_BUILD_TESTING=OFF -DCMAKE_BUILD_TYPE=Debug -DWITH_QGLVIEWER=false -DWITH_ITK=false"
-  - if [ $CONFIG == "Debug,QGLVIEWER" ]; then export DGTALTYPE="-DBUILD_EXAMPLES=OFF -DDGTAL_BUILD_TESTING=OFF -DCMAKE_BUILD_TYPE=Debug -DWITH_QGLVIEWER=true -DWITH_ITK=false"; fi
+  - DGTALTYPE="-DBUILD_EXAMPLES=OFF -DDGTAL_BUILD_TESTING=OFF -DCMAKE_BUILD_TYPE=Debug -DWITH_QGLVIEWER=false -DWITH_ITK=false -DWITH_EIGEN=true"
+  - if [ $CONFIG == "Debug,QGLVIEWER" ]; then export DGTALTYPE="-DBUILD_EXAMPLES=OFF -DDGTAL_BUILD_TESTING=OFF -DCMAKE_BUILD_TYPE=Debug -DWITH_QGLVIEWER=true -DWITH_ITK=false -DWITH_EIGEN=true"; fi
   - ccache -V && ccache --show-stats && ccache --zero-stats
   - 'echo "using gcc : : ccache $CXX : <cflags>-std=c11 <cxxflags>-std=c++11 ;" > ~/user-config.jam'
   - 'echo "using clang : : ccache $CXX : <cflags>-std=c11 <cxxflags>-std=c++11 ;" >> ~/user-config.jam'
