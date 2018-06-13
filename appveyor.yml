@@ -8,7 +8,7 @@ environment:
     B_NAME: Win32
     BOOST_LIBRARYDIR: "C:\\Libraries\\boost_1_59_0\\lib32-msvc-14.0"
     CONFIGQGL: Release
-    QTDIR: C:\Qt\5.4\msvc2013_opengl 
+    QTDIR: C:\Qt\5.10.1\msvc2013_64
 
 #  - VS_GEN: Visual Studio 14 2015 Win64
 #    CONFIG: Release
