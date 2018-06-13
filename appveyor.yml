@@ -1,7 +1,7 @@
 version: 0.9beta.{build}
 
 environment:
-  BOOST_ROOT: "C:\\Libraries\\boost_1_59_0"
+  BOOST_ROOT: "C:\\Libraries\\boost_1_63_0"
   matrix:
   - VS_GEN: Visual Studio 14 2015
     CONFIG: RelWithDebInfo
