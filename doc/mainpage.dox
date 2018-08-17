@@ -1,0 +1,143 @@
+
+/**
+ * @mainpage DGtalTools - Digital Geometry Tools and Algorithms Library.
+
+
+DGtalTools is a separate github project containing tools constructed
+using DGtal library. The main goal of this part is to gather simple
+and useful tools exploiting the structures and algorithms defined in
+DGtal. The resulting tools could be useful to:
+
+- Share and apply DGtal algorithms to various data from different domains.
+
+- Construct demonstration tools like online demonstrations (as for instance the one of the Image Processing Online (http://www.ipol.im)
+
+- Simplify comparisons of different algorithms with an single framework.
+
+- Provide useful tools of digital image related algorithms (extraction
+  of connected components, digital contour/surface extraction, simple
+  visualization tools ... etc).
+
+
+
+The source code of the tools can also be used to non DGtal familiar
+user to show how to include the DGtal library framework directly in their
+own source code (in complement of DGtal tutorial http://liris.cnrs.fr/dgtal/doc/nightly/packageTutorials.html).
+
+
+@section Organisation
+
+Actually the DGTal project is organized as follows:
+
+ - [Converters](\ref converters)
+
+ - [Estimators](\ref estimators_Doc)
+
+ - [Generators](\ref generators)
+
+ - [Visualization](\ref visualization)
+
+ - [Volumetric](\ref volumetric_Doc)
+
+ - [Image Processing](\ref imageprocessing_Doc)
+
+
+   <center>
+    <table>
+    <tr bgcolor="#FAFFFA">
+    <td align = center colspan="3" vertical-align=middle> Example of tools of section  @ref converters : </td>
+    </tr>
+    <tr>
+    <td> <img height=150px src="resVol2sdp.png"> </td>
+        <td><img height=150px src="resMesh2heightfield.png"></td>
+        <td><img height=150px src="resVolAddnoise.png"></td>
+    </tr>
+    <tr>
+           <td align = center>@ref vol2sdp </td>
+           <td align = center>@ref mesh2heightfield </td>
+           <td align = center>@ref volAddNoise</td>
+   </tr>
+
+    <tr bgcolor="#FAFFFA">
+   <td align = center colspan="3" vertical-align=middle> Example of tools of section @ref estimators_Doc : </td>
+   </tr>
+   <tr>
+   <td>    <img height=150px src="res3dCurveTangentEstimator.png"> </td>
+           <td><img height=150px src="res2dLocalEstimators.png"></td>
+           <td><img height=150px src="resGeneric3dNormalEstimatorsII.png"></td>
+   </tr>
+      <tr>
+           <td align = center>@ref Doc3dCurveTangentEstimator </td>
+           <td align = center>@ref Doc2dLocalEstimators </td>
+           <td align = center>@ref generic3dNormalEstimators</td>
+   </tr>
+
+
+
+   <tr bgcolor="#FAFFFA">
+    <td align = center colspan="3" vertical-align=middle> Example of tools of section @ref generators : </td>
+   </tr>
+   <tr>
+   <td center colspan="2">
+           <img height=150px src="resContourGenerator.png"> </td>
+           <td><img height=150px src="resShapeGenerator.png"></td>
+   </tr>
+      <tr>
+           <td align = center colspan="2"> @ref  contourGenerator </td>
+           <td align = center> @ref shapeGenerator </td>
+   </tr>
+
+
+   <tr bgcolor="#FAFFFA">
+    <td align = center colspan="3" vertical-align=middle> Example of tools of section @ref visualization_Doc : </td>
+   </tr>
+   <tr>
+   <td><img height=150px src="res3dCurvatureViewerNoise.png"> </td>
+   <td><img height=150px src="res3dVolViewer.png"></td>
+   <td><img height=150px src="resSliceViewer.png"></td>
+
+   </tr>
+      <tr>
+           <td align = center>@ref Doc3DCurvatureViewerNoise </td>
+           <td align = center>@ref Doc3dVolViewer </td>
+           <td align = center>@ref sliceViewer </td>
+</tr>
+
+
+   <tr bgcolor="#FAFFFA">
+    <td align = center colspan="3" vertical-align=middle> Example of tools of section @ref volumetric_Doc : </td>
+   </tr>
+   <tr>
+   <td><img height=150px src="res3dVolMarchingCubes2.png"> </td>
+   <td><img height=150px src="resHomotopicThinning3D.png"></td>
+   <td><img height=150px src="resVolReSample.png"></td>
+
+   </tr>
+      <tr>
+           <td align = center>@ref Doc3dVolMarchingCubes </td>
+           <td align = center>@ref homotopicThinning3D </td>
+           <td align = center>@ref volReSample </td>
+</tr>
+
+<tr bgcolor="#FAFFFA">
+    <td align = center colspan="3" vertical-align=middle> Example of tools of @ref imageProcessing : </td>
+   </tr>
+   <tr>
+   <td><img height=150px src="barbara-cropped-b01.png"> </td>
+   <td><img height=150px src="barbara-cropped-b01-l0.0054088-a1.0-u0-v1-u.png"></td>
+   <td></td>
+   </tr>
+      <tr>
+           <td align = center>Input image </td>
+           <td align = center>@ref DocATu2v0, @ref DocATu0v1 </td>
+           <td align = center> </td>
+      </tr>
+
+  </table>
+   </center>
+
+
+
+
+
+*/

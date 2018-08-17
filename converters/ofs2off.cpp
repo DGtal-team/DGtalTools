@@ -42,6 +42,29 @@
 using namespace std;
 using namespace DGtal;
 
+/**
+ @page ofs2off ofs2off
+ @brief  Convert OFS file into OFF mesh format.
+
+@b Usage: ofs2off [input] [output]
+
+@b Allowed @b options @b are:
+
+@code
+  -h [ --help ]         display this message
+  -i [ --input ] arg    ofs file (.ofs) 
+  -o [ --output ] arg   ofs file (.off) 
+@endcode
+
+@b Example:
+@code
+  $ ofs2off -i input.ofs -o output.off 
+@endcode
+
+@see ofs2off.cpp
+
+*/
+
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace po = boost::program_options;

@@ -15,7 +15,7 @@
  **/
 /**
  * @file curvatureMCMS.cpp
- * @ingroup Tools
+ * @ingroup estimators
  * @author Tristan Roussillon (\c tristan.roussillon@liris.cnrs.fr ) 
  * Laboratoire d'InfoRmatique en Image et Systèmes d'information - LIRIS (CNRS, UMR 5205), CNRS,
  * France
@@ -59,6 +59,52 @@
 
 using namespace DGtal;
 using namespace std;
+
+
+/**
+ @page curvatureMCMS curvatureMCMS
+ 
+ @brief Estimates curvature using length of most centered segment computers.
+
+ @b Usage:  curvatureMCMS [options] --input  <fileName> 
+
+
+ @b Allowed @b options @b are : 
+ @code
+  -h [ --help ]              display this message
+  -i [ --input ] arg         input FreemanChain file name
+  -s [ --GridStep ] arg (=1) Grid step
+
+ @endcode
+
+ @b Example: 
+We consider as input shape the freeman chain of the DGtal/examples/sample directory. The contour can be displayed with @ref displayContours : 
+ @code
+$  displayContours -i $DGtal/examples/samples/contourS.fc -o contourS.png  --drawPointOfIndex 0
+ @endcode
+
+The curvature can be computed as follows:
+@code 
+$ curvatureMCMS -i $DGtal/examples/samples/contourS.fc  > curvatureMCMS.dat
+$ gnuplot 
+gnuplot> plot 'curvatureMCMS.dat' w lines title "curvature using length of most centered segment computers estimator"
+@endcode
+
+
+
+ You should obtain such a result:
+
+ | contour  | curvature  | 
+ | :------: | :--------: |   
+ | ![ ](resCurvatureBCcontour.png)  | ![ ](resCurvatureMCMS.png)  |
+ | CCW oriented (index 0=blue pt)| resulting curvature |
+ 
+ @see
+ @ref curvatureMCMS.cpp
+
+ */
+
+
 
 ///////////////////////////////////////////////////////////////////////////////
 /*
@@ -114,7 +160,7 @@ int main( int argc, char** argv )
   po::options_description general_opt("Allowed options are");
   general_opt.add_options()
     ("help,h", "display this message")
-    ("FreemanChain,f", po::value<std::string>(), "FreemanChain file name")
+    ("input,i", po::value<std::string>(), "input FreemanChain file name")
     ("GridStep,step", po::value<double>()->default_value(1.0), "Grid step");
   
   
@@ -128,11 +174,11 @@ int main( int argc, char** argv )
   }
 
   po::notify(vm);    
-  if(!parseOK || vm.count("help")||argc<=1 || (!(vm.count("FreemanChain"))) )
+  if(!parseOK || vm.count("help")||argc<=1 || (!(vm.count("input"))) )
     {
-      trace.info() << "Curvature using length of most centered segment computers " << std::endl; 
+      trace.info() << "Estimates curvature using length of most centered segment computers. " << std::endl; 
       trace.info() << "Basic usage: " << std::endl
-		   << "\t curvatureMCMS [options] --FreemanChain  <fileName> "<< std::endl
+		   << "\t curvatureMCMS [options] --input  <fileName> "<< std::endl
 		   << general_opt << "\n";
       return 0;
     }
@@ -140,8 +186,8 @@ int main( int argc, char** argv )
   
   double h = vm["GridStep"].as<double>();  
  
-  if(vm.count("FreemanChain")){
-    string fileName = vm["FreemanChain"].as<string>();
+  if(vm.count("input")){
+    string fileName = vm["input"].as<string>();
 
     typedef Z2i::Space Space; 
     typedef Space::Point Point; 

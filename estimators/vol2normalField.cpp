@@ -73,6 +73,60 @@ namespace po = boost::program_options;
 
 
 /**
+ @page vol2normalField vol2normalField
+ 
+ @brief Generates normal vector field from a vol file using DGtal library.
+
+ It will output the embedded vector field (Gaussian convolution on elementary normal vectors)
+ an OFF file, and a TXT normal vector file (theta, phi in degree).
+
+
+ @b Usage: 	vol2normalField[options] --input <volFileName> --o <outputFileName> 
+
+
+ @b Allowed @b options @b are : 
+ @code
+  -h [ --help ]                   display this message.
+  -i [ --input ] arg              Input vol file.
+  -o [ --output ] arg             Output filename.
+  -l [ --level ] arg (=0)         Iso-level for the surface construction.
+  -s [ --sigma ] arg (=5)         Sigma parameter of the Gaussian kernel.
+  --exportOriginAndExtremity      exports the origin and extremity of the 
+                                  vector fields when exporting the vector field
+                                  in TXT format (useful to be displayed in 
+                                  other viewer like meshViewer).
+  -N [ --vectorsNorm ] arg (=1)   set the norm of the exported vectors in TXT 
+                                  format (when the extremity points are 
+                                  exported with --exportOriginAndExtremity). By
+                                  using a negative value you will invert the 
+                                  direction of the vectors.
+  -n [ --neighborhood ] arg (=10) Size of the neighborhood for the convolution 
+                                  (distance on surfel graph).
+ @endcode
+
+ @b Example: 
+
+ We consider the generation of normal vector field from the Iso-level 40 and export the vectors with a norm = -3 (negative value to invert the normal direction).
+ 
+ @code
+ $ vol2normalField -i $DGtal/examples/samples/lobster.vol -o lobTreshold40 -l 40 --exportOriginAndExtremity  -N -3
+ @endcode
+
+
+ You can use the too meshViewer to display the resulting vector field with the Iso-level surface:
+@code
+$ meshViewer -i lobTreshold40.off -f lobTreshold40.txt  --vectorFieldIndex 2 3 4 5 6 7  -n
+@endcode
+
+ You should obtain such a result:
+ @image html resVol2normalField.png "Resulting vector field visualization."
+ 
+ @see
+ @ref vol2normalField.cpp
+
+ */
+
+/**
  * Missing parameter error message.
  *
  * @param param
@@ -94,9 +148,11 @@ int main ( int argc, char**argv )
     ( "help,h", "display this message." )
     ( "input,i", po::value<std::string>(), "Input vol file." )
     ( "output,o", po::value<string>(),"Output filename." )
-    ( "level,", po::value<unsigned char>()->default_value ( 0 ),"Iso-level for the surface construction." )
+    ( "level,l", po::value<unsigned int>()->default_value ( 0 ),"Iso-level for the surface construction." )
     ( "sigma,s", po::value<double>()->default_value ( 5.0 ),"Sigma parameter of the Gaussian kernel." )
-    ( "neighborhood,n", po::value<unsigned int>()->default_value ( 10 ),"Size of the neighborhood for the convolution (distance on surfel graph)." );
+    ("exportOriginAndExtremity", "exports the origin and extremity of the vector fields when exporting the vector field in TXT format (useful to be displayed in other viewer like meshViewer).") 
+      ("vectorsNorm,N", po::value<double>()->default_value(1.0), "set the norm of the exported vectors in TXT format (when the extremity points are exported with --exportOriginAndExtremity). By using a negative value you will invert the direction of the vectors.") 
+      ( "neighborhood,n", po::value<unsigned int>()->default_value ( 10 ),"Size of the neighborhood for the convolution (distance on surfel graph)." );
 
     bool parseOK=true;
     po::variables_map vm;
@@ -125,10 +181,10 @@ int main ( int argc, char**argv )
     if ( ! ( vm.count ( "output" ) ) ) missingParam ( "--output" );
     std::string outputFileName = vm["output"].as<std::string>();
 
-    unsigned char level = vm["level"].as<unsigned char>();
+    unsigned int level = vm["level"].as<unsigned int>();
     double sigma = vm["sigma"].as<double>();
     unsigned int neighborhood = vm["neighborhood"].as<unsigned int>();
-
+    double normExport = vm["vectorsNorm"].as<double>();
     typedef ImageSelector < Z3i::Domain, unsigned char>::Type Image;
     Image image = VolReader<Image>::importVol ( filename );
 
@@ -194,7 +250,21 @@ int main ( int argc, char**argv )
         {
             res = myNormalEstimatorG.eval ( it );
             //We output Theta - Phi
-            out3<< acos ( res [2] ) *180.0/M_PI <<"  " << ( atan2 ( res [1], res [0] ) + M_PI ) *180.0/M_PI <<std::endl;
+            out3<< acos ( res [2] ) *180.0/M_PI <<"  " << ( atan2 ( res [1], res [0] ) + M_PI ) *180.0/M_PI;
+
+            if (vm.count("exportOriginAndExtremity"))
+              {
+                res *= normExport;
+                out3 << " " << mySurfelEmbedderG(*it)[0]
+                     << " " << mySurfelEmbedderG(*it)[1]
+                     << " " << mySurfelEmbedderG(*it)[2] << " " 
+                     <<  mySurfelEmbedderG(*it)[0]+res[0] << " "
+                     << mySurfelEmbedderG(*it)[1]+res[1] <<  " "
+                     << mySurfelEmbedderG(*it)[2]+res[2];
+              
+              }
+
+              out3 <<std::endl;
         }
     }
     out3.close();

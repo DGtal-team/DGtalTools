@@ -51,6 +51,48 @@
 
 using namespace DGtal;
 
+/**
+ @page freeman2sdp freeman2sdp
+ @brief Transform freeman chain into a Sequence of Discrete Points. Result is given to std output.
+
+ @b Usage: freeman2sdp [input] > output.sdp
+
+@b Allowed @b options @b are:
+
+@code
+  -h [ --help ]         display this message
+  -i [ --input ] arg    Input freeman chain file name.
+  --info                adds some info as comments at the beginning of the 
+                        file.
+  -o [ --oneLine ]       output the digital contour in one line like: X0 Y0 X1 
+                        Y1 ... XN YN
+@endcode
+
+@b Example:
+@code
+  freeman2sdp -i ${DGtal}/tests/samples/contourS.fc > contourS.sdp
+@endcode
+You will obtain such result:
+@verbatim
+$ more contourS.sdp  
+# grid curve 1/1 closed
+13 60
+14 60
+14 59
+14 58
+15 58
+15 57
+16 57
+16 56
+17 56
+17 55
+17 54
+18 54
+...
+@endverbatim
+@see freeman2sdp.cpp
+
+*/
 
 
 
@@ -63,9 +105,10 @@ int main( int argc, char** argv )
   po::options_description general_opt("Allowed options are: ");
   general_opt.add_options()
     ("help,h", "display this message")
-    ("info,i", "adds some info as comments at the beginning of the file.") 
-    ("oneLine,o", " output the digital contour in one line like: X0 Y0 X1 Y1 ... XN YN") 
-    ("FreemanChain,f", po::value<std::string>(), "FreemanChain file name");
+    ("input,i", po::value<std::string>(), "Input freeman chain file name.")
+    ("info", "adds some info as comments at the beginning of the file.") 
+    ("oneLine,o", " output the digital contour in one line like: X0 Y0 X1 Y1 ... XN YN");
+
   
   
   typedef FreemanChain<Z2i::Integer> FreemanChain;
@@ -81,17 +124,20 @@ int main( int argc, char** argv )
   }
 
   po::notify(vm);    
-  if(!parseOK||vm.count("help")||argc<=1 || (!(vm.count("FreemanChain")) ) )
+  if(!parseOK||vm.count("help")||argc<=1 || (!(vm.count("input")) ) )
     {
-      trace.info()<< "Transform freeman chain into a Sequence of Discrete Points. Result is given to std output " <<std::endl << "Basic usage: "<<std::endl
-		  << "\t freeman2sdp [options] --FreemanChain  <fileName>  "<<std::endl
+      trace.info()<< "Transform freeman chain into a Sequence of Discrete Points. Result is given to std output. " <<std::endl << "Basic usage: "<<std::endl
+		  << "\t freeman2sdp [input] > out.sdp  "<<std::endl
 		  << general_opt << "\n";
+      trace.info() << "Example:\n"
+                   << "freeman2sdp -i ${DGtal}/tests/samples/contourS.fc > contourS.sdp \n";
+
       return 0;
     }
   
   bool oneline = vm.count("oneLine");
-  if( vm.count("FreemanChain") ){
-    std::string fileName = vm["FreemanChain"].as<std::string>();
+  if( vm.count("input") ){
+    std::string fileName = vm["input"].as<std::string>();
     std::vector< FreemanChain > vectFcs =  PointListReader< Z2i::Point >:: getFreemanChainsFromFile<Z2i::Integer> (fileName); 
     
     for(unsigned int i=0; i< vectFcs.size(); i++){
@@ -104,10 +150,14 @@ int main( int argc, char** argv )
       std::vector<Z2i::Point> vectPts; 
       FreemanChain::getContourPoints( vectFcs.at(i), vectPts ); 
       for(unsigned int k=0; k < vectPts.size(); k++){
-        std::cout << vectPts.at(k)[0] << " "<< vectPts.at(k)[1];
+        std::cout << vectPts.at(k)[0] << " "<< vectPts.at(k)[1] ;
 	if(!oneline){
           std::cout << std::endl;
-	}
+	}else
+          {
+            std::cout << " "; 
+          }
+          
       }
       std::cout << std::endl;
     }

@@ -1,0 +1,74 @@
+/**
+ * @file visualization.dox
+ * @author Bertrand Kerautret 
+ * LORIA (CNRS, UMR 7503), University of Lorraine, France
+ *
+ * @date 2016/05/09
+ *
+ * Documentation file for visualization
+ *
+ * This file is part of the DGtal library.
+ */
+
+
+//----------------------------------------
+/*!
+@page visualization
+@writers Bertrand Kerautret
+
+@section visualization_Doc Visualization
+
+
+  - @ref Doc2dCompImage : compare images and displays differences (squared and absolute differences). 
+  - @ref CompSurfelData : computes generic scalar surfel data comparisons (squared error) ( given from an input data file and from a reference one). 
+  - @ref Doc3DCurvatureViewer :  permits to compute and visualize mean or gaussian curvature of binary shapes.   
+  - @ref Doc3DCurvatureViewerNoise :  same as @ref Doc3DCurvatureViewer, but allows to add some noise to objects. 
+  - @ref Doc3dCurveViewer : displays a 3D curve given as the input filename (with possibly projections and/or tangent information) by using QGLviewer.
+  - @ref Doc3dDisplaySurfelData : displays surfel data from SDP file with color attributes given as scalar interpreted as color. 
+  - @ref Doc3dHeightMapViewer : displays 2D image as heightmap by using QGLviewer.
+  - @ref Doc3dImageViewer : displays volume file as a voxel set by using QGLviewer.
+  - @ref Doc3dImplicitSurfaceExtractorBy4DExtension : computes the zero level set of the given polynomial.
+  - @ref Doc3dImplicitSurfaceExtractorByThickening : computes the zero level set of the given polynomial.
+  - @ref Doc3DSDPViewer : displays sequence of 3d discrete points by using QGLviewer.
+  - @ref Doc3dVolBoundaryViewer : displays the boundary of a volume file by using QGLviewer. 
+  - @ref Doc3dVolViewer : displays volume file as a voxel set by using QGLviewer.
+  - @ref displayContours : displays discrete contours.
+  - @ref meshViewer : displays OFF mesh file by using QGLviewer.
+  - @ref patternTriangulation : draws the Delaunay triangulation of a pattern using DGtal library.
+  - @ref sliceViewer : displays volume file with slice image by using QT and QGLviewer.
+
+
+
+<center>
+<table>
+  <tr>
+        <td> <img height=200px src="res3dCurvatureViewer.png"> </td>
+        <td><img height=200px src="res3dCurvatureViewerNoise.png"></td>
+        <td><img height=200px src="res3dHeightMapViewer.png"></td>        
+        <td><img height=200px src="res3dImageViewer.png"></td>        
+</tr>
+<tr>
+        <td align = center>@ref Doc3DCurvatureViewer </td>
+        <td align = center>@ref Doc3DCurvatureViewerNoise </td>   
+        <td align = center>@ref Doc3dHeightMapViewer</td>
+        <td align = center>@ref Doc3dImageViewer</td>
+</tr>
+  <tr>
+        <td> <img height=200px src="res3dImplicitSurfaceExtractorByThickening.png"> </td>
+        <td><img height=200px src="res3dVolViewer.png"></td>
+        <td><img height=200px src="resDisplayContours.png"></td>        
+        <td><img height=200px src="resSliceViewer.png"></td>        
+</tr>
+<tr>
+        <td align = center>@ref Doc3dImplicitSurfaceExtractorByThickening </td>
+        <td align = center>@ref Doc3dVolViewer </td>   
+        <td align = center>@ref displayContours</td>
+        <td align = center>@ref sliceViewer</td>
+</tr>
+
+
+</table>
+</center>
+
+
+*/

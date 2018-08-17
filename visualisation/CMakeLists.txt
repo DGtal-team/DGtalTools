@@ -3,6 +3,7 @@ SET(DGTAL_TOOLS_SRC
         patternTriangulation
         3dCurvatureViewer
         3dCurvatureViewerNoise
+        2dCompImage
 )
 
 foreach (FILE ${DGTAL_TOOLS_SRC})
@@ -24,7 +25,9 @@ if (  WITH_VISU3D_QGLVIEWER )
     meshViewer
     3dHeightMapViewer
     3dDisplaySurfelData
-	3dCompSurfelData)
+    3dCompSurfelData
+    3dImplicitSurfaceExtractorBy4DExtension
+    3dImplicitSurfaceExtractorByThickening )
 
   FOREACH(FILE ${DGTAL_EXAMPLES_QGL_SRC})
     add_executable(${FILE} ${FILE})

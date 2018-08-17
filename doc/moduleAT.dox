@@ -1,0 +1,455 @@
+/**
+ * @file moduleAT.dox
+ * @author Jacques-Olivier Lachaud (\c jacques-olivier.lachaud@univ-savoie.fr )
+ * Laboratory of Mathematics (CNRS, UMR 5127), University of Savoie, France
+ *
+ * @date 2016/10/15
+ *
+ * Documentation file for imageProcessing
+ *
+ * This file is part of the DGtal library.
+ */
+
+/*!
+@page moduleAT Image restoration and inpainting with Ambrosio-Tortorelli functional
+
+@writers Marion Foare and Jacques-Olivier Lachaud
+
+  Part of tool \ref imageProcessing.
+  [TOC]
+
+- related tools: \ref DocATu2v0, \ref DocATu0v1
+- related classes: \ref DGtal::ATu0v1, \ref DGtal::ATu2v0, \ref DGtal::DECImage2D
+- related namespace: \ref DGtal::functions::dec
+- related functions: \ref DGtal::functions::dec::diagonal, \ref DGtal::functions::dec::squares, \ref DGtal::functions::dec::squaredDiagonal, \ref DGtal::functions::dec::writePixel, \ref DGtal::functions::dec::writePrimalLinel, \ref DGtal::functions::dec::writeDualLinel, \ref DGtal::functions::dec::form2ToImage, \ref DGtal::functions::dec::form1ToImage, \ref DGtal::functions::dec::dualForm1ToImage, \ref DGtal::functions::dec::primalForm1ToImage, \ref DGtal::functions::dec::threeForms2ToImage, \ref DGtal::functions::dec::form2ToGreyLevelImage, \ref DGtal::functions::dec::primalForm1ToGreyLevelImage, \ref DGtal::functions::dec::dualForm1ToGreyLevelImage, \ref DGtal::functions::dec::primalForm1ToRGBColorImage, \ref DGtal::functions::dec::dualForm1ToRGBColorImage, \ref DGtal::functions::dec::threeForms2ToRGBColorImage.
+
+@section AT1 The Ambrosio-Tortorelli functional  
+
+The Ambrosio-Tortorelli functional is a classical relaxation of the
+Mumford-Shah functional.
+
+Given an input grayscale image, defined in an open bounded domain
+\f$ \Omega \f$, we represent its gray levels by a function \f$ g
+\in L^{\infty}(\Omega) \f$. In the Ambrosio-Tortorelli functional [1],
+one wants to find a function \f$ u \in SBV(\Omega) \f$ which is a
+smooth approximation of the input image \f$ g \f$.
+The Ambrosio-Tortorelli functional [1] is defined by
+\f[
+  \displaystyle
+  AT_{\varepsilon}(u,v)	= \int_\Omega \alpha |u-g|^2 + v^2 |\nabla u|^2
+  + \lambda \varepsilon |\nabla v|^2 + \frac{\lambda}{4 \varepsilon} |1-v|^2 dx,
+\f]
+for functions \f$ u,v \in W^{1,2}(\Omega)\f$ with \f$ 0 \leq v \leq 1 \f$.
+
+
+In AT functional, function \f$ v \f$ is a smooth approximation
+of the set of discontinuities, and takes value close to 0 in this set,
+while being close to 1 outside discontinuities. A remarkable property
+of this functional is that it \f$ \Gamma \f$-converges to (a
+relaxation of) MS functional as \f$ \varepsilon \f$ tends to 0 (see [1]).
+The intuition is that a large \f$ \varepsilon \f$ induces a solution
+with a fuzzy set of discontinuities, which is then progressively
+narrowed to the crisp 1-dimensional set of discontinuites as
+\f$ \varepsilon \f$ goes to 0.
+
+
+@section AT2 Discretization of AT with discrete calculus
+
+@subsection AT2_1 Discrete Calculus
+
+The idea is to decompose the image domain \f$ \Omega \f$ into a cell
+complex \a K. Here, the faces of \a K are simply the pixels of the image,
+the edges of \a K are the sides shared by two pixels, while the
+vertices of \a K are the vertices shared by four pixels. For
+technical reasons, the dual complex \a K' of \a K is also needed and
+is defined in the usual way: a vertex of \a K is thus associated
+one-to-one to a face of \a K', etc. A discrete \f$ k \f$-form is a map
+that associates a scalar to a \f$ k \f$-dimensional cell.
+If the number of \f$ k \f$-dimensional cells of \a K is denoted by
+\f$ n_k \f$, then a discrete \f$ k \f$-form is simply represented by a
+column vector of size \f$ n_k \times 1 \f$.
+
+We denote by \f$ \mathbf{d_k} \f$ and \f$ \bar{\mathbf{d_k}} \f$ the
+standard discrete exterior primal and dual derivative operators. The
+derivative operator \f$ \mathbf{d_0} \f$ is the oriented vertex-edge
+incidence matrix of \a K. Similarly, the primal derivative
+\f$ \mathbf{d_1} \f$ is the oriented edge-face incidence matrix of \a K.
+
+Discrete Hodge star operators \f$ \mathbf{\star} \f$ send \f$ k
+\f$-forms of the primal complex \a K onto \f$ (n-k) \f$-forms of the
+dual complex \a K'. Of course, there are dual Hodge star operators \f$
+\bar{\mathbf{\star}} \f$ which send \f$ k \f$-forms of the dual
+complex \a K' onto \f$ (n-k) \f$-forms of the primal complex \a
+K'. The composition of \f$ \mathbf{\star} \f$ with its dual \f$
+\bar{\mathbf{\star}} \f$ is idempotent except for a sign change in
+some cases, i.e. \f$ \bar{\mathbf{\star}} \mathbf{\star} = (-1)^{k(n-k)} \mathbf{Id} \f$.
+
+We define \f$ \mathbf{M} \f$ the matrix which transforms a 0-form into a
+1-form by averaging the values on the two edge extremities, i.e.
+\f$ \mathbf{M} = \frac{1}{2} |\mathbf{d_0}| \f$. Moreover, we use the
+edge laplacian defined in [5] by
+\f$ \bar{\mathbf{\star}} \bar{\mathbf{d_0}} \mathbf{\star} \mathbf{d_1}
++ \mathbf{d_0} \bar{\mathbf{\star}} \bar{\mathbf{d_1}} \mathbf{\star} \f$.
+
+
+
+@subsection AT2_2 Formulations AT01 and AT20
+
+We first set \f$ u \f$ and \f$ g \f$ to live on the faces and \f$ v \f$
+to live on the vertices and edges. Pixels are faces, so functions
+\f$ u \f$ and \f$ g \f$ are 2-forms since they represent the gray levels
+of each pixel. On the contrary, we set \f$ v \f$ in-between cells of
+non null measure, so in this case on vertices as a 0-form, and on edges
+by averaging with \f$ \mathbf{M} \f$. We call this formulation AT20. The DEC
+reformulation is straightforward, except for the
+second term, where we use matrix \f$ \mathbf{M} \f$ to transport the 0-form
+\f$ v \f$ onto edges :
+\f[
+  \displaystyle
+  AT20(u,v) = \Sigma_{i=1}^n
+      \alpha \langle u_i - g_i , u_i - g_i \rangle_2
+    + \langle \mathbf{M} v , \bar{\mathbf{\star}} \bar{\mathbf{d_0}}
+      \mathbf{\star} u_i \rangle_1 ^2 \\
+    + \lambda \varepsilon \langle \mathbf{d_0} v , \mathbf{d_0} v \rangle_1
+    + \frac{\lambda}{4\varepsilon} \langle 1 - v , 1 - v \rangle_0.
+\f]
+
+
+
+A second possibility is to define \f$ u \f$ and \f$ g \f$ on the vertices
+and \f$ v \f$ on the edges. We denote this formulation
+AT01. Gray levels are seen as point mass on the center of pixels, so
+that functions \f$ u \f$ and \f$ g \f$ are both 0-forms, while \f$ v \f$
+is a dual 1-form in between \f$ u \f$. It follows:
+\f[
+  \displaystyle
+  AT01(u,v) = \Sigma_{i=1}^n
+      \alpha \langle u_i - g_i , u_i - g_i \rangle_0
+    + \langle v , \mathbf{d_0} u_i \rangle_1 \langle v ,
+                                          \mathbf{d_0} u_i \rangle_1 \\
+    + \lambda \varepsilon \langle (\mathbf{d_1}
+          + \bar{\mathbf{\star}} \bar{\mathbf{d_1}} \mathbf{\star}) v ,
+          (\mathbf{d_1} + \bar{\mathbf{\star}} \bar{\mathbf{d_1}}
+                        \mathbf{\star}) v   \rangle_1
+    + \frac{\lambda}{4\varepsilon} \langle 1 - v , 1 - v \rangle_1.
+\f]
+
+For more details about discrete formulations and numerical
+optimizationf of AT, we refer the reader to [2] and [3].
+
+@subsection AT2_3 Solutions to AT01 and AT20
+
+Functionals AT20 and AT01 are both sums of quadratic terms, independently,
+but not simultaneously, convex in \f$ u \f$ and \f$ v \f$. They must have
+null derivative at optimum. We thus propose to alternatively solve for
+\f$ u \f$, then \f$ v \f$. The derivatives can be given explicitly as
+linear systems.
+To simplify notations, let \f$ \mathbf{A} := \mathbf{d_0} \f$,
+\f$  \mathbf{B} := \mathbf{d_1} \f$,
+\f$ \mathbf{A'} := \bar{\mathbf{\star}} \bar{\mathbf{d_1}} \mathbf{\star} \f$
+and \f$ \mathbf{B'} := \bar{\mathbf{\star}} \bar{\mathbf{d_0}} \mathbf{\star} \f$.
+We get at optimum:
+\f[
+  \displaystyle
+  \left\{ \begin{array}{r @{=} l c}
+    \left[\alpha \mathbf{Id} - {\mathbf{B'}}^T diag(\mathbf{M} v)^2 \mathbf{B'} \right] u
+    & = \quad \alpha g & (1.1) \\
+    \left[ \frac{\lambda}{4\varepsilon} \mathbf{Id}
+          + \lambda \varepsilon \mathbf{A}^T \mathbf{A}
+          + \mathbf{M}^T diag(\mathbf{B'} u)^2 \mathbf{M} \right] v
+    & = \quad \frac{\lambda}{4 \varepsilon} \mathbf{1}
+    & (1.2)
+  \end{array}\right.
+\f]
+
+for the derivative of AT20, and
+
+\f[
+  \displaystyle
+  \left\{ \begin{array}{r @{=} l c}
+    \left[\alpha \mathbf{Id} - \mathbf{A}^T diag(v)^2 \mathbf{A} \right] u
+    & = \quad \alpha g & (2.1) \\
+    \left[ \frac{\lambda}{4\varepsilon} \mathbf{Id}
+          + \lambda \varepsilon (\mathbf{A'}^T \mathbf{A'}
+          + \mathbf{B}^T \mathbf{B})
+          + diag(\mathbf{A} u)^2  \right] v
+    & = \quad \frac{\lambda}{4 \varepsilon} \mathbf{1}
+    & (2.2)
+  \end{array}\right.
+\f]
+for the derivative of AT01. Since all matrices are
+symmetric, definite and positive, we use a Cholesky factorization to
+solve alternatively the two equations of each system.
+
+
+@subsection AT2_4 Algorithm
+
+
+\f$
+\begin{array}{l l l l}
+\rlap{OPTIMIZE-AT01( (g_1, ..., g_N ): 0-forms,
+(\alpha, \lambda, \varepsilon_1, \varepsilon_2, \varepsilon_r): reals );} \\
+  \rlap{\mathbf{Var~} (u_1, ..., u_N): 0-forms, (v, v'): 1-forms, \varepsilon: real ; } \\
+  \rlap{\mathbf{begin}} &  \\
+  & \rlap{\mathbf{foreach~} i \in \{1, 2, 3\} \mathbf{~do~} u_i \leftarrow g_i;} \\
+  & \rlap{v \leftarrow 1, \varepsilon \leftarrow \varepsilon_1;} \\
+  & \rlap{\mathbf{while~} \varepsilon \geq \varepsilon_2 \mathbf{~do~}} \\
+  & & \rlap{\mathbf{repeat}} \\
+  & & & v' \leftarrow v; \\
+  & & & \hbox{Solve Eq.(1.1) for all } u_i ; \\
+  & & & \hbox{Solve Eq.(1.2) for } v ; \\
+  & & \rlap{\mathbf{until~} ||v - v'|| \hbox{~is small;}} \\
+  & & \rlap{\varepsilon \leftarrow \varepsilon / \varepsilon_r;} \\
+  & \rlap{\mathbf{end}} \\
+  \rlap{\mathbf{end}}
+\end{array}
+\f$
+
+@section AT3 Piecewise smooth approximation of images
+
+@subsection AT3_1 Some examples of restoration and discontinuity detections
+
+We display below the different resconstructions of image "lena" with
+approximately 20% noise, for varying parameter \f$ \lambda \f$. Note
+that a too big \f$ \lambda \f$ gives a fuzzy result, while a too small
+\f$ \lambda \f$ keeps noise.
+
+<center>
+<table>
+<tr>
+<td> Input \a g </td>
+  <td> @image html lena-370-b02.png </td>
+  <td> @image html lena-370-b02.png </td>
+  <td> @image html lena-370-b02.png </td>
+  <td> @image html lena-370-b02.png </td>
+  <td> @image html lena-370-b02.png </td>
+</tr>
+<tr>
+  <td> Approx. \a u </td>
+  <td> @image html lena-370-b02-a0_48000-l0_2000000-u.png </td>
+  <td> @image html lena-370-b02-a0_48000-l0_1000000-u.png </td>
+  <td> @image html lena-370-b02-a0_48000-l0_0500000-u.png </td>
+  <td> @image html lena-370-b02-a0_48000-l0_0250000-u.png </td>
+  <td> @image html lena-370-b02-a0_48000-l0_0125000-u.png </td>
+</tr>
+<tr align=center>
+  <td> \f$ \alpha = 0.48, \varepsilon = 4 \searrow 0.25 \f$ </td>
+  <td> \f$ \lambda = 0.2 \f$ </td>
+  <td> \f$ \lambda = 0.1 \f$ </td>
+  <td> \f$ \lambda = 0.05 \f$ </td>
+  <td> \f$ \lambda = 0.025 \f$ </td>
+  <td> \f$ \lambda = 0.0125 \f$ </td>
+</tr>
+</table>
+</center>
+
+\code
+./imageProcessing/at-u2-v0 -i ../imageProcessing/Images/lena-370-b02.ppm -o lena-370-b02 -a 0.48 --lambda-1 0.2 --lambda-2 0.0125 --lambda-ratio 2.0 --epsilon-1 4.0 --epsilon-2 0.25 -p 2 -n 20
+\endcode
+
+
+@image html lena-370-b02-a0_48000-l0_0500000-u-v.png "Result of \a u and \a v for lambda=0.05, discontinuities are in a red."
+
+
+Our approach allows us to restore images with texture, as illustrated
+below on image "barbara" with noise approximately 10%.
+
+<center>
+<table>
+<tr>
+  <td> @image html images/barbara-cropped-b01.png </td>
+  <td> @image html images/barbara-cropped-b01-l0.0054088-a1.0-u0-v1-u.png </td>
+  <td> @image html images/Barbara_Crop_ATu2v0.png </td>
+  <td> @image html images/Barbara_Crop_ATu0v1.png </td>
+</tr>
+<tr align=center>
+  <td> Input image \a g </td>
+  <td> Approx. \a u with AT20 and AT01 </td>
+  <td> \a u and \a v with AT20 </td>
+  <td> \a u and \a v with AT01 </td>
+</tr>
+<tr>
+  <td> Command line are: </td>
+  <td align=center colspan="3">
+    \code ./imageProcessing/at-u2-v0 -i ../imageProcessing/Images/barbara-cropped-b01.pgm -o barbara  -a 1.0 --lambda 0.0054  --epsilon-1 2.0 --epsilon-2 0.25 \endcode
+    \code ./imageProcessing/at-u0-v1 -i ../imageProcessing/Images/barbara-cropped-b01.pgm -o barbara  -a 0.69 --lambda 0.0065  --epsilon-1 2.0 --epsilon-2 0.25 \endcode
+  </td>
+</tr>
+</table>
+</center>
+
+
+
+
+@subsection AT3_2 Influence of parameter epsilon
+
+<center>
+<table>
+<tr>
+  <td> @image html images/carre2Degradesb02.png </td>
+  <td> @image html images/cb2-e4_0-a0_10000-l0_0062092-u0-v1.png </td>
+  <td> @image html images/cb2-e2_0-a0_10000-l0_0062092-u0-v1.png </td>
+  <td> @image html images/cb2-e1_0-a0_10000-l0_0062092-u0-v1.png </td>
+  <td> @image html images/cb2-e0_5-a0_10000-l0_0062092-u0-v1.png </td>
+  <td> @image html images/cb2-e0_25-a0_10000-l0_0062092-u0-v1.png </td>
+</tr>
+<tr align=center>
+  <td> Input image \a g </td>
+  <td> \f$ \varepsilon = 4 \searrow 4 \f$ </td>
+  <td> \f$ \varepsilon = 4 \searrow 2 \f$ </td>
+  <td> \f$ \varepsilon = 4 \searrow 1 \f$ </td>
+  <td> \f$ \varepsilon = 4 \searrow 0.5 \f$ </td>
+  <td> \f$ \varepsilon = 4 \searrow 0.25 \f$ </td>
+</tr>
+<tr>
+  <td>Command lines are:</td>
+  <td align=center colspan="5">
+  \code ./imageProcessing/at-u0-v1 -i ../imageProcessing/Images/carre2Degradesb02.pgm -o cb2 -a 0.1 --lambda 0.006 --epsilon-1 4.0 --epsilon-2 4.0 \endcode
+  \code ./imageProcessing/at-u0-v1 -i ../imageProcessing/Images/carre2Degradesb02.pgm -o cb2 -a 0.1 --lambda 0.006 --epsilon-1 4.0 --epsilon-2 2.0 \endcode
+  \code ./imageProcessing/at-u0-v1 -i ../imageProcessing/Images/carre2Degradesb02.pgm -o cb2 -a 0.1 --lambda 0.006 --epsilon-1 4.0 --epsilon-2 1.0 \endcode
+  \code ./imageProcessing/at-u0-v1 -i ../imageProcessing/Images/carre2Degradesb02.pgm -o cb2 -a 0.1 --lambda 0.006 --epsilon-1 4.0 --epsilon-2 0.5 \endcode
+  \code ./imageProcessing/at-u0-v1 -i ../imageProcessing/Images/carre2Degradesb02.pgm -o cb2 -a 0.1 --lambda 0.006 --epsilon-1 2.0 --epsilon-2 0.25 \endcode
+  </td>
+</tr>
+</table>
+</center>
+
+
+
+@subsection AT3_3 Influence of parameter alpha
+
+<center>
+<table>
+<tr>
+  <td> @image html images/carre2Degradesb02.png </td>
+  <td> @image html images/cb2-a1_00000-l1_0000000-u.png </td>
+  <td> @image html images/cb2-a0_50000-l1_0000000-u.png </td>
+  <td> @image html images/cb2-a0_10000-l1_0000000-u.png </td>
+  <td> @image html images/cb2-a0_05000-l1_0000000-u.png </td>
+  <td> @image html images/cb2-a0_01000-l1_0000000-u.png </td>
+</tr>
+<tr align=center>
+  <td> \f$ \lambda = 1.0, \epsilon = 2 \searrow 0.25 \f$ </td>
+  <td> \f$ \alpha = 1.0 \f$ </td>
+  <td> \f$ \alpha = 0.5 \f$ </td>
+  <td> \f$ \alpha = 0.1 \f$ </td>
+  <td> \f$ \alpha = 0.05 \f$ </td>
+  <td> \f$ \alpha = 0.01 \f$ </td>
+</tr>
+<tr>
+  <td>Command lines are:</td>
+  <td align=center colspan="5">
+    \code ./imageProcessing/at-u0-v1 -i ../imageProcessing/Images/carre2Degradesb02.pgm -o cb2 -a 1.0 --lambda 1.0 --epsilon-1 2.0 --epsilon-2 0.25 \endcode
+    \code ./imageProcessing/at-u0-v1 -i ../imageProcessing/Images/carre2Degradesb02.pgm -o cb2 -a 0.5 --lambda 1.0 --epsilon-1 2.0 --epsilon-2 0.25 \endcode
+    \code ./imageProcessing/at-u0-v1 -i ../imageProcessing/Images/carre2Degradesb02.pgm -o cb2 -a 0.1 --lambda 1.0 --epsilon-1 2.0 --epsilon-2 0.25 \endcode
+    \code ./imageProcessing/at-u0-v1 -i ../imageProcessing/Images/carre2Degradesb02.pgm -o cb2 -a 0.05 --lambda 1.0 --epsilon-1 2.0 --epsilon-2 0.25 \endcode
+    \code ./imageProcessing/at-u0-v1 -i ../imageProcessing/Images/carre2Degradesb02.pgm -o cb2 -a 0.01 --lambda 1.0 --epsilon-1 2.0 --epsilon-2 0.25 \endcode
+  </td>
+</tr>
+</table>
+</center>
+
+
+
+@subsection AT3_4 Influence of parameter lambda
+
+<center>
+<table>
+<tr>
+  <td> @image html images/triple-spirale-b02.png </td>
+  <td> @image html images/Triangle_0_1.png </td>
+  <td> @image html images/Triangle_0_01.png </td>
+  <td> @image html images/Triangle_0_0048.png </td>
+  <td> @image html images/Triangle_0_0011.png </td>
+</tr>
+<tr align=center>
+  <td> Input image \a g </td>
+  <td> \f$ \lambda = 0.1 \f$ </td>
+  <td> \f$ \lambda = 0.01 \f$ </td>
+  <td> \f$ \lambda = 0.0048 \f$ </td>
+  <td> \f$ \lambda = 0.0011 \f$ </td>
+</tr>
+<tr>
+  <td>Command lines are:</td>
+  <td align=center colspan="4">
+  \code ./imageProcessing/at-u0-v1 -i ../imageProcessing/Images/triple-spirale-b02.pgm -o tb2 -a 0.162 --lambda 0.1 --epsilon-1 1.0 --epsilon-2 0.25\endcode
+  \code ./imageProcessing/at-u0-v1 -i ../imageProcessing/Images/triple-spirale-b02.pgm -o tb2 -a 0.162 --lambda 0.01 --epsilon-1 1.0 --epsilon-2 0.25\endcode
+  \code ./imageProcessing/at-u0-v1 -i ../imageProcessing/Images/triple-spirale-b02.pgm -o tb2 -a 0.162 --lambda 0.0048 --epsilon-1 1.0 --epsilon-2 0.25\endcode
+  \code ./imageProcessing/at-u0-v1 -i ../imageProcessing/Images/triple-spirale-b02.pgm -o tb2 -a 0.162 --lambda 0.0011 --epsilon-1 1.0 --epsilon-2 0.25\endcode
+  </td>
+</tr>
+</table>
+</center>
+
+
+@section AT4 Use of AT models for inpainting
+
+The AT20 model is much superior to the AT01 model for inpainting since
+it is less sensitive to L1-metrication artefacts. Indeed, for large
+\f$ \varepsilon \f$, the discontinuity set is averaged along points,
+not along edges. Hence AT20 is smoothed in all directions while AT01
+is smoothed along axes. This is illustrated on the inpainting
+quadruple angle below. AT01 finds the solution in the L1-metric sense
+for the length of discontinuities, while AT20 finds the correct two
+triple points in the L2-metric sense.
+
+
+<center>
+<table>
+<tr>
+  <td> @image html images/q2-d2-g-mask.png </td>
+  <td> @image html images/q2-d-a0_10000-l0_0620921-u.png </td>
+  <td> @image html images/q2-d2-a1.00000-l0.0100000-u2-v0.png </td>
+</tr>
+<tr>
+  <td> @image html images/q452-d-g-mask.png </td>
+  <td> @image html images/q452-d-a0_10000-l0_0289664-u.png </td>
+  <td> @image html images/q452-d-a1.00000-l0.0250000-u2-v0.png </td>
+</tr>
+<tr align=center>
+  <td> Input \a g + mask </td>
+  <td> Inpainted \a u with AT01 </td>
+  <td> Inpainted \a u with AT20 </td>
+</tr>
+<tr>
+  <td>Command lines are:</td>
+  <td align=center colspan="2">
+  \code ./imageProcessing/at-u0-v1 -i ../imageProcessing/Images/quadruple-color.ppm -o q -m ../imageProcessing/Images/mask-big-disc.pgm -a 1.0 --lambda 0.01 --epsilon-1 4.0 --epsilon-2 0.25\endcode
+  \code ./imageProcessing/at-u0-v1 -i ../imageProcessing/Images/quadruple-45-color.ppm -o q -m ../imageProcessing/Images/mask-disc.pgm -a 1.0 --lambda 0.025 --epsilon-1 4.0 --epsilon-2 0.25\endcode
+
+  \code ./imageProcessing/at-u2-v0 -i ../imageProcessing/Images/quadruple-color.ppm -o q -m ../imageProcessing/Images/mask-big-disc.pgm -a 1.0 --lambda 0.01 --epsilon-1 4.0 --epsilon-2 0.25\endcode
+  \code ./imageProcessing/at-u2-v0 -i ../imageProcessing/Images/quadruple-45-color.ppm -o q -m ../imageProcessing/Images/mask-disc.pgm -a 1.0 --lambda 0.025 --epsilon-1 4.0 --epsilon-2 0.25\endcode
+  </td>
+</tr>
+</table>
+</center>
+
+
+
+
+@section References
+
+[1] Luigi Ambrosio, and Vincenzo Maria Tortorelli. "Approximation of
+functional depending on jumps by elliptic functional via t‐convergence."
+Communications on Pure and Applied Mathematics 43.8 (1990): 999-1036.
+
+[2] Marion Foare, Jacques-Olivier Lachaud, and Hugues Talbot. "Image restoration
+and segmentation using the Ambrosio-Tortorelli functional and discrete calculus."
+In Proceedings of the IAPR International Conference on Pattern Recognition
+(ICPR2016), Cancun, Mexico, 2016.
+
+[3] Marion Foare, Jacques-Olivier Lachaud, and Hugues
+Talbot. "Numerical implementation of the Ambrosio-Tortorelli
+functional using discrete calculus and application to image
+restoration and inpainting."  In Proceedings of 1st Workshop on
+Reproducible Research In Pattern Recognition (RRPR 2016), Springer
+LNCS. To appear.
+
+[4] Matteo Focardi. "On the variational approximation of free-
+discontinuity problems in the vectorial case." Mathematical Models
+and Methods in Applied Sciences 11.04 (2001): 663-684.
+
+[5] Leo J. Grady and Jonathan Polimeni. Discrete calculus: Applied analysis on graphs
+for computational science . Springer, 2010.
+
+*/

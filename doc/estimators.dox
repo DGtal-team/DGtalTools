@@ -1,0 +1,64 @@
+/**
+ * @file estimators.dox
+ * @author Bertrand Kerautret
+ * LORIA (CNRS, UMR 7503), University of Lorraine, France
+ *
+ * @date 2016/05/12
+ *
+ * Documentation file for visualization
+ *
+ * This file is part of the DGtal library.
+ */
+
+
+//----------------------------------------
+/*!
+@page estimators
+@writers Bertrand Kerautret
+
+@section estimators_Doc Estimators
+
+
+  - @ref Doc2dLocalEstimators : compares local estimators on implicit shapes using DGtal Library.
+  - @ref Doc3dCurveTangentEstimator : estimates the tangent vector to a set of 3D integer points.
+  - @ref curvatureBC : estimates curvature using a binomial convolver.
+  - @ref curvatureMCMS : estimates curvature using length of most centered segment computers.
+  - @ref curvatureScaleSpaceBCC : generates the Curvature Scale Space image using a binomial convolver based estimator.
+  - @ref eulerCharacteristic : computes the Euleur Characteristic of  a vol to a 8-bit raw file.
+  - @ref generic3dNormalEstimators : computes a normal vector field over a digitized 3D implicit surface for several estimators.
+  - @ref lengthEstimators : generates multigrid length estimations of paramteric shapes using DGtal library.
+  - @ref statisticsEstimators : computes satistics (L1, L2, Loo) from results of two estimators.
+  - @ref tangentBC : estimates tangent using a binomial convolver.
+  - @ref vol2normalField : generates normal vector field from a vol file using DGtal library.
+  - @ref volSurfaceRegularization : regularizes a digital surface into a smooth cubical complex.
+
+
+<center>
+<table>
+  <tr>
+        <td> <img height=200px src="res2dLocalEstimators.png"> </td>
+        <td><img height=200px src="res3dCurveTangentEstimator.png"></td>
+        <td><table> <tr><td><img height=50px src="resCurvatureBCcontour.png"></td><td><img height=200px src="resCurvatureBCcurvature.png"></td></tr></table></td>
+</tr>
+<tr>
+        <td align = center>@ref Doc2dLocalEstimators </td>
+        <td align = center>@ref Doc3dCurveTangentEstimator </td>
+        <td align = center>@ref curvatureBC</td>
+</tr>
+  <tr>
+        <td> <img height=200px src="resVol2normalField.png"> </td>
+        <td><img height=200px src="resGeneric3dNormalEstimatorsVCM.png"></td>
+        <td><img height=100px src="resCurvatureScaleSpaceBCC.png"></td>
+</tr>
+<tr>
+        <td align = center>@ref vol2normalField </td>
+        <td align = center>@ref generic3dNormalEstimators </td>
+        <td align = center>@ref curvatureScaleSpaceBCC</td>
+</tr>
+
+
+</table>
+</center>
+
+
+*/

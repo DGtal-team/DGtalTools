@@ -1,0 +1,86 @@
+/**
+ * @file converters.dox
+ * @author Bertrand Kerautret
+ * LORIA (CNRS, UMR 7503), University of Lorraine, France
+ *
+ * @date 2016/05/09
+ *
+ * Documentation file for converters
+ *
+ * This file is part of the DGtal library.
+ */
+
+
+//----------------------------------------
+/*!
+@page converters
+@writers Bertrand Kerautret
+
+@section converters Converters
+
+
+Utilities to convert various simple file formats:
+
+
+  - @ref convertVol : a simple generic volume image converters (can process actually pgm3d, vol, longvol, raw (for writing)).
+
+
+  - @ref dicom2vol : converts dicom file into a volumetric file (.vol, .longvol .pgm3d).
+  - @ref freeman2img : transforms one or several freeman chains into a pgm file by filling their interior areas.
+  - @ref freeman2sdp : transforms Freeman chain into a Sequence of Discrete Points.
+  - @ref HDF52vol : converts a 3D 8-bit HDF5 file to vol.
+  - @ref heightfield2shading :  renders a 2D heightfield image into a shading image.
+  - @ref heightfield2vol : transforms 2D heightfield into a volumetric file.
+  - @ref img2freeman :  extracts FreemanChains from thresholded image.
+  - @ref imgAddNoise : adds noise (Kanungo's) to a binary 2D object.
+  - @ref itk2vol : converts itk file into a volumetric file (.vol, .pgm3d).
+  - @ref longvol2vol : converts a longvol (long int) to a vol file (unsigned char).
+  - @ref mesh2heightfield : converts a mesh file into a 2D heightmap (from a normal direction N and from a starting point P).
+  - @ref mesh2vol : converts a mesh file into a 26-separated or 6-separated voxelization in a given resolution grid.
+  - @ref ofs2off : converts OFS file into OFF mesh format.
+  - @ref raw2HDF5 :  converts a 3D 8-bit raw file to HDF5.
+  - @ref raw2vol : converts a  8-bit raw file to vol.
+  - @ref sdp2vol : converts digital set of points into a volumic file.
+  - @ref slice2vol : converts set of 2D images into volumetric file  (pgm3d, vol, longvol).
+  - @ref volAddNoise : adds Kanungo noise to a binary object with 0 values as background points and values >0 for the foreground ones.
+  - @ref vol2obj : converts any volumetric file to an OBJ one.
+  - @ref vol2raw : converts a vol to a 8-bit raw file.
+  - @ref vol2sdp : extracts digital points from 3d vol files.
+  - @ref vol2slice : converts a volumetric file (.vol, .longvol, .pgm3d) into a set of 2D slice images.
+  - @ref volBoundary2obj : exports the boundary of a volume file to OBJ format.
+  - @ref vol2heightfield : converts volumetric  file into a projected 2D image given from a normal direction N and from a starting point P.
+  - @ref vox2vol : converts a MagicaVoxel VOX file to a vol file.
+  - @ref vol2vox : converts a vol file to a MagicaVoxel VOX file.
+
+<center>
+<table>
+  <tr>
+        <td> <img height=200px src="resHeightfield2shading.png"> </td>
+        <td><img height=200px src="resHeightfield2vol.png"></td>
+        <td><img height=200px src="resImgAddNoise.png"></td>
+        <td><img height=200px src="resMesh2heightfield.png"></td>
+</tr>
+<tr>
+        <td align = center>@ref heightfield2shading </td>
+        <td align = center>@ref heightfield2vol </td>
+        <td align = center>@ref imgAddNoise</td>
+        <td align = center>@ref mesh2heightfield</td>
+</tr>
+  <tr>
+        <td> <img height=200px src="resVol2heightfield.png"> </td>
+        <td><img height=200px src="resVol2sdp.png"></td>
+        <td><img height=200px src="resVol2slice.png"></td>
+        <td><img height=200px src="resVolAddnoise.png"></td>
+</tr>
+<tr>
+        <td align = center>@ref vol2heightfield </td>
+        <td align = center>@ref vol2sdp </td>
+        <td align = center>@ref vol2slice</td>
+        <td align = center>@ref volAddNoise</td>
+</tr>
+
+
+</table>
+</center>
+
+*/

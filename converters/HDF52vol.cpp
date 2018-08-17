@@ -43,6 +43,29 @@ using namespace Z3i;
 
 namespace po = boost::program_options;
 
+/**
+ @page HDF52vol HDF52vol
+ @brief Converts a 3D 8-bit HDF5 file to vol.
+
+@b Usage: HDF52vol [input] [output]
+
+@b Allowed @b options @b are:
+
+@code
+  -h [ --help ]                     display this message
+  -i [ --input ] arg                the input FreemanChain file name
+  -o [ --output ] arg (=result.pgm)  the output filename
+@endcode
+
+@b Example:
+@code
+  $HDF52vol -i ${DGtal}/tests/samples/ex_image2.h5 -o out.vol
+@endcode
+
+@see HDF52vol.cpp
+
+*/
+
 
 /**
  * Missing parameter error message.

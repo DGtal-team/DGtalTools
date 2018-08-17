@@ -1,0 +1,68 @@
+/**
+ * @file volumetric.dox
+ * @author Bertrand Kerautret 
+ * LORIA (CNRS, UMR 7503), University of Lorraine, France
+ *
+ * @date 2016/05/12
+ *
+ * Documentation file for visualization
+ *
+ * This file is part of the DGtal library.
+ */
+
+
+//----------------------------------------
+/*!
+@page volumetric
+@writers Bertrand Kerautret
+
+@section volumetric_Doc Volumetric
+
+
+  - @ref criticalKernelsThinning3D :  applies an criticalKernels thinning algorithm of a 3d image file (vol,longvol,pgm3d...) with 3D viewer.
+  - @ref Doc3dVolMarchingCubes : outputs the isosurface of the input volume  as an OFF file. 
+  - @ref homotopicThinning3D : applies an homotopic thinning of a 3d image file (vol,longvol,pgm3d...) with 3D viewer.
+  - @ref volAddBorder : adds a border of one voxel with value 0 around a vol file.
+  - @ref volCComponentCounter : counts the number of connected component (same values) in a  volume (Vol) file image.
+  - @ref volCrop : crops a 3D vol image from domain coordinates.
+  - @ref volFlip : flips 2D slice image of an 3D vol image (mirror transformation).
+  - @ref volImageMetrics : applies basic image measures (RMSE, PSNR) between two volumetric images A and B.
+  - @ref volIntensityScale : applies a linear rescaling of the image intensity.  
+  - @ref volReSample :  re samples a 3D volumetric image (.vol, .longvol, .pgm3d)  with a given grid size.
+  - @ref volSegment : segments volumetric file from a simple threshold.
+  - @ref volShapeMetrics : applies shape measures to compare two volumetric images A and B (shape defined from thresholds). 
+  - @ref volSubSample : brutally sub samples a vol file (division by 2 in each direction).  
+  - @ref volTrValues : applies basic vol image transform from the input values to output values.
+
+
+
+
+<center>
+<table>
+  <tr>
+        <td> <img height=200px src="res3dVolMarchingCubes2.png"> </td>
+        <td><img height=200px src="resHomotopicThinning3D.png"></td>
+        <td><img height=200px src="resVolReSample.png"></td>        
+</tr>
+<tr>
+        <td align = center>@ref Doc3dVolMarchingCubes </td>
+        <td align = center>@ref homotopicThinning3D </td>   
+        <td align = center>@ref volReSample</td>
+
+</tr>
+
+<tr>
+<td><img height=200px src="resVolTrValues.png"></td>        
+<td><img height=200px src="resVolSegment.png"></td>
+<td><img height=200px src="resVolSubSample.png"></td>        
+</tr>
+<tr>
+<td align = center>@ref volTrValues</td>
+<td align = center>@ref volSegment</td>
+<td align = center>@ref volSubSample</td>            
+</tr>
+</table>
+</center>
+
+
+*/

@@ -42,6 +42,36 @@
 using namespace std;
 using namespace DGtal;
 
+/**
+ @page convertVol convertVol
+ @brief Converts volumetric file into volumetric file from different formats (pgm3d, vol, longvol). This tool can also be used to upgrade a Version-2 Vol or Longvol file to the new (compressed) Version-3.
+
+
+@b Usage: convertVol [input] [output]
+
+@b Allowed @b options @b are:
+
+@code
+  -h [ --help ]         display this message
+  -i [ --input ] arg    volumetric file (.pgm3d, .vol, .longvol) 
+  -o [ --output ] arg   volumetric file (.pgm3d, .vol, .longvol) 
+@endcode
+
+@b Examples:
+@code 
+$ convertVol -i ${DGtal}/examples/samples/lobster.vol -o convertedVol.p3d 
+@endcode
+
+ To upgrade a "Version-2" vol file to a "Version-3" (default Vol writer):
+ @code
+ $ convertVol -i ${DGtal}/examples/samples/lobster.vol -o ${DGtal}/examples/samples/lobster.vol
+ @endcode
+ 
+
+@see convertVol.cpp
+
+*/
+
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace po = boost::program_options;
@@ -70,7 +100,7 @@ int main( int argc, char** argv )
   if( !parseOK || vm.count("help")||argc<=1)
     {
       std::cout << "Usage: " << argv[0] << " [input] [output]\n"
-		<< "Convert volumetric  file into volumetric file from different formats (pgm3d, vol, longvol) "
+		<< "Convert volumetric file into volumetric file from different formats (pgm3d, vol, longvol) "
 		<< general_opt << "\n";
       std::cout << "Example:\n"
 		<< "convertVol -i ${DGtal}/examples/samples/lobster.vol -o convertedVol.p3d \n";

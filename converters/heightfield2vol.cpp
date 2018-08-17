@@ -49,6 +49,37 @@ using namespace DGtal;
 ///////////////////////////////////////////////////////////////////////////////
 namespace po = boost::program_options;
 
+/**
+ @page heightfield2vol heightfield2vol
+ @brief  Converts a 2D heightfield image into a volumetric file.
+
+@b Usage: heightfield2vol [input] [output]
+
+@b Allowed @b options @b are:
+
+@code
+  -h [ --help ]                       display this message
+  -i [ --input ] arg                  heightfield file.
+  -o [ --output ] arg                 volumetric file 
+  -s [ --scale ] arg (=1)             set the scale factor on height values. 
+                                      (default 1.0)
+  -z [ --volZ ] arg (=255)            set the Z max value of domain.
+  -f [ --foregroundValue ] arg (=128) specify the foreground value of the 
+                                      resulting voxel.
+  -b [ --backgroundValue ] arg (=0)   specify the background value of the 
+                                      resulting volumetric file.
+@endcode
+
+@b Example:
+@code
+  $ heightfield2vol -i ${DGtal}/examples/samples/church.pgm -o volResu.vol -s 0.3 -z 50  
+
+@endcode
+You will obtain such image:
+@image html  resHeightfield2vol.png "Resulting image."
+@see heightfield2vol.cpp
+
+*/
 
 
 
@@ -67,7 +98,7 @@ struct Image3DPredicatFrom2DImage{
                              ):myImageRef(anImage), 
                                myScale(aScale),
                                myMaxHeight(maxHeight),
-                               myBG(bg), myFG(fg){    
+                               myFG(fg), myBG(bg) {
   }   
   inline
   unsigned int operator()(const Point3D &aPoint)  const {
@@ -92,12 +123,9 @@ struct Image3DPredicatFrom2DImage{
 
 int main( int argc, char** argv )
 {
-  typedef ImageContainerBySTLVector < Z3i::Domain, unsigned char > Image3D;
   typedef ImageContainerBySTLVector < Z2i::Domain, unsigned char> Image2D;
 
-  typedef DGtal::ConstImageAdapter<Image3D, Z2i::Domain, DGtal::functors::Point2DEmbedderIn3D<DGtal::Z3i::Domain>,
-                                   Image3D::Value,  DGtal::functors::Identity >  ImageAdapterExtractor;
-
+  
   // parse command line ----------------------------------------------
   po::options_description general_opt("Allowed options are: ");
   general_opt.add_options()
@@ -105,7 +133,7 @@ int main( int argc, char** argv )
     ("input,i", po::value<std::string>(), "heightfield file." )
     ("output,o", po::value<std::string>(), "volumetric file ") 
     ("scale,s", po::value<double>()->default_value(1.0), "set the scale factor on height values. (default 1.0)")
-    ("volZ,z", po::value<uint32_t>()->default_value(255), "set the Z max value of domain.")    
+    ("volZ,z", po::value<unsigned int>()->default_value(255), "set the Z max value of domain.")    
     ("foregroundValue,f", po::value<unsigned int>()->default_value(128), "specify the foreground value of the resulting voxel." )
     ("backgroundValue,b", po::value<unsigned int>()->default_value(0), "specify the background value of the resulting volumetric file.");
   
@@ -121,7 +149,7 @@ int main( int argc, char** argv )
   if( !parseOK || vm.count("help")||argc<=1)
     {
       std::cout << "Usage: " << argv[0] << " [input] [output]\n"
-		<< "Convert a 2D heightfield image into a volumetric file."
+		<< "Convert a 2D heightfield image into a volumetric file. "
 		<< general_opt << "\n";
       std::cout << "Example:\n"
 		<< "heightfield2vol -i ${DGtal}/examples/samples/church.pgm -o volResu.vol -s 0.3 -z 50  \n";
@@ -140,7 +168,7 @@ int main( int argc, char** argv )
   trace.info() << "Reading input file " << inputFilename ; 
   Image2D inputImage = DGtal::GenericReader<Image2D>::import(inputFilename);  
   double scale = vm["scale"].as<double>(); 
-  uint32_t maxZ = vm["volZ"].as<uint32_t>();
+  unsigned int  maxZ = vm["volZ"].as<unsigned int>();
   trace.info() << " [done] " << std::endl ; 
   
   unsigned int foregroundValue = vm["foregroundValue"].as<unsigned int>();

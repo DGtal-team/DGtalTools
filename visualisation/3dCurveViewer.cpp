@@ -26,12 +26,60 @@
  * This file is part of the DGtal library
  */
 
+
+
+
 /**
- * Description of 3dCurveViewer <p>
- *
- * Display a 3D curve given as the <input> filename (with possibly
- * projections and/or tangent information) by using QGLviewer.
+ @page Doc3dCurveViewer 3dCurveViewer
+ 
+ @brief  Displays a 3D curve given as the input filename (with possibly projections and/or tangent information) by using QGLviewer.
+ 
+
+ @b Usage:  3dCurveViewer [options] input
+ 
+
+ @b Allowed @b options @b are :
+ 
+ @code
+  -h [ --help ]                 display this message
+  -i [ --input ] arg            the name of the text file containing the list 
+                                of 3D points (x y z per line)
+  -b [ --box ] arg (=0)         specifies the the tightness of the bounding box
+                                around the curve with a given integer 
+                                displacement <arg> to enlarge it (0 is tight)
+  -v [ --viewBox ] arg (=WIRED) displays the bounding box, <arg>=WIRED means 
+                                that only edges are displayed, <arg>=COLORED 
+                                adds colors for planes (XY is red, XZ green, 
+                                YZ, blue).
+  -C [ --curve3d ]              displays the 3D curve
+  -c [ --curve2d ]              displays the 2D projections of the 3D curve on 
+                                the bounding box
+  -3 [ --cover3d ]              displays the 3D tangential cover of the curve
+  -2 [ --cover2d ]              displays the 2D projections of the 3D 
+                                tangential cover of the curve
+  -n [ --nbColors ] arg (=3)    sets the number of successive colors used for 
+                                displaying 2d and 3d maximal segments (default 
+                                is 3: red, green, blue)
+  -t [ --tangent ]              displays the tangents to the curve
+
+ @endcode
+
+
+ @b Example: 
+ 
+ @code
+ $  3dCurveViewer -C -b 1 -3 -2 -c ${DGtal}/examples/samples/sinus.dat
+ @endcode
+
+ You should obtain such a visualisation:
+ @image html res3dCurveViewer.png "resulting visualisation of 3d curve with tangential cover."
+ 
+
+ @see
+ @ref 3dCurveViewer.cpp
+
  */
+
 
 #include <iostream>
 #include <iterator>
@@ -153,11 +201,24 @@ void displayDSS3dTangent( Viewer3D<space, kspace> & viewer,
         const DGtal::Color & color3d )
 {
   typedef typename StandardDSS6Computer::Point3d Point;
-  typedef typename StandardDSS6Computer::PointD3d PointD3d;
+  typedef typename StandardDSS6Computer::PointR3d PointR3d;
+  typedef DGtal::PointVector<3,double> PointD3d;
   typedef typename Display3D<>::BallD3D PointD3D;
   Point directionZ3;
-  PointD3d P1, P2, direction, intercept, thickness;
-  dss3d.getParameters( directionZ3, intercept, thickness );
+  PointR3d interceptR, thicknessR;
+  PointD3d P1, P2, direction;
+  dss3d.getParameters( directionZ3, interceptR, thicknessR );
+  
+  PointD3d intercept;
+  intercept[0] = (double) NumberTraits<int>::castToInt64_t ( interceptR[0].first ) / (double) NumberTraits<int>::castToInt64_t ( interceptR[0].second );
+  intercept[1] = (double) NumberTraits<int>::castToInt64_t ( interceptR[1].first ) / (double) NumberTraits<int>::castToInt64_t ( interceptR[1].second );
+  intercept[2] = (double) NumberTraits<int>::castToInt64_t ( interceptR[2].first ) / (double) NumberTraits<int>::castToInt64_t ( interceptR[2].second );
+  
+  PointD3d thickness;
+  thickness[0] = (double) NumberTraits<int>::castToInt64_t ( thicknessR[0].first ) / (double) NumberTraits<int>::castToInt64_t ( thicknessR[0].second );
+  thickness[1] = (double) NumberTraits<int>::castToInt64_t ( thicknessR[1].first ) / (double) NumberTraits<int>::castToInt64_t ( thicknessR[1].second );
+  thickness[2] = (double) NumberTraits<int>::castToInt64_t ( thicknessR[2].first ) / (double) NumberTraits<int>::castToInt64_t ( thicknessR[2].second );
+  
   assign( direction, directionZ3 );
   direction /= direction.norm();
   assign( P1, *dss3d.begin() );
@@ -321,7 +382,7 @@ int main(int argc, char **argv)
 
   // specify command line ----------------------------------------------
   QApplication application(argc,argv); // remove Qt arguments.
-  po::options_description general_opt("Specific allowed options (for Qt options, see Qt official site) are: ");
+  po::options_description general_opt("Specific allowed options (for Qt options, see Qt official site) are");
   general_opt.add_options()
     ("help,h", "display this message")
     ("input,i", po::value<std::string>(), "the name of the text file containing the list of 3D points (x y z per line)" )

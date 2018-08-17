@@ -11,9 +11,25 @@ SET(DGTAL_TOOLS_SRC
   eulerCharacteristic
 )
 
+if (WITH_EIGEN)
+    add_executable(volSurfaceRegularization volSurfaceRegularization.cpp volSurfaceRegularization-details/surface_approx.cpp)
+    target_link_libraries(volSurfaceRegularization ${DGTAL_LIBRARIES} ${DGtalToolsLibDependencies})
+endif()
+
+if ( WITH_VISU3D_QGLVIEWER )
+  SET(VISU3D_TESTS_SRC
+      3dCurveTangentEstimator
+  )
+  FOREACH(FILE ${VISU3D_TESTS_SRC})
+    add_executable(${FILE} ${FILE})
+    target_link_libraries (${FILE}  ${DGTAL_LIBRARIES} ${DGtalToolsLibDependencies})
+  ENDFOREACH(FILE)
+endif ( WITH_VISU3D_QGLVIEWER )
+
 if (  WITH_CGAL )
   SET(CGAL_TESTS_SRC
-    3dLocalEstimators )
+#    3dLocalEstimators
+     )
   FOREACH(FILE ${CGAL_TESTS_SRC})
     add_executable(${FILE} ${FILE})
     target_link_libraries (${FILE}  ${DGTAL_LIBRARIES} ${DGtalToolsLibDependencies})

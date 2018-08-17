@@ -39,6 +39,7 @@
 
 #include "DGtal/base/Common.h"
 #include "DGtal/helpers/StdDefs.h"
+#include "DGtal/io/readers/PointListReader.h"
 
 //Grid curve
 #include "DGtal/geometry/curves/FreemanChain.h"
@@ -52,13 +53,60 @@ using namespace DGtal;
 ///////////////////////////////////////////////////////////////////////////////
 namespace po = boost::program_options;
 
+
+
+/**
+ @page tangentBC tangentBC
+ 
+ @brief  Estimates tangent using a binomial convolver.
+
+ @b Usage:  tangentBC [options] --input  <fileName> 
+
+
+ @b Allowed @b options @b are : 
+ @code
+  -h [ --help ]              display this message
+  -i [ --input ] arg         input file name: FreemanChain (.fc) or a sequence of discrete points (.sdp).
+  -s [ --GridStep ] arg (=1) Grid step
+ @endcode
+
+@note The file may contain several freeman chains.
+
+
+ @b Example: 
+
+We consider as input shape the freeman chain of the DGtal/examples/sample directory. The contour can be displayed with @ref displayContours : 
+ @code
+$  displayContours -i $DGtal/examples/samples/contourS.fc -o contourS.png  --drawPointOfIndex 0
+ @endcode
+
+The tangents can be computed as follows:
+@code 
+$ tangentBC -i $DGtal/examples/samples/contourS.fc  > tangentsBC.dat
+$ gnuplot 
+gnuplot> plot [] [-1.2:1.2]'tangentsBC.dat' using 1:3  w lines title "tangents with Binomial Convolution estimator"
+@endcode
+
+ You should obtain such a result:
+
+ | contour  | curvature  | 
+ | :------: | :--------: |   
+ | ![ ](resCurvatureBCcontour.png)  | ![ ](resTangentBC.png)  |
+ | CCW oriented (index 0=blue pt)| resulting tangent (angle) |
+ 
+ @see
+ @ref tangentBC.cpp
+
+ */
+
+
 int main( int argc, char** argv )
 {
   // parse command line ----------------------------------------------
   po::options_description general_opt("Allowed options are: ");
   general_opt.add_options()
     ("help,h", "display this message")
-    ("FreemanChain,f", po::value<std::string>(), "FreemanChain file name")
+    ("input,i", po::value<std::string>(), "input file name: FreemanChain (.fc) or a sequence of discrete points (.sdp).")
     ("GridStep,step", po::value<double>()->default_value(1.0), "Grid step");
   
   
@@ -72,10 +120,10 @@ int main( int argc, char** argv )
   }
 
   po::notify(vm);    
-  if(!parseOK || vm.count("help")||argc<=1 || (!(vm.count("FreemanChain"))) )
+  if(!parseOK || vm.count("help")||argc<=1 || (!(vm.count("input"))) )
     {
       trace.info()<< "Tangent using a binomial convolver " <<std::endl << "Basic usage: "<<std::endl
-      << "\t tangentBC [options] --FreemanChain  <fileName> "<<std::endl
+      << "\t tangentBC [options] --input  <fileName> "<<std::endl
       << general_opt << "\n"
       << "NB: the file may contain several freeman chains." << "\n";
       return 0;
@@ -86,9 +134,10 @@ int main( int argc, char** argv )
 
 
  
-  if(vm.count("FreemanChain")){
-    std::string fileName = vm["FreemanChain"].as<std::string>();
-
+  if(vm.count("input")){
+    std::string fileName = vm["input"].as<std::string>();
+    std::string extension =  fileName.substr( fileName.find_last_of(".") + 1 );
+    bool isSDP = extension == "sdp";
     typedef Z2i::Space Space; 
     typedef Space::Point Point; 
     typedef PointVector<2, double> RealPoint; 
@@ -97,18 +146,30 @@ int main( int argc, char** argv )
     typedef std::vector< Point > Storage;
     typedef Storage::const_iterator ConstIteratorOnPoints; 
 
-    std::vector< FreemanChain > vectFcs =  
-      PointListReader< Point >:: getFreemanChainsFromFile<Integer> (fileName); 
-    
-    for(unsigned int i=0; i<vectFcs.size(); i++){
-
-      bool isClosed = vectFcs.at(i).isClosed(); 
-      std::cout << "# grid curve " << i << "/" << vectFcs.size() << " "
-                << ( (isClosed)?"closed":"open" ) << std::endl;
-
+    std::vector< FreemanChain > vectFcs;
+    if(!isSDP)
+      {
+        vectFcs =   
+          PointListReader< Point >:: getFreemanChainsFromFile<Integer> (fileName); 
+      }
+    for(unsigned int i=0; i<vectFcs.size() || (i==0 && isSDP); i++){
       Storage vectPts; 
-      FreemanChain::getContourPoints( vectFcs.at(i), vectPts ); 
-
+      bool isClosed;
+      if(!isSDP)
+        {
+          isClosed = vectFcs.at(i).isClosed(); 
+          std::cout << "# grid curve " << i << "/" << vectFcs.size() << " "
+                    << ( (isClosed)?"closed":"open" ) << std::endl;
+          FreemanChain::getContourPoints( vectFcs.at(i), vectPts ); 
+        }
+      else
+        {
+          vectPts = PointListReader<Z2i::Point>::getPointsFromFile(fileName);
+          Z2i::Point pf =vectPts[0];
+          Z2i::Point pl =vectPts[vectPts.size()-1];
+          isClosed = (pf[0]-pl[0])+(pf[1]-pl[1]) <= 1;
+        }
+      
       // Binomial
       std::cout << "# Curvature estimation from binomial convolution" << std::endl;
       typedef BinomialConvolver<ConstIteratorOnPoints, double> MyBinomialConvolver;
@@ -127,7 +188,7 @@ int main( int argc, char** argv )
              tangents.begin() ); 
 
       // Output
-      std::cout << "# id tangent.x tangent.y angle(atan2(y,x))" << std::endl;  
+      std::cout << "# id tangent.x tangent.y angle(atan2(y,x)) x y" << std::endl;  
       unsigned int j = 0;
       for ( ConstIteratorOnPoints 
         it = vectPts.begin(), it_end = vectPts.end();
@@ -137,7 +198,7 @@ int main( int argc, char** argv )
     double y = tangents[ j ][ 1 ];
     std::cout << j << std::setprecision( 15 )
               << " " << x << " " << y 
-              << " " << atan2( y, x )
+              << " " << atan2( y, x ) << " " << (*it)[0] << " " << (*it)[1]
               << std::endl;
   }
 

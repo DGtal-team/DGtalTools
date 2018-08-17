@@ -15,7 +15,7 @@
  **/
 /**
  * @file curvatureBC.cpp
- * @ingroup Tools
+ * @ingroup estimators
  * @author Tristan Roussillon (\c tristan.roussillon@liris.cnrs.fr ) 
  * Laboratoire d'InfoRmatique en Image et Systèmes d'information - LIRIS (CNRS, UMR 5205), CNRS,
  * France
@@ -58,6 +58,49 @@ using namespace DGtal;
 
 
 
+/**
+ @page curvatureBC curvatureBC
+ 
+ @brief Estimatates curvature using a binomial convolver.
+
+ @b Usage: curvatureBC [options] --input  \<fileName\> 
+
+
+ @b Allowed @b options @b are : 
+ @code
+  -h [ --help ]              display this message
+  -i [ --input ] arg         input FreemanChain file name
+  -s [ --GridStep ] arg (=1) Grid step
+ @endcode
+
+ @b Example: 
+ 
+We consider as input shape the freeman chain of the DGtal/examples/sample directory. The contour can be displayed with @ref displayContours : 
+ @code
+$  displayContours -i $DGtal/examples/samples/contourS.fc -o contourS.png  --drawPointOfIndex 0
+ @endcode
+
+The curvature can be computed as follows:
+@code 
+$ curvatureBC -i $DGtal/examples/samples/contourS.fc  > curvatureBC.dat
+$ gnuplot 
+gnuplot> plot 'curvatureBC.dat' w lines title "curvature with Binomial Convolution estimator"
+@endcode
+
+
+
+ You should obtain such a result:
+
+ | contour  | curvature  | 
+ | :------: | :--------: |   
+ | ![ ](resCurvatureBCcontour.png)  | ![ ](resCurvatureBCcurvature.png)  |
+ | CCW oriented (index 0=blue pt)| resulting curvature |
+
+ @see
+ @ref curvatureBC.cpp
+
+ */
+
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace po = boost::program_options;
@@ -68,7 +111,7 @@ int main( int argc, char** argv )
   po::options_description general_opt("Allowed options are: ");
   general_opt.add_options()
     ("help,h", "display this message")
-    ("FreemanChain,f", po::value<std::string>(), "FreemanChain file name")
+    ("input,i", po::value<std::string>(), "input FreemanChain file name")
     ("GridStep,step", po::value<double>()->default_value(1.0), "Grid step");
   
   
@@ -81,10 +124,10 @@ int main( int argc, char** argv )
     trace.info()<< "Error checking program options: "<< ex.what()<< std::endl;
   }
   po::notify(vm);    
-  if(!parseOK || vm.count("help")||argc<=1 || (!(vm.count("FreemanChain"))) )
+  if(!parseOK || vm.count("help")||argc<=1 || (!(vm.count("input"))) )
     {
       trace.info()<< "Curvature using a binomial convolver " <<std::endl << "Basic usage: "<<std::endl
-      << "\t curvatureBC [options] --FreemanChain  <fileName> "<<std::endl
+      << "\t curvatureBC [options] --input  <fileName> "<<std::endl
       << general_opt << "\n";
       return 0;
     }
@@ -94,8 +137,8 @@ int main( int argc, char** argv )
 
 
  
-  if(vm.count("FreemanChain")){
-    std::string fileName = vm["FreemanChain"].as<std::string>();
+  if(vm.count("input")){
+    std::string fileName = vm["input"].as<std::string>();
 
     typedef Z2i::Space Space; 
     typedef Space::Point Point; 

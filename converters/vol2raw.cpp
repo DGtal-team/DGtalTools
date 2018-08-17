@@ -27,7 +27,7 @@
 
 #include <iostream>
 #include <DGtal/base/Common.h>
-#include <DGtal/io/readers/VolReader.h>
+#include <DGtal/io/readers/GenericReader.h>
 #include <DGtal/io/writers/RawWriter.h>
 #include <DGtal/helpers/StdDefs.h>
 #include <DGtal/images/Image.h>
@@ -42,6 +42,39 @@ using namespace DGtal;
 using namespace Z3i;
 
 namespace po = boost::program_options;
+
+/**
+ @page vol2raw vol2raw
+ @brief Converts a vol to a 8-bit raw file.
+
+@b Usage: vol2raw [input] [output]
+
+@b Allowed @b options @b are:
+
+@code
+    -h [ --help ]         display this message.
+    -i [ --input ] arg    vol file (.vol, .longvol .p3d, .pgm3d and if 
+                          WITH_ITK is selected: dicom, dcm, mha, mhd). For
+                          longvol, dicom, dcm, mha or mhd formats, the 
+                          input values are linearly scaled between 0 and 
+                          255.
+    -o [ --output ] arg   Output filename.
+    --rescaleInputMin arg (=0)   min value used to rescale the input intensity 
+                          (to avoid basic cast into 8  bits image).
+    --rescaleInputMax arg (=255) max value used to rescale the input intensity 
+                          (to avoid basic cast into 8 bits image).
+
+@endcode
+
+@b Example:
+@code 
+   vol2raw -i input.vol -o out.raw
+@endcode
+
+@see
+@ref vol2raw.cpp
+
+*/
 
 
 /**
@@ -64,8 +97,10 @@ int main(int argc, char**argv)
   po::options_description general_opt ( "Allowed options are: " );
   general_opt.add_options()
     ( "help,h", "display this message." )
-    ( "input,i", po::value<std::string>(), "Input vol file." )
-    ( "output,o", po::value<string>(),"Output filename." );
+    ("input,i", po::value<std::string>(), "vol file (.vol, .longvol .p3d, .pgm3d and if WITH_ITK is selected: dicom, dcm, mha, mhd). For longvol, dicom, dcm, mha or mhd formats, the input values are linearly scaled between 0 and 255." )
+    ( "output,o", po::value<string>(),"Output filename." )
+    ("rescaleInputMin", po::value<DGtal::int64_t>()->default_value(0), "min value used to rescale the input intensity (to avoid basic cast into 8  bits image).")
+    ("rescaleInputMax", po::value<DGtal::int64_t>()->default_value(255), "max value used to rescale the input intensity (to avoid basic cast into 8 bits image).");
   bool parseOK=true;
   po::variables_map vm;
   try{
@@ -89,10 +124,17 @@ int main(int argc, char**argv)
   std::string filename = vm["input"].as<std::string>();
   if ( ! ( vm.count ( "output" ) ) ) missingParam ( "--output" );
   std::string outputFileName = vm["output"].as<std::string>();
-
+  DGtal::int64_t rescaleInputMin = vm["rescaleInputMin"].as<DGtal::int64_t>();
+  DGtal::int64_t rescaleInputMax = vm["rescaleInputMax"].as<DGtal::int64_t>();
+  
   typedef ImageContainerBySTLVector<Z3i::Domain, unsigned char>  MyImageC;
+  typedef DGtal::functors::Rescaling<DGtal::int64_t ,unsigned char > RescalFCT;
+  MyImageC imageC =  GenericReader< MyImageC >::importWithValueFunctor( filename ,RescalFCT(rescaleInputMin,
+                                                                                               rescaleInputMax,
+                                                                                               0, 255) );
 
-  MyImageC  imageC = VolReader< MyImageC >::importVol ( filename );
+  
+  
   bool res =  RawWriter< MyImageC >::exportRaw8(outputFileName, imageC);
   trace.info() << "Raw export done, image dimensions: "  << imageC.domain().upperBound()[0]-imageC.domain().lowerBound()[0]+1
                << " " << imageC.domain().upperBound()[1]-imageC.domain().lowerBound()[1]+1

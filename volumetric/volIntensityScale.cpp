@@ -46,6 +46,46 @@ namespace po = boost::program_options;
 
 
 /**
+ @page volIntensityScale volIntensityScale
+ 
+ @brief Applies a linear rescaling of the image intensity from an input intensity interval [InMin, InMax] into an output interval [OutMin, OutMax].
+
+ @b Usage: 	 volIntensityScale --input \<volFileName\> --output \<volOutputFileName\>  (both files can be independently in vol, pgm3D, p3d format)
+
+
+
+ @b Allowed @b options @b are : 
+ @code
+  -h [ --help ]             display this message.
+  -i [ --input ] arg        Input vol file.
+  -o [ --output ] arg       volumetric output file (.vol, .pgm, .pgm3d, 
+                            .longvol) 
+  -m [ --inMin ] arg (=0)   the min value of the input image.
+  -M [ --inMax ] arg (=255) the max value of the input image.
+  --outMin arg (=0)         the min value of the output image.
+  --outMax arg (=255)       the max value of the output image.
+
+ @endcode
+
+ @b Example: 
+
+ In this example, we select all intensities included in [0,100] and scale them into [0, 255]: 
+
+ @code
+  $ volIntensityScale -i  ${DGtal}/examples/samples/lobster.vol  --inMin 0 --inMax 100 -o lobster0-100.vol 
+
+ @endcode
+
+
+ You should obtain such a result:
+ @image html resVolIntensityScale.png "(a) source image, (b) intensity scaled image."
+ 
+ @see
+ @ref volIntensityScale.cpp
+
+ */
+
+/**
  * Missing parameter error message.
  *
  * @param param

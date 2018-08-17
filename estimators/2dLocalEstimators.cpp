@@ -40,6 +40,7 @@
 #include <iomanip>
 #include <vector>
 #include <string>
+#include <fstream>
 
 #include <boost/program_options/options_description.hpp>
 #include <boost/program_options/parsers.hpp>
@@ -84,6 +85,87 @@
 #include "DGtal/kernel/BasicPointFunctors.h"
 
 using namespace DGtal;
+
+
+
+/**
+ @page Doc2dLocalEstimators 2dLocalEstimators
+ 
+ @brief Compares local estimators on implicit shapes using DGtal library.
+
+ @b Usage: 	2dlocalEstimators --output <output> --shape <shapeName> [required parameters] --estimators <binaryWord> --properties <binaryWord>
+
+Below are the different available families of estimators: 
+	 - True estimators
+	 - Maximal DSS based estimators
+	 - Maximal DCA based estimators
+	 - Binomial convolver based estimators
+	 - Integral Invariants based estimators
+
+The i-th family of estimators is enabled if the i-th character of the binary word is not 0. The default binary word is '10000'. This means that the first family of estimators, ie. true estimators, is enabled, whereas the next ones are disabled. 
+Below are the different available properties: 
+	 - Tangent
+	 - Curvature
+
+
+
+
+ @b Allowed @b options @b are : 
+ @code
+  -h [ --help ]                      display this message
+  -l [ --list ]                      List all available shapes
+  -o [ --output ] arg                Output
+  -s [ --shape ] arg                 Shape name
+  -R [ --radius ] arg                Radius of the shape
+  -K [ --kernelradius ] arg (=0)     Radius of the convolution kernel (Integral
+                                     invariants estimators)
+  --alpha arg (=0.33333333333333331) Alpha parameter for Integral Invariant 
+                                     computation
+  -A [ --axis1 ] arg                 Half big axis of the shape (ellipse)
+  -a [ --axis2 ] arg                 Half small axis of the shape (ellipse)
+  -r [ --smallradius ] arg (=5)      Small radius of the shape
+  -v [ --varsmallradius ] arg (=5)   Variable small radius of the shape
+  -k [ --k ] arg (=3)                Number of branches or corners the shape
+  --phi arg (=0)                     Phase of the shape (in radian)
+  -w [ --width ] arg (=10)           Width of the shape
+  -p [ --power ] arg (=2)            Power of the metric (double)
+  -x [ --center_x ] arg (=0)         x-coordinate of the shape center (double)
+  -y [ --center_y ] arg (=0)         y-coordinate of the shape center (double)
+  -g [ --gridstep ] arg (=1)         Grid step for the digitization
+  -n [ --noise ] arg (=0)            Level of noise to perturb the shape
+  --properties arg (=11)             the i-th property is disabled iff there is
+                                     a 0 at position i
+  -e [ --estimators ] arg (=10000)   the i-th estimator is disabled iff there 
+                                     is a 0 at position i
+  -l [ --lambda ] arg (=0)           Use the shape to get a better 
+                                     approximation of the surface (optional)
+   -E [exportShape ] arf             Exports the contour of the source shape as a sequence of discrete points (.sdp)." )
+ @endcode
+
+ @b Example: 
+ With this tool you can easely compare several estimator with the real value:
+ @code
+$  2dlocalEstimators --output curvature --shape flower --radius 15 -v 5  --gridstep 1  --estimators 11100 --properties 01
+ @endcode
+
+You can display the result by using gnuplot:
+
+@code
+$ gnuplot
+gnuplot> plot [][-0.4:0.35] 'curvature_True_curvature.dat' w lines title "true curvature" , 'curvature_MDCA_curvature.dat' w lines  title "Maximal DCA curvature estimator", 'curvature_MDSSl_curvature.dat' w lines title "Maximal DSS based estimators"
+@endcode
+
+
+You should obtain such a graph:
+
+
+ @image html res2dLocalEstimators.png "Resulting visualization."
+ 
+ @see
+ @ref 2dLocalEstimators.cpp
+
+ */
+
 
 
 /**
@@ -316,10 +398,10 @@ computeLocalEstimations( const std::string & filename,
                          struct OptionsIntegralInvariant< Z2i::RealPoint > optionsII,
                          const std::string & options,
                          const std::string & properties,
+                         const std::string & outShape,
                          double noiseLevel = 0.0 )
 {
   // Types
-  typedef typename Space::Point Point;
   typedef typename Space::Vector Vector;
   typedef typename Space::RealPoint RealPoint;
   typedef typename Space::Integer Integer;
@@ -389,7 +471,19 @@ computeLocalEstimations( const std::string & filename,
     // Create GridCurve
     GridCurve< KSpace > gridcurve;
     gridcurve.initFromSCellsVector( points );
+    if(outShape != "")
+      {
+        std::ofstream outS;
+        outS.open(outShape.c_str());
+        for(const auto &p : points)
+          {
 
+            Dimension track = *( K.sDirs( p ) );
+            SCell pointel = K.sIndirectIncident( p, track );
+            outS << K.sCoords( pointel )[0] << " " << K.sCoords( pointel )[1] << std::endl;
+          }
+        outS.close();
+      }
     // Ranges
     typedef typename GridCurve< KSpace >::MidPointsRange PointsRange;
     PointsRange pointsRange = gridcurve.getMidPointsRange();
@@ -863,6 +957,7 @@ int main( int argc, char** argv )
       ("noise,n",  po::value<double>()->default_value(0.0), "Level of noise to perturb the shape" )
       ("properties",  po::value<std::string>()->default_value("11"), "the i-th property is disabled iff there is a 0 at position i" )
       ("estimators,e",  po::value<std::string>()->default_value("10000"), "the i-th estimator is disabled iff there is a 0 at position i" )
+      ("exportShape,E",  po::value<std::string>(), "Exports the contour of the source shape as a sequence of discrete points (.sdp)" )
       ("lambda,l",  po::value< bool >()->default_value( false ), "Use the shape to get a better approximation of the surface (optional)" );
 
 
@@ -946,7 +1041,6 @@ int main( int argc, char** argv )
 
   // standard types
   typedef Z2i::Space Space;
-  typedef Space::Point Point;
   typedef Space::RealPoint RealPoint;
 
   RealPoint center( vm["center_x"].as<double>(),
@@ -959,6 +1053,7 @@ int main( int argc, char** argv )
   optII.lambda_optimized = vm["lambda"].as< bool >();
   optII.center = center;
 
+  std::string outShape = vm.count("exportShape")? vm["exportShape"].as<std::string>(): "";
   double noiseLevel = vm["noise"].as<double>();
 
   if (id ==0)
@@ -968,7 +1063,7 @@ int main( int argc, char** argv )
     double radius = vm["radius"].as<double>();
 
     Ball2D<Space> * ball = new Ball2D<Space>( center, radius);
-    computeLocalEstimations<Space>( filename, ball, h, optII, options, properties, noiseLevel );
+    computeLocalEstimations<Space>( filename, ball, h, optII, options, properties, outShape, noiseLevel );
     delete ball;
   }
   else if (id ==1)
@@ -1004,7 +1099,7 @@ int main( int argc, char** argv )
     double phi = vm["phi"].as<double>();
 
     Flower2D<Space> * flower = new Flower2D<Space>( center, radius, varsmallradius, k, phi );
-    computeLocalEstimations<Space>( filename, flower, h, optII, options, properties, noiseLevel );
+    computeLocalEstimations<Space>( filename, flower, h, optII, options, properties, outShape, noiseLevel );
     delete flower;
   }
   else if (id ==4)
@@ -1018,7 +1113,7 @@ int main( int argc, char** argv )
     double phi = vm["phi"].as<double>();
 
     NGon2D<Space> * object = new NGon2D<Space>( center, radius, k, phi );
-    computeLocalEstimations<Space>( filename, object, h, optII, options, properties, noiseLevel );
+    computeLocalEstimations<Space>( filename, object, h, optII, options, properties, outShape, noiseLevel );
     delete object;
   }
   else if (id ==5)
@@ -1034,7 +1129,7 @@ int main( int argc, char** argv )
     double phi = vm["phi"].as<double>();
 
     AccFlower2D<Space> * accflower = new AccFlower2D<Space>( center, radius, varsmallradius, k, phi );
-    computeLocalEstimations<Space>( filename, accflower, h, optII, options, properties, noiseLevel );
+    computeLocalEstimations<Space>( filename, accflower, h, optII, options, properties, outShape, noiseLevel );
     delete accflower;
   }
   else if (id ==6)
@@ -1048,7 +1143,7 @@ int main( int argc, char** argv )
     double phi = vm["phi"].as<double>();
 
     Ellipse2D<Space> * ellipse = new Ellipse2D<Space>( center, a1, a2, phi );
-    computeLocalEstimations<Space>( filename, ellipse, h, optII, options, properties, noiseLevel );
+    computeLocalEstimations<Space>( filename, ellipse, h, optII, options, properties, outShape, noiseLevel );
     delete ellipse;
   }
 }

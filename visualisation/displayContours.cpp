@@ -15,7 +15,7 @@
  **/
 /**
  * @file displayContours.cpp
- * @ingroup Tools
+ * @ingroup visualization
  * @author Bertrand Kerautret (\c kerautre@loria.fr)
  * LORIA (CNRS, UMR 7503), University of Nancy, France
  *
@@ -51,6 +51,7 @@
 #include "DGtal/images/ImageContainerBySTLVector.h"
 #include "DGtal/images/ImageSelector.h"
 #include "DGtal/io/readers/PointListReader.h"
+#include "DGtal/io/readers/TableReader.h"
 #include "DGtal/io/Color.h"
 
  #include "DGtal/io/readers/GenericReader.h"
@@ -75,6 +76,100 @@ using namespace DGtal;
 
 
 
+/**
+ @page displayContours displayContours
+ 
+ @brief Displays discrete contours. 
+
+
+ @b Usage:   	 displayContours [options] -i  <fileName>  
+
+
+ @b Allowed @b options @b are :
+ 
+ @code
+  -h [ --help ]           display this message
+  -i [ --input ] arg      input Freeman chain file name
+  --SDP arg               Import a contour as a Sequence of Discrete Points 
+                          (SDP format)
+  --SFP arg               Import a contour as a Sequence of Floating Points 
+                          (SFP format)
+  --drawContourPoint arg  <size> display contour points as disk of radius 
+                          <size>
+  --fillContour           fill the contours with default color (gray)
+  --lineWidth arg (=1)    Define the linewidth of the contour (SDP format)
+  --drawPointOfIndex arg  <index> Draw the contour point of index <index> 
+                          (default 0) 
+  --pointSize arg (=2)    <size> Set the display point size of the point 
+                          displayed by drawPointofIndex option (default 2.0) 
+  --noXFIGHeader           to exclude xfig header in the resulting output 
+                          stream (no effect with option -outputFile).
+  --withProcessing arg    Processing (used only when the input is a Freeman chain (--input)):
+                           DSS segmentation {DSS}
+                            Maximal segments {MS}
+                           Faithful Polygon {FP}
+                           Minimum Length Polygon {MLP}
+  -o [ --outputFile ] arg  <filename> save output file automatically according 
+                          the file format extension.
+  -v [ --displayVectorField ] arg    Add the display of a vector field 
+                                     represented by two floating coordinates. 
+                                     Each vector is displayed starting from the
+                                     corresponding contour point coordinates.
+  -v [ --scaleVectorField ] arg (=1) set the scale of the vector field (default
+                                     1) (used with --displayVectorField).
+  --vectorFieldIndex arg             specify the vector field index (by default
+                                     0,1) (used with --displayVectorField).
+  --vectorFromAngle arg              specify that the vectors are defined from 
+                                     an angle value represented at the given 
+                                     index  (by default 0) (used with 
+                                     --displayVectorField).
+
+  --rotateVectorField                apply a CCW rotation of 90° (used with 
+                                     --displayVectorField).  
+
+  --outputStreamEPS        specify eps for output stream format.
+  --outputStreamSVG        specify svg for output stream format.
+  --outputStreamFIG        specify fig for output stream format.
+  --invertYaxis            invertYaxis invert the Y axis for display contours 
+                          (used only with --SDP)
+  --backgroundImage arg   backgroundImage <filename> : display image as 
+                          background 
+  --alphaBG arg           alphaBG <value> 0-1.0 to display the background image
+                          in transparency (default 1.0), (transparency works 
+                          only if cairo is available)
+  --scale arg             scale <value> 1: normal; >1 : larger ; <1 lower 
+                          resolutions  )
+ @endcode
+
+
+ @b Example: 
+
+ In this example we show how to display of a set of contours extracted
+ in a single image. The first step is to extract a set contours by
+ using the tool 
+
+@code
+$ img2freeman -i $DGtal/examples/samples/church.pgm  -R 0 20 255 -s 200  > church.fc 
+@endcode
+
+Then, we display the set of contours with the background images (you need to have compiled DGTal with the options (-DWITH_MAGICK=true and -DWITH_CAIRO=true) :
+
+ @code
+$  displayContours -i church.fc   --backgroundImage $DGtal/examples/samples/church.png --alphaBG 0.75 --outputFile church.pdf
+ @endcode
+
+
+ You should obtain such a result:
+
+ @image html resDisplayContours.png "Resulting visualization."
+ 
+
+ @see
+ @ref displayContours.cpp
+
+ */
+
+
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace po = boost::program_options;
@@ -86,7 +181,7 @@ int main( int argc, char** argv )
   po::options_description general_opt("Allowed options are: ");
   general_opt.add_options()
     ("help,h", "display this message")
-    ("FreemanChain,f", po::value<std::string>(), "FreemanChain file name")
+    ("input,i", po::value<std::string>(), "input FreemanChain file name")
     ("SDP", po::value<std::string>(), "Import a contour as a Sequence of Discrete Points (SDP format)")
     ("SFP", po::value<std::string>(), "Import a contour as a Sequence of Floating Points (SFP format)")
     ("drawContourPoint", po::value<double>(), "<size> display contour points as disk of radius <size>")    
@@ -95,16 +190,17 @@ int main( int argc, char** argv )
     ("drawPointOfIndex", po::value<int>(), "<index> Draw the contour point of index <index> (default 0) ") 
     ("pointSize", po::value<double>()->default_value(2.0), "<size> Set the display point size of the point displayed by drawPointofIndex option (default 2.0) ") 
     ("noXFIGHeader", " to exclude xfig header in the resulting output stream (no effect with option -outputFile).")
-    ("withProcessing", po::value<std::string>(), "Processing (used only with --FreemanChain):\n\t DSS segmentation {DSS}\n\t  Maximal segments {MS}\n\t Faithful Polygon {FP}\n\t Minimum Length Polygon {MLP}")   
+    ("withProcessing", po::value<std::string>(), "Processing (used only when the input is a Freeman chain (--input)):\n\t DSS segmentation {DSS}\n\t  Maximal segments {MS}\n\t Faithful Polygon {FP}\n\t Minimum Length Polygon {MLP}")   
     ("outputFile,o", po::value<std::string>(), " <filename> save output file automatically according the file format extension.")
+    ("displayVectorField,v", po::value<std::string>(), "Add the display of a vector field represented by two floating coordinates. Each vector is displayed starting from the corresponding contour point coordinates.")
+    ("scaleVectorField,v", po::value<double>()->default_value(1.0), "set the scale of the vector field (default 1) (used with --displayVectorField).")
+    ("vectorFieldIndex", po::value<std::vector <unsigned int> >()->multitoken(), "specify the vector field index (by default 0,1) (used with --displayVectorField)." )
+    ("vectorFromAngle", po::value<unsigned int>(), "specify that the vectors are defined from an angle value represented at the given index  (by default 0) (used with --displayVectorField)." )
+    ("rotateVectorField", "apply a CCW rotation of 90° (used with --displayVectorField).  ") 
     ("outputStreamEPS", " specify eps for output stream format.")
     ("outputStreamSVG", " specify svg for output stream format.")
     ("outputStreamFIG", " specify fig for output stream format.")
-#ifdef WITH_CAIRO
-    ("outputPDF", po::value<std::string>(), "outputPDF <filename> specify pdf format. ")
-    ("outputPNG", po::value<std::string>(), "outputPNG <filename> specify png format.")
     ("invertYaxis", " invertYaxis invert the Y axis for display contours (used only with --SDP)")
-#endif
 
     ("backgroundImage", po::value<std::string>(), "backgroundImage <filename> : display image as background ")
     ("alphaBG", po::value<double>(), "alphaBG <value> 0-1.0 to display the background image in transparency (default 1.0), (transparency works only if cairo is available)")
@@ -123,11 +219,11 @@ int main( int argc, char** argv )
   }
 
   po::notify(vm);    
-  if(!parseOK||vm.count("help")||argc<=1 || (!(vm.count("FreemanChain")) && !(vm.count("SDP")) && !(vm.count("SFP"))&&
+  if(!parseOK||vm.count("help")||argc<=1 || (!(vm.count("input")) && !(vm.count("SDP")) && !(vm.count("SFP"))&&
 					     !(vm.count("backgroundImage")) ) )
     {
       trace.info()<< "Display discrete contours. " <<std::endl << "Basic usage: "<<std::endl
-		  << "\t displayContours [options] --FreemanChain  <fileName>  "<<std::endl
+		  << "\t displayContours [options] --input  <fileName>  "<<std::endl
 		  << general_opt << "\n";
       return 0;
     }
@@ -168,8 +264,8 @@ int main( int argc, char** argv )
  
 
  
-  if(vm.count("FreemanChain")){
-    std::string fileName = vm["FreemanChain"].as<std::string>();
+  if(vm.count("input")){
+    std::string fileName = vm["input"].as<std::string>();
     std::vector< FreemanChain<int> > vectFc =  PointListReader< Z2i::Point>:: getFreemanChainsFromFile<int> (fileName); 
     aBoard << CustomStyle( vectFc.at(0).className(), 
 			   new CustomColors( Color::Red  ,  filled?  Color::Gray: Color::None  ) );    
@@ -317,8 +413,7 @@ int main( int argc, char** argv )
     std::vector<LibBoard::Point> contourPt;
     if(vm.count("SDP")){
       std::string fileName = vm["SDP"].as<std::string>();
-      std::vector< Z2i::Point >  contour = 
-	PointListReader< Z2i::Point >::getPointsFromFile(fileName); 
+      std::vector< Z2i::Point  >  contour = PointListReader< Z2i::Point >::getPointsFromFile(fileName); 
       for(unsigned int j=0; j<contour.size(); j++){
 	LibBoard::Point pt((double)(contour.at(j)[0]),
 			   (invertYaxis? (double)(-contour.at(j)[1]+contour.at(0)[1]):(double)(contour.at(j)[1])));
@@ -343,7 +438,7 @@ int main( int argc, char** argv )
       }
       
     }
-  
+    
     
     aBoard.setPenColor(Color::Red);
     aBoard.setFillColor(Color::Gray);
@@ -358,10 +453,50 @@ int main( int argc, char** argv )
       int index = vm["drawPointOfIndex"].as<int>();
       double size = vm["pointSize"].as<double>();
       aBoard.fillCircle((double)(contourPt.at(index).x), (double)(contourPt.at(index).y), size);
-    }
+    }   
+
     
-   
-  
+    // display vector field
+    if(vm.count("displayVectorField"))
+      {
+        bool rotate = vm.count("rotateVectorField");
+        double sv = vm["scaleVectorField"].as<double>();
+        std::vector<unsigned int> vIndex = {0,1};
+        if(vm.count("vectorFieldIndex"))
+          {
+            vIndex = vm["vectorFieldIndex"].as<std::vector<unsigned int>>();
+          }
+        std::string vname = vm["displayVectorField"].as<std::string>();
+        std::vector< PointVector<2,double>  >  vField;
+        if(vm.count("vectorFromAngle"))
+          {
+            unsigned int aIndex = vm["vectorFromAngle"].as<unsigned int>();
+            std::vector<double> vAngles  = TableReader<double>::getColumnElementsFromFile(vname, aIndex); 
+            for(unsigned int i = 0; i < vAngles.size(); i++)
+              {
+                vField.push_back(Z2i::RealPoint(cos(vAngles[i]),sin(vAngles[i])));
+              }
+          }
+        else
+          {
+            vField = PointListReader<  PointVector<2,double>  >::getPointsFromFile(vname, vIndex);
+          }
+        for(unsigned int i = 0; i< contourPt.size(); i++)
+          {
+            vField[i] = vField[i].getNormalized();
+            auto p = contourPt[i];
+            if(!rotate)
+              {
+                aBoard.drawArrow(p.x, p.y, p.x+vField[i][0]*sv, p.y+vField[i][1]*sv  );
+              }
+            else
+              {
+                aBoard.drawArrow(p.x, p.y, p.x-vField[i][1]*sv, p.y+vField[i][0]*sv  );
+              }
+              
+          }
+        
+      }
   }
 
 
