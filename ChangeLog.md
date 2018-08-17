@@ -1,3 +1,10 @@
+# DGtalTools 1.0
+
+- *generators*
+
+  - 3dParametricCurveDigitizer - a tool for digitization of 3D parametric curves
+
+
 # DGtalTools 0.9.4
 
 - *converters*
