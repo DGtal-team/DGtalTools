@@ -1,3 +1,18 @@
+
+# DGtalTools 1.0
+
+- *geometricTransform*
+
+  - rigidTransform2D/3D: fix in accordance with new API.
+
+- *estimators*
+
+  - Add support for L-MST3DBy2D tangent estimator to 3dCurveTangentEstimator
+  
+- *generators*
+ 
+  - Add a tool to digitize 3D parametric curves (3dParametricCurveDigitizer)
+
 # DGtalTools 0.9.4
 
 - *converters*

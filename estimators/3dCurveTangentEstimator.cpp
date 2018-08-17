@@ -60,6 +60,7 @@
 #include "DGtal/geometry/volumes/distance/ExactPredicateLpSeparableMetric.h"
 #include "DGtal/geometry/volumes/estimation/VoronoiCovarianceMeasure.h"
 #include "DGtal/geometry/curves/estimation/LambdaMST3D.h"
+#include "DGtal/geometry/curves/estimation/LambdaMST3DBy2D.h"
 #include "DGtal/geometry/curves/estimation/FunctorsLambdaMST.h"
 #include "DGtal/io/viewers/Viewer3D.h"
 #include "DGtal/io/readers/PointListReader.h"
@@ -666,6 +667,52 @@ void ComputeLMST26 ( const PointIterator & begin, const PointIterator & end, Tan
   }
 }
 
+
+template < typename PointIterator, typename Space, typename TangentSequence >
+void ComputeLMST3DBy2D26 ( const PointIterator & begin, const PointIterator & end, TangentSequence & tangents, const std::string & output  )
+{
+
+    fstream outputStream;
+    outputStream.open ( ( output + ".lmst" ).c_str(), std::ios::out );
+    outputStream << "X Y Z X Y Z" << endl;
+
+    LambdaMST3DBy2D < PointIterator, functors::Lambda64Function, 8 > lmst;
+    lmst.init ( begin, end );
+    lmst.eval ( begin, end, std::back_inserter ( tangents ) );
+    typename TangentSequence::iterator itt = tangents.begin();
+    for ( PointIterator it = begin; it != end; ++it, ++itt )
+    {
+        typename Space::RealVector & tangent = (*itt);
+        if ( tangent.norm() != 0. )
+            tangent = tangent.getNormalized();
+        outputStream << (*it)[0] << " " << (*it)[1] << " " << (*it)[2] << " "
+                     << tangent[0] << " " << tangent[1] << " " << tangent[2] << endl;
+    }
+}
+
+
+template < typename PointIterator, typename Space, typename TangentSequence >
+void ComputeLMST3DBy2D6 ( const PointIterator & begin, const PointIterator & end, TangentSequence & tangents, const std::string & output  )
+{
+
+    fstream outputStream;
+    outputStream.open ( ( output + ".lmst" ).c_str(), std::ios::out );
+    outputStream << "X Y Z X Y Z" << endl;
+
+    LambdaMST3DBy2D < PointIterator, functors::Lambda64Function, 4 > lmst;
+    lmst.init ( begin, end );
+    lmst.eval ( begin, end, std::back_inserter ( tangents ) );
+    typename TangentSequence::iterator itt = tangents.begin();
+    for ( PointIterator it = begin; it != end; ++it, ++itt )
+    {
+        typename Space::RealVector & tangent = (*itt);
+        if ( tangent.norm() != 0. )
+            tangent = tangent.getNormalized();
+        outputStream << (*it)[0] << " " << (*it)[1] << " " << (*it)[2] << " "
+                     << tangent[0] << " " << tangent[1] << " " << tangent[2] << endl;
+    }
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace po = boost::program_options;
 
@@ -734,7 +781,7 @@ int main(int argc, char **argv)
     << "This program estimates the tangent vector to a set of 3D integer points, which are supposed to approximate a 3D curve. "
     << "This set of points is given as a list of points in file <input>."
     << endl 
-    << "The tangent estimator uses either the digital Voronoi Covariance Measure (VCM) or the 3D lambda-Maximal Segment Tangent (L-MST)." 
+    << "The tangent estimator uses either the digital Voronoi Covariance Measure (VCM) or the 3D lambda-Maximal Segment Tangent (L-MST or L-MSTBy2D)."
     << endl
     << "This program can also displays the curve and tangent estimations, "
     << "and it can also extract maximal digital straight segments (2D and 3D)."
@@ -805,6 +852,11 @@ int main(int argc, char **argv)
     else
       ComputeLMST26  < PointIterator, Z3, std::vector< RealVector > > ( sequence.begin(), sequence.end(), tangents, output );
   }
+  else if ( method == "L-MSTBy2D" )
+    if (vm[ "connectivity" ].as<string>() == "6")
+      ComputeLMST3DBy2D6 < PointIterator, Z3, std::vector< RealVector > > ( sequence.begin(), sequence.end(), tangents, output );
+    else
+      ComputeLMST3DBy2D26 < PointIterator, Z3, std::vector< RealVector > > ( sequence.begin(), sequence.end(), tangents, output );
   else
   {
     trace.info() << "Wrong method! Try: VCM or L-MST" << endl;

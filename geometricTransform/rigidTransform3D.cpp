@@ -33,6 +33,7 @@
 #include <DGtal/images/Image.h>
 #include <DGtal/images/ImageSelector.h>
 #include <DGtal/images/ConstImageAdapter.h>
+#include <DGtal/kernel/BasicPointFunctors.h>
 #include <DGtal/images/RigidTransformation3D.h>
 
 #include <boost/program_options/options_description.hpp>
@@ -129,8 +130,8 @@ int main(int argc, char**argv)
   double tz =  vm["tz"].as<double>();
 
   typedef ImageSelector<Domain, unsigned char >::Type Image;
-  typedef ForwardRigidTransformation3D < Space > ForwardTrans;
-  typedef BackwardRigidTransformation3D < Space > BackwardTrans;
+  typedef ForwardRigidTransformation3D < Space, VectorRounding < RealPoint, Point>, RealPoint, Point > ForwardTrans;
+  typedef BackwardRigidTransformation3D < Space, VectorRounding < RealPoint, Point>, RealPoint, Point > BackwardTrans;
   typedef ConstImageAdapter<Image, Domain, BackwardTrans, Image::Value, Identity > MyImageBackwardAdapter;
   typedef DomainRigidTransformation3D < Domain, ForwardTrans > MyTransformedDomain;
   typedef MyTransformedDomain::Bounds Bounds;
