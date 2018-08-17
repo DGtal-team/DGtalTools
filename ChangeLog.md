@@ -5,6 +5,9 @@
 
   - rigidTransform2D/3D: fix in accordance with new API.
 
+- *estimators*
+
+  - Add support for L-MST3DBy2D tangent estimator to 3dCurveTangentEstimator
 
 # DGtalTools 0.9.4
 
