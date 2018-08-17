@@ -1,3 +1,11 @@
+
+# DGtalTools 1.0
+
+- *geometricTransform*
+
+  - rigidTransform2D/3D: fix in accordance with new API.
+
+
 # DGtalTools 0.9.4
 
 - *converters*
