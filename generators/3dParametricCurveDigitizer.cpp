@@ -57,12 +57,12 @@ using namespace DGtal;
 
 
 /**
- @page shapeGenerator shapeGenerator
- @brief  Generates shapes using DGtal library.
+ @page 3dParametricCurveDigitizer 3dParametricCurveDigitizer
+ @brief  Digitizes 3D parametric curves using DGtal library.
  
 
 
- @b Usage:  shapeGenerator [options] --shape <shapeName> --output <outputBasename>
+ @b Usage:  3dParametricCurveDigitizer [options] --curve <curve> --param1 <double> --param2 <double> --param3 <double> --tstart <double> --tend <double> --step <double> --output <basename>
 
  @b Allowed @b options @b are:
 
@@ -89,7 +89,7 @@ using namespace DGtal;
  @endcode
  You can list the potential curves:
  @code
- $ contourGenerator --list
+ $ 3dParametricCurveDigitizer --list
  3D Parametric curves:
 	EllipticHelix Helix with two axes and a distance between consecutive turns. Its period is 2 * Pi.
 		Required parameter(s): --param1 [-p1], --param2 [p2], --param3 [-p3]
