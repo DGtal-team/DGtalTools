@@ -717,7 +717,7 @@ void print_main_axes ( PointIterator begin, PointIterator end, multimap < typena
     {
         typename std::multimap<typename Space::Point, string>::const_iterator it = axes.lower_bound(*itt);
         typename std::multimap<typename Space::Point, string>::const_iterator it2 = axes.upper_bound(*itt);
-        cout << *it << " MAIN_AXIS = (";
+        cout << it->first[0] << ", " << it->first[1] << ", " << it->first[2] << " MAIN_AXIS = (";
         for (; it != it2; it++ )
         {
             if ( distance( it, it2 ) > 1 )
