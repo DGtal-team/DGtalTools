@@ -13,6 +13,7 @@ SET(DGTAL_TOOLS_SRC
   volReSample
   volTrValues
   volIntensityScale
+  volFillInterior
 )
 
 
@@ -25,7 +26,7 @@ FOREACH(FILE ${DGTAL_TOOLS_SRC})
         ARCHIVE DESTINATION lib)
 ENDFOREACH(FILE)
 
-      
+
 if (  WITH_VISU3D_QGLVIEWER )
   SET(DGTAL_EXAMPLES_QGL_SRC
     homotopicThinning3D
