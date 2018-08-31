@@ -1,3 +1,10 @@
+# DGtalTools 1.0
+
+- *global*:
+    - Continuous integration AppVeyor fix.
+      (Bertrand Kerautret, [##337](https://github.com/DGtal-team/DGtalTools/pull/337)).
+
+
 # DGtalTools 0.9.4
 
 - *converters*

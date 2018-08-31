@@ -473,6 +473,7 @@ int main( int argc, char** argv )
 
   QApplication application(argc,argv);
   Viewer3D<> *viewer = new Viewer3D<>();
+  viewer->show();
   bool usehm = vm.count("hueColorMap");
   bool usegh = vm.count("gradHotColorMap");
   bool usegc = vm.count("gradCoolColorMap");
