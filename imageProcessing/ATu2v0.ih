@@ -39,14 +39,17 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 // ----------------------- Standard services ------------------------------
+///////////////////////////////////////////////////////////////////////////////
+
+
 template <typename TKSpace, typename TLinearAlgebra>
 DGtal::ATu2v0<TKSpace, TLinearAlgebra>::
 ATu2v0( int _verbose )
   : Base( _verbose ),
     M01( calculus ), M12( calculus ), primal_AD2( calculus ),
-    v0( calculus ), former_v0( calculus ), 
-    alpha_Id2( calculus ), left_V0( calculus ), 
-    l_1_over_4( calculus ), l_1_over_4e( calculus ), 
+    v0( calculus ), former_v0( calculus ),
+    alpha_Id2( calculus ), left_V0( calculus ),
+    l_1_over_4( calculus ), l_1_over_4e( calculus ),
     l_1_over_4e_Id0( calculus ),
     metric_average( false )
 {}
@@ -63,7 +66,7 @@ init( Clone<KSpace> aKSpace )
   M01.myContainer = .5 * M01.myContainer.cwiseAbs();
   if ( verbose > 1 ) trace.info() << "M12" << std::endl;
   M12 = calculus.template derivative<1, PRIMAL>();
-  M12.myContainer = .25 * M12.myContainer.cwiseAbs(); 
+  M12.myContainer = .25 * M12.myContainer.cwiseAbs();
   if ( verbose > 1 ) trace.info() << "primal_AD2" << std::endl;
   primal_AD2 = calculus.template antiderivative<2,PRIMAL>();
   if ( verbose > 1 ) trace.info() << "v0" << std::endl;
@@ -74,16 +77,16 @@ init( Clone<KSpace> aKSpace )
 //-----------------------------------------------------------------------------
 template <typename TKSpace, typename TLinearAlgebra>
 template <typename Image, typename Function>
-void 
+void
 DGtal::ATu2v0<TKSpace, TLinearAlgebra>::
-addInput( const Image& image, 
+addInput( const Image& image,
           const Function& f,
           bool perfect_data )
 {
   if ( perfect_data ) i2.push_back( PrimalForm2( calculus ) );
   else                g2.push_back( PrimalForm2( calculus ) );
   PrimalForm2& g  = perfect_data ? i2.back() : g2.back();
-  const KSpace& K = calculus.myKSpace; 
+  const KSpace& K = calculus.myKSpace;
   for ( Index index = 0; index < g.myContainer.rows(); index++)
     {
       SCell cell = g.getSCell( index );
@@ -112,7 +115,7 @@ computeSNR() const
 
 //-----------------------------------------------------------------------------
 template <typename TKSpace, typename TLinearAlgebra>
-void 
+void
 DGtal::ATu2v0<TKSpace, TLinearAlgebra>::
 setMetricAverage( bool average )
 {
@@ -121,7 +124,7 @@ setMetricAverage( bool average )
 
 //-----------------------------------------------------------------------------
 template <typename TKSpace, typename TLinearAlgebra>
-void 
+void
 DGtal::ATu2v0<TKSpace, TLinearAlgebra>::
 setAlpha( Scalar _alpha )
 {
@@ -132,11 +135,12 @@ setAlpha( Scalar _alpha )
   alpha_g2.clear();
   for ( unsigned int i = 0; i < g2.size(); i++ )
     alpha_g2.push_back( alpha_Id2 * g2[ i ] );
+
 }
 
 //-----------------------------------------------------------------------------
 template <typename TKSpace, typename TLinearAlgebra>
-void 
+void
 DGtal::ATu2v0<TKSpace, TLinearAlgebra>::
 setAlpha( Scalar _alpha, const PrimalForm2& m )
 {
@@ -151,12 +155,13 @@ setAlpha( Scalar _alpha, const PrimalForm2& m )
 
 //-----------------------------------------------------------------------------
 template <typename TKSpace, typename TLinearAlgebra>
-void 
+void
 DGtal::ATu2v0<TKSpace, TLinearAlgebra>::
 setLambda( Scalar _lambda )
 {
   ASSERT( _lambda >= 0.0 );
   lambda     = _lambda;
+
   if ( metric_average )
     l_1_over_4 = (lambda / 4.0 )
       * M01.transpose() * M12.transpose()
@@ -165,16 +170,18 @@ setLambda( Scalar _lambda )
   else
     l_1_over_4 = (lambda / 4.0 )
       * KForm< Calculus, 0, PRIMAL >::ones( calculus );
+
 }
 
 //-----------------------------------------------------------------------------
 template <typename TKSpace, typename TLinearAlgebra>
-void 
+void
 DGtal::ATu2v0<TKSpace, TLinearAlgebra>::
 setEpsilon( Scalar _epsilon )
 {
   ASSERT( _epsilon > 0.0 );
   epsilon     = _epsilon;
+
   if ( metric_average )
     left_V0     = ( lambda/(4.0*epsilon) )
       * M01.transpose() * M12.transpose()
@@ -184,12 +191,13 @@ setEpsilon( Scalar _epsilon )
     left_V0     = ( lambda/(4.0*epsilon) )
       * calculus.template identity<0, PRIMAL>()
       + (lambda*epsilon) * D0.transpose() * D0;
+
   l_1_over_4e = (1.0/epsilon) * l_1_over_4;
 }
- 
+
 //-----------------------------------------------------------------------------
 template <typename TKSpace, typename TLinearAlgebra>
-void 
+void
 DGtal::ATu2v0<TKSpace, TLinearAlgebra>::
 setUFromInput()
 {
@@ -198,7 +206,7 @@ setUFromInput()
 
 //-----------------------------------------------------------------------------
 template <typename TKSpace, typename TLinearAlgebra>
-void 
+void
 DGtal::ATu2v0<TKSpace, TLinearAlgebra>::
 setUFromInputAndMask()
 {
@@ -210,7 +218,7 @@ setUFromInputAndMask()
         {
           if ( alpha_g2[ i ].myContainer( index ) == 0.0 )
             u2[ i ].myContainer( index ) = ((double) rand()) / (double) RAND_MAX;
-        }      
+        }
     }
 }
 
@@ -222,11 +230,12 @@ solveU()
 {
   if ( verbose > 0 ) trace.beginBlock("Solving for u");
   if ( verbose > 1 ) trace.info() << "- building matrix M : = alpha_Id2 - tB'_Diag(M01 v)^2_B'" << std::endl;
-  
+
   const PrimalIdentity1 diag_Mv_squared = functions::dec::squaredDiagonal( M01 * v0 );
   // JOL: clarify sign below.
   const PrimalIdentity2 M = alpha_Id2
     + primal_AD2.transpose() * diag_Mv_squared * primal_AD2;
+
   if ( verbose > 1 ) trace.info() << "- prefactoring matrix M" << std::endl;
   solver_u.compute( M );
   bool ok = true;
@@ -252,13 +261,13 @@ solveV()
   if ( verbose > 1 ) trace.info() << "- building matrix N := l/4e Id0 + le A tA + tM01 sum Diag(B' u_i)^2 M01" << std::endl;
 
   PrimalForm1 squared_norm_D_u2 = PrimalForm1::zeros(calculus);
-  
+
   PrimalIdentity1 U2 = functions::dec::squaredDiagonal( primal_AD2 * u2[ 0 ] );
   for ( Dimension i = 1; i < u2.size(); ++i )
     U2.myContainer += functions::dec::squaredDiagonal( primal_AD2 * u2[ i ] ).myContainer;
   const PrimalIdentity0 N  = left_V0 + M01.transpose() * U2 * M01;
 
-  typedef typename PrimalIdentity0::Container Matrix; 
+  typedef typename PrimalIdentity0::Container Matrix;
   const Matrix & M = N.myContainer;
   if ( verbose > 2 )
     for (int k = 0; k < M.outerSize(); ++k)
@@ -306,6 +315,225 @@ computeVariation()
   return delta_v_loo;
 }
 
+
+/** Compute energies of AT --------------------------------------------------*/
+//-----------------------------------------------------------------------------
+template <typename TKSpace, typename TLinearAlgebra>
+typename DGtal::ATu2v0<TKSpace, TLinearAlgebra>::Scalar
+DGtal::ATu2v0<TKSpace, TLinearAlgebra>::
+computeFidelity()
+{
+  if ( verbose > 0 ) trace.beginBlock( "Compute fidelity term a(u-g)^2 in AT.");
+
+  double E = 0.0;
+
+  // a(u-g)^2
+  double a_u_minus_g = 0.0;
+  for ( Dimension i = 0; i < u2.size(); ++i )
+    {
+      const PrimalForm2   diff = u2[ i ] - g2[ i ];
+      const PrimalForm2 a_diff = alpha_Id2 * diff;
+
+      // Noemie: la metrique est portee par alpha_Id2 (= ah * G2 * Identity)
+      double ip = 0.0;
+      for ( typename Calculus::Index index = 0; index < diff.myContainer.rows(); index++ )
+        ip += a_diff.myContainer( index ) * diff.myContainer( index );
+
+      a_u_minus_g += ip;
+    }
+
+  E = a_u_minus_g;
+
+  if ( verbose > 0 ) trace.endBlock();
+  return E;
+}
+
+//-----------------------------------------------------------------------------
+template <typename TKSpace, typename TLinearAlgebra>
+typename DGtal::ATu2v0<TKSpace, TLinearAlgebra>::Scalar
+DGtal::ATu2v0<TKSpace, TLinearAlgebra>::
+computeCrossTerm()
+{
+  if ( verbose > 0 ) trace.beginBlock( "Compute cross term v^2|grad u|^2 in AT.");
+
+  double E = 0.0;
+
+  // v^2|grad u|^2
+  const PrimalIdentity1 diag_Mv_squared = functions::dec::diagonal( M01 * v0 );
+  double v_grad_u = 0.0;
+  for ( Dimension i = 0; i < u2.size(); ++i )
+    {
+      PrimalForm1 v_A_u = diag_Mv_squared * primal_AD2 * u2[ i ];
+      //v_grad_u_squared += innerProduct( calculus, v_A_u, v_A_u );
+      double ip = 0.0;
+      for ( typename Calculus::Index index = 0; index < v_A_u.myContainer.rows(); index++ )
+        ip += v_A_u.myContainer( index ) * v_A_u.myContainer( index );
+
+      v_grad_u += ip;
+    }
+
+  E = v_grad_u;
+
+  if ( verbose > 0 ) trace.endBlock();
+  return E;
+}
+
+//-----------------------------------------------------------------------------
+template <typename TKSpace, typename TLinearAlgebra>
+typename DGtal::ATu2v0<TKSpace, TLinearAlgebra>::Scalar
+DGtal::ATu2v0<TKSpace, TLinearAlgebra>::
+computeGradV()
+{
+  if ( verbose > 0 ) trace.beginBlock( "Compute gradient of v.");
+
+  double Per = 0.0;
+
+  // le|grad v|^2
+  PrimalForm0 v0_prime = D0.transpose() * D0 * v0;
+  double ip = 0.0;
+  for ( typename Calculus::Index index = 0; index < v0.myContainer.rows(); index++ )
+    ip += v0.myContainer( index ) * v0_prime.myContainer( index );
+  //double le_square_grad_v = lambda * epsilon * innerProduct( calculus, v, v_prime );
+  //double le_grad_v = lambda * epsilon * ip;
+  double le_grad_v = lambda * epsilon * ip;
+
+  Per = le_grad_v;
+
+  if ( verbose > 0 ) trace.endBlock();
+  return Per;
+}
+
+
+//-----------------------------------------------------------------------------
+template <typename TKSpace, typename TLinearAlgebra>
+typename DGtal::ATu2v0<TKSpace, TLinearAlgebra>::Scalar
+DGtal::ATu2v0<TKSpace, TLinearAlgebra>::
+computeConstraintV()
+{
+  if ( verbose > 0 ) trace.beginBlock( "Compute constraint on v.");
+
+  double Per = 0.0;
+
+  // l(1-v)^2/4e
+  PrimalForm0 one_minus_v = v0; // (1-v)
+  for ( typename Calculus::Index index_i = 0; index_i < v0.myContainer.rows(); index_i++)
+    one_minus_v.myContainer( index_i ) = 1.0 - v0.myContainer( index_i );
+
+  double ip2 = 0.0; // (1-v) * (1-v)
+  for ( typename Calculus::Index index = 0; index < one_minus_v.myContainer.rows(); index++ )
+    ip2 += one_minus_v.myContainer( index ) * one_minus_v.myContainer( index );
+
+  //double l_over_4e_1_minus_v = lambda / (4.0 * epsilon) * ip2;
+  double l_over_4e_1_minus_v = lambda / (4.0 * epsilon) * ip2;
+
+  Per = l_over_4e_1_minus_v;
+
+  if ( verbose > 0 ) trace.endBlock();
+  return Per;
+}
+
+//-----------------------------------------------------------------------------
+template <typename TKSpace, typename TLinearAlgebra>
+typename DGtal::ATu2v0<TKSpace, TLinearAlgebra>::Scalar
+DGtal::ATu2v0<TKSpace, TLinearAlgebra>::
+computeEv()
+{
+  if ( verbose > 0 ) trace.beginBlock( "Compute Ev.");
+  double Ev = computeGradV() + computeConstraintV();
+  if ( verbose > 0 ) trace.endBlock();
+  return Ev;
+}
+
+//-----------------------------------------------------------------------------
+template <typename TKSpace, typename TLinearAlgebra>
+typename DGtal::ATu2v0<TKSpace, TLinearAlgebra>::Scalar
+DGtal::ATu2v0<TKSpace, TLinearAlgebra>::
+computeLambdaPerimeter()
+{
+  if ( verbose > 0 ) trace.beginBlock( "Compute lambda*perimeter.");
+  //double CrossTerm = computeCrossTerm();
+  double Ev = computeEv();
+  //double lPer = CrossTerm + Ev;
+  double lPer = Ev;
+  if ( verbose > 0 ) trace.endBlock();
+  return lPer;
+}
+
+//-----------------------------------------------------------------------------
+template <typename TKSpace, typename TLinearAlgebra>
+typename DGtal::ATu2v0<TKSpace, TLinearAlgebra>::Scalar
+DGtal::ATu2v0<TKSpace, TLinearAlgebra>::
+computePerimeter()
+{
+  if ( verbose > 0 ) trace.beginBlock( "Compute perimeter.");
+  double Per = computeLambdaPerimeter() / lambda;
+  if ( verbose > 0 ) trace.endBlock();
+  return Per;
+}
+
+
+
+//-----------------------------------------------------------------------------
+template <typename TKSpace, typename TLinearAlgebra>
+typename DGtal::ATu2v0<TKSpace, TLinearAlgebra>::Scalar
+DGtal::ATu2v0<TKSpace, TLinearAlgebra>::
+computeEnergy()
+{
+  if ( verbose > 0 ) trace.beginBlock( "Compute energy AT.");
+
+  double E = 0.0;
+
+//  // a(u-g)^2
+//  double a_u_minus_g = 0.0;
+//  for ( Dimension i = 0; i < u2.size(); ++i )
+//    {
+//      const PrimalForm2   diff = u2[ i ] - g2[ i ];
+//      const PrimalForm2 a_diff = alpha_Id2 * diff;
+//      double ip = 0.0;
+//      for ( typename Calculus::Index index = 0; index < diff.myContainer.rows(); index++ )
+//        ip += a_diff.myContainer( index ) * diff.myContainer( index );
+//      a_u_minus_g += ip;
+//    }
+
+//  // v^2|grad u|^2
+//  const PrimalIdentity1 diag_Mv_squared = functions::dec::diagonal( M01 * v0 );
+//  double v_grad_u = 0.0;
+//  for ( Dimension i = 0; i < u2.size(); ++i )
+//    {
+//      PrimalForm1 v_A_u = diag_Mv_squared * primal_AD2 * u2[ i ];
+//      //v_grad_u_squared += innerProduct( calculus, v_A_u, v_A_u );
+//      double ip = 0.0;
+//      for ( typename Calculus::Index index = 0; index < v_A_u.myContainer.rows(); index++ )
+//        ip += v_A_u.myContainer( index ) * v_A_u.myContainer( index );
+//      v_grad_u += ip;
+//    }
+
+//  // le|grad v|^2
+//  PrimalForm0 v0_prime = D0.transpose() * D0 * v0;
+//  double ip = 0.0;
+//  for ( typename Calculus::Index index = 0; index < v0.myContainer.rows(); index++ )
+//    ip += v0.myContainer( index ) * v0_prime.myContainer( index );
+//  //double le_square_grad_v = lambda * epsilon * innerProduct( calculus, v, v_prime );
+//  double le_grad_v = lambda * epsilon * ip;
+
+//  // l(1-v)^2/4e
+//  PrimalForm0 one_minus_v = v0;
+//  for ( typename Calculus::Index index_i = 0; index_i < v0.myContainer.rows(); index_i++)
+//    one_minus_v.myContainer( index_i ) = 1.0 - v0.myContainer( index_i );
+//  double ip2 = 0.0;
+//  for ( typename Calculus::Index index = 0; index < one_minus_v.myContainer.rows(); index++ )
+//    ip2 += one_minus_v.myContainer( index ) * one_minus_v.myContainer( index );
+//  double l_over_4e_1_minus_v = lambda / (4.0 * epsilon) * ip2;
+
+//  E = a_u_minus_g + v_grad_u + le_grad_v + l_over_4e_1_minus_v;
+
+  E = computeFidelity() + computeCrossTerm() + computeEv();
+
+  if ( verbose > 0 ) trace.endBlock();
+  return E;
+}
+
+
 //-----------------------------------------------------------------------------
 template <typename TKSpace, typename TLinearAlgebra>
 typename DGtal::ATu2v0<TKSpace, TLinearAlgebra>::Scalar
@@ -323,7 +551,7 @@ checkV()
       m2 = std::max( m2, val );
       ma += val;
     }
-  if ( verbose > 0 ) 
+  if ( verbose > 0 )
     trace.info() << "1-form v: min=" << m1 << " avg=" << ( ma / size0() )
                  << " max=" << m2 << std::endl;
   // for ( Index index = 0; index < size1(); index++)
@@ -377,5 +605,3 @@ DGtal::operator<< ( std::ostream & out,
 
 //                                                                           //
 ///////////////////////////////////////////////////////////////////////////////
-
-
