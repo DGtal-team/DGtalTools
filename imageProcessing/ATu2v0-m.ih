@@ -387,11 +387,7 @@ metric_average( false )
             const KSpace& K = calculus.myKSpace;
             double H2 = H * H;
             Domain D = image.domain();
-/*
-            trace.info()    << "Kspace : " << K << " - " << "[ " << K.lowerBound()[0] << "," << K.upperBound()[0] << " ]" << " - " << "[ " << K.lowerBound()[1] << "," << K.upperBound()[1] << " ]" << std::endl
-                            << "Domain : " << D << " - " << "[ " << D.lowerBound()[0] << "," << D.upperBound()[0] << " ]" << " - " << "[ " << D.lowerBound()[1] << "," << D.upperBound()[1] << " ]" << std::endl
-                            << std::endl;
-*/
+
             for ( int x = D.lowerBound()[0] ; x <= D.upperBound()[0] ; x++ ) {
                 for ( int y = D.lowerBound()[1] ; y <= D.upperBound()[1] ; y++ ) {
                     Point p(x,y);   // coordonnees digitales
@@ -400,42 +396,19 @@ metric_average( false )
                     Point pk2(p[0] * 4 + 1, p[1] * 4 + 3);
                     Point pk3(p[0] * 4 + 3, p[1] * 4 + 1);
                     Point pk4(p[0] * 4 + 3, p[1] * 4 + 3);
- /*                   trace.info() << "Point (x,y) = " << "("<<x<<","<<y<<")" << std::endl
-                                 << "Recuperation des quatres points" << std::endl
-                                 << "> pk1: " << pk1 << std::endl
-                                 << "> pk2: " << pk2 << std::endl
-                                 << "> pk3: " << pk3 << std::endl
-                                 << "> pk4: " << pk4 << std::endl;
- */
+
                     // Recuperation des Cell correspondantes aux points
                     Cell c1 = K.uCell(pk1);
                     Cell c2 = K.uCell(pk2);
                     Cell c3 = K.uCell(pk3);
                     Cell c4 = K.uCell(pk4);
-/*                    trace.info() << "Recuperation des SCell correspondantes" << std::endl
-                                 << "> c1: " << c1 << std::endl
-                                 << "> c2: " << c2 << std::endl
-                                 << "> c3: " << c3 << std::endl
-                                 << "> c4: " << c4 << std::endl;
-*/
+
                     // Recuperation des index correspondants aux Cell dans la kforme
                     auto index1 = calculus.getCellIndex(c1);
                     auto index2 = calculus.getCellIndex(c2);
                     auto index3 = calculus.getCellIndex(c3);
                     auto index4 = calculus.getCellIndex(c4);
-/*                    trace.info() << "Recuperation des index correspondants pour la nouvelle KForm" << std::endl
-                                 << "> index1: " << index1 << std::endl
-                                 << "> index2: " << index2 << std::endl
-                                 << "> index3: " << index3 << std::endl
-                                 << "> index4: " << index4 << std::endl;
-                    trace.info() << "---------------------------------" << std::endl
-                                 << "(x,y) = " << p << std::endl
-                                 << "    > " << pk1 << "  ->  " << index1 << "    ->  " << (u.getSCell(index1)) << std::endl
-                                 << "    > " << pk2 << "  ->  " << index2 << "    ->  " << (u.getSCell(index2)) << std::endl
-                                 << "    > " << pk3 << "  ->  " << index3 << "    ->  " << (u.getSCell(index3)) << std::endl
-                                 << "    > " << pk4 << "  ->  " << index4 << "    ->  " << (u.getSCell(index4)) << std::endl
-                                 << "---------------------------------" << std::endl << std::endl;
-*/
+
                     // definition de g selon la valeur du pixel
                     u.myContainer( index1 ) = H2 * f( image( p ) );
                     u.myContainer( index2 ) = H2 * f( image( p ) );
@@ -462,11 +435,6 @@ metric_average( false )
             const KSpace& K = calculus.myKSpace;
             double H2 = H * H;
             Domain D = image.domain();
-/*
-            trace.info()    << "Kspace : " << K << " - " << "[ " << K.lowerBound()[0] << "," << K.upperBound()[0] << " ]" << " - " << "[ " << K.lowerBound()[1] << "," << K.upperBound()[1] << " ]" << std::endl
-                            << "Domain : " << D << " - " << "[ " << D.lowerBound()[0] << "," << D.upperBound()[0] << " ]" << " - " << "[ " << D.lowerBound()[1] << "," << D.upperBound()[1] << " ]" << std::endl
-                            << std::endl;
-*/
             /*
              * Gestion du bord de l'image : retirer 2 ou 3 pixels du bord de l'image
              * pour ne pas les considérer et  eviter les informations en trop

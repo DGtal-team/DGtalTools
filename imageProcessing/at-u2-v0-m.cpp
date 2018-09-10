@@ -278,7 +278,7 @@ int main( int argc, char* argv[] )
     Color color_v( (unsigned int) std::stoul( scv, nullptr, 16 ), 255 );
     double h;
     bool multires = vm.count( "multiresolution" );
-    string taille = multires ? vm[ "images-size" ].as<string>() : "16 32 64 128";
+    string taille = multires ? vm[ "images-size" ].as<string>() : "";
 
     // Gestion des tailles pour la multiresolution
     std::stringstream iss( taille );
@@ -291,10 +291,8 @@ int main( int argc, char* argv[] )
     double l1_copy = l1;
 
     // Creating memory vectors for keep u and v for each size
-    std::vector< Calculus::PrimalForm2 > u_memory;
     std::vector< string > file_restored;
     std::vector< string > file_contours;
-    std::vector< Calculus::PrimalForm1 > v_memory;
     std::vector< string > filename1;
     std::vector< string > filename2;
 
@@ -307,11 +305,11 @@ int main( int argc, char* argv[] )
         for( int i = 0 ; i < mySizes.size() ; i++ ){
             // Creation d'un veceteur de noms pour f1
             f1 = f1_copy;
-            f1.insert( lastindex , std::to_string( mySizes[i] ) );
+            f1.insert( lastindex , std::to_string( mySizes[i] ) );  // insertion de la taille
             filename1.push_back( f1 );
             // Creation d'un veceteur de noms pour f2
             f2 = f2_copy;
-            f2.append( std::to_string( mySizes[i] ) );
+            f2.append( std::to_string( mySizes[i] ) );              // insertion de la taille
             filename2.push_back( f2 );
         }
     }
@@ -320,9 +318,10 @@ int main( int argc, char* argv[] )
     trace.beginBlock("Temps total");
     int iterator_size = 0;
     do {
-        trace.info() << "-------------------------------------------------------------------------------------" << endl;
+        trace.info() << "--------------------------------------------------------------------" << endl;
         trace.info() << endl;
         trace.beginBlock("Temps pour une image");
+        if(multires) trace.info() << "Taille : " << mySizes[iterator_size] << endl;
 
         // Initialisation
         f1 = f1_copy;
@@ -336,10 +335,8 @@ int main( int argc, char* argv[] )
             f2.append( std::to_string( mySizes[ iterator_size ] ) );                // SORTANT : Insertion de la taille a la fin
         }
 
-        if (verb > 0) trace.info()  << "Iterator_size = " << iterator_size << endl
-                                    << "Fichier entrant = " << f1 << endl
-                                    << "Nom images resultantes = " << f2 << endl
-                                    << endl;
+        trace.info()  << "Fichier entrant (f1) = " << f1 << endl;
+        trace.info()  << "Fichiers sortants (f2) = " << f2 << endl << endl;
 
         // Determinaison du type d'image
         bool color_image = f1.size() > 4 && f1.compare( f1.size() - 4, 4, ".ppm" ) == 0;
@@ -358,7 +355,11 @@ int main( int argc, char* argv[] )
         int Nx, Ny;
 
 
-        //---------------------------------------------------------------------------
+        //------------------------------------------------------------------------------------------------------------
+        // Initialisation de g
+        trace.info() << endl;
+        trace.beginBlock("Initialisation de g");
+        trace.info() << "Initialisation de g (addInput) : " << f1 << endl;
         if ( color_image )
         {
             if(verb > 0) trace.beginBlock("Reading PPM image");
@@ -409,6 +410,9 @@ int main( int argc, char* argv[] )
             AT.addInput( image, [] (unsigned char c ) { return ((double) c) / 255.0; } );
             if(verb > 0) trace.endBlock();
         }
+        trace.endBlock();
+        trace.info() << endl;
+        // -----------------------------------------------------------------------------------------------
 
         double one_h = 1 / h ;
         double one_h2 = 1 / (h*h) ;
@@ -451,26 +455,32 @@ int main( int argc, char* argv[] )
         if( multires && (iterator_size > 0) ){
             trace.info() << "Utilisation du resultat precedent. " << endl;
             if( grey_image ){
-                trace.info() << "lecture de l'image resataure a l'etape precedente." << endl;
+                trace.info() << "Resultat a l'etape precedente : " << endl;
+                trace.info() << "Restauree : " << file_restored[iterator_size-1] << endl;
+                trace.info() << "Contours : " << file_contours[iterator_size-1] << endl;
                 GreyLevelImage restoredImage = PGMReader<GreyLevelImage>::importPGM(file_restored[iterator_size-1]);
                 ColorImage restoredContour = PPMReader<ColorImage>::importPPM(file_contours[iterator_size-1]);
                 AT.setUFromImage( restoredImage, [] (unsigned char c ) { return (double) c / 255.0; } );
                 AT.setVFromImage(restoredContour ,[] ( Color c ) { return (double) c.red()   / 255.0; });
             }else if ( color_image ){
-                // TODO : a faire
-                trace.info() << "lecture de l'image resataure a l'etape precedente." << endl;
+                trace.info() << "Resultat a l'etape precedente : " << endl;
+                trace.info() << "Restauree : " << file_restored[iterator_size-1] << endl;
+                trace.info() << "Contours : " << file_contours[iterator_size-1] << endl;
                 ColorImage restoredImage = PPMReader<ColorImage>::importPPM(file_restored[iterator_size-1]);
                 ColorImage restoredContour = PPMReader<ColorImage>::importPPM(file_contours[iterator_size-1]);
                 AT.setUFromImage( restoredImage, [] ( Color c ) { return (double) c.red()   / 255.0; } );
                 AT.setUFromImage( restoredImage, [] ( Color c ) { return (double) c.green() / 255.0; } );
                 AT.setUFromImage( restoredImage, [] ( Color c ) { return (double) c.blue()  / 255.0; } );
-                AT.setVFromImage(restoredContour ,[] ( Color c ) { return (double) c.red()   / 255.0; });
+                AT.setVFromImage( restoredContour ,[] ( Color c ) { return (double) c.red()   / 255.0; });
             }
         }else{
             trace.info() << "Utilisation de l'image donnee en entree : u = g. " << endl;
             AT.setUFromInput();
         }
         trace.endBlock(); trace.info() << endl;
+
+
+
 
         // -------------------------------------------------------
         double g_snr = snr ? AT.computeSNR() : 0.0;
@@ -544,7 +554,9 @@ int main( int argc, char* argv[] )
                     n_v = AT.computeVariation();
                 } while ( ( n_v > 0.0001 ) && ( ++n < nbiter ) );
                 trace.progressBar( n, nbiter );
-                trace.info() << "[#### last variation = " << n_v << " " << endl;
+                trace.info() << ">> last variation = " << n_v << " " << endl;
+                trace.info() << ">> number iteration = " << n << " (nbitermax="<<nbiter<<") " << endl;
+                trace.info() << ">> energie =         " << AT.computeEnergy() <<  "       " << (AT.computeEnergy()*h) << endl;
 
             }
 
@@ -554,51 +566,35 @@ int main( int argc, char* argv[] )
             {
                 if ( verb > 0 ) trace.beginBlock("Writing u[0] as PGM image");
                 ostringstream ossU, ossV, ossW;
-                /*
-                          ossU << boost::format("%s-[h_%.5f]-[a_%.5f]-[l_%.7f]-u.pgm") % f2 % h % a % l1;
-                          ossV << boost::format("%s-[h_%.5f]-[a_%.5f]-[l_%.7f]-u-v.pgm") % f2 % h % a % l1;
-                          ossW << boost::format("%s-[h_%.5f]-[a_%.5f]-[l_%.7f]-v.ppm") % f2 % h % a % l1;
-                */
+
                 ossU << boost::format("%sRestaure.pgm") % f2;
                 ossV << boost::format("%sContours.ppm") % f2;
                 const Calculus::PrimalForm2 u = AT.getU( 0 );
                 const Calculus::PrimalForm1 v = AT.M01 * AT.getV();
 
-                u_memory.push_back(u);
-                v_memory.push_back(v);
                 file_restored.push_back(ossU.str());
                 file_contours.push_back(ossV.str());
 
                 energieFile << Nx << "\t"
-                            << Ny << "\t"
-                            << a << "\t"
-                            << l1 << "\t"
                             << h << "\t"
-                            << ah << "\t"
-                            << lh << "\t"
-                            << e2 << "\t"
-                            << e2h << "\t"
-                            << AT.computeEnergy() << "\t"
-                            << AT.computeLambdaPerimeter() << "\t"
+                            << AT.computeEnergy()*h << "\t"
                             << AT.computePerimeter() << "\t"
-                            << AT.computeFidelity() << "\t"
-                            << AT.computeCrossTerm() << "\t"
-                            << AT.computeGradV() << "\t"
-                            << AT.computeConstraintV() << "\t"
-                            << ( AT.computeEv() / lh ) << "\t"
-                            << ( AT.computeCrossTerm() / lh ) << "\t"
-                            << ( ( AT.computeCrossTerm() + AT.computeEv() ) / lh );
+                            << AT.computeFidelity()*h << "\t"
+                            << AT.computeCrossTerm()*h << "\t"
+                            << AT.computeGradV()*h << "\t"
+                            << AT.computeConstraintV()*h << "\t";
 
                 trace.info() << endl;
                 trace.beginBlock("Calcul d'energie");
-                trace.info() << "Energie calculee = " << AT.computeEnergy() << endl;
-                trace.info() << "Perimetre*lambda_h = " << AT.computeLambdaPerimeter() << endl;
-                trace.info() << "Perimetre = " << (AT.computePerimeter()) << endl;
-                trace.info() << "Fidelite = " << AT.computeFidelity() << endl;
-                trace.info() << "Cross term = " << AT.computeCrossTerm() << endl;
-                trace.info() << "Gradient de V = " << AT.computeGradV() << endl;
-                trace.info() << "Contraintes sur V = " << AT.computeConstraintV() << endl;
-                trace.endBlock(); trace.info() << endl;
+                trace.info() << "Energie calculee = " << AT.computeEnergy() <<  "       " << (AT.computeEnergy()*h) << endl;
+                //trace.info() << "Perimetre*lambda_h = " << AT.computeLambdaPerimeter() << endl;
+                trace.info() << "Perimetre =        " << (AT.computePerimeter()) << endl;
+                trace.info() << "Fidelite =         " << AT.computeFidelity() << "      " << (AT.computeFidelity()*h) << endl;
+                trace.info() << "Cross term =       " << AT.computeCrossTerm() << "     " << (AT.computeCrossTerm()*h) << endl;
+                trace.info() << "Gradient de V =    " << AT.computeGradV() << "     " << (AT.computeGradV()*h) << endl;
+                trace.info() << "Contraintes V =    " << AT.computeConstraintV() << "       " << (AT.computeConstraintV()*h) << endl;
+                trace.endBlock();
+                trace.info() << endl;
 
                 // Restored image
                 GreyLevelImage image_u( domain );
@@ -614,7 +610,6 @@ int main( int argc, char* argv[] )
 
 
                 if ( verb > 0 ) trace.endBlock();
-
 
 
 // NOEMIE::TEST DE LA METHODE ADDINPUTFROMIMAGE
@@ -659,6 +654,7 @@ int main( int argc, char* argv[] )
 */
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+
             }
             else if ( color_image )
             {
@@ -666,55 +662,36 @@ int main( int argc, char* argv[] )
                 ostringstream ossU, ossV;
                 ossU << boost::format("%sRestaure.ppm") % f2;
                 ossV << boost::format("%sContours.ppm") % f2;
-                /*
-                          ossU << boost::format("%s-[h_%.5f]-[a_%.5f]-[l_%.7f]-u.ppm") % f2 % h % a % l1;
-                          ossV << boost::format("%s-[h_%.5f]-[a_%.5f]-[l_%.7f]-u-v.ppm") % f2 % h % a % l1;
-                */
+
                 const Calculus::PrimalForm2 u0 = AT.getU( 0 );
                 const Calculus::PrimalForm2 u1 = AT.getU( 1 );
                 const Calculus::PrimalForm2 u2 = AT.getU( 2 );
                 const Calculus::PrimalForm1 v  = AT.M01 * AT.getV();
 
-                // TODO : entrer u et v dans le vecteur memoire
-
-                u_memory.push_back(u0);
-                u_memory.push_back(u1);
-                u_memory.push_back(u2);
-                v_memory.push_back(v);
                 file_restored.push_back(ossU.str());
                 file_contours.push_back(ossV.str());
 
 
                 energieFile << Nx << "\t"
-                            << Ny << "\t"
-                            << a << "\t"
-                            << l1 << "\t"
                             << h << "\t"
-                            << ah << "\t"
-                            << lh << "\t"
-                            << e2 << "\t"
-                            << e2h << "\t"
-                            << AT.computeEnergy() << "\t"
-                            << AT.computeLambdaPerimeter() << "\t"
+                            << AT.computeEnergy()*h << "\t"
                             << AT.computePerimeter() << "\t"
-                            << AT.computeFidelity() << "\t"
-                            << AT.computeCrossTerm() << "\t"
-                            << AT.computeGradV() << "\t"
-                            << AT.computeConstraintV() << "\t"
-                            << ( AT.computeEv() / lh ) << "\t"
-                            << ( AT.computeCrossTerm() / lh ) << "\t"
-                            << ( ( AT.computeCrossTerm() + AT.computeEv() ) / lh );
+                            << AT.computeFidelity()*h << "\t"
+                            << AT.computeCrossTerm()*h << "\t"
+                            << AT.computeGradV()*h << "\t"
+                            << AT.computeConstraintV()*h << "\t";
 
                 trace.info() << endl;
                 trace.beginBlock("Calcul d'energie");
-                trace.info() << "Energie calculee = " << AT.computeEnergy() << endl;
-                trace.info() << "Perimetre*lambda_h = " << AT.computeLambdaPerimeter() << endl;
-                trace.info() << "Perimetre = " << (AT.computePerimeter()) << endl;
-                trace.info() << "Fidelite = " << AT.computeFidelity() << endl;
-                trace.info() << "Cross term = " << AT.computeCrossTerm() << endl;
-                trace.info() << "Gradient de V = " << AT.computeGradV() << endl;
-                trace.info() << "Contraintes sur V = " << AT.computeConstraintV() << endl;
-                trace.endBlock(); trace.info() << endl;
+                trace.info() << "Energie calculee = " << AT.computeEnergy() <<  "       " << (AT.computeEnergy()*h) << endl;
+                //trace.info() << "Perimetre*lambda_h = " << AT.computeLambdaPerimeter() << endl;
+                trace.info() << "Perimetre =        " << (AT.computePerimeter()) << endl;
+                trace.info() << "Fidelite =         " << AT.computeFidelity() << "      " << (AT.computeFidelity()*h) << endl;
+                trace.info() << "Cross term =       " << AT.computeCrossTerm() << "     " << (AT.computeCrossTerm()*h) << endl;
+                trace.info() << "Gradient de V =    " << AT.computeGradV() << "     " << (AT.computeGradV()*h) << endl;
+                trace.info() << "Contraintes V =    " << AT.computeConstraintV() << "       " << (AT.computeConstraintV()*h) << endl;
+                trace.endBlock();
+                trace.info() << endl;
 
 
                 // Restored image
