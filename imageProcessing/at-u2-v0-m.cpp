@@ -280,10 +280,6 @@ int main( int argc, char* argv[] )
     bool multires = vm.count( "multiresolution" );
     string taille = multires ? vm[ "images-size" ].as<string>() : "";
 
-    // Gestion des tailles pour la multiresolution
-    std::stringstream iss( taille );
-    int number;
-    std::vector<int> mySizes;
 
     // Copie des variables qui sont mene a bouger
     string f1_copy = f1;
@@ -297,6 +293,10 @@ int main( int argc, char* argv[] )
     std::vector< string > filename2;
 
 
+    // Gestion des tailles pour la multiresolution
+    std::stringstream iss( taille );
+    int number;
+    std::vector<int> mySizes;
     if(multires){
         // Recuperation des tailles dans un vecteur de int : mySizes
         while ( iss >> number )
@@ -418,7 +418,6 @@ int main( int argc, char* argv[] )
         double one_h2 = 1 / (h*h) ;
         double lh = l1 * one_h ;
         double ah = a + one_h2 ;
-        double e1h = e1 * h ;
         double e2h = e2 * h ;
 
 
