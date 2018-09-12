@@ -157,12 +157,12 @@ For more details, see \ref moduleAT
 
 @b example without multireoslution:
 \code
-./imageProcessing/at-u2-v0-m -i ./../Images/CarreSimple/Carre256.pgm --epsilon-1 2 --epsilon-2 1 -v 0 -o ./../IPResultat/ -a 1 -l 0.1
+./imageProcessing/at-u2-v0-m -i ./../imageProcessing/Images/CarreSimple/Carre256.pgm --epsilon-1 2 --epsilon-2 1 -v 0 -o ./imageProcessing/simple -a 1 -l 0.1
 \endcode
 
 @b example with multiresolution:
 \code
-./imageProcessing/at-u2-v0-m -i ./../Images/CarreSimple/Carre.pgm --epsilon-1 2 --epsilon-2 1 -v 0 -o ./../IPResultat/ -a 1 -l 0.1 --multiresolution true -t "32 64 128 256"
+./imageProcessing/at-u2-v0-m -i ./../imageProcessing/Images/CarreSimple/Carre.pgm --epsilon-1 2 --epsilon-2 1 -v 0 -o ./imageProcessing/multi -a 1 -l 0.1 --multiresolution true -t "32 64 128"
 \endcode
 
 <center>
