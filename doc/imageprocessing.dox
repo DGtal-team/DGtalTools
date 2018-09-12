@@ -43,23 +43,14 @@
 </table>
 </center>
 
- - @ref DocATu2v0-m : Computes a piecewise smooth approximation of an image, by optimizing the Ambrosio-Tortorelli functional (with u a 2-form and v a 0-form) including euclidean metric.
+ - @ref DocATu2v0-m : Computes a piecewise smooth approximation of an image, by optimizing the Ambrosio-Tortorelli functional (with u a 2-form and v a 0-form) including metric.
 
 <center>
 <table>
   <tr>
-        <td>
-        <img height=200px src="lena-370-b02.png">
-        </td>
-        <td>
-        <img height=200px src="LenaBruit256Restaure.png">
-        </td>
-        <td>
-        <img height=200px src="LenaBruit256Contours.png">
-        </td>
-</tr>
-<tr>
-        <td colspan=2 align = center>@ref DocATu2v0, @ref DocATu0v1 </td>
+        <td> @image html images/LenaBruit256.png height=200px </td>
+        <td> @image html images/LenaBruit256Restaure.png height=200px </td>
+        <td> @image html images/LenaBruit256Contours.png height=200px </td>
 </tr>
 </table>
 </center>

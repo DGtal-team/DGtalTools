@@ -173,20 +173,31 @@ For more details, see \ref moduleAT
 <td> Perfect image </td>
 </tr>
 <tr>
-<td>@image html degrade-b04.png "Input image (noise = 0.4)"</td>
-<td>@image html degrade-a0.05000-l0.0075000-u2.png "AT20 alpha=0.05 lambda=0.0075 "</td>
-<td>@image html degrade.png "Perfect image"</td>
-</tr>
-<tr>
-<td> SNR of \a g = 21.9183 </td>
-<td> SNR of \a u = 34.3655 </td>
-<td> Perfect image </td>
+<td>@image html DegradeBruit128.png "Input image (noise = 0.4)"</td>
+<td>@image html DegradeBruit128Restaure.png "alpha=0.5 lambda=0.1 "</td>
+<td>@image html Degrade128.png "Perfect image"</td>
 </tr>
 </table>
 </center>
 
-@note Other restoration examples, parameter analysis, and image
-inpainting examples may be found in \ref moduleAT.
+@note For the last step of multiresolution for a noisy image can be problematic because of the law followed by \f$ \alpha \f$ parameter.
+
+<center>
+<table>
+<tr>
+<td> Input image \a g </td>
+<td> Reconstructed image \a u </td>
+<td> Perfect image </td>
+</tr>
+<tr>
+<td>@image html degrade-b04.png "Input image (noise = 0.4)"</td>
+<td>@image html DegradeBruit256Restaure.png "alpha=0.5 lambda=0.1 "</td>
+<td>@image html degrade.png "Perfect image"</td>
+</tr>
+</table>
+</center>
+
+
 
 */
 
