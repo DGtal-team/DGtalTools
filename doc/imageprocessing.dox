@@ -43,5 +43,6 @@
 </table>
 </center>
 
+ - @ref DocATu2v0-m : Computes a piecewise smooth approximation of an image, by optimizing the Ambrosio-Tortorelli functional (with u a 2-form and v a 0-form) including euclidean metric.
 
 */

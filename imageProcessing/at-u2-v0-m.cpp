@@ -56,17 +56,17 @@
 #include "ATu2v0-m.h"
 
 /**
-@page DocATu2v0 imageProcessing/at-u2-v0
+@page DocATu2v0-m imageProcessing/at-u2-v0-m
 
-@brief Computes a piecewise smooth approximation of a grey-level or color image, by optimizing the Ambrosio-Tortorelli functional (with u a 2-form and v a 0-form).
+@brief Computes a piecewise smooth approximation of a grey-level or color image, by optimizing the Ambrosio-Tortorelli functional (with u a 2-form and v a 0-form) including euclidean metric.
 
-@writers Marion Foare, Jacques-Olivier Lachaud
+@writers Noemie Tasca
 
-@b Usage: at-u2-v0 -i [input.pgm]
+@b Usage: at-u2-v0-m -i [input.pgm]
 
 (for grey-level image restoration)
 
-@b Usage: at-u2-v0 -i [input.ppm]
+@b Usage: at-u2-v0-m -i [input.ppm]
 
 (for color image restoration)
 
@@ -103,13 +103,12 @@ edges. Pixels are faces, so functions \f$ u \f$ and \f$ g \f$ are
 2-forms since they represent the gray levels of each pixel. On the
 contrary, we set \f$ v \f$ in-between cells of non null measure, so in
 this case on vertices as a 0-form, and on edges by averaging with \f$
-\mathbf{M} \f$. We call this formulation AT20. The DEC reformulation
-is straightforward, except for the second term, where we use matrix
-\f$ \mathbf{M} \f$ to transport the 0-form \f$ v \f$ onto edges :
+\mathbf{M} \f$. We call this formulation AT20-m :
 
 \f[
   \displaystyle
-  AT20(u,v) = \Sigma_{i=1}^n
+  TODO : change
+  AT20m(u,v) = \Sigma_{i=1}^n
       \alpha \langle u_i - g_i , u_i - g_i \rangle_2
     + \langle \mathbf{M} v , \bar{\mathbf{\star}} \bar{\mathbf{d_0}}
       \mathbf{\star} u_i \rangle_1 ^2 \\
@@ -148,14 +147,22 @@ For more details, see \ref moduleAT
                                         singularities v (e.g. red is 0xff0000).
   -v [ --verbose ] arg (=0)             the verbose level (0: silent, 1: less
                                         silent, etc).
+  -s [ --step ]                         The step size for defined metric tensors
+                                        (default value is 1/N where N is the size of image
+  --multiresolution                     The option for a multiresolution option for solving
+  -t [ --images-size ]                  A string that contens vaious size for multiresolution option
+
+
 \endcode
 
-@b example:
-
-@b example:
-
+@b example without multireoslution:
 \code
-./imageProcessing/at-u2-v0 -i ../imageProcessing/Images/degrade-b04.pgm --image-snr ../imageProcessing/Images/degrade.pgm -a 0.05 --epsilon-1 4 --epsilon-2 0.25 -l 0.0075 -p 2 -c 0xff0000 -o degrade
+./imageProcessing/at-u2-v0-m -i ./../Images/CarreSimple/Carre256.pgm --epsilon-1 2 --epsilon-2 1 -v 0 -o ./../IPResultat/ -a 1 -l 0.1
+\endcode
+
+@b example with multiresolution:
+\code
+./imageProcessing/at-u2-v0-m -i ./../Images/CarreSimple/Carre.pgm --epsilon-1 2 --epsilon-2 1 -v 0 -o ./../IPResultat/ -a 1 -l 0.1 --multiresolution true -t "32 64 128 256"
 \endcode
 
 <center>

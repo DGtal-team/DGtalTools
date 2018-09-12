@@ -426,6 +426,77 @@ triple points in the L2-metric sense.
 
 
 
+-----------------------------------------
+
+@section AT2 Discretization of AT with discrete calculus inluding euclidean metric
+
+
+@subsection AT2_2 Formulations AT20-m with metric
+
+Let \f$ N \f$ be the size of image.
+Let \f$ h \f$ be the step associated to the image resolution and defined as
+\f[
+    \displaystyle
+    h = \frac{1}{N}
+\f]
+
+The euclidean metric appears in the scalar product
+\f[
+  \displaystyle
+  langle
+  a , b
+  \rangle
+  =
+  a^T G_k b
+\f]
+where \f$ G_k \f$ are diagonal matrices, called metric tensors of k-forms (for \f$ k \in 0,1,2 \f$) and defined as
+\f[
+    \displaystyle
+    G_0 = ...
+    \quad \quad
+    G_1 = ...
+    \quad \quad
+    G_2 = ...
+\f]
+
+Hence, the formulation of AT20-m including metric become
+\f[
+    \displaystyle
+\f]
+
+
+@subsection AT2_3 Solutions to AT20-m
+
+Functional AT20-m is sum of quadratic terms, independently,
+but not simultaneously, convex in \f$ u \f$ and \f$ v \f$.
+It must has null derivative at optimum.
+We thus propose to alternatively solve for \f$ u \f$, then \f$ v \f$.
+The derivatives can be given explicitly as linear systems.
+To simplify notations, let \f$ \mathbf{A} := \mathbf{d_0} \f$,
+\f$  \mathbf{B} := \mathbf{d_1} \f$,
+\f$ \mathbf{A'} := \bar{\mathbf{\star}} \bar{\mathbf{d_1}} \mathbf{\star} \f$
+and \f$ \mathbf{B'} := \bar{\mathbf{\star}} \bar{\mathbf{d_0}} \mathbf{\star} \f$.
+We get at optimum:
+
+\f[
+  \displaystyle
+  \left\{ \begin{array}{r @{=} l c}
+    \left[\alpha \mathbf{Id} - {\mathbf{B'}}^T diag(\mathbf{M} v)^2 \mathbf{B'} \right] u
+    & = \quad \alpha g & (1.1) \\
+    \left[ \frac{\lambda}{4\varepsilon} \mathbf{Id}
+          + \lambda \varepsilon \mathbf{A}^T \mathbf{A}
+          + \mathbf{M}^T diag(\mathbf{B'} u)^2 \mathbf{M} \right] v
+    & = \quad \frac{\lambda}{4 \varepsilon} \mathbf{1}
+    & (1.2)
+  \end{array}\right.
+\f]
+
+Since all matrices are symmetric, definite and positive, we use a Cholesky factorization to
+solve alternatively the two equations of each system.
+
+----------------------------------------
+
+
 
 @section References
 
