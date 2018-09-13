@@ -52,6 +52,9 @@
         <td> @image html images/LenaBruit256Restaure.png height=200px </td>
         <td> @image html images/LenaBruit256Contours.png height=200px </td>
 </tr>
+<tr>
+        <td colspan=3 align = center>@ref DocATu2v0-m </td>
+</tr>
 </table>
 </center>
 

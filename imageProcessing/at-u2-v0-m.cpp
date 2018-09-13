@@ -76,10 +76,10 @@ Mumford-Shah functional.
 Given an input grayscale image, defined in an open bounded domain
 \f$ \Omega \f$, we represent its gray levels by a function \f$ g
 \in L^{\infty}(\Omega) \f$. <br>
-In the Ambrosio-Tortorelli functional [1],
+In the Ambrosio-Tortorelli functional,
 one wants to find a function \f$ u \in SBV(\Omega) \f$ which is a
 smooth approximation of the input image \f$ g \f$. <br>
-The Ambrosio-Tortorelli functional [1] is defined by
+The Ambrosio-Tortorelli functional is defined by
 \f[
   \displaystyle
   AT_{\varepsilon}(u,v)	= \int_\Omega \alpha |u-g|^2 + v^2 |\nabla u|^2
@@ -92,7 +92,7 @@ In AT functional, function \f$ v \f$ is a smooth approximation
 of the set of discontinuities, and takes value close to 0 in this set,
 while being close to 1 outside discontinuities. <br>
 A remarkable property of this functional is that it \f$ \Gamma \f$-converges to (a
-relaxation of) MS functional as \f$ \varepsilon \f$ tends to 0 (see [1]). <br>
+relaxation of) MS functional as \f$ \varepsilon \f$ tends to 0. <br>
 The intuition is that a large \f$ \varepsilon \f$ induces a solution
 with a fuzzy set of discontinuities, which is then progressively
 narrowed to the crisp 1-dimensional set of discontinuites as
@@ -100,11 +100,7 @@ narrowed to the crisp 1-dimensional set of discontinuites as
 
 We discretize AT with discrete calculus and we set \f$ u \f$ and \f$ g
 \f$ to live on the faces and \f$ v \f$ to live on the vertices and
-edges. Pixels are faces, so functions \f$ u \f$ and \f$ g \f$ are
-2-forms since they represent the gray levels of each pixel. <br>
-On the contrary, we set \f$ v \f$ in-between cells of non null measure, so in
-this case on vertices as a 0-form, and on edges by averaging with \f$
-\mathbf{M} \f$. <br>
+edges. <br>
 We call this formulation AT20-m :
 
 \f[

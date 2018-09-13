@@ -15,15 +15,15 @@
 **/
 
 /**
-* @file ATu2v0.ih
+* @file ATu2v0-m.ih
 * @author Jacques-Olivier Lachaud (\c jacques-olivier.lachaud@univ-savoie.fr )
 * Laboratory of Mathematics (CNRS, UMR 5127), University of Savoie, France
-* @author Marion Foare (\c marion.foare@univ-savoie.fr )
-* Laboratory of Mathematics (CNRS, UMR 5127), University of Savoie, France
+* @author Noemie Tasca (\c noemie.tasca@etu.univ-smb.fr )
+ * Master informatique, University of Savoie, France
 *
-* @date 2016/10/12
+* @date 2018/09/13
 *
-* Implementation of inline methods defined in ATu2v0.h
+* Implementation of inline methods defined in ATu2v0-m.h
 *
 * This file is part of the DGtal library.
 */

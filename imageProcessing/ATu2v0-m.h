@@ -17,28 +17,28 @@
 #pragma once
 
 /**
- * @file ATu2v0.h
+ * @file ATu2v0-m.h
  * @author Jacques-Olivier Lachaud (\c jacques-olivier.lachaud@univ-savoie.fr )
  * Laboratory of Mathematics (CNRS, UMR 5127), University of Savoie, France
- * @author Marion Foare (\c marion.foare@univ-savoie.fr )
- * Laboratory of Mathematics (CNRS, UMR 5127), University of Savoie, France
+ * @author Noemie Tasca (\c noemie.tasca@etu.univ-smb.fr )
+ * Master informatique, University of Savoie, France
  *
- * @date 2016/10/12
+ * @date 2018/09/13
  *
- * Header file for module ATu2v0.cpp
+ * Header file for module ATu2v0-m.cpp
  *
  * This file is part of the DGtal library.
  */
 
-#if defined(ATu2v0_RECURSES)
-#error Recursive header files inclusion detected in ATu2v0.h
+#if defined(ATu2v0m_RECURSES)
+#error Recursive header files inclusion detected in ATu2v0-m.h
 #else // defined(ATu2v0_RECURSES)
 /** Prevents recursive inclusion of headers. */
-#define ATu2v0_RECURSES
+#define ATu2v0m_RECURSES
 
-#if !defined ATu2v0_h
+#if !defined ATu2v0m_h
 /** Prevents repeated inclusion of headers. */
-#define ATu2v0_h
+#define ATu2v0m_h
 
 //////////////////////////////////////////////////////////////////////////////
 // Inclusions
@@ -511,13 +511,13 @@ namespace DGtal
 
 ///////////////////////////////////////////////////////////////////////////////
 // Includes inline functions.
-//#include "DGtal/dec/ATu2v0.ih"
+//#include "DGtal/dec/ATu2v0-m.ih"
 #include "ATu2v0-m.ih"
 
 //                                                                           //
 ///////////////////////////////////////////////////////////////////////////////
 
-#endif // !defined ATu2v0_h
+#endif // !defined ATu2v0m_h
 
-#undef ATu2v0_RECURSES
-#endif // else defined(ATu2v0_RECURSES)
+#undef ATu2v0m_RECURSES
+#endif // else defined(ATu2v0m_RECURSES)
