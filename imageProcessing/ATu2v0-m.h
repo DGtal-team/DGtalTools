@@ -214,6 +214,31 @@ namespace DGtal
 
 
 /*
+        /**
+        * Adds an input 2-form by filtering a smaller \a image values (size N/2 X N/2).
+        *
+        * @param image any image such that the domain size is half than actual domain.
+        *
+        * @param f any functor associated a scalar to an image value.
+        *
+        * @note For a grey-level image stored with values `unsigned char`,
+        * should be called as
+        *
+        * @code
+        * AT.addInputFromImage( image, [] (unsigned char c ) { return (double) c / 255.0; } );
+        * @endcode
+        *
+        * @note For a color image stored with values `Color`, should be called as
+        * @code
+        * AT.addInputFromImage( image, [] ( Color c ) { return (double) c.red()   / 255.0; } );
+        * AT.addInputFromImage( image, [] ( Color c ) { return (double) c.green() / 255.0; } );
+        * AT.addInputFromImage( image, [] ( Color c ) { return (double) c.blue()  / 255.0; } );
+        * @endcode
+        *
+        * @tparam Image any Image type.
+        * @tparam Function any function type ( typename Image::Value ) -> Scalar.
+        */
+/*        template <typename Image, typename Function>
         template <typename Image, typename Function>
         void addInputFromImage(   const Image& image,
                                   const Function& f   );

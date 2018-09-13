@@ -167,79 +167,50 @@ metric_average( false )
     }
 
 
+/*
     //-----------------------------------------------------------------------------
-    /*
     template <typename TKSpace, typename TLinearAlgebra>
     template <typename Image, typename Function>
     void
     DGtal::ATu2v0<TKSpace, TLinearAlgebra>::
     addInputFromImage( const Image& image, const Function& f)
     {
-        trace.beginBlock(">>>> addInputFromImage");
-
         g2.push_back( PrimalForm2( calculus ) );
         PrimalForm2& g  = g2.back();
         const KSpace& K = calculus.myKSpace;
         double H2 = H * H;
         Domain D = image.domain();
 
-        trace.info()    << "Kspace : " << K << " - " << "[ " << K.lowerBound()[0] << "," << K.upperBound()[0] << " ]" << " - " << "[ " << K.lowerBound()[1] << "," << K.upperBound()[1] << " ]" << std::endl
-                        << "Domain : " << D << " - " << "[ " << D.lowerBound()[0] << "," << D.upperBound()[0] << " ]" << " - " << "[ " << D.lowerBound()[1] << "," << D.upperBound()[1] << " ]" << std::endl
-                        << std::endl;
-
-        for ( int x = D.lowerBound()[0] ; x <= D.upperBound()[0] ; x++ ) {
-            for ( int y = D.lowerBound()[1] ; y <= D.upperBound()[1] ; y++ ) {
+        for ( int x = D.lowerBound()[0] ; x <= D.upperBound()[0] ; x++ )
+        {
+            for ( int y = D.lowerBound()[1] ; y <= D.upperBound()[1] ; y++ )
+            {
                 Point p(x,y);   // coordonnees digitales
-                trace.info() << "Point (x,y) = " << "("<<x<<","<<y<<")" << std::endl;
                 // Recuperation des quatres points resultants (coordonnees khalimsky)
                 Point pk1(p[0] * 4 + 1, p[1] * 4 + 1);
                 Point pk2(p[0] * 4 + 1, p[1] * 4 + 3);
                 Point pk3(p[0] * 4 + 3, p[1] * 4 + 1);
                 Point pk4(p[0] * 4 + 3, p[1] * 4 + 3);
-                trace.info() << "Recuperation des quatres points" << std::endl
-                             << "> pk1: " << pk1 << std::endl
-                             << "> pk2: " << pk2 << std::endl
-                             << "> pk3: " << pk3 << std::endl
-                             << "> pk4: " << pk4 << std::endl;
                 // Recuperation des Cell correspondantes aux points
                 Cell c1 = K.uCell(pk1);
                 Cell c2 = K.uCell(pk2);
                 Cell c3 = K.uCell(pk3);
                 Cell c4 = K.uCell(pk4);
-                trace.info() << "Recuperation des SCell correspondantes" << std::endl
-                             << "> c1: " << c1 << std::endl
-                             << "> c2: " << c2 << std::endl
-                             << "> c3: " << c3 << std::endl
-                             << "> c4: " << c4 << std::endl;
                 // Recuperation des index correspondants aux Cell dans la kforme
                 auto index1 = calculus.getCellIndex(c1);
                 auto index2 = calculus.getCellIndex(c2);
                 auto index3 = calculus.getCellIndex(c3);
                 auto index4 = calculus.getCellIndex(c4);
-                trace.info() << "Recuperation des index correspondants pour la nouvelle KForm" << std::endl
-                             << "> index1: " << index1 << std::endl
-                             << "> index2: " << index2 << std::endl
-                             << "> index3: " << index3 << std::endl
-                             << "> index4: " << index4 << std::endl;
-                trace.info() << "---------------------------------" << std::endl
-                             << "(x,y) = " << p << std::endl
-                             << "    > " << pk1 << "  ->  " << index1 << "    ->  " << (g.getSCell(index1)) << std::endl
-                             << "    > " << pk2 << "  ->  " << index2 << "    ->  " << (g.getSCell(index2)) << std::endl
-                             << "    > " << pk3 << "  ->  " << index3 << "    ->  " << (g.getSCell(index3)) << std::endl
-                             << "    > " << pk4 << "  ->  " << index4 << "    ->  " << (g.getSCell(index4)) << std::endl
-                             << "---------------------------------" << std::endl << std::endl;
                 // definition de g selon la valeur du pixel
                 g.myContainer( index1 ) = H2 * f( image( p ) );
                 g.myContainer( index2 ) = H2 * f( image( p ) );
                 g.myContainer( index3 ) = H2 * f( image( p ) );
                 g.myContainer( index4 ) = H2 * f( image( p ) );
-                trace.info()    << "Definition de g selon la valeur du pixel" << std::endl
-                                << "Velur du pixel en (x,y) = " << f( image( p ) ) << std::endl
-                                << "Valeur attribue a g : " << ( H2 * f( image( p ) ) ) << std::endl;
             }
         }
     }
-     */
+*/
+
 
         //-----------------------------------------------------------------------------
         template <typename TKSpace, typename TLinearAlgebra>
@@ -380,8 +351,6 @@ metric_average( false )
         setUFromImage(const Image& image, const Function& f)
         {
 
-            trace.beginBlock("SetUFromImage");
-
             u2.push_back( PrimalForm2( calculus ) );
             PrimalForm2& u  = u2.back();
             const KSpace& K = calculus.myKSpace;
@@ -417,8 +386,6 @@ metric_average( false )
                 }
             }
 
-            trace.endBlock();
-
         }
 
         //-----------------------------------------------------------------------------
@@ -428,8 +395,6 @@ metric_average( false )
         DGtal::ATu2v0<TKSpace, TLinearAlgebra>::
         setVFromImage(const Image& image, const Function& f)
         {
-            // TODO :  a faire
-            trace.beginBlock("SetVFromImage");
 
             PrimalForm0& v  = v0;
             const KSpace& K = calculus.myKSpace;
@@ -489,7 +454,6 @@ metric_average( false )
                     v.myContainer( index9 ) = H2 * f( image( p ) );
                 }
             }
-            trace.endBlock();
 
         }
 

@@ -1,8 +1,3 @@
-/*
- * Exemple de commande d'execution du code :
- * ./imageProcessing/at-u2-v0-m -i ./../Images/CarreSimple/Carre.pgm --epsilon-1 2 --epsilon-2 1 -v 0 -o ./../IPResultat/ -a 1 -l 0.1 --multiresolution true -t "8 16 32 64"
- */
-
  /**
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Lesser General Public License as
@@ -305,13 +300,15 @@ int main( int argc, char* argv[] )
     // Gestion des tailles pour la multiresolution
     std::stringstream iss( taille );
     std::vector<int> mySizes;
-    if(multires){
+    if(multires)
+    {
         // Recuperation des tailles dans un vecteur de int : mySizes
         int number;
         while ( iss >> number )
             mySizes.push_back( number );
         size_t lastindex = f1.find_last_of(".");
-        for( int i = 0 ; i < mySizes.size() ; i++ ){
+        for( int i = 0 ; i < mySizes.size() ; i++ )
+        {
             // Creation d'un veceteur de noms pour f1
             f1 = f1_copy;
             f1.insert( lastindex , std::to_string( mySizes[i] ) );  // insertion de la taille
@@ -326,7 +323,8 @@ int main( int argc, char* argv[] )
     trace.info() << endl;
     trace.beginBlock("Temps total");
     int iterator_size = 0;
-    do {
+    do
+    {
         trace.info() << "--------------------------------------------------------------------" << endl;
         trace.info() << endl;
         trace.beginBlock("Temps pour une image");
@@ -338,7 +336,8 @@ int main( int argc, char* argv[] )
         l1 = l1_copy;
 
         // Gestion de la taille de fichier pour la multiresolution
-        if(multires){
+        if(multires)
+        {
             size_t lastindex = f1.find_last_of(".");                                // Position de l'extension
             f1.insert( lastindex , std::to_string( mySizes[ iterator_size ] ) );    // ENTRANT : Insertion de la taille avant l'extension
             f2.append( std::to_string( mySizes[ iterator_size ] ) );                // SORTANT : Insertion de la taille a la fin
@@ -452,21 +451,25 @@ int main( int argc, char* argv[] )
         //---------------------------------------------------------------------------
 //      // Initialisation de U
         trace.info() << endl;
-        trace.beginBlock("Initialisation de u et v");
-        if( multires && (iterator_size > 0) ){
-            trace.info() << "Utilisation du resultat precedent. " << endl;
-            if( grey_image ){
-                trace.info() << "Resultat a l'etape precedente : " << endl;
-                trace.info() << "Restauree : " << file_restored[iterator_size-1] << endl;
-                trace.info() << "Contours : " << file_contours[iterator_size-1] << endl;
+        if(verb > 0) trace.beginBlock("Initialisation de u et v");
+        if( multires && (iterator_size > 0) )
+        {
+            if(verb > 0) trace.info() << "Utilisation du resultat precedent. " << endl;
+            if( grey_image )
+            {
+                if(verb > 0) trace.info() << "Resultat a l'etape precedente : " << endl;
+                if(verb > 0) trace.info() << "Restauree : " << file_restored[iterator_size-1] << endl;
+                if(verb > 0) trace.info() << "Contours : " << file_contours[iterator_size-1] << endl;
                 GreyLevelImage restoredImage = PGMReader<GreyLevelImage>::importPGM(file_restored[iterator_size-1]);
                 ColorImage restoredContour = PPMReader<ColorImage>::importPPM(file_contours[iterator_size-1]);
                 AT.setUFromImage( restoredImage, [] (unsigned char c ) { return (double) c / 255.0; } );
                 AT.setVFromImage(restoredContour ,[] ( Color c ) { return (double) c.red()   / 255.0; });
-            }else if ( color_image ){
-                trace.info() << "Resultat a l'etape precedente : " << endl;
-                trace.info() << "Restauree : " << file_restored[iterator_size-1] << endl;
-                trace.info() << "Contours : " << file_contours[iterator_size-1] << endl;
+            }
+            else if ( color_image )
+            {
+                if(verb > 0) trace.info() << "Resultat a l'etape precedente : " << endl;
+                if(verb > 0) trace.info() << "Restauree : " << file_restored[iterator_size-1] << endl;
+                if(verb > 0) trace.info() << "Contours : " << file_contours[iterator_size-1] << endl;
                 ColorImage restoredImage = PPMReader<ColorImage>::importPPM(file_restored[iterator_size-1]);
                 ColorImage restoredContour = PPMReader<ColorImage>::importPPM(file_contours[iterator_size-1]);
                 AT.setUFromImage( restoredImage, [] ( Color c ) { return (double) c.red()   / 255.0; } );
@@ -474,8 +477,10 @@ int main( int argc, char* argv[] )
                 AT.setUFromImage( restoredImage, [] ( Color c ) { return (double) c.blue()  / 255.0; } );
                 AT.setVFromImage( restoredContour ,[] ( Color c ) { return (double) c.red()   / 255.0; });
             }
-        }else{
-            trace.info() << "Utilisation de l'image donnee en entree : u = g. " << endl;
+        }
+        else
+        {
+            if(verb > 0) trace.info() << "Utilisation de l'image donnee en entree : u = g. " << endl;
             AT.setUFromInput();
         }
         trace.endBlock(); trace.info() << endl;
@@ -588,7 +593,6 @@ int main( int argc, char* argv[] )
                 trace.info() << endl;
                 trace.beginBlock("Calcul d'energie");
                 trace.info() << "Energie calculee = " << AT.computeEnergy() <<  "       " << (AT.computeEnergy()*h) << endl;
-                //trace.info() << "Perimetre*lambda_h = " << AT.computeLambdaPerimeter() << endl;
                 trace.info() << "Perimetre =        " << (AT.computePerimeter()) << endl;
                 trace.info() << "Fidelite =         " << AT.computeFidelity() << "      " << (AT.computeFidelity()*h) << endl;
                 trace.info() << "Cross term =       " << AT.computeCrossTerm() << "     " << (AT.computeCrossTerm()*h) << endl;
@@ -599,16 +603,13 @@ int main( int argc, char* argv[] )
 
                 // Restored image
                 GreyLevelImage image_u( domain );
-                functions::dec::form2ToGreyLevelImage
-                        ( AT.calculus, u, image_u, 0.0, 1.0, 1 );
+                functions::dec::form2ToGreyLevelImage( AT.calculus, u, image_u, 0.0, 1.0, 1 );
                 PGMWriter<GreyLevelImage>::exportPGM( ossU.str(), image_u );
 
-                // Zoomed restored image with discontinuities (in specified color).
+                // Image with discontinuities (in specified color).
                 ColorImage cimage( out_domain );
-                functions::dec::primalForm1ToRGBColorImage
-                        ( AT.calculus, v, cimage, color_v, 0.0, 1.0, pix_sz );
+                functions::dec::primalForm1ToRGBColorImage( AT.calculus, v, cimage, color_v, 0.0, 1.0, pix_sz );
                 PPMWriter<ColorImage, functors::Identity >::exportPPM( ossV.str(), cimage );
-
 
                 if ( verb > 0 ) trace.endBlock();
             }
@@ -640,7 +641,6 @@ int main( int argc, char* argv[] )
                 trace.info() << endl;
                 trace.beginBlock("Calcul d'energie");
                 trace.info() << "Energie calculee = " << AT.computeEnergy() <<  "       " << (AT.computeEnergy()*h) << endl;
-                //trace.info() << "Perimetre*lambda_h = " << AT.computeLambdaPerimeter() << endl;
                 trace.info() << "Perimetre =        " << (AT.computePerimeter()) << endl;
                 trace.info() << "Fidelite =         " << AT.computeFidelity() << "      " << (AT.computeFidelity()*h) << endl;
                 trace.info() << "Cross term =       " << AT.computeCrossTerm() << "     " << (AT.computeCrossTerm()*h) << endl;
@@ -655,10 +655,10 @@ int main( int argc, char* argv[] )
                 functions::dec::threeForms2ToRGBColorImage( AT.calculus, u0, u1, u2, image_u, 0.0, 1.0, 1 );
                 PPMWriter<ColorImage, functors::Identity >::exportPPM( ossU.str(), image_u );
 
-                // Contours image
+                // Image with discontinuities (in specified color).
                 ColorImage image_v( out_domain );
                 functions::dec::primalForm1ToRGBColorImage( AT.calculus, v, image_v, color_v, 0.0, 1.0, pix_sz );
-                PPMWriter<ColorImage, functors::Identity >::exportPPM( ossV.str(), image_v ); 
+                PPMWriter<ColorImage, functors::Identity >::exportPPM( ossV.str(), image_v );
 
                 if ( verb > 0 ) trace.endBlock();
             }
