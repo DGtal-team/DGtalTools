@@ -422,13 +422,6 @@ int main( int argc, char* argv[] )
         trace.endBlock();
         trace.info() << endl;
         // -----------------------------------------------------------------------------------------------
-/*
-        double one_h = 1 / h ;
-        double one_h2 = 1 / (h*h) ;
-        double lh = l1 * one_h ;
-        double ah = a + one_h2 ;
-        double e2h = e2 * h ;
-*/
 
 
         //---------------------------------------------------------------------------
@@ -618,51 +611,6 @@ int main( int argc, char* argv[] )
 
 
                 if ( verb > 0 ) trace.endBlock();
-
-
-// NOEMIE::TEST DE LA METHODE ADDINPUTFROMIMAGE
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/*
- * L'option "multiresolution" va prendre en compte un argument : une chaine de caractere qui donne la liste des tailles a traiter pour une image.
- * Il faut au prealable avoir une pyramide d'image avec un nom generique : <NomImage><TailleImage>.<extension>
- *
- * Exemple d'argument pour la multiresolution :
- * "8 16 32 64" avec le fichier Carre.pgm
- *      Traitera les fichiers :
- *          > Carre8.pgm    : resolution normal initialisee a 0
- *          > Carre16.pgm   : multiresolution avec initialisation selon les resultat de Carre8.pgm
- *          > Carre32.pgm   : multiresolution avec initialisation selon les resultat de Carre16.pgm
- *          > Carre64.pgm   : multiresolution avec initialisation selon les resultat de Carre32.pgm
- *
- * Exemple de commande d'execution :
- * ./imageProcessing/at-u2-v0-m -i ./../Images/CarreSimple/Carre.pgm --epsilon-1 2 --epsilon-2 1 -v 0 -o ./../IPResultat/ -a 1 -l 0.1 --multiresolution true -t "8 16 32"
- */
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/*
-                if( multires && (iterator_size > 0) ) {
-                    GreyLevelImage restoredImage = PGMReader<GreyLevelImage>::importPGM(file_restored[iterator_size-1]);
-                    //ColorImage restoredImage = PPMReader<ColorImage>::importPPM( file_contours[iterator_size-1] );
-                    // Initialisation de u a partir du resultat precedent
-                    AT.setUFromImage( restoredImage, [] (unsigned char c ) { return (double) c / 255.0; } );
-                    //AT.setUFromImage( restoredImage, [] ( Color c ) -> double { return ((double) c.red())   / 255.0; } );
-                    //AT.setUFromImage( restoredImage, [] ( Color c ) -> double { return ((double) c.green()) / 255.0; } );
-                    //AT.setUFromImage( restoredImage, [] ( Color c ) -> double { return ((double) c.blue())  / 255.0; } );
-
-                    const Calculus::PrimalForm2 u = AT.getU( 0 );
-                    trace.info() << "Forme u : " << u << endl;
-
-                    ostringstream ImU;
-                    ImU << boost::format("%1%ImU.ppm") % (f2);
-                    ColorImage cimageu(domain);
-                    functions::dec::threeForms2ToRGBColorImage(AT.calculus, u, u, u, cimageu, 0.0, 255.0, pix_sz);
-                    PPMWriter<ColorImage, functors::Identity>::exportPPM(ImU.str(), cimageu);
-                }
-*/
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-
             }
             else if ( color_image )
             {
@@ -704,17 +652,14 @@ int main( int argc, char* argv[] )
 
                 // Restored image
                 ColorImage image_u( domain );
-                functions::dec::threeForms2ToRGBColorImage
-                        ( AT.calculus, u0, u1, u2, image_u, 0.0, 1.0, 1 );
+                functions::dec::threeForms2ToRGBColorImage( AT.calculus, u0, u1, u2, image_u, 0.0, 1.0, 1 );
                 PPMWriter<ColorImage, functors::Identity >::exportPPM( ossU.str(), image_u );
 
-                ColorImage image_uv( out_domain );
-                functions::dec::primalForm1ToRGBColorImage
-                        ( AT.calculus, v, image_uv, color_v, 0.0, 1.0, pix_sz );
-                /*          functions::dec::threeForms2ToRGBColorImage
-                            ( AT.calculus, u0, u1, u2, image_uv, 0.0, 1.0, pix_sz );
-                */
-                PPMWriter<ColorImage, functors::Identity >::exportPPM( ossV.str(), image_uv );
+                // Contours image
+                ColorImage image_v( out_domain );
+                functions::dec::primalForm1ToRGBColorImage( AT.calculus, v, image_v, color_v, 0.0, 1.0, pix_sz );
+                PPMWriter<ColorImage, functors::Identity >::exportPPM( ossV.str(), image_v ); 
+
                 if ( verb > 0 ) trace.endBlock();
             }
             // Compute SNR if possible
