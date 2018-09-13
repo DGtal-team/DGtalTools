@@ -107,13 +107,15 @@ this case on vertices as a 0-form, and on edges by averaging with \f$
 
 \f[
   \displaystyle
-  TODO : change
-  AT20m(u,v) = \Sigma_{i=1}^n
-      \alpha \langle u_i - g_i , u_i - g_i \rangle_2
-    + \langle \mathbf{M} v , \bar{\mathbf{\star}} \bar{\mathbf{d_0}}
-      \mathbf{\star} u_i \rangle_1 ^2 \\
-    + \lambda \varepsilon \langle \mathbf{d_0} v , \mathbf{d_0} v \rangle_1
-    + \frac{\lambda}{4\varepsilon} \langle 1 - v , 1 - v \rangle_0.
+  \begin{array}{rcl}
+        AT_\varepsilon^{2,0} (u,v)
+        &=&
+        \alpha \, \sum_{i=1}^n \left( u_i - g_i \right)^T \, G_2 \, \left( u_i - g_i \right) \\[0.2cm]
+        &+&
+        \sum_{i=1}^n  u_i^T \, G_2^T \, B'^T \, diag\left( M_{01} \, v \right)^2 \, B' \, G_2 \, u_i \\[0.2cm]
+        &+&
+        \lambda \, \varepsilon \, v^T \, A^T \, G_1 \, A \, v + \dfrac{\lambda}{4 \, \varepsilon} \, \left( 1 - v \right)^T \, G_0 \, \left( 1 - v \right)
+    \end{array}
 \f]
 
 For more details, see \ref moduleAT
@@ -180,8 +182,8 @@ For more details, see \ref moduleAT
 </table>
 </center>
 
-@note For the last step of multiresolution for a noisy image can be problematic because of the law followed by \f$ \alpha \f$ parameter.
-
+@note The last step of multiresolution for a noisy image can be problematic because of the law followed by \f$ \alpha \f$ parameter.
+@b example
 <center>
 <table>
 <tr>
