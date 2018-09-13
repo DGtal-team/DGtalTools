@@ -182,7 +182,7 @@ For more details, see \ref moduleAT
 </table>
 </center>
 
-@note The last step of multiresolution for a noisy image can be problematic because of the law followed by \f$ \alpha \f$ parameter.
+@note The last step of multiresolution for a noisy image can be problematic because of the law followed by \f$ \alpha \f$ parameter. <br>
 @b example
 <center>
 <table>

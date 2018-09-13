@@ -426,7 +426,7 @@ triple points in the L2-metric sense.
 
 
 
------------------------------------------
+<!-- Partie de Noemie ---------------------------------------------------------------------------------------------- -->
 
 @section AT2m Discretization of AT with discrete calculus inluding euclidean metric
 
@@ -519,7 +519,7 @@ We get at optimum:
 Since all matrices are symmetric, definite and positive, we use a Cholesky factorization to
 solve alternatively the two equations of each system.
 
-----------------------------------------
+<!-- Partie de Noemie ---------------------------------------------------------------------------------------------- -->
 
 
 
