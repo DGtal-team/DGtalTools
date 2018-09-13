@@ -304,10 +304,10 @@ int main( int argc, char* argv[] )
 
     // Gestion des tailles pour la multiresolution
     std::stringstream iss( taille );
-    int number;
     std::vector<int> mySizes;
     if(multires){
         // Recuperation des tailles dans un vecteur de int : mySizes
+        int number;
         while ( iss >> number )
             mySizes.push_back( number );
         size_t lastindex = f1.find_last_of(".");
@@ -422,13 +422,13 @@ int main( int argc, char* argv[] )
         trace.endBlock();
         trace.info() << endl;
         // -----------------------------------------------------------------------------------------------
-
+/*
         double one_h = 1 / h ;
         double one_h2 = 1 / (h*h) ;
         double lh = l1 * one_h ;
         double ah = a + one_h2 ;
         double e2h = e2 * h ;
-
+*/
 
 
         //---------------------------------------------------------------------------
