@@ -428,10 +428,10 @@ triple points in the L2-metric sense.
 
 -----------------------------------------
 
-@section AT2 Discretization of AT with discrete calculus inluding euclidean metric
+@section AT2m Discretization of AT with discrete calculus inluding euclidean metric
 
 
-@subsection AT2_2 Formulations AT20-m with metric
+@subsection AT2m_1 Formulations AT20-m with metric
 
 Let \f$ N \f$ be the size of image.
 Let \f$ h \f$ be the step associated to the image resolution and defined as
@@ -443,29 +443,55 @@ Let \f$ h \f$ be the step associated to the image resolution and defined as
 The euclidean metric appears in the scalar product
 \f[
   \displaystyle
-  langle
+  \langle
   a , b
   \rangle
   =
-  a^T G_k b
+  a^T \, G_k \, b
 \f]
 where \f$ G_k \f$ are diagonal matrices, called metric tensors of k-forms (for \f$ k \in 0,1,2 \f$) and defined as
 \f[
     \displaystyle
-    G_0 = ...
+    G_0 =
+    \begin{bmatrix}
+    	h^2 & & \\
+    	& \ddots & \\
+    	& & h^2
+    \end{bmatrix}
     \quad \quad
-    G_1 = ...
+    G_1 =
+    \begin{bmatrix}
+    \mathbf{1} & & \\
+    & \ddots & \\
+    & & \mathbf{1}
+    \end{bmatrix}
     \quad \quad
-    G_2 = ...
+    G_2 =
+    \begin{bmatrix}
+    \dfrac{1}{h^2} & & \\
+    & \ddots & \\
+    & & \dfrac{1}{h^2}
+    \end{bmatrix}
 \f]
 
 Hence, the formulation of AT20-m including metric become
 \f[
     \displaystyle
+    \begin{array}{rcl}
+    			AT_\varepsilon^{2,0} (u,v)
+    			&=&
+    			\alpha \, \sum_{i=1}^n \left( u_i - g_i \right)^T \, G_2 \, \left( u_i - g_i \right) \\
+    			&+&
+    			\sum_{i=1}^n  u_i^T \, G_2^T \, B'^T \, diag\left( M_{01} \, v \right)^2 \, B' \, G_2 \, u_i \\
+    			&+&
+    			\lambda \, \varepsilon \, v^T \, A^T \, G_1 \, A \, v \\
+    			&+&
+    			\dfrac{\lambda}{4 \, \varepsilon} \, \left( 1 - v \right)^T \, G_0 \, \left( 1 - v \right)
+    		\end{array}
 \f]
 
 
-@subsection AT2_3 Solutions to AT20-m
+@subsection AT2m_2 Solutions to AT20-m
 
 Functional AT20-m is sum of quadratic terms, independently,
 but not simultaneously, convex in \f$ u \f$ and \f$ v \f$.
@@ -479,16 +505,17 @@ and \f$ \mathbf{B'} := \bar{\mathbf{\star}} \bar{\mathbf{d_0}} \mathbf{\star} \f
 We get at optimum:
 
 \f[
-  \displaystyle
-  \left\{ \begin{array}{r @{=} l c}
-    \left[\alpha \mathbf{Id} - {\mathbf{B'}}^T diag(\mathbf{M} v)^2 \mathbf{B'} \right] u
-    & = \quad \alpha g & (1.1) \\
-    \left[ \frac{\lambda}{4\varepsilon} \mathbf{Id}
-          + \lambda \varepsilon \mathbf{A}^T \mathbf{A}
-          + \mathbf{M}^T diag(\mathbf{B'} u)^2 \mathbf{M} \right] v
-    & = \quad \frac{\lambda}{4 \varepsilon} \mathbf{1}
-    & (1.2)
-  \end{array}\right.
+    \displaystyle
+    \left\{
+        \begin{array}{rcl}
+            \left[ \alpha \, G_2 \, + \, G_2^T \, B'^T \, diag\left( M_{01} v \right)^2 \, B' \, G_2 \right] u_i
+                & = &
+                \alpha \, G_2 \, g_i \\
+            \left[ \dfrac{\lambda}{4 \, \varepsilon} \, G_0 \, + \, \lambda \, \varepsilon \, A^T \, G_1 \, A \, + \, M_{01} \, \left( diag\left( B' \, G_2 \, u_i \right)^2 \right)^T \, M_{01} \right] v
+                & = &
+                \dfrac{\lambda}{4 \, \varepsilon} \, G_0 \, \mathbf{1}
+        \end{array}
+    \right.
 \f]
 
 Since all matrices are symmetric, definite and positive, we use a Cholesky factorization to
