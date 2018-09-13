@@ -18,7 +18,7 @@
   Part of tool \ref imageProcessing.
   [TOC]
 
-- related tools: \ref DocATu2v0, \ref DocATu0v1
+- related tools: \ref DocATu2v0, \ref DocATu0v1, \ref DocATu2v0-m
 - related classes: \ref DGtal::ATu0v1, \ref DGtal::ATu2v0, \ref DGtal::DECImage2D
 - related namespace: \ref DGtal::functions::dec
 - related functions: \ref DGtal::functions::dec::diagonal, \ref DGtal::functions::dec::squares, \ref DGtal::functions::dec::squaredDiagonal, \ref DGtal::functions::dec::writePixel, \ref DGtal::functions::dec::writePrimalLinel, \ref DGtal::functions::dec::writeDualLinel, \ref DGtal::functions::dec::form2ToImage, \ref DGtal::functions::dec::form1ToImage, \ref DGtal::functions::dec::dualForm1ToImage, \ref DGtal::functions::dec::primalForm1ToImage, \ref DGtal::functions::dec::threeForms2ToImage, \ref DGtal::functions::dec::form2ToGreyLevelImage, \ref DGtal::functions::dec::primalForm1ToGreyLevelImage, \ref DGtal::functions::dec::dualForm1ToGreyLevelImage, \ref DGtal::functions::dec::primalForm1ToRGBColorImage, \ref DGtal::functions::dec::dualForm1ToRGBColorImage, \ref DGtal::functions::dec::threeForms2ToRGBColorImage.
