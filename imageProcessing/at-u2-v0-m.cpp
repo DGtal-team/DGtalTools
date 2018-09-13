@@ -19,16 +19,16 @@
  *
  **/
 /**
- * @file at-u2-v0.cpp
+ * @file at-u2-v0-m.cpp
  * @ingroup Tools
  * @author Jacques-Olivier Lachaud (\c jacques-olivier.lachaud@univ-savoie.fr )
  * Laboratory of Mathematics (CNRS, UMR 5127), University of Savoie, France
- * @author Marion Foare (\c marion.foare@univ-savoie.fr )
- * Laboratory of Mathematics (CNRS, UMR 5127), University of Savoie, France
+ * @author Noemie Tasca (\c noemie.tasca@etu.univ-smb.fr )
+ * Master informatique, University of Savoie, France
  *
- * @date 2016/10/12
+ * @date 2018/09/13
  *
- * A tool file named at-u2-v0.
+ * A tool file named at-u2-v0-m.
  *
  * This file is part of the DGtal library.
  */
@@ -75,9 +75,10 @@ Mumford-Shah functional.
 
 Given an input grayscale image, defined in an open bounded domain
 \f$ \Omega \f$, we represent its gray levels by a function \f$ g
-\in L^{\infty}(\Omega) \f$. In the Ambrosio-Tortorelli functional [1],
+\in L^{\infty}(\Omega) \f$. <br>
+In the Ambrosio-Tortorelli functional [1],
 one wants to find a function \f$ u \in SBV(\Omega) \f$ which is a
-smooth approximation of the input image \f$ g \f$.
+smooth approximation of the input image \f$ g \f$. <br>
 The Ambrosio-Tortorelli functional [1] is defined by
 \f[
   \displaystyle
@@ -89,9 +90,9 @@ for functions \f$ u,v \in W^{1,2}(\Omega)\f$ with \f$ 0 \leq v \leq 1 \f$.
 
 In AT functional, function \f$ v \f$ is a smooth approximation
 of the set of discontinuities, and takes value close to 0 in this set,
-while being close to 1 outside discontinuities. A remarkable property
-of this functional is that it \f$ \Gamma \f$-converges to (a
-relaxation of) MS functional as \f$ \varepsilon \f$ tends to 0 (see [1]).
+while being close to 1 outside discontinuities. <br>
+A remarkable property of this functional is that it \f$ \Gamma \f$-converges to (a
+relaxation of) MS functional as \f$ \varepsilon \f$ tends to 0 (see [1]). <br>
 The intuition is that a large \f$ \varepsilon \f$ induces a solution
 with a fuzzy set of discontinuities, which is then progressively
 narrowed to the crisp 1-dimensional set of discontinuites as
@@ -100,10 +101,11 @@ narrowed to the crisp 1-dimensional set of discontinuites as
 We discretize AT with discrete calculus and we set \f$ u \f$ and \f$ g
 \f$ to live on the faces and \f$ v \f$ to live on the vertices and
 edges. Pixels are faces, so functions \f$ u \f$ and \f$ g \f$ are
-2-forms since they represent the gray levels of each pixel. On the
-contrary, we set \f$ v \f$ in-between cells of non null measure, so in
+2-forms since they represent the gray levels of each pixel. <br>
+On the contrary, we set \f$ v \f$ in-between cells of non null measure, so in
 this case on vertices as a 0-form, and on edges by averaging with \f$
-\mathbf{M} \f$. We call this formulation AT20-m :
+\mathbf{M} \f$. <br>
+We call this formulation AT20-m :
 
 \f[
   \displaystyle
@@ -130,29 +132,20 @@ For more details, see \ref moduleAT
   -l [ --lambda ] arg                   the parameter lambda.
   -1 [ --lambda-1 ] arg (=0.3125)       the initial parameter lambda (l1).
   -2 [ --lambda-2 ] arg (=0.0005)       the final parameter lambda (l2).
-  -q [ --lambda-ratio ] arg (=1.414213) the division ratio for lambda from l1
-                                        to l2.
+  -q [ --lambda-ratio ] arg (=1.414213) the division ratio for lambda from l1 to l2.
   -a [ --alpha ] arg (=1)               the parameter alpha.
-  -e [ --epsilon ] arg                  the initial and final parameter epsilon
-                                        of AT functional at the same time.
+  -e [ --epsilon ] arg                  the initial and final parameter epsilon of AT functional at the same time.
   --epsilon-1 arg (=2)                  the initial parameter epsilon.
   --epsilon-2 arg (=0.25)               the final parameter epsilon.
-  --epsilon-r arg (=2)                  sets the ratio between two consecutive
-                                        epsilon values of AT functional.
+  --epsilon-r arg (=2)                  sets the ratio between two consecutive epsilon values of AT functional.
   -n [ --nbiter ] arg (=10)             the maximum number of iterations.
-  --image-snr arg                       the input image without deterioration
-                                        if you wish to compute the SNR.
-  -p [ --pixel-size ] arg (=1)          the pixel size for outputing images
-                                        (useful when one wants to see the
-                                        discontinuities v on top of u).
-  -c [ --color-v ] arg (=0xff0000)      the color chosen for displaying the
-                                        singularities v (e.g. red is 0xff0000).
-  -v [ --verbose ] arg (=0)             the verbose level (0: silent, 1: less
-                                        silent, etc).
-  -s [ --step ]                         The step size for defined metric tensors
-                                        (default value is 1/N where N is the size of image
+  --image-snr arg                       the input image without deterioration if you wish to compute the SNR.
+  -p [ --pixel-size ] arg (=1)          the pixel size for outputing images (useful when one wants to see the discontinuities v on top of u).
+  -c [ --color-v ] arg (=0xff0000)      the color chosen for displaying the singularities v (e.g. red is 0xff0000).
+  -v [ --verbose ] arg (=0)             the verbose level (0: silent, 1: less silent, etc).
+  -s [ --step ]                         The step size for defined metric tensors (default value is 1/N where N is the size of image
   --multiresolution                     The option for a multiresolution option for solving
-  -t [ --images-size ]                  A string that contens vaious size for multiresolution option
+  -t [ --images-size ]                  A string that contens various size for multiresolution option
 
 
 \endcode
