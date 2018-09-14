@@ -335,7 +335,7 @@ int main( int argc, char** argv )
   double az =  vm["az"].as<double>();
 
 
-  typedef functors::ForwardRigidTransformation3D < Z3i::Space, functors::Identity, Z3i::RealPoint, Z3i::RealPoint > ForwardTrans;
+  typedef functors::ForwardRigidTransformation3D < Z3i::Space, Z3i::RealPoint, Z3i::RealPoint, functors::Identity > ForwardTrans;
   ForwardTrans trans ( Z3i::RealPoint ( ox, oy, oz ), Z3i::RealPoint ( ax, ay, az ), angle, Z3i::RealVector ( 0, 0, 0 ) );
   //We check that the shape is known
   unsigned int id = checkAndRetrunIndex ( curveName );
