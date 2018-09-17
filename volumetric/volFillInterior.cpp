@@ -25,6 +25,36 @@
  * This file is part of the DGtal library.
  */
 
+
+/**
+ @page volFillInterior volFillInterior
+ 
+ @brief  Fills the interior of a voxel shape. The process can be sketched as follows: First the volume is filled in a
+ breath-first approach from the point (0,0,0) (supposed to be exterior) using 6-adjacency. Then the complement is returned.
+ 
+ @b Usage:  volFillInterior --input \<volFileName\> -o \<volOutputFileName\> (vol, longvol, p3d format)
+ 
+ 
+ 
+ @b Allowed @b options @b are :
+ @code
+ -h [ --help ]         display this message.
+ -i [ --input ] arg    Input vol file.
+ -o [ --output ] arg   Output filename.
+ @endcode
+ 
+ @b Example:
+ 
+ @code
+ $ volFlip -i ${DGtal}/examples/samples/lobster.vol -o filled.vol
+ @endcode
+ 
+ 
+ @see
+ @ref volFillInterior
+ 
+ */
+
 #include <iostream>
 #include <DGtal/base/Common.h>
 #include <DGtal/io/readers/VolReader.h>
