@@ -48,7 +48,7 @@ namespace po = boost::program_options;
  *
  * @param param
  */
-void missingParam ( std::string param )
+void missingParam ( const std::string &param )
 {
   trace.error() <<" Parameter: "<<param<<" is required..";
   trace.info() <<std::endl;
