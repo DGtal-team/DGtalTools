@@ -67,9 +67,9 @@ using namespace DGtal;
 
  @code
   -h  [ --help ]                   Display this message
-  -p1 [ --param1]                  First parameter e.g. a radius or a scaling factor
-  -p2 [ --param2]                  Second parameter e.g. a radius or a scaling factor
-  -p3 [ --param3]                  Third parameter e.g. a distance between consecutive turns or a scaling factor
+  --param1                  First parameter e.g. a radius or a scaling factor
+  --param2                  Second parameter e.g. a radius or a scaling factor
+  --param3                  Third parameter e.g. a distance between consecutive turns or a scaling factor
   -ts [ --tstart]                  Start time
   -te [ --tend]                    End time
   -s  [ --step]                    Step
@@ -91,23 +91,23 @@ using namespace DGtal;
  $ 3dParametricCurveDigitizer --list
  3D Parametric curves:
 	EllipticHelix Helix with two axes and a distance between consecutive turns. Its period is 2 * Pi.
-		Required parameter(s): --param1 [-p1], --param2 [p2], --param3 [-p3]
+		Required parameter(s): --param1, --param2, --param3
 	Knot_3_1 Parametric knot 3_1 i.e., a trefoli polynomial knot
-		Required parameter(s): --param1 [-p1], --param2 [p2], --param3 [-p3]
+		Required parameter(s): --param1, --param2, --param3
 	Knot_3_2 Parametric knot 3_2 i.e., a trefoli knot having a period of 2 * Pi
-		Required parameter(s): --param1 [-p1], --param2 [p2], --param3 [-p3]
+		Required parameter(s): --param1, --param2, --param3
 	Knot_4_1 Parametric knot 4_1 (polynomial knot)
-		Required parameter(s): --param1 [-p1], --param2 [p2], --param3 [-p3]
+		Required parameter(s): --param1, --param2, --param3
 	Knot_4_3 Parametric knot 4_3 having a period 2 * Pi.
-		Required parameter(s): --param1 [-p1], --param2 [p2], --param3 [-p3]
+		Required parameter(s): --param1, --param2, --param3
 	Knot_5_1 Parametric knot 5_1 (polynomial knot)
-		Required parameter(s): --param1 [-p1], --param2 [p2], --param3 [-p3]
+		Required parameter(s): --param1, --param2, --param3
 	Knot_5_2 Parametric knot 5_2 having a period 2 * Pi
-		Required parameter(s): --param1 [-p1], --param2 [p2], --param3 [-p3]
+		Required parameter(s): --param1, --param2, --param3
 	Knot_6_2 Parametric knot 6_2 (polynomial knot)
-		Required parameter(s): --param1 [-p1], --param2 [p2], --param3 [-p3]
+		Required parameter(s): --param1, --param2, --param3
 	Knot_7_4 Parametric knot 7_4 (polynomial knot)
-		Required parameter(s): --param1 [-p1], --param2 [p2], --param3 [-p3]
+		Required parameter(s): --param1, --param2, --param3
  @endcode
 
  @b Example:
@@ -250,9 +250,9 @@ int main( int argc, char** argv )
   po::options_description general_opt("Allowed options are: ");
   general_opt.add_options()
   ("help,h", "display this message")
-  ("param1,p1", po::value<double>()->default_value(1), "a radius or a scaling factor")
-  ("param2,p2", po::value<double>()->default_value(1), "a radius or a scaling factor")
-  ("param3,p3", po::value<double>()->default_value(1), "a radius or a scaling factor")
+  ("param1", po::value<double>()->default_value(1), "a radius or a scaling factor")
+  ("param2", po::value<double>()->default_value(1), "a radius or a scaling factor")
+  ("param3", po::value<double>()->default_value(1), "a radius or a scaling factor")
   ("tstart,ts", po::value<double>(), "start time")
   ("tend,te", po::value<double>(), "end time")
   ("step,s", po::value<double>(), "step")
