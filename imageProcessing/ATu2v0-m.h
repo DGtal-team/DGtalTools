@@ -389,6 +389,10 @@ namespace DGtal
         /// @return the fidelity.
         Scalar computeFidelity();
 
+        /// Computes the variance of u wrt g.
+        /// @return the variance of u wrt g.
+        Scalar computeVariance();
+
         /// Computes the cross term in AT.
         /// @return the cross term.
         Scalar computeCrossTerm();

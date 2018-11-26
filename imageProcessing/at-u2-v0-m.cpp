@@ -213,7 +213,7 @@ int main( int argc, char* argv[] )
             ("lambda-1,1", po::value<double>()->default_value( 0.3125 ), "the initial parameter lambda (l1)." )
             ("lambda-2,2", po::value<double>()->default_value( 0.0005 ), "the final parameter lambda (l2)." )
             ("lambda-ratio,q", po::value<double>()->default_value( sqrt(2) ), "the division ratio for lambda from l1 to l2." )
-            ("alpha,a", po::value<double>()->default_value( 1.0 ), "the parameter alpha." )
+            ("alpha,a", po::value<double>()->default_value( 1.0 ), "the parameter alpha (should be multiplied by N^2 where NxN is the size of the finest image)." )
             ("epsilon,e", po::value<double>(), "the initial and final parameter epsilon of AT functional at the same time." )
             ("epsilon-1", po::value<double>()->default_value( 2.0 ), "the initial parameter epsilon." )
             ("epsilon-2", po::value<double>()->default_value( 0.25 ), "the final parameter epsilon." )
@@ -542,8 +542,6 @@ int main( int argc, char* argv[] )
         double eps = 0.0;
         while ( l1 >= l2 )
         {
-            energieFile << endl;
-
             trace.info() << endl;
             trace.beginBlock("Minimisation : resolution alternee");   // CPU Time execution
 
@@ -581,26 +579,6 @@ int main( int argc, char* argv[] )
                 file_restored.push_back(ossU.str());
                 file_contours.push_back(ossV.str());
 
-                energieFile << Nx << "\t"
-                            << h << "\t"
-                            << AT.computeEnergy()*h << "\t"
-                            << AT.computePerimeter() << "\t"
-                            << AT.computeFidelity()*h << "\t"
-                            << AT.computeCrossTerm()*h << "\t"
-                            << AT.computeGradV()*h << "\t"
-                            << AT.computeConstraintV()*h << "\t";
-
-                trace.info() << endl;
-                trace.beginBlock("Calcul d'energie");
-                trace.info() << "Energie calculee = " << AT.computeEnergy()  << endl;
-                trace.info() << "Perimetre =        " << AT.computePerimeter() << endl;
-                trace.info() << "Fidelite =         " << AT.computeFidelity() << endl;
-                trace.info() << "Cross term =       " << AT.computeCrossTerm() << endl;
-                trace.info() << "Gradient de V =    " << AT.computeGradV() << endl;
-                trace.info() << "Contraintes V =    " << AT.computeConstraintV()  << endl;
-                trace.endBlock();
-                trace.info() << endl;
-
                 // Restored image
                 GreyLevelImage image_u( domain );
                 functions::dec::form2ToGreyLevelImage( AT.calculus, u, image_u, 0.0, 1.0, 1 );
@@ -629,27 +607,6 @@ int main( int argc, char* argv[] )
                 file_contours.push_back(ossV.str());
 
 
-                energieFile << Nx << "\t"
-                            << h << "\t"
-                            << AT.computeEnergy()*h << "\t"
-                            << AT.computePerimeter() << "\t"
-                            << AT.computeFidelity()*h << "\t"
-                            << AT.computeCrossTerm()*h << "\t"
-                            << AT.computeGradV()*h << "\t"
-                            << AT.computeConstraintV()*h << "\t";
-
-                trace.info() << endl;
-                trace.beginBlock("Calcul d'energie");
-                trace.info() << "Energie calculee = " << AT.computeEnergy() <<  "       " << (AT.computeEnergy()*h) << endl;
-                trace.info() << "Perimetre =        " << (AT.computePerimeter()) << endl;
-                trace.info() << "Fidelite =         " << AT.computeFidelity() << "      " << (AT.computeFidelity()*h) << endl;
-                trace.info() << "Cross term =       " << AT.computeCrossTerm() << "     " << (AT.computeCrossTerm()*h) << endl;
-                trace.info() << "Gradient de V =    " << AT.computeGradV() << "     " << (AT.computeGradV()*h) << endl;
-                trace.info() << "Contraintes V =    " << AT.computeConstraintV() << "       " << (AT.computeConstraintV()*h) << endl;
-                trace.endBlock();
-                trace.info() << endl;
-
-
                 // Restored image
                 ColorImage image_u( domain );
                 functions::dec::threeForms2ToRGBColorImage( AT.calculus, u0, u1, u2, image_u, 0.0, 1.0, 1 );
@@ -662,6 +619,30 @@ int main( int argc, char* argv[] )
 
                 if ( verb > 0 ) trace.endBlock();
             }
+            
+            energieFile << Nx << "\t"
+                        << h << "\t"
+                        << AT.computeEnergy() << "\t"
+                        << AT.computePerimeter() << "\t"
+                        << AT.computeVariance() << "\t"
+                        << AT.computeFidelity() << "\t"
+                        << AT.computeCrossTerm() << "\t"
+                        << AT.computeGradV() << "\t"
+                        << AT.computeConstraintV() << "\t";
+            
+            trace.info() << endl;
+            trace.beginBlock("Calcul d'energie");
+            trace.info() << "Energie calculee = " << AT.computeEnergy()  << endl;
+            trace.info() << "Perimetre =        " << AT.computePerimeter() << endl;
+            trace.info() << "Variance =         " << AT.computeVariance() << endl;
+            trace.info() << "Fidelite =         " << AT.computeFidelity() << endl;
+            trace.info() << "Cross term =       " << AT.computeCrossTerm() << endl;
+            trace.info() << "Gradient de V =    " << AT.computeGradV() << endl;
+            trace.info() << "Contraintes V =    " << AT.computeConstraintV()  << endl;
+            trace.endBlock();
+            trace.info() << endl;
+            
+
             // Compute SNR if possible
             if ( snr )
             {
@@ -670,6 +651,7 @@ int main( int argc, char* argv[] )
                 energieFile << "\t" << u_snr << "\t" << g_snr;
             }
             l1 /= lr;
+            energieFile << endl;
         }
 
 
