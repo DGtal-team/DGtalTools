@@ -136,7 +136,7 @@ For more details, see \ref moduleAT
   -v [ --verbose ] arg (=0)             the verbose level (0: silent, 1: less silent, etc).
   -s [ --step ]                         The step size for defined metric tensors (default value is 1/N where N is the size of image
   --multiresolution                     The option for a multiresolution option for solving
-  -t [ --images-size ]                  A string that contens various size for multiresolution option
+  -t [ --images-size ]                  A string that contains various sizes for multiresolution option
 
 
 \endcode
@@ -309,11 +309,11 @@ int main( int argc, char* argv[] )
         size_t lastindex = f1.find_last_of(".");
         for( int i = 0 ; i < mySizes.size() ; i++ )
         {
-            // Creation d'un veceteur de noms pour f1
+            // Creation d'un vecteur de noms pour f1
             f1 = f1_copy;
             f1.insert( lastindex , std::to_string( mySizes[i] ) );  // insertion de la taille
             filename1.push_back( f1 );
-            // Creation d'un veceteur de noms pour f2
+            // Creation d'un vecteur de noms pour f2
             f2 = f2_copy;
             f2.append( std::to_string( mySizes[i] ) );              // insertion de la taille
             filename2.push_back( f2 );
@@ -483,7 +483,8 @@ int main( int argc, char* argv[] )
             if(verb > 0) trace.info() << "Utilisation de l'image donnee en entree : u = g. " << endl;
             AT.setUFromInput();
         }
-        trace.endBlock(); trace.info() << endl;
+        if (verb>0 )trace.endBlock();
+        trace.info() << endl;
 
 
 
@@ -563,10 +564,9 @@ int main( int argc, char* argv[] )
                 trace.info() << ">> last variation = " << n_v << " " << endl;
                 trace.info() << ">> number iteration = " << n << " (nbitermax="<<nbiter<<") " << endl;
                 trace.info() << ">> energie =         " << AT.computeEnergy() <<  "       " << (AT.computeEnergy()*h) << endl;
-
             }
-
             trace.endBlock(); trace.info() << endl;  // CPU Time execution
+
 
             if ( grey_image )
             {
