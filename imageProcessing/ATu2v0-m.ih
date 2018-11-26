@@ -251,7 +251,9 @@ metric_average( false )
 
             // Define alpha_h depending of step h
             double H2 = H * H;
-            alpha_h = _alpha * (1/H2);
+            // JOL, MF : try to keep constant integral
+            // alpha_h = _alpha * (1/H2);
+            alpha_h = _alpha;
 
             // Building alpha_Id2
             alpha_Id2 = alpha_h * G2 * calculus.template identity<2, PRIMAL>();
@@ -271,7 +273,9 @@ metric_average( false )
 
             // Define alpha_h depending of step h
             double H2 = H * H;
-            alpha_h = _alpha * (1/H2);
+            // JOL, MF : try to keep constant integral
+            // alpha_h = _alpha * (1/H2);
+            alpha_h = _alpha;
 
             // Building alpha_Id0
             alpha_Id2 = alpha_h * functions::dec::diagonal( m ) * G2 * calculus.template identity<2, PRIMAL>();
@@ -592,7 +596,7 @@ metric_average( false )
               // Noemie: la metrique est portee par alpha_Id2 (= ah * G2 * Identity)
               double ip = 0.0;
               for ( typename Calculus::Index index = 0; index < diff.myContainer.rows(); index++ )
-                ip += a_diff.myContainer( index ) * diff.myContainer( index );
+                ip += fabs( a_diff.myContainer( index ) * diff.myContainer( index ) );
 
               a_u_minus_g += ip;
             }
@@ -615,7 +619,7 @@ metric_average( false )
 
           // v^2|grad u|^2
           const PrimalIdentity1 diag_Mv_squared = functions::dec::diagonal( M01 * v0 );
-          const PrimalIdentity1 diag_Mv_squared_NOEMIE = functions::dec::squaredDiagonal( M01 * v0 );
+          //const PrimalIdentity1 diag_Mv_squared_NOEMIE = functions::dec::squaredDiagonal( M01 * v0 );
           double v_grad_u = 0.0;
           for ( Dimension i = 0; i < u2.size(); ++i )
             {
@@ -648,7 +652,7 @@ metric_average( false )
           PrimalForm0 v0_prime = D0.transpose() * G1 * D0 * v0;
           double ip = 0.0;
           for ( typename Calculus::Index index = 0; index < v0.myContainer.rows(); index++ )
-            ip += v0.myContainer( index ) * v0_prime.myContainer( index );
+            ip += fabs( v0.myContainer( index ) * v0_prime.myContainer( index ) );
           //double le_square_grad_v = lambda * epsilon * innerProduct( calculus, v, v_prime );
           //double le_grad_v = lambda * epsilon * ip;
           double le_grad_v = lambda_h * epsilon_h * ip;
@@ -679,7 +683,7 @@ metric_average( false )
 
           double ip2 = 0.0; // (1-v)*G0 * (1-v)
           for ( typename Calculus::Index index = 0; index < one_minus_v.myContainer.rows(); index++ )
-            ip2 += one_minus_v_G0.myContainer( index ) * one_minus_v.myContainer( index );
+            ip2 += fabs( one_minus_v_G0.myContainer( index ) * one_minus_v.myContainer( index ) );
 
           //double l_over_4e_1_minus_v = lambda / (4.0 * epsilon) * ip2;
           double l_over_4e_1_minus_v = lambda_h / (4.0 * epsilon_h) * ip2;
