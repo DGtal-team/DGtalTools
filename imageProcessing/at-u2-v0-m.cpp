@@ -592,12 +592,12 @@ int main( int argc, char* argv[] )
 
                 trace.info() << endl;
                 trace.beginBlock("Calcul d'energie");
-                trace.info() << "Energie calculee = " << AT.computeEnergy() <<  "       " << (AT.computeEnergy()*h) << endl;
-                trace.info() << "Perimetre =        " << (AT.computePerimeter()) << endl;
-                trace.info() << "Fidelite =         " << AT.computeFidelity() << "      " << (AT.computeFidelity()*h) << endl;
-                trace.info() << "Cross term =       " << AT.computeCrossTerm() << "     " << (AT.computeCrossTerm()*h) << endl;
-                trace.info() << "Gradient de V =    " << AT.computeGradV() << "     " << (AT.computeGradV()*h) << endl;
-                trace.info() << "Contraintes V =    " << AT.computeConstraintV() << "       " << (AT.computeConstraintV()*h) << endl;
+                trace.info() << "Energie calculee = " << AT.computeEnergy()  << endl;
+                trace.info() << "Perimetre =        " << AT.computePerimeter() << endl;
+                trace.info() << "Fidelite =         " << AT.computeFidelity() << endl;
+                trace.info() << "Cross term =       " << AT.computeCrossTerm() << endl;
+                trace.info() << "Gradient de V =    " << AT.computeGradV() << endl;
+                trace.info() << "Contraintes V =    " << AT.computeConstraintV()  << endl;
                 trace.endBlock();
                 trace.info() << endl;
 
