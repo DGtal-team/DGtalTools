@@ -2,9 +2,11 @@
 
 - *global*:
     - Continuous integration AppVeyor fix.
-      (Bertrand Kerautret, [##337](https://github.com/DGtal-team/DGtalTools/pull/337)).
-
-
+      (Bertrand Kerautret, [#337](https://github.com/DGtal-team/DGtalTools/pull/337)).
+- *volumetric*
+    - New tool to fill the interior of a voxel set (volFillInterior).
+      (David  Coeurjolly,[#343](https://github.com/DGtal-team/DGtalTools/pull/334)).
+ 
 # DGtalTools 0.9.4
 
 - *converters*
