@@ -52,7 +52,7 @@ addons:
 
 before_install:
   - DOC="false"; BTYPE=""
-  - if [ $CONFIG == "DOCUMENTATION" ]; then if [ $OriginalRepo == "true" ];  then if [ $TRAVIS_PULL_REQUEST == "false" ]; then DOC="true"; fi; fi; fi
+  - if [ $CONFIG == "DOCUMENTATION" ]; then DOC="true"; fi
   - if [ $DOC == "true" ]; then openssl aes-256-cbc -K $encrypted_a0b8e3011fca_key -iv $encrypted_a0b8e3011fca_iv -in .travis/dgtal_rsa.enc -out .travis/dgtal_rsa -d; chmod 600 .travis/dgtal_rsa;  fi
   - env
   - export SRC_DIR="`pwd`"
