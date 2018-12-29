@@ -1,3 +1,5 @@
+#!/bin/bash
+
 mkdir ~/doxygen && cd ~/doxygen
 wget http://doxygen.nl/files/doxygen-1.8.14.src.tar.gz && tar xzf doxygen-1.8.14.src.tar.gz
 cd doxygen-1.8.14 ; mkdir build ; cd build

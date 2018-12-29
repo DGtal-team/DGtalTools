@@ -40,6 +40,7 @@ addons:
     - graphviz
     - libgmp-dev
     - libgdcm2-dev
+    - ninja-build
     - libgraphicsmagick++1-dev
     - libqglviewer-dev
     - libinsighttoolkit3-dev
