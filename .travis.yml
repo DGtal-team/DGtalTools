@@ -12,7 +12,7 @@ compiler:
 
 cache: apt
 
-
+secure: "Ra00iyQ+5wm7G3XfaaI40aKgfcGTigfmEd+3/TY1hYcjYnJvNOG0dekolcMDSelE8SfqLcWYnK6+vtOCmyZuUWheUhA+83Tgq/bIH6dMzSvLkJdyq2D9me4sX6zx3ct90swP7Adj8EBHmv61pH5OBeEcmNWJNIZmNQs3+1awca4="
 env:
   - CONFIG="Debug,QGLVIEWER"
   - CONFIG="Debug"
@@ -86,4 +86,16 @@ script:
 
 after_success:
   ## We publish the DGtalTools tags
-  - if [ $DOC == "true" ]; then echo "Uploading the doc..."; .travis/publish_doc.sh;  fi
+  - if [ $DOC == "true" ]; then mkdir ${TRAVIS_BUILD_DIR}/tools; mkdir ${TRAVIS_BUILD_DIR}/tools/tools; mv ${TRAVIS_BUILD_DIR}/build/html $TRAVIS_BUILD_DIR/tools/tools;   fi
+
+
+jobs:
+     deploy:
+       provider: pages
+       skip-cleanup: true
+       github-token: $GITHUB_TOKEN
+       keep-history: true
+       repo: DGtal-team/doc-nightly
+       target-branch: master
+       verbose: true
+       local-dir: "$TRAVIS_BUILD_DIR/tools"
