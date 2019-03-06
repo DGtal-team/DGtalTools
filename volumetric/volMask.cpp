@@ -123,38 +123,63 @@ int main( int argc, char** argv )
   string maskFileName = vm["mask"].as<string>();
   string outputFileName = vm["output"].as<string>();
 
-  Image3D::Value maskValue = vm["mask"].as<Image3D::Value>();
+  Image3D::Value maskValue = vm["maskValue"].as<Image3D::Value>();
 
   trace.info() << "Reading input image...";
   Image3D inputImage = DGtal::GenericReader<Image3D>::import(inputFileName);
   trace.info() << "[done]"<< std::endl;
-  trace.info() << "Reading input image...";
-  Image3D maskImage = DGtal::GenericReader<Image3D>::import(inputFileName);
+  trace.info() << "Reading mask image...";
+  Image3D maskImage = DGtal::GenericReader<Image3D>::import(maskFileName);
   trace.info() << "[done]"<< std::endl;
 
-  
   // Some nice processing  --------------------------------------------------
   Image3D::Domain d =  inputImage.domain();
   // First step getting the bounding box of the domain:
-  for (const auto &p: inputImage.domain())
+
+  Z3i::Point minP = inputImage.domain().upperBound();
+  Z3i::Point maxP = inputImage.domain().lowerBound();
+  
+  Z3i::Point::Iterator minIt;
+  Z3i::Point::Iterator maxIt;
+
+  for(const auto &p: inputImage.domain())
   {
-    if (maskImage(p) == maskValue)
-    {
-      // ...
-    }
+    minIt = minP.begin();
+    maxIt = maxP.begin();
+    maxIt = maxP.begin();
+    if( maskImage(p) ) // no noise on mask image
+	  {
+      for(auto pIt=p.begin(); pIt!=p.end();pIt++ )
+      {
+        if( *pIt < *minIt ){*minIt = *pIt;}
+        if( *pIt > *maxIt ){*maxIt = *pIt;}
+        minIt++;
+        maxIt++;
+      }
+	  }
   }
-  Image3D outputImage(d);
+    
+  // offset to avoid problems on borders
+  Z3i::Point offset(5,5,5);
+  minP -= offset;
+  maxP += offset;
+  
+  trace.info() << "sub-domain:" << minP << " " << maxP << std::endl;
+
+  Image3D outputImage( Image3D::Domain(minP,maxP) );
   
   // Second step: masking source image
-  for (const auto &p: inputImage.domain())
+  for (const auto &p: outputImage.domain())
   {
-    if (maskImage(p) == maskValue)
+    if (maskImage(p) ==  maskValue)
     {
       outputImage.setValue(p, inputImage(p) );
     }
   }
-  GenericWriter<Image3D>::exportFile(outputFileName, outputImage);
 
+  trace.info() << "writing output image...";
+  GenericWriter<Image3D>::exportFile(outputFileName, outputImage);
+  trace.info() << "[Done]" << std::endl;
   return 0;
 }
 
