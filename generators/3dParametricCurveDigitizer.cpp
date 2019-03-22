@@ -48,7 +48,7 @@
 #include "DGtal/geometry/curves/parametric/Knot_5_2.h"
 #include "DGtal/geometry/curves/parametric/Knot_6_2.h"
 #include "DGtal/geometry/curves/parametric/Knot_7_4.h"
-#include "DGtal/geometry/curves/parametric/UglyNaiveParametricCurveDigitizer3D.h"
+#include "DGtal/geometry/curves/parametric/NaiveParametricCurveDigitizer3D.h"
 #include "DGtal/geometry/curves/parametric/DecoratorParametricCurveTransformation.h"
 #include "DGtal/images/RigidTransformation3D.h"
 
@@ -343,9 +343,9 @@ int main( int argc, char** argv )
   {
     typedef EllipticHelix < Z3i::Space > MyHelix;
     typedef DecoratorParametricCurveTransformation < MyHelix, ForwardTrans > MyRotatedCurve;
-    typedef UglyNaiveParametricCurveDigitizer3D < MyRotatedCurve >  Digitizer;
-    typedef typename UglyNaiveParametricCurveDigitizer3D < MyRotatedCurve >::DigitalCurve MyDigitalCurve;
-    typedef UglyNaiveParametricCurveDigitizer3D < MyRotatedCurve >::MetaData MyMetaData;
+    typedef NaiveParametricCurveDigitizer3D < MyRotatedCurve >  Digitizer;
+    typedef typename NaiveParametricCurveDigitizer3D < MyRotatedCurve >::DigitalCurve MyDigitalCurve;
+    typedef NaiveParametricCurveDigitizer3D < MyRotatedCurve >::MetaData MyMetaData;
 
     MyDigitalCurve digitalCurve;
     MyHelix helix ( param1, param2, param3 );
@@ -362,9 +362,9 @@ int main( int argc, char** argv )
   {
     typedef Knot_3_1 < Z3i::Space > MyKnot;
     typedef DecoratorParametricCurveTransformation < MyKnot, ForwardTrans > MyRotatedCurve;
-    typedef UglyNaiveParametricCurveDigitizer3D < MyRotatedCurve >  Digitizer;
-    typedef UglyNaiveParametricCurveDigitizer3D < MyRotatedCurve >::DigitalCurve MyDigitalCurve;
-    typedef UglyNaiveParametricCurveDigitizer3D < MyRotatedCurve >::MetaData MyMetaData;
+    typedef NaiveParametricCurveDigitizer3D < MyRotatedCurve >  Digitizer;
+    typedef NaiveParametricCurveDigitizer3D < MyRotatedCurve >::DigitalCurve MyDigitalCurve;
+    typedef NaiveParametricCurveDigitizer3D < MyRotatedCurve >::MetaData MyMetaData;
 
     MyDigitalCurve digitalCurve;
     MyKnot knot ( param1, param2, param3 );
@@ -381,9 +381,9 @@ int main( int argc, char** argv )
   {
     typedef Knot_3_2 < Z3i::Space > MyKnot;
     typedef DecoratorParametricCurveTransformation < MyKnot, ForwardTrans > MyRotatedCurve;
-    typedef UglyNaiveParametricCurveDigitizer3D < MyRotatedCurve >  Digitizer;
-    typedef UglyNaiveParametricCurveDigitizer3D < MyRotatedCurve >::DigitalCurve MyDigitalCurve;
-    typedef UglyNaiveParametricCurveDigitizer3D < MyRotatedCurve >::MetaData MyMetaData;
+    typedef NaiveParametricCurveDigitizer3D < MyRotatedCurve >  Digitizer;
+    typedef NaiveParametricCurveDigitizer3D < MyRotatedCurve >::DigitalCurve MyDigitalCurve;
+    typedef NaiveParametricCurveDigitizer3D < MyRotatedCurve >::MetaData MyMetaData;
 
     MyDigitalCurve digitalCurve;
     MyKnot knot ( param1, param2, param3 );
@@ -400,9 +400,9 @@ int main( int argc, char** argv )
   {
     typedef Knot_4_1 < Z3i::Space > MyKnot;
     typedef DecoratorParametricCurveTransformation < MyKnot, ForwardTrans > MyRotatedCurve;
-    typedef UglyNaiveParametricCurveDigitizer3D < MyRotatedCurve >  Digitizer;
-    typedef UglyNaiveParametricCurveDigitizer3D < MyRotatedCurve >::DigitalCurve MyDigitalCurve;
-    typedef UglyNaiveParametricCurveDigitizer3D < MyRotatedCurve >::MetaData MyMetaData;
+    typedef NaiveParametricCurveDigitizer3D < MyRotatedCurve >  Digitizer;
+    typedef NaiveParametricCurveDigitizer3D < MyRotatedCurve >::DigitalCurve MyDigitalCurve;
+    typedef NaiveParametricCurveDigitizer3D < MyRotatedCurve >::MetaData MyMetaData;
 
     MyDigitalCurve digitalCurve;
     MyKnot knot ( param1, param2, param3 );
@@ -419,9 +419,9 @@ int main( int argc, char** argv )
   {
     typedef Knot_4_3 < Z3i::Space > MyKnot;
     typedef DecoratorParametricCurveTransformation < MyKnot, ForwardTrans > MyRotatedCurve;
-    typedef UglyNaiveParametricCurveDigitizer3D < MyRotatedCurve >  Digitizer;
-    typedef UglyNaiveParametricCurveDigitizer3D < MyRotatedCurve >::DigitalCurve MyDigitalCurve;
-    typedef UglyNaiveParametricCurveDigitizer3D < MyRotatedCurve >::MetaData MyMetaData;
+    typedef NaiveParametricCurveDigitizer3D < MyRotatedCurve >  Digitizer;
+    typedef NaiveParametricCurveDigitizer3D < MyRotatedCurve >::DigitalCurve MyDigitalCurve;
+    typedef NaiveParametricCurveDigitizer3D < MyRotatedCurve >::MetaData MyMetaData;
 
     MyDigitalCurve digitalCurve;
     MyKnot knot ( param1, param2, param3 );
@@ -438,9 +438,9 @@ int main( int argc, char** argv )
   {
     typedef Knot_5_1 < Z3i::Space > MyKnot;
     typedef DecoratorParametricCurveTransformation < MyKnot, ForwardTrans > MyRotatedCurve;
-    typedef UglyNaiveParametricCurveDigitizer3D < MyRotatedCurve >  Digitizer;
-    typedef UglyNaiveParametricCurveDigitizer3D < MyRotatedCurve >::DigitalCurve MyDigitalCurve;
-    typedef UglyNaiveParametricCurveDigitizer3D < MyRotatedCurve >::MetaData MyMetaData;
+    typedef NaiveParametricCurveDigitizer3D < MyRotatedCurve >  Digitizer;
+    typedef NaiveParametricCurveDigitizer3D < MyRotatedCurve >::DigitalCurve MyDigitalCurve;
+    typedef NaiveParametricCurveDigitizer3D < MyRotatedCurve >::MetaData MyMetaData;
 
     MyDigitalCurve digitalCurve;
     MyKnot knot ( param1, param2, param3 );
@@ -457,9 +457,9 @@ int main( int argc, char** argv )
   {
     typedef Knot_5_2 < Z3i::Space > MyKnot;
     typedef DecoratorParametricCurveTransformation < MyKnot, ForwardTrans > MyRotatedCurve;
-    typedef UglyNaiveParametricCurveDigitizer3D < MyRotatedCurve >  Digitizer;
-    typedef UglyNaiveParametricCurveDigitizer3D < MyRotatedCurve >::DigitalCurve MyDigitalCurve;
-    typedef UglyNaiveParametricCurveDigitizer3D < MyRotatedCurve >::MetaData MyMetaData;
+    typedef NaiveParametricCurveDigitizer3D < MyRotatedCurve >  Digitizer;
+    typedef NaiveParametricCurveDigitizer3D < MyRotatedCurve >::DigitalCurve MyDigitalCurve;
+    typedef NaiveParametricCurveDigitizer3D < MyRotatedCurve >::MetaData MyMetaData;
 
     MyDigitalCurve digitalCurve;
     MyKnot knot ( param1, param2, param3 );
@@ -476,9 +476,9 @@ int main( int argc, char** argv )
   {
     typedef Knot_6_2 < Z3i::Space > MyKnot;
     typedef DecoratorParametricCurveTransformation < MyKnot, ForwardTrans > MyRotatedCurve;
-    typedef UglyNaiveParametricCurveDigitizer3D < MyRotatedCurve >  Digitizer;
-    typedef UglyNaiveParametricCurveDigitizer3D < MyRotatedCurve >::DigitalCurve MyDigitalCurve;
-    typedef UglyNaiveParametricCurveDigitizer3D < MyRotatedCurve >::MetaData MyMetaData;
+    typedef NaiveParametricCurveDigitizer3D < MyRotatedCurve >  Digitizer;
+    typedef NaiveParametricCurveDigitizer3D < MyRotatedCurve >::DigitalCurve MyDigitalCurve;
+    typedef NaiveParametricCurveDigitizer3D < MyRotatedCurve >::MetaData MyMetaData;
 
     MyDigitalCurve digitalCurve;
     MyKnot knot ( param1, param2, param3 );
@@ -495,9 +495,9 @@ int main( int argc, char** argv )
   {
     typedef Knot_7_4 < Z3i::Space > MyKnot;
     typedef DecoratorParametricCurveTransformation < MyKnot, ForwardTrans > MyRotatedCurve;
-    typedef UglyNaiveParametricCurveDigitizer3D < MyRotatedCurve >  Digitizer;
-    typedef UglyNaiveParametricCurveDigitizer3D < MyRotatedCurve >::DigitalCurve MyDigitalCurve;
-    typedef UglyNaiveParametricCurveDigitizer3D < MyRotatedCurve >::MetaData MyMetaData;
+    typedef NaiveParametricCurveDigitizer3D < MyRotatedCurve >  Digitizer;
+    typedef NaiveParametricCurveDigitizer3D < MyRotatedCurve >::DigitalCurve MyDigitalCurve;
+    typedef NaiveParametricCurveDigitizer3D < MyRotatedCurve >::MetaData MyMetaData;
 
     MyDigitalCurve digitalCurve;
     MyKnot knot ( param1, param2, param3 );
