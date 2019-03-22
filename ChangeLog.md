@@ -1,3 +1,15 @@
+# DGtalTools 1.0
+
+- *global*:
+    - Continuous integration AppVeyor fix.
+      (Bertrand Kerautret, [#337](https://github.com/DGtal-team/DGtalTools/pull/337)).
+- *volumetric*
+    - New tool to fill the interior of a voxel set (volFillInterior).
+      (David  Coeurjolly,[#343](https://github.com/DGtal-team/DGtalTools/pull/334)).
+    - Update Critical Kernels thinning using VoxelComplex, following
+      [recent changes in DGtal](https://github.com/DGtal-team/DGtal/pull/1369).
+      (Pablo Hernandez, [#345](https://github.com/DGtal-team/DGtalTools/pull/345))
+ 
 # DGtalTools 0.9.4
 
 - *converters*
