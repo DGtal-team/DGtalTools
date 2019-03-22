@@ -350,18 +350,16 @@ estimation( Estimator & estimator, double h,
  *
  * @return Euclidean radius for the convolver of Integral Invariant estimators
  */
-template< typename ConstIteratorOnPoints, typename Point >
+template< typename ConstIteratorOnPoints, typename RPoint >
 unsigned int suggestedSizeIntegralInvariant( const double h,
-                                             const Point& center,
+                                             const RPoint& center,
                                              const ConstIteratorOnPoints& itb,
                                              const ConstIteratorOnPoints& ite )
 {
-  typedef typename Point::Component TValue;
-
   ConstIteratorOnPoints it = itb;
-  Point p( *it );
-  Point distance = p - center;
-  TValue minRadius = distance.norm();
+  RPoint p( *it );
+  RPoint distance = p - center;
+  auto minRadius = distance.norm();
   ++it;
 
   for ( ; it != ite; ++it )
@@ -831,7 +829,7 @@ computeLocalEstimations( const std::string & filename,
 
           if( optionsII.radius <= 0.0 )
           {
-            optionsII.radius = suggestedSizeIntegralInvariant( h, dig->round( optionsII.center ), pointsRange.begin(), pointsRange.end() );
+            optionsII.radius = suggestedSizeIntegralInvariant( h,  optionsII.center, pointsRange.begin(), pointsRange.end() );
             file << "# Estimated radius: " << optionsII.radius << std::endl;
           }
           double re = optionsII.radius * std::pow( h, optionsII.alpha );
