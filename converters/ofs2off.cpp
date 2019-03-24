@@ -107,7 +107,7 @@ int main( int argc, char** argv )
   string outputFilename = vm["output"].as<std::string>();
 
   // We store the colors
-  Mesh<Display3D<>::BallD3D> anImportedMesh(true);
+  Mesh<Z3i::RealPoint> anImportedMesh(true);
   bool import = anImportedMesh << inputFilename;
   bool exported = anImportedMesh >> outputFilename;
   if(!import || !exported){

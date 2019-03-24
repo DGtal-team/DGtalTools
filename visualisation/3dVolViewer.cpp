@@ -229,7 +229,7 @@ int main( int argc, char** argv )
     }else if(extension=="sdp"){
     vector<Z3i::RealPoint> vectVoxels = PointListReader<Z3i::RealPoint>::getPointsFromFile(inputFilename);
     for(unsigned int i=0;i< vectVoxels.size(); i++){
-      viewer << vectVoxels.at(i);
+      viewer << Z3i::Point(vectVoxels.at(i), functors::Round<>());
     }
   }
   if(vm.count("displayMesh")){

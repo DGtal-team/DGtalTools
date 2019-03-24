@@ -10,6 +10,7 @@
 #include <DGtal/geometry/surfaces/estimation/estimationFunctors/ElementaryConvolutionNormalVectorEstimator.h>
 #include <DGtal/geometry/volumes/KanungoNoise.h>
 #include <DGtal/math/ScalarFunctors.h>
+#include <DGtal/geometry/volumes/distance/LpMetric.h>
 
 template <typename Shape>
 Calculus
@@ -119,7 +120,7 @@ computeFaceNormals(const Calculus& calculus, const Shape& shape, const double ra
         typedef KSpace::SurfelSet MySurfelSet;
         typedef DGtal::SetOfSurfels<KSpace, MySurfelSet> MySetOfSurfels;
         typedef DGtal::DigitalSurface<MySetOfSurfels> MyDigitalSurface;
-        typedef DGtal::ExactPredicateLpSeparableMetric<Space,2> MyMetric;
+        typedef DGtal::LpMetric<Space> MyMetric;
         typedef DGtal::CanonicSCellEmbedder<KSpace> MyCanonicSCellEmbedder;
         typedef DGtal::functors::ElementaryConvolutionNormalVectorEstimator<SCell, MyCanonicSCellEmbedder> MySurfelFunctor;
         typedef RealVector::Component MyScalar;
@@ -135,7 +136,7 @@ computeFaceNormals(const Calculus& calculus, const Shape& shape, const double ra
         const MyHatFunctor hat_functor(1., radius);
         const MyCanonicSCellEmbedder canonic_embedder(kspace);
         MySurfelFunctor surfel_functor(canonic_embedder, 1.);
-        const MyMetric metric;
+        const MyMetric metric(2.0);
 
         TrivialNormalEstimator nt_estimator;
         nt_estimator.attach(digital_surface);
