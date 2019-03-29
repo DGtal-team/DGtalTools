@@ -1,24 +1,26 @@
 # DGtalTools 1.0
 
 - *generators*
-
   - 3dParametricCurveDigitizer - a tool for digitization of 3D parametric curves (Kacper Pluta,
     [#341](https://github.com/DGtal-team/DGtalTools/pull/341))
 
-- *global*:
+- *global*
     - Continuous integration AppVeyor fix.
       (Bertrand Kerautret, [#337](https://github.com/DGtal-team/DGtalTools/pull/337)).
+    -  Fix PointVector implicit conversion (in link to DGtal PR #1345)
+      (Bertrand Kerautret and David Coeurjolly
+      [#347](https://github.com/DGtal-team/DGtalTools/pull/347))
+      
 - *volumetric*
     - New tool to fill the interior of a voxel set (volFillInterior).
       (David  Coeurjolly,[#343](https://github.com/DGtal-team/DGtalTools/pull/334)).
     - Update Critical Kernels thinning using VoxelComplex, following
       [recent changes in DGtal](https://github.com/DGtal-team/DGtal/pull/1369).
-      (Pablo Hernandez, [#345](https://github.com/DGtal-team/DGtalTools/pull/345))
- 
+      (Pablo Hernandez, [#345](https://github.com/DGtal-team/DGtalTools/pull/345))    
+    
 # DGtalTools 0.9.4
 
 - *converters*
-
    - mesh2vol: add option to add margin in the generated volume
      (to better extract the surfel boudary near domain limits).  
      (Bertrand Kerautret, [#322](https://github.com/DGtal-team/DGtalTools/pull/322))
@@ -31,7 +33,7 @@
    [#317](https://github.com/DGtal-team/DGtalTools/pull/317))
    - Fix the bad surfel display of volBoundary2obj (issue #320)
    (Bertrand Kerautret, [#321](https://github.com/DGtal-team/DGtalTools/pull/321))
-   
+
 - *volumetric*
    - new option to volAddNoise to extract the largest 6-connected
    component. (David  Coeurjolly,
@@ -47,12 +49,12 @@
   - New tool for mesh voxelization from a mesh in input (.off)
     to a volumetric output (vol, pgm3d)
     (Monir Hadji, [#279](https://github.com/DGtal-team/DGtalTools/pull/279)
-  - 2dCompImage : Computes and displays image comparisons (squared and absolute 
-    differences) 
+  - 2dCompImage : Computes and displays image comparisons (squared and absolute
+    differences)
     (Bertrand Kerautret, [#313](https://github.com/DGtal-team/DGtalTools/pull/313))
-  - Improve visualisation tools (vol2heightfield, vol2obj, vol2raw, vol2sdp, 
-    vol2slice,volBoundary2obj,3dImageViewer, 3dVolViewer, sliceViewer, Viewer3DImage) 
-    allowing to read longvol including rescaling. (Bertrand Kerautret, 
+  - Improve visualisation tools (vol2heightfield, vol2obj, vol2raw, vol2sdp,
+    vol2slice,volBoundary2obj,3dImageViewer, 3dVolViewer, sliceViewer, Viewer3DImage)
+    allowing to read longvol including rescaling. (Bertrand Kerautret,
     [#296](https://github.com/DGtal-team/DGtalTools/pull/296))
   - Add an option to filter vector displayed in 3dSDPViewer.
    (Bertrand Kerautret, [#297](https://github.com/DGtal-team/DGtalTools/pull/297))

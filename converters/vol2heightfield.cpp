@@ -185,7 +185,7 @@ int main( int argc, char** argv )
   int minTh = vm["thresholdMin"].as<int>();
   int maxTh = vm["thresholdMax"].as<int>();
   
-  trace.info() << "Processing image to output file " << outputFilename ; 
+  trace.info() << "Processing image to output file " << outputFilename << std::endl; 
   
   unsigned int widthImageScan = vm["height"].as<unsigned int>();
   unsigned int heightImageScan = vm["width"].as<unsigned int>();
@@ -218,8 +218,9 @@ int main( int argc, char** argv )
   
   unsigned int maxDepthFound = 0;
   for(unsigned int k=0; k < maxScan; k++){
+    Z3i::Point c (ptCenter+normalDir*k, DGtal::functors::Round<>());
     DGtal::functors::Point2DEmbedderIn3D<DGtal::Z3i::Domain >  embedder(inputImage.domain(), 
-                                                                        ptCenter+normalDir*k,
+                                                                        c,
                                                                         normalDir,
                                                                         widthImageScan);
     ImageAdapterExtractor extractedImage(inputImage, aDomain2D, embedder, idV);
