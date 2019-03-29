@@ -3,6 +3,9 @@
 - *global*
     - Continuous integration AppVeyor fix.
       (Bertrand Kerautret, [#337](https://github.com/DGtal-team/DGtalTools/pull/337)).
+    -  Fix PointVector implicit conversion (in link to DGtal PR #1345)
+      (Bertrand Kerautret and David Coeurjolly
+      [#347](https://github.com/DGtal-team/DGtalTools/pull/347))
 - *volumetric*
     - New tool to fill the interior of a voxel set (volFillInterior).
       (David  Coeurjolly,[#343](https://github.com/DGtal-team/DGtalTools/pull/334)).
@@ -13,7 +16,6 @@
 # DGtalTools 0.9.4
 
 - *converters*
-
    - mesh2vol: add option to add margin in the generated volume
      (to better extract the surfel boudary near domain limits).  
      (Bertrand Kerautret, [#322](https://github.com/DGtal-team/DGtalTools/pull/322))
