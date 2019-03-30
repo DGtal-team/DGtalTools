@@ -285,7 +285,7 @@ int main( int argc, char** argv )
   {
     trace.info()<< "Digitizes curves using DGtal library" <<std::endl << "Basic usage: "<<std::endl
     << "\t3dParametricCurveDigitize [options] --curve <curveName> --tstart <double> --tend <double> --step <double> --knext <unsigned int> --output <outputBasename>"<<std::endl
-    << general_opt << "\n";
+    << general_opt << "\n Example: 3dParametricCurveDigitizer --curve Knot_3_1 --param1 10 --param2 10 --param3 10 --tstart -2.2 --tend 2.2 --step 0.001 --output knot_3_1 --list" << std::endl;
     return 0;
   }
 
