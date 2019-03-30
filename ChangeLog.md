@@ -1,11 +1,16 @@
 # DGtalTools 1.0
 
+- *generators*
+  - 3dParametricCurveDigitizer - a tool for digitization of 3D parametric curves (Kacper Pluta,
+    [#341](https://github.com/DGtal-team/DGtalTools/pull/341))
+
 - *global*
     - Continuous integration AppVeyor fix.
       (Bertrand Kerautret, [#337](https://github.com/DGtal-team/DGtalTools/pull/337)).
     -  Fix PointVector implicit conversion (in link to DGtal PR #1345)
       (Bertrand Kerautret and David Coeurjolly
       [#347](https://github.com/DGtal-team/DGtalTools/pull/347))
+      
 - *volumetric*
     - New tool to fill the interior of a voxel set (volFillInterior).
       (David  Coeurjolly,[#343](https://github.com/DGtal-team/DGtalTools/pull/334)).
