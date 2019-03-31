@@ -81,7 +81,7 @@ before_script:
 script:
    - echo "---- $DGTALTYPE ---$BUILD_DOC---$UPLOAD_DOC--*$DOC*-$BTYPE---"
    - cmake . -DDGtal_DIR=$PWD/DGtal $BTYPE $DGTALTYPE  -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_COMPILER=$CXXCOMPILER -DCMAKE_C_COMPILER=$CCOMPILER 
-   - if [ $DOC == "true" ]; then  make doc;  echo "doc"; fi
+   - if [ $DOC == "true" ]; then  make doc;  echo "doc"; mkdir doctools; mv -r html doctools/tools;   fi
    - if [ $CONFIG == "Debug" ]; then make; fi
    - if [ $CONFIG == "Debug,QGLVIEWER" ]; then make; fi
 
@@ -94,7 +94,7 @@ jobs:
        skip-cleanup: true
        github-token: $GITHUB_TOKEN
        keep-history: true
-       repo: kerautret/DGTtalTools
+       repo: DGtal-team/doc-nightly
        target-branch: gh-pages
        verbose: true
-       local-dir: "$TRAVIS_BUILD_DIR/html"
+       local-dir: "$TRAVIS_BUILD_DIR/doctools"
