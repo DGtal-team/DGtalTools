@@ -12,7 +12,7 @@ compiler:
 
 cache: apt
 
-secure: "Ra00iyQ+5wm7G3XfaaI40aKgfcGTigfmEd+3/TY1hYcjYnJvNOG0dekolcMDSelE8SfqLcWYnK6+vtOCmyZuUWheUhA+83Tgq/bIH6dMzSvLkJdyq2D9me4sX6zx3ct90swP7Adj8EBHmv61pH5OBeEcmNWJNIZmNQs3+1awca4="
+
 env:
   - CONFIG="Debug,QGLVIEWER"
   - CONFIG="Debug"
@@ -40,6 +40,7 @@ addons:
     - graphviz
     - libgmp-dev
     - libgdcm2-dev
+    - ninja-build
     - libgraphicsmagick++1-dev
     - libqglviewer-dev
     - libinsighttoolkit3-dev
@@ -52,7 +53,7 @@ addons:
 
 before_install:
   - DOC="false"; BTYPE=""
-  - if [ $CONFIG == "DOCUMENTATION" ]; then if [ $OriginalRepo == "true" ];  then if [ $TRAVIS_PULL_REQUEST == "false" ]; then DOC="true"; fi; fi; fi
+  - if [ $CONFIG == "DOCUMENTATION" ]; then DOC="true"; fi
   - if [ $DOC == "true" ]; then openssl aes-256-cbc -K $encrypted_a0b8e3011fca_key -iv $encrypted_a0b8e3011fca_iv -in .travis/dgtal_rsa.enc -out .travis/dgtal_rsa -d; chmod 600 .travis/dgtal_rsa;  fi
   - env
   - export SRC_DIR="`pwd`"
@@ -73,20 +74,18 @@ before_script:
   - cmake . $DGTALTYPE -DCMAKE_CXX_COMPILER=$CXXCOMPILER -DCMAKE_C_COMPILER=$CCOMPILER 
   - make
   - cd ..
-  - if [ $DOC == "true" ]; then .travis/install_doxygen.sh;  BTYPE="-DDOXYGEN_EXECUTABLE=$HOME/doxygen/doxygen-1.8.10/bin/doxygen -DCMAKE_BUILD_TYPE=Debug -DWITH_CAIRO=true  -DWITH_GMP=true -DWITH_EIGEN=true";  fi
+  - if [ $DOC == "true" ]; then .travis/install_doxygen.sh;  BTYPE="-DDOXYGEN_EXECUTABLE=$TRAVIS_BUILD_DIR/doxygen/bin/doxygen -DCMAKE_BUILD_TYPE=Debug -DWITH_CAIRO=true  -DWITH_GMP=true -DWITH_EIGEN=true";  fi
   - if [ $DOC == "true" ]; then wget http://dgtal.org/doc/tags/DGtal-tagfile --no-check-certificate ;fi
 
 
 script:
    - echo "---- $DGTALTYPE ---$BUILD_DOC---$UPLOAD_DOC--*$DOC*-$BTYPE---"
    - cmake . -DDGtal_DIR=$PWD/DGtal $BTYPE $DGTALTYPE  -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_COMPILER=$CXXCOMPILER -DCMAKE_C_COMPILER=$CCOMPILER 
-   - if [ $DOC == "true" ]; then  make doc;  echo "doc"; fi
+   - if [ $DOC == "true" ]; then  make doc;  echo "doc"; mkdir doctools; mv  html doctools/tools;   fi
    - if [ $CONFIG == "Debug" ]; then make; fi
    - if [ $CONFIG == "Debug,QGLVIEWER" ]; then make; fi
 
-after_success:
-  ## We publish the DGtalTools tags
-  - if [ $DOC == "true" ]; then mkdir ${TRAVIS_BUILD_DIR}/tools; mkdir ${TRAVIS_BUILD_DIR}/tools/tools; mv ${TRAVIS_BUILD_DIR}/build/html $TRAVIS_BUILD_DIR/tools/tools;   fi
+
 
 
 jobs:
@@ -96,6 +95,6 @@ jobs:
        github-token: $GITHUB_TOKEN
        keep-history: true
        repo: DGtal-team/doc-nightly
-       target-branch: master
+       target-branch: gh-pages
        verbose: true
-       local-dir: "$TRAVIS_BUILD_DIR/tools"
+       local-dir: "$TRAVIS_BUILD_DIR/doctools"
