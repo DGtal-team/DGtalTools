@@ -89,7 +89,10 @@ script:
 
 
 jobs:
-     deploy:
+  include:
+    - stage: "Documentation"
+      name: "Building and deploying the documentation"
+      deploy:
        provider: pages
        skip-cleanup: true
        github-token: $GITHUB_TOKEN
