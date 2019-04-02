@@ -1,40 +1,36 @@
 language: cpp
 dist: trusty
 sudo: false
-
 os:
-  - linux
-  - osx
-
+- linux
+- osx
 compiler:
-  - gcc
-  - clang
-
+- gcc
+- clang
 cache: apt
-
-
 env:
+  matrix:
   - CONFIG="Debug,QGLVIEWER"
   - CONFIG="Debug"
   - CONFIG="DOCUMENTATION"
-
+  global:
+    secure: Yqy3tGMrSrMcUB7uPDEkYJWKFVke3x4PjlfXhBBlc3q9P35mr12q++gIt1ZQcPS0twhVp2jDSfFUkhSzE2Q6JaXJg5J+YrBqx4PFS1OmqHU32MtPpQ2g3dvqmj0z7yW46ggeGfhMRE27xZpOL1ANMDu0BRBCm81qfP/sMZNUq0ysZbHKrhhZ0MPOv4+U7Bs0xnoJis8wHRy3qTPK/B6vT/TJ1TGl+32zJDKFcx0zwmDYIoSQrF+nuxei9xyCNCTSUvx8OlpeoPUG6zY6mYbN/qBDSaw5bo5RA0ZEv+GXdihazC9GGXzEIMnXYYymDkv+6ZhZPvVyi8TPTiejqaN/4igqDHokL4aNb4DHFxarWnZGYFJuMTnQKyxEL/sOc6wVsnbaaKlr90kYSBktr5maEkTQTcNnPdIi7tr0gcxPcC3as99P9vGhbX1QhY6FXmzDsW7I3HbIT2NHKgn+1tvoAoUcYUwWHGjY3XM5uvj17TaeRoA20gmJ/6VVt12cPgeBNr3N/ZIp+B0nLkE8co2mp5K3QXeNoxX2ttAaRevQaEsRWgg1QnyjmbMAeXq/zB/Mq1bcB4Q4c3Fii/VMQJ0bT8dLia7Y5JU671vHLIq7on4j0OiQ4auqm/vKzrhgVJZ5OX9ke8BAljY9z7NcR92vjod7u6J8RUjByolrKHA25lY=
 matrix:
   fast_finish: true
   exclude:
-    - os: osx
-      env: CONFIG="DOCUMENTATION"
-    - compiler: gcc
-      os: linux
-      env: CONFIG="DOCUMENTATION"
-    - os: osx
-      compiler: gcc
-
+  - os: osx
+    env: CONFIG="DOCUMENTATION"
+  - compiler: gcc
+    os: linux
+    env: CONFIG="DOCUMENTATION"
+  - os: osx
+    compiler: gcc
 addons:
   apt:
-   sources:
+    sources:
     - deadsnakes
     - ubuntu-toolchain-r-test
-   packages:
+    packages:
     - libhdf5-serial-dev
     - libcairo2-dev
     - graphviz
@@ -49,55 +45,53 @@ addons:
     - libboost-dev
     - libboost-program-options-dev
     - libboost-system-dev
-
-
 before_install:
-  - DOC="false"; BTYPE=""
-  - if [ $CONFIG == "DOCUMENTATION" ]; then DOC="true"; fi
-  - if [ $DOC == "true" ]; then openssl aes-256-cbc -K $encrypted_a0b8e3011fca_key -iv $encrypted_a0b8e3011fca_iv -in .travis/dgtal_rsa.enc -out .travis/dgtal_rsa -d; chmod 600 .travis/dgtal_rsa;  fi
-  - env
-  - export SRC_DIR="`pwd`"
-  - if [ $CXX == "g++" ]; then export CXX="g++-4.8"  CC="gcc-4.8"  CCOMPILER="gcc-4.8" CXXCOMPILER="g++-4.8"; fi
-  - source .travis/install_eigen.sh  ; cd $TRAVIS_BUILD_DIR;
-
-# Manual boost install since linking fails with libboost-program-options1.46-dev and g++48
-
+- DOC="false"; BTYPE=""
+- if [ $CONFIG == "DOCUMENTATION" ]; then DOC="true"; fi
+- if [ $DOC == "true" ]; then openssl aes-256-cbc -K $encrypted_a0b8e3011fca_key -iv
+  $encrypted_a0b8e3011fca_iv -in .travis/dgtal_rsa.enc -out .travis/dgtal_rsa -d;
+  chmod 600 .travis/dgtal_rsa;  fi
+- env
+- export SRC_DIR="`pwd`"
+- if [ $CXX == "g++" ]; then export CXX="g++-4.8"  CC="gcc-4.8"  CCOMPILER="gcc-4.8"
+  CXXCOMPILER="g++-4.8"; fi
+- source .travis/install_eigen.sh  ; cd $TRAVIS_BUILD_DIR;
 before_script:
-  - if [ $TRAVIS_OS_NAME == linux ]; then echo "All done.";   fi
-  - if [ $TRAVIS_OS_NAME == osx ]; then source .travis/install_deps_macos.sh; fi
-  - DGTALTYPE="-DBUILD_EXAMPLES=OFF -DDGTAL_BUILD_TESTING=OFF -DCMAKE_BUILD_TYPE=Debug -DWITH_QGLVIEWER=false -DWITH_ITK=false -DWITH_EIGEN=true -DEIGEN3_INCLUDE_DIR='$EIGEN_ROOT/include/eigen3'"
-  - if [ $CONFIG == "Debug,QGLVIEWER" AND  $TRAVIS_OS_NAME == osx  ]; then export DGTALTYPE="-DBUILD_EXAMPLES=OFF -DDGTAL_BUILD_TESTING=OFF -DCMAKE_BUILD_TYPE=Debug -DWITH_QGLVIEWER=true -DWITH_QT5=true -DWITH_ITK=false -DWITH_EIGEN=true -DEIGEN3_INCLUDE_DIR='$EIGEN_ROOT/include/eigen3'"; fi
-  - if [ $CONFIG == "Debug,QGLVIEWER" AND  $TRAVIS_OS_NAME == linux  ]; then export DGTALTYPE="-DBUILD_EXAMPLES=OFF -DDGTAL_BUILD_TESTING=OFF -DCMAKE_BUILD_TYPE=Debug -DWITH_QGLVIEWER=true  -DWITH_ITK=false -DWITH_EIGEN=true -DEIGEN3_INCLUDE_DIR='$EIGEN_ROOT/include/eigen3'"; fi
-  - cd $SRC_DIR
-  - git clone --depth=1 git://github.com/DGtal-team/DGtal.git
-  - cd DGtal
-  - cmake . $DGTALTYPE -DCMAKE_CXX_COMPILER=$CXXCOMPILER -DCMAKE_C_COMPILER=$CCOMPILER 
-  - make
-  - cd ..
-  - if [ $DOC == "true" ]; then .travis/install_doxygen.sh;  BTYPE="-DDOXYGEN_EXECUTABLE=$TRAVIS_BUILD_DIR/doxygen/bin/doxygen -DCMAKE_BUILD_TYPE=Debug -DWITH_CAIRO=true  -DWITH_GMP=true -DWITH_EIGEN=true";  fi
-  - if [ $DOC == "true" ]; then wget http://dgtal.org/doc/tags/DGtal-tagfile --no-check-certificate ;fi
-
-
+- if [ $TRAVIS_OS_NAME == linux ]; then echo "All done.";   fi
+- if [ $TRAVIS_OS_NAME == osx ]; then source .travis/install_deps_macos.sh; fi
+- DGTALTYPE="-DBUILD_EXAMPLES=OFF -DDGTAL_BUILD_TESTING=OFF -DCMAKE_BUILD_TYPE=Debug
+  -DWITH_QGLVIEWER=false -DWITH_ITK=false -DWITH_EIGEN=true -DEIGEN3_INCLUDE_DIR='$EIGEN_ROOT/include/eigen3'"
+- if [ $CONFIG == "Debug,QGLVIEWER" AND  $TRAVIS_OS_NAME == osx  ]; then export DGTALTYPE="-DBUILD_EXAMPLES=OFF
+  -DDGTAL_BUILD_TESTING=OFF -DCMAKE_BUILD_TYPE=Debug -DWITH_QGLVIEWER=true -DWITH_QT5=true
+  -DWITH_ITK=false -DWITH_EIGEN=true -DEIGEN3_INCLUDE_DIR='$EIGEN_ROOT/include/eigen3'";
+  fi
+- if [ $CONFIG == "Debug,QGLVIEWER" AND  $TRAVIS_OS_NAME == linux  ]; then export
+  DGTALTYPE="-DBUILD_EXAMPLES=OFF -DDGTAL_BUILD_TESTING=OFF -DCMAKE_BUILD_TYPE=Debug
+  -DWITH_QGLVIEWER=true  -DWITH_ITK=false -DWITH_EIGEN=true -DEIGEN3_INCLUDE_DIR='$EIGEN_ROOT/include/eigen3'";
+  fi
+- cd $SRC_DIR
+- git clone --depth=1 git://github.com/DGtal-team/DGtal.git
+- cd DGtal
+- cmake . $DGTALTYPE -DCMAKE_CXX_COMPILER=$CXXCOMPILER -DCMAKE_C_COMPILER=$CCOMPILER
+- make
+- cd ..
+- if [ $DOC == "true" ]; then .travis/install_doxygen.sh;  BTYPE="-DDOXYGEN_EXECUTABLE=$TRAVIS_BUILD_DIR/doxygen/bin/doxygen
+  -DCMAKE_BUILD_TYPE=Debug -DWITH_CAIRO=true  -DWITH_GMP=true -DWITH_EIGEN=true";  fi
+- if [ $DOC == "true" ]; then wget http://dgtal.org/doc/tags/DGtal-tagfile --no-check-certificate
+  ;fi
 script:
-   - echo "---- $DGTALTYPE ---$BUILD_DOC---$UPLOAD_DOC--*$DOC*-$BTYPE---"
-   - cmake . -DDGtal_DIR=$PWD/DGtal $BTYPE $DGTALTYPE  -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_COMPILER=$CXXCOMPILER -DCMAKE_C_COMPILER=$CCOMPILER 
-   - if [ $DOC == "true" ]; then  make doc;  echo "doc"; mkdir doctools; mv  html doctools/tools;   fi
-   - if [ $CONFIG == "Debug" ]; then make; fi
-   - if [ $CONFIG == "Debug,QGLVIEWER" ]; then make; fi
-
-
-
-
-jobs:
-  include:
-    - stage: "Documentation"
-      name: "Building and deploying the documentation"
-      deploy:
-       provider: pages
-       skip-cleanup: true
-       github-token: $GITHUB_TOKEN
-       keep-history: true
-       repo: DGtal-team/doc-nightly
-       target-branch: gh-pages
-       verbose: true
-       local-dir: "$TRAVIS_BUILD_DIR/doctools"
+- echo "---- $DGTALTYPE ---$BUILD_DOC---$UPLOAD_DOC--*$DOC*-$BTYPE---"
+- cmake . -DDGtal_DIR=$PWD/DGtal $BTYPE $DGTALTYPE  -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_COMPILER=$CXXCOMPILER
+  -DCMAKE_C_COMPILER=$CCOMPILER
+- if [ $DOC == "true" ]; then  make doc;  echo "doc";   fi
+- if [ $CONFIG == "Debug" ]; then make; fi
+- if [ $CONFIG == "Debug,QGLVIEWER" ]; then make; fi
+deploy:
+  provider: pages
+  skip-cleanup: true
+  github-token: "$GITHUB_TOKEN"
+  keep-history: true
+  repo: DGtal-team/doctools-nightly
+  target-branch: master
+  verbose: true
+  local-dir: "$TRAVIS_BUILD_DIR/html"
