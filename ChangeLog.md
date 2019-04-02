@@ -7,9 +7,12 @@
 - *global*
     - Continuous integration AppVeyor fix.
       (Bertrand Kerautret, [#337](https://github.com/DGtal-team/DGtalTools/pull/337)).
-    -  Fix PointVector implicit conversion (in link to DGtal PR #1345)
+    - Fix PointVector implicit conversion (in link to DGtal PR #1345)
       (Bertrand Kerautret and David Coeurjolly
       [#347](https://github.com/DGtal-team/DGtalTools/pull/347))
+    - Fix Documentation nightly update on github website.
+      (Bertrand Kerautret
+      [#348](https://github.com/DGtal-team/DGtalTools/pull/347))
       
 - *volumetric*
     - New tool to fill the interior of a voxel set (volFillInterior).
