@@ -95,3 +95,4 @@ deploy:
   target-branch: master
   verbose: true
   local-dir: "$TRAVIS_BUILD_DIR/html"
+  if: [$DOC == "true"] AND branch == master
