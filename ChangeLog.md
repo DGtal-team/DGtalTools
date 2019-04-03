@@ -13,6 +13,9 @@
     - Fix Documentation nightly update on github website.
       (Bertrand Kerautret
       [#348](https://github.com/DGtal-team/DGtalTools/pull/347))
+    - Fix compilation and execution with Visual Studio
+      (Raphael Lenain
+      [#353](https://github.com/DGtal-team/DGtalTools/pull/353))
       
 - *volumetric*
     - New tool to fill the interior of a voxel set (volFillInterior).
