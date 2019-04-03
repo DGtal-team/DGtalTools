@@ -12,7 +12,10 @@
       [#347](https://github.com/DGtal-team/DGtalTools/pull/347))
     - Fix Documentation nightly update on github website.
       (Bertrand Kerautret
-      [#348](https://github.com/DGtal-team/DGtalTools/pull/347))
+      [#348](https://github.com/DGtal-team/DGtalTools/pull/348))
+    - CMake expose boost static option.
+      (Bertrand Kerautret
+      [#351](https://github.com/DGtal-team/DGtalTools/pull/351))
       
 - *volumetric*
     - New tool to fill the interior of a voxel set (volFillInterior).
