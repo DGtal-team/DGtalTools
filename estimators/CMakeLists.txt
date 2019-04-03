@@ -37,6 +37,9 @@ if (  WITH_CGAL )
 endif ( WITH_CGAL )
 
 FOREACH(FILE ${DGTAL_TOOLS_SRC})
+  if(MSVC)
+    set_source_files_properties( ${FILE} PROPERTIES COMPILE_FLAGS "/bigobj" )
+  endif(MSVC)
   add_executable(${FILE} ${FILE})
   target_link_libraries (${FILE}  ${DGTAL_LIBRARIES} ${DGtalToolsLibDependencies})
   install(TARGETS ${FILE}

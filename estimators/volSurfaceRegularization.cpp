@@ -90,6 +90,9 @@ Surface approximation options:
 #include <boost/program_options/errors.hpp>
 #include <DGtal/images/ImageSelector.h>
 #include <DGtal/io/readers/GenericReader.h>
+#include <DGtal/topology/SurfelNeighborhood.h>
+#include <DGtal/topology/helpers/Surfaces.h>
+#include <DGtal/geometry/volumes/distance/VoronoiMap.h>
 #include <random>
 #include <iomanip>
 #include <regex>

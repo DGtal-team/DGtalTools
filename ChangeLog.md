@@ -16,6 +16,9 @@
     - CMake expose boost static option.
       (Bertrand Kerautret
       [#351](https://github.com/DGtal-team/DGtalTools/pull/351))
+    - Fix compilation and execution with Visual Studio for volSurfaceRegularization.
+      (Raphael Lenain
+      [#353](https://github.com/DGtal-team/DGtalTools/pull/353))
       
 - *volumetric*
     - New tool to fill the interior of a voxel set (volFillInterior).
