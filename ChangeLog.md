@@ -12,7 +12,10 @@
       [#347](https://github.com/DGtal-team/DGtalTools/pull/347))
     - Fix Documentation nightly update on github website.
       (Bertrand Kerautret
-      [#348](https://github.com/DGtal-team/DGtalTools/pull/347))
+      [#348](https://github.com/DGtal-team/DGtalTools/pull/348))
+    - CMake expose boost static option.
+      (Bertrand Kerautret
+      [#351](https://github.com/DGtal-team/DGtalTools/pull/351))
     - Fix compilation and execution with Visual Studio for volSurfaceRegularization.
       (Raphael Lenain
       [#353](https://github.com/DGtal-team/DGtalTools/pull/353))
