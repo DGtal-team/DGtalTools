@@ -1,4 +1,7 @@
+#!/bin/bash
 
 mkdir ~/doxygen && cd ~/doxygen
-wget http://ftp.stack.nl/pub/users/dimitri/doxygen-1.8.10.linux.bin.tar.gz
-tar xzf doxygen-1.8.10.linux.bin.tar.gz
+wget http://doxygen.nl/files/doxygen-1.8.14.src.tar.gz && tar xzf doxygen-1.8.14.src.tar.gz
+cd doxygen-1.8.14 ; mkdir build ; cd build
+cmake .. -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=$TRAVIS_BUILD_DIR/doxygen/
+ninja install
