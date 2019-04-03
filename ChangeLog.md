@@ -13,7 +13,7 @@
     - Fix Documentation nightly update on github website.
       (Bertrand Kerautret
       [#348](https://github.com/DGtal-team/DGtalTools/pull/347))
-    - Fix compilation and execution with Visual Studio
+    - Fix compilation and execution with Visual Studio for volSurfaceRegularization.
       (Raphael Lenain
       [#353](https://github.com/DGtal-team/DGtalTools/pull/353))
       
