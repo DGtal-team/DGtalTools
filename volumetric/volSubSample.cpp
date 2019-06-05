@@ -103,7 +103,7 @@ void missingParam ( std::string param )
 }
 
 template<typename Val, typename Image, typename Point, typename Domain>
-Val maxVal(Image &image, Point &p, Domain& domain)
+Val maxVal(Image const& image, Point const& p, Domain const& domain)
 {
   typename Image::Domain dom( p*2, p*2 + Point::diagonal(1));
   Val v=image(p*2);
@@ -115,7 +115,7 @@ Val maxVal(Image &image, Point &p, Domain& domain)
   return v;    
 } 
 template<typename Val, typename Image, typename Point, typename Domain>
-Val minVal(Image &image, Point &p, Domain& domain)
+Val minVal(Image const& image, Point const& p, Domain const& domain)
 {
   typename Image::Domain dom( p*2, p*2 + Point::diagonal(1));
   Val v=image(p*2);
@@ -127,7 +127,7 @@ Val minVal(Image &image, Point &p, Domain& domain)
   return v;    
 } 
 template<typename Val, typename Image, typename Point, typename Domain>
-Val meanVal(Image &image, Point &p, Domain& domain)
+Val meanVal(Image const& image, Point const& p, Domain const& domain)
 {
   typename Image::Domain dom( p*2, p*2 + Point::diagonal(1));
   int v=0;
