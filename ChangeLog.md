@@ -1,3 +1,10 @@
+# DGtalTools 1.1
+
+- *global*
+  -  Fix issue of link with boost program option.  (Bertrand Kerautret
+    [#356](https://github.com/DGtal-team/DGtalTools/pull/356))
+
+
 # DGtalTools 1.0
 
 - *generators*
