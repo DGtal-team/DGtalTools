@@ -3,7 +3,8 @@
 - *global*
   -  Fix issue of link with boost program option.  (Bertrand Kerautret
     [#356](https://github.com/DGtal-team/DGtalTools/pull/356))
-
+  - Using SourceForge to download doxygen sources during Travis CI jobs.
+    (Roland Denis [#360](https://github.com/DGtal-team/DGtalTools/pull/360))
 
 # DGtalTools 1.0
 
