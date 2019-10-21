@@ -3,6 +3,10 @@
 - *global*
   -  Fix issue of link with boost program option.  (Bertrand Kerautret
     [#356](https://github.com/DGtal-team/DGtalTools/pull/356))
+
+- *volumetric:
+  - Passing argument by const reference in (min|max|mean)Val of volSubSample.
+    (Roland Denis, [#359](https://github.com/DGtal-team/DGtalTools/pull/359/files))
   - Using SourceForge to download doxygen sources during Travis CI jobs.
     (Roland Denis [#360](https://github.com/DGtal-team/DGtalTools/pull/360))
 
