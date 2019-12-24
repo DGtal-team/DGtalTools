@@ -18,8 +18,8 @@
   Part of tool \ref imageProcessing.
   [TOC]
 
-- related tools: \ref DocATu2v0, \ref DocATu0v1
-- related classes: \ref DGtal::ATu0v1, \ref DGtal::ATu2v0, \ref DGtal::DECImage2D
+- related tools: \ref DocATu2v0, \ref DocATVu2v0, \ref DocATu0v1
+- related classes: \ref DGtal::ATu0v1, \ref DGtal::ATu2v0, \ref DGtal::ATVu2v0, \ref DGtal::DECImage2D
 - related namespace: \ref DGtal::functions::dec
 - related functions: \ref DGtal::functions::dec::diagonal, \ref DGtal::functions::dec::squares, \ref DGtal::functions::dec::squaredDiagonal, \ref DGtal::functions::dec::writePixel, \ref DGtal::functions::dec::writePrimalLinel, \ref DGtal::functions::dec::writeDualLinel, \ref DGtal::functions::dec::form2ToImage, \ref DGtal::functions::dec::form1ToImage, \ref DGtal::functions::dec::dualForm1ToImage, \ref DGtal::functions::dec::primalForm1ToImage, \ref DGtal::functions::dec::threeForms2ToImage, \ref DGtal::functions::dec::form2ToGreyLevelImage, \ref DGtal::functions::dec::primalForm1ToGreyLevelImage, \ref DGtal::functions::dec::dualForm1ToGreyLevelImage, \ref DGtal::functions::dec::primalForm1ToRGBColorImage, \ref DGtal::functions::dec::dualForm1ToRGBColorImage, \ref DGtal::functions::dec::threeForms2ToRGBColorImage.
 
@@ -424,10 +424,58 @@ triple points in the L2-metric sense.
 </table>
 </center>
 
+@section AT5 A variant for AT model
+
+Following ideas from Elie Bretin and Simon Masnou (Institut Camille
+Jordan), it is possible to approximate the Hausdorff 1-measure of
+singularities using the Laplacian of v instead of its gradient. The
+functional becomes:
+
+\f[
+  \displaystyle
+  AT_{\varepsilon}(u,v)	= \int_\Omega \alpha |u-g|^2 + v^2 |\nabla u|^2
+  + c \lambda \varepsilon |\Delta v|^2 + c \frac{\lambda}{\varepsilon} |1-v|^2 dx,
+\f]
+
+It Gamma-converges to a length estimation multiplied by \f$2
+\sqrt{2}\f$, while having a smoother profile than the standard AT. The
+constant c is set to \f$1/(2 \sqrt{2})\f$ to correct this estimation
+and to keep the same parameterization as AT.
+
+Here is an example.
+
+
+\code
+./imageProcessing/atv-u2-v0 -i ../imageProcessing/Images/degrade-b04.pgm --image-snr ../imageProcessing/Images/degrade.pgm -a 0.05 --epsilon-1 4 --epsilon-2 0.25 -l 0.0075 -p 2 -c 0xff0000 -o degrade
+\endcode
+
+<center>
+<table>
+<tr>
+<td> Input image \a g </td>
+<td> Reconstructed image \a u </td>
+<td> Perfect image </td>
+</tr>
+<tr>
+<td>@image html degrade-b04.png "Input image (noise = 0.4)"</td>
+<td>@image html degrade-atv-a0.05000-l0.0075000-u.png "ATV20 alpha=0.05 lambda=0.0075 "</td>
+<td>@image html degrade.png "Perfect image"</td>
+</tr>
+<tr>
+<td> SNR of \a g = 21.9183 </td>
+<td> SNR of \a u = 34.3655 </td>
+<td> Perfect image </td>
+</tr>
+</table>
+</center>
+
+\note After some experiments, experimental results are very similar to
+`at-u2-v0`. Timings are longer since \f$ | \Delta v |^2 \f$ induces
+less sparse matrices.
 
 
 
-@section References
+@section ATref References
 
 [1] Luigi Ambrosio, and Vincenzo Maria Tortorelli. "Approximation of
 functional depending on jumps by elliptic functional via t‐convergence."
