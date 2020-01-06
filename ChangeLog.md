@@ -2,9 +2,9 @@
 
 - *global*
   -  Fix issue of link with boost program option.  (Bertrand Kerautret
-    [#356](https://github.com/DGtal-team/DGtalTools/pull/356)
-  - set cmake  based CPP11 check instead the manual DGtal check
-    [#364](https://github.com/DGtal-team/DGtalTools/pull/364)
+    [#356](https://github.com/DGtal-team/DGtalTools/pull/356))
+  - set cmake  based CPP11 check instead the manual DGtal check. (Bertrand
+    Kerautret [#364](https://github.com/DGtal-team/DGtalTools/pull/364))
 
 - *volumetric:
   - Passing argument by const reference in (min|max|mean)Val of volSubSample.
