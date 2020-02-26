@@ -124,8 +124,7 @@ void estimationFromLength( double h, const I& itb, const I& ite, const O& ito )
   typedef MostCenteredMaximalSegmentEstimator<SegmentComputer,SCEstimator> Estimator;
   Estimator CurvatureEstimator(sc, f);
 
-  CurvatureEstimator.init( h, itb, ite );
-  CurvatureEstimator.eval( itb, ite, ito ); 
+  CurvatureEstimator.eval( itb, ite, ito, h ); 
 }
 
 /*
@@ -146,8 +145,7 @@ void estimationFromLengthAndWidth( double h, const I& itb, const I& ite, const O
   typedef MostCenteredMaximalSegmentEstimator<SegmentComputer,SCEstimator> Estimator;
   Estimator CurvatureEstimator(sc, f);
 
-  CurvatureEstimator.init( h, itb, ite );
-  CurvatureEstimator.eval( itb, ite, ito ); 
+  CurvatureEstimator.eval( itb, ite, ito, h ); 
 }
 
 
