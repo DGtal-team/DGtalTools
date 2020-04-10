@@ -6,7 +6,7 @@
   - set cmake  based CPP11 check instead the manual DGtal check. (Bertrand
     Kerautret [#364](https://github.com/DGtal-team/DGtalTools/pull/364))
   - fix ld boost program options macos warnings.
-    Kerautret [#XXX](https://github.com/DGtal-team/DGtalTools/pull/XXX))
+    Kerautret [#366](https://github.com/DGtal-team/DGtalTools/pull/366))
     
 - *volumetric:
   - Passing argument by const reference in (min|max|mean)Val of volSubSample.
