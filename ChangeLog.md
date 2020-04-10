@@ -12,6 +12,12 @@
   - Using SourceForge to download doxygen sources during Travis CI jobs.
     (Roland Denis [#360](https://github.com/DGtal-team/DGtalTools/pull/360))
 
+- *converters*
+  - itk2vol: change type of threshold parameter in order to be able to
+    convert ITK images of type double.  (Bertrand Kerautret, -
+    [#367](https://github.com/DGtal-team/DGtalTools/pull/367))
+
+
 # DGtalTools 1.0
 
 - *generators*
