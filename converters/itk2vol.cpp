@@ -75,7 +75,7 @@ namespace po = boost::program_options;
 int main( int argc, char** argv )
 {
   typedef ImageContainerBySTLVector < Z3i::Domain, unsigned char > Image3DChar;
-  typedef ImageContainerBySTLVector < Z3i::Domain,  int > Image3D;
+  typedef ImageContainerBySTLVector < Z3i::Domain,  double > Image3D;
   
   // parse command line ----------------------------------------------
   po::options_description general_opt("Allowed options are ");
@@ -83,8 +83,8 @@ int main( int argc, char** argv )
     ("help,h", "display this message")
     ("input,i", po::value<std::string>(), "Any file format in the ITK library (mhd, mha, ...) " )
     ("output,o", po::value<std::string>(), "volumetric file (.vol, .pgm3d) " )
-    ("inputMin", po::value<int>()->default_value(-1000), "set minimum density threshold on Hounsfield scale")
-    ("inputMax", po::value<int>()->default_value(3000), "set maximum density threshold on Hounsfield scale");
+    ("inputMin", po::value<double>()->default_value(-1000.0), "set minimum density threshold on Hounsfield scale")
+    ("inputMax", po::value<double>()->default_value(3000.0), "set maximum density threshold on Hounsfield scale");
 
   
   
@@ -116,9 +116,9 @@ int main( int argc, char** argv )
   
   string inputFilename = vm["input"].as<std::string>();
   string outputFilename = vm["output"].as<std::string>();
-  int inputMin = vm["inputMin"].as<int>();
-  int inputMax = vm["inputMax"].as<int>();
-  typedef DGtal::functors::Rescaling<int ,unsigned char > RescalFCT;
+  double inputMin = vm["inputMin"].as<double>();
+  double inputMax = vm["inputMax"].as<double>();
+  typedef DGtal::functors::Rescaling<double ,unsigned char > RescalFCT;
   
   trace.info() << "Reading input input file " << inputFilename ; 
   Image3D inputImage = ITKReader< Image3D  >::importITK(inputFilename);

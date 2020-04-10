@@ -120,7 +120,7 @@ int main( int argc, char** argv )
   general_opt.add_options()
   ("help,h", "display this message")
   ("input,i", po::value<std::string>(), "the volume file (.vol)" )
-  ("threshold,t",  po::value<unsigned int>()->default_value(1), "the value that defines the isosurface in the image (an integer between 0 and 255)." )
+  ("threshold,t",  po::value<double>()->default_value(1.0), "the value that defines the isosurface in the image (an integer between 0 and 255)." )
   ("adjacency,a",  po::value<unsigned int>()->default_value(0), "0: interior adjacency, 1: exterior adjacency")
   ("output,o",  po::value<std::string>()->default_value( "marching-cubes.off" ), "the output OFF file that represents the geometry of the isosurface")
   ("noise,n",  po::value<double>(), "Kanungo noise level in ]0,1[. Note that only the largest connected component is considered and that no specific embedder is used.");
@@ -149,7 +149,7 @@ int main( int argc, char** argv )
     return 1;
   }
   std::string inputFilename = vm["input"].as<std::string>();
-  unsigned int threshold = vm["threshold"].as<unsigned int>();
+  double threshold = vm["threshold"].as<double>();
   bool intAdjacency = ( vm["adjacency"].as<unsigned int>() == 0 );
   std::string outputFilename = vm["output"].as<std::string>();
   double noise ;
