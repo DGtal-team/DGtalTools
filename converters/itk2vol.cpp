@@ -75,7 +75,8 @@ namespace po = boost::program_options;
 int main( int argc, char** argv )
 {
   typedef ImageContainerBySTLVector < Z3i::Domain, unsigned char > Image3DChar;
-  typedef ImageContainerBySTLVector < Z3i::Domain,  double > Image3D;
+  typedef ImageContainerBySTLVector < Z3i::Domain,  double > Image3D_D;
+  typedef ImageContainerBySTLVector < Z3i::Domain,  int > Image3D_I;
   
   // parse command line ----------------------------------------------
   po::options_description general_opt("Allowed options are ");
@@ -83,6 +84,7 @@ int main( int argc, char** argv )
     ("help,h", "display this message")
     ("input,i", po::value<std::string>(), "Any file format in the ITK library (mhd, mha, ...) " )
     ("output,o", po::value<std::string>(), "volumetric file (.vol, .pgm3d) " )
+    ("inputType,t", po::value<std::string>()->default_value("int"), "to sepcify the input image type (int or double)." )
     ("inputMin", po::value<double>()->default_value(-1000.0), "set minimum density threshold on Hounsfield scale")
     ("inputMax", po::value<double>()->default_value(3000.0), "set maximum density threshold on Hounsfield scale");
 
@@ -118,15 +120,33 @@ int main( int argc, char** argv )
   string outputFilename = vm["output"].as<std::string>();
   double inputMin = vm["inputMin"].as<double>();
   double inputMax = vm["inputMax"].as<double>();
-  typedef DGtal::functors::Rescaling<double ,unsigned char > RescalFCT;
-  
-  trace.info() << "Reading input input file " << inputFilename ; 
-  Image3D inputImage = ITKReader< Image3D  >::importITK(inputFilename);
-  trace.info() << " [done] " << std::endl ; 
-  trace.info() << " converting into vol file... " ; 
-  RescalFCT rescaleCustom(inputMin, inputMax, 0, 255);
+  string inputType = vm["inputType"].as<std::string>();
+  if (inputType == "double") {
+      typedef DGtal::functors::Rescaling<double ,unsigned char > RescalFCT;
+      typedef Image3D_D Image3D;
+      trace.info() << "Reading input input file " << inputFilename ; 
+      Image3D inputImage = ITKReader< Image3D  >::importITK(inputFilename);
+      trace.info() << " [done] " << std::endl ; 
+      trace.info() << " converting into vol file... " ; 
+      RescalFCT rescaleCustom(inputMin, inputMax, 0, 255);
+      
+      DGtal::GenericWriter<Image3D, 3, unsigned char, RescalFCT>::exportFile(outputFilename,
+                                                                             inputImage, "UInt8Array3D", rescaleCustom);
+      
+  }else {
+     typedef DGtal::functors::Rescaling<int ,unsigned char > RescalFCT;
+     typedef Image3D_I Image3D;
+      trace.info() << "Reading input input file " << inputFilename ; 
+      Image3D inputImage = ITKReader< Image3D  >::importITK(inputFilename);
+      trace.info() << " [done] " << std::endl ; 
+      trace.info() << " converting into vol file... " ; 
+      RescalFCT rescaleCustom(inputMin, inputMax, 0, 255);
+      
+      DGtal::GenericWriter<Image3D, 3, unsigned char, RescalFCT>::exportFile(outputFilename,
+                                                                             inputImage, "UInt8Array3D", rescaleCustom);
 
-  DGtal::GenericWriter<Image3D, 3, unsigned char, RescalFCT>::exportFile(outputFilename, inputImage, "UInt8Array3D", rescaleCustom);
+  }
+  
   
 
   trace.info() << " [done] " << std::endl ;   
