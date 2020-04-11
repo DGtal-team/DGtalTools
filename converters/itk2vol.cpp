@@ -52,11 +52,22 @@ using namespace DGtal;
 @b Allowed @b options @b are:
 
 @code
-  -h [ --help ]           display this message
-  -i [ --input ] arg      Any file format in the ITK library (mhd, mha, ...) 
-  -o [ --output ] arg     volumetric file (.vol, .pgm3d) 
-  --inputMin arg (=-1000) set minimum density threshold on Hounsfield scale
-  --inputMax arg (=3000)  set maximum density threshold on Hounsfield scale
+ -h [ --help ]                     display this message
+  -i [ --input ] arg                Any file format in the ITK library (mhd, 
+                                    mha, ...) 
+  -o [ --output ] arg               volumetric file (.vol, .pgm3d) 
+  -m [ --maskImage ] arg            Use a mask image to remove image part 
+                                    (where mask is 0). The default mask value 
+                                    can be changed using mask default value.
+  -r [ --maskRemoveLabel ] arg (=0) Change the label value that define the part
+                                    of the image to be removed by the option 
+                                    --maskImage.
+  -t [ --inputType ] arg (=int)     to sepcify the input image type (int or 
+                                    double).
+  --inputMin arg (=-1000)           set minimum density threshold on Hounsfield
+                                    scale
+  --inputMax arg (=3000)            set maximum density threshold on Hounsfield
+                                    scale
 @endcode
 
 @b Example:
@@ -102,7 +113,7 @@ int main( int argc, char** argv )
     ("input,i", po::value<std::string>(), "Any file format in the ITK library (mhd, mha, ...) " )
     ("output,o", po::value<std::string>(), "volumetric file (.vol, .pgm3d) " )
     ("maskImage,m", po::value<std::string>(), "Use a mask image to remove image part (where mask is 0). The default mask value can be changed using mask default value." )
-    ("maskRemoveLabel,r", po::value<int>()->default_value(0), "Change the label value that define the part of the image to be removed by the option --maskImage." )
+    ("maskRemoveLabel,r", po::value<int>()->default_value(0), "Change the label value that defines the part of input image to be removed by the option --maskImage." )
     ("inputType,t", po::value<std::string>()->default_value("int"), "to sepcify the input image type (int or double)." )
     ("inputMin", po::value<double>()->default_value(-1000.0), "set minimum density threshold on Hounsfield scale")
     ("inputMax", po::value<double>()->default_value(3000.0), "set maximum density threshold on Hounsfield scale");
