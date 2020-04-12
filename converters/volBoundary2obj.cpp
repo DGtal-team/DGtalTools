@@ -209,12 +209,12 @@ int main( int argc, char** argv )
   {
     auto tr = SH3::makeTriangulatedSurface(surface);
     auto ok  = SH3::saveOBJ( tr, SH3::RealVectors(), SH3::Colors(), outputFilename, cD );
-    return ok;
+    return ok ? EXIT_SUCCESS : EXIT_FAILURE ;
   }
   else
   {
     auto ok  = SH3::saveOBJ( surface, SH3::RealVectors(), SH3::Colors(), outputFilename,cD);
-    return ok;
+    return  ok ? EXIT_SUCCESS : EXIT_FAILURE;
   }
-  return 0;
+  return EXIT_SUCCESS;
 }
