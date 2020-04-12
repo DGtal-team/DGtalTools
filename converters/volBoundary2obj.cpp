@@ -208,12 +208,12 @@ int main( int argc, char** argv )
   if (vm.count("triangulatedSurface"))
   {
     auto tr = SH3::makeTriangulatedSurface(surface);
-    auto ok  = SH3::saveOBJ( tr, SH3::RealVectors(), SH3::Colors(), outputFilename, cD );
+    auto ok  = SH3::saveOBJ( tr, SH3::RealVectors(), SH3::Colors(), outputFilename, Color( 32, 32, 32 ), cD );
     return ok ? EXIT_SUCCESS : EXIT_FAILURE ;
   }
   else
   {
-    auto ok  = SH3::saveOBJ( surface, SH3::RealVectors(), SH3::Colors(), outputFilename,cD);
+    auto ok  = SH3::saveOBJ( surface, SH3::RealVectors(), SH3::Colors(), outputFilename, Color( 32, 32, 32 ), cD);
     return  ok ? EXIT_SUCCESS : EXIT_FAILURE;
   }
   return EXIT_SUCCESS;
