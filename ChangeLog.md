@@ -11,6 +11,9 @@
     (Roland Denis, [#359](https://github.com/DGtal-team/DGtalTools/pull/359/files))
   - Using SourceForge to download doxygen sources during Travis CI jobs.
     (Roland Denis [#360](https://github.com/DGtal-team/DGtalTools/pull/360))
+  - Fix a wrong error message that appears when using the tool (wrong IO error)
+    (Bertrand Kerautret
+    [#368](https://github.com/DGtal-team/DGtalTools/pull/368))
 
 # DGtalTools 1.0
 
