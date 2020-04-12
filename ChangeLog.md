@@ -6,11 +6,16 @@
   - set cmake  based CPP11 check instead the manual DGtal check. (Bertrand
     Kerautret [#364](https://github.com/DGtal-team/DGtalTools/pull/364))
 
-- *volumetric:
+- *volumetric*
   - Passing argument by const reference in (min|max|mean)Val of volSubSample.
     (Roland Denis, [#359](https://github.com/DGtal-team/DGtalTools/pull/359/files))
   - Using SourceForge to download doxygen sources during Travis CI jobs.
     (Roland Denis [#360](https://github.com/DGtal-team/DGtalTools/pull/360))
+
+- *converters*
+  - 3dVolMarchingCubes improved using new Shortcuts helpers.
+    (Bertrand Kerautret
+    [#370](https://github.com/DGtal-team/DGtalTools/pull/370))
 
 # DGtalTools 1.0
 
