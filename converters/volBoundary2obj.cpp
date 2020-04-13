@@ -202,7 +202,7 @@ int main( int argc, char** argv )
     cD.setRGBi(vectCol[0], vectCol[1], vectCol[2], vectCol[3]);
   }
   
-  auto surface = SH3::makeLightDigitalSurface( bimage, K, params( "thresholdMin", thresholdMin ) |
+  auto surface = SH3::makeDigitalSurface( bimage, K, params( "thresholdMin", thresholdMin ) |
   params( "thresholdMax", thresholdMax ) );
   
   if (vm.count("triangulatedSurface"))
