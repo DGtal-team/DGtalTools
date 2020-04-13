@@ -117,7 +117,7 @@ int main( int argc, char** argv )
   general_opt.add_options()
   ("help,h", "display this message")
   ("input,i", po::value<std::string>(), "vol file (.vol, .longvol .p3d, .pgm3d and if WITH_ITK is selected: dicom, dcm, mha, mhd). For longvol, dicom, dcm, mha or mhd formats, the input values are linearly scaled between 0 and 255." )
-  ("output,o", po::value<std::string>(), "output obj file (.obj)" )
+  ("output,o", po::value<std::string>(), "output file (.obj or .off)." )
   ("thresholdMin,m",  po::value<int>()->default_value(0), "threshold min (excluded) to define binary shape" )
   ("thresholdMax,M",  po::value<int>()->default_value(255), "threshold max (included) to define binary shape" )
   ("customDiffuse",po::value<std::vector<unsigned int> >()->multitoken(), "set the R, G, B, A components of the diffuse colors of the mesh faces." )
@@ -204,17 +204,38 @@ int main( int argc, char** argv )
   
   auto surface = SH3::makeDigitalSurface( bimage, K, params( "thresholdMin", thresholdMin ) |
   params( "thresholdMax", thresholdMax ) );
-  
+  const std::string extension = outputFilename.substr( outputFilename.find_last_of(".") + 1 );  
+  if (extension != "obj" && extension != "off")
+  {
+    trace.warning() << "File extension not recognized, saving by default in objg format"<< std::endl;
+  }
   if (vm.count("triangulatedSurface"))
   {
     auto tr = SH3::makeTriangulatedSurface(surface);
-    auto ok  = SH3::saveOBJ( tr, SH3::RealVectors(), SH3::Colors(), outputFilename, Color( 32, 32, 32 ), cD );
+    bool ok = true;
+    if (extension!="off")
+    {
+      ok  = SH3::saveOBJ( tr, SH3::RealVectors(), SH3::Colors(), outputFilename, Color( 32, 32, 32 ), cD );
+    }
+    else 
+    {
+      ok  = SH3::saveOFF( tr, outputFilename, cD);
+    }
     return ok ? EXIT_SUCCESS : EXIT_FAILURE ;
   }
   else
   {
-    auto ok  = SH3::saveOBJ( surface, SH3::RealVectors(), SH3::Colors(), outputFilename, Color( 32, 32, 32 ), cD);
+    bool ok = true;
+    if (extension!="off")
+    {
+      ok  = SH3::saveOBJ( surface, SH3::RealVectors(), SH3::Colors(), outputFilename, Color( 32, 32, 32 ), cD);
+    } else
+    {
+      ok  = SH3::saveOFF( surface, outputFilename, cD);
+    }
     return  ok ? EXIT_SUCCESS : EXIT_FAILURE;
   }
   return EXIT_SUCCESS;
 }
+
+
