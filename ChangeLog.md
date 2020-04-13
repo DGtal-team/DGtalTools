@@ -13,7 +13,7 @@
     (Roland Denis [#360](https://github.com/DGtal-team/DGtalTools/pull/360))
 
 - *converters*
-  - 3dVolMarchingCubes improved using new Shortcuts helpers.
+  - volBoundary2obj improved using new Shortcuts helpers.
     (Bertrand Kerautret
     [#370](https://github.com/DGtal-team/DGtalTools/pull/370))
 
