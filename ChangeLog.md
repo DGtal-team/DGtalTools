@@ -11,6 +11,10 @@
     (Roland Denis, [#359](https://github.com/DGtal-team/DGtalTools/pull/359/files))
   - Using SourceForge to download doxygen sources during Travis CI jobs.
     (Roland Denis [#360](https://github.com/DGtal-team/DGtalTools/pull/360))
+  - volAddBorder: add an option to fill the border of interior volume (Bertrand
+    Kertautret [#371](https://github.com/DGtal-team/DGtalTools/pull/371))
+
+
 
 # DGtalTools 1.0
 
