@@ -12,6 +12,10 @@
   - Using SourceForge to download doxygen sources during Travis CI jobs.
     (Roland Denis [#360](https://github.com/DGtal-team/DGtalTools/pull/360))
 
+- *documentations*
+  -  Fix doc link to the DGtal lib in the tool source (from new github website).
+     Kerautret [#371](https://github.com/DGtal-team/DGtalTools/pull/371))
+    
 # DGtalTools 1.0
 
 - *generators*
