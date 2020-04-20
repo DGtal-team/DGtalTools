@@ -54,9 +54,12 @@ namespace po = boost::program_options;
  @b Allowed @b options @b are:
 
  @code
- -h [ --help ]                   display this message
- -i [ --input ] arg              Input vol file.
- -o [ --output ] arg             Ouput vox file.
+ Usage: ./converters/vol2vox [OPTIONS]
+
+ Options:
+   -h,--help                             Print this help message and exit
+   -i,--input TEXT:FILE REQUIRED         Input vol file.
+   -o TEXT=result.sdp                    Output filename.
  @endcode
 
  @b Example:
