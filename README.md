@@ -26,6 +26,8 @@ own source code (in complement of DGtal tutorial https://dgtal-team.github.io/do
 More Information
 ----------------
 * Related DGtalTools-contrib: https://github.com/DGtal-team/DGtalTools-contrib
+
+* Release 1.0 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.2704747.svg)](https://doi.org/10.5281/zenodo.2704747)
 * Release 0.9.4.1 DOI [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.1207828.svg)](https://doi.org/10.5281/zenodo.1207828)
 * Release 0.9.4 DOI [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.1203421.svg)](https://doi.org/10.5281/zenodo.1203421)
 * Release 0.9.3 DOI [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.290554.svg)](https://doi.org/10.5281/zenodo.290554)
