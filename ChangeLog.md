@@ -14,7 +14,7 @@
 
 - *converters*
   - volBoundary2obj improved using new Shortcuts helpers.
-    (Bertrand Kerautret
+    (Bertrand Kerautret 
     [#370](https://github.com/DGtal-team/DGtalTools/pull/370))
 
 # DGtalTools 1.0
