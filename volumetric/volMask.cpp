@@ -152,11 +152,7 @@ processImage(const TImage &inputImage, const TImageMask &maskImage,
   // Second step: masking source image
   applyMask(inputImage, outputImage, maskImage,  maskValue);
   trace.info() << "writing output image...";
-#ifdef WITH_ITK
-  ITKWriter<TImage>::exportITK(outputFileName, outputImage);
-#else
   GenericWriter<TImage>::exportFile(outputFileName, outputImage);
-#endif
 }
 
 
@@ -168,7 +164,7 @@ int main( int argc, char** argv )
   ("help,h", "display this message")
 #ifdef WITH_ITK
   ("input,i", po::value<std::string >(), "an input vol (or ITK: .nii, mha, ... ) file. " )
-  ("inputType,t", po::value<std::string>()->default_value("int"), "to sepcify the input image type (int or double)." )
+  ("inputType,t", po::value<std::string>()->default_value(""), "to sepcify the input image type (int or double)." )
 #else 
   ("input,i", po::value<std::string >(), "an input vol file. " )
 #endif
@@ -195,9 +191,9 @@ int main( int argc, char** argv )
   if( !parseOK || vm.count("help")||argc<=1)
   {
     std::cout << "Usage: " << argv[0] << " [input]\n"
-    << "Allows to extract a new image from the a mask image that represents the area of the image which is selected and copied in the resulting image. Elements outside the region defined by the mask are set to 0.\n"
+    << "Extracts a new image from the a mask image that represents the regions of the image which are selected and copied in the resulting image. Elements outside the regions defined by the mask are set to 0.\n"
     << general_opt << "\n"
-    << "Typical use example:\n \t volMask -i ... \n";
+    << "Typical use example:\n \t volMask -i  \n";
     return 0;
   }
   if(! vm.count("input"))
@@ -225,19 +221,19 @@ int main( int argc, char** argv )
 #ifdef WITH_ITK
   if (inputType=="double")
   {
-    Image3D_D inputImage = ITKReader<Image3D_D>::importITK(inputFileName);
+    Image3D_D inputImage = DGtal::GenericReader<Image3D_D>::import(inputFileName);
     trace.info() << "[done]"<< std::endl;
     processImage(inputImage, maskImage, maskValue, outputFileName);
   }
   else if (inputType=="int")
   {
-    Image3D_I inputImage = ITKReader<Image3D_I>::importITK(inputFileName);
+    Image3D_I inputImage = DGtal::GenericReader<Image3D_I>::import(inputFileName);
     trace.info() << "[done]"<< std::endl;
     processImage(inputImage, maskImage, maskValue, outputFileName);
   }
   else
   {
-    Image3D inputImage = ITKReader<Image3D>::importITK(inputFileName);
+    Image3D inputImage = DGtal::GenericReader<Image3D>::import(inputFileName);
     trace.info() << "[done]"<< std::endl;
     processImage(inputImage, maskImage, maskValue, outputFileName);
   }
