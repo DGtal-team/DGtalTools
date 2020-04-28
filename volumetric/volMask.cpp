@@ -55,22 +55,28 @@ namespace po = boost::program_options;
 /**
  @page volMask volMask
  
- @brief  Description of the tool...
+ @brief  Extracts a new image from the a mask image that represents the regions of the image which are selected and copied in the resulting image. Elements outside the regions defined by the mask are set to 0.
  
  @b Usage:   volMask [input]
  
  @b Allowed @b options @b are :
  
  @code
- -h [ --help ]           display this message
- -i [ --input ] arg      an input file...
- -p [ --parameter] arg   a double parameter...
+ -h [ --help ]               display this message
+ -i [ --input ] arg          an input vol (or ITK: .nii, mha, ... ) file.
+ -t [ --inputType ] arg      to sepcify the input image type (int or double).
+ -a [ --mask ] arg           the mask image that represents the elements that
+                             are copied as output in the resulting image (by
+                             default set to 1 you can change this value by
+                             using --maskValue).
+ -o [ --output ] arg         the output masked image.
+ -m [ --maskValue ] arg (=1) the masking value.
  @endcode
  
  @b Example:
  
  @code
- volMask -i  $DGtal/examples/samples/....
+ volMask -i ${DGtal}/examples/samples/lobster.vol  -a ${DGtal}/examples/samples/lobster.vol -o lobsMasked.vol -m 100
  @endcode
  
  @image html resvolMask.png "Example of result. "
@@ -93,7 +99,8 @@ typedef ImageContainerBySTLVector < Z3i::Domain,  int > Image3D_I;
 
 template<typename TImage, typename TImageMask>
 typename TImageMask::Domain
-subDomainMasked(const TImage &image, const  TImageMask &maskImage){
+subDomainMasked(const TImage &image, const  TImageMask &maskImage,
+                typename TImageMask::Value maskValue){
   typename TImageMask::Domain res;
   Z3i::Point minP = image.domain().upperBound();
   Z3i::Point maxP = image.domain().lowerBound();
@@ -106,7 +113,7 @@ subDomainMasked(const TImage &image, const  TImageMask &maskImage){
     minIt = minP.begin();
     maxIt = maxP.begin();
     maxIt = maxP.begin();
-    if( maskImage.domain().isInside(p) && maskImage(p) ) // no noise on mask image
+    if( maskImage.domain().isInside(p) && maskImage(p) ==  maskValue ) // no noise on mask image
     {
       for(auto pIt=p.begin(); pIt!=p.end();pIt++ )
       {
@@ -147,7 +154,7 @@ void
 processImage(const TImage &inputImage, const TImageMask &maskImage,
              typename TImageMask::Value maskValue, std::string outputFileName ){
   // First step getting the bounding box of the domain:
-  auto subDm = subDomainMasked(inputImage, maskImage);
+  auto subDm = subDomainMasked(inputImage, maskImage, maskValue);
   TImage outputImage( subDm );
   // Second step: masking source image
   applyMask(inputImage, outputImage, maskImage,  maskValue);
@@ -169,7 +176,7 @@ int main( int argc, char** argv )
   ("input,i", po::value<std::string >(), "an input vol file. " )
 #endif
   ("mask,a", po::value<std::string >(), "the mask image that represents the elements that are copied as output in the resulting image (by default set to 1 you can change this value by using --maskValue).  " )
-  ("output,o", po::value<std::string >(), "the output masked image." )
+  ("output,o", po::value<std::string >()->default_value("result.vol"), "the output masked image." )
   ("maskValue,m", po::value<int>()->default_value(1), "the masking value." );
   
   
@@ -193,7 +200,7 @@ int main( int argc, char** argv )
     std::cout << "Usage: " << argv[0] << " [input]\n"
     << "Extracts a new image from the a mask image that represents the regions of the image which are selected and copied in the resulting image. Elements outside the regions defined by the mask are set to 0.\n"
     << general_opt << "\n"
-    << "Typical use example:\n \t volMask -i  \n";
+    << "Typical use example:\n \t volMask -i ${DGtal}/examples/samples/lobster.vol  -a ${DGtal}/examples/samples/lobster.vol -o lobsMasked.vol -m 100  \n";
     return 0;
   }
   if(! vm.count("input"))
