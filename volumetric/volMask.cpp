@@ -18,7 +18,8 @@
  * @file
  * @ingroup volumetric
  * @author Bertrand Kerautret (\c bertrand.kerautret@univ-lyon2.fr )
- * 
+ * @author Jonas Lamy (\c jonas.lamy@univ-lyon2.fr )
+ *
  *
  * @date 2019/03/01
  *
@@ -37,6 +38,13 @@
 #include <boost/program_options/options_description.hpp>
 #include <boost/program_options/parsers.hpp>
 #include <boost/program_options/variables_map.hpp>
+#ifdef WITH_ITK
+#include "DGtal/io/readers/ITKReader.h"
+#include "DGtal/io/writers/ITKWriter.h"
+
+#endif
+
+
 ///////////////////////////////////////////////////////////////////////////////
 using namespace std;
 using namespace DGtal;
@@ -48,107 +56,58 @@ namespace po = boost::program_options;
  @page volMask volMask
  
  @brief  Description of the tool...
-
+ 
  @b Usage:   volMask [input]
-
+ 
  @b Allowed @b options @b are :
  
  @code
-  -h [ --help ]           display this message
-  -i [ --input ] arg      an input file... 
-  -p [ --parameter] arg   a double parameter...
+ -h [ --help ]           display this message
+ -i [ --input ] arg      an input file...
+ -p [ --parameter] arg   a double parameter...
  @endcode
-
- @b Example: 
-
+ 
+ @b Example:
+ 
  @code
-   	volMask -i  $DGtal/examples/samples/....
+ volMask -i  $DGtal/examples/samples/....
  @endcode
-
+ 
  @image html resvolMask.png "Example of result. "
-
+ 
  @see
  @ref volMask.cpp
-
+ 
  */
 
+
+
+
 typedef ImageContainerBySTLVector < Z3i::Domain, unsigned char > Image3D;
-
-
-int main( int argc, char** argv )
-{
-  // parse command line -------------------------------------------------------
-  po::options_description general_opt("Allowed options are");
-  general_opt.add_options()
-    ("help,h", "display this message")
-    ("input,i", po::value<std::string >(), "an input vol file. " )
-    ("mask,a", po::value<std::string >(), "the mask image." )
-    ("output,o", po::value<std::string >(), "the output masked image." )
-  ("maskValue,m", po::value<Image3D::Value>()->default_value(1), "the masking value." );
-
-
-  bool parseOK=true;
-  po::variables_map vm;
-  try
-    {
-      po::store(po::parse_command_line(argc, argv, general_opt), vm);
-    }
-  catch(const std::exception& ex)
-    {
-      parseOK=false;
-      trace.info()<< "Error checking program options: "<< ex.what()<< endl;
-    }
-  
-
-  // check if min arguments are given and tools description ------------------
-  po::notify(vm);
-  if( !parseOK || vm.count("help")||argc<=1)
-    {
-      std::cout << "Usage: " << argv[0] << " [input]\n"
-                << "The tools description... \n"
-                << general_opt << "\n"
-                << "Typical use example:\n \t volMask -i ... \n";
-      return 0;
-    }  
-  if(! vm.count("input"))
-    {
-      trace.error() << " The file name was not defined" << endl;
-      return 1;
-    }
+#ifdef WITH_ITK
+typedef ImageContainerBySTLVector < Z3i::Domain,  double > Image3D_D;
+typedef ImageContainerBySTLVector < Z3i::Domain,  int > Image3D_I;
+#endif
 
 
 
-  //  recover the  args ----------------------------------------------------
-  string inputFileName = vm["input"].as<string>();
-  string maskFileName = vm["mask"].as<string>();
-  string outputFileName = vm["output"].as<string>();
-
-  Image3D::Value maskValue = vm["maskValue"].as<Image3D::Value>();
-
-  trace.info() << "Reading input image...";
-  Image3D inputImage = DGtal::GenericReader<Image3D>::import(inputFileName);
-  trace.info() << "[done]"<< std::endl;
-  trace.info() << "Reading mask image...";
-  Image3D maskImage = DGtal::GenericReader<Image3D>::import(maskFileName);
-  trace.info() << "[done]"<< std::endl;
-
-  // Some nice processing  --------------------------------------------------
-  Image3D::Domain d =  inputImage.domain();
-  // First step getting the bounding box of the domain:
-
-  Z3i::Point minP = inputImage.domain().upperBound();
-  Z3i::Point maxP = inputImage.domain().lowerBound();
+template<typename TImage, typename TImageMask>
+typename TImageMask::Domain
+subDomainMasked(const TImage &image, const  TImageMask &maskImage){
+  typename TImageMask::Domain res;
+  Z3i::Point minP = image.domain().upperBound();
+  Z3i::Point maxP = image.domain().lowerBound();
   
   Z3i::Point::Iterator minIt;
   Z3i::Point::Iterator maxIt;
-
-  for(const auto &p: inputImage.domain())
+  
+  for(const auto &p: image.domain())
   {
     minIt = minP.begin();
     maxIt = maxP.begin();
     maxIt = maxP.begin();
-    if( maskImage(p) ) // no noise on mask image
-	  {
+    if( maskImage.domain().isInside(p) && maskImage(p) ) // no noise on mask image
+    {
       for(auto pIt=p.begin(); pIt!=p.end();pIt++ )
       {
         if( *pIt < *minIt ){*minIt = *pIt;}
@@ -156,29 +115,137 @@ int main( int argc, char** argv )
         minIt++;
         maxIt++;
       }
-	  }
+    }
   }
-    
+  
   // offset to avoid problems on borders
   Z3i::Point offset(5,5,5);
   minP -= offset;
   maxP += offset;
-  
   trace.info() << "sub-domain:" << minP << " " << maxP << std::endl;
+  return typename TImageMask::Domain(minP, maxP);
+}
 
-  Image3D outputImage( Image3D::Domain(minP,maxP) );
-  
-  // Second step: masking source image
+
+template<typename TImage, typename TImageMask>
+void
+applyMask(const TImage &inputImage,TImage &outputImage,
+          const TImageMask &maskImage, typename TImageMask::Value maskValue)
+{
   for (const auto &p: outputImage.domain())
   {
-    if (maskImage(p) ==  maskValue)
+    if (inputImage.domain().isInside(p) &&  maskImage(p) ==  maskValue)
     {
       outputImage.setValue(p, inputImage(p) );
     }
   }
+  
+}
 
+template<typename TImage, typename TImageMask>
+void
+processImage(const TImage &inputImage, const TImageMask &maskImage,
+             typename TImageMask::Value maskValue, std::string outputFileName ){
+  // First step getting the bounding box of the domain:
+  auto subDm = subDomainMasked(inputImage, maskImage);
+  TImage outputImage( subDm );
+  // Second step: masking source image
+  applyMask(inputImage, outputImage, maskImage,  maskValue);
   trace.info() << "writing output image...";
-  GenericWriter<Image3D>::exportFile(outputFileName, outputImage);
+#ifdef WITH_ITK
+  ITKWriter<TImage>::exportITK(outputFileName, outputImage);
+#else
+  GenericWriter<TImage>::exportFile(outputFileName, outputImage);
+#endif
+}
+
+
+int main( int argc, char** argv )
+{
+  // parse command line -------------------------------------------------------
+  po::options_description general_opt("Allowed options are");
+  general_opt.add_options()
+  ("help,h", "display this message")
+#ifdef WITH_ITK
+  ("input,i", po::value<std::string >(), "an input vol (or ITK: .nii, mha, ... ) file. " )
+  ("inputType,t", po::value<std::string>()->default_value("int"), "to sepcify the input image type (int or double)." )
+#else 
+  ("input,i", po::value<std::string >(), "an input vol file. " )
+#endif
+  ("mask,a", po::value<std::string >(), "the mask image that represents the elements that are copied as output in the resulting image (by default set to 1 you can change this value by using --maskValue).  " )
+  ("output,o", po::value<std::string >(), "the output masked image." )
+  ("maskValue,m", po::value<int>()->default_value(1), "the masking value." );
+  
+  
+  bool parseOK=true;
+  po::variables_map vm;
+  try
+  {
+    po::store(po::parse_command_line(argc, argv, general_opt), vm);
+  }
+  catch(const std::exception& ex)
+  {
+    parseOK=false;
+    trace.info()<< "Error checking program options: "<< ex.what()<< endl;
+  }
+  
+  
+  // check if min arguments are given and tools description ------------------
+  po::notify(vm);
+  if( !parseOK || vm.count("help")||argc<=1)
+  {
+    std::cout << "Usage: " << argv[0] << " [input]\n"
+    << "Allows to extract a new image from the a mask image that represents the area of the image which is selected and copied in the resulting image. Elements outside the region defined by the mask are set to 0.\n"
+    << general_opt << "\n"
+    << "Typical use example:\n \t volMask -i ... \n";
+    return 0;
+  }
+  if(! vm.count("input"))
+  {
+    trace.error() << " The file name was not defined" << endl;
+    return 1;
+  }
+  
+  
+  
+  //  recover the  args ----------------------------------------------------
+  string inputFileName = vm["input"].as<string>();
+  string maskFileName = vm["mask"].as<string>();
+  string outputFileName = vm["output"].as<string>();
+#ifdef WITH_ITK
+  string inputType = vm["inputType"].as<std::string>();
+#endif
+  
+  
+  int maskValue = vm["maskValue"].as<int>();
+  trace.info() << "Reading mask image...";
+  Image3D maskImage = DGtal::GenericReader<Image3D>::import(maskFileName);
+  trace.info() << "[done]"<< std::endl;
+  trace.info() << "Reading input image...";
+#ifdef WITH_ITK
+  if (inputType=="double")
+  {
+    Image3D_D inputImage = ITKReader<Image3D_D>::importITK(inputFileName);
+    trace.info() << "[done]"<< std::endl;
+    processImage(inputImage, maskImage, maskValue, outputFileName);
+  }
+  else if (inputType=="int")
+  {
+    Image3D_I inputImage = ITKReader<Image3D_I>::importITK(inputFileName);
+    trace.info() << "[done]"<< std::endl;
+    processImage(inputImage, maskImage, maskValue, outputFileName);
+  }
+  else
+  {
+    Image3D inputImage = ITKReader<Image3D>::importITK(inputFileName);
+    trace.info() << "[done]"<< std::endl;
+    processImage(inputImage, maskImage, maskValue, outputFileName);
+  }
+#else
+  Image3D inputImage = DGtal::GenericReader<Image3D>::import(inputFileName);
+  processImage(inputImage, maskImage, maskValue, outputFileName);
+#endif
+  
   trace.info() << "[Done]" << std::endl;
   return 0;
 }
