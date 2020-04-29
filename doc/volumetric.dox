@@ -33,7 +33,7 @@
   - @ref volReSample :  re samples a 3D volumetric image (.vol, .longvol, .pgm3d)  with a given grid size.
   - @ref volSegment : segments volumetric file from a simple threshold.
   - @ref volShapeMetrics : applies shape measures to compare two volumetric images A and B (shape defined from thresholds). 
-  - @ref volSubSample : brutally sub samples a vol file (division by 2 in each direction).  
+  - @ref volSubSample : brutally sub samples a vol file (division by 2 in each direction).
   - @ref volTrValues : applies basic vol image transform from the input values to output values.
 
 
