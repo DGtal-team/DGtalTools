@@ -19,6 +19,7 @@
  * @author Jacques-Olivier Lachaud (\c jacques-olivier.lachaud@univ-savoie.fr )
  * Laboratory of Mathematics (CNRS, UMR 5127), University of Savoie, France
  * @author David Coeurjolly (\c david.coeurjolly@liris.cnrs.fr )
+ * @author Bertrand Kerautret (\c bertrand.kerautret@liris.cnrs.fr )
  *
  * @date 2013/11/15
  *
@@ -166,18 +167,20 @@ int main( int argc, char** argv )
   int thresholdMin = vm["thresholdMin"].as<int>();
   int thresholdMax = vm["thresholdMax"].as<int>();
   
-  DGtal::int64_t rescaleInputMin = vm["rescaleInputMin"].as<DGtal::int64_t>();
-  DGtal::int64_t rescaleInputMax = vm["rescaleInputMax"].as<DGtal::int64_t>();
   
   trace.beginBlock( "Loading file.." );
-  auto gimage    = SH3::makeGrayScaleImage(inputFilename);
   typedef DGtal::functors::Rescaling<DGtal::int64_t ,unsigned char > RescalFCT;
+  DGtal::int64_t rescaleInputMin = vm["rescaleInputMin"].as<DGtal::int64_t>();
+  DGtal::int64_t rescaleInputMax = vm["rescaleInputMax"].as<DGtal::int64_t>();
   RescalFCT f (rescaleInputMin, rescaleInputMax,0, 255);
-  for (const auto &i: gimage->domain()) gimage->setValue(i, f((*gimage)(i)));
+
   
+  SH3::GrayScaleImage image =
+  GenericReader< SH3::GrayScaleImage >::importWithValueFunctor(inputFilename, f );
   
-  auto bimage = SH3::makeBinaryImage(gimage,params( "thresholdMin", rescaleInputMin ) |
-                                     params( "thresholdMax", rescaleInputMax ) );
+  auto gimage = CountedPtr<SH3::GrayScaleImage>( new SH3::GrayScaleImage( image ) );
+  auto bimage = SH3::makeBinaryImage(gimage,params( "thresholdMin", thresholdMin )
+                                                  ( "thresholdMax", thresholdMax ) );
   
   
   trace.info() << "Image loaded: "<<gimage<< std::endl;
@@ -190,7 +193,7 @@ int main( int argc, char** argv )
   string outputFilename = vm["output"].as<std::string>();
   bool customDiffuse =  vm.count("customDiffuse");
   
-  SH3::Color cD ( 30,30,30 );
+  SH3::Color cD ( 230,230,230 );
   
   if(customDiffuse)
   {
@@ -202,8 +205,7 @@ int main( int argc, char** argv )
     cD.setRGBi(vectCol[0], vectCol[1], vectCol[2], vectCol[3]);
   }
   
-  auto surface = SH3::makeDigitalSurface( bimage, K, params( "thresholdMin", thresholdMin ) |
-  params( "thresholdMax", thresholdMax ) );
+  auto surface = SH3::makeDigitalSurface( bimage, K );
   const std::string extension = outputFilename.substr( outputFilename.find_last_of(".") + 1 );  
   if (extension != "obj" && extension != "off")
   {
