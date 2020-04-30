@@ -107,14 +107,15 @@ subDomainMasked(const TImage &image, const  TImageMask &maskImage,
   
   Z3i::Point::Iterator minIt;
   Z3i::Point::Iterator maxIt;
-  
+  bool foundMaskedVal = false;
   for(const auto &p: image.domain())
   {
     minIt = minP.begin();
     maxIt = maxP.begin();
-    maxIt = maxP.begin();
+
     if( maskImage.domain().isInside(p) && maskImage(p) ==  maskValue ) // no noise on mask image
     {
+      foundMaskedVal=true;
       for(auto pIt=p.begin(); pIt!=p.end();pIt++ )
       {
         if( *pIt < *minIt ){*minIt = *pIt;}
@@ -124,7 +125,12 @@ subDomainMasked(const TImage &image, const  TImageMask &maskImage,
       }
     }
   }
-  
+  if (!foundMaskedVal)
+  {
+    trace.info() << "No masked value found resulting image will be the input image." << std::endl;
+    return image.domain();
+
+  }
   // offset to avoid problems on borders
   Z3i::Point offset(5,5,5);
   minP -= offset;
