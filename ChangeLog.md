@@ -5,7 +5,7 @@
     [#356](https://github.com/DGtal-team/DGtalTools/pull/356))
   - set cmake  based CPP11 check instead the manual DGtal check. (Bertrand
     Kerautret [#364](https://github.com/DGtal-team/DGtalTools/pull/364))
-  - fix ld boost program options macos warnings.
+  - fix ld boost program options macos warnings. (Bertrand
     Kerautret [#366](https://github.com/DGtal-team/DGtalTools/pull/366))
     
 - *volumetric:
@@ -14,6 +14,10 @@
   - Using SourceForge to download doxygen sources during Travis CI jobs.
     (Roland Denis [#360](https://github.com/DGtal-team/DGtalTools/pull/360))
 
+- *documentations*
+  -  Fix doc link to the DGtal lib in the tool source (from new github website).
+     (Bertrand Kerautret [#372](https://github.com/DGtal-team/DGtalTools/pull/372))
+    
 
 # DGtalTools 1.0
 
