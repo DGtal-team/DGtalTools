@@ -5,7 +5,9 @@
     [#356](https://github.com/DGtal-team/DGtalTools/pull/356))
   - set cmake  based CPP11 check instead the manual DGtal check. (Bertrand
     Kerautret [#364](https://github.com/DGtal-team/DGtalTools/pull/364))
-
+  - fix ld boost program options macos warnings. (Bertrand
+    Kerautret [#366](https://github.com/DGtal-team/DGtalTools/pull/366))
+    
 - *volumetric:
   - Passing argument by const reference in (min|max|mean)Val of volSubSample.
     (Roland Denis, [#359](https://github.com/DGtal-team/DGtalTools/pull/359/files))
@@ -14,8 +16,9 @@
 
 - *documentations*
   -  Fix doc link to the DGtal lib in the tool source (from new github website).
-     Kerautret [#371](https://github.com/DGtal-team/DGtalTools/pull/371))
+     (Bertrand Kerautret [#372](https://github.com/DGtal-team/DGtalTools/pull/372))
     
+
 # DGtalTools 1.0
 
 - *generators*
