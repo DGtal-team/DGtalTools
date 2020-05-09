@@ -59,7 +59,7 @@ using namespace DGtal;
   -m [ --maskImage ] arg            Use a mask image to remove image part 
                                     (where mask is 0). The default mask value 
                                     can be changed using mask default value.
-  -r [ --maskRemoveLabel ] arg (=0) Change the label value that define the part
+  -r [ --maskRemoveLabel ] arg (=0) Change the label value that defines the part
                                     of the image to be removed by the option 
                                     --maskImage.
   -t [ --inputType ] arg (=int)     to sepcify the input image type (int or 
@@ -203,5 +203,4 @@ int main( int argc, char** argv )
   return 0;
   
 }
-
 
