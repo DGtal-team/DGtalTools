@@ -100,8 +100,6 @@
 #include <boost/program_options/parsers.hpp>
 #include <boost/program_options/variables_map.hpp>
 // Distance Map
-#include "DGtal/kernel/BasicPointPredicates.h"
-#include "DGtal/images/SimpleThresholdForegroundPredicate.h"
 #include "DGtal/geometry/volumes/distance/ExactPredicateLpSeparableMetric.h"
 #include "DGtal/geometry/volumes/distance/VoronoiMap.h"
 #include "DGtal/geometry/volumes/distance/DistanceTransformation.h"
@@ -115,19 +113,19 @@ int main(int argc, char* const argv[]){
   /*-------------- Parse command line -----------------------------*/
   po::options_description general_opt ( "Allowed options are: " );
   general_opt.add_options()
-    ( "help,h", "display this message." )
+    ( "help,h", "Display this message." )
     ( "input,i", po::value<string>()->required(), "Input vol file." )
-    ( "skel,s",  po::value<string>()->required(), "type of skeletonization" )
-    ( "select,c",  po::value<string>()->required(), "select method for skeletonization" )
-    ( "foreground,f",  po::value<string>()->default_value("black"), "foreground color in binary image" )
-    ( "thresholdMin,m",  po::value<int>()->default_value(0), "threshold min (excluded) to define binary shape" )
-    ( "thresholdMax,M",  po::value<int>()->default_value(255), "threshold max (included) to define binary shape" )
-    ( "persistence,p",  po::value<int>()->default_value(0), "persistence value, implies use of persistence algorithm if p>=1" )
-    ( "profile",  po::bool_switch()->default_value(false), "profile algorithm" )
-    ( "verbose,v",  po::bool_switch()->default_value(false), "verbose output" )
+    ( "skel,s",  po::value<string>()->default_value("1isthmus"), "Type of skeletonization. Options: 1isthmus, isthmus, end, ulti." )
+    ( "select,c",  po::value<string>()->default_value("dmax"), "Select the ordering for skeletonization. Options: dmax, random, first" )
+    ( "foreground,f",  po::value<string>()->default_value("black"), "Foreground color in binary image" )
+    ( "thresholdMin,m",  po::value<int>()->default_value(0), "Threshold min (excluded) to define binary shape" )
+    ( "thresholdMax,M",  po::value<int>()->default_value(255), "Threshold max (included) to define binary shape" )
+    ( "persistence,p",  po::value<int>()->default_value(0), "Persistence value, implies use of persistence algorithm if p>=1" )
+    ( "profile",  po::bool_switch()->default_value(false), "Profile algorithm" )
+    ( "verbose,v",  po::bool_switch()->default_value(false), "Verbose output" )
     ( "exportImage,o", po::value<std::string>(), "Export the resulting set of points to a image compatible with GenericWriter.")
     ( "exportSDP,e", po::value<std::string>(), "Export the resulting set of points in a simple (sequence of discrete point (sdp)).")
-    ( "visualize,t",  po::bool_switch()->default_value(false), "visualize result in viewer" );
+    ( "visualize,t",  po::bool_switch()->default_value(false), "Visualize result in viewer" );
   bool parseOK=true;
   po::variables_map vm;
 
@@ -206,10 +204,7 @@ int main(int argc, char* const argv[]){
   using DigitalSet =
     DGtal::DigitalSetByAssociativeContainer<Domain ,
       std::unordered_set< typename Domain::Point> >;
-  using Object =
-    DGtal::Object<DigitalTopology, DigitalSet>;
-  using Complex =
-    DGtal::VoxelComplex<KSpace, Object>;
+  using Complex = DGtal::VoxelComplex<KSpace>;
 
   auto & sk = sk_string;
   KSpace ks;
@@ -217,14 +212,9 @@ int main(int argc, char* const argv[]){
   ks.init(image.domain().lowerBound() - d1 ,
       image.domain().upperBound() + d1 , true);
 
-  DigitalTopology::ForegroundAdjacency adjF;
-  DigitalTopology::BackgroundAdjacency adjB;
-  DigitalTopology topo(adjF, adjB, DGtal::DigitalTopologyProperties::JORDAN_DT);
-  Object obj(topo,image_set);
-
   trace.beginBlock("construct with table");
   Complex vc(ks);
-  vc.construct(obj.pointSet(), functions::loadTable(simplicity::tableSimple26_6 ));
+  vc.construct(image_set, functions::loadTable(simplicity::tableSimple26_6 ));
   trace.endBlock();
   trace.beginBlock("load isthmus table");
   boost::dynamic_bitset<> isthmus_table;
@@ -253,11 +243,10 @@ int main(int argc, char* const argv[]){
    * Calculate distance map even if not requested:
    */
   trace.beginBlock("Create Distance Map");
-  using Predicate = Z3i::DigitalSet;
   using L3Metric = ExactPredicateLpSeparableMetric<Z3i::Space, 3>;
-  using DT       = DistanceTransformation<Z3i::Space, Predicate, L3Metric>;
+  using DT       = DistanceTransformation<Z3i::Space, DigitalSet, L3Metric>;
   L3Metric l3;
-  DT dt(obj.domain(),obj.pointSet(), l3);
+  DT dt(image.domain(), image_set, l3);
   trace.endBlock();
 
   std::function< std::pair<typename Complex::Cell, typename Complex::Data>(const Complex::Clique&) > Select ;
@@ -285,8 +274,10 @@ int main(int argc, char* const argv[]){
   auto elapsed = std::chrono::duration_cast<std::chrono::seconds> (end - start) ;
   if (profile) std::cout <<"Time elapsed: " << elapsed.count() << std::endl;
 
-  const auto & thin_set = vc_new.objectSet();
-  const auto & all_set = obj.pointSet();
+
+  DigitalSet thin_set(image.domain());
+  vc_new.dumpVoxels(thin_set);
+  const auto & all_set = image_set;
 
   if (vm.count("exportSDP"))
   {

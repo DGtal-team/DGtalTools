@@ -20,48 +20,50 @@ DGtal. The resulting tools could be useful to:
 
 The source code of the tools can also be used to non DGtal familiar
 user to show how to include the DGtal library framework directly in their
-own source code (in complement of DGtal tutorial http://liris.cnrs.fr/dgtal/doc/nightly/packageTutorials.html).
+own source code (in complement of DGtal tutorial https://dgtal-team.github.io/doc-nightly/packageTutorials.html).
 
 
 More Information
 ----------------
 * Related DGtalTools-contrib: https://github.com/DGtal-team/DGtalTools-contrib
-* Release 0.9.4.1 DOI [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.1207828.svg)](https://doi.org/10.5281/zenodo.1207828)
-* Release 0.9.4 DOI [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.1203421.svg)](https://doi.org/10.5281/zenodo.1203421)
-* Release 0.9.3 DOI [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.290554.svg)](https://doi.org/10.5281/zenodo.290554)
-* Release 0.9.2 DOI [![DOI](https://zenodo.org/badge/doi/10.5281/zenodo.56432.svg)](http://dx.doi.org/10.5281/zenodo.56432)
-* Release 0.9.1 DOI [![DOI](https://zenodo.org/badge/doi/10.5281/zenodo.45130.svg)](http://dx.doi.org/10.5281/zenodo.45130)
-* Release 0.9 DOI [![DOI](https://zenodo.org/badge/doi/10.5281/zenodo.31882.svg)](http://dx.doi.org/10.5281/zenodo.31882)
-* Release 0.8 DOI [![DOI](https://zenodo.org/badge/doi/10.5281/zenodo.11587.svg)](http://dx.doi.org/10.5281/zenodo.11587)
+
+* Release 1.0 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.2704747.svg)](https://doi.org/10.5281/zenodo.2704747)
+* Release 0.9.4.1 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.1207828.svg)](https://doi.org/10.5281/zenodo.1207828)
+* Release 0.9.4 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.1203421.svg)](https://doi.org/10.5281/zenodo.1203421)
+* Release 0.9.3 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.290554.svg)](https://doi.org/10.5281/zenodo.290554)
+* Release 0.9.2 [![DOI](https://zenodo.org/badge/doi/10.5281/zenodo.56432.svg)](http://dx.doi.org/10.5281/zenodo.56432)
+* Release 0.9.1 [![DOI](https://zenodo.org/badge/doi/10.5281/zenodo.45130.svg)](http://dx.doi.org/10.5281/zenodo.45130)
+* Release 0.9 [![DOI](https://zenodo.org/badge/doi/10.5281/zenodo.31882.svg)](http://dx.doi.org/10.5281/zenodo.31882)
+* Release 0.8 [![DOI](https://zenodo.org/badge/doi/10.5281/zenodo.11587.svg)](http://dx.doi.org/10.5281/zenodo.11587)
 * Linux/MacOS [![Build Status](https://api.travis-ci.org/DGtal-team/DGtalTools.svg?branch=master)](https://travis-ci.org/DGtal-team/DGtalTools)
 * Windows [![Build status](https://ci.appveyor.com/api/projects/status/o156pe96bd02sdr5/branch/master?svg=true)](https://ci.appveyor.com/project/kerautret/dgtaltools-7x999/branch/master)
 
 Documentation
 ==============
 
-The description and documentation of the tools are available [here] (http://dgtal.org/doc/tools/nightly/). 
+The description and documentation of the tools are available [here](https://dgtal-team.github.io/doctools-nightly). 
 
 Actually the DGTal project is organized as follows:
 
- - [Converters](http://dgtal.org/doc/tools/nightly/converters.html#converters):
+ - [Converters](https://dgtal-team.github.io/doctools-nightly/converters.html#converters):
    utilities to convert various simple file formats (for instance vol2raw, dicom2vol, mesh2heightfield ...)
    
- - [Estimators](http://dgtal.org/doc/tools/nightly/estimators.html#estimators_Doc):
+ - [Estimators](https://dgtal-team.github.io/doctools-nightly/estimators.html#estimators_Doc):
    different geometric estimators (like tangent, curvature 2D/3D...)
 
 
- - [Generators](http://dgtal.org/doc/tools/nightly/generators.html):
+ - [Generators](https://dgtal-team.github.io/doctools-nightly/generators.html):
    utilities to generate various contours/shapes
 
 
- - [Visualization](http://dgtal.org/doc/tools/nightly/visualization.html#visualization_Doc):
+ - [Visualization](https://dgtal-team.github.io/doctools-nightly/visualization.html#visualization_Doc):
    various tools to visualize digital data (set of voxels, vol file, heightmap ... )
    
 
- - [Volumetric](http://dgtal.org/doc/tools/nightly/volumetric.html#volumetric_Doc): 
+ - [Volumetric](https://dgtal-team.github.io/doctools-nightly/volumetric.html#volumetric_Doc): 
    tools to manipulate volumetric files (marching cube, sub sampling, thinning)
 
- - [ImageProcessing](http://dgtal.org/doc/tools/nightly/imageProcessing.html): 
+ - [ImageProcessing](https://dgtal-team.github.io/doctools-nightly/imageProcessing.html): 
    tools to process images (image restoration, image inpainting)
 
 
@@ -76,7 +78,7 @@ How to build the tools
 Galleries
 =========
 
- - [Converters](http://dgtal.org/doc/tools/nightly/converters.html#converters) :
+ - [Converters](https://dgtal-team.github.io/doctools-nightly/converters.html#converters) :
    <center>
    <table>
    <tr>
@@ -86,10 +88,10 @@ Galleries
    <td> <img height=150 src="https://cloud.githubusercontent.com/assets/772865/6914104/6d25be78-d787-11e4-9433-2a834fc4a0af.png"> </td>
    </tr>
    <tr>
-   <td align=center > <a href="http://dgtal.org/doc/tools/nightly/vol2heightfield.html">vol2heightmap</a></td>
-   <td align=center ><a href="http://dgtal.org/doc/tools/nightly/heightfield2vol.html">heightfield2vol</a></td>
-   <td align=center ><a href="http://dgtal.org/doc/tools/nightly/imgAddNoise.html">imgAddNoise</a></td> 
-   <td align=center ><a href="http://dgtal.org/doc/tools/nightly/volAddNoise.html">volAddNoise</a></td>
+   <td align=center > <a href="https://dgtal-team.github.io/doctools-nightly/vol2heightfield.html">vol2heightmap</a></td>
+   <td align=center ><a href="https://dgtal-team.github.io/doctools-nightly/heightfield2vol.html">heightfield2vol</a></td>
+   <td align=center ><a href="https://dgtal-team.github.io/doctools-nightly/imgAddNoise.html">imgAddNoise</a></td> 
+   <td align=center ><a href="https://dgtal-team.github.io/doctools-nightly/volAddNoise.html">volAddNoise</a></td>
    </tr>
    <tr>
    <td> <img height=150 src="https://cloud.githubusercontent.com/assets/772865/7106643/c09cb8d4-e148-11e4-8653-2d5bac5dc3c5.png"> 
@@ -98,24 +100,24 @@ Galleries
    <td> <img height=150 src="https://cloud.githubusercontent.com/assets/772865/15342675/b17e505c-1c97-11e6-85c3-663550b3b39a.png"></td>
    </tr>
    <tr>
-   <td align=center ><a href="http://dgtal.org/doc/tools/nightly/mesh2heightfield.html"> mesh2heightfield</a></td>
-   <td align=center ><a href="http://dgtal.org/doc/tools/nightly/heightfield2shading.html"> heightfield2shading</a></td>
-   <td align=center ><a href="http://dgtal.org/doc/tools/nightly/vol2sdp.html"> vol2sdp</a></td>
-   <td align=center ><a href="http://dgtal.org/doc/tools/nightly/vol2slice.html"> vol2slice</a></td>
+   <td align=center ><a href="https://dgtal-team.github.io/doctools-nightly/mesh2heightfield.html"> mesh2heightfield</a></td>
+   <td align=center ><a href="https://dgtal-team.github.io/doctools-nightly/heightfield2shading.html"> heightfield2shading</a></td>
+   <td align=center ><a href="https://dgtal-team.github.io/doctools-nightly/vol2sdp.html"> vol2sdp</a></td>
+   <td align=center ><a href="https://dgtal-team.github.io/doctools-nightly/vol2slice.html"> vol2slice</a></td>
    </tr>
    <tr>
    </table>
    </center>
  
  
- - [Estimators](http://dgtal.org/doc/tools/nightly/estimators.html#estimators_Doc) :
+ - [Estimators](https://dgtal-team.github.io/doctools-nightly/estimators.html#estimators_Doc) :
    <center>
    <table>
    <tr>
    <td colspan="3"><img height=130 src="https://cloud.githubusercontent.com/assets/772865/2646108/f515b0a2-bf39-11e3-96f8-c7606173f43b.png"></td>
    </tr>
    <tr>
-   <td colspan="3" align=center >Illustration of <a href="http://dgtal.org/doc/tools/nightly/curvatureScaleSpaceBCC.html"> curvatureScaleSpaceBCC</a> </td>
+   <td colspan="3" align=center >Illustration of <a href="https://dgtal-team.github.io/doctools-nightly/curvatureScaleSpaceBCC.html"> curvatureScaleSpaceBCC</a> </td>
    </tr>
    <tr>
    <td align=center ><img height=200 src="https://cloud.githubusercontent.com/assets/793707/2996392/d3ee9e58-dced-11e3-98a0-72233927aaf6.jpg"> </td>
@@ -123,8 +125,8 @@ Galleries
    <td align=center> <img height=200 src="https://cloud.githubusercontent.com/assets/772865/15352637/6cfde4a8-1ce5-11e6-8d36-a2a3be4744d1.png"> </td>
    </tr>
    <tr>
-   <td colspan="2"> Illustration of <a href="http://dgtal.org/doc/tools/nightly/generic3dNormalEstimators.html">generic3dNormalEstimators</a> on VCM estimator applied on smooth and noisy shapes.</td>
-   <td> <a align=center href="http://dgtal.org/doc/tools/nightly/Doc2dLocalEstimators.html"> 2dLocalEstimators </a> </td>
+   <td colspan="2"> Illustration of <a href="https://dgtal-team.github.io/doctools-nightly/generic3dNormalEstimators.html">generic3dNormalEstimators</a> on VCM estimator applied on smooth and noisy shapes.</td>
+   <td> <a align=center href="https://dgtal-team.github.io/doctools-nightly/Doc2dLocalEstimators.html"> 2dLocalEstimators </a> </td>
    </tr>
    <tr> 
    <td> <img height=200 src="https://cloud.githubusercontent.com/assets/772865/15351379/5d2cd562-1cdf-11e6-81b6-8171b0e7f87f.png"></td>
@@ -132,14 +134,14 @@ Galleries
    <td> <img height=200 src="https://cloud.githubusercontent.com/assets/772865/15352775/29e2fad6-1ce6-11e6-958c-34ca77175a90.png"></td>
    </tr>
    <tr> 
-   <td align=center > <a href="http://dgtal.org/doc/tools/nightly/Doc3dCurveTangentEstimator.html"> 3dCurveTangentEstimator</a> </td>
-   <td align=center > <a href="http://dgtal.org/doc/tools/nightly/vol2normalField.html"> vol2normalField</a> </td>
-   <td align=center > <a href="http://dgtal.org/doc/tools/nightly/lengthEstimators.html"> lengthEstimators</a> </td>
+   <td align=center > <a href="https://dgtal-team.github.io/doctools-nightly/Doc3dCurveTangentEstimator.html"> 3dCurveTangentEstimator</a> </td>
+   <td align=center > <a href="https://dgtal-team.github.io/doctools-nightly/vol2normalField.html"> vol2normalField</a> </td>
+   <td align=center > <a href="https://dgtal-team.github.io/doctools-nightly/lengthEstimators.html"> lengthEstimators</a> </td>
    </tr>
    </table>
    </center>
 
- - [Generators](http://dgtal.org/doc/tools/nightly/generators.html) :
+ - [Generators](https://dgtal-team.github.io/doctools-nightly/generators.html) :
    <center>
    <table>
    <tr>
@@ -151,12 +153,12 @@ Galleries
    <td> grid size = 1</td> <td> grid size= 0.1</td> <td> grid size = 0.01</td>
    </tr>
    <tr>
-   <td colspan="3" align=center> <a href="http://dgtal.org/doc/tools/nightly/shapeGenerator.html">shapeGenerator</a>  
+   <td colspan="3" align=center> <a href="https://dgtal-team.github.io/doctools-nightly/shapeGenerator.html">shapeGenerator</a>  
    </tr>
    </table>
    </center>
    
- - [Visualization](http://dgtal.org/doc/tools/nightly/visualization.html#visualization_Doc) :
+ - [Visualization](https://dgtal-team.github.io/doctools-nightly/visualization.html#visualization_Doc) :
    <center>
    <table>
    <tr>
@@ -166,10 +168,10 @@ Galleries
    <td><img height=130 src="https://f.cloud.github.com/assets/772865/684590/778bea9a-d9ff-11e2-8e04-6e3e8a39ae3c.png"></td>
    </tr>
    <tr>
-   <td align=center > <a href="http://dgtal.org/doc/tools/nightly/Doc3DCurvatureViewer.html" > 3dCurvatureViewer</a></td>
-   <td align=center > <a href="http://dgtal.org/doc/tools/nightly/Doc3dCurveViewer.html" > 3dCurveViewer</a> </td>
-   <td align=center > <a href="http://dgtal.org/doc/tools/nightly/Doc3dImageViewer.html" > 3dImageViewer</a></td>
-   <td align=center > <a href="http://dgtal.org/doc/tools/nightly/Doc3dVolViewer.html" > 3dVolViewer</a></td>
+   <td align=center > <a href="https://dgtal-team.github.io/doctools-nightly/Doc3DCurvatureViewer.html" > 3dCurvatureViewer</a></td>
+   <td align=center > <a href="https://dgtal-team.github.io/doctools-nightly/Doc3dCurveViewer.html" > 3dCurveViewer</a> </td>
+   <td align=center > <a href="https://dgtal-team.github.io/doctools-nightly/Doc3dImageViewer.html" > 3dImageViewer</a></td>
+   <td align=center > <a href="https://dgtal-team.github.io/doctools-nightly/Doc3dVolViewer.html" > 3dVolViewer</a></td>
    </tr>
    <tr>
    <td><img height=130 src="https://f.cloud.github.com/assets/772865/684598/c3adcf4c-d9ff-11e2-8c3f-e67c8abd0c76.png"></td>
@@ -178,10 +180,10 @@ Galleries
    <td><img  width=300 src="https://cloud.githubusercontent.com/assets/772865/10269635/8678ca02-6add-11e5-9d83-fbcf3608612f.png"></td>
    </tr>
    <tr>
-   <td align=center > <a href="http://dgtal.org/doc/tools/nightly/displayContours.html"> displayContours</a></td>
-   <td align=center > <a href="http://dgtal.org/doc/tools/nightly/meshViewer.html"> meshViewer</a></td>
-   <td align=center > <a href="http://dgtal.org/doc/tools/nightly/Doc3DSDPViewer.html"> 3dSDPViewer</a></td>
-   <td align=center > <a href="http://dgtal.org/doc/tools/nightly/sliceViewer.html"> sliceViewer</a></td>
+   <td align=center > <a href="https://dgtal-team.github.io/doctools-nightly/displayContours.html"> displayContours</a></td>
+   <td align=center > <a href="https://dgtal-team.github.io/doctools-nightly/meshViewer.html"> meshViewer</a></td>
+   <td align=center > <a href="https://dgtal-team.github.io/doctools-nightly/Doc3DSDPViewer.html"> 3dSDPViewer</a></td>
+   <td align=center > <a href="https://dgtal-team.github.io/doctools-nightly/sliceViewer.html"> sliceViewer</a></td>
    </tr>
    <tr>
    <td><img  width=300 src="https://cloud.githubusercontent.com/assets/772865/3486505/6edb2144-043e-11e4-81c4-2c20f272a119.png" </td>
@@ -189,9 +191,9 @@ Galleries
    <td align="center" colspan="2"><img width=250 src="https://cloud.githubusercontent.com/assets/772865/12538898/00459c06-c2e6-11e5-91f6-d14494ab05da.png"</td>
    </tr>
    <tr>
-   <td align=center ><a href="http://dgtal.org/doc/tools/nightly/Doc3dHeightMapViewer.html" > 3dHeightMapViewer</a></td>
-   <td align=center  ><a href="http://dgtal.org/doc/tools/nightly/CompSurfelData.html" > 3dCompSurfelData</a></td>
-   <td  align="center" colspan="2"><a href="http://dgtal.org/doc/tools/nightly/Doc3dImplicitSurfaceExtractorByThickening.html" > 3dImplicitSurfaceExtractorByThickening</a> </td>
+   <td align=center ><a href="https://dgtal-team.github.io/doctools-nightly/Doc3dHeightMapViewer.html" > 3dHeightMapViewer</a></td>
+   <td align=center  ><a href="https://dgtal-team.github.io/doctools-nightly/CompSurfelData.html" > 3dCompSurfelData</a></td>
+   <td  align="center" colspan="2"><a href="https://dgtal-team.github.io/doctools-nightly/Doc3dImplicitSurfaceExtractorByThickening.html" > 3dImplicitSurfaceExtractorByThickening</a> </td>
    </tr>
    </table>
    </center>
@@ -200,7 +202,7 @@ Galleries
 
 
 
- - [Volumetric](http://dgtal.org/doc/tools/nightly/volumetric.html#volumetric_Doc) :
+ - [Volumetric](https://dgtal-team.github.io/doctools-nightly/volumetric.html#volumetric_Doc) :
    <center>
    <table>
    <tr>
@@ -209,9 +211,9 @@ Galleries
    <td> <img width=300 src="https://cloud.githubusercontent.com/assets/772865/15342834/a6736bb0-1c98-11e6-9a42-9dc5a198800f.png"> </td>
    </tr>
    <tr>
-   <td align=center  ><a href="http://dgtal.org/doc/tools/nightly/Doc3dVolMarchingCubes.html"> 3dVolMarchingCubes </a> </td>
-   <td align=center  ><a href="http://dgtal.org/doc/tools/nightly/homotopicThinning3D.html"> homotopicThinning3D </a> </td>
-   <td align=center  ><a href="http://dgtal.org/doc/tools/nightly/volSubSample.html"> volSubSample </a> </td>
+   <td align=center  ><a href="https://dgtal-team.github.io/doctools-nightly/Doc3dVolMarchingCubes.html"> 3dVolMarchingCubes </a> </td>
+   <td align=center  ><a href="https://dgtal-team.github.io/doctools-nightly/homotopicThinning3D.html"> homotopicThinning3D </a> </td>
+   <td align=center  ><a href="https://dgtal-team.github.io/doctools-nightly/volSubSample.html"> volSubSample </a> </td>
    </tr>
    <tr>
    <td align=center > <img width=300 src="https://cloud.githubusercontent.com/assets/772865/15342933/2da32a80-1c99-11e6-9600-16a68f145bdd.png"> </td>
@@ -219,9 +221,9 @@ Galleries
    <td align=center > <img width=300 src="https://cloud.githubusercontent.com/assets/772865/15343002/b2fdf4c6-1c99-11e6-986b-9f56299b4a16.png"> </td>
    </tr>
    <tr>
-   <td align=center ><a href="http://dgtal.org/doc/tools/nightly/volReSample.html"> volReSample </a> </td>
-   <td align=center ><a href="http://dgtal.org/doc/tools/nightly/volTrValues.html"> volTrValues </a> </td>
-   <td align=center ><a href="http://dgtal.org/doc/tools/nightly/volSegment.html"> volSegment </a> </td>
+   <td align=center ><a href="https://dgtal-team.github.io/doctools-nightly/volReSample.html"> volReSample </a> </td>
+   <td align=center ><a href="https://dgtal-team.github.io/doctools-nightly/volTrValues.html"> volTrValues </a> </td>
+   <td align=center ><a href="https://dgtal-team.github.io/doctools-nightly/volSegment.html"> volSegment </a> </td>
    </tr>
    <tr>
    <td align=center > <img width=300 src="https://raw.github.com/phcerdan/DGtalTools/thin_criticalkernel/doc/images/resCriticalKernelsThinning3D_select-first_skel-1isthmus_persistence-1.png"> </td>

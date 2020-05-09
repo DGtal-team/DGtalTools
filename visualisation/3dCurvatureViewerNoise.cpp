@@ -664,7 +664,7 @@ int main( int argc, char** argv )
         {
           DGtal::Dimension kDim = K.sOrthDir( *abegin2 );
           SCell outer = K.sIndirectIncident( *abegin2, kDim);
-          if ( predicate(embedder(outer)) )
+          if ( predicate(Z3i::Point(embedder(outer), functors::Round<>()) ))
             {
               outer = K.sDirectIncident( *abegin2, kDim);
             }
