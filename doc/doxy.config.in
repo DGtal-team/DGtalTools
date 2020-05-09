@@ -2076,8 +2076,8 @@ SKIP_FUNCTION_MACROS   = YES
 # the path). If a tag file is not located in the directory in which doxygen is
 # run, you must also specify the path to the tagfile here.
 
-TAGFILES               = "DGtal-tagfile=http://dgtal.org/doc/nightly/" \
-                         "Board-tagfile=http://dgtal.org/doc/nightly/"
+TAGFILES               = "DGtal-tagfile=https://dgtal-team.github.io/doc-nightly/" \
+                         "Board-tagfile=https://dgtal-team.github.io/doc-nightly/"
 
 # When a file name is specified after GENERATE_TAGFILE, doxygen will create a
 # tag file that is based on the input files it reads. See section "Linking to
