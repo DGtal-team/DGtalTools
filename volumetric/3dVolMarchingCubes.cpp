@@ -270,6 +270,7 @@ int main( int argc, char** argv )
     
     if ( out.good() )
       digSurf.exportEmbeddedSurfaceAs3DOFF( out, cellEmbedder );
+    else
     {
       trace.error()<<"IO error while opening the output file"<<std::endl;
       exit(2);
