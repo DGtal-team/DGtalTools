@@ -58,6 +58,7 @@ namespace po = boost::program_options;
  @code
   -h [ --help ]         display this message.
   -i [ --input ] arg    Input vol file.
+  -inside               Sets zero value to domain boundary voxels without changing the domain extent.
   -o [ --output ] arg   Output filename.
 
  @endcode
@@ -102,7 +103,7 @@ int main(int argc, char**argv)
   general_opt.add_options()
     ( "help,h", "display this message." )
     ( "input,i", po::value<std::string>(), "Input vol file." )
-    ( "inside", "Add border inside the volume (set 0 inside the border)." )
+    ( "inside", "Sets zero value to domain boundary voxels without changing the domain extent." )
     ( "output,o", po::value<string>(),"Output filename." );
   bool parseOK=true;
   po::variables_map vm;
