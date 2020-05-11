@@ -25,9 +25,13 @@
 - *converters*
   - itk2vol: change the type of the threshold parameter in order to be able to
     convert ITK images of type double, it also adds a new option to mask the
-    source image using another image.  (Bertrand Kerautret, -
+    source image using another image.  (Bertrand Kerautret, 
     [#367](https://github.com/DGtal-team/DGtalTools/pull/367))
 
+- *global*
+  - curvatureScaleSpaceBCC: better use of exportFile with template specialisation.
+    (Bertrand Kerautret, [#375](https://github.com/DGtal-team/DGtalTools/pull/375))
+  
 
 # DGtalTools 1.0
 
