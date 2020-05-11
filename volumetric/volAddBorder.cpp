@@ -58,6 +58,7 @@ namespace po = boost::program_options;
  @code
   -h [ --help ]         display this message.
   -i [ --input ] arg    Input vol file.
+  -inside               Sets zero value to domain boundary voxels without changing the domain extent.
   -o [ --output ] arg   Output filename.
 
  @endcode
@@ -102,6 +103,7 @@ int main(int argc, char**argv)
   general_opt.add_options()
     ( "help,h", "display this message." )
     ( "input,i", po::value<std::string>(), "Input vol file." )
+    ( "inside", "Sets zero value to domain boundary voxels without changing the domain extent." )
     ( "output,o", po::value<string>(),"Output filename." );
   bool parseOK=true;
   po::variables_map vm;
@@ -127,19 +129,38 @@ int main(int argc, char**argv)
   std::string filename = vm["input"].as<std::string>();
   if ( ! ( vm.count ( "output" ) ) ) missingParam ( "--output" );
   std::string outputFileName = vm["output"].as<std::string>();
-
+  bool addInside = vm.count("inside");
+  
   typedef ImageContainerBySTLVector<Z3i::Domain, unsigned char>  MyImageC;
-
+  
   MyImageC  imageC = VolReader< MyImageC >::importVol ( filename );
-  MyImageC  outputImage( Z3i::Domain( imageC.domain().lowerBound() - Vector().diagonal(1),
-                                      imageC.domain().upperBound() + Vector().diagonal(1)));
-  
-  //Fast Copy
-  for(MyImageC::Domain::ConstIterator it = imageC.domain().begin(),
-        itend = imageC.domain().end(); it != itend; ++it)
-    outputImage.setValue( *it , imageC(*it));
-  
+  Z3i::Domain rDom  ( imageC.domain().lowerBound() -  Vector().diagonal(addInside ? 0: 1),
+                      imageC.domain().upperBound() + Vector().diagonal(addInside ? 0: 1));
+  MyImageC  outputImage(rDom);
+  Z3i::Domain iDom  ( imageC.domain().lowerBound() +  Vector().diagonal( 1),
+                      imageC.domain().upperBound() - Vector().diagonal( 1));
 
-  bool res =  VolWriter< MyImageC>::exportVol(outputFileName, outputImage);
+  //Fast Copy
+ 
+  for(MyImageC::Domain::ConstIterator it = imageC.domain().begin(),
+          itend = imageC.domain().end(); it != itend; ++it){
+     if(!addInside){
+          outputImage.setValue( *it , imageC(*it));
+     }
+     else
+     {
+       if (!iDom.isInside(*it)){
+         imageC.setValue( *it , 0); 
+       }
+     }      
+     
+  }  
+  bool res = true;
+  if (!addInside) {
+    res=  VolWriter< MyImageC>::exportVol(outputFileName, outputImage);
+  }
+  else{
+    res=  VolWriter< MyImageC>::exportVol(outputFileName, imageC);
+  }
   if (res) return 0; else return 1;
 }
