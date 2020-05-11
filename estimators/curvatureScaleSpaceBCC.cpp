@@ -202,7 +202,7 @@ int main( int argc, char** argv )
     }
     trace.progressBar(height, height);
     trace.info() <<std::endl;
-    DGtal::GenericWriter<Image2D, 2, double, HueShadeColorMap<double> >::exportFile(vm["output"].as<std::string>(), cssImage, gradCurvature );       
+    DGtal::GenericWriter<Image2D, 2, DGtal::Color, HueShadeColorMap<double> >::exportFile(vm["output"].as<std::string>(), cssImage, gradCurvature );       
   }
   return 0;
 }
