@@ -138,7 +138,7 @@ int main( int argc, char** argv )
   if( !parseOK || vm.count("help")||argc<=1)
   {
     std::cout << "Usage: " << argv[0] << " -i [input] -o [output]\n"
-    << "Export the boundary of a volume file to OBJ format. By default the resulting mesh is defined from the surfles of the surface elements, a triangulated (dual)"<< endl
+    << "Export the boundary of a volume file to OBJ format. By default the resulting mesh is defined from the surfels of the surface elements, a triangulated (dual)"<< endl
     << general_opt << "\n";
     return 0;
   }
