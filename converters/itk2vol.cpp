@@ -52,11 +52,22 @@ using namespace DGtal;
 @b Allowed @b options @b are:
 
 @code
-  -h [ --help ]           display this message
-  -i [ --input ] arg      Any file format in the ITK library (mhd, mha, ...) 
-  -o [ --output ] arg     volumetric file (.vol, .pgm3d) 
-  --inputMin arg (=-1000) set minimum density threshold on Hounsfield scale
-  --inputMax arg (=3000)  set maximum density threshold on Hounsfield scale
+ -h [ --help ]                     display this message
+  -i [ --input ] arg                Any file format in the ITK library (mhd, 
+                                    mha, ...) 
+  -o [ --output ] arg               volumetric file (.vol, .pgm3d) 
+  -m [ --maskImage ] arg            Use a mask image to remove image part 
+                                    (where mask is 0). The default mask value 
+                                    can be changed using mask default value.
+  -r [ --maskRemoveLabel ] arg (=0) Change the label value that defines the part
+                                    of the image to be removed by the option 
+                                    --maskImage.
+  -t [ --inputType ] arg (=int)     to sepcify the input image type (int or 
+                                    double).
+  --inputMin arg (=-1000)           set minimum density threshold on Hounsfield
+                                    scale
+  --inputMax arg (=3000)            set maximum density threshold on Hounsfield
+                                    scale
 @endcode
 
 @b Example:
@@ -69,13 +80,31 @@ $itk2vol -i image.mhd --dicomMin -500 --dicomMax -100 -o sample.vol
 */
 
 
+
+template<typename TImage, typename TImageMask>
+void
+applyMaskImage( TImage &imageInput,  const  TImageMask &maskImage,
+                typename TImageMask::Value valRemove)
+{
+  for(const auto &p : imageInput.domain())
+  {
+    if (maskImage(p) == valRemove)
+    {
+      imageInput.setValue(p,0);
+    }
+  }
+  
+}
+
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace po = boost::program_options;
 
 int main( int argc, char** argv )
 {
   typedef ImageContainerBySTLVector < Z3i::Domain, unsigned char > Image3DChar;
-  typedef ImageContainerBySTLVector < Z3i::Domain,  int > Image3D;
+  typedef ImageContainerBySTLVector < Z3i::Domain,  double > Image3D_D;
+  typedef ImageContainerBySTLVector < Z3i::Domain,  int > Image3D_I;
   
   // parse command line ----------------------------------------------
   po::options_description general_opt("Allowed options are ");
@@ -83,8 +112,11 @@ int main( int argc, char** argv )
     ("help,h", "display this message")
     ("input,i", po::value<std::string>(), "Any file format in the ITK library (mhd, mha, ...) " )
     ("output,o", po::value<std::string>(), "volumetric file (.vol, .pgm3d) " )
-    ("inputMin", po::value<int>()->default_value(-1000), "set minimum density threshold on Hounsfield scale")
-    ("inputMax", po::value<int>()->default_value(3000), "set maximum density threshold on Hounsfield scale");
+    ("maskImage,m", po::value<std::string>(), "Use a mask image to remove image part (where mask is 0). The default mask value can be changed using mask default value." )
+    ("maskRemoveLabel,r", po::value<int>()->default_value(0), "Change the label value that defines the part of input image to be removed by the option --maskImage." )
+    ("inputType,t", po::value<std::string>()->default_value("int"), "to sepcify the input image type (int or double)." )
+    ("inputMin", po::value<double>()->default_value(-1000.0), "set minimum density threshold on Hounsfield scale")
+    ("inputMax", po::value<double>()->default_value(3000.0), "set maximum density threshold on Hounsfield scale");
 
   
   
@@ -112,21 +144,57 @@ int main( int argc, char** argv )
       trace.error() << " Input and output filename are needed to be defined" << endl;      
       return 0;
     }
-
+  
+  bool isMasked = vm.count("maskImage");
   
   string inputFilename = vm["input"].as<std::string>();
   string outputFilename = vm["output"].as<std::string>();
-  int inputMin = vm["inputMin"].as<int>();
-  int inputMax = vm["inputMax"].as<int>();
-  typedef DGtal::functors::Rescaling<int ,unsigned char > RescalFCT;
-  
-  trace.info() << "Reading input input file " << inputFilename ; 
-  Image3D inputImage = ITKReader< Image3D  >::importITK(inputFilename);
-  trace.info() << " [done] " << std::endl ; 
-  trace.info() << " converting into vol file... " ; 
-  RescalFCT rescaleCustom(inputMin, inputMax, 0, 255);
+  double inputMin = vm["inputMin"].as<double>();
+  double inputMax = vm["inputMax"].as<double>();
+  string inputType = vm["inputType"].as<std::string>();
+  if (inputType == "double") {
+      typedef DGtal::functors::Rescaling<double ,unsigned char > RescalFCT;
+      trace.info() << "Reading input input file " << inputFilename ; 
+      Image3D_D inputImage = ITKReader< Image3D_D  >::importITK(inputFilename);
+      trace.info() << " [done] " << std::endl ; 
+      trace.info() << " converting into vol file... " ; 
+      if (isMasked)
+      {
+        string inputMask = vm["maskImage"].as<std::string>();
+        int v = vm["maskRemoveLabel"].as<int>();
+        Image3D_I maskImage = ITKReader< Image3D_I  >::importITK(inputMask);
+        applyMaskImage(inputImage, maskImage, v);
+      }
 
-  DGtal::GenericWriter<Image3D, 3, unsigned char, RescalFCT>::exportFile(outputFilename, inputImage, "UInt8Array3D", rescaleCustom);
+      RescalFCT rescaleCustom(inputMin, inputMax, 0, 255);
+      
+      DGtal::GenericWriter<Image3D_D, 3, unsigned char, RescalFCT>::exportFile(outputFilename,
+                                                                               inputImage,
+                                                                               "UInt8Array3D",
+                                                                               rescaleCustom);
+      
+  }else {
+     typedef DGtal::functors::Rescaling<int ,unsigned char > RescalFCT;
+      trace.info() << "Reading input input file " << inputFilename ; 
+      Image3D_I inputImage = ITKReader< Image3D_I  >::importITK(inputFilename);
+      trace.info() << " [done] " << std::endl ; 
+      trace.info() << " converting into vol file... " ; 
+      RescalFCT rescaleCustom(inputMin, inputMax, 0, 255);
+      if (isMasked)
+      {
+        string inputMask = vm["maskImage"].as<std::string>();
+        int v = vm["maskRemoveLabel"].as<int>();
+        Image3D_I maskImage = ITKReader< Image3D_I  >::importITK(inputMask);
+        applyMaskImage(inputImage, maskImage, v);
+      }
+      
+      DGtal::GenericWriter<Image3D_I, 3, unsigned char, RescalFCT>::exportFile(outputFilename,
+                                                                               inputImage,
+                                                                               "UInt8Array3D",
+                                                                               rescaleCustom);
+
+  }
+  
   
 
   trace.info() << " [done] " << std::endl ;   
@@ -135,5 +203,4 @@ int main( int argc, char** argv )
   return 0;
   
 }
-
 
