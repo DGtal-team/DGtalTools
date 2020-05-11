@@ -37,6 +37,7 @@
 #include "DGtal/io/writers/MeshWriter.h"
 #include "DGtal/images/ConstImageAdapter.h"
 #include "DGtal/kernel/BasicPointFunctors.h"
+#include <DGtal/base/BasicFunctors.h>
 #include "DGtal/math/linalg/SimpleMatrix.h"
 
 #include <boost/program_options/options_description.hpp>
@@ -335,8 +336,9 @@ int main( int argc, char** argv )
   for(unsigned int k=0; k < maxScan; k++)
     {
       trace.progressBar(k, maxScan);
+      Z3i::Point c (ptCenter+normalDir*k, DGtal::functors::Round<>());
       DGtal::functors::Point2DEmbedderIn3D<DGtal::Z3i::Domain >  embedder(meshVolImage.domain(), 
-                                                                          ptCenter+normalDir*k,
+                                                                          c,
                                                                           normalDir,
                                                                           widthImageScan);
       ImageAdapterExtractor extractedImage(meshVolImage, aDomain2D, embedder, idV);

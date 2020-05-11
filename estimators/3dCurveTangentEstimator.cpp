@@ -39,8 +39,11 @@
 #include <iterator>
 #include <cstdio>
 #include <cmath>
+#include <string>
+#include <map>
 #include <fstream>
 #include <vector>
+#include <utility>
 
 #include <boost/program_options/options_description.hpp>
 #include <boost/program_options/parsers.hpp>
@@ -124,6 +127,7 @@ This program can also displays the curve and tangent estimations, and it can als
                                         estimator.
   -m [ --method ] arg (=VCM)            the method of tangent computation: VCM 
                                         (default), L-MST.
+  -a [ --axes ]  arg (=OFF)             main axes for each digital point ON/OFF
   -o [ --output ] arg (=3d-curve-tangent-estimations)
                                         the basename of the output text file 
                                         which will contain points and tangent 
@@ -666,6 +670,64 @@ void ComputeLMST26 ( const PointIterator & begin, const PointIterator & end, Tan
   }
 }
 
+template < typename PointIterator, typename Space, int CONNECT = 8  >
+void find_main_axes ( PointIterator begin, PointIterator end, multimap < typename Space::Point, string > & axes )
+{
+    typedef Naive3DDSSComputer < PointIterator, int, CONNECT > SegmentComputer;
+    typedef SaturatedSegmentation < SegmentComputer > Segmentation;
+
+    Segmentation segmenter ( begin, end, SegmentComputer ( ) );
+
+    for ( auto it = begin; it != end; ++it )
+    {
+        unsigned int cX = 0, cY = 0, cZ = 0;
+        for ( typename Segmentation::SegmentComputerIterator idss = segmenter.begin ( ); idss != segmenter.end ( ); ++idss )
+        {
+            if ( idss->isInDSS ( *it ) )
+            {
+                const typename SegmentComputer::ArithmeticalDSSComputer2d & dssXY = (*idss).arithmeticalDSS2dXY();
+                const typename SegmentComputer::ArithmeticalDSSComputer2d & dssXZ = (*idss).arithmeticalDSS2dXZ();
+                const typename SegmentComputer::ArithmeticalDSSComputer2d & dssYZ = (*idss).arithmeticalDSS2dYZ();
+                unsigned int lenXY = distance ( dssXY.begin(), dssXY.end() );
+                unsigned int lenXZ = distance ( dssXZ.begin(), dssXZ.end() );
+                unsigned int lenYZ = distance ( dssYZ.begin(), dssYZ.end() );
+
+                if ( lenXY >= lenYZ && lenXZ >= lenYZ )
+                    cX++;
+                else if ( lenXY >= lenXZ && lenYZ >= lenXZ )
+                    cY++;
+                else
+                    cZ++;
+            }
+        }
+        if ( cX > 0 )
+          axes.insert (  pair <typename Space::Point, string > ( *it, string ( "X" ) ) );
+        if ( cY > 0 )
+          axes.insert (  pair <typename Space::Point, string > ( *it, string ( "Y" ) ) );
+        if ( cZ > 0 )
+          axes.insert (  pair <typename Space::Point, string > ( *it, string ( "Z" ) ) );
+
+    }
+}
+
+template < typename PointIterator, typename Space >
+void print_main_axes ( PointIterator begin, PointIterator end, multimap < typename Space::Point, string > & axes )
+{
+    for ( PointIterator itt = begin; itt != end; ++itt )
+    {
+        typename std::multimap<typename Space::Point, string>::const_iterator it = axes.lower_bound(*itt);
+        typename std::multimap<typename Space::Point, string>::const_iterator it2 = axes.upper_bound(*itt);
+        cout << "(" << it->first[0] << ", " << it->first[1] << ", " << it->first[2] << "); MAIN_AXES = (";
+        for (; it != it2; it++ )
+        {
+            if ( distance( it, it2 ) > 1 )
+                cout << it->second << ", ";
+            else
+                cout << it->second << ")";
+        }
+    cout << endl;
+    }
+}
 ///////////////////////////////////////////////////////////////////////////////
 namespace po = boost::program_options;
 
@@ -708,6 +770,7 @@ int main(int argc, char **argv)
   ("big-radius,R", po::value<double>()->default_value( 10.0 ), "the radius parameter R in the VCM estimator." )
   ("small-radius,r", po::value<double>()->default_value( 3.0 ), "the radius parameter r in the VCM estimator." )
   ("method,m", po::value<string>()->default_value( "VCM" ), "the method of tangent computation: VCM (default), L-MST." )
+  ("axes,a", po::value<string>()->default_value("OFF"), "show main axes - prints list of axes for each point and color points color = (if X => 255, if Y => 255, if Z => 255)" )
   ("output,o", po::value<string>()->default_value( "3d-curve-tangent-estimations"), "the basename of the output text file which will contain points and tangent vectors: (x y z tx ty tz) per line" )
   ;
   po::positional_options_description pos_opt;
@@ -768,7 +831,22 @@ int main(int argc, char **argv)
   
   // start viewer
   bool view = vm[ "view" ].as<string>() == "ON";
-  
+
+  // axes
+  bool axes = vm[ "axes" ].as<string>() == "ON";
+  multimap < Z3i::Point, string > mainAxes;
+
+  if ( axes && vm[ "connectivity" ].as<string>() == "26" )
+  {
+      find_main_axes<PointIterator, Z3i::Space>(sequence.begin(), sequence.end(), mainAxes);
+      print_main_axes<PointIterator, Z3i::Space>(sequence.begin(), sequence.end(), mainAxes);
+  }
+  else if ( axes && vm[ "connectivity" ].as<string>() == "6" )
+  {
+    find_main_axes < PointIterator, Z3i::Space, 4 > ( sequence.begin ( ), sequence.end ( ), mainAxes );
+    print_main_axes<PointIterator, Z3i::Space>(sequence.begin(), sequence.end(), mainAxes);
+  }
+
   // ----------------------------------------------------------------------
   // Create domain and curve.
   Point lowerBound = sequence[ 0 ];
@@ -861,12 +939,33 @@ int main(int argc, char **argv)
 		      vm.count( "tangent" ),
 		      vm["nbColors"].as<int>() );
     // Display 3D curve points.
-    if ( vm.count( "curve3d" ) )
+    if ( vm.count( "curve3d" ) && ! axes )
     {
       viewer << CustomColors3D( CURVE3D_COLOR, CURVE3D_COLOR );
-      for ( vector<Point>::const_iterator it = sequence.begin(), itE = sequence.end();
-	   it != itE; ++it )
+      for ( vector<Point>::const_iterator it = sequence.begin(); it != sequence.end(); ++it )
 	   viewer << *it;  
+    }
+    else if ( vm.count( "curve3d" ) && axes )
+    {
+        for ( vector<Point>::const_iterator itt = sequence.begin(); itt != sequence.end(); ++itt ) {
+
+            typename std::multimap<typename Z3i::Point, string>::const_iterator it = mainAxes.lower_bound(*itt);
+            typename std::multimap<typename Z3i::Point, string>::const_iterator it2 = mainAxes.upper_bound(*itt);
+            Z3i::Point pColor;
+            for (; it != it2; it++ )
+            {
+                if (it->second == "X")
+                    pColor[0] = 255;
+                if (it->second == "Y")
+                    pColor[1] = 255;
+                if (it->second == "Z")
+                    pColor[2] = 255;
+
+            }
+            Color c ( pColor[0], pColor[1], pColor[2], 255 );
+            viewer.setFillColor(c);
+            viewer << *itt;
+        }
     }
     // ----------------------------------------------------------------------
     // User "interaction".

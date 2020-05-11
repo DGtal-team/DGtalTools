@@ -25,13 +25,14 @@
   - @ref volAddBorder : adds a border of one voxel with value 0 around a vol file.
   - @ref volCComponentCounter : counts the number of connected component (same values) in a  volume (Vol) file image.
   - @ref volCrop : crops a 3D vol image from domain coordinates.
+  - @ref volFillInterior : fills the interior of a voxel set.
   - @ref volFlip : flips 2D slice image of an 3D vol image (mirror transformation).
   - @ref volImageMetrics : applies basic image measures (RMSE, PSNR) between two volumetric images A and B.
-  - @ref volIntensityScale : applies a linear rescaling of the image intensity.  
+  - @ref volIntensityScale : applies a linear rescaling of the image intensity.
   - @ref volReSample :  re samples a 3D volumetric image (.vol, .longvol, .pgm3d)  with a given grid size.
   - @ref volSegment : segments volumetric file from a simple threshold.
   - @ref volShapeMetrics : applies shape measures to compare two volumetric images A and B (shape defined from thresholds). 
-  - @ref volSubSample : brutally sub samples a vol file (division by 2 in each direction).  
+  - @ref volSubSample : brutally sub samples a vol file (division by 2 in each direction).
   - @ref volTrValues : applies basic vol image transform from the input values to output values.
 
 
