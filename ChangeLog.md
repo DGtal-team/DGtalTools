@@ -5,12 +5,37 @@
     [#356](https://github.com/DGtal-team/DGtalTools/pull/356))
   - set cmake  based CPP11 check instead the manual DGtal check. (Bertrand
     Kerautret [#364](https://github.com/DGtal-team/DGtalTools/pull/364))
-
+  - fix ld boost program options macos warnings. (Bertrand
+    Kerautret [#366](https://github.com/DGtal-team/DGtalTools/pull/366))
+    
 - *volumetric:
   - Passing argument by const reference in (min|max|mean)Val of volSubSample.
     (Roland Denis, [#359](https://github.com/DGtal-team/DGtalTools/pull/359/files))
   - Using SourceForge to download doxygen sources during Travis CI jobs.
     (Roland Denis [#360](https://github.com/DGtal-team/DGtalTools/pull/360))
+
+  - volAddBorder: Add an option that sets zero value to domain boundary voxels without 
+    changing the domain extent (Bertrand Kertautret 
+    [#371](https://github.com/DGtal-team/DGtalTools/pull/371))
+
+  - Fix a wrong error message that appears when using the tool (wrong IO error)
+    (Bertrand Kerautret
+    [#368](https://github.com/DGtal-team/DGtalTools/pull/368))
+
+- *documentations*
+  -  Fix doc link to the DGtal lib in the tool source (from new github website).
+     (Bertrand Kerautret [#372](https://github.com/DGtal-team/DGtalTools/pull/372))
+    
+- *converters*
+  - itk2vol: change the type of the threshold parameter in order to be able to
+    convert ITK images of type double, it also adds a new option to mask the
+    source image using another image.  (Bertrand Kerautret, 
+    [#367](https://github.com/DGtal-team/DGtalTools/pull/367))
+
+- *estimators*
+  - volSurfaceRegularization now in the "make install" command. (David
+    Coeurjolly, [#376](https://github.com/DGtal-team/DGtalTools/pull/376))
+
 
 # DGtalTools 1.0
 
