@@ -14,6 +14,10 @@ SET(DGTAL_TOOLS_SRC
 if (WITH_EIGEN)
     add_executable(volSurfaceRegularization volSurfaceRegularization.cpp volSurfaceRegularization-details/surface_approx.cpp)
     target_link_libraries(volSurfaceRegularization ${DGTAL_LIBRARIES} ${DGtalToolsLibDependencies})
+    install(TARGETS volSurfaceRegularization
+        RUNTIME DESTINATION bin
+        LIBRARY DESTINATION lib
+        ARCHIVE DESTINATION lib)
 endif()
 
 if ( WITH_VISU3D_QGLVIEWER )
@@ -23,6 +27,10 @@ if ( WITH_VISU3D_QGLVIEWER )
   FOREACH(FILE ${VISU3D_TESTS_SRC})
     add_executable(${FILE} ${FILE})
     target_link_libraries (${FILE}  ${DGTAL_LIBRARIES} ${DGtalToolsLibDependencies})
+    install(TARGETS ${FILE}
+        RUNTIME DESTINATION bin
+        LIBRARY DESTINATION lib
+        ARCHIVE DESTINATION lib)
   ENDFOREACH(FILE)
 endif ( WITH_VISU3D_QGLVIEWER )
 
