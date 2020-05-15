@@ -7,7 +7,9 @@
     Kerautret [#364](https://github.com/DGtal-team/DGtalTools/pull/364))
   - fix ld boost program options macos warnings. (Bertrand
     Kerautret [#366](https://github.com/DGtal-team/DGtalTools/pull/366))
-    
+  - curvatureScaleSpaceBCC: better use of exportFile with template specialisation.
+    (Bertrand Kerautret, [#375](https://github.com/DGtal-team/DGtalTools/pull/375))
+ 
 - *volumetric:
   - Passing argument by const reference in (min|max|mean)Val of volSubSample.
     (Roland Denis, [#359](https://github.com/DGtal-team/DGtalTools/pull/359/files))
