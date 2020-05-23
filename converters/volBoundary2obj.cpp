@@ -31,9 +31,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 #include <iostream>
 #include <set>
-#include <boost/program_options/options_description.hpp>
-#include <boost/program_options/parsers.hpp>
-#include <boost/program_options/variables_map.hpp>
+#include "CLI11.hpp"
 
 #include "DGtal/base/Common.h"
 #include "DGtal/base/BasicFunctors.h"
@@ -62,38 +60,35 @@ using namespace DGtal;
 //using namespace Z3i;
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace po = boost::program_options;
+
 
 /**
  @page volBoundary2obj volBoundary2obj
- @brief  Extracts digital points from 3d vol files.
+ @brief Export the boundary of a volume file to OBJ format. By default the resulting mesh is defined from the surfels of the surface elements, a triangulated (dual)
  
- @b Usage: volBoundary2obj [input] [output]
+ @b Usage: converters/volBoundary2obj [OPTIONS] 1 [2]
  
  @b Allowed @b options @b are:
  
  @code
-  -h [ --help ]                    display this message
-  -i [ --input ] arg               vol file (.vol, .longvol .p3d, .pgm3d and if
-                                   WITH_ITK is selected: dicom, dcm, mha, mhd).
-                                   For longvol, dicom, dcm, mha or mhd formats,
-                                   the input values are linearly scaled between
-                                   0 and 255.
-  -o [ --output ] arg              output obj file (.obj)
-  -m [ --thresholdMin ] arg (=0)   threshold min (excluded) to define binary 
-                                   shape
-  -M [ --thresholdMax ] arg (=255) threshold max (included) to define binary 
-                                   shape
-  --customDiffuse arg              set the R, G, B, A components of the diffuse
-                                   colors of the mesh faces.
-  --rescaleInputMin arg (=0)       min value used to rescale the input 
-                                   intensity (to avoid basic cast into 8  bits 
-                                   image).
-  --rescaleInputMax arg (=255)     max value used to rescale the input 
-                                   intensity (to avoid basic cast into 8 bits 
-                                   image).
-  -t [ --triangulatedSurface ]     save the dual triangulated surface instead 
-                                   instead the default digital surface.
+
+
+Positionals:
+  1 TEXT:FILE REQUIRED                  vol file (.vol, .longvol .p3d, .pgm3d and if WITH_ITK is selected: dicom, dcm, mha, mhd). For longvol, dicom, dcm, mha or mhd formats, the input values are linearly scaled between 0 and 255.
+  2 TEXT                                output file (.obj or .off).
+
+Options:
+  -h,--help                             Print this help message and exit
+  -i,--input TEXT:FILE REQUIRED         vol file (.vol, .longvol .p3d, .pgm3d and if WITH_ITK is selected: dicom, dcm, mha, mhd). For longvol, dicom, dcm, mha or mhd formats, the input values are linearly scaled between 0 and 255.
+  -o,--output TEXT                      output file (.obj or .off).
+  -m,--thresholdMin INT=128             threshold min (excluded) to define binary shape.
+  -M,--thresholdMax INT=255             threshold max (included) to define binary shape.
+  --rescaleInputMin INT=0               min value used to rescale the input intensity (to avoid basic cast into 8  bits image).
+  --rescaleInputMax INT=255             max value used to rescale the input intensity (to avoid basic cast into 8  bits image).
+  -c,--customDiffuse UINT=[230,230,230,255] x 4
+                                        set the R, G, B, A components of the diffuse colors of the mesh faces.
+  -t,--triangulatedSurface              save the dual triangulated surface instead instead the default digital surface.
+
 
  @endcode
  
@@ -113,47 +108,8 @@ namespace po = boost::program_options;
 
 int main( int argc, char** argv )
 {
-  // parse command line ----------------------------------------------
-  po::options_description general_opt("Allowed options are: ");
-  general_opt.add_options()
-  ("help,h", "display this message")
-  ("input,i", po::value<std::string>(), "vol file (.vol, .longvol .p3d, .pgm3d and if WITH_ITK is selected: dicom, dcm, mha, mhd). For longvol, dicom, dcm, mha or mhd formats, the input values are linearly scaled between 0 and 255." )
-  ("output,o", po::value<std::string>(), "output file (.obj or .off)." )
-  ("thresholdMin,m",  po::value<int>()->default_value(0), "threshold min (excluded) to define binary shape" )
-  ("thresholdMax,M",  po::value<int>()->default_value(255), "threshold max (included) to define binary shape" )
-  ("customDiffuse",po::value<std::vector<unsigned int> >()->multitoken(), "set the R, G, B, A components of the diffuse colors of the mesh faces." )
-  ("rescaleInputMin", po::value<DGtal::int64_t>()->default_value(0), "min value used to rescale the input intensity (to avoid basic cast into 8  bits image).")
-  ("rescaleInputMax", po::value<DGtal::int64_t>()->default_value(255), "max value used to rescale the input intensity (to avoid basic cast into 8 bits image).")
-  ("triangulatedSurface,t","save the dual triangulated surface instead instead the default digital surface.");
-  
-  bool parseOK=true;
-  po::variables_map vm;
-  try{
-    po::store(po::parse_command_line(argc, argv, general_opt), vm);
-  }catch(const std::exception& ex){
-    parseOK=false;
-    trace.info()<< "Error checking program options: "<< ex.what()<< endl;
-  }
-  po::notify(vm);
-  if( !parseOK || vm.count("help")||argc<=1)
-  {
-    std::cout << "Usage: " << argv[0] << " -i [input] -o [output]\n"
-    << "Export the boundary of a volume file to OBJ format. By default the resulting mesh is defined from the surfels of the surface elements, a triangulated (dual)"<< endl
-    << general_opt << "\n";
-    return 0;
-  }
-  
-  if(! vm.count("input"))
-  {
-    trace.error() << " The file name was defined" << endl;
-    return 0;
-  }
-  
-  if(! vm.count("output"))
-  {
-    trace.error() << " The output filename was defined" << endl;
-    return 0;
-  }
+
+  CLI::App app;
   
   
   // Using standard 3D digital space.
@@ -161,20 +117,37 @@ int main( int argc, char** argv )
   typedef ShortcutsGeometry<Z3i::KSpace> SHG3;
   auto params = SH3::defaultParameters() | SHG3::defaultParameters();
   
+  int thresholdMin {128};
+  int thresholdMax {255};  
+  string inputFilename;
+  DGtal::int64_t rescaleInputMin {0};
+  DGtal::int64_t rescaleInputMax {255};
+  std::vector<unsigned int > vectCol=  {230, 230, 230, 255};
+  bool triangulatedSurface {false};
+  std::string outputFilename = "result.obj";
+ 
+  app.description("Export the boundary of a volume file to OBJ format. By default the resulting mesh is defined from the surfels of the surface elements, a triangulated (dual)");
   
+  app.add_option("-i,--input,1", inputFilename, "vol file (.vol, .longvol .p3d, .pgm3d and if WITH_ITK is selected: dicom, dcm, mha, mhd). For longvol, dicom, dcm, mha or mhd formats, the input values are linearly scaled between 0 and 255." )
+    ->required()
+    ->check(CLI::ExistingFile);
+  app.add_option("--output,-o,2",outputFilename ,"output file (.obj or .off).");
+  app.add_option("--thresholdMin,-m", thresholdMin, "threshold min (excluded) to define binary shape.", true);
+  app.add_option("--thresholdMax,-M", thresholdMax, "threshold max (included) to define binary shape.", true);
+  app.add_option("--rescaleInputMin", rescaleInputMin, "min value used to rescale the input intensity (to avoid basic cast into 8  bits image).", true);
+  app.add_option("--rescaleInputMax", rescaleInputMax, "max value used to rescale the input intensity (to avoid basic cast into 8  bits image).", true);
+  app.add_option("--customDiffuse,-c", vectCol, "set the R, G, B, A components of the diffuse colors of the mesh faces.", true)
+    ->expected(4);
+  app.add_flag("--triangulatedSurface,-t", triangulatedSurface, "save the dual triangulated surface instead instead the default digital surface.");
+  app.get_formatter()->column_width(40);
+  CLI11_PARSE(app, argc, argv);
   
-  string inputFilename = vm["input"].as<std::string>();
-  int thresholdMin = vm["thresholdMin"].as<int>();
-  int thresholdMax = vm["thresholdMax"].as<int>();
-  
-  
-  trace.beginBlock( "Loading file.." );
+
+
   typedef DGtal::functors::Rescaling<DGtal::int64_t ,unsigned char > RescalFCT;
-  DGtal::int64_t rescaleInputMin = vm["rescaleInputMin"].as<DGtal::int64_t>();
-  DGtal::int64_t rescaleInputMax = vm["rescaleInputMax"].as<DGtal::int64_t>();
   RescalFCT f (rescaleInputMin, rescaleInputMax,0, 255);
 
-  
+  trace.beginBlock( "Loading file.." );
   SH3::GrayScaleImage image =
   GenericReader< SH3::GrayScaleImage >::importWithValueFunctor(inputFilename, f );
   
@@ -186,24 +159,10 @@ int main( int argc, char** argv )
   trace.info() << "Image loaded: "<<gimage<< std::endl;
   trace.endBlock();
   params( "faceSubdivision", "Centroid" )( "surfelAdjacency", 1);
-  
   auto K         = SH3::getKSpace( bimage);
+
+  SH3::Color cD (vectCol[0], vectCol[1], vectCol[2], vectCol[3]);
   
-  
-  string outputFilename = vm["output"].as<std::string>();
-  bool customDiffuse =  vm.count("customDiffuse");
-  
-  SH3::Color cD ( 230,230,230 );
-  
-  if(customDiffuse)
-  {
-    std::vector<unsigned int > vectCol = vm["customDiffuse"].as<std::vector<unsigned int> >();
-    if(vectCol.size()!=4)
-    {
-      trace.error() << "colors specification should contain R,G,B and Alpha values"<< std::endl;
-    }
-    cD.setRGBi(vectCol[0], vectCol[1], vectCol[2], vectCol[3]);
-  }
   
   auto surface = SH3::makeDigitalSurface( bimage, K );
   const std::string extension = outputFilename.substr( outputFilename.find_last_of(".") + 1 );  
@@ -211,7 +170,7 @@ int main( int argc, char** argv )
   {
     trace.warning() << "File extension not recognized, saving by default in objg format"<< std::endl;
   }
-  if (vm.count("triangulatedSurface"))
+  if (triangulatedSurface)
   {
     auto tr = SH3::makeTriangulatedSurface(surface);
     bool ok = true;
