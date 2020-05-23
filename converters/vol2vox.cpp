@@ -31,17 +31,13 @@
 #include <DGtal/helpers/StdDefs.h>
 #include <DGtal/images/Image.h>
 #include <DGtal/images/ImageContainerBySTLVector.h>
+
 #include "CLI11.hpp"
 
-#include <boost/program_options/options_description.hpp>
-#include <boost/program_options/parsers.hpp>
-#include <boost/program_options/variables_map.hpp>
 
 using namespace std;
 using namespace DGtal;
 using namespace Z3i;
-
-namespace po = boost::program_options;
 
 
 /**
