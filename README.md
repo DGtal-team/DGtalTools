@@ -26,13 +26,15 @@ own source code (in complement of DGtal tutorial https://dgtal-team.github.io/do
 More Information
 ----------------
 * Related DGtalTools-contrib: https://github.com/DGtal-team/DGtalTools-contrib
-* Release 0.9.4.1 DOI [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.1207828.svg)](https://doi.org/10.5281/zenodo.1207828)
-* Release 0.9.4 DOI [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.1203421.svg)](https://doi.org/10.5281/zenodo.1203421)
-* Release 0.9.3 DOI [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.290554.svg)](https://doi.org/10.5281/zenodo.290554)
-* Release 0.9.2 DOI [![DOI](https://zenodo.org/badge/doi/10.5281/zenodo.56432.svg)](http://dx.doi.org/10.5281/zenodo.56432)
-* Release 0.9.1 DOI [![DOI](https://zenodo.org/badge/doi/10.5281/zenodo.45130.svg)](http://dx.doi.org/10.5281/zenodo.45130)
-* Release 0.9 DOI [![DOI](https://zenodo.org/badge/doi/10.5281/zenodo.31882.svg)](http://dx.doi.org/10.5281/zenodo.31882)
-* Release 0.8 DOI [![DOI](https://zenodo.org/badge/doi/10.5281/zenodo.11587.svg)](http://dx.doi.org/10.5281/zenodo.11587)
+
+* Release 1.0 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.2704747.svg)](https://doi.org/10.5281/zenodo.2704747)
+* Release 0.9.4.1 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.1207828.svg)](https://doi.org/10.5281/zenodo.1207828)
+* Release 0.9.4 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.1203421.svg)](https://doi.org/10.5281/zenodo.1203421)
+* Release 0.9.3 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.290554.svg)](https://doi.org/10.5281/zenodo.290554)
+* Release 0.9.2 [![DOI](https://zenodo.org/badge/doi/10.5281/zenodo.56432.svg)](http://dx.doi.org/10.5281/zenodo.56432)
+* Release 0.9.1 [![DOI](https://zenodo.org/badge/doi/10.5281/zenodo.45130.svg)](http://dx.doi.org/10.5281/zenodo.45130)
+* Release 0.9 [![DOI](https://zenodo.org/badge/doi/10.5281/zenodo.31882.svg)](http://dx.doi.org/10.5281/zenodo.31882)
+* Release 0.8 [![DOI](https://zenodo.org/badge/doi/10.5281/zenodo.11587.svg)](http://dx.doi.org/10.5281/zenodo.11587)
 * Linux/MacOS [![Build Status](https://api.travis-ci.org/DGtal-team/DGtalTools.svg?branch=master)](https://travis-ci.org/DGtal-team/DGtalTools)
 * Windows [![Build status](https://ci.appveyor.com/api/projects/status/o156pe96bd02sdr5/branch/master?svg=true)](https://ci.appveyor.com/project/kerautret/dgtaltools-7x999/branch/master)
 

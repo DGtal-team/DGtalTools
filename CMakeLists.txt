@@ -74,6 +74,10 @@ if ( Boost_FOUND )
      ${Boost_LIBRAIRIES}
      ${Boost_PROGRAM_OPTIONS_LIBRARY} Boost::program_options)
    SET(DGtalLibInc ${Boost_INCLUDE_DIRS})
+   ## Used to avoid ld warnings (to be removed when using CLI11 instead program_options)
+   if(APPLE)
+      set (CMAKE_CXX_FLAGS "-fvisibility=hidden")
+   endif(APPLE)
 endif( Boost_FOUND )
 
 

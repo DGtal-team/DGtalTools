@@ -134,7 +134,7 @@ int main( int argc, char** argv )
     ("input,i", po::value<std::string>(), "Input FreemanChain file name")
     ("gridStepInit", po::value<double>()->default_value(1.0), "Grid step initial")
     ("gridStepIncrement", po::value<double>()->default_value(1.0), "Grid step increment ")
-    ("output,o ", po::value<std::string>(), "set the output name ")
+    ("output,o", po::value<std::string>(), "set the output name ")
     ("gridStepFinal", po::value<double>()->default_value(1.0), "Grid step final")
     ("curvatureCutOff,c", po::value<double>()->default_value(10.0), "set the curvature limits to better display");
   
@@ -202,7 +202,7 @@ int main( int argc, char** argv )
     }
     trace.progressBar(height, height);
     trace.info() <<std::endl;
-    DGtal::GenericWriter<Image2D, 2, double, HueShadeColorMap<double> >::exportFile(vm["output"].as<std::string>(), cssImage, gradCurvature );       
+    DGtal::GenericWriter<Image2D, 2, DGtal::Color, HueShadeColorMap<double> >::exportFile(vm["output"].as<std::string>(), cssImage, gradCurvature );       
   }
   return 0;
 }
