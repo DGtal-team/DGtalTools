@@ -37,7 +37,6 @@
 #include "DGtal/images/ConstImageAdapter.h"
 #include "DGtal/kernel/BasicPointFunctors.h"
 
-
 #include "CLI11.hpp"
 
 using namespace std;
