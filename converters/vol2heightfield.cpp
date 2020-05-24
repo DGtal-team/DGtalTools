@@ -38,16 +38,11 @@
 #include "DGtal/kernel/BasicPointFunctors.h"
 
 
-#include <boost/program_options/options_description.hpp>
-#include <boost/program_options/parsers.hpp>
-#include <boost/program_options/variables_map.hpp>
+#include "CLI11.hpp"
 
 using namespace std;
 using namespace DGtal;
 
-
-///////////////////////////////////////////////////////////////////////////////
-namespace po = boost::program_options;
 
 
 /**
@@ -62,38 +57,28 @@ namespace po = boost::program_options;
 @b Allowed @b options @b are:
 
 @code
-  -h [ --help ]                    display this message
-  -i [ --input ] arg               vol file (.vol, .longvol .p3d, .pgm3d and if
-                                   WITH_ITK is selected: dicom, dcm, mha, mhd).
-                                   For longvol, dicom, dcm, mha or mhd formats,
-                                   the input values are linearly scaled between
-                                   0 and 255.
-  -o [ --output ] arg              sequence of discrete point file (.sdp) 
-  -m [ --thresholdMin ] arg (=128) min threshold (default 128)
-  -M [ --thresholdMax ] arg (=255) max threshold (default 255)
-  --nx arg (=0)                    set the x component of the projection 
-                                   direction.
-  --ny arg (=0)                    set the y component of the projection 
-                                   direction.
-  --nz arg (=1)                    set the z component of the projection 
-                                   direction.
-  -x [ --centerX ] arg (=0)        choose x center of the projected image.
-  -y [ --centerY ] arg (=0)        choose y center of the projected image.
-  -z [ --centerZ ] arg (=1)        choose z center of the projected image.
-  --width arg (=100)               set the width of the resulting height Field 
-                                   image.
-  --height arg (=100)              set the height of the resulting height Field
-                                   image.
-  --heightFieldMaxScan arg (=255)  set the maximal scan deep.
-  --setBackgroundLastDepth         change the default background (black with 
-                                   the last filled intensity).
-  --rescaleInputMin arg (=0)       min value used to rescale the input 
-                                   intensity (to avoid basic cast into 8  bits 
-                                   image).
-  --rescaleInputMax arg (=255)     max value used to rescale the input 
-                                   intensity (to avoid basic cast into 8 bits 
-                                   image).
 
+Positionals:
+  1 TEXT:FILE REQUIRED                  vol file (.vol, .longvol .p3d, .pgm3d and if WITH_ITK is selected: dicom, dcm, mha, mhd). For longvol, dicom, dcm, mha or mhd formats, the input values are linearly scaled between 0 and 255.
+
+Options:
+  -h,--help                             Print this help message and exit
+  -i,--input TEXT:FILE REQUIRED         vol file (.vol, .longvol .p3d, .pgm3d and if WITH_ITK is selected: dicom, dcm, mha, mhd). For longvol, dicom, dcm, mha or mhd formats, the input values are linearly scaled between 0 and 255.
+  -o,--output TEXT                      sequence of discrete point file (.sdp)
+  -m,--thresholdMin INT=128             threshold min (excluded) to define binary shape.
+  -M,--thresholdMax INT=255             threshold max (included) to define binary shape.
+  --rescaleInputMin INT=0               min value used to rescale the input intensity (to avoid basic cast into 8  bits image).
+  --rescaleInputMax INT=255             max value used to rescale the input intensity (to avoid basic cast into 8  bits image).
+  --nx FLOAT=0                          set the x component of the projection direction.
+  --ny FLOAT=0                          set the y component of the projection direction.
+  --nz FLOAT=1                          set the z component of the projection direction.
+  -x,--centerX UINT=0                   choose x center of the projected image.
+  -y,--centerY UINT=0                   choose y center of the projected image.
+  -z,--centerZ UINT=0                   choose z center of the projected image.
+  -w,--width UINT=100                   set the width of the resulting height Field image.
+  --height UINT=100                     set the height of the resulting height Field image.
+  --heightFieldMaxScan UINT             set the maximal scan deep.
+  --setBackgroundLastDepth              change the default background (black with the last filled intensity).
 
 @endcode
 
@@ -117,93 +102,72 @@ int main( int argc, char** argv )
   typedef DGtal::ConstImageAdapter<Image3D, Z2i::Domain, DGtal::functors::Point2DEmbedderIn3D<DGtal::Z3i::Domain>,
                                    Image3D::Value,  DGtal::functors::Identity >  ImageAdapterExtractor;
 
-  // parse command line ----------------------------------------------
-  po::options_description general_opt("Allowed options are: ");
-  general_opt.add_options()
-    ("help,h", "display this message")
-     ("input,i", po::value<std::string>(), "vol file (.vol, .longvol .p3d, .pgm3d and if WITH_ITK is selected: dicom, dcm, mha, mhd). For longvol, dicom, dcm, mha or mhd formats, the input values are linearly scaled between 0 and 255." )
-    ("output,o", po::value<std::string>(), "sequence of discrete point file (.sdp) ") 
-    ("thresholdMin,m", po::value<int>()->default_value(128), "min threshold (default 128)" )
-    ("thresholdMax,M", po::value<int>()->default_value(255), "max threshold (default 255)" )
-    ("nx", po::value<double>()->default_value(0), "set the x component of the projection direction." )
-    ("ny", po::value<double>()->default_value(0), "set the y component of the projection direction." )
-    ("nz", po::value<double>()->default_value(1), "set the z component of the projection direction." )
-    ("centerX,x", po::value<unsigned int>()->default_value(0), "choose x center of the projected image." )
-    ("centerY,y", po::value<unsigned int>()->default_value(0), "choose y center of the projected image." )
-    ("centerZ,z", po::value<unsigned int>()->default_value(1), "choose z center of the projected image." )
-    ("width", po::value<unsigned int>()->default_value(100), "set the width of the resulting height Field image." )
-    ("height", po::value<unsigned int>()->default_value(100), "set the height of the resulting height Field image." )
-    ("heightFieldMaxScan", po::value<unsigned int>()->default_value(255), "set the maximal scan deep." )
-    ("setBackgroundLastDepth", "change the default background (black with the last filled intensity).")
-    ("rescaleInputMin", po::value<DGtal::int64_t>()->default_value(0), "min value used to rescale the input intensity (to avoid basic cast into 8  bits image).")
-    ("rescaleInputMax", po::value<DGtal::int64_t>()->default_value(255), "max value used to rescale the input intensity (to avoid basic cast into 8 bits image).");
+// parse command line using CLI ----------------------------------------------
+   CLI::App app;
+   std::string inputFileName;
+   std::string outputFileName {"result.raw"};
+   int thresholdMin {128};
+   int thresholdMax {255};
+   DGtal::int64_t rescaleInputMin {0};
+   DGtal::int64_t rescaleInputMax {255};
+   double nx {0};
+   double ny {0};
+   double nz {1};
+   unsigned int centerX {0};
+   unsigned int centerY {0};
+   unsigned int centerZ {0};
+   unsigned int heightImageScan {100};
+   unsigned int widthImageScan {100};
+   unsigned int heightFieldMaxScan {255};
+   unsigned int maxScan;
+   bool bgLastDepth = false;
+   
+   app.description("Convert volumetric  file into a projected 2D image given from a normal direction N and from a starting point P. The 3D volume is scanned in this normal direction N starting from P with a step 1. If the intensity of the 3d point is inside the given thresholds its 2D gray values are set to the current scan number.\n  Example:\n vol2heightfield -i ${DGtal}/examples/samples/lobster.vol -m 60 -M 500  --nx 0 --ny 0.7 --nz -1 -x 150 -y 0 -z 150 --width 300 --height 300 --heightFieldMaxScan 350  -o resultingHeightMap.pgm");
+   app.add_option("-i,--input,1", inputFileName, "vol file (.vol, .longvol .p3d, .pgm3d and if WITH_ITK is selected: dicom, dcm, mha, mhd). For longvol, dicom, dcm, mha or mhd formats, the input values are linearly scaled between 0 and 255." )
+    ->required()
+    ->check(CLI::ExistingFile);
+  app.add_option("-o,--output", outputFileName, "sequence of discrete point file (.sdp)");
+  app.add_option("--thresholdMin,-m", thresholdMin, "threshold min (excluded) to define binary shape.", true);
+  app.add_option("--thresholdMax,-M", thresholdMax, "threshold max (included) to define binary shape.", true);
+  app.add_option("--rescaleInputMin", rescaleInputMin, "min value used to rescale the input intensity (to avoid basic cast into 8  bits image).", true);
+  app.add_option("--rescaleInputMax", rescaleInputMax, "max value used to rescale the input intensity (to avoid basic cast into 8  bits image).", true);
+ 
+  app.add_option("--nx",nx, "set the x component of the projection direction.", true);
+  app.add_option("--ny",ny, "set the y component of the projection direction.", true);
+  app.add_option("--nz",nz, "set the z component of the projection direction.", true);
+  app.add_option("--centerX,-x", centerX, "choose x center of the projected image.", true);
+  app.add_option("--centerY,-y", centerY, "choose y center of the projected image.", true);
+  app.add_option("--centerZ,-z", centerZ, "choose z center of the projected image.", true);
+  app.add_option("--width,-w", widthImageScan, "set the width of the resulting height Field image.", true);
+  app.add_option("--height", heightImageScan, "set the height of the resulting height Field image.", true);
+  app.add_option("--heightFieldMaxScan",maxScan, "set the maximal scan deep.");
+  app.add_flag("--setBackgroundLastDepth", bgLastDepth,"change the default background (black with the last filled intensity).");
   
   
-  
-  bool parseOK=true;
-  po::variables_map vm;
-  try{
-    po::store(po::parse_command_line(argc, argv, general_opt), vm);  
-  }catch(const std::exception& ex){
-    parseOK=false;
-    trace.info()<< "Error checking program options: "<< ex.what()<< endl;
-  }
-  po::notify(vm);    
-  if( !parseOK || vm.count("help")||argc<=1)
-    {
-      std::cout << "Usage: " << argv[0] << " [input] [output]\n"
-		<< "Convert volumetric  file into a projected 2D image given from a normal direction N and from a starting point P. The 3D volume is scanned in this normal direction N starting from P with a step 1. If the intensity of the 3d point is inside the given thresholds its 2D gray values are set to the current scan number."
-		<< general_opt << "\n";
-      std::cout << "Example:\n"
-		<< "vol2heightfield -i ${DGtal}/examples/samples/lobster.vol -m 60 -M 500  --nx 0 --ny 0.7 --nz -1 -x 150 -y 0 -z 150 --width 300 --height 300 --heightFieldMaxScan 350  -o resultingHeightMap.pgm \n";
-      return 0;
-    }
-  
-  if(! vm.count("input") ||! vm.count("output"))
-    {
-      trace.error() << " Input and output filename are needed to be defined" << endl;      
-      return 0;
-    }
-  
-  string inputFilename = vm["input"].as<std::string>();
-  string outputFilename = vm["output"].as<std::string>();
-  DGtal::int64_t rescaleInputMin = vm["rescaleInputMin"].as<DGtal::int64_t>();
-  DGtal::int64_t rescaleInputMax = vm["rescaleInputMax"].as<DGtal::int64_t>();
+  app.get_formatter()->column_width(40);
+  CLI11_PARSE(app, argc, argv);
+  // END parse command line using CLI ----------------------------------------------
 
-  trace.info() << "Reading input file " << inputFilename ; 
+
+  trace.info() << "Reading input file " << inputFileName ; 
 
   typedef DGtal::functors::Rescaling<DGtal::int64_t ,unsigned char > RescalFCT;
-  Image3D inputImage =  GenericReader< Image3D >::importWithValueFunctor( inputFilename,RescalFCT(rescaleInputMin,
+  Image3D inputImage =  GenericReader< Image3D >::importWithValueFunctor( inputFileName,RescalFCT(rescaleInputMin,
                                                                                                   rescaleInputMax,
                                                                                                   0, 255) );
 
-
-  trace.info() << " [done] " << std::endl ; 
-  
+  trace.info() << " [done] " << std::endl ;   
   std::ofstream outStream;
-  outStream.open(outputFilename.c_str());
-  int minTh = vm["thresholdMin"].as<int>();
-  int maxTh = vm["thresholdMax"].as<int>();
+  outStream.open(outputFileName.c_str());
   
-  trace.info() << "Processing image to output file " << outputFilename << std::endl; 
-  
-  unsigned int widthImageScan = vm["height"].as<unsigned int>();
-  unsigned int heightImageScan = vm["width"].as<unsigned int>();
-  unsigned int maxScan = vm["heightFieldMaxScan"].as<unsigned int>();
+  trace.info() << "Processing image to output file " << outputFileName << std::endl;   
+
   if(maxScan > std::numeric_limits<Image2D::Value>::max()){
     maxScan = std::numeric_limits<Image2D::Value>::max();
     trace.warning()<< "value --setBackgroundLastDepth outside mox value of image. Set to max value:" << maxScan << std::endl; 
   }
   
-  unsigned int centerX = vm["centerX"].as<unsigned int>();
-  unsigned int centerY = vm["centerY"].as<unsigned int>();
-  unsigned int centerZ = vm["centerZ"].as<unsigned int>();
 
-  double nx = vm["nx"].as<double>();
-  double ny = vm["ny"].as<double>();
-  double nz = vm["nz"].as<double>();
-  
-  
   Image2D::Domain aDomain2D(DGtal::Z2i::Point(0,0), 
                           DGtal::Z2i::Point(widthImageScan, heightImageScan));
   Z3i::Point ptCenter (centerX, centerY, centerZ);
@@ -226,14 +190,14 @@ int main( int argc, char** argv )
     ImageAdapterExtractor extractedImage(inputImage, aDomain2D, embedder, idV);
     for(Image2D::Domain::ConstIterator it = extractedImage.domain().begin(); 
         it != extractedImage.domain().end(); it++){
-      if( resultingImage(*it)== 0 &&  extractedImage(*it) < maxTh &&
-          extractedImage(*it) > minTh){
+      if( resultingImage(*it)== 0 &&  extractedImage(*it) < thresholdMax &&
+          extractedImage(*it) > thresholdMin){
         maxDepthFound = k;
         resultingImage.setValue(*it, maxScan-k);
       }
     }    
   }
-  if (vm.count("setBackgroundLastDepth")){
+  if (bgLastDepth) {
     for(Image2D::Domain::ConstIterator it = resultingImage.domain().begin(); 
         it != resultingImage.domain().end(); it++){
       if( resultingImage(*it)== 0 ){
@@ -241,11 +205,9 @@ int main( int argc, char** argv )
       }
     }
   }   
-  
-  resultingImage >> outputFilename;
-
+  resultingImage >> outputFileName;  
   trace.info() << " [done] " << std::endl ;   
-  return 0;  
+  return EXIT_SUCCESS;
 }
 
 
