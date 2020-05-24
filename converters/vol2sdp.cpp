@@ -34,16 +34,12 @@
 #include "DGtal/images/ImageContainerBySTLVector.h"
 #include "DGtal/io/readers/GenericReader.h"
 
-#include <boost/program_options/options_description.hpp>
-#include <boost/program_options/parsers.hpp>
-#include <boost/program_options/variables_map.hpp>
+#include "CLI11.hpp"
+
 
 using namespace std;
 using namespace DGtal;
 
-
-///////////////////////////////////////////////////////////////////////////////
-namespace po = boost::program_options;
 
 
 /**
@@ -55,25 +51,25 @@ namespace po = boost::program_options;
    @b Allowed @b options @b are:
 
    @code
-   -h [ --help ]                    display this message
-   -i [ --input ] arg               vol file (.vol, .longvol .p3d, .pgm3d and if
-                                    WITH_ITK is selected: dicom, dcm, mha, mhd) 
-                                    or sdp (sequence of discrete points). For 
-                                    longvol, dicom, dcm, mha or mhd formats, the
-                                    input values are linearly scaled between 0 
-                                    and 255.
-   -o [ --output ] arg              sequence of discrete point file (.sdp) 
-   -e [ --exportImageValues ]       option to export also the image value of the
-   voxel in a fourth field.
-   -m [ --thresholdMin ] arg (=128) min threshold (default 128)
-   -M [ --thresholdMax ] arg (=255) max threshold (default 255)
-   --rescaleInputMin arg (=0)       min value used to rescale the input 
-   intensity (to avoid basic cast into 8  bits 
-   image).
-   --rescaleInputMax arg (=255)     max value used to rescale the input 
-   intensity (to avoid basic cast into 8 bits 
-   image).
+   
+   vol2sdp -i ${DGtal}/examples/samples/lobster.vol -o volumeList.sdp
+   Usage: ./converters/vol2sdp [OPTIONS] 1 [2]
 
+   Positionals:
+   1 TEXT:FILE REQUIRED        vol file (.vol, .longvol .p3d, .pgm3d and if WITH_ITK is selected: dicom, dcm, mha, mhd) or sdp (sequence of discrete points). For longvol, dicom, dcm, mha or mhd formats, the input values are linearly scaled between 0 and 255.
+   2 TEXT=result.sdp           sequence of discrete point file (.sdp)
+
+   Options:
+   -h,--help                   Print this help message and exit
+   -i,--input TEXT:FILE REQUIRED
+                              vol file (.vol, .longvol .p3d, .pgm3d and if WITH_ITK is selected: dicom, dcm, mha, mhd) or sdp (sequence of discrete points). 
+                              For longvol, dicom, dcm, mha or mhd formats, the input values are linearly scaled between 0 and 255.
+  -o,--output TEXT=result.sdp sequence of discrete point file (.sdp)
+  -e,--exportImageValues      option to export also the image value of the voxel in a fourth field.
+  -m,--thresholdMin INT=128   threshold min (excluded) to define binary shape.
+  -M,--thresholdMax INT=255   threshold max (included) to define binary shape.
+  --rescaleInputMin INT=0     min value used to rescale the input intensity (to avoid basic cast into 8  bits image).
+  --rescaleInputMax INT=255   max value used to rescale the input intensity (to avoid basic cast into 8  bits image).
 
    @endcode
 
@@ -94,53 +90,31 @@ namespace po = boost::program_options;
 
 int main( int argc, char** argv )
 {
+  CLI::App app;
+  std::string inputFilename;
+  std::string outputFilename {"result.sdp"};
+  bool exportImageValues {false};
+  int thresholdMin {128};
+  int thresholdMax {255};  
+  DGtal::int64_t rescaleInputMin {0};
+  DGtal::int64_t rescaleInputMax {255};
   typedef ImageContainerBySTLVector < Z3i::Domain, unsigned char > Image3D;
   
-  // parse command line ----------------------------------------------
-  po::options_description general_opt("Allowed options are: ");
-  general_opt.add_options()
-    ("help,h", "display this message")
-    ("input,i", po::value<std::string>(), "vol file (.vol, .longvol .p3d, .pgm3d and if WITH_ITK is selected: dicom, dcm, mha, mhd) or sdp (sequence of discrete points). For longvol, dicom, dcm, mha or mhd formats, the input values are linearly scaled between 0 and 255." )
-    ("output,o", po::value<std::string>(), "sequence of discrete point file (.sdp) " )
-    ("exportImageValues,e","option to export also the image value of the voxel in a fourth field.")
-    ("thresholdMin,m", po::value<int>()->default_value(128), "min threshold (default 128)" )
-    ("thresholdMax,M", po::value<int>()->default_value(255), "max threshold (default 255)" )
-    ("rescaleInputMin", po::value<DGtal::int64_t>()->default_value(0), "min value used to rescale the input intensity (to avoid basic cast into 8  bits image).")
-    ("rescaleInputMax", po::value<DGtal::int64_t>()->default_value(255), "max value used to rescale the input intensity (to avoid basic cast into 8 bits image).");
-  
-  
-  bool parseOK=true;
-  po::variables_map vm;
-  try{
-    po::store(po::parse_command_line(argc, argv, general_opt), vm);  
-  }catch(const std::exception& ex){
-    parseOK=false;
-    trace.info()<< "Error checking program options: "<< ex.what()<< endl;
-  }
-  po::notify(vm);    
-  if( !parseOK || vm.count("help")||argc<=1)
-    {
-      std::cout << "Usage: " << argv[0] << " [input] [output]\n"
-		<< "Convert volumetric  file into a digital set of points from a given threshold."
-		<< general_opt << "\n";
-      std::cout << "Example:\n"
-		<< "vol2sdp -i ${DGtal}/examples/samples/lobster.vol -o volumeList.sdp \n";
-      return 0;
-    }
-  
-  if(! vm.count("input") ||! vm.count("output"))
-    {
-      trace.error() << " Input and output filename are needed to be defined" << endl;      
-      return 0;
-    }
+  // parse command line using CLI ----------------------------------------------
+  app.description("Convert volumetric  file into a digital set of points from a given threshold.\n vol2sdp -i ${DGtal}/examples/samples/lobster.vol -o volumeList.sdp");
+  app.add_option("-i,--input,1", inputFilename,  "vol file (.vol, .longvol .p3d, .pgm3d and if WITH_ITK is selected: dicom, dcm, mha, mhd) or sdp (sequence of discrete points). For longvol, dicom, dcm, mha or mhd formats, the input values are linearly scaled between 0 and 255." )
+    ->required()
+    ->check(CLI::ExistingFile);
+  app.add_option("--output,-o,2", outputFilename, "sequence of discrete point file (.sdp)", true);
+  app.add_flag("--exportImageValues,-e",exportImageValues, "option to export also the image value of the voxel in a fourth field.");
+  app.add_option("--thresholdMin,-m", thresholdMin, "threshold min (excluded) to define binary shape.", true);
+  app.add_option("--thresholdMax,-M", thresholdMax, "threshold max (included) to define binary shape.", true);
+  app.add_option("--rescaleInputMin", rescaleInputMin, "min value used to rescale the input intensity (to avoid basic cast into 8  bits image).", true);
+  app.add_option("--rescaleInputMax", rescaleInputMax, "max value used to rescale the input intensity (to avoid basic cast into 8  bits image).", true);
 
-  
-  string inputFilename = vm["input"].as<std::string>();
-  string outputFilename = vm["output"].as<std::string>();
-  
-  trace.info() << "Reading input file " << inputFilename ; 
-  DGtal::int64_t rescaleInputMin = vm["rescaleInputMin"].as<DGtal::int64_t>();
-  DGtal::int64_t rescaleInputMax = vm["rescaleInputMax"].as<DGtal::int64_t>();
+  app.get_formatter()->column_width(40);
+  CLI11_PARSE(app, argc, argv);
+  // END parse command line using CLI ----------------------------------------------
 
   typedef DGtal::functors::Rescaling<DGtal::int64_t ,unsigned char > RescalFCT;
   Image3D inputImage =  GenericReader< Image3D >::importWithValueFunctor( inputFilename,RescalFCT(rescaleInputMin,
@@ -149,23 +123,23 @@ int main( int argc, char** argv )
   trace.info() << " [done] " << std::endl ; 
   std::ofstream outStream;
   outStream.open(outputFilename.c_str());
-  int minTh = vm["thresholdMin"].as<int>();
-  int maxTh = vm["thresholdMax"].as<int>();
 
   trace.info() << "Processing image to output file " << outputFilename ; 
   //Processing all points
-  outStream << "# sdp file generate by vol2sdp with source vol:" << inputFilename << " and threshold min: " <<  minTh << " max:" << maxTh << std::endl;
+  outStream << "# sdp file generate by vol2sdp with source vol:" << inputFilename
+            << " and threshold min: " <<  thresholdMin << " max:" << thresholdMax << std::endl;
   outStream << "# format: x y z ";
-  if(vm.count("exportImageValues")){
+  if(exportImageValues){
     outStream << " image_value";
   }
   outStream << std::endl;
   
+
   
   for(Image3D::Domain::ConstIterator it=inputImage.domain().begin(); it != inputImage.domain().end(); ++it){
-    if(inputImage(*it) >= minTh && inputImage(*it) <= maxTh ){
+    if(inputImage(*it) >= thresholdMin && inputImage(*it) <= thresholdMax ){
       outStream << (*it)[0] << " " << (*it)[1] << " " << (*it)[2];
-      if(vm.count("exportImageValues")){
+      if(exportImageValues){
         outStream << " " << (unsigned int) inputImage(*it);
       }
       
@@ -173,14 +147,8 @@ int main( int argc, char** argv )
     }
   }
   outStream.close();
-
   trace.info() << " [done] " << std::endl ;   
-
-
-  return 0;
+  return EXIT_SUCCESS;
   
 }
-
-
-
 
