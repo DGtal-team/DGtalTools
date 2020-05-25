@@ -97,8 +97,6 @@ int main(int argc, char**argv)
   CLI::App app;
   std::string inputFileName;
   std::string outputFileName {"result.raw"};
-  DGtal::int64_t rescaleInputMin {0};
-  DGtal::int64_t rescaleInputMax {255}; 
 
   app.description("Convert a vol to a 8-bit raw file.\n Example: vol2raw  ${DGtal}/examples/samples/lobster.vol res.raw \n");
   app.add_option("-i,--input,1", inputFileName, "vol file (.vol, .longvol .p3d, .pgm3d and if WITH_ITK is selected: dicom, dcm, mha, mhd). For longvol, dicom, dcm, mha or mhd formats, the input values are linearly scaled between 0 and 255." )
