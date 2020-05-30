@@ -14,7 +14,7 @@
  *
  **/
 /**
- * @file freeman2pgm.cpp
+ * @file freeman2img.cpp
  * @ingroup Tools
  * @author Bertrand Kerautret (\c kerautre@loria.fr) and Jacques-Olivier Lachaud 
  * LORIA (CNRS, UMR 7503), University of Nancy, France 
@@ -41,21 +41,15 @@
 #include "DGtal/topology/helpers/Surfaces.h"
 #include "DGtal/topology/SurfelSetPredicate.h"
 
-
-//boost
-#include <boost/program_options/options_description.hpp>
-#include <boost/program_options/parsers.hpp>
-#include <boost/program_options/variables_map.hpp>
-
 //STL
 #include <vector>
 #include <string>
 
+#include "CLI11.hpp"
+
+
 using namespace DGtal;
 
-
-///////////////////////////////////////////////////////////////////////////////
-namespace po = boost::program_options;
 
 /**
  @page freeman2img freeman2img
@@ -68,16 +62,21 @@ namespace po = boost::program_options;
 @b Allowed @b options @b are:
 
 @code
-  -h [ --help ]                     display this message
-  -i [ --input ] arg                the input FreemanChain file name
-  -o [ --output ] arg (=result.pgm)  the output filename
-  -b [ --border ] arg (=0)           add a border in the resulting image (used 
-                                    only in the automatic mode i.e when --space
-                                    is not used.
-  -s [ --space ] arg                Define the space from its bounding box 
-                                    (lower and upper coordinates) else the 
-                                    space is automatically defined from the 
-                                    freemanchain bounding boxes.
+
+Positionals:
+  1 TEXT:FILE REQUIRED                  Input freeman chain file name.
+
+Options:
+
+Positionals:
+  1 TEXT:FILE REQUIRED                  Input freeman chain file name.
+
+Options:
+  -h,--help                             Print this help message and exit
+  -i,--input TEXT:FILE REQUIRED         Input freeman chain file name.
+  -b,--border UINT                      add a border in the resulting image (used only in the automatic mode i.e when --space is not used.
+  -o,--output TEXT=result.pgm           the output fileName
+  -s,--space INT x 4                    Define the space from its bounding box (lower and upper coordinates) else the space is automatically defined from the freemanchain bounding boxes.
 @endcode
 
 @b Example:
@@ -109,57 +108,44 @@ You will obtain such image:
 
 int main( int argc, char** argv )
 {
-  // parse command line ----------------------------------------------
-  po::options_description general_opt("Allowed options are: ");
-  general_opt.add_options()
-    ("help,h", "display this message")  
-    ("input,i", po::value<std::string>(), "the input FreemanChain file name")
-    ("output,o", po::value<std::string>()->default_value("result.pgm"), " the output filename")
-    ("border,b", po::value<unsigned int>()->default_value(0), " add a border in the resulting image (used only in the automatic mode i.e when --space is not used.")
-    ("space,s", po::value<std::vector <int> >()->multitoken(), "Define the space from its bounding box (lower and upper coordinates) \
-else the space is automatically defined from the freemanchain bounding boxes.");
+
+  // parse command line using CLI ----------------------------------------------
+  CLI::App app;
+  std::string inputFileName;
+  std::string outputFileName="result.pgm";
+  unsigned int border {0};
+  std::vector<int> space;
+
+  app.description("Transform one or several freeman chains into an grayscale image file by filling its interior areas.\nThe transformation can fill shapes with hole by using the freemanchain orientation.  The interior is considered on the left according to a freeman chain move, i.e. a clockwise oriented contour represents a hole in the shape. Basic example:\n \t freeman2img  -i  inputChain.fc -o contourDisplay.pgm -b 5");    
+  app.add_option("-i,--input,1", inputFileName, "Input freeman chain file name." )
+    ->required()
+    ->check(CLI::ExistingFile);
+  app.add_option("-b,--border",border, "add a border in the resulting image (used only in the automatic mode i.e when --space is not used.");
+  app.add_option("-o,--output", outputFileName, "the output fileName", true);
+  app.add_option("-s,--space", space, "Define the space from its bounding box (lower and upper coordinates) else the space is automatically defined from the freemanchain bounding boxes." )
+    ->expected(4);
+
   
+  app.get_formatter()->column_width(40);
+  CLI11_PARSE(app, argc, argv);
+  // END parse command line using CLI ----------------------------------------------
+
+    
   typedef KhalimskySpaceND<2, int>::Cell Cell;
   typedef KhalimskySpaceND<2, int>::SCell SCell;
   typedef FreemanChain<Z2i::Integer> FreemanChain;
   typedef DGtal::KhalimskySpaceND< 2, int > KSpace;
   typedef DGtal::ImageContainerBySTLVector<Z2i::Domain, unsigned char> Image2D ; 
+      
+    
+  std::vector< FreemanChain > vectFcs =  PointListReader< Z2i::Point >::getFreemanChainsFromFile<Z2i::Integer> (inputFileName);    
+  int minx=std::numeric_limits<int>::max();
+  int miny=std::numeric_limits<int>::max();
+  int maxx=std::numeric_limits<int>::min();
+  int maxy=std::numeric_limits<int>::min();
+
   
-  bool parseOK=true;
-  po::variables_map vm;
-  try{
-    po::store(po::parse_command_line(argc, argv, general_opt), vm);  
-  }catch(const std::exception& ex){
-    parseOK=false;
-    trace.info()<< "Error checking program options: "<< ex.what()<< std::endl;
-  }
-  
-  
-  po::notify(vm);    
-  if(!parseOK||vm.count("help")||argc<=1 || (!(vm.count("input")   ) ) )
-    {
-      if(!parseOK){
-        trace.info() <<" Error parsing options\n" <<std::endl;
-          }
-      trace.info()<< "Transform one or several freeman chains into an grayscale image file by filling its interior areas." << std::endl
-                  << "The transformation can fill shapes with hole by using the freemanchain orientation."
-                  <<" The interior is considered on the left according to a freeman chain move, i.e. a clockwise oriented contour represents a hole in the shape." <<std::endl
-                  << "Basic usage: "<<std::endl
-                  << "\t freeman2img  -i  inputChain.fc -o contourDisplay.pgm -b 5  "<<std::endl
-		  << general_opt << "\n";
-      return 0;
-    }  
-  
-  if( vm.count("input") ){
-    unsigned int border = vm["border"].as<unsigned int>();
-    std::string fileName = vm["input"].as<std::string>();
-    std::vector< FreemanChain > vectFcs =  PointListReader< Z2i::Point >::getFreemanChainsFromFile<Z2i::Integer> (fileName);    
-    int minx=std::numeric_limits<int>::max();
-    int miny=std::numeric_limits<int>::max();
-    int maxx=std::numeric_limits<int>::min();
-    int maxy=std::numeric_limits<int>::min();
-        
-    if(!vm.count("space")){
+  if(space.size()!=4){
       for(std::vector< FreemanChain >::const_iterator it = vectFcs.begin(); it!= vectFcs.end(); it++){
         FreemanChain fc = *it;
         int t_minx=std::numeric_limits<int>::max();
@@ -174,15 +160,10 @@ else the space is automatically defined from the freemanchain bounding boxes.");
       }
       minx-=border; miny-=border; maxx+=border;   maxy+=border;
     }else{
-      std::vector<int> vectSpace = vm["space"].as<std::vector<int> > ();
-      if(vectSpace.size()!=4){
-        trace.error() << " Option : --space: you need to enter the two lower and upper point of the space."<<std::endl;
-        return 0;
-      }
-      minx = vectSpace[0];
-      miny = vectSpace[1];
-      maxx = vectSpace[2];
-      maxy = vectSpace[3];      
+      minx = space[0];
+      miny = space[1];
+      maxx = space[2];
+      maxy = space[3];      
     }
     KSpace aKSpace;
     aKSpace.init(Z2i::Point(minx, miny), Z2i::Point(maxx, maxy), true);
@@ -195,9 +176,8 @@ else the space is automatically defined from the freemanchain bounding boxes.");
     
     Image2D imageResult (Z2i::Domain(Z2i::Point(minx, miny), Z2i::Point(maxx, maxy))); 
     Surfaces<KSpace>::uFillInterior(aKSpace, functors::SurfelSetPredicate<std::set<SCell>,SCell>(boundarySCell), imageResult, 255, false, false );  
-    imageResult >> vm["output"].as<std::string>();
-  }
+    imageResult >> outputFileName;
+  
 
 }
-
 
