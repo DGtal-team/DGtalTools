@@ -33,15 +33,13 @@
 #include <DGtal/images/Image.h>
 #include <DGtal/images/ImageContainerBySTLVector.h>
 
-#include <boost/program_options/options_description.hpp>
-#include <boost/program_options/parsers.hpp>
-#include <boost/program_options/variables_map.hpp>
+#include "CLI11.hpp"
+
 
 using namespace std;
 using namespace DGtal;
 using namespace Z3i;
 
-namespace po = boost::program_options;
 
 /**
  @page HDF52vol HDF52vol
@@ -52,9 +50,14 @@ namespace po = boost::program_options;
 @b Allowed @b options @b are:
 
 @code
-  -h [ --help ]                     display this message
-  -i [ --input ] arg                the input FreemanChain file name
-  -o [ --output ] arg (=result.pgm)  the output filename
+
+Positionals:
+  1 TEXT:FILE REQUIRED                  volumetric file (.pgm3d, .vol, .longvol).
+
+Options:
+  -h,--help                             Print this help message and exit
+  -i,--input TEXT:FILE REQUIRED         the input FreemanChain file name
+  -o,--output TEXT                      the output filename
 @endcode
 
 @b Example:
@@ -83,49 +86,31 @@ void missingParam ( std::string param )
 int main(int argc, char**argv)
 {
 
-  // parse command line ----------------------------------------------
-  po::options_description general_opt ( "Allowed options are: " );
-  general_opt.add_options()
-    ( "help,h", "display this message." )
-    ( "input,i", po::value<std::string>(), "Input HDF5 file." )
-    ( "output,o", po::value<string>(),"Output vol filename." );
-  
-  bool parseOK=true;
-  po::variables_map vm;
-  try{
-    po::store(po::parse_command_line(argc, argv, general_opt), vm);  
-  }catch(const std::exception& ex){
-    parseOK=false;
-    trace.info()<< "Error checking program options: "<< ex.what()<< endl;
-  }
+// parse command line using CLI ----------------------------------------------
+   CLI::App app;
+   std::string inputFileName;
+   std::string outputFileName {"result.vol"};
 
-  po::notify ( vm );
-  if (!parseOK || vm.count ( "help" ) ||argc<=1 )
-    {
-      trace.info() << "Convert a 3D 8-bit HDF5 file to vol."<<std::endl
-                   << std::endl << "Basic usage: "<<std::endl
-                   << "\tHDF52vol --input <HDF5FileName> --output <VolOutputFileName> "<<std::endl
-                   << general_opt << "\n";
-      return 0;
-    }
+   app.description("Convert a 3D 8-bit HDF5 file to vol.");
+   app.add_option("-i,--input,1", inputFileName, "Input HDF5 file." )
+    ->required()
+    ->check(CLI::ExistingFile);
+   app.add_option("-o,--output,2", outputFileName, "Output vol filename.", true );
 
-  //Parse options
-  if ( ! ( vm.count ( "input" ) ) ) missingParam ( "--input" );
-  std::string filename = vm["input"].as<std::string>();
-  if ( ! ( vm.count ( "output" ) ) ) missingParam ( "--output" );
-  std::string outputFileName = vm["output"].as<std::string>();
- 
-
+   app.get_formatter()->column_width(40);
+   CLI11_PARSE(app, argc, argv);
+   // END parse command line using CLI ----------------------------------------------
+   
   typedef ImageContainerBySTLVector<Z3i::Domain, unsigned char>  MyImageC;
 
-  MyImageC imageC = HDF5Reader< MyImageC >::importHDF5_3D( filename, "/UInt8Array3D" );
+  MyImageC imageC = HDF5Reader< MyImageC >::importHDF5_3D( inputFileName, "/UInt8Array3D" );
   bool res = VolWriter< MyImageC>::exportVol(outputFileName, imageC);
 
   if (res)
-    return 0;
+    return EXIT_SUCCESS;
   else 
     {
       trace.error()<< "Error while exporting the volume."<<std::endl;
-      return 1;
+      return EXIT_FAILURE;
     }
 }

@@ -90,7 +90,7 @@ int main( int argc, char** argv )
    app.add_option("-i,--input,1", inputFileName, "dicom image  (.dcm)." )
     ->required()
     ->check(CLI::ExistingFile);
-   app.add_option("-o,--output", outputFileName, "volumetric file (.vol, .longvol .pgm3d, .raw)");
+   app.add_option("-o,--output,2", outputFileName, "volumetric file (.vol, .longvol .pgm3d, .raw)", true);
    app.add_option("--dicomMin",dicomMin,"set minimum density threshold on Hounsfield scale" );
    app.add_option("--dicomMax",dicomMax,"set maximum density threshold on Hounsfield scale" );
 
