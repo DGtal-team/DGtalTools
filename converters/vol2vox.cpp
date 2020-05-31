@@ -50,12 +50,14 @@ using namespace Z3i;
  @b Allowed @b options @b are:
 
  @code
- Usage: ./converters/vol2vox [OPTIONS]
 
- Options:
-   -h,--help                             Print this help message and exit
-   -i,--input TEXT:FILE REQUIRED         Input vol file.
-   -o TEXT=result.sdp                    Output filename.
+Positionals:
+  2 TEXT=result.vox                     Output filename.
+
+Options:
+  -h,--help                             Print this help message and exit
+  -i,--input TEXT:FILE REQUIRED         Input vol file.
+  -o,--output TEXT=result.vox           Output filename.
  @endcode
 
  @b Example:
@@ -92,24 +94,24 @@ std::ostream& write_word( std::ostream& outs, Word value )
 int main(int argc, char**argv)
 {
   
-  CLI::App app;
+
   
-
-
-  // parse command line ----------------------------------------------
-  std::string filename;
-  std::string outputFileName{"result.sdp"};
-  app.description("Convert a vol (up to [0,126]^3) to a vox.\n The current exporter does not support custom colormaps, only the voxel values are exported \n Example: /vol2vox  -i ${DGtal}/examples/samples/Al.100.vol -o Al.100.vox");
-  app.add_option("-i,--input", filename, "Input vol file.")
+   // parse command line using CLI ----------------------------------------------
+   CLI::App app;
+   std::string inputFileName;
+   std::string outputFileName{"result.vox"};
+  app.description("Convert a vol (up to [0,126]^3) to a vox.\n The current exporter does not support custom colormaps, only the voxel values are exported \n Example: vol2vox  -i ${DGtal}/examples/samples/Al.100.vol -o Al.100.vox");
+  app.add_option("-i,--input", inputFileName, "Input vol file.")
     ->required()
     ->check(CLI::ExistingFile);
-  app.add_option("-o", outputFileName, "Output filename.", true);
+  app.add_option("-o,--output,2", outputFileName, "Output filename.", true);
   app.get_formatter()->column_width(40);
   CLI11_PARSE(app, argc, argv);
 
+  
   typedef ImageContainerBySTLVector<Z3i::Domain, unsigned char>  MyImageC;
   trace.beginBlock("Loading..");
-  MyImageC  imageL = VolReader< MyImageC >::importVol ( filename );
+  MyImageC  imageL = VolReader< MyImageC >::importVol ( inputFileName );
   trace.endBlock();
  
    if ( (imageL.domain().upperBound() - imageL.domain().lowerBound()).max() > 126 )
