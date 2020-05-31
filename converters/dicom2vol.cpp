@@ -94,7 +94,6 @@ int main( int argc, char** argv )
    app.add_option("--dicomMin",dicomMin,"set minimum density threshold on Hounsfield scale" );
    app.add_option("--dicomMax",dicomMax,"set maximum density threshold on Hounsfield scale" );
 
-
    app.get_formatter()->column_width(40);
    CLI11_PARSE(app, argc, argv);
    // END parse command line using CLI ----------------------------------------------
@@ -109,7 +108,7 @@ int main( int argc, char** argv )
   inputImage >> outputFileName; 
   trace.info() << " [done] " << std::endl ;   
 
-  return 0;
+  return EXIT_SUCCESS;
 }
 
 
