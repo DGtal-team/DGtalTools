@@ -5,6 +5,8 @@
     [#356](https://github.com/DGtal-team/DGtalTools/pull/356))
   - set cmake  based CPP11 check instead the manual DGtal check. (Bertrand
     Kerautret [#364](https://github.com/DGtal-team/DGtalTools/pull/364))
+
+- *volumetric*
   - fix ld boost program options macos warnings. (Bertrand
     Kerautret [#366](https://github.com/DGtal-team/DGtalTools/pull/366))
   - curvatureScaleSpaceBCC: better use of exportFile with template specialisation.
@@ -38,6 +40,11 @@
   - volSurfaceRegularization now in the "make install" command. (David
     Coeurjolly, [#376](https://github.com/DGtal-team/DGtalTools/pull/376))
 
+
+- *converters*
+  - volBoundary2obj improved using new Shortcuts helpers.
+    (Bertrand Kerautret 
+    [#370](https://github.com/DGtal-team/DGtalTools/pull/370))
 
 # DGtalTools 1.0
 
