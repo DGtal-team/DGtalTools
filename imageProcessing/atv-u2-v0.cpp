@@ -14,7 +14,7 @@
  *
  **/
 /**
- * @file at-u2-v0.cpp
+ * @file atv-u2-v0.cpp
  * @ingroup Tools
  * @author Jacques-Olivier Lachaud (\c jacques-olivier.lachaud@univ-savoie.fr )
  * Laboratory of Mathematics (CNRS, UMR 5127), University of Savoie, France
@@ -81,17 +81,17 @@ for functions \f$ u,v \in W^{1,2}(\Omega)\f$ with \f$ 0 \leq v \leq 1 \f$.
 We use a variant here that reads as:
 \f[
   \displaystyle
-  AT_{\varepsilon}(u,v)	= \int_\Omega \alpha |u-g|^2 + v^2 |\nabla u|^2
+  ATV_{\varepsilon}(u,v) = \int_\Omega \alpha |u-g|^2 + v^2 |\nabla u|^2
   + c \lambda \varepsilon |\Delta v|^2 + c \frac{\lambda}{\varepsilon} |1-v|^2 dx,
 \f]
 
-It Gamma-converges to a length estimation multiplied by \f$2
+It \f$ \Gamma \f$-converges to a length estimation multiplied by \f$2
 \sqrt{2}\f$, while having a smoother profile than the standard AT. The
 constant c is set to \f$1/(2 \sqrt{2})\f$ to correct this estimation
 and to keep the same parameterization as AT.
 
 
-In AT functional, function \f$ v \f$ is a smooth approximation
+In ATV functional, function \f$ v \f$ is a smooth approximation
 of the set of discontinuities, and takes value close to 0 in this set,
 while being close to 1 outside discontinuities. A remarkable property
 of this functional is that it \f$ \Gamma \f$-converges to (a
@@ -101,13 +101,13 @@ with a fuzzy set of discontinuities, which is then progressively
 narrowed to the crisp 1-dimensional set of discontinuites as
 \f$ \varepsilon \f$ goes to 0.
 
-We discretize AT with discrete calculus and we set \f$ u \f$ and \f$ g
+We discretize ATV with discrete calculus and we set \f$ u \f$ and \f$ g
 \f$ to live on the faces and \f$ v \f$ to live on the vertices and
 edges. Pixels are faces, so functions \f$ u \f$ and \f$ g \f$ are
 2-forms since they represent the gray levels of each pixel. On the
 contrary, we set \f$ v \f$ in-between cells of non null measure, so in
 this case on vertices as a 0-form, and on edges by averaging with \f$
-\mathbf{M} \f$. We call this formulation AT20. The DEC reformulation
+\mathbf{M} \f$. We call this formulation ATV20. The DEC reformulation
 is straightforward, except for the second term, where we use matrix
 \f$ \mathbf{M} \f$ to transport the 0-form \f$ v \f$ onto edges :
 
@@ -121,7 +121,7 @@ is straightforward, except for the second term, where we use matrix
     + c \frac{\lambda}{4\varepsilon} \langle 1 - v , 1 - v \rangle_0.
 \f]
 
-For more details, see \ref moduleAT
+For more comparisons and details, see \ref moduleAT
 
 \b Allowed \b options \b are:
 
@@ -168,16 +168,19 @@ For more details, see \ref moduleAT
 <td> Input image \a g </td>
 <td> Reconstructed image \a u </td>
 <td> Perfect image </td>
+<td> Reconstructed image \a u (with discontinuities \a v)</td>
 </tr>
 <tr>
 <td>@image html degrade-b04.png "Input image (noise = 0.4)"</td>
 <td>@image html degrade-atv-a0.05000-l0.0075000-u.png "ATV20 alpha=0.05 lambda=0.0075 "</td>
 <td>@image html degrade.png "Perfect image"</td>
+<td>@image html degrade-atv-a0.05000-l0.0075000-u-v.png "ATV20 alpha=0.05 lambda=0.0075 "</td>
 </tr>
 <tr>
 <td> SNR of \a g = 21.9183 </td>
-<td> SNR of \a u = 34.3655 </td>
+<td> SNR of \a u = 34.3261 </td>
 <td> Perfect image </td>
+<td> SNR of \a u = 34.3261 </td>
 </tr>
 </table>
 </center>

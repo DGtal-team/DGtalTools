@@ -437,10 +437,40 @@ functional becomes:
   + c \lambda \varepsilon |\Delta v|^2 + c \frac{\lambda}{\varepsilon} |1-v|^2 dx,
 \f]
 
-It Gamma-converges to a length estimation multiplied by \f$2
+It \f$ \Gamma \f$-converges to a length estimation multiplied by \f$2
 \sqrt{2}\f$, while having a smoother profile than the standard AT. The
 constant c is set to \f$1/(2 \sqrt{2})\f$ to correct this estimation
 and to keep the same parameterization as AT.
+
+In ATV functional, function \f$ v \f$ is a smooth approximation
+of the set of discontinuities, and takes value close to 0 in this set,
+while being close to 1 outside discontinuities. A remarkable property
+of this functional is that it \f$ \Gamma \f$-converges to (a
+relaxation of) MS functional as \f$ \varepsilon \f$ tends to 0 (see [1]).
+The intuition is that a large \f$ \varepsilon \f$ induces a solution
+with a fuzzy set of discontinuities, which is then progressively
+narrowed to the crisp 1-dimensional set of discontinuites as
+\f$ \varepsilon \f$ goes to 0.
+
+We discretize ATV with discrete calculus and we set \f$ u \f$ and \f$ g
+\f$ to live on the faces and \f$ v \f$ to live on the vertices and
+edges. Pixels are faces, so functions \f$ u \f$ and \f$ g \f$ are
+2-forms since they represent the gray levels of each pixel. On the
+contrary, we set \f$ v \f$ in-between cells of non null measure, so in
+this case on vertices as a 0-form, and on edges by averaging with \f$
+\mathbf{M} \f$. We call this formulation ATV20. The DEC reformulation
+is straightforward, except for the second term, where we use matrix
+\f$ \mathbf{M} \f$ to transport the 0-form \f$ v \f$ onto edges :
+
+\f[
+  \displaystyle
+  ATV20(u,v) = \Sigma_{i=1}^n
+      \alpha \langle u_i - g_i , u_i - g_i \rangle_2
+    + \langle \mathbf{M} v , \bar{\mathbf{\star}} \bar{\mathbf{d_0}}
+      \mathbf{\star} u_i \rangle_1 ^2 \\
+    + c \lambda \varepsilon \langle \mathbf{L_0} v , \mathbf{L_0} v \rangle_1
+    + c \frac{\lambda}{4\varepsilon} \langle 1 - v , 1 - v \rangle_0.
+\f]
 
 Here is an example.
 
@@ -453,23 +483,26 @@ Here is an example.
 <table>
 <tr>
 <td> Input image \a g </td>
-<td> Reconstructed image \a u </td>
+<td> Reconstructed image ATV \a u </td>
+<td> Reconstructed image TV \a u (for comparison) </td>
 <td> Perfect image </td>
 </tr>
 <tr>
 <td>@image html degrade-b04.png "Input image (noise = 0.4)"</td>
 <td>@image html degrade-atv-a0.05000-l0.0075000-u.png "ATV20 alpha=0.05 lambda=0.0075 "</td>
+<td>@image html degrade-a0.05000-l0.0075000-u2.png "AT20 alpha=0.05 lambda=0.0075 "</td>
 <td>@image html degrade.png "Perfect image"</td>
 </tr>
 <tr>
 <td> SNR of \a g = 21.9183 </td>
+<td> SNR of \a u = 34.3261 </td>
 <td> SNR of \a u = 34.3655 </td>
 <td> Perfect image </td>
 </tr>
 </table>
 </center>
 
-\note After some experiments, experimental results are very similar to
+\note After some experiments, pratical results are very similar to
 `at-u2-v0`. Timings are longer since \f$ | \Delta v |^2 \f$ induces
 less sparse matrices.
 
