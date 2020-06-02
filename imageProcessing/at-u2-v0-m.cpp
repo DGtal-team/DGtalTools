@@ -239,7 +239,8 @@ int main( int argc, char* argv[] )
     po::notify(vm);
     if ( ! parseOK || vm.count("help") || !vm.count("input") )
     {
-        cerr << "Usage: " << argv[0] << " -i toto.pgm\n"
+        cerr << "Usage: " << argv[0] << " -i toto.pgm -o res.pgm\n"
+
              << "Computes the Ambrosio-Tortorelli reconstruction/segmentation of an input image."
              << "It outputs 2 or 3 images (of basename given by option --output) giving the"
              << " reconstructed image u, and other images superposing u and the discontinuities v."
