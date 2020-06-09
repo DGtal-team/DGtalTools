@@ -171,6 +171,22 @@ For more details, see \ref moduleAT
 @note Other restoration examples, parameter analysis, and image
 inpainting examples may be found in \ref moduleAT.
 
+[2] Marion Foare, Jacques-Olivier Lachaud, and Hugues Talbot. "Image restoration
+and segmentation using the Ambrosio-Tortorelli functional and discrete calculus."
+In Proceedings of the IAPR International Conference on Pattern Recognition
+(ICPR2016), Cancun, Mexico, 2016.
+
+[3] Marion Foare, Jacques-Olivier Lachaud, and Hugues
+Talbot. "Numerical implementation of the Ambrosio-Tortorelli
+functional using discrete calculus and application to image
+restoration and inpainting."  In Proceedings of 1st Workshop on
+Reproducible Research In Pattern Recognition (RRPR 2016), Springer
+LNCS. To appear.
+
+[4] Matteo Focardi. "On the variational approximation of free-
+discontinuity problems in the vectorial case." Mathematical Models
+and Methods in Applied Sciences 11.04 (2001): 663-684.
+
 */
 
 
