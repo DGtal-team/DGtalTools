@@ -96,7 +96,7 @@ typedef ImageContainerBySTLVector < Z3i::Domain,  int > Image3D_I;
 #endif
 
 /**
- * Computes the minimal subdoampin containing a masked value.
+ * Computes the minimal subdomain containing a masked value.
  * If no masked value appears it returns the image domain.
  **/
 template<typename TImage, typename TImageMask>
@@ -128,7 +128,7 @@ subDomainMasked(const TImage &image, const  TImageMask &maskImage,
   }
   if (!foundMaskedVal)
   {
-    trace.info() << "No masked value found resulting image will empty." << std::endl;
+    trace.info() << "No masked value found resulting image will be empty." << std::endl;
     return image.domain();
 
   }
@@ -177,7 +177,7 @@ int main( int argc, char** argv )
   general_opt.add_options()
     ("help,h", "display this message")
 #ifdef WITH_ITK
-    ("input,i", po::value<std::string >(), "an input 3D image vo (or ITK: .nii, mha, ... ) file. " )
+    ("input,i", po::value<std::string >(), "an input 3D image vol (or ITK: .nii, mha, ... ) file. " )
     ("inputType,t", po::value<std::string>()->default_value(""), "to specify the input image type (int or double)." )
 #else 
     ("input,i", po::value<std::string >(), "an input vol file. " )
