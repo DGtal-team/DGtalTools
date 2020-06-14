@@ -173,12 +173,12 @@ compareShapeEstimators( const std::string & filename,
 
     ASSERT (( noiseLevel < 1.0 ));
     // Digitizer
-    DigitalShape* dshape = new DigitalShape();
-    dshape->attach( *aShape );
-    dshape->init( border_min, border_max, h );
+    DigitalShape dshape;
+  dshape.attach( *aShape );
+  dshape.init( border_min, border_max, h );
 
     KSpace K;
-    if ( ! K.init( dshape->getLowerBound(), dshape->getUpperBound(), true ) )
+  if ( ! K.init( dshape.getLowerBound(), dshape.getUpperBound(), true ) )
     {
         std::cerr << "[3dLocalEstimators] error in creating KSpace." << std::endl;
         return false;
@@ -201,18 +201,19 @@ compareShapeEstimators( const std::string & filename,
             // typedef FunctorOnCells< MyPointFunctor, KSpace > MySpelFunctor;
 
             // Extracts shape boundary
-            KanungoPredicate * noisifiedObject = new KanungoPredicate( *dshape, dshape->getDomain(), noiseLevel );
-            SCell bel = Surfaces< KSpace >::findABel( K, *noisifiedObject, 10000 );
-            Boundary * boundary = new Boundary( K, *noisifiedObject, SurfelAdjacency< KSpace::dimension >( true ), bel );
+            auto d = dshape.getDomain();
+            KanungoPredicate  noisifiedObject ( dshape, d, noiseLevel );
+            SCell bel = Surfaces< KSpace >::findABel( K, noisifiedObject, 10000 );
+            Boundary * boundary = new Boundary( K, noisifiedObject, SurfelAdjacency< KSpace::dimension >( true ), bel );
             MyDigitalSurface surf ( *boundary );
 
-            double minsize = dshape->getUpperBound()[0] - dshape->getLowerBound()[0];
+          double minsize = dshape.getUpperBound()[0] - dshape.getLowerBound()[0];
             unsigned int tries = 0;
             while( surf.size() < 2 * minsize || tries > 150 )
             {
                 delete boundary;
-                bel = Surfaces< KSpace >::findABel( K, *noisifiedObject, 10000 );
-                boundary = new Boundary( K, *noisifiedObject, SurfelAdjacency< KSpace::dimension >( true ), bel );
+                bel = Surfaces< KSpace >::findABel( K, noisifiedObject, 10000 );
+                boundary = new Boundary( K, noisifiedObject, SurfelAdjacency< KSpace::dimension >( true ), bel );
                 surf = MyDigitalSurface( *boundary );
                 ++tries;
             }
@@ -379,7 +380,7 @@ compareShapeEstimators( const std::string & filename,
                     curvatureFunctor.init( h, re );
 
                     MyIICurvatureEstimator curvatureEstimator( curvatureFunctor );
-                    curvatureEstimator.attach( K, *noisifiedObject );
+                    curvatureEstimator.attach( K, noisifiedObject );
                     curvatureEstimator.setParams( re/h );
                     curvatureEstimator.init( h, ibegin, iend );
 
@@ -420,7 +421,7 @@ compareShapeEstimators( const std::string & filename,
                     curvatureFunctor.init( h, re );
 
                     MyIICurvatureEstimator curvatureEstimator( curvatureFunctor );
-                    curvatureEstimator.attach( K, *noisifiedObject );
+                    curvatureEstimator.attach( K, noisifiedObject );
                     curvatureEstimator.setParams( re/h );
                     curvatureEstimator.init( h, ibegin, iend );
 
@@ -461,7 +462,7 @@ compareShapeEstimators( const std::string & filename,
                     curvatureFunctor.init( h, re );
 
                     MyIICurvatureEstimator curvatureEstimator( curvatureFunctor );
-                    curvatureEstimator.attach( K, *noisifiedObject );
+                    curvatureEstimator.attach( K, noisifiedObject );
                     curvatureEstimator.setParams( re/h );
                     curvatureEstimator.init( h, ibegin, iend );
 
@@ -657,8 +658,8 @@ compareShapeEstimators( const std::string & filename,
             // typedef FunctorOnCells< MyPointFunctor, KSpace > MySpelFunctor;
 
             // Extracts shape boundary
-            SCell bel = Surfaces<KSpace>::findABel ( K, *dshape, 10000 );
-            Boundary boundary( K, *dshape, SurfelAdjacency< KSpace::dimension >( true ), bel );
+            SCell bel = Surfaces<KSpace>::findABel ( K, dshape, 10000 );
+            Boundary boundary( K, dshape, SurfelAdjacency< KSpace::dimension >( true ), bel );
             MyDigitalSurface surf ( boundary );
 
             VisitorRange * range;
@@ -666,9 +667,9 @@ compareShapeEstimators( const std::string & filename,
             VisitorConstIterator iend;
 
             unsigned int cntIn = 0;
-            for( typename Z3i::Domain::ConstIterator it = dshape->getDomain().begin(), ite = dshape->getDomain().end(); it != ite; ++it )
+          for( typename Z3i::Domain::ConstIterator it = dshape.getDomain().begin(), ite = dshape.getDomain().end(); it != ite; ++it )
             {
-                if( dshape->operator ()(*it))
+              if( dshape.operator ()(*it))
                 {
                     ++cntIn;
                 }
@@ -833,7 +834,7 @@ compareShapeEstimators( const std::string & filename,
                     curvatureFunctor.init( h, re );
 
                     MyIICurvatureEstimator curvatureEstimator( curvatureFunctor );
-                    curvatureEstimator.attach( K, *dshape );
+                    curvatureEstimator.attach( K, dshape );
                     curvatureEstimator.setParams( re/h );
                     curvatureEstimator.init( h, ibegin, iend );
 
@@ -874,7 +875,7 @@ compareShapeEstimators( const std::string & filename,
                     curvatureFunctor.init( h, re );
 
                     MyIICurvatureEstimator curvatureEstimator( curvatureFunctor );
-                    curvatureEstimator.attach( K, *dshape );
+                    curvatureEstimator.attach( K, dshape );
                     curvatureEstimator.setParams( re/h );
                     curvatureEstimator.init( h, ibegin, iend );
 
@@ -915,7 +916,7 @@ compareShapeEstimators( const std::string & filename,
                     curvatureFunctor.init( h, re );
 
                     MyIICurvatureEstimator curvatureEstimator( curvatureFunctor );
-                    curvatureEstimator.attach( K, *dshape );
+                    curvatureEstimator.attach( K, dshape );
                     curvatureEstimator.setParams( re/h );
                     curvatureEstimator.init( h, ibegin, iend );
 
@@ -1112,7 +1113,6 @@ compareShapeEstimators( const std::string & filename,
         return false;
     }
 
-    delete dshape;
 
     return true;
 }
