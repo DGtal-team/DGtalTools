@@ -149,7 +149,8 @@ int main( int argc, char** argv )
   app.add_option("--rescaleInputMax", rescaleInputMax, "max value used to rescale the input intensity (to avoid basic cast into 8  bits image).", true);
   app.add_option("--numMaxVoxel,-n", numDisplayedMax, "set the maximal voxel number to be displayed.");
   app.add_option("--displayMesh", displayMesh, "display a Mesh given in OFF or OFS format.");
-  app.add_option("--colorMesh", colorMesh, "set the color of Mesh (given from displayMesh option) : r g b a ");
+  app.add_option("--colorMesh", colorMesh, "set the color of Mesh (given from displayMesh option) : r g b a ")
+   ->expected(4);
   app.add_flag("--doSnapShotAndExit,-d",snapShotFile, "save display snapshot into file. Notes that the camera setting is set by default according the last saved configuration (use SHIFT+Key_M to save current camera setting in the Viewer3D). If the camera setting was not saved it will use the default camera setting." );
   
   app.add_option("--transparency,-t", transparency, "change the defaukt transparency", true);
