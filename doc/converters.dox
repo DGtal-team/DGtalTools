@@ -13,7 +13,7 @@
 
 //----------------------------------------
 /*!
-@page converters
+@page converters Converters 
 @writers Bertrand Kerautret
 
 @section converters Converters
@@ -42,7 +42,6 @@ Utilities to convert various simple file formats:
   - @ref raw2vol : converts a  8-bit raw file to vol.
   - @ref sdp2vol : converts digital set of points into a volumic file.
   - @ref slice2vol : converts set of 2D images into volumetric file  (pgm3d, vol, longvol).
-  - @ref volAddNoise : adds Kanungo noise to a binary object with 0 values as background points and values >0 for the foreground ones.
   - @ref vol2obj : converts any volumetric file to an OBJ one.
   - @ref vol2raw : converts a vol to a 8-bit raw file.
   - @ref vol2sdp : extracts digital points from 3d vol files.

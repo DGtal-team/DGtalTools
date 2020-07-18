@@ -29,7 +29,9 @@
 - *documentations*
   -  Fix doc link to the DGtal lib in the tool source (from new github website).
      (Bertrand Kerautret [#372](https://github.com/DGtal-team/DGtalTools/pull/372))
-    
+  -  Fix missing title page and various small doc corrections.
+     (Bertrand Kerautret [#381](https://github.com/DGtal-team/DGtalTools/pull/381))
+     
 - *converters*
   - itk2vol: change the type of the threshold parameter in order to be able to
     convert ITK images of type double, it also adds a new option to mask the
