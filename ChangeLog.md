@@ -40,11 +40,18 @@
   - volSurfaceRegularization now in the "make install" command. (David
     Coeurjolly, [#376](https://github.com/DGtal-team/DGtalTools/pull/376))
 
-
 - *converters*
   - volBoundary2obj improved using new Shortcuts helpers.
     (Bertrand Kerautret 
     [#370](https://github.com/DGtal-team/DGtalTools/pull/370))
+
+- *imageProcessing*:
+  - Add a variant of Ambrosio-Tortorelli functional for image
+    restoration and inpainting, using Laplacian of discontinuity
+    function instead of gradient and based on discrete calculus.
+    (Jacques-Olivier Lachaud
+    [#363](https://github.com/DGtal-team/DGtalTools/pull/363))
+
 
 # DGtalTools 1.0
 
