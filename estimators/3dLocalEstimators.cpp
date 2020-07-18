@@ -73,8 +73,60 @@
 using namespace DGtal;
 using namespace functors;
 
-typedef std::pair<double,double> PrincipalCurvatures;
 
+
+/**
+ @page Doc3dLocalEstimators 3dLocalEstimators
+ 
+ @brief Compares local estimators on implicit shapes using DGtal library.
+
+ @b Usage:  3dLocalEstimators [options] --shape <shape> --h <h> --radius <radius> --estimators <binaryWord> --output <output>
+
+    Below are the different available families of estimators:
+    - Integral Invariant Mean
+    - Integral Invariant Gaussian
+    - Monge Jet Fitting Mean
+    - Monge Jet Fitting Gaussian
+
+ @b Allowed @b options @b are :
+ @code
+   -h [ --help ]                      display this message
+   -s [ --shape ] arg                 Shape
+   -o [ --output ] arg                Output file
+   -r [ --radius ] arg                Kernel radius for IntegralInvariant
+   --alpha arg (=0.33333333333333331) Alpha parameter for Integral Invariant
+                                      computation
+   --h arg                            Grid step
+   -a [ --minAABB ] arg (=-10)        Min value of the AABB bounding box
+                                      (domain)
+   -A [ --maxAABB ] arg (=10)         Max value of the AABB bounding box
+                                      (domain)
+   -n [ --noise ] arg (=0)            Level of noise to perturb the shape
+   -l [ --lambda ] arg (=0)           Use the shape to get a better
+                                      approximation of the surface (optional)
+   --properties arg (=110)            the i-th property is disabled iff there is
+                                      a 0 at position i
+   -e [ --estimators ] arg (=110)     the i-th estimator is disabled iff there
+                                      is a 0 at position i
+ @endcode
+
+ @b Example:
+     The following example will estimate the curvature of an implicit cone shape and will produce six resulting files (toto_II_gaussian.dat,toto_II_mean.dat, toto_MongeJetFitting_gaussian.dat, toto_MongeJetFitting_mean.dat, toto_True_gaussian.dat, toto_True_mean.dat)
+     @code
+     ./estimators/3dlocalEstimators --shape "z^2-x^2-y^2" --output result --h 0.4 --radius 1.0
+
+     @endcode
+      You can check other example of implicit shapes like the followinf:
+     - whitney  : x^2-y*z^2
+     - 4lines   : x*y*(y-x)*(y-z*x)
+     - cone     : z^2-x^2-y^2
+     - simonU   : x^2-z*y^2+x^4+y^4
+     - cayley3  : 4*(x^2 + y^2 + z^2) + 16*x*y*z - 1
+     - crixxi   : -0.9*(y^2+z^2-1)^2-(x^2+y^2-1)^3
+**/
+
+
+typedef std::pair<double,double> PrincipalCurvatures;
 template < typename Shape, typename KSpace, typename ConstIterator, typename OutputIterator >
 void
 estimateTrueMeanCurvatureQuantity( const ConstIterator & it_begin,
@@ -1183,6 +1235,9 @@ int main( int argc, char** argv )
     << "\t - Mean Curvature" << std::endl
     << "\t - Gaussian Curvature" << std::endl
     << "\t - k1/k2" << std::endl
+    << std::endl
+    << general_opt
+    << "Example: \n ./estimators/3dlocalEstimators --shape \"z^2-x^2-y^2\" --output result --h 0.4 --radius 1.0"
     << std::endl;
     return 0;
   }
