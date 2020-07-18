@@ -55,10 +55,10 @@
 #include "DGtal/topology/CanonicSCellEmbedder.h"
 
 
-
 //Estimators
 #include "DGtal/kernel/BasicPointFunctors.h"
 #include "DGtal/geometry/surfaces/FunctorOnCells.h"
+#include "DGtal/geometry/volumes/distance/LpMetric.h"
 
 #include "DGtal/geometry/curves/estimation/TrueLocalEstimatorOnPoints.h"
 #include "DGtal/geometry/surfaces/estimation/IIGeometricFunctors.h"
@@ -133,7 +133,7 @@ estimateTruePrincipalCurvaturesQuantity( const ConstIterator & it_begin,
     typedef typename KSpace::Space::RealPoint RealPoint;
     typedef CanonicSCellEmbedder< KSpace > Embedder;
 
-    Embedder embedder( K );
+  Embedder embedder( K );
     RealPoint currentRealPoint;
 
     for ( ConstIterator it = it_begin; it != it_end; ++it )
@@ -497,16 +497,17 @@ compareShapeEstimators( const std::string & filename,
                 if( properties.at( 0 ) != '0' )
                 {
                     trace.beginBlock( "Monge mean curvature" );
-
+                    typedef LpMetric<Space> L2Metric;
                     typedef functors::MongeJetFittingMeanCurvatureEstimator<Surfel, CanonicSCellEmbedder<KSpace> > FunctorMean;
                     typedef functors::ConstValue< double > ConvFunctor;
-                    typedef LocalEstimatorFromSurfelFunctorAdapter<typename MyDigitalSurface::DigitalSurfaceContainer, Z3i::L2Metric, FunctorMean, ConvFunctor> ReporterH;
+                    typedef LocalEstimatorFromSurfelFunctorAdapter<typename MyDigitalSurface::DigitalSurfaceContainer, L2Metric, FunctorMean, ConvFunctor> ReporterH;
                     CanonicSCellEmbedder<KSpace> embedder( K );
                     FunctorMean estimatorH( embedder, h );
                     ConvFunctor convFunc(1.0);
+                    L2Metric l2(2.0);
                     ReporterH reporterH;
                     reporterH.attach( surf );
-                    reporterH.setParams( Z3i::l2Metric, estimatorH, convFunc, re/h );
+                    reporterH.setParams( l2, estimatorH, convFunc, re/h );
 
                     c.startClock();
                     range = new VisitorRange( new Visitor( surf, *surf.begin() ));
@@ -527,8 +528,6 @@ compareShapeEstimators( const std::string & filename,
                     range = new VisitorRange( new Visitor( surf, *surf.begin() ));
                     ibegin = range->begin();
                     iend = range->end();
-                    //typename ReporterH::SurfelConstIterator aabegin = surf.begin();
-                    //typename ReporterH::SurfelConstIterator aaend = surf.end();
                     reporterH.eval(ibegin, iend, out_it_monge_mean);
                     double TMongeMeanCurv = c.stopClock();
                     file << "# time = " << TMongeMeanCurv << std::endl;
@@ -546,13 +545,15 @@ compareShapeEstimators( const std::string & filename,
 
                     typedef functors::MongeJetFittingGaussianCurvatureEstimator<Surfel, CanonicSCellEmbedder<KSpace> > FunctorGaussian;
                     typedef functors::ConstValue< double > ConvFunctor;
-                    typedef LocalEstimatorFromSurfelFunctorAdapter<typename MyDigitalSurface::DigitalSurfaceContainer, Z3i::L2Metric, FunctorGaussian, ConvFunctor> ReporterK;
+                    typedef LpMetric<Space> L2Metric;
+                    typedef LocalEstimatorFromSurfelFunctorAdapter<typename MyDigitalSurface::DigitalSurfaceContainer, L2Metric, FunctorGaussian, ConvFunctor> ReporterK;
                     CanonicSCellEmbedder<KSpace> embedder( K );
                     FunctorGaussian estimatorK( embedder, h );
                     ConvFunctor convFunc(1.0);
                     ReporterK reporterK;
                     reporterK.attach( surf );
-                    reporterK.setParams( Z3i::l2Metric, estimatorK, convFunc, re/h );
+                    L2Metric l2(2.0);
+                    reporterK.setParams( l2, estimatorK, convFunc, re/h );
                     c.startClock();
 
                     range = new VisitorRange( new Visitor( surf, *surf.begin() ));
@@ -560,9 +561,6 @@ compareShapeEstimators( const std::string & filename,
                     iend = range->end();
 
                     reporterK.init( h , ibegin, iend );
-
-                    //typename ReporterK::SurfelConstIterator aaabegin = surf.begin();
-                    //typename ReporterK::SurfelConstIterator aaaend = surf.end();
 
                     delete range;
                     range = new VisitorRange( new Visitor( surf, *surf.begin() ));
@@ -590,16 +588,17 @@ compareShapeEstimators( const std::string & filename,
                 if( properties.at( 2 ) != '0' )
                 {
                     trace.beginBlock( "Monge Principal Curvature" );
-
+                    typedef LpMetric<Space> L2Metric;
                     typedef functors::MongeJetFittingPrincipalCurvaturesEstimator<Surfel, CanonicSCellEmbedder<KSpace> > FunctorPrincCurv;
                     typedef functors::ConstValue< double > ConvFunctor;
-                    typedef LocalEstimatorFromSurfelFunctorAdapter<typename MyDigitalSurface::DigitalSurfaceContainer, Z3i::L2Metric, FunctorPrincCurv, ConvFunctor> ReporterK;
+                    typedef LocalEstimatorFromSurfelFunctorAdapter<typename MyDigitalSurface::DigitalSurfaceContainer, L2Metric, FunctorPrincCurv, ConvFunctor> ReporterK;
                     CanonicSCellEmbedder<KSpace> embedder( K );
                     FunctorPrincCurv estimatorK( embedder, h );
                     ConvFunctor convFunc(1.0);
+                    L2Metric l2(2.0);
                     ReporterK reporterK;
                     reporterK.attach( surf );
-                    reporterK.setParams( Z3i::l2Metric, estimatorK, convFunc, re/h );
+                    reporterK.setParams( l2, estimatorK, convFunc, re/h );
 
                     c.startClock();
 
@@ -617,13 +616,12 @@ compareShapeEstimators( const std::string & filename,
                     std::ostream_iterator< std::string > out_it_monge_principal( file, "\n" );
 
                     std::vector<PrincipalCurvatures> v_results;
-                    std::back_insert_iterator< std::vector<PrincipalCurvatures> > bkIt(v_results);
+                    std::back_insert_iterator<std::vector<PrincipalCurvatures> > bkIt(v_results);
 
                     delete range;
                     range = new VisitorRange( new Visitor( surf, *surf.begin() ));
                     ibegin = range->begin();
                     iend = range->end();
-
                     reporterK.eval(ibegin, iend , bkIt);//out_it_monge_principal);
 
                     for(unsigned int ii = 0; ii < v_results.size(); ++ii )
@@ -653,9 +651,6 @@ compareShapeEstimators( const std::string & filename,
             typedef DepthFirstVisitor< MyDigitalSurface > Visitor;
             typedef GraphVisitorRange< Visitor > VisitorRange;
             typedef typename VisitorRange::ConstIterator VisitorConstIterator;
-
-            // typedef PointFunctorFromPointPredicateAndDomain< DigitalShape, Z3i::Domain, unsigned int > MyPointFunctor;
-            // typedef FunctorOnCells< MyPointFunctor, KSpace > MySpelFunctor;
 
             // Extracts shape boundary
             SCell bel = Surfaces<KSpace>::findABel ( K, dshape, 10000 );
@@ -951,16 +946,17 @@ compareShapeEstimators( const std::string & filename,
                 if( properties.at( 0 ) != '0' )
                 {
                     trace.beginBlock( "Monge mean curvature" );
-
+                    typedef LpMetric<Space> L2Metric;
                     typedef functors::MongeJetFittingMeanCurvatureEstimator<Surfel, CanonicSCellEmbedder<KSpace> > FunctorMean;
                     typedef functors::ConstValue< double > ConvFunctor;
-                    typedef LocalEstimatorFromSurfelFunctorAdapter<typename MyDigitalSurface::DigitalSurfaceContainer, Z3i::L2Metric, FunctorMean, ConvFunctor> ReporterH;
+                    typedef LocalEstimatorFromSurfelFunctorAdapter<typename MyDigitalSurface::DigitalSurfaceContainer, L2Metric, FunctorMean, ConvFunctor> ReporterH;
                     CanonicSCellEmbedder<KSpace> embedder( K );
                     FunctorMean estimatorH( embedder, h );
                     ConvFunctor convFunc(1.0);
+                    L2Metric l2(2.0);
                     ReporterH reporterH;
                     reporterH.attach( surf );
-                    reporterH.setParams( Z3i::l2Metric, estimatorH, convFunc, re/h );
+                    reporterH.setParams( l2, estimatorH, convFunc, re/h );
                     c.startClock();
 
                     range = new VisitorRange( new Visitor( surf, *surf.begin() ));
@@ -995,16 +991,17 @@ compareShapeEstimators( const std::string & filename,
                 if( properties.at( 1 ) != '0' )
                 {
                     trace.beginBlock( "Monge Gaussian curvature" );
-
+                    typedef LpMetric<Space> L2Metric;
                     typedef functors::MongeJetFittingGaussianCurvatureEstimator<Surfel, CanonicSCellEmbedder<KSpace> > FunctorGaussian;
                     typedef functors::ConstValue< double > ConvFunctor;
-                    typedef LocalEstimatorFromSurfelFunctorAdapter<typename MyDigitalSurface::DigitalSurfaceContainer, Z3i::L2Metric, FunctorGaussian, ConvFunctor> ReporterK;
+                    typedef LocalEstimatorFromSurfelFunctorAdapter<typename MyDigitalSurface::DigitalSurfaceContainer, L2Metric, FunctorGaussian, ConvFunctor> ReporterK;
                     CanonicSCellEmbedder<KSpace> embedder( K );
                     FunctorGaussian estimatorK( embedder, h );
                     ConvFunctor convFunc(1.0);
                     ReporterK reporterK;
                     reporterK.attach( surf );
-                    reporterK.setParams( Z3i::l2Metric, estimatorK, convFunc, re/h );
+                    L2Metric l2(2.0);
+                    reporterK.setParams( l2, estimatorK, convFunc, re/h );
 
                     c.startClock();
 
@@ -1039,19 +1036,19 @@ compareShapeEstimators( const std::string & filename,
                 if( properties.at( 2 ) != '0' )
                 {
                     trace.beginBlock( "Monge Principal Curvature" );
+                    typedef LpMetric<Space> L2Metric;
 
                     typedef functors::MongeJetFittingPrincipalCurvaturesEstimator<Surfel, CanonicSCellEmbedder<KSpace> > FunctorPrincCurv;
                     typedef functors::ConstValue< double > ConvFunctor;
-                    typedef LocalEstimatorFromSurfelFunctorAdapter<typename MyDigitalSurface::DigitalSurfaceContainer, Z3i::L2Metric, FunctorPrincCurv, ConvFunctor> ReporterK;
+                    typedef LocalEstimatorFromSurfelFunctorAdapter<typename MyDigitalSurface::DigitalSurfaceContainer, L2Metric, FunctorPrincCurv, ConvFunctor> ReporterK;
                     CanonicSCellEmbedder<KSpace> embedder( K );
                     FunctorPrincCurv estimatorK( embedder, h );
                     ConvFunctor convFunc(1.0);
                     ReporterK reporterK;
                     reporterK.attach(surf);
-                    reporterK.setParams(Z3i::l2Metric, estimatorK, convFunc, re/h);
-
+                    L2Metric l2(2.0);
+                    reporterK.setParams(l2, estimatorK, convFunc, re/h);
                     c.startClock();
-
                     range = new VisitorRange( new Visitor( surf, *surf.begin() ));
                     ibegin = range->begin();
                     iend = range->end();
@@ -1071,8 +1068,7 @@ compareShapeEstimators( const std::string & filename,
                     std::ostream_iterator< std::string > out_it_monge_principal( file, "\n" );
 
                     std::vector<PrincipalCurvatures> v_results;
-                    std::back_insert_iterator< std::vector<PrincipalCurvatures> > bkIt(v_results);
-
+                    std::back_insert_iterator<std::vector<PrincipalCurvatures> > bkIt(v_results);
                     reporterK.eval(ibegin, iend , bkIt);//out_it_monge_principal);
 
                     for(unsigned int ii = 0; ii < v_results.size(); ++ii )
