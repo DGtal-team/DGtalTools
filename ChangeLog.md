@@ -39,6 +39,8 @@
 - *estimators*
   - volSurfaceRegularization now in the "make install" command. (David
     Coeurjolly, [#376](https://github.com/DGtal-team/DGtalTools/pull/376))
+  - 3dLocalEstimators now include in the main build and fix compilation issues #382. 
+    (Bertrand Kerautret [#383](https://github.com/DGtal-team/DGtalTools/pull/383))
 
 - *converters*
   - volBoundary2obj improved using new Shortcuts helpers.
