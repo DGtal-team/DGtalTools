@@ -21,7 +21,6 @@
   - volAddBorder: Add an option that sets zero value to domain boundary voxels without 
     changing the domain extent (Bertrand Kertautret 
     [#371](https://github.com/DGtal-team/DGtalTools/pull/371))
-
   - Fix a wrong error message that appears when using the tool (wrong IO error)
     (Bertrand Kerautret
     [#368](https://github.com/DGtal-team/DGtalTools/pull/368))
@@ -39,9 +38,10 @@
 - *estimators*
   - volSurfaceRegularization now in the "make install" command. (David
     Coeurjolly, [#376](https://github.com/DGtal-team/DGtalTools/pull/376))
-  - 3dLocalEstimators now include in the main build and fix compilation issues #382. 
+  - 3dLocalEstimators now include in the main build and fix compilation issues
+    [#382](https://github.com/DGtal-team/DGtalTools/issues/382). 
     (Bertrand Kerautret [#383](https://github.com/DGtal-team/DGtalTools/pull/383))
-
+    
 - *converters*
   - volBoundary2obj improved using new Shortcuts helpers.
     (Bertrand Kerautret 
