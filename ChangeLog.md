@@ -17,11 +17,12 @@
     (Roland Denis, [#359](https://github.com/DGtal-team/DGtalTools/pull/359/files))
   - Using SourceForge to download doxygen sources during Travis CI jobs.
     (Roland Denis [#360](https://github.com/DGtal-team/DGtalTools/pull/360))
+  - volMask: new tool to extract a new image from the a masked image.
+    (Jonas Lamy and Bertrand Kerautret [374](https://github.com/DGtal-team/DGtalTools/pull/374))
 
   - volAddBorder: Add an option that sets zero value to domain boundary voxels without 
     changing the domain extent (Bertrand Kertautret 
     [#371](https://github.com/DGtal-team/DGtalTools/pull/371))
-
   - Fix a wrong error message that appears when using the tool (wrong IO error)
     (Bertrand Kerautret
     [#368](https://github.com/DGtal-team/DGtalTools/pull/368))
@@ -29,7 +30,9 @@
 - *documentations*
   -  Fix doc link to the DGtal lib in the tool source (from new github website).
      (Bertrand Kerautret [#372](https://github.com/DGtal-team/DGtalTools/pull/372))
-    
+  -  Fix missing title page and various small doc corrections.
+     (Bertrand Kerautret [#381](https://github.com/DGtal-team/DGtalTools/pull/381))
+     
 - *converters*
   - itk2vol: change the type of the threshold parameter in order to be able to
     convert ITK images of type double, it also adds a new option to mask the
@@ -39,12 +42,23 @@
 - *estimators*
   - volSurfaceRegularization now in the "make install" command. (David
     Coeurjolly, [#376](https://github.com/DGtal-team/DGtalTools/pull/376))
-
-
+  - 3dLocalEstimators now included in the main build and fix compilation issues
+    and documentation added. 
+    [#382](https://github.com/DGtal-team/DGtalTools/issues/382). 
+    (Bertrand Kerautret [#383](https://github.com/DGtal-team/DGtalTools/pull/383))
+    
 - *converters*
   - volBoundary2obj improved using new Shortcuts helpers.
     (Bertrand Kerautret 
     [#370](https://github.com/DGtal-team/DGtalTools/pull/370))
+
+- *imageProcessing*:
+  - Add a variant of Ambrosio-Tortorelli functional for image
+    restoration and inpainting, using Laplacian of discontinuity
+    function instead of gradient and based on discrete calculus.
+    (Jacques-Olivier Lachaud
+    [#363](https://github.com/DGtal-team/DGtalTools/pull/363))
+
 
 # DGtalTools 1.0
 

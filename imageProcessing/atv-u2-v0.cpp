@@ -14,7 +14,7 @@
  *
  **/
 /**
- * @file at-u2-v0.cpp
+ * @file atv-u2-v0.cpp
  * @ingroup Tools
  * @author Jacques-Olivier Lachaud (\c jacques-olivier.lachaud@univ-savoie.fr )
  * Laboratory of Mathematics (CNRS, UMR 5127), University of Savoie, France
@@ -23,7 +23,7 @@
  *
  * @date 2016/10/12
  *
- * A tool file named at-u2-v0.
+ * A tool file named atv-u2-v0.
  *
  * This file is part of the DGtal library.
  */
@@ -46,20 +46,20 @@
 #include "DGtal/io/readers/GenericReader.h"
 #include "DGtal/io/writers/GenericWriter.h"
 
-#include "ATu2v0.h"
+#include "ATVu2v0.h"
 
 /**
-@page DocATu2v0 imageProcessing/at-u2-v0 
+@page DocATVu2v0 imageProcessing/atv-u2-v0 
 
-@brief Computes a piecewise smooth approximation of a grey-level or color image, by optimizing the Ambrosio-Tortorelli functional (with u a 2-form and v a 0-form).
+@brief Computes a piecewise smooth approximation of a grey-level or color image, by optimizing a variant of the Ambrosio-Tortorelli functional (with u a 2-form and v a 0-form).
 
-@writers Marion Foare, Jacques-Olivier Lachaud
+@writers Jacques-Olivier Lachaud
 
-@b Usage: at-u2-v0 -i [input.pgm]
+@b Usage: atv-u2-v0 -i [input.pgm]
 
 (for grey-level image restoration)
 
-@b Usage: at-u2-v0 -i [input.ppm]
+@b Usage: atv-u2-v0 -i [input.ppm]
 
 (for color image restoration)
 
@@ -78,9 +78,20 @@ The Ambrosio-Tortorelli functional [1] is defined by
   + \lambda \varepsilon |\nabla v|^2 + \frac{\lambda}{4 \varepsilon} |1-v|^2 dx,
 \f]
 for functions \f$ u,v \in W^{1,2}(\Omega)\f$ with \f$ 0 \leq v \leq 1 \f$.
+We use a variant here that reads as:
+\f[
+  \displaystyle
+  ATV_{\varepsilon}(u,v) = \int_\Omega \alpha |u-g|^2 + v^2 |\nabla u|^2
+  + c \lambda \varepsilon |\Delta v|^2 + c \frac{\lambda}{\varepsilon} |1-v|^2 dx,
+\f]
+
+It \f$ \Gamma \f$-converges to a length estimation multiplied by \f$2
+\sqrt{2}\f$, while having a smoother profile than the standard AT. The
+constant c is set to \f$1/(2 \sqrt{2})\f$ to correct this estimation
+and to keep the same parameterization as AT.
 
 
-In AT functional, function \f$ v \f$ is a smooth approximation
+In ATV functional, function \f$ v \f$ is a smooth approximation
 of the set of discontinuities, and takes value close to 0 in this set,
 while being close to 1 outside discontinuities. A remarkable property
 of this functional is that it \f$ \Gamma \f$-converges to (a
@@ -90,27 +101,27 @@ with a fuzzy set of discontinuities, which is then progressively
 narrowed to the crisp 1-dimensional set of discontinuites as
 \f$ \varepsilon \f$ goes to 0.
 
-We discretize AT with discrete calculus and we set \f$ u \f$ and \f$ g
+We discretize ATV with discrete calculus and we set \f$ u \f$ and \f$ g
 \f$ to live on the faces and \f$ v \f$ to live on the vertices and
 edges. Pixels are faces, so functions \f$ u \f$ and \f$ g \f$ are
 2-forms since they represent the gray levels of each pixel. On the
 contrary, we set \f$ v \f$ in-between cells of non null measure, so in
 this case on vertices as a 0-form, and on edges by averaging with \f$
-\mathbf{M} \f$. We call this formulation AT20. The DEC reformulation
+\mathbf{M} \f$. We call this formulation ATV20. The DEC reformulation
 is straightforward, except for the second term, where we use matrix
 \f$ \mathbf{M} \f$ to transport the 0-form \f$ v \f$ onto edges :
 
 \f[
   \displaystyle
-  AT20(u,v) = \Sigma_{i=1}^n
+  ATV20(u,v) = \Sigma_{i=1}^n
       \alpha \langle u_i - g_i , u_i - g_i \rangle_2
     + \langle \mathbf{M} v , \bar{\mathbf{\star}} \bar{\mathbf{d_0}}
       \mathbf{\star} u_i \rangle_1 ^2 \\
-    + \lambda \varepsilon \langle \mathbf{d_0} v , \mathbf{d_0} v \rangle_1
-    + \frac{\lambda}{4\varepsilon} \langle 1 - v , 1 - v \rangle_0.
+    + c \lambda \varepsilon \langle \mathbf{L_0} v , \mathbf{L_0} v \rangle_1
+    + c \frac{\lambda}{4\varepsilon} \langle 1 - v , 1 - v \rangle_0.
 \f]
 
-For more details, see \ref moduleAT
+For more comparisons and details, see \ref moduleAT
 
 \b Allowed \b options \b are:
 
@@ -145,10 +156,8 @@ For more details, see \ref moduleAT
 
 @b example:
 
-@b example:
-
 \code
-./imageProcessing/at-u2-v0 -i ../imageProcessing/Images/degrade-b04.pgm --image-snr ../imageProcessing/Images/degrade.pgm -a 0.05 --epsilon-1 4 --epsilon-2 0.25 -l 0.0075 -p 2 -c 0xff0000 -o degrade
+./imageProcessing/atv-u2-v0 -i ../imageProcessing/Images/degrade-b04.pgm --image-snr ../imageProcessing/Images/degrade.pgm -a 0.05 --epsilon-1 4 --epsilon-2 0.25 -l 0.0075 -p 2 -c 0xff0000 -o degrade
 \endcode
 
 <center>
@@ -157,16 +166,19 @@ For more details, see \ref moduleAT
 <td> Input image \a g </td>
 <td> Reconstructed image \a u </td>
 <td> Perfect image </td>
+<td> Reconstructed image \a u (with discontinuities \a v)</td>
 </tr>
 <tr>
 <td>@image html degrade-b04.png "Input image (noise = 0.4)"</td>
-<td>@image html degrade-a0.05000-l0.0075000-u2.png "AT20 alpha=0.05 lambda=0.0075 "</td>
+<td>@image html degrade-atv-a0.05000-l0.0075000-u.png "ATV20 alpha=0.05 lambda=0.0075 "</td>
 <td>@image html degrade.png "Perfect image"</td>
+<td>@image html degrade-atv-a0.05000-l0.0075000-u-v.png "ATV20 alpha=0.05 lambda=0.0075 "</td>
 </tr>
 <tr>
 <td> SNR of \a g = 21.9183 </td>
-<td> SNR of \a u = 34.3655 </td>
+<td> SNR of \a u = 34.3261 </td>
 <td> Perfect image </td>
+<td> SNR of \a u = 34.3261 </td>
 </tr>
 </table>
 </center>
@@ -242,21 +254,22 @@ int main( int argc, char* argv[] )
   if ( ! parseOK || vm.count("help") || !vm.count("input") )
     {
       cerr << "Usage: " << argv[0] << " -i toto.pgm\n"
-           << "Computes the Ambrosio-Tortorelli reconstruction/segmentation of an input image."
+           << "Computes a variant of the Ambrosio-Tortorelli reconstruction/segmentation of an input image."
            << "It outputs 2 or 3 images (of basename given by option --output) giving the"
            << " reconstructed image u, and other images superposing u and the discontinuities v."
            << endl << endl
            << " / "
            << endl
-           << " | a.(u-g)^2 + v^2 |grad u|^2 + le.|grad v|^2 + (l/4e).(1-v)^2 "
+           << " | a.(u-g)^2 + v^2 |grad u|^2 + c.l.e^3.|Delta v|^2 + (c.l/e).(1-v)^2 "
            << endl
            << " / "
            << endl
-           << "Discretized as (u 2-form, v 0-form, A vertex-edge bdry, B edge-face bdy, M vertex-edge average)" << endl
-           << "E(u,v) = a(u-g)^t (u-g) +  u^t B diag(M v)^2 B^t u + l e v^t A^t A v + l/(4e) (1-v)^t (1-v)" << endl
+           << "Discretized as (u 2-form, v 0-form, L=A^t A laplacian, B edge-face bdy, M vertex-edge average)" << endl
+           << "E(u,v) = a(u-g)^t (u-g) +  u^t B diag(M v)^2 B^t u + l e^3 v^t L^t L v + l/e (1-v)^t (1-v)" << endl
            << endl
+	   << "where c=1/(2sqrt(2)) is a constant that reflects the fact that the Gamma-limit of discontinuity length estimation term is 2.sqrt(2).L, for a length L of discontinuities."
            << general_opt << "\n"
-           << "Example: ./at-u2-v0 -i ../Images/cerclesTriangle64b02.pgm -o tmp -a 0.05 -e 1 --lambda-1 0.1 --lambda-2 0.00001 -g"
+           << "Example: ./atv-u2-v0 -i ../Images/cerclesTriangle64b02.pgm -o tmp -a 0.05 -e 1 --lambda-1 0.1 --lambda-2 0.00001"
            << endl;
       return 1;
     }
@@ -293,11 +306,11 @@ int main( int argc, char* argv[] )
     }
 
   KSpace K;
-  ATu2v0< KSpace > AT( verb );
+  ATVu2v0< KSpace > AT( verb );
   Domain domain;
   AT.setMetricAverage( metric );
   
-  typedef ATu2v0<KSpace>::Calculus Calculus;
+  typedef ATVu2v0<KSpace>::Calculus Calculus;
   typedef ImageContainerBySTLVector<Domain, Color> ColorImage;
   typedef ImageContainerBySTLVector<Domain, unsigned char> GreyLevelImage;
   //---------------------------------------------------------------------------
@@ -398,10 +411,11 @@ int main( int argc, char* argv[] )
   trace.info() << AT << std::endl;
   double n_v = 0.0;
   double eps = 0.0;
+  double cst = 1.0 / ( 2.0 * sqrt(2.0) );
   while ( l1 >= l2 )
     {
       trace.info() << "************ lambda = " << l1 << " **************" << endl;
-      AT.setLambda( l1 );
+      AT.setLambda( cst * l1 );
       for ( eps = e1; eps >= e2; eps /= er )
         {
           trace.info() << "  ======= epsilon = " << eps << " ========" << endl;

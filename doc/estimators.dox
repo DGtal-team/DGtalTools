@@ -13,14 +13,14 @@
 
 //----------------------------------------
 /*!
-@page estimators
+@page estimators Estimators
 @writers Bertrand Kerautret
 
 @section estimators_Doc Estimators
 
-
   - @ref Doc2dLocalEstimators : compares local estimators on implicit shapes using DGtal Library.
   - @ref Doc3dCurveTangentEstimator : estimates the tangent vector to a set of 3D integer points.
+  - @ref Doc3dLocalEstimators : compares local estimators on implicit shapes using DGtal library.
   - @ref curvatureBC : estimates curvature using a binomial convolver.
   - @ref curvatureMCMS : estimates curvature using length of most centered segment computers.
   - @ref curvatureScaleSpaceBCC : generates the Curvature Scale Space image using a binomial convolver based estimator.
