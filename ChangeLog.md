@@ -17,6 +17,8 @@
     (Roland Denis, [#359](https://github.com/DGtal-team/DGtalTools/pull/359/files))
   - Using SourceForge to download doxygen sources during Travis CI jobs.
     (Roland Denis [#360](https://github.com/DGtal-team/DGtalTools/pull/360))
+  - volMask: new tool to extract a new image from the a masked image.
+    (Jonas Lamy and Bertrand Kerautret [374](https://github.com/DGtal-team/DGtalTools/pull/374))
 
   - volAddBorder: Add an option that sets zero value to domain boundary voxels without 
     changing the domain extent (Bertrand Kertautret 
