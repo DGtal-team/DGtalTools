@@ -32,9 +32,8 @@
 ///////////////////////////////////////////////////////////////////////////////
 #include <iostream>
 #include <map>
-#include <boost/program_options/options_description.hpp>
-#include <boost/program_options/parsers.hpp>
-#include <boost/program_options/variables_map.hpp>
+#include "CLI11.hpp"
+
 
 #include "DGtal/base/Common.h"
 #include "DGtal/base/CountedPtr.h"
@@ -492,54 +491,43 @@ int main( int argc, char** argv )
   typedef CC4::CellMapConstIterator         CellMapConstIterator;
   typedef CC4::Cells                        Cells4;
 
-  //-------------- parse command line ----------------------------------------------
-  namespace po = boost::program_options;
-  po::options_description general_opt("Allowed options are: ");
-  general_opt.add_options()
-    ("help,h", "display this message")
-    ("polynomial,p", po::value<string>(), "the implicit polynomial whose zero-level defines the shape of interest." )
-    ("minAABB,a",  po::value<double>()->default_value( -10.0 ), "the min value of the AABB bounding box (domain)" )
-    ("maxAABB,A",  po::value<double>()->default_value( 10.0 ), "the max value of the AABB bounding box (domain)" )
-    ("gridstep,g", po::value< double >()->default_value( 1.0 ), "the gridstep that defines the digitization (often called h). " )
-    ("timestep,t", po::value< double >()->default_value( 0.000001 ), "the gridstep that defines the digitization in the 4th dimension (small is generally a good idea, default is 1e-6). " )
-    ("project,P", po::value< std::string >()->default_value( "Newton" ), "defines the projection: either No or Newton." )
-    ("epsilon,e", po::value< double >()->default_value( 0.0000001 ), "the maximum precision relative to the implicit surface." )
-    ("max_iter,n", po::value< unsigned int >()->default_value( 500 ), "the maximum number of iteration in the Newton approximation of F=0." )
-    ("view,v", po::value< std::string >()->default_value( "Normal" ), "specifies if the surface is viewed as is (Normal) or if places close to singularities are highlighted (Singular)." )
-    ;
+  
+  // parse command line using CLI ----------------------------------------------
+  CLI::App app;
+  string poly_str;
+  std::string outputFileName {"result.raw"};
+  DGtal::int64_t rescaleInputMin {0};
+  DGtal::int64_t rescaleInputMax {255};
+  Ring min_x {-10.0};
+  Ring max_x {10.0};
+  Ring h {1.0};
+  Ring t {0.000001};
 
-  bool parseOK=true;
-  po::variables_map vm;
-  try {
-    po::store(po::parse_command_line(argc, argv, general_opt), vm);  
-  } catch ( const exception& ex ) {
-    parseOK=false;
-    cerr << "Error checking program options: "<< ex.what()<< endl;
-  }
-  po::notify(vm);    
-  if( ! parseOK || vm.count("help") || ! vm.count( "polynomial" ) )
-    {
-      if ( ! vm.count( "polynomial" ) ) 
-        cerr << "Need parameter --polynomial / -p" << endl;
+  std::string project {"Newton"};
+  double epsilon {1e-6};
+  unsigned int max_iter {500};
+  std::string view {"Normal"};
+    app.description( "Computes the zero level set of the given polynomial. Usage:  3dImplicitSurfaceExtractorBy4DExtension -p <polynomial> [options]\n Example:\n 3dImplicitSurfaceExtractorBy4DExtension  -p \"-0.9*(y^2+z^2-1)^2-(x^2+y^2-1)^3\" -g 0.06125 -a -2 -A 2 -v Singular -t 0.02 \n - whitney  : x^2-y*z^2 \n - 4lines   : x*y*(y-x)*(y-z*x) \n - cone     : z^2-x^2-y^2 \n - simonU   : x^2-z*y^2+x^4+y^4 \n - cayley3  : 4*(x^2 + y^2 + z^2) + 16*x*y*z - 1 \n - crixxi   : -0.9*(y^2+z^2-1)^2-(x^2+y^2-1)^3 \n Some other examples (more difficult): \n 3dImplicitSurfaceExtractorBy4DExtension -a -2 -A 2 -p \"((y^2+z^2-1)^2-(x^2+y^2-1)^3)*(y*(x-1)^2-z*(x+1))^2\" -g 0.025 -e 1e-6 -n 50000 -v Singular -t 0.5 -P Newton \n 3dImplicitSurfaceExtractorBy4DExtension -a -2 -A 2 -p \"(x^5-4*z^3*y^2)*((x+y)^2-(z-x)^3)\" -g 0.025 -e 1e-6 -n 50000 -v Singular -t 0.05 -P Newton ");
+  app.add_option("-p,--polynomial,1", poly_str, "the implicit polynomial whose zero-level defines the shape of interest." )
+  ->required();
+  app.add_option("--minAABB,-a",min_x, "the min value of the AABB bounding box (domain)" , true);
+  app.add_option("--maxAABB,-A",max_x, "the max value of the AABB bounding box (domain)" , true);
+  app.add_option("--gridstep,-g", h, "the gridstep that defines the digitization in the 4th dimension (small is generally a good idea, default is 1e-6). ", true);
+  app.add_option("--timestep,-t",t, "the thickening parameter for the implicit surface." , true);
+  app.add_option("--project,-P", project, "defines the projection: either No or Newton.", true)
+   -> check(CLI::IsMember({"No", "Newton"}));
+  app.add_option("--epsilon,-e", epsilon, "the maximum precision relative to the implicit surface in the Newton approximation of F=0.", true);
+  app.add_option("--max_iter,-n", max_iter, "the maximum number of iteration in the Newton approximation of F=0.", true );
+  app.add_option("--view,-v", view, "specifies if the surface is viewed as is (Normal) or if places close to singularities are highlighted (Singular), or if unsure places should not be displayed (Hide).",true )
+   -> check(CLI::IsMember({"Singular", "Normal", "Hide"}));
+  
+  app.get_formatter()->column_width(40);
+  CLI11_PARSE(app, argc, argv);
+  // END parse command line using CLI ----------------------------------------------
 
-      cerr << "Usage: " << argv[0] << " -p <polynomial> [options]\n"
-		<< "Computes the zero level set of the given polynomial." 
-                << endl
-		<< general_opt << "\n";
-      cerr << "Example:\n" << endl
-           << argv[ 0 ] << " -p \"-0.9*(y^2+z^2-1)^2-(x^2+y^2-1)^3\" -g 0.06125 -a -2 -A 2 -v Singular -t 0.02" << endl
-           << " - whitney  : x^2-y*z^2" << endl
-           << " - 4lines   : x*y*(y-x)*(y-z*x)" << endl
-           << " - cone     : z^2-x^2-y^2" << endl
-           << " - simonU   : x^2-z*y^2+x^4+y^4" << endl
-           << " - cayley3  : 4*(x^2 + y^2 + z^2) + 16*x*y*z - 1" << endl
-           << " - crixxi   : -0.9*(y^2+z^2-1)^2-(x^2+y^2-1)^3" << endl << endl;
-      return 0;
-    }
-
+   
   //-------------- read polynomial and creating 4d implicit fct -----------------
   trace.beginBlock( "Reading polynomial and creating 4D implicit function" );
-  string poly_str = vm[ "polynomial" ].as<string>();
   Polynomial3 poly;
   Polynomial3Reader reader;
   string::const_iterator iter = reader.read( poly, poly_str.begin(), poly_str.end() );
@@ -553,10 +541,7 @@ int main( int argc, char** argv )
   ImplicitShape3 shape3( poly );
   CountedPtr<ImplicitShape4> shape( new ImplicitShape4( poly ) ); 
 
-  Ring min_x = vm[ "minAABB" ].as<double>();
-  Ring max_x = vm[ "maxAABB" ].as<double>();
-  Ring h     = vm[ "gridstep" ].as<double>();
-  Ring t     = vm[ "timestep" ].as<double>();
+  
   RealPoint4 p1( min_x, min_x, min_x, -t*h );
   RealPoint4 p2( max_x, max_x, max_x,  0 );
   // Creating digitized shape and storing it with smart pointer for automatic deallocation.
@@ -664,9 +649,6 @@ int main( int argc, char** argv )
 
   //-------------- Project complex onto surface --------------------------------
   trace.beginBlock( "Project complex onto surface. " );
-  std::string project   = vm[ "project" ].as<std::string>();
-  double epsilon        = vm[ "epsilon" ].as<double>();
-  unsigned int max_iter = vm[ "max_iter" ].as<unsigned int>();
   std::vector<RealPoint3> points;
   if ( project == "Newton" )
     projectComplex( points, complex4, *shape, dshape, shape3, epsilon, max_iter );
@@ -676,7 +658,6 @@ int main( int argc, char** argv )
 
   //-------------- Create Mesh -------------------------------------------
   trace.beginBlock( "Create Mesh. " );
-  std::string view = vm[ "view" ].as<std::string>();
   bool highlight = ( view == "Singular" );
   Mesh<RealPoint3> mesh( true );
   std::map<Cell4,unsigned int> indices;
