@@ -31,9 +31,8 @@
 #include "DGtal/base/Common.h"
 #include <cstring>
 
-#include <boost/program_options/options_description.hpp>
-#include <boost/program_options/parsers.hpp>
-#include <boost/program_options/variables_map.hpp>
+#include "CLI11.hpp"
+
 
 // Shape constructors
 #include "DGtal/io/readers/GenericReader.h"
@@ -94,44 +93,27 @@ using namespace functors;
  @b Allowed @b options @b are:
 
  @code
-  -h [ --help ]                         display this message
-  -i [ --input ] arg                    .vol file
-  -r [ --radius ] arg                   Kernel radius for IntegralInvariant
-  -k [ --noise ] arg (=0.5)             Level of Kanungo noise ]0;1[
-  -t [ --threshold ] arg (=8)           Min size of SCell boundary of an object
-  -l [ --minImageThreshold ] arg (=0)   set the minimal image threshold to
-                                        define the image object (object defined
-                                        by the voxel with intensity belonging
-                                        to ]minImageThreshold,
-                                        maxImageThreshold ] ).
-  -u [ --maxImageThreshold ] arg (=255) set the minimal image threshold to
-                                        define the image object (object defined
-                                        by the voxel with intensity belonging
-                                        to ]minImageThreshold,
-                                        maxImageThreshold] ).
-  -m [ --mode ] arg (=mean)             type of output : mean, gaussian, k1,
-                                        k2, prindir1, prindir2 or
-                                        normal(default mean)
-  -o [ --exportOBJ ] arg                Export the scene to specified OBJ/MTL
-                                        filename (extensions added).
-  -d [ --exportDAT ] arg                Export resulting curvature (for mean,
-                                        gaussian, k1 or k2 mode) in a simple
-                                        data file each line representing a
-                                        surfel.
-  --exportOnly                          Used to only export the result without
-                                        the 3d Visualisation (usefull for
-                                        scripts).
-  -s [ --imageScale ] arg               scaleX, scaleY, scaleZ: re sample the
-                                        source image according with a grid of
-                                        size 1.0/scale (usefull to compute
-                                        curvature on image defined on
-                                        anisotropic grid). Set by default to
-                                        1.0 for the three axis.
-  -n [ --normalization ]                When exporting to OBJ, performs a
-                                        normalization so that the geometry fits
-                                        in [-1/2,1/2]^3
 
+ Positionals:
+   1 TEXT:FILE REQUIRED                  vol file (.vol, .longvol .p3d, .pgm3d and if WITH_ITK is selected: dicom, dcm, mha, mhd). For longvol, dicom, dcm, mha or mhd formats, the input values are linearly scaled between 0 and 255.
 
+ Options:
+   -h,--help                             Print this help message and exit
+   -i,--input TEXT:FILE REQUIRED         vol file (.vol, .longvol .p3d, .pgm3d and if WITH_ITK is selected: dicom, dcm, mha, mhd). For longvol, dicom, dcm, mha or mhd formats, the input values are linearly scaled between 0 and 255.
+   -r,--radius FLOAT REQUIRED            Kernel radius for IntegralInvariant
+   -k,--noise FLOAT=0.5                  Level of Kanungo noise ]0;1[
+   -t,--threshold UINT=8                 Min size of SCell boundary of an object
+   -l,--minImageThreshold INT=0          set the minimal image threshold to define the image object (object defined by the voxel with intensity belonging to ]minImageThreshold, maxImageThreshold ] ).
+   -u,--maxImageThreshold INT=255        set the maximal image threshold to define the image object (object defined by the voxel with intensity belonging to ]minImageThreshold, maxImageThreshold] ).
+   -m,--mode TEXT:{mean,gaussian,k1,k2,prindir1,prindir2,normal}=mean
+                                         type of output : mean, gaussian, k1, k2, prindir1, prindir2 or normal(default mean)
+   -o,--exportOBJ TEXT                   Export the scene to specified OBJ/MTL filename (extensions added).
+   -d,--exportDAT TEXT                   Export resulting curvature (for mean, gaussian, k1 or k2 mode) in a simple data file each line representing a surfel.
+   --exportOnly                          Used to only export the result without the 3d Visualisation (usefull for scripts).
+   -s,--imageScale FLOAT x 3             scaleX, scaleY, scaleZ: re sample the source image according with a grid of size 1.0/scale (usefull to compute curvature on image defined on anisotropic grid). Set by default to 1.0 for the three axis.
+   -n,--normalization BOOLEAN            When exporting to OBJ, performs a normalization so that the geometry fits in [-1/2,1/2]^3
+
+ 
  @endcode
 
  Below are the different available modes:
@@ -179,78 +161,69 @@ void missingParam( std::string param )
   trace.info() << std::endl;
 }
 
-namespace po = boost::program_options;
 
 int main( int argc, char** argv )
 {
-  // parse command line ----------------------------------------------
-  po::options_description general_opt("Allowed options are");
-  general_opt.add_options()
-    ("help,h", "display this message")
-    ("input,i", po::value< std::string >(), ".vol file")
-    ("radius,r",  po::value< double >(), "Kernel radius for IntegralInvariant" )
-    ("noise,k",  po::value< double >()->default_value(0.5), "Level of Kanungo noise ]0;1[" )
-    ("threshold,t",  po::value< unsigned int >()->default_value(8), "Min size of SCell boundary of an object" )
-    ("minImageThreshold,l",  po::value<  int >()->default_value(0), "set the minimal image threshold to define the image object (object defined by the voxel with intensity belonging to ]minImageThreshold, maxImageThreshold ] )." )
-    ("maxImageThreshold,u",  po::value<  int >()->default_value(255), "set the minimal image threshold to define the image object (object defined by the voxel with intensity belonging to ]minImageThreshold, maxImageThreshold] )." )
-    ("mode,m", po::value< std::string >()->default_value("mean"), "type of output : mean, gaussian, k1, k2, prindir1, prindir2 or normal(default mean)")
-    ("exportOBJ,o", po::value< std::string >(), "Export the scene to specified OBJ/MTL filename (extensions added)." )
-    ("exportDAT,d", po::value<std::string>(), "Export resulting curvature (for mean, gaussian, k1 or k2 mode) in a simple data file each line representing a surfel. ")
-    ("exportOnly", "Used to only export the result without the 3d Visualisation (usefull for scripts)." )
-    ("imageScale,s", po::value<std::vector<double> >()->multitoken(), "scaleX, scaleY, scaleZ: re sample the source image according with a grid of size 1.0/scale (usefull to compute curvature on image defined on anisotropic grid). Set by default to 1.0 for the three axis.  ")
-    ("normalization,n", "When exporting to OBJ, performs a normalization so that the geometry fits in [-1/2,1/2]^3") ;
+  // parse command line using CLI ----------------------------------------------
+  CLI::App app;
+  std::string inputFileName;
+  double re_convolution_kernel;
+  double noiseLevel {0.5};
+  unsigned int threshold {8};
+  int minImageThreshold {0};
+  int maxImageThreshold {255};
+  std::string mode {"mean"};
+  std::string export_obj_filename;
+  std::string export_dat_filename;
+  bool exportOnly {false};
+  std::vector< double> vectScale;
+  bool normalization {false};
 
-  bool parseOK = true;
-  po::variables_map vm;
-  try
-    {
-      po::store( po::parse_command_line( argc, argv, general_opt ), vm );
-    }
-  catch( const std::exception & ex )
-    {
-      parseOK = false;
-      trace.error() << " Error checking program options: " << ex.what() << std::endl;
-    }
+  
+  app.description("Visualisation of 3d curvature from .vol file using curvature from Integral Invariant\nBasic usage:\n \t3dCurvatureViewerNoise -i file.vol --radius 5 --mode mean --noise 0.5 \n Below are the different available modes: \n\t - \"mean\" for the mean curvature \n \t - \"mean\" for the mean curvature\n\t - \"gaussian\" for the Gaussian curvature\n\t - \"k1\" for the first principal curvature\n\t - \"k2\" for the second principal curvature\n\t - \"prindir1\" for the first principal curvature direction\n\t - \"prindir2\" for the second principal curvature direction\n\t - \"normal\" for the normal vector");
+
+  
+  
+  app.add_option("-i,--input,1", inputFileName, "vol file (.vol, .longvol .p3d, .pgm3d and if WITH_ITK is selected: dicom, dcm, mha, mhd). For longvol, dicom, dcm, mha or mhd formats, the input values are linearly scaled between 0 and 255." )
+  ->required()
+  ->check(CLI::ExistingFile);
+  
+  app.add_option("--radius,-r", re_convolution_kernel, "Kernel radius for IntegralInvariant" )
+    ->required();
+  app.add_option("--noise,-k", noiseLevel, "Level of Kanungo noise ]0;1[", true);
+  app.add_option("--threshold,-t", threshold, "Min size of SCell boundary of an object", true);
+  app.add_option("--minImageThreshold,-l",minImageThreshold,  "set the minimal image threshold to define the image object (object defined by the voxel with intensity belonging to ]minImageThreshold, maxImageThreshold ] ).", true);
+  app.add_option("--maxImageThreshold,-u",maxImageThreshold, "set the maximal image threshold to define the image object (object defined by the voxel with intensity belonging to ]minImageThreshold, maxImageThreshold] ).", true);
+  app.add_option("--mode,-m", mode, "type of output : mean, gaussian, k1, k2, prindir1, prindir2 or normal(default mean)", true)
+   -> check(CLI::IsMember({"mean","gaussian", "k1", "k2", "prindir1","prindir2", "normal" }));
+  app.add_option("--exportOBJ,-o", export_obj_filename, "Export the scene to specified OBJ/MTL filename (extensions added).");
+  app.add_option("--exportDAT,-d",export_dat_filename, "Export resulting curvature (for mean, gaussian, k1 or k2 mode) in a simple data file each line representing a surfel."  );
+  app.add_flag("--exportOnly", exportOnly, "Used to only export the result without the 3d Visualisation (usefull for scripts).");
+  
+  app.add_option("--imageScale,-s", vectScale,  "scaleX, scaleY, scaleZ: re sample the source image according with a grid of size 1.0/scale (usefull to compute curvature on image defined on anisotropic grid). Set by default to 1.0 for the three axis.")
+   ->expected(3);
+ 
+  app.add_option("--normalization,-n",normalization, "When exporting to OBJ, performs a normalization so that the geometry fits in [-1/2,1/2]^3") ;
+  
+  app.get_formatter()->column_width(40);
+  CLI11_PARSE(app, argc, argv);
+  // END parse command line using CLI ----------------------------------------------
+
   bool neededArgsGiven=true;
 
-  if (parseOK && !(vm.count("input"))){
-    missingParam("--input");
-    neededArgsGiven=false;
-  }
-  if (parseOK && !(vm.count("radius"))){
-    missingParam("--radius");
-    neededArgsGiven=false;
-  }
-
-  bool normalization = false;
-  if (parseOK && vm.count("normalization"))
-    normalization = true;
-
-  std::string mode;
-  if( parseOK )
-    mode =  vm["mode"].as< std::string >();
-  if ( parseOK && ( mode.compare("gaussian") != 0 ) && ( mode.compare("mean") != 0 ) &&
-       ( mode.compare("k1") != 0 ) && ( mode.compare("k2") != 0 ) &&
-       ( mode.compare("prindir1") != 0 ) && ( mode.compare("prindir2") != 0 )&& ( mode.compare("normal") != 0 ))
-    {
-      parseOK = false;
-      trace.error() << " The selected mode ("<<mode << ") is not defined."<<std::endl;
-    }
-
-  double noiseLevel = vm["noise"].as< double >();
   if( noiseLevel < 0.0 || noiseLevel > 1.0 )
     {
-      parseOK = false;
       trace.error() << "The noise level should be in the interval: ]0, 1["<< std::endl;
+      exit(EXIT_FAILURE);
     }
 
 #ifndef WITH_VISU3D_QGLVIEWER
   bool enable_visu = false;
 #else
-  bool enable_visu = !vm.count("exportOnly"); ///<! Default QGLViewer viewer. Disabled if exportOnly is set.
+  bool enable_visu = exportOnly; ///<! Default QGLViewer viewer. Disabled if exportOnly is set.
 #endif
-  bool enable_obj = vm.count("exportOBJ"); ///<! Export to a .obj file.
-  bool enable_dat = vm.count("exportDAT"); ///<! Export to a .dat file.
+  bool enable_obj = export_obj_filename != ""; ///<! Export to a .obj file.
+  bool enable_dat = export_dat_filename != ""; ///<! Export to a .dat file.
 
   if( !enable_visu && !enable_obj && !enable_dat )
     {
@@ -262,36 +235,10 @@ int main( int argc, char** argv )
       neededArgsGiven = false;
     }
 
-  if(!neededArgsGiven || !parseOK || vm.count("help") || argc <= 1 )
-    {
-      trace.info()<< "Visualisation of 3d curvature from .vol file using curvature from Integral Invariant" <<std::endl
-                  << general_opt << "\n"
-                  << "Basic usage: "<<std::endl
-                  << "\t3dCurvatureViewerNoise -i file.vol --radius 5 --mode mean --noise 0.5"<<std::endl
-                  << std::endl
-                  << "Below are the different available modes: " << std::endl
-                  << "\t - \"mean\" for the mean curvature" << std::endl
-                  << "\t - \"gaussian\" for the Gaussian curvature" << std::endl
-                  << "\t - \"k1\" for the first principal curvature" << std::endl
-                  << "\t - \"k2\" for the second principal curvature" << std::endl
-                  << "\t - \"prindir1\" for the first principal curvature direction" << std::endl
-                  << "\t - \"prindir2\" for the second principal curvature direction" << std::endl
-                  << "\t - \"normal\" for the normal vector" << std::endl
-                  << std::endl;
-      return 0;
-    }
-  unsigned int threshold = vm["threshold"].as< unsigned int >();
-  int minImageThreshold =  vm["minImageThreshold"].as<  int >();
-  int maxImageThreshold =  vm["maxImageThreshold"].as<  int >();
-
   double h = 1.0;
-
-  std::string export_obj_filename;
-  std::string export_dat_filename;
 
   if( enable_obj )
     {
-      export_obj_filename = vm["exportOBJ"].as< std::string >();
       if( export_obj_filename.find(".obj") == std::string::npos )
         {
           std::ostringstream oss;
@@ -299,31 +246,14 @@ int main( int argc, char** argv )
           export_obj_filename = oss.str();
         }
     }
-
-
-  if( enable_dat )
-    {
-      export_dat_filename = vm["exportDAT"].as<std::string>();
-    }
-
-  double re_convolution_kernel = vm["radius"].as< double >();
-
-
+ 
   std::vector<  double > aGridSizeReSample;
-  if( vm.count( "imageScale" ))
+  if( vectScale.size() == 3)
     {
-      std::vector< double> vectScale = vm["imageScale"].as<std::vector<double > >();
-      if( vectScale.size() != 3 )
-        {
-          trace.error() << "The grid size should contains 3 elements" << std::endl;
-          return 0;
-        }
-      else
-        {
-          aGridSizeReSample.push_back(1.0/vectScale.at(0));
-          aGridSizeReSample.push_back(1.0/vectScale.at(1));
-          aGridSizeReSample.push_back(1.0/vectScale.at(2));
-        }
+      aGridSizeReSample.push_back(1.0/vectScale.at(0));
+      aGridSizeReSample.push_back(1.0/vectScale.at(1));
+      aGridSizeReSample.push_back(1.0/vectScale.at(2));
+
     }
   else
     {
@@ -350,8 +280,8 @@ int main( int argc, char** argv )
   typedef KSpace::Cell Cell;
 
   trace.beginBlock("Loading the file");
-  std::string filename = vm["input"].as< std::string >();
-  Image image = GenericReader<Image>::import( filename );
+
+  Image image = GenericReader<Image>::import( inputFileName );
 
   PointVector<3,int> shiftVector3D( 0 ,0, 0 );
   DGtal::functors::BasicDomainSubSampler< HyperRectDomain< SpaceND< 3, int > >,
