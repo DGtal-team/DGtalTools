@@ -220,7 +220,7 @@ int main( int argc, char** argv )
 #ifndef WITH_VISU3D_QGLVIEWER
   bool enable_visu = false;
 #else
-  bool enable_visu = exportOnly; ///<! Default QGLViewer viewer. Disabled if exportOnly is set.
+  bool enable_visu = !exportOnly; ///<! Default QGLViewer viewer. Disabled if exportOnly is set.
 #endif
   bool enable_obj = export_obj_filename != ""; ///<! Export to a .obj file.
   bool enable_dat = export_dat_filename != ""; ///<! Export to a .dat file.
