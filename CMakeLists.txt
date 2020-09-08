@@ -1,3 +1,4 @@
+
 #David Coeurjolly <david.coeurjolly@liris.cnrs.fr>
 # -----------------------------------------------------------------------------
 # Project definition
@@ -51,8 +52,8 @@ endif (CMAKE_CXX_FLAGS MATCHES "-ftemplate-depth-[0-9]*")
 # -----------------------------------------------------------------------------
 SET(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
 SET(DGtalTools_VERSION_MAJOR 1)
-SET(DGtalTools_VERSION_MINOR 0)
-SET(DGtalTools_VERSION_PATCH 0)
+SET(DGtalTools_VERSION_MINOR 1)
+SET(DGtalTools_VERSION_PATCH beta)
 SET(DGTALTOOLS_VERSION "${DGtalTools_VERSION_MAJOR}.${DGtalTools_VERSION_MINOR}.${DGtalTools_VERSION_PATCH}")
 SET(PROJECT_VERSION "${DGtalTools_VERSION_MAJOR}.${DGtalTools_VERSION_MINOR}.${DGtalTools_VERSION_PATCH}")
 SET(VERSION ${DGtalTools_VERSION_MAJOR}.${DGtalTools_VERSION_MINOR}.${DGtalTools_VERSION_PATCH})
