@@ -5,6 +5,9 @@
     [#356](https://github.com/DGtal-team/DGtalTools/pull/356))
   - set cmake  based CPP11 check instead the manual DGtal check. (Bertrand
     Kerautret [#364](https://github.com/DGtal-team/DGtalTools/pull/364))
+  - Travis: Fix broken Eigen url. Update Eigen in travis to 3.3.7.
+     (Pablo Hernandez and Bertrand Kerautret
+     [#373](https://github.com/DGtal-team/DGtal/pull/#373))
 
 - *volumetric*
   - fix ld boost program options macos warnings. (Bertrand
