@@ -62,7 +62,7 @@ void missingParam ( std::string param )
 
 int main(int argc, char**argv)
 {
-
+  //Phuc
   // parse command line ----------------------------------------------
   po::options_description general_opt ( "Allowed options are: " );
   general_opt.add_options()
