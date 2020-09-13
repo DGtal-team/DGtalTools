@@ -35,83 +35,69 @@
 #include <DGtal/images/ConstImageAdapter.h>
 #include <DGtal/images/RigidTransformation2D.h>
 
-#include <boost/program_options/options_description.hpp>
-#include <boost/program_options/parsers.hpp>
-#include <boost/program_options/variables_map.hpp>
+#include "CLI11.hpp"
 
 using namespace std;
 using namespace DGtal;
 using namespace Z2i;
 using namespace functors;
 
-namespace po = boost::program_options;
-
-
 /**
- * Missing parameter error message.
- *
- * @param param
- */
-void missingParam ( std::string param )
-{
-  trace.error() <<" Parameter: "<<param<<" is required..";
-  trace.info() <<std::endl;
-  exit ( 1 );
-}
 
+@b Allowed @b options @b are :
+
+@code
+
+Apply rigid transformation on a given image.
+
+Positionals:
+  1 TEXT:FILE REQUIRED                  Input file.
+  2 TEXT REQUIRED                       Output file.
+
+Options:
+  -h,--help                             Print this help message and exit
+  -i,--input TEXT:FILE REQUIRED         Input file.
+  -o,--output TEXT REQUIRED             Output file.
+  -m,--model TEXT REQUIRED              Transformation model: backward, forward.
+  -a,--angle TEXT REQUIRED              Rotation angle in radians.
+  --ox FLOAT REQUIRED                   X coordinate of origin.
+  --oy FLOAT REQUIRED                   Y coordinate of origin.
+  --tx FLOAT REQUIRED                   X component of translation vector.
+  --ty FLOAT REQUIRED                   Y component of translation vector.
+
+@endcode
+
+
+@b Example
+rigidTrans2D --input <RawFileName> --output <OutputFileName> --ox 1.0 --oy 1.0 -a 1.2 --tx 1 --ty 0 --m <forward|backward>
+
+**/
 
 int main(int argc, char**argv)
 {
-  //Phuc
-  // parse command line ----------------------------------------------
-  po::options_description general_opt ( "Allowed options are: " );
-  general_opt.add_options()
-    ( "help,h", "display this message." )
-    ( "input,i", po::value<std::string>(), "Input file." )
-    ( "output,o", po::value<string>(),"Output filename." )
-    ( "model,m", po::value<string>(),"Transformation model: backward, forward." )
-    ( "angle,a", po::value<double>(),"Rotation angle in radians." )
-    ( "ox", po::value<double>(),"X coordinate of origin." )
-    ( "oy", po::value<double>(),"Y coordinate of origin." )
-    ( "tx", po::value<double>(),"X component of translation vector." )
-    ( "ty", po::value<double>(),"Y component of translation vector." );
+  // parse command line using CLI ----------------------------------------------
+  CLI::App app;
+  std::string filename;
+  std::string outputFileName;
+  std::string model;
+  double angle;
+  double ox;
+  double oy;
+  double tx;
+  double ty;
 
-  bool parseOK=true;
-  po::variables_map vm;
-  try{
-    po::store(po::parse_command_line(argc, argv, general_opt), vm);
-  }catch(const std::exception& ex){
-    parseOK=false;
-    trace.info()<< "Error checking program options: "<< ex.what()<< endl;
-  }
-
-  po::notify ( vm );
-  if (!parseOK || vm.count ( "help" ) ||argc<=1 )
-    {
-      trace.info() << "Rotate 2D image."<<std::endl
-                   << std::endl << "Basic usage: "<<std::endl
-                   << "rigidTrans2D --ox 1.0 --oy 1.0 -a 1.2 --tx 1 --ty 0 --m <forward|backward> --input <RawFileName> --output <VolOutputFileName> "<<std::endl
-                   << general_opt << "\n";
-      return 0;
-    }
-
-  //Parse options
-  if ( ! ( vm.count ( "input" ) ) ) missingParam ( "--input" );
-  std::string filename = vm["input"].as<std::string>();
-  if ( ! ( vm.count ( "output" ) ) ) missingParam ( "--output" );
-  std::string outputFileName = vm["output"].as<std::string>();
-  if ( ! ( vm.count ( "model" ) ) ) missingParam ( "--model" );
-  std::string model = vm["model"].as<std::string>();
-  if ( ! ( vm.count ( "angle" ) ) ) missingParam ( "--angle" );
-  double angle =  vm["angle"].as<double>();
-  if ( ! ( vm.count ( "ox" ) ) ) missingParam ( "--ox" );
-  double ox =  vm["ox"].as<double>();
-  if ( ! ( vm.count ( "oy" ) ) ) missingParam ( "--oy" );
-  double oy =  vm["oy"].as<double>();
-  if ( ! ( vm.count ( "tx" ) ) ) missingParam ( "--tx" );
-  double tx =  vm["tx"].as<double>();
-  if ( ! ( vm.count ( "ty" ) ) ) missingParam ( "--ty" );
-  double ty =  vm["ty"].as<double>();
+  app.description("Apply rigid transformation on a given image.\n Typical use example:\n \t rigidTrans2D --input <RawFileName> --output <OutputFileName> --ox 1.0 --oy 1.0 -a 1.2 --tx 1 --ty 0 --m <forward|backward>\n");
+  app.add_option("-i,--input,1",filename,"Input file.")->required()->check(CLI::ExistingFile);
+  app.add_option("-o,--output,2",outputFileName,"Output file.")->required();
+  app.add_option("-m,--model",model,"Transformation model: backward, forward.")->required();
+  app.add_option("-a,--angle",model,"Rotation angle in radians.")->required();
+  app.add_option("--ox",ox,"X coordinate of origin.")->required();
+  app.add_option("--oy",oy,"Y coordinate of origin.")->required();
+  app.add_option("--tx",tx,"X component of translation vector.")->required();
+  app.add_option("--ty",ty,"Y component of translation vector.")->required();
+  app.get_formatter()->column_width(40);
+  CLI11_PARSE(app, argc, argv);
+  // END parse command line using CLI ----------------------------------------------
 
   typedef ImageSelector<Domain, unsigned char >::Type Image;
   typedef ForwardRigidTransformation2D < Space > ForwardTrans;
