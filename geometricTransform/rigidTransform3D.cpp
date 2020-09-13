@@ -43,13 +43,13 @@ using namespace Z3i;
 using namespace functors;
 
 /**
+@brief Apply rigid transformation on a given volumic image.
+
+@b Usage : rigidTrans3D --input <RawFileName> --output <VolOutputFileName> --ox 1.0 --oy 1.0 --oz 1 -a 1.2 --ax 1 --ay 1 --az 0 --tx 1 --ty 0 --tz 0 --m <forward|backward>  
 
 @b Allowed @b options @b are :
 
 @code
-
-Apply rigid transformation on a given volumic image.
-
 Positionals:
   1 TEXT:FILE REQUIRED                  Input file.
   2 TEXT REQUIRED                       Output file.
@@ -59,21 +59,21 @@ Options:
   -i,--input TEXT:FILE REQUIRED         Input file.
   -o,--output TEXT REQUIRED             Output file.
   -m,--model TEXT REQUIRED              Transformation model: backward, forward.
-  -a,--angle TEXT REQUIRED              Rotation angle in radians.
-  --ox FLOAT REQUIRED                   X coordinate of origin.
-  --oy FLOAT REQUIRED                   Y coordinate of origin.
-  --oz FLOAT REQUIRED                   Z coordinate of origin.
-  --ax FLOAT REQUIRED                   X component of rotation axis.
-  --ay FLOAT REQUIRED                   Y component of rotation axis.
-  --az FLOAT REQUIRED                   Z component of rotation axis.
-  --tx FLOAT REQUIRED                   X component of translation vector.
-  --ty FLOAT REQUIRED                   Y component of translation vector.
-  --tz FLOAT REQUIRED                   Y component of translation vector.
+  -a,--angle FLOAT=0                    Rotation angle in radians (default 0)
+  --ox FLOAT=0                          X coordinate of origin (default 0)
+  --oy FLOAT=0                          Y coordinate of origin (default 0)
+  --oz FLOAT=0                          Z coordinate of origin (default 0)
+  --ax FLOAT=1                          X component of rotation axis (default 1)
+  --ay FLOAT=0                          Y component of rotation axis (default 0)
+  --az FLOAT=0                          Z component of rotation axis (default 0)
+  --tx FLOAT=0                          X component of translation vector (default 0)
+  --ty FLOAT=0                          Y component of translation vector (default 0)
+  --tz FLOAT=0                          Y component of translation vector (default 0)
 
 @endcode
 
 @b Example
-rigidTrans3D --input <RawFileName> --output <VolOutputFileName> --ox 1.0 --oy 1.0 --oz 1 -a 1.2 --ax 1 --ay 1 --az 0 --tx 1 --ty 0 --tz 0 --m <forward|backward>  
+
 */
 
 int main(int argc, char**argv)
@@ -84,31 +84,25 @@ int main(int argc, char**argv)
   std::string filename;
   std::string outputFileName;
   std::string model;
-  double angle;
-  double ox;
-  double oy;
-  double oz;
-  double ax;
-  double ay;
-  double az;
-  double tx;
-  double ty;
-  double tz;
+  double angle {0};
+  double ox {0}, oy {0}, oz {0};
+  double ax {1}, ay {0}, az {0};
+  double tx {0}, ty {0}, tz {0};
 
   app.description("Apply rigid transformation on a given volumic image.\n Typical use example:\n \t rigidTrans3D --input <RawFileName> --output <VolOutputFileName> --ox 1.0 --oy 1.0 --oz 1 -a 1.2 --ax 1 --ay 1 --az 0 --tx 1 --ty 0 --tz 0 --m <forward|backward>\n");
   app.add_option("-i,--input,1",filename,"Input file.")->required()->check(CLI::ExistingFile);
   app.add_option("-o,--output,2",outputFileName,"Output file.")->required();
   app.add_option("-m,--model",model,"Transformation model: backward, forward.")->required();
-  app.add_option("-a,--angle",model,"Rotation angle in radians.")->required();
-  app.add_option("--ox",ox,"X coordinate of origin.")->required();
-  app.add_option("--oy",oy,"Y coordinate of origin.")->required();
-  app.add_option("--oz",oz,"Z coordinate of origin.")->required();
-  app.add_option("--ax",ax,"X component of rotation axis.")->required();
-  app.add_option("--ay",ay,"Y component of rotation axis.")->required();
-  app.add_option("--az",az,"Z component of rotation axis.")->required();
-  app.add_option("--tx",tx,"X component of translation vector.")->required();
-  app.add_option("--ty",ty,"Y component of translation vector.")->required();
-  app.add_option("--tz",tz,"Y component of translation vector.")->required();
+  app.add_option("-a,--angle",angle,"Rotation angle in radians (default 0)",true);
+  app.add_option("--ox",ox,"X coordinate of origin (default 0)",true);
+  app.add_option("--oy",oy,"Y coordinate of origin (default 0)",true);
+  app.add_option("--oz",oz,"Z coordinate of origin (default 0)",true);
+  app.add_option("--ax",ax,"X component of rotation axis (default 1)",true);
+  app.add_option("--ay",ay,"Y component of rotation axis (default 0)",true);
+  app.add_option("--az",az,"Z component of rotation axis (default 0)",true);
+  app.add_option("--tx",tx,"X component of translation vector (default 0)",true);
+  app.add_option("--ty",ty,"Y component of translation vector (default 0)",true);
+  app.add_option("--tz",tz,"Y component of translation vector (default 0)",true);
 
   app.get_formatter()->column_width(40);
   CLI11_PARSE(app, argc, argv);

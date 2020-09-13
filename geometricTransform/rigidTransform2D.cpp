@@ -43,13 +43,13 @@ using namespace Z2i;
 using namespace functors;
 
 /**
+@brief Apply rigid transformation on a given image.
+
+@b Usage: rigidTrans2D --input <RawFileName> --output <OutputFileName> --ox 1.0 --oy 1.0 -a 1.2 --tx 1 --ty 0 --m <forward|backward>
 
 @b Allowed @b options @b are :
 
 @code
-
-Apply rigid transformation on a given image.
-
 Positionals:
   1 TEXT:FILE REQUIRED                  Input file.
   2 TEXT REQUIRED                       Output file.
@@ -59,17 +59,18 @@ Options:
   -i,--input TEXT:FILE REQUIRED         Input file.
   -o,--output TEXT REQUIRED             Output file.
   -m,--model TEXT REQUIRED              Transformation model: backward, forward.
-  -a,--angle TEXT REQUIRED              Rotation angle in radians.
-  --ox FLOAT REQUIRED                   X coordinate of origin.
-  --oy FLOAT REQUIRED                   Y coordinate of origin.
-  --tx FLOAT REQUIRED                   X component of translation vector.
-  --ty FLOAT REQUIRED                   Y component of translation vector.
+  -a,--angle FLOAT=0                    Rotation angle in radians (default 0)
+  --ox FLOAT=0                          X coordinate of origin (default 0)
+  --oy FLOAT=0                          Y coordinate of origin (default 0)
+  --tx FLOAT=0                          X component of translation vector (default 0)
+  --ty FLOAT=0                          Y component of translation vector (default 0)
 
 @endcode
 
-
 @b Example
-rigidTrans2D --input <RawFileName> --output <OutputFileName> --ox 1.0 --oy 1.0 -a 1.2 --tx 1 --ty 0 --m <forward|backward>
+@code
+# transform lena.pgm
+./rigidTransform2D -i lena.pgm -o lena_transf.pgm -m backward -a 0.5 --ox 0.5 --oy 0.3 --tx 0.1 --ty 0.1
 
 **/
 
@@ -80,21 +81,22 @@ int main(int argc, char**argv)
   std::string filename;
   std::string outputFileName;
   std::string model;
-  double angle;
-  double ox;
-  double oy;
-  double tx;
-  double ty;
+  double angle {0};
+  double ox {0};
+  double oy {0};
+  double tx {0};
+  double ty {0};
 
   app.description("Apply rigid transformation on a given image.\n Typical use example:\n \t rigidTrans2D --input <RawFileName> --output <OutputFileName> --ox 1.0 --oy 1.0 -a 1.2 --tx 1 --ty 0 --m <forward|backward>\n");
   app.add_option("-i,--input,1",filename,"Input file.")->required()->check(CLI::ExistingFile);
   app.add_option("-o,--output,2",outputFileName,"Output file.")->required();
   app.add_option("-m,--model",model,"Transformation model: backward, forward.")->required();
-  app.add_option("-a,--angle",model,"Rotation angle in radians.")->required();
-  app.add_option("--ox",ox,"X coordinate of origin.")->required();
-  app.add_option("--oy",oy,"Y coordinate of origin.")->required();
-  app.add_option("--tx",tx,"X component of translation vector.")->required();
-  app.add_option("--ty",ty,"Y component of translation vector.")->required();
+  app.add_option("-a,--angle",angle,"Rotation angle in radians (default 0)",true);
+  app.add_option("--ox",ox,"X coordinate of origin (default 0)",true);
+  app.add_option("--oy",oy,"Y coordinate of origin (default 0)",true);
+  app.add_option("--tx",tx,"X component of translation vector (default 0)",true);
+  app.add_option("--ty",ty,"Y component of translation vector (default 0)",true);
+  
   app.get_formatter()->column_width(40);
   CLI11_PARSE(app, argc, argv);
   // END parse command line using CLI ----------------------------------------------
