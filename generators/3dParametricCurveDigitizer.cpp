@@ -228,18 +228,6 @@ struct Exporter
   }
 };
 
-/**
- * Missing parameter error message.
- *
- * @param param
- */
-void missingParam ( std::string param )
-{
-  trace.error ( ) <<" Parameter: "<< param <<" is required..";
-  trace.info ( ) << std::endl;
-  exit ( 1 );
-}
-
 ///////////////////////////////////////////////////////////////////////////////
 
 int main( int argc, char** argv )
@@ -279,6 +267,10 @@ int main( int argc, char** argv )
   app.add_option("--az",az,"Z component of rotation axis (default 0)",true);
   app.add_option("--output,-o",outputName,"Basename of the output file")->required();
 
+  app.get_formatter()->column_width(40);
+  CLI11_PARSE(app, argc, argv);
+  // END parse command line using CLI ----------------------------------------------
+
   //List creation
   createList();
 
@@ -287,11 +279,7 @@ int main( int argc, char** argv )
     displayList();
     return 0;
   }
-
-  app.get_formatter()->column_width(40);
-  CLI11_PARSE(app, argc, argv);
-  // END parse command line using CLI ----------------------------------------------
-
+  
   typedef functors::ForwardRigidTransformation3D < Z3i::Space, Z3i::RealPoint, Z3i::RealPoint, functors::Identity > ForwardTrans;
   ForwardTrans trans ( Z3i::RealPoint ( ox, oy, oz ), Z3i::RealPoint ( ax, ay, az ), angle, Z3i::RealVector ( 0, 0, 0 ) );
   //We check that the shape is known
