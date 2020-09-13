@@ -35,8 +35,9 @@
 #include <vector>
 #include <string>
 
-#include "CLI11.hpp"
-
+#include <boost/program_options/options_description.hpp>
+#include <boost/program_options/parsers.hpp>
+#include <boost/program_options/variables_map.hpp>
 
 #include "DGtal/base/Common.h"
 #include "DGtal/kernel/domains/HyperRectDomain.h"
