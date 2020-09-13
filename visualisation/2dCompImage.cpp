@@ -70,7 +70,7 @@ typedef GradientColorMap<unsigned int, CMAP_JET, 1 > JetMap;
 
  Positionals:
    1 TEXT:FILE REQUIRED                  Input filename of image A.
-   1 TEXT:FILE REQUIRED                  Input filename of image B.
+   2 TEXT:FILE REQUIRED                  Input filename of image B.
 
  Options:
    -h,--help                             Print this help message and exit
@@ -166,7 +166,7 @@ int main( int argc, char** argv )
   app.add_option("-a,--imageA,1", inputFileNameA, "Input filename of image A." )
   ->required()
   ->check(CLI::ExistingFile);
-  app.add_option("-b,--imageB,1", inputFileNameA, "Input filename of image B." )
+  app.add_option("-b,--imageB,2", inputFileNameA, "Input filename of image B." )
    ->required()
    ->check(CLI::ExistingFile);
 
