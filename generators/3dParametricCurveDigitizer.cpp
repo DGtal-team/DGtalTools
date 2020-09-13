@@ -66,15 +66,15 @@ using namespace DGtal;
 
  @code
   -h,--help                             Print this help message and exit
-  --param1 FLOAT=1 REQUIRED             a radius or a scaling factor (default 0)
-  --param2 FLOAT=1 REQUIRED             a radius or a scaling factor (default 0)
-  --param3 FLOAT=1 REQUIRED             a radius or a scaling factor (default 0)
-  --tstart FLOAT REQUIRED               start time
-  --tend FLOAT REQUIRED                 end time
-  -s,--step FLOAT REQUIRED              step
+  --param1 FLOAT=1                      a radius or a scaling factor (default 0)
+  --param2 FLOAT=1                      a radius or a scaling factor (default 0)
+  --param3 FLOAT=1                      a radius or a scaling factor (default 0)
+  --tstart FLOAT                        start time
+  --tend FLOAT                          end time
+  -s,--step FLOAT                       step
   -k,--knext UINT=5                     K_NEXT value (default 5)
-  -l,--list BOOLEAN                     List all available shapes
-  -c,--curve TEXT REQUIRED              Shape name
+  -l,--list                             List all available shapes
+  -c,--curve TEXT                       Shape name
   -a,--angle FLOAT=0                    Rotation angle in radians(default 0)
   --ox FLOAT=0                          X coordinate of origin (default 0)
   --oy FLOAT=0                          Y coordinate of origin (default 0)
@@ -82,7 +82,7 @@ using namespace DGtal;
   --ax FLOAT=1                          X component of rotation axis (default 1)
   --ay FLOAT=0                          Y component of rotation axis (default 0)
   --az FLOAT=0                          Z component of rotation axis (default 0)
-  -o,--output TEXT REQUIRED             Basename of the output file
+  -o,--output TEXT                      Basename of the output file
 
  @endcode
  You can list the potential curves:
@@ -228,6 +228,18 @@ struct Exporter
   }
 };
 
+/**
+ * Missing parameter error message.
+ *
+ * @param param
+ */
+void missingParam(std::string param)
+{
+  trace.error() <<" Parameter: "<<param<<" is required..";
+  trace.info()<<std::endl;
+  exit(1);
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 
 int main( int argc, char** argv )
@@ -246,18 +258,17 @@ int main( int argc, char** argv )
   double angle;
   double ox {0}, oy {0}, oz {0};
   double ax {1}, ay {0}, az {0}; 
-  bool list; 
 
   app.description("Digitizes 3D parametric curves using DGtal library.\n Typical use example:\n \t 3dParametricCurveDigitizer [options] --curve <curve> --param1 <double> --param2 <double> --param3 <double> --tstart <double> --tend <double> --step <double> --output <basename>\n");
-  app.add_option("--param1",param1,"a radius or a scaling factor (default 0)",true)->required();
-  app.add_option("--param2",param2,"a radius or a scaling factor (default 0)",true)->required();
-  app.add_option("--param3",param3,"a radius or a scaling factor (default 0)",true)->required();
-  app.add_option("--tstart",tstart,"start time")->required();
-  app.add_option("--tend",tend,"end time")->required();
-  app.add_option("--step, -s",step,"step")->required();
+  app.add_option("--param1",param1,"a radius or a scaling factor (default 0)",true);
+  app.add_option("--param2",param2,"a radius or a scaling factor (default 0)",true);
+  app.add_option("--param3",param3,"a radius or a scaling factor (default 0)",true);
+  auto tstartOpt = app.add_option("--tstart",tstart,"start time");
+  auto tendOpt = app.add_option("--tend",tend,"end time");
+  auto stepOpt = app.add_option("--step, -s",step,"step");
   app.add_option("--knext, -k",knext,"K_NEXT value (default 5)",true);
-  auto listOpt = app.add_option("--list,-l",list,"List all available shapes");
-  app.add_option("--curve,-c",curveName,"Shape name")->required();
+  auto listOpt = app.add_flag("--list,-l","List all available shapes");
+  auto curveNameOpt = app.add_option("--curve,-c",curveName,"Shape name");
   app.add_option("--angle,-a",angle,"Rotation angle in radians(default 0)",true);
   app.add_option("--ox",ox,"X coordinate of origin (default 0)",true);
   app.add_option("--oy",oy,"Y coordinate of origin (default 0)",true);
@@ -265,7 +276,7 @@ int main( int argc, char** argv )
   app.add_option("--ax",ax,"X component of rotation axis (default 1)",true);
   app.add_option("--ay",ay,"Y component of rotation axis (default 0)",true);
   app.add_option("--az",az,"Z component of rotation axis (default 0)",true);
-  app.add_option("--output,-o",outputName,"Basename of the output file")->required();
+  auto outputNameOpt = app.add_option("--output,-o",outputName,"Basename of the output file");
 
   app.get_formatter()->column_width(40);
   CLI11_PARSE(app, argc, argv);
@@ -274,12 +285,18 @@ int main( int argc, char** argv )
   //List creation
   createList();
 
-  if ( listOpt->count() > 1 )
+  if ( listOpt->count() > 0 )
   {
     displayList();
     return 0;
   }
-  
+
+  if ( curveNameOpt->count() == 0) missingParam("--curve");
+  if ( outputNameOpt->count() == 0) missingParam("--output");
+  if ( tstartOpt->count() == 0) missingParam("--tstart");
+  if ( tendOpt->count() == 0) missingParam("--tend");
+  if ( stepOpt->count() == 0) missingParam("--step");
+
   typedef functors::ForwardRigidTransformation3D < Z3i::Space, Z3i::RealPoint, Z3i::RealPoint, functors::Identity > ForwardTrans;
   ForwardTrans trans ( Z3i::RealPoint ( ox, oy, oz ), Z3i::RealPoint ( ax, ay, az ), angle, Z3i::RealVector ( 0, 0, 0 ) );
   //We check that the shape is known

@@ -77,9 +77,9 @@ using namespace DGtal;
  @b Allowed @b options @b are:
  
  @code
--h,--help                             Print this help message and exit
-  -l,--list BOOLEAN                     List all available shapes
-  -s,--shape TEXT REQUIRED              Shape name
+  -h,--help                             Print this help message and exit
+  -l,--list                             List all available shapes
+  -s,--shape TEXT                       Shape name
   -R,--radius FLOAT                     Radius of the shape
   -A,--axis1 FLOAT                      Half big axis of the shape (ellipse)
   -a,--axis2 FLOAT                      Half small axis of the shape (ellipse)
@@ -468,7 +468,6 @@ int main( int argc, char** argv )
   double smallradius {5};
   double varsmallradius {5};
   double cx {0.0}, cy {0.0};
-  bool list; 
   double h {1.0};
   unsigned int k {3};
   double phi {0.0};
@@ -476,16 +475,16 @@ int main( int argc, char** argv )
   double axis1, axis2;
 
   app.description("Generates multigrid contours of 2d digital shapes using DGtal library.\n Typical use example:\n \t contourGenerator --shape <shapeName> [requiredParam] [otherOptions]\n");
-  auto listOpt = app.add_option("--list,-l",list,"List all available shapes");
-  app.add_option("--shape,-s", shapeName, "Shape name")->required();
+  auto listOpt = app.add_flag("--list,-l","List all available shapes");
+  auto shapeNameOpt = app.add_option("--shape,-s", shapeName, "Shape name");
   auto radiusOpt = app.add_option("--radius,-R", radius, "Radius of the shape" );
   auto axis1Opt = app.add_option("--axis1,-A", axis1, "Half big axis of the shape (ellipse)" );
   auto axis2Opt = app.add_option("--axis2,-a", axis2, "Half small axis of the shape (ellipse)" );
   auto smallradiusOpt = app.add_option("--smallradius,-r", smallradius, "Small radius of the shape (default 5)", true);
   auto varsmallradiusOpt = app.add_option("--varsmallradius,-v", varsmallradius, "Variable small radius of the shape (default 5)", true );
-  auto kOpt = app.add_option("-k",  k, "Number of branches or corners the shape (default 3)", true );
-  auto phiOpt = app.add_option("--phi",  phi, "Phase of the shape (in radian, default 0.0)", true );
-  auto widthOpt = app.add_option("--width,-w",  width, "Width of the shape (default 10.0)", true );
+  auto kOpt = app.add_option("-k", k, "Number of branches or corners the shape (default 3)", true );
+  auto phiOpt = app.add_option("--phi", phi, "Phase of the shape (in radian, default 0.0)", true );
+  auto widthOpt = app.add_option("--width,-w", width, "Width of the shape (default 10.0)", true );
   auto powerOpt = app.add_option("--power,-p", power, "Power of the metric (default 2.0)", true );
   app.add_option("--center_x,-x", cx, "x-coordinate of the shape center (default 0.0)", true );
   app.add_option("--center_y,-y", cy, "y-coordinate of the shape center (default 0.0)", true );
@@ -500,12 +499,13 @@ int main( int argc, char** argv )
   //List creation
   createList();
 
-  if ( listOpt->count() > 1 )
+  if ( listOpt->count() > 0 )
   {
     displayList();
     return 0;
   }
   
+  if(shapeNameOpt->count()==0) missingParam("--shape");
   bool withGeom = true;
   if (outputFileNameOpt->count()==0) withGeom = false;
   

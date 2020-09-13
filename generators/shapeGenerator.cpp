@@ -31,9 +31,7 @@
 #include <vector>
 #include <string>
 
-#include <boost/program_options/options_description.hpp>
-#include <boost/program_options/parsers.hpp>
-#include <boost/program_options/variables_map.hpp>
+#include "CLI11.hpp"
 
 #include "DGtal/base/Common.h"
 
@@ -66,27 +64,23 @@ using namespace DGtal;
  @b Allowed @b options @b are:
 
  @code
-  -h [ --help ]                    display this message
-  -s [ --shape ] arg               Shape name
-  -l [ --list ]                    List all available shapes
-  -R [ --radius ] arg              Radius of the shape
-  -A [ --axis1 ] arg               Half big axis of the shape (ellipse)
-  -a [ --axis2 ] arg               Half small axis of the shape (ellipse)
-  -r [ --smallradius ] arg (=5)    Small radius of the shape
-  -v [ --varsmallradius ] arg (=5) Variable small radius of the shape
-  -k [ --k ] arg (=3)              Number of branches or corners the shape
-  --phi arg (=0)                   Phase of the shape (in radian)
-  -w [ --width ] arg (=10)         Width of the shape
-  -p [ --power ] arg (=2)          Power of the metric (double)
-  -o [ --output ] arg              Basename of the output file
-  --signature                      Display to the standard output the signature
-                                   (normal, curvature) at each point of the
-                                   specified shape contour (middle point of
-                                   each contour linel)
-  -f [ --format ] arg (=pgm)       Output format:
-                                     Bitmap {pgm, raw}
-                                     Vector {svg} (+ {png,pdf} if libCairo
-                                   installed)
+  -h,--help                             Print this help message and exit
+  -l,--list                             List all available shapes
+  -s,--shape TEXT                       Shape name
+  -R,--radius FLOAT                     Radius of the shape
+  -A,--axis1 FLOAT                      Half big axis of the shape (ellipse)
+  -a,--axis2 FLOAT                      Half small axis of the shape (ellipse)
+  -r,--smallradius FLOAT=5              Small radius of the shape (default 5)
+  -v,--varsmallradius FLOAT=5           Variable small radius of the shape (default 5)
+  -k UINT=3                             Number of branches or corners the shape (default 3)
+  --phi FLOAT=0                         Phase of the shape (in radian, default 0.0)
+  -w,--width FLOAT=10                   Width of the shape (default 10.0)
+  -p,--power FLOAT=2                    Power of the metric (default 2.0)
+  -o,--output TEXT                      Basename of the output file
+  --signature                           Display to the standard output the signature (normal, curvature) at each point of the specified shape contour (middle point of each contour linel)
+  -f,--format TEXT                      Output format:
+                                            Bitmap {pgm, raw}
+                                            Vector {svg} (+ {png,pdf} if libCairo installed) (default pgm)
  @endcode
  You can list the potential shapes:
  @code
@@ -373,66 +367,54 @@ void missingParam(std::string param)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace po = boost::program_options;
 
 int main( int argc, char** argv )
 {
-  // parse command line ----------------------------------------------
-  po::options_description general_opt("Allowed options are: ");
-  general_opt.add_options()
-    ("help,h", "display this message")
-    ("shape,s", po::value<std::string>(), "Shape name")
-    ("list,l",  "List all available shapes")
-    ("radius,R",  po::value<double>(), "Radius of the shape" )
-    ("axis1,A",  po::value<double>(), "Half big axis of the shape (ellipse)" )
-    ("axis2,a",  po::value<double>(), "Half small axis of the shape (ellipse)" )
-    ("smallradius,r",  po::value<double>()->default_value(5), "Small radius of the shape" )
-    ("varsmallradius,v",  po::value<double>()->default_value(5), "Variable small radius of the shape" )
-    ("k,k",  po::value<unsigned int>()->default_value(3), "Number of branches or corners the shape" )
-    ("phi",  po::value<double>()->default_value(0.0), "Phase of the shape (in radian)" )
-    ("width,w",  po::value<double>()->default_value(10.0), "Width of the shape" )
-    ("power,p",   po::value<double>()->default_value(2.0), "Power of the metric (double)" )
-    ("output,o", po::value<std::string>(), "Basename of the output file")
-    ("signature", "Display to the standard output the signature (normal, curvature) at each point of the specified shape contour (middle point of each contour linel)")
-    ("format,f",   po::value<std::string>()->default_value("pgm"), "Output format:\n\t  Bitmap {pgm, raw}\n\t  Vector {svg} (+ {png,pdf} if libCairo installed)" );
+  // parse command line CLI ----------------------------------------------
+  CLI::App app;
+  std::string shapeName;
+  std::string outputName;
+  std::string outputFormat {"pgm"};
+  double radius;
+  double power {2.0};
+  double smallradius {5};
+  double varsmallradius {5};
+  unsigned int k {3};
+  double phi {0.0};
+  double width {10.0};
+  double axis1, axis2;
+  
+  app.description("Generates shapes using DGtal library.\n Typical use example:\n \t shapeGenerator [options] --shape <shapeName> --output <outputBasename>\n");
+  auto listOpt = app.add_flag("--list,-l","List all available shapes");
+  auto shapeNameOpt = app.add_option("--shape,-s", shapeName, "Shape name");
+  auto radiusOpt = app.add_option("--radius,-R", radius, "Radius of the shape" );
+  auto axis1Opt = app.add_option("--axis1,-A", axis1, "Half big axis of the shape (ellipse)" );
+  auto axis2Opt = app.add_option("--axis2,-a", axis2, "Half small axis of the shape (ellipse)" );
+  auto smallradiusOpt = app.add_option("--smallradius,-r", smallradius, "Small radius of the shape (default 5)", true);
+  auto varsmallradiusOpt = app.add_option("--varsmallradius,-v", varsmallradius, "Variable small radius of the shape (default 5)", true );
+  auto kOpt = app.add_option("-k", k, "Number of branches or corners the shape (default 3)", true );
+  auto phiOpt = app.add_option("--phi", phi, "Phase of the shape (in radian, default 0.0)", true );
+  auto widthOpt = app.add_option("--width,-w", width, "Width of the shape (default 10.0)", true );
+  auto powerOpt = app.add_option("--power,-p", power, "Power of the metric (default 2.0)", true );
+  auto outputNameOpt = app.add_option("--output,-o", outputName, "Basename of the output file");
+  auto signatureOpt = app.add_flag("--signature", "Display to the standard output the signature (normal, curvature) at each point of the specified shape contour (middle point of each contour linel)");
+  app.add_option("--format,-f", outputFormat, "Output format:\n\t  Bitmap {pgm, raw}\n\t  Vector {svg} (+ {png,pdf} if libCairo installed) (default pgm)" );
 
-  bool parseOK=true;
-  po::variables_map vm;
-  try{
-    po::store(po::parse_command_line(argc, argv, general_opt), vm);
-  }catch(const std::exception& ex){
-    parseOK=false;
-    trace.info()<< "Error checking program options: "<< ex.what()<< std::endl;
-  }
-
-  po::notify(vm);
-  if(!parseOK || vm.count("help")||argc<=1)
-    {
-      trace.info()<< "Generate shapes using DGtal library" <<std::endl << "Basic usage: "<<std::endl
-		  << "\tshapeGenerator [options] --shape <shapeName> --output <outputBasename>"<<std::endl
-		  << general_opt << "\n";
-      return 0;
-    }
+  app.get_formatter()->column_width(40);
+  CLI11_PARSE(app, argc, argv);
+  // END parse command line using CLI ----------------------------------------------  
 
   //List creation
   createList();
 
-  if (vm.count("list"))
-    {
-      displayList();
-      return 0;
-    }
+  if ( listOpt->count() > 0 )
+  {
+    displayList();
+    return 0;
+  }
 
-  //Parse options
-  if (!(vm.count("shape"))) missingParam("--shape");
-  std::string shapeName = vm["shape"].as<std::string>();
-
-
-  if (!(vm.count("output"))) missingParam("--output");
-  std::string outputName = vm["output"].as<std::string>();
-
-  if (!(vm.count("format"))) missingParam("--format");
-  std::string outputFormat = vm["format"].as<std::string>();
+  if(shapeNameOpt->count()==0) missingParam("--shape");
+  if(outputNameOpt->count()==0) missingParam("--output");
 
   //We check that the shape is known
   unsigned int id = checkAndRetrunIndex(shapeName);
@@ -440,9 +422,7 @@ int main( int argc, char** argv )
 
   if (id ==0)
     {
-      if (!(vm.count("radius"))) missingParam("--radius");
-      double radius = vm["radius"].as<double>();
-
+      if (radiusOpt->count()==0) missingParam("--radius");
       Ball2D<Z2i::Space> ball(Z2i::Point(0,0), radius);
       Z2i::Domain domain(ball.getLowerBound(), ball.getUpperBound());
       Z2i::DigitalSet aSet(domain);
@@ -450,67 +430,57 @@ int main( int argc, char** argv )
       Shapes<Z2i::Domain>::euclideanShaper(aSet, ball);
       Exporter<Z2i::DigitalSet,Image>::save(aSet,outputName,outputFormat);
 
-      if (vm.count("signature"))
-	Exporter<Z2i::DigitalSet,Image>::exportSignature(ball,aSet,domain);
+      if (signatureOpt->count()>0)
+        Exporter<Z2i::DigitalSet,Image>::exportSignature(ball,aSet,domain);
 
       return 0;
     }
   else
     if (id ==1)
       {
-	if (!(vm.count("width"))) missingParam("--width");
-	double width = vm["width"].as<double>();
+      	//if (widthOpt->count()==0) missingParam("--width");
+      	ImplicitHyperCube<Z2i::Space> object(Z2i::Point(0,0), width/2.0);
+      	Z2i::Domain domain(object.getLowerBound(), object.getUpperBound());
+      	Z2i::DigitalSet aSet(domain);
 
-	ImplicitHyperCube<Z2i::Space> object(Z2i::Point(0,0), width/2.0);
-	Z2i::Domain domain(object.getLowerBound(), object.getUpperBound());
-	Z2i::DigitalSet aSet(domain);
+      	Shapes<Z2i::Domain>::euclideanShaper(aSet, object);
+      	Exporter<Z2i::DigitalSet,Image>::save(aSet,outputName,outputFormat);
 
-	Shapes<Z2i::Domain>::euclideanShaper(aSet, object);
-	Exporter<Z2i::DigitalSet,Image>::save(aSet,outputName,outputFormat);
+      	if (signatureOpt->count()>0)
+      	  {
+      	    trace.error()<< "No signature export for this shape.";
+      	    trace.info()<<std::endl;
+      	  }
 
-	if (vm.count("signature"))
-	  {
-	    trace.error()<< "No signature export for this shape.";
-	    trace.info()<<std::endl;
-	  }
-
-	return 0;
+      	return 0;
       }
     else
       if (id ==2)
-	{
-	  if (!(vm.count("power"))) missingParam("--power");
-	  if (!(vm.count("radius"))) missingParam("--radius");
-	  double radius = vm["radius"].as<double>();
-	  double power = vm["power"].as<double>();
+      	{
+      	  //if (powerOpt->count()==0) missingParam("--power");
+          if (radiusOpt->count()==0) missingParam("--radius");
+      	  ImplicitRoundedHyperCube<Z2i::Space> ball(Z2i::Point(0,0), radius, power);
+      	  Z2i::Domain domain(ball.getLowerBound(), ball.getUpperBound());
+      	  Z2i::DigitalSet aSet(domain);
 
-	  ImplicitRoundedHyperCube<Z2i::Space> ball(Z2i::Point(0,0), radius, power);
-	  Z2i::Domain domain(ball.getLowerBound(), ball.getUpperBound());
-	  Z2i::DigitalSet aSet(domain);
+      	  Shapes<Z2i::Domain>::euclideanShaper(aSet, ball);
+      	  Exporter<Z2i::DigitalSet,Image>::save(aSet,outputName,outputFormat);
 
-	  Shapes<Z2i::Domain>::euclideanShaper(aSet, ball);
-	  Exporter<Z2i::DigitalSet,Image>::save(aSet,outputName,outputFormat);
+      	  if (signatureOpt->count()>0)
+      	    {
+      	      trace.error()<< "No signature export for this shape.";
+      	      trace.info()<<std::endl;
+      	    }
 
-	  if (vm.count("signature"))
-	    {
-	      trace.error()<< "No signature export for this shape.";
-	      trace.info()<<std::endl;
-	    }
-
-	  return 0;
-	}
+      	  return 0;
+      	}
       else
 	if (id ==3)
 	  {
-	    if (!(vm.count("varsmallradius"))) missingParam("--varsmallradius");
-	    if (!(vm.count("radius"))) missingParam("--radius");
-	    if (!(vm.count("k"))) missingParam("--k");
-	    if (!(vm.count("phi"))) missingParam("--phi");
-	    double radius = vm["radius"].as<double>();
-	    double varsmallradius = vm["varsmallradius"].as<double>();
-	    unsigned int k = vm["k"].as<unsigned int>();
-	    double phi = vm["phi"].as<double>();
-
+	    //if (varsmallradiusOpt->count()==0) missingParam("--varsmallradius");
+      if (radiusOpt->count()==0) missingParam("--radius");
+      //if (kOpt->count()==0) missingParam("--k");
+      //if (phiOpt->count()==0) missingParam("--phi");
 	    Flower2D<Z2i::Space> flower(Z2i::Point(0,0), radius, varsmallradius,k,phi);
 	    Z2i::Domain domain(flower.getLowerBound(), flower.getUpperBound());
 	    Z2i::DigitalSet aSet(domain);
@@ -518,7 +488,7 @@ int main( int argc, char** argv )
 	    Shapes<Z2i::Domain>::euclideanShaper(aSet, flower);
 	    Exporter<Z2i::DigitalSet,Image>::save(aSet,outputName,outputFormat);
 
-	    if (vm.count("signature"))
+	    if (signatureOpt->count()>0)
 	      Exporter<Z2i::DigitalSet,Image>::exportSignature(flower,aSet,domain);
 
 	    return 0;
@@ -526,13 +496,9 @@ int main( int argc, char** argv )
 	else
 	  if (id ==4)
 	    {
-	      if (!(vm.count("radius"))) missingParam("--radius");
-	      if (!(vm.count("k"))) missingParam("--k");
-	      if (!(vm.count("phi"))) missingParam("--phi");
-	      double radius = vm["radius"].as<double>();
-	      unsigned int k = vm["k"].as<unsigned int>();
-	      double phi = vm["phi"].as<double>();
-
+	      if (radiusOpt->count()==0) missingParam("--radius");
+        //if (kOpt->count()==0) missingParam("--k");
+        //if (phiOpt->count()==0) missingParam("--phi");
 	      NGon2D<Z2i::Space> object(Z2i::Point(0,0), radius,k,phi);
 	      Z2i::Domain domain(object.getLowerBound(), object.getUpperBound());
 	      Z2i::DigitalSet aSet(domain);
@@ -540,55 +506,46 @@ int main( int argc, char** argv )
 	      Shapes<Z2i::Domain>::euclideanShaper(aSet, object);
 	      Exporter<Z2i::DigitalSet,Image>::save(aSet,outputName,outputFormat);
 
-	      if (vm.count("signature"))
-		Exporter<Z2i::DigitalSet,Image>::exportSignature(object,aSet,domain);
+	      if (signatureOpt->count()>0)
+          Exporter<Z2i::DigitalSet,Image>::exportSignature(object,aSet,domain);
 
 	      return 0;
 	    }
 	  else
 	    if (id ==5)
 	      {
-		if (!(vm.count("varsmallradius"))) missingParam("--varsmallradius");
-		if (!(vm.count("radius"))) missingParam("--radius");
-		if (!(vm.count("k"))) missingParam("--k");
-		if (!(vm.count("phi"))) missingParam("--phi");
-		double radius = vm["radius"].as<double>();
-		double varsmallradius = vm["varsmallradius"].as<double>();
-		unsigned int k = vm["k"].as<unsigned int>();
-		double phi = vm["phi"].as<double>();
+      		//if (varsmallradiusOpt->count()==0) missingParam("--varsmallradius");
+          if (radiusOpt->count()==0) missingParam("--radius");
+          //if (kOpt->count()==0) missingParam("--k");
+          //if (phiOpt->count()==0) missingParam("--phi");
+      		AccFlower2D<Z2i::Space> flower(Z2i::Point(0,0), radius, varsmallradius,k,phi);
+      		Z2i::Domain domain(flower.getLowerBound(), flower.getUpperBound());
+      		Z2i::DigitalSet aSet(domain);
 
-		AccFlower2D<Z2i::Space> flower(Z2i::Point(0,0), radius, varsmallradius,k,phi);
-		Z2i::Domain domain(flower.getLowerBound(), flower.getUpperBound());
-		Z2i::DigitalSet aSet(domain);
+      		Shapes<Z2i::Domain>::euclideanShaper(aSet, flower);
+      		Exporter<Z2i::DigitalSet,Image>::save(aSet,outputName,outputFormat);
 
-		Shapes<Z2i::Domain>::euclideanShaper(aSet, flower);
-		Exporter<Z2i::DigitalSet,Image>::save(aSet,outputName,outputFormat);
+      		if (signatureOpt->count()>0)
+      		  Exporter<Z2i::DigitalSet,Image>::exportSignature(flower,aSet,domain);
 
-		if (vm.count("signature"))
-		  Exporter<Z2i::DigitalSet,Image>::exportSignature(flower,aSet,domain);
-
-		return 0;
+      		return 0;
 	      }
 	    else
 	      //if (id ==6)
 	      {
-		if (!(vm.count("axis1"))) missingParam("--axis1");
-		if (!(vm.count("axis2"))) missingParam("--axis2");
-		if (!(vm.count("phi"))) missingParam("--phi");
-		double a1 = vm["axis1"].as<double>();
-		double a2 = vm["axis2"].as<double>();
-		double phi = vm["phi"].as<double>();
+      		if (axis1Opt->count()==0) missingParam("--axis1");
+          if (axis2Opt->count()==0) missingParam("--axis2");
+          //if (phiOpt->count()==0) missingParam("--phi");
+      		Ellipse2D<Z2i::Space> ell(Z2i::Point(0,0), axis1, axis2,phi);
+      		Z2i::Domain domain(ell.getLowerBound(), ell.getUpperBound());
+      		Z2i::DigitalSet aSet(domain);
 
-		Ellipse2D<Z2i::Space> ell(Z2i::Point(0,0), a1, a2,phi);
-		Z2i::Domain domain(ell.getLowerBound(), ell.getUpperBound());
-		Z2i::DigitalSet aSet(domain);
+      		Shapes<Z2i::Domain>::euclideanShaper(aSet, ell);
+      		Exporter<Z2i::DigitalSet,Image>::save(aSet,outputName,outputFormat);
 
-		Shapes<Z2i::Domain>::euclideanShaper(aSet, ell);
-		Exporter<Z2i::DigitalSet,Image>::save(aSet,outputName,outputFormat);
+      		if (signatureOpt->count()>0)
+      		  Exporter<Z2i::DigitalSet,Image>::exportSignature(ell,aSet,domain);
 
-		if (vm.count("signature"))
-		  Exporter<Z2i::DigitalSet,Image>::exportSignature(ell,aSet,domain);
-
-		return 0;
+      		return 0;
 	      }
 }
