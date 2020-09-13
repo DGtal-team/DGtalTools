@@ -21,7 +21,6 @@
  *
  * @date 2014/07/20
  *
- * 
  *
  * This file is part of the DGtalTools.
  */
@@ -42,17 +41,11 @@
 #include "DGtal/topology/DigitalSurface.h"
 #include "DGtal/topology/helpers/Surfaces.h"
 
+#include "CLI11.hpp"
 
-#include <boost/program_options/options_description.hpp>
-#include <boost/program_options/parsers.hpp>
-#include <boost/program_options/variables_map.hpp>
 
 using namespace std;
 using namespace DGtal;
-
-
-///////////////////////////////////////////////////////////////////////////////
-namespace po = boost::program_options;
 
 
 /**
@@ -66,17 +59,18 @@ namespace po = boost::program_options;
 
  @b Allowed @b options @b are : 
  @code
-  -h [ --help ]                  display this message
-  -i [ --input ] arg             volumetric input file (.vol, .pgm, .pgm3d, 
-                                 .longvol) 
-  -o [ --output ] arg            volumetric output file (.vol, .pgm, .pgm3d, 
-                                 .longvol) 
-  --labelBackground              option to define a label to regions associated
-                                 to object background. 
-  -m [ --thresholdMin ] arg (=0) min threshold (if not given the max threshold 
-                                 is computed with Otsu algorithm).
-  -M [ --thresholdMax ] arg      max threshold (default 255)
- @endcode
+
+ Positionals:
+   1 TEXT:FILE REQUIRED                  volumetric input file (.vol, .pgm, .pgm3d, .longvol).
+
+ Options:
+   -h,--help                             Print this help message and exit
+   -i,--input TEXT:FILE REQUIRED         volumetric input file (.vol, .pgm, .pgm3d, .longvol).
+   -o,--output TEXT=result.vol           volumetric output file (.vol, .pgm, .pgm3d, .longvol)
+   --labelBackground                     option to define a label to regions associated to object background.
+   -m,--thresholdMin INT=0               min threshold (if not given the max threshold is computed with Otsu algorithm).
+   -M,--thresholdMax INT=255             max threshold
+   @endcode
 
  @b Example: 
  
@@ -105,8 +99,6 @@ and display them with @ref Doc3DSDPViewer :
   @ref volSegment.cpp
  */
 
-
-
 typedef ImageContainerBySTLVector < Z3i::Domain, unsigned char > Image3D;
 
 std::vector<unsigned int> getHistoFromImage(const Image3D &image){
@@ -117,7 +109,6 @@ std::vector<unsigned int> getHistoFromImage(const Image3D &image){
   }
   return vectHisto;
 }
-
 
 
 unsigned int 
@@ -165,64 +156,45 @@ int main( int argc, char** argv )
   typedef Z3i::KSpace::SurfelSet SurfelSet;
   typedef SetOfSurfels< Z3i::KSpace, SurfelSet > MySetOfSurfels;
   
-  // parse command line ----------------------------------------------
-  po::options_description general_opt(" \n Allowed options are ");
-  general_opt.add_options()
-    ("help,h", "display this message")
-    ("input,i", po::value<std::string>(), "volumetric input file (.vol, .pgm, .pgm3d, .longvol) " )
-    ("output,o", po::value<std::string>(), "volumetric output file (.vol, .pgm, .pgm3d, .longvol) " )
-    ("labelBackground", "option to define a label to regions associated to object background. ")
-    ("thresholdMin,m", po::value<int>()->default_value(0), "min threshold (if not given the max threshold is computed with Otsu algorithm)." )
-    ("thresholdMax,M", po::value<int>(), "max threshold (default 255)" );
+  
+  // parse command line using CLI ----------------------------------------------
+  CLI::App app;
+  std::string inputFileName;
+  std::string outputFileName {"result.vol"};
+  bool labelBackground {false};
+  int minTh {0};
+  int maxTh {255};
+  
+  app.description("Segment volumetric file from a simple threshold which can be set automatically from the otsu estimation.\n The segmentation result is given by an integer label given in the resulting image. Example:\n volSegment -i ${DGtal}/examples/samples/lobster.vol -o segmentation.vol \n");
   
   
-  bool parseOK=true;
-  po::variables_map vm;
-  try{
-    po::store(po::parse_command_line(argc, argv, general_opt), vm);  
-  }catch(const std::exception& ex){
-    parseOK=false;
-    trace.info()<< "Error checking program options: "<< ex.what()<< endl;
-  }
-  po::notify(vm);    
-  if( !parseOK || vm.count("help")||argc<=1)
-    {
-      std::cout << "Usage: " << argv[0] << " [input] [output]\n"
-		<< "Segment volumetric file from a simple threshold which can be set automatically from the otsu estimation.\n"
-                << "The segmentation result is given by an integer label given in the resulting image."
-		<< general_opt << "\n";
-      std::cout << "Example:\n"
-		<< "volSegment -i ${DGtal}/examples/samples/lobster.vol -o segmentation.vol \n";
-      return 0;
-    }
-  
-  
-  if(! vm.count("input") ||! vm.count("output"))
-    {
-      trace.error() << " Input and output filename are needed to be defined" << endl;      
-      return 0;
-    }
+  app.add_option("-i,--input,1", inputFileName, "volumetric input file (.vol, .pgm, .pgm3d, .longvol)." )
+  ->required()
+  ->check(CLI::ExistingFile);
+
+  app.add_option("-o,--output", outputFileName, "volumetric output file (.vol, .pgm, .pgm3d, .longvol)", true);
+  auto labelOpt = app.add_flag("--labelBackground",labelBackground, "option to define a label to regions associated to object background.");
+  app.add_option("-m,--thresholdMin",minTh, "min threshold (if not given the max threshold is computed with Otsu algorithm).", true );
+  auto maxThOpt = app.add_option("-M,--thresholdMax", maxTh, "max threshold", true );
 
   
-  string inputFilename = vm["input"].as<std::string>();
-  string outputFilename = vm["output"].as<std::string>();
+  app.get_formatter()->column_width(40);
+  CLI11_PARSE(app, argc, argv);
+  // END parse command line using CLI ----------------------------------------------
+
   
-  trace.info() << "Reading input file " << inputFilename ; 
-  Image3D inputImage = DGtal::GenericReader<Image3D>::import(inputFilename);
+  trace.info() << "Reading input file " << inputFileName ;
+  Image3D inputImage = DGtal::GenericReader<Image3D>::import(inputFileName);
   Image3D imageResuSegmentation(inputImage.domain());
   
   trace.info() << " [done] " << std::endl ; 
   std::ofstream outStream;
-  outStream.open(outputFilename.c_str());
-  int minTh = vm["thresholdMin"].as<int>();
-  int maxTh = 128;
-  if(!vm.count("thresholdMax")){
+  outStream.open(outputFileName.c_str());
+  if(maxThOpt->count()==0){
     maxTh = getOtsuThreshold(inputImage);
     trace.info() << "maximal threshold value not specified, using Otsu value: "  << maxTh << std::endl;
-  }else{
-   maxTh =  vm["thresholdMax"].as<int>();
-  }  
-  trace.info() << "Processing image to output file " << outputFilename << std::endl; 
+  }
+  trace.info() << "Processing image to output file " << outputFileName << std::endl;
 
   functors::IntervalForegroundPredicate<Image3D> simplePredicate ( inputImage, minTh, maxTh );
   SurfelAdjacency< Z3i::KSpace::dimension > SAdj ( true );
@@ -232,7 +204,6 @@ int main( int argc, char** argv )
      trace.error() << "problem initializing 3d space" << endl;
   }
 
-    
   std::vector< std::vector<Z3i::SCell > > vectConnectedSCell;
   Surfaces<Z3i::KSpace>::extractAllConnectedSCell(vectConnectedSCell,K, SAdj, simplePredicate, false);
   trace.progressBar(0, vectConnectedSCell.size());
@@ -273,7 +244,7 @@ int main( int argc, char** argv )
          DGtal::Surfaces<Z3i::KSpace>::uFillInterior( kRestr,  aSet.surfelPredicate(), 
                                                       imageResuSegmentation,
                                                       i, false, false);
-       }else if (vm.count("labelBackground")){
+       }else if (labelOpt->count() > 0){
          DGtal::Surfaces<Z3i::KSpace>::uFillExterior( kRestr,  aSet.surfelPredicate(), 
                                                       imageResuSegmentation,
                                                       i+1, false, false);
@@ -281,7 +252,7 @@ int main( int argc, char** argv )
     }
   trace.progressBar(vectConnectedSCell.size(), vectConnectedSCell.size());
   trace.info() << std::endl;
-  GenericWriter<Image3D>::exportFile(outputFilename, imageResuSegmentation);   
+  GenericWriter<Image3D>::exportFile(outputFileName, imageResuSegmentation);
   return 0;
 }
 

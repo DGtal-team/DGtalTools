@@ -41,7 +41,7 @@ Options:
 
 @b Example:
 @code
-  $ img2freeman -i ${DGtal}/examples/samples/church.pgm -o contours.fc  
+  $ img2freeman -i ${DGtal}/examples/samples/church.pgm > contours.fc  
 
 @endcode
 You will obtain such results:

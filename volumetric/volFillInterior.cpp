@@ -38,9 +38,13 @@
  
  @b Allowed @b options @b are :
  @code
- -h [ --help ]         display this message.
- -i [ --input ] arg    Input vol file.
- -o [ --output ] arg   Output filename.
+ Positionals:
+   1 TEXT:FILE REQUIRED                  Input vol file.
+
+ Options:
+   -h,--help                             Print this help message and exit
+   -i,--input TEXT:FILE REQUIRED         Input vol file.
+   -o,--output TEXT=result.vol           Output filename.
  @endcode
  
  @b Example:
@@ -48,7 +52,6 @@
  @code
  $ volFlip -i ${DGtal}/examples/samples/lobster.vol -o filled.vol
  @endcode
- 
  
  @see
  @ref volFillInterior
@@ -63,15 +66,11 @@
 #include <DGtal/images/Image.h>
 #include <DGtal/images/ImageContainerBySTLVector.h>
 
-#include <boost/program_options/options_description.hpp>
-#include <boost/program_options/parsers.hpp>
-#include <boost/program_options/variables_map.hpp>
+#include "CLI11.hpp"
 
 using namespace std;
 using namespace DGtal;
 using namespace Z3i;
-
-namespace po = boost::program_options;
 
 /**
  * Missing parameter error message.
@@ -88,41 +87,26 @@ void missingParam ( const std::string &param )
 
 int main(int argc, char**argv)
 {
+  // parse command line using CLI ----------------------------------------------
+  CLI::App app;
+  std::string inputFileName;
+  std::string outputFileName {"result.vol"};
+
+  app.description("Fill the interior of a voxel set by filling the exterior using the 6-adjacency.\nThe exterior is the set of voxels with value zero and the interior voxels have value 128\n Basic usage:\n\tvolFillInterior --input <volFileName> --o <volOutputFileName> ");
   
-  // parse command line ----------------------------------------------
-  po::options_description general_opt ( "Allowed options are: " );
-  general_opt.add_options()
-  ( "help,h", "display this message." )
-  ( "input,i", po::value<std::string>(), "Input vol file." )
-  ( "output,o", po::value<string>(),"Output filename." );
-  bool parseOK=true;
-  po::variables_map vm;
-  try{
-    po::store(po::parse_command_line(argc, argv, general_opt), vm);
-  }catch(const std::exception& ex){
-    parseOK=false;
-    trace.info()<< "Error checking program options: "<< ex.what()<< endl;
-  }
-  po::notify ( vm );
-  if ( !parseOK || vm.count ( "help" ) ||argc<=1 )
-  {
-    trace.info() << "Fill the interior of a voxel set by filling the exterior using the 6-adjacency."<<std::endl;
-    trace.info() << "The exterior is the set of voxels with value zero and the interior voxels have value 128."<<std::endl
-    << std::endl << "Basic usage: "<<std::endl
-    << "\tvolFillInterior --input <volFileName> --o <volOutputFileName> "<<std::endl
-    << general_opt << "\n";
-    return 0;
-  }
+  app.add_option("-i,--input,1", inputFileName, "Input vol file." )
+  ->required()
+  ->check(CLI::ExistingFile);
+  app.add_option("-o,--output",outputFileName, "Output filename.", true);
   
-  //Parse options
-  if ( ! ( vm.count ( "input" ) ) ) missingParam ( "--input" );
-  std::string filename = vm["input"].as<std::string>();
-  if ( ! ( vm.count ( "output" ) ) ) missingParam ( "--output" );
-  std::string outputFileName = vm["output"].as<std::string>();
+  app.get_formatter()->column_width(40);
+  CLI11_PARSE(app, argc, argv);
+  // END parse command line using CLI ----------------------------------------------
+
   
   trace.beginBlock("Loading");
   typedef ImageContainerBySTLVector<Z3i::Domain, unsigned char>  MyImageC;
-  MyImageC  image = VolReader< MyImageC >::importVol ( filename );
+  MyImageC  image = VolReader< MyImageC >::importVol ( inputFileName );
   trace.info() << image << std::endl;
   trace.endBlock();
   
@@ -154,7 +138,6 @@ int main(int argc, char**argv)
         pstack.push( p + delta);
   }
   trace.endBlock();
-  
   
   trace.beginBlock("Complement");
   for(auto &p :  image.domain())
