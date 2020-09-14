@@ -45,10 +45,7 @@
 //Estimators
 #include "DGtal/geometry/curves/BinomialConvolver.h"
 
-
-#include <boost/program_options/options_description.hpp>
-#include <boost/program_options/parsers.hpp>
-#include <boost/program_options/variables_map.hpp>
+#include "CLI11.hpp"
 
 #include <vector>
 #include <string>
@@ -68,9 +65,9 @@ using namespace DGtal;
 
  @b Allowed @b options @b are : 
  @code
-  -h [ --help ]              display this message
-  -i [ --input ] arg         input FreemanChain file name
-  -s [ --GridStep ] arg (=1) Grid step
+  -h,--help                             Print this help message and exit
+  -i,--input TEXT:FILE REQUIRED         Input FreemanChain file name
+  --GridStep FLOAT=1                    Grid step
  @endcode
 
  @b Example: 
@@ -103,43 +100,23 @@ gnuplot> plot 'curvatureBC.dat' w lines title "curvature with Binomial Convoluti
 
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace po = boost::program_options;
 
 int main( int argc, char** argv )
 {
-  // parse command line ----------------------------------------------
-  po::options_description general_opt("Allowed options are: ");
-  general_opt.add_options()
-    ("help,h", "display this message")
-    ("input,i", po::value<std::string>(), "input FreemanChain file name")
-    ("GridStep,step", po::value<double>()->default_value(1.0), "Grid step");
-  
-  
-  bool parseOK=true;
-  po::variables_map vm;
-  try{
-    po::store(po::parse_command_line(argc, argv, general_opt), vm);  
-  }catch(const std::exception& ex){
-    parseOK=false;
-    trace.info()<< "Error checking program options: "<< ex.what()<< std::endl;
-  }
-  po::notify(vm);    
-  if(!parseOK || vm.count("help")||argc<=1 || (!(vm.count("input"))) )
-    {
-      trace.info()<< "Curvature using a binomial convolver " <<std::endl << "Basic usage: "<<std::endl
-      << "\t curvatureBC [options] --input  <fileName> "<<std::endl
-      << general_opt << "\n";
-      return 0;
-    }
-  
-  
-  double h = vm["GridStep"].as<double>();  
+  // parse command line CLI ----------------------------------------------
+  CLI::App app;
+  std::string fileName;
+  double h {1.0};
 
+  app.description("Estimates curvature using length of most centered segment computers.\n Typical use example:\n \t curvatureMCMS [options] --input  <fileName>\n");
+  app.add_option("-i,--input",fileName,"Input FreemanChain file name")->required()->check(CLI::ExistingFile);
+  app.add_option("--GridStep", h, "Grid step",true);
+  
+  app.get_formatter()->column_width(40);
+  CLI11_PARSE(app, argc, argv);
+  // END parse command line using CLI ----------------------------------------------  
 
- 
-  if(vm.count("input")){
-    std::string fileName = vm["input"].as<std::string>();
-
+  
     typedef Z2i::Space Space; 
     typedef Space::Point Point; 
     typedef Space::Integer Integer;  
@@ -184,7 +161,6 @@ int main( int argc, char** argv )
 
    }
 
- }
  
   return 0;
 }
