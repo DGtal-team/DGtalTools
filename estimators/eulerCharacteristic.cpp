@@ -29,20 +29,15 @@
 #include <DGtal/base/Common.h>
 #include <DGtal/helpers/StdDefs.h>
 #include <DGtal/io/readers/VolReader.h>
-#include <boost/program_options/options_description.hpp>
-#include <boost/program_options/parsers.hpp>
-#include <boost/program_options/variables_map.hpp>
+
+#include "CLI11.hpp"
+
 #include <DGtal/images/ImageContainerBySTLVector.h>
 #include <DGtal/images/IntervalForegroundPredicate.h>
 
 using namespace std;
 using namespace DGtal;
 using namespace Z3i;
-
-namespace po = boost::program_options;
-
-
-
 
 /**
  @page eulerCharacteristic eulerCharacteristic
@@ -57,11 +52,14 @@ namespace po = boost::program_options;
 
  @b Allowed @b options @b are : 
  @code
-  -h [ --help ]                    display this message.
-  -i [ --input ] arg               Input vol file.
-  -m [ --thresholdMin ] arg (=0)   threshold min (excluded) to define binary 
-                                   shape
-  -M [ --thresholdMax ] arg (=255) threshold max (included) to define binary 
+  Positionals:
+  1 TEXT:FILE REQUIRED                  Input vol file.
+
+  Options:
+  -h,--help                             Print this help message and exit
+  -i,--input TEXT:FILE REQUIRED         Input vol file.
+  -m,--thresholdMin INT=0               threshold min (excluded) to define binary shape (default 0)
+  -M,--thresholdMax INT=255             threshold max (included) to define binary shape (default 255)
  @endcode
 
  @b Example: 
@@ -83,56 +81,23 @@ Volumetric Euler Characteristic = 1
 
  */
 
-
-/**
- * Missing parameter error message.
- *
- * @param param
- */
-void missingParam ( std::string param )
-{
-  trace.error() <<" Parameter: "<<param<<" is required..";
-  trace.info() <<std::endl;
-  exit ( 1 );
-}
-
-
 int main(int argc, char**argv)
 {
 
-  // parse command line ----------------------------------------------
-  po::options_description general_opt ( "Allowed options are: " );
-  general_opt.add_options()
-    ( "help,h", "display this message." )
-    ( "input,i", po::value<std::string>(), "Input vol file." )
-    ("thresholdMin,m",  po::value<int>()->default_value(0), "threshold min (excluded) to define binary shape" )
-    ("thresholdMax,M",  po::value<int>()->default_value(255), "threshold max (included) to define binary shape" );
-  bool parseOK=true;
-  po::variables_map vm;
+  // parse command line CLI ----------------------------------------------
+  CLI::App app;
+  std::string filename;
+  int thresholdMin {0};
+  int thresholdMax {255};
 
-
+  app.description("Computes the Euleur Characteristic of  a vol to a 8-bit raw file.\n Typical use example:\n \t eulerCharacteristic --input <volFileName> -m <minlevel> -M <maxlevel>\n");
+  app.add_option("--input,-i,1", filename, "Input vol file." )->required()->check(CLI::ExistingFile);
+  app.add_option("--thresholdMin,-m", thresholdMin, "threshold min (excluded) to define binary shape (default 0)", true);
+  app.add_option("--thresholdMax,-M", thresholdMax, "threshold max (included) to define binary shape (default 255)", true);
   
-  try{
-    po::store(po::parse_command_line(argc, argv, general_opt), vm);  
-  }catch(const std::exception& ex){
-    parseOK=false;
-    trace.info()<< "Error checking program options: "<< ex.what()<< endl;
-  }
-  po::notify ( vm );
-  if (!parseOK || vm.count ( "help" ) ||argc<=1 )
-    {
-      trace.info() << "Compute the Euleur Characteristic of  a vol to a 8-bit raw file. The vol file is first binarized using interval [m,M[ thresholds and the Eucler characteristic is given from the cubical complex."<<std::endl
-                   << std::endl << "Basic usage: "<<std::endl
-                   << "\t eulerCharacteristic --input <volFileName> -m <minlevel> -M <maxlevel> "<<std::endl
-                   << general_opt << "\n";
-      return 0;
-    }
-
-  //Parse options
-  if ( ! ( vm.count ( "input" ) ) ) missingParam ( "--input" );
-  std::string filename = vm["input"].as<std::string>();
-  int thresholdMin = vm["thresholdMin"].as<int>();
-  int thresholdMax = vm["thresholdMax"].as<int>();
+  app.get_formatter()->column_width(40);
+  CLI11_PARSE(app, argc, argv);
+  // END parse command line using CLI ----------------------------------------------
  
   //Importing the Vol
   trace.beginBlock("Loading the vol file");
