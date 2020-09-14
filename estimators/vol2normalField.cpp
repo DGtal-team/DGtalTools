@@ -57,20 +57,13 @@
 #include "DGtal/geometry/surfaces/estimation/LocalConvolutionNormalVectorEstimator.h"
 #include "DGtal/geometry/surfaces/estimation/DigitalSurfaceEmbedderWithNormalVectorEstimator.h"
 
-
-
-#include <boost/program_options/options_description.hpp>
-#include <boost/program_options/parsers.hpp>
-#include <boost/program_options/variables_map.hpp>
+#include "CLI11.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
 
 using namespace std;
 using namespace DGtal;
 using namespace Z3i;
-
-namespace po = boost::program_options;
-
 
 /**
  @page vol2normalField vol2normalField
@@ -86,21 +79,19 @@ namespace po = boost::program_options;
 
  @b Allowed @b options @b are : 
  @code
-  -h [ --help ]                   display this message.
-  -i [ --input ] arg              Input vol file.
-  -o [ --output ] arg             Output filename.
-  -l [ --level ] arg (=0)         Iso-level for the surface construction.
-  -s [ --sigma ] arg (=5)         Sigma parameter of the Gaussian kernel.
-  --exportOriginAndExtremity      exports the origin and extremity of the 
-                                  vector fields when exporting the vector field
-                                  in TXT format (useful to be displayed in 
-                                  other viewer like meshViewer).
-  -N [ --vectorsNorm ] arg (=1)   set the norm of the exported vectors in TXT 
-                                  format (when the extremity points are 
-                                  exported with --exportOriginAndExtremity). By
-                                  using a negative value you will invert the 
-                                  direction of the vectors.
-  -n [ --neighborhood ] arg (=10) Size of the neighborhood for the convolution 
+  Positionals:
+  1 TEXT:FILE REQUIRED                  Input vol file.
+  2 TEXT REQUIRED                       Output file.
+
+  Options:
+  -h,--help                             Print this help message and exit
+  -i,--input TEXT:FILE REQUIRED         Input vol file.
+  -o,--output TEXT REQUIRED             Output file.
+  -l,--level UINT=0                     Iso-level for the surface construction (default 0).
+  -s,--sigma FLOAT=5                    Sigma parameter of the Gaussian kernel (default 5.0).
+  --exportOriginAndExtremity            exports the origin and extremity of the vector fields when exporting the vector field in TXT format (useful to be displayed in other viewer like meshViewer).
+  -N,--vectorsNorm FLOAT=1              set the norm of the exported vectors in TXT format (when the extremity points are exported with --exportOriginAndExtremity). By using a negative value you will invert the direction of the vectors (default 1.0).
+  -n,--neighborhood UINT=10             Size of the neighborhood for the convolution (distance on surfel graph, default 10). 
                                   (distance on surfel graph).
  @endcode
 
@@ -142,49 +133,28 @@ void missingParam ( std::string param )
 int main ( int argc, char**argv )
 {
 
-    // parse command line ----------------------------------------------
-    po::options_description general_opt ( "Allowed options are: " );
-    general_opt.add_options()
-    ( "help,h", "display this message." )
-    ( "input,i", po::value<std::string>(), "Input vol file." )
-    ( "output,o", po::value<string>(),"Output filename." )
-    ( "level,l", po::value<unsigned int>()->default_value ( 0 ),"Iso-level for the surface construction." )
-    ( "sigma,s", po::value<double>()->default_value ( 5.0 ),"Sigma parameter of the Gaussian kernel." )
-    ("exportOriginAndExtremity", "exports the origin and extremity of the vector fields when exporting the vector field in TXT format (useful to be displayed in other viewer like meshViewer).") 
-      ("vectorsNorm,N", po::value<double>()->default_value(1.0), "set the norm of the exported vectors in TXT format (when the extremity points are exported with --exportOriginAndExtremity). By using a negative value you will invert the direction of the vectors.") 
-      ( "neighborhood,n", po::value<unsigned int>()->default_value ( 10 ),"Size of the neighborhood for the convolution (distance on surfel graph)." );
+    // parse command line CLI ----------------------------------------------
+    CLI::App app;
+    std::string filename;
+    std::string outputFileName;
+    unsigned int level {0};
+    double sigma {5.0};
+    unsigned int neighborhood {10};
+    double normExport {1.0};
 
-    bool parseOK=true;
-    po::variables_map vm;
-    try{
-      po::store(po::parse_command_line(argc, argv, general_opt), vm);  
-    }catch(const std::exception& ex){
-      parseOK=false;
-      trace.info()<< "Error checking program options: "<< ex.what()<< endl;
-    }
-    
-    po::notify ( vm );
-    if (!parseOK ||  vm.count ( "help" ) ||argc<=1 )
-    {
-        trace.info() << "Generate normal vector field from a vol file using DGtal library."<<std::endl
-                     << "It will output the embedded vector field (Gaussian convolution on elementary normal vectors)"<<std::endl
-                     << "an OFF file, and a TXT normal vector file (theta, phi in degree)."
-                     << std::endl << "Basic usage: "<<std::endl
-                     << "\tvol2normalField[options] --input <volFileName> --o <outputFileName> "<<std::endl
-                     << general_opt << "\n";
-        return 0;
-    }
+    app.description("Generates normal vector field from a vol file using DGtal library.\n Typical use example:\n \t vol2normalField[options] --input <volFileName> --o <outputFileName>\n");
+    app.add_option("-i,--input,1",filename,"Input vol file.")->required()->check(CLI::ExistingFile);
+    app.add_option("-o,--output,2",outputFileName,"Output file.")->required();
+    app.add_option("--level,-l",level,"Iso-level for the surface construction (default 0).",true);
+    app.add_option("--sigma,-s", sigma,"Sigma parameter of the Gaussian kernel (default 5.0).",true);
+    auto expOpt = app.add_flag("--exportOriginAndExtremity", "exports the origin and extremity of the vector fields when exporting the vector field in TXT format (useful to be displayed in other viewer like meshViewer).");
+    app.add_option("--vectorsNorm,-N", normExport, "set the norm of the exported vectors in TXT format (when the extremity points are exported with --exportOriginAndExtremity). By using a negative value you will invert the direction of the vectors (default 1.0).",true); 
+    app.add_option("--neighborhood,-n", neighborhood,"Size of the neighborhood for the convolution (distance on surfel graph, default 10).",true);  
 
-    //Parse options
-    if ( ! ( vm.count ( "input" ) ) ) missingParam ( "--input" );
-    std::string filename = vm["input"].as<std::string>();
-    if ( ! ( vm.count ( "output" ) ) ) missingParam ( "--output" );
-    std::string outputFileName = vm["output"].as<std::string>();
+    app.get_formatter()->column_width(40);
+    CLI11_PARSE(app, argc, argv);
+    // END parse command line using CLI ----------------------------------------------  
 
-    unsigned int level = vm["level"].as<unsigned int>();
-    double sigma = vm["sigma"].as<double>();
-    unsigned int neighborhood = vm["neighborhood"].as<unsigned int>();
-    double normExport = vm["vectorsNorm"].as<double>();
     typedef ImageSelector < Z3i::Domain, unsigned char>::Type Image;
     Image image = VolReader<Image>::importVol ( filename );
 
@@ -252,7 +222,7 @@ int main ( int argc, char**argv )
             //We output Theta - Phi
             out3<< acos ( res [2] ) *180.0/M_PI <<"  " << ( atan2 ( res [1], res [0] ) + M_PI ) *180.0/M_PI;
 
-            if (vm.count("exportOriginAndExtremity"))
+            if (expOpt->count()>0)
               {
                 res *= normExport;
                 out3 << " " << mySurfelEmbedderG(*it)[0]

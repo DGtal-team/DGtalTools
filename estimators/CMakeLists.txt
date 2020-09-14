@@ -11,14 +11,14 @@ SET(DGTAL_TOOLS_SRC
   eulerCharacteristic
 )
 
-if (WITH_EIGEN)
-    add_executable(volSurfaceRegularization volSurfaceRegularization.cpp volSurfaceRegularization-details/surface_approx.cpp)
-    target_link_libraries(volSurfaceRegularization ${DGTAL_LIBRARIES} ${DGtalToolsLibDependencies})
-    install(TARGETS volSurfaceRegularization
-        RUNTIME DESTINATION bin
-        LIBRARY DESTINATION lib
-        ARCHIVE DESTINATION lib)
-endif()
+#if (WITH_EIGEN)
+#    add_executable(volSurfaceRegularization volSurfaceRegularization.cpp volSurfaceRegularization-details/surface_approx.cpp)
+ #   target_link_libraries(volSurfaceRegularization ${DGTAL_LIBRARIES} ${DGtalToolsLibDependencies})
+#    install(TARGETS volSurfaceRegularization
+#        RUNTIME DESTINATION bin
+#        LIBRARY DESTINATION lib
+#        ARCHIVE DESTINATION lib)
+#endif()
 
 if ( WITH_VISU3D_QGLVIEWER )
   SET(VISU3D_TESTS_SRC
