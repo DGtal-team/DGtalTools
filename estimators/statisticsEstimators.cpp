@@ -37,9 +37,8 @@
 #include <limits>
 #include <boost/foreach.hpp>
 #include <boost/tokenizer.hpp>
-#include <boost/program_options/options_description.hpp>
-#include <boost/program_options/parsers.hpp>
-#include <boost/program_options/variables_map.hpp>
+
+#include "CLI11.hpp"
 
 #include "DGtal/base/Common.h"
 
@@ -56,13 +55,18 @@ using namespace DGtal;
 
  @b Allowed @b options @b are : 
  @code
-  -h [ --help ]           display this message
-  -f [ --file1 ] arg      File 1
-  -F [ --file2 ] arg      File 2
-  -c [ --column1 ] arg    Column of file 1
-  -C [ --column2 ] arg    Column of file 2
-  -o [ --output ] arg     Output file
-  -m [ --monge ] arg (=0) Is from Monge mean computation (optional)
+  Positionals:
+  1 TEXT:FILE REQUIRED                  File 1.
+  2 TEXT:FILE REQUIRED                  File 2.
+
+  Options:
+  -h,--help                             Print this help message and exit
+  -f,--file1 TEXT:FILE REQUIRED         File 1.
+  -F,--file2 TEXT:FILE REQUIRED         File 2.
+  -c,--column1 UINT REQUIRED            Column of file 1
+  -C,--column2 UINT REQUIRED            Column of file 2
+  -o,--output TEXT REQUIRED             Output file
+  -m,--monge BOOLEAN=0                  Is from Monge mean computation (optional, default false)
  @endcode
 
  @b Example: 
@@ -239,70 +243,29 @@ int ComputeStatistics ( const std::string & inputdata1,
     return 1;
 }
 
-/**
- * Missing parameter error message.
- *
- * @param param
- */
-void missingParam( std::string param )
-{
-    trace.error() << " Parameter: " << param << " is required.";
-    trace.info() << std::endl;
-    exit( 1 );
-}
-
-namespace po = boost::program_options;
-
 int main( int argc, char** argv )
 {
-    po::options_description general_opt("Allowed options are");
-    general_opt.add_options()
-            ("help,h", "display this message")
-            ("file1,f", po::value< std::string >(), "File 1")
-            ("file2,F", po::value< std::string >(), "File 2")
-            ("column1,c",  po::value< unsigned int >(), "Column of file 1" )
-            ("column2,C",  po::value< unsigned int >(), "Column of file 2" )
-            ("output,o", po::value< std::string >(), "Output file")
-            ("monge,m",  po::value< bool >()->default_value( false ), "Is from Monge mean computation (optional)" );
+    // parse command line CLI ----------------------------------------------
+    CLI::App app;
+    std::string filename1;
+    std::string filename2;
+    unsigned int column1;
+    unsigned int column2;
+    std::string output_filename;
+    bool isMongeMean {false};
 
+    app.description("Computes satistics (L1, L2, Loo) from results of two estimators.\n Typical use example:\n \t statisticsEstimators --file1 <file1> --column1 <column1> --file2 <file2> --column2 <column2> --output <output>\n");
+    app.add_option("-f,--file1,1",filename1,"File 1.")->required()->check(CLI::ExistingFile);
+    app.add_option("-F,--file2,2",filename2,"File 2.")->required()->check(CLI::ExistingFile);
+    app.add_option("--column1,-c", column1, "Column of file 1" )->required();
+    app.add_option("--column2,-C", column2, "Column of file 2" )->required();
+    app.add_option("--output,-o", output_filename, "Output file")->required();
+    app.add_option("--monge,-m", isMongeMean, "Is from Monge mean computation (optional, default false)", true);
 
-    bool parseOK = true;
-    po::variables_map vm;
-    try
-    {
-        po::store( po::parse_command_line( argc, argv, general_opt ), vm );
-    }
-    catch( const std::exception & ex )
-    {
-        parseOK = false;
-        trace.info() << "Error checking program options: " << ex.what() << std::endl;
-    }
-    po::notify( vm );
-    if( !parseOK || vm.count("help") || argc <= 1 )
-    {
-        trace.info()<< "Compute satistics (L1, L2, Loo) from results of two estimators" <<std::endl
-                    << "Basic usage: "<<std::endl
-                    << "\tstatisticsEstimators --file1 <file1> --column1 <column1> --file2 <file2> --column2 <column2> --output <output>"<<std::endl
-                    << std::endl
-                    << general_opt << std::endl;
-
-        return 0;
-    }
-
-
-    if (!(vm.count("file1"))) missingParam("--file1");
-    if (!(vm.count("file2"))) missingParam("--file2");
-    if (!(vm.count("column1"))) missingParam("--column1");
-    if (!(vm.count("column2"))) missingParam("--column2");
-    if (!(vm.count("output"))) missingParam("--output");
-
-    std::string filename1 = vm["file1"].as< std::string >();
-    std::string filename2 = vm["file2"].as< std::string >();
-    unsigned int column1 = vm["column1"].as< unsigned int >();
-    unsigned int column2 = vm["column2"].as< unsigned int >();
-    std::string output_filename = vm["output"].as< std::string >();
-    bool isMongeMean = vm["monge"].as< bool >();
-
+    app.get_formatter()->column_width(40);
+    CLI11_PARSE(app, argc, argv);
+    // END parse command line using CLI ----------------------------------------------  
+    
     std::ifstream inFileEmptyTest; inFileEmptyTest.open(output_filename.c_str());
     bool isNew = inFileEmptyTest.peek() == std::ifstream::traits_type::eof(); inFileEmptyTest.close();
     std::ofstream file( output_filename.c_str(), std::ofstream::out | std::ofstream::app );
