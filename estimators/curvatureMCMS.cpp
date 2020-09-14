@@ -71,7 +71,6 @@ using namespace std;
   -h,--help                             Print this help message and exit
   -i,--input TEXT:FILE REQUIRED         Input FreemanChain file name
   --GridStep FLOAT=1                    Grid step
-
  @endcode
 
  @b Example: 
@@ -158,7 +157,7 @@ int main( int argc, char** argv )
   double h {1.0};
 
   app.description("Estimates curvature using length of most centered segment computers.\n Typical use example:\n \t curvatureMCMS [options] --input  <fileName>\n");
-  app.add_option("-i,--input,1",fileName,"Input FreemanChain file name")->required()->check(CLI::ExistingFile);
+  app.add_option("-i,--input",fileName,"Input FreemanChain file name")->required()->check(CLI::ExistingFile);
   app.add_option("--GridStep", h, "Grid step",true);
   
   app.get_formatter()->column_width(40);
