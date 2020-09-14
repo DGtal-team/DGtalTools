@@ -32,10 +32,8 @@
 #include <iostream>
 #include <vector>
 #include <string>
-#include <boost/program_options/options_description.hpp>
-#include <boost/program_options/parsers.hpp>
-#include <boost/program_options/variables_map.hpp>
 
+#include "CLI11.hpp"
 
 #include "DGtal/base/Common.h"
 #include "DGtal/helpers/StdDefs.h"
@@ -51,9 +49,6 @@
 using namespace DGtal;
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace po = boost::program_options;
-
-
 
 /**
  @page tangentBC tangentBC
@@ -65,9 +60,13 @@ namespace po = boost::program_options;
 
  @b Allowed @b options @b are : 
  @code
-  -h [ --help ]              display this message
-  -i [ --input ] arg         input file name: FreemanChain (.fc) or a sequence of discrete points (.sdp).
-  -s [ --GridStep ] arg (=1) Grid step
+  Positionals:
+  1 TEXT:FILE REQUIRED                  input file name: FreemanChain (.fc) or a sequence of discrete points (.sdp).
+
+  Options:
+  -h,--help                             Print this help message and exit
+  -i,--input TEXT:FILE REQUIRED         input file name: FreemanChain (.fc) or a sequence of discrete points (.sdp).
+  --GridStep FLOAT=1                    Grid step (default 1.0)
  @endcode
 
 @note The file may contain several freeman chains.
@@ -102,40 +101,20 @@ gnuplot> plot [] [-1.2:1.2]'tangentsBC.dat' using 1:3  w lines title "tangents w
 
 int main( int argc, char** argv )
 {
-  // parse command line ----------------------------------------------
-  po::options_description general_opt("Allowed options are: ");
-  general_opt.add_options()
-    ("help,h", "display this message")
-    ("input,i", po::value<std::string>(), "input file name: FreemanChain (.fc) or a sequence of discrete points (.sdp).")
-    ("GridStep,step", po::value<double>()->default_value(1.0), "Grid step");
-  
-  
-  bool parseOK=true;
-  po::variables_map vm;
-  try{
-    po::store(po::parse_command_line(argc, argv, general_opt), vm);  
-  }catch(const std::exception& ex){
-    parseOK=false;
-    trace.info()<< "Error checking program options: "<< ex.what()<< std::endl;
-  }
+  // parse command line CLI ----------------------------------------------
+  CLI::App app;
+  std::string fileName;
+  double h {1.0};
 
-  po::notify(vm);    
-  if(!parseOK || vm.count("help")||argc<=1 || (!(vm.count("input"))) )
-    {
-      trace.info()<< "Tangent using a binomial convolver " <<std::endl << "Basic usage: "<<std::endl
-      << "\t tangentBC [options] --input  <fileName> "<<std::endl
-      << general_opt << "\n"
-      << "NB: the file may contain several freeman chains." << "\n";
-      return 0;
-    }
-  
-  
-  double h = vm["GridStep"].as<double>();  
+  app.description("Estimates tangent using a binomial convolver.\n Typical use example:\n \t tangentBC [options] --input  <fileName>\n");
+  auto filenameOpt = app.add_option("--input,-i,1",fileName,"input file name: FreemanChain (.fc) or a sequence of discrete points (.sdp).")->required()->check(CLI::ExistingFile);
+  app.add_option("--GridStep", h, "Grid step (default 1.0)", true);
+   
+  app.get_formatter()->column_width(40);
+  CLI11_PARSE(app, argc, argv);
+  // END parse command line using CLI ----------------------------------------------  
 
-
- 
-  if(vm.count("input")){
-    std::string fileName = vm["input"].as<std::string>();
+  if(filenameOpt->count()>0){
     std::string extension =  fileName.substr( fileName.find_last_of(".") + 1 );
     bool isSDP = extension == "sdp";
     typedef Z2i::Space Space; 
