@@ -94,7 +94,7 @@ using namespace DGtal;
   -g,--gridstep FLOAT=1                 Gridstep for the digitization (default 1.0)
   -f,--format TEXT=pts                  Output format:
                                             List of pointel coordinates {pts}
-                                            Freman chaincode Vector {fc} (default pts)
+                                            Freeman chaincode Vector {fc} (default pts)
   -o,--outputGeometry TEXT              Base name of the file containing the shape geometry (points, tangents, curvature)
  @endcode
 
@@ -489,7 +489,7 @@ int main( int argc, char** argv )
   app.add_option("--center_x,-x", cx, "x-coordinate of the shape center (default 0.0)", true );
   app.add_option("--center_y,-y", cy, "y-coordinate of the shape center (default 0.0)", true );
   app.add_option("--gridstep,-g", h, "Gridstep for the digitization (default 1.0)", true );
-  auto outputFormatOpt = app.add_option("--format,-f", outputFormat, "Output format:\n\t  List of pointel coordinates {pts}\n\t  Freman chaincode Vector {fc} (default pts)", true );
+  auto outputFormatOpt = app.add_option("--format,-f", outputFormat, "Output format:\n\t  List of pointel coordinates {pts}\n\t  Freeman chaincode Vector {fc} (default pts)", true );
   auto outputFileNameOpt = app.add_option("--outputGeometry,-o", outputFileName, "Base name of the file containing the shape geometry (points, tangents, curvature)" );
   
   app.get_formatter()->column_width(40);
