@@ -191,10 +191,9 @@ int main( int argc, char* argv[] )
 {
   using namespace Z2i;
 
-  // parse command line ----------------------------------------------
 
   // parse command line using CLI ----------------------------------------------
-     CLI::App app;
+  CLI::App app;
   string f1;
   string f2 {"AT"};
   string inpainting_mask;
@@ -231,7 +230,7 @@ int main( int argc, char* argv[] )
        << "Discretized as (u 0-form, v 1-form, A vertex-edge bdry, B edge-face bdy)" << endl
        << "E(u,v) = a(u-g)^t (u-g) +  u^t A^t diag(v)^2 A^t u + l e v^t (A A^t + B^t B) v + l/(4e) (1-v)^t (1-v)" << endl
        << endl
-       << "Example: ./at-u0-v1 -i ../Images/cerclesTriangle64b02.pgm -o tmp -a 0.05 -e 1 --lambda-1 0.1 --lambda-2 0.00001 -g";
+       << "Example: ./at-u0-v1 -i ../Images/cerclesTriangle64b02.pgm -o tmp -a 0.05 -e 1 --lambda-1 0.1 --lambda-2 0.00001";
   app.description(ssDescr.str());
   
   
