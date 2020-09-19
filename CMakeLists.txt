@@ -62,24 +62,7 @@ SET(DGTALTOOLS_VERSION "${DGtalTools_VERSION_MAJOR}.${DGtalTools_VERSION_MINOR}.
 SET(PROJECT_VERSION "${DGtalTools_VERSION_MAJOR}.${DGtalTools_VERSION_MINOR}.${DGtalTools_VERSION_PATCH}")
 SET(VERSION ${DGtalTools_VERSION_MAJOR}.${DGtalTools_VERSION_MINOR}.${DGtalTools_VERSION_PATCH})
 
-OPTION(Boost_USE_STATIC_LIBS "Use boost static lib" ON)
-SET(Boost_USE_MULTITHREADED ON)
-SET(Boost_USE_STATIC_RUNTIME OFF)
-SET(Boost_FOUND FALSE)
-FIND_PACKAGE(Boost 1.46.0 REQUIRED COMPONENTS program_options)
-if ( Boost_FOUND )
-  message(STATUS "Boost and boost_program_options found.")
-  ADD_DEFINITIONS(${BOOST_DEFINITIONS} -DBOOST_ALL_NO_LIB)    
-  include_directories( ${Boost_INCLUDE_DIRS} )
-  SET(DGtalToolsLibDependencies ${DGtalToolsLibDependencies}
-     ${Boost_LIBRAIRIES}
-     ${Boost_PROGRAM_OPTIONS_LIBRARY} Boost::program_options)
-   SET(DGtalLibInc ${Boost_INCLUDE_DIRS})
-   ## Used to avoid ld warnings (to be removed when using CLI11 instead program_options)
-   if(APPLE)
-      set (CMAKE_CXX_FLAGS "-fvisibility=hidden")
-   endif(APPLE)
-endif( Boost_FOUND )
+
 
 
 
