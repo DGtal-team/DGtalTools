@@ -66,6 +66,10 @@ SET(VERSION ${DGtalTools_VERSION_MAJOR}.${DGtalTools_VERSION_MINOR}.${DGtalTools
 
 
 
+ # -----------------------------------------------------------------------------
+ # Looking for boost
+ # -----------------------------------------------------------------------------
+
 set(Boost_USE_STATIC_LIBS   ON)
 set(Boost_USE_MULTITHREADED ON)
 set(Boost_USE_STATIC_RUNTIME OFF)
