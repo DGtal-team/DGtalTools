@@ -62,9 +62,21 @@ SET(DGTALTOOLS_VERSION "${DGtalTools_VERSION_MAJOR}.${DGtalTools_VERSION_MINOR}.
 SET(PROJECT_VERSION "${DGtalTools_VERSION_MAJOR}.${DGtalTools_VERSION_MINOR}.${DGtalTools_VERSION_PATCH}")
 SET(VERSION ${DGtalTools_VERSION_MAJOR}.${DGtalTools_VERSION_MINOR}.${DGtalTools_VERSION_PATCH})
 
-OPTION(Boost_USE_STATIC_LIBS "Use boost static lib" ON)
-SET(Boost_USE_MULTITHREADED ON)
-SET(Boost_USE_STATIC_RUNTIME OFF)
+# -----------------------------------------------------------------------------
+# Looking for boost
+# -----------------------------------------------------------------------------
+set(Boost_USE_STATIC_LIBS   ON)
+set(Boost_USE_MULTITHREADED ON)
+set(Boost_USE_STATIC_RUNTIME OFF)
+set(Boost_FOUND FALSE)
+FIND_PACKAGE(Boost 1.50.0 REQUIRED)
+if ( Boost_FOUND )
+  ADD_DEFINITIONS(${BOOST_DEFINITIONS} -DBOOST_ALL_NO_LIB)
+  # SYSTEM to avoid warnings from boost.
+  include_directories(SYSTEM ${Boost_INCLUDE_DIRS} )
+  SET(DGtalLibInc ${DGtalLibInc} ${Boost_INCLUDE_DIRS})
+endif( Boost_FOUND )
+
 
 
 
