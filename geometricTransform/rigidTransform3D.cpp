@@ -35,98 +35,78 @@
 #include <DGtal/images/ConstImageAdapter.h>
 #include <DGtal/images/RigidTransformation3D.h>
 
-#include <boost/program_options/options_description.hpp>
-#include <boost/program_options/parsers.hpp>
-#include <boost/program_options/variables_map.hpp>
+#include "CLI11.hpp"
 
 using namespace std;
 using namespace DGtal;
 using namespace Z3i;
 using namespace functors;
 
-namespace po = boost::program_options;
-
-
 /**
- * Missing parameter error message.
- *
- * @param param
- */
-void missingParam ( std::string param )
-{
-  trace.error() <<" Parameter: "<<param<<" is required..";
-  trace.info() <<std::endl;
-  exit ( 1 );
-}
+@brief Apply rigid transformation on a given volumic image.
 
+@b Usage : rigidTrans3D --input <RawFileName> --output <VolOutputFileName> --ox 1.0 --oy 1.0 --oz 1 -a 1.2 --ax 1 --ay 1 --az 0 --tx 1 --ty 0 --tz 0 --m <forward|backward>  
+
+@b Allowed @b options @b are :
+
+@code
+Positionals:
+  1 TEXT:FILE REQUIRED                  Input file.
+  2 TEXT REQUIRED                       Output file.
+
+Options:
+  -h,--help                             Print this help message and exit
+  -i,--input TEXT:FILE REQUIRED         Input file.
+  -o,--output TEXT REQUIRED             Output file.
+  -m,--model TEXT REQUIRED              Transformation model: backward, forward.
+  -a,--angle FLOAT=0                    Rotation angle in radians (default 0)
+  --ox FLOAT=0                          X coordinate of origin (default 0)
+  --oy FLOAT=0                          Y coordinate of origin (default 0)
+  --oz FLOAT=0                          Z coordinate of origin (default 0)
+  --ax FLOAT=1                          X component of rotation axis (default 1)
+  --ay FLOAT=0                          Y component of rotation axis (default 0)
+  --az FLOAT=0                          Z component of rotation axis (default 0)
+  --tx FLOAT=0                          X component of translation vector (default 0)
+  --ty FLOAT=0                          Y component of translation vector (default 0)
+  --tz FLOAT=0                          Y component of translation vector (default 0)
+
+@endcode
+
+@b Example
+
+*/
 
 int main(int argc, char**argv)
 {
 
-  // parse command line ----------------------------------------------
-  po::options_description general_opt ( "Allowed options are: " );
-  general_opt.add_options()
-    ( "help,h", "display this message." )
-    ( "input,i", po::value<std::string>(), "Input file." )
-    ( "output,o", po::value<string>(),"Output filename." )
-    ( "model,m", po::value<string>(),"Transformation model: backward, forward." )
-    ( "angle,a", po::value<double>(),"Rotation angle in radians." )
-    ( "ox", po::value<double>(),"X coordinate of origin." )
-    ( "oy", po::value<double>(),"Y coordinate of origin." )
-    ( "oz", po::value<double>(),"Z coordinate of origin." )
-    ( "ax", po::value<double>(),"X component of rotation axis." )
-    ( "ay", po::value<double>(),"Y component of rotation axis." )
-    ( "az", po::value<double>(),"Z component of rotation axis." )
-    ( "tx", po::value<double>(),"X component of translation vector." )
-    ( "ty", po::value<double>(),"Y component of translation vector." )
-    ( "tz", po::value<double>(),"Z component of translation vector." );
+  // parse command line CLI ----------------------------------------------
+  CLI::App app;
+  std::string filename;
+  std::string outputFileName;
+  std::string model;
+  double angle {0};
+  double ox {0}, oy {0}, oz {0};
+  double ax {1}, ay {0}, az {0};
+  double tx {0}, ty {0}, tz {0};
 
-  bool parseOK=true;
-  po::variables_map vm;
-  try{
-    po::store(po::parse_command_line(argc, argv, general_opt), vm);
-  }catch(const std::exception& ex){
-    parseOK=false;
-    trace.info()<< "Error checking program options: "<< ex.what()<< endl;
-  }
+  app.description("Apply rigid transformation on a given volumic image.\n Typical use example:\n \t rigidTrans3D --input <RawFileName> --output <VolOutputFileName> --ox 1.0 --oy 1.0 --oz 1 -a 1.2 --ax 1 --ay 1 --az 0 --tx 1 --ty 0 --tz 0 --m <forward|backward>\n");
+  app.add_option("-i,--input,1",filename,"Input file.")->required()->check(CLI::ExistingFile);
+  app.add_option("-o,--output,2",outputFileName,"Output file.")->required();
+  app.add_option("-m,--model",model,"Transformation model: backward, forward.")->required();
+  app.add_option("-a,--angle",angle,"Rotation angle in radians (default 0)",true);
+  app.add_option("--ox",ox,"X coordinate of origin (default 0)",true);
+  app.add_option("--oy",oy,"Y coordinate of origin (default 0)",true);
+  app.add_option("--oz",oz,"Z coordinate of origin (default 0)",true);
+  app.add_option("--ax",ax,"X component of rotation axis (default 1)",true);
+  app.add_option("--ay",ay,"Y component of rotation axis (default 0)",true);
+  app.add_option("--az",az,"Z component of rotation axis (default 0)",true);
+  app.add_option("--tx",tx,"X component of translation vector (default 0)",true);
+  app.add_option("--ty",ty,"Y component of translation vector (default 0)",true);
+  app.add_option("--tz",tz,"Y component of translation vector (default 0)",true);
 
-  po::notify ( vm );
-  if (!parseOK || vm.count ( "help" ) ||argc<=1 )
-    {
-      trace.info() << "Rotate 2D image."<<std::endl
-                   << std::endl << "Basic usage: "<<std::endl
-                   << "rigidTrans2D --ox 1.0 --oy 1.0 --oz 1 -a 1.2 --ax 1 --ay 1 --az 0 --tx 1 --ty 0 --tz 0 --m <forward|backward> --input <RawFileName> --output <VolOutputFileName> "<<std::endl
-                   << general_opt << "\n";
-      return 0;
-    }
-
-  //Parse options
-  if ( ! ( vm.count ( "input" ) ) ) missingParam ( "--input" );
-  std::string filename = vm["input"].as<std::string>();
-  if ( ! ( vm.count ( "output" ) ) ) missingParam ( "--output" );
-  std::string outputFileName = vm["output"].as<std::string>();
-  if ( ! ( vm.count ( "model" ) ) ) missingParam ( "--model" );
-  std::string model = vm["model"].as<std::string>();
-  if ( ! ( vm.count ( "angle" ) ) ) missingParam ( "--angle" );
-  double angle =  vm["angle"].as<double>();
-  if ( ! ( vm.count ( "ox" ) ) ) missingParam ( "--ox" );
-  double ox =  vm["ox"].as<double>();
-  if ( ! ( vm.count ( "oy" ) ) ) missingParam ( "--oy" );
-  double oy =  vm["oy"].as<double>();
-  if ( ! ( vm.count ( "oz" ) ) ) missingParam ( "--oz" );
-  double oz =  vm["oz"].as<double>();
-  if ( ! ( vm.count ( "ax" ) ) ) missingParam ( "--ax" );
-  double ax =  vm["ax"].as<double>();
-  if ( ! ( vm.count ( "ay" ) ) ) missingParam ( "--ay" );
-  double ay =  vm["ay"].as<double>();
-  if ( ! ( vm.count ( "az" ) ) ) missingParam ( "--az" );
-  double az =  vm["az"].as<double>();
-  if ( ! ( vm.count ( "tx" ) ) ) missingParam ( "--tx" );
-  double tx =  vm["tx"].as<double>();
-  if ( ! ( vm.count ( "ty" ) ) ) missingParam ( "--ty" );
-  double ty =  vm["ty"].as<double>();
-  if ( ! ( vm.count ( "tz" ) ) ) missingParam ( "--tz" );
-  double tz =  vm["tz"].as<double>();
+  app.get_formatter()->column_width(40);
+  CLI11_PARSE(app, argc, argv);
+  // END parse command line using CLI ----------------------------------------------
 
   typedef ImageSelector<Domain, unsigned char >::Type Image;
   typedef ForwardRigidTransformation3D < Space > ForwardTrans;

@@ -46,16 +46,12 @@
 #include <DGtal/topology/helpers/Surfaces.h>
 #include <DGtal/io/colormaps/GradientColorMap.h>
 
-#include <boost/program_options/options_description.hpp>
-#include <boost/program_options/parsers.hpp>
-#include <boost/program_options/variables_map.hpp>
-
 using namespace std;
 using namespace DGtal;
 using namespace Z3i;
 
-///////////////////////////////////////////////////////////////////////////////
-namespace po = boost::program_options;
+#include "CLI11.hpp"
+
 
 
 /**
@@ -69,15 +65,16 @@ namespace po = boost::program_options;
  @b Allowed @b options @b are :
  
  @code
-  -h [ --help ]                  display this message
-  -s [ --scale ] arg (=1)        set the scale of the maximal level. (default 
-                                 1.0)
-  -c [ --colorMap ]              define the heightmap color with a pre-defined 
-                                 colormap (GradientColorMap)
-  -t [ --colorTextureImage ] arg define the heightmap color from a given color 
-                                 image (32 bits image).
-  -i [ --input-file ] arg        2d input image representing the height map 
-                                 (given as grayscape image cast into 8 bits).
+
+ Positionals:
+   1 TEXT:FILE REQUIRED                  2d input image representing the height map (given as grayscape image cast into 8 bits).
+
+ Options:
+   -h,--help                             Print this help message and exit
+   -i,--input TEXT:FILE REQUIRED         2d input image representing the height map (given as grayscape image cast into 8 bits).
+   -s,--scale FLOAT                      set the scale of the maximal level. (default 1.0)
+   -c,--colorMap                         define the heightmap color with a pre-defined colormap (GradientColorMap)
+   -t,--colorTextureImage TEXT           define the heightmap color from a given color image (32 bits image).
 
  @endcode
 
@@ -180,9 +177,6 @@ protected:
   }
 };
 
-
-
-
 // Defining a Helper to get the 3D point functor from an 2DImage
 template<typename TImage2D, typename TPoint3D >
 struct Image3DPredicatFrom2DImage{
@@ -211,55 +205,39 @@ struct Image3DPredicatFrom2DImage{
 
 int main( int argc, char** argv )
 {
-  // parse command line ----------------------------------------------
-  po::options_description general_opt("Allowed options are: ");
-  general_opt.add_options()
-    ("help,h", "display this message")
-    ("scale,s", po::value<double>()->default_value(1.0), "set the scale of the maximal level. (default 1.0)")
-    ("colorMap,c", "define the heightmap color with a pre-defined colormap (GradientColorMap)")
-    ("colorTextureImage,t",po::value<std::string>(),  "define the heightmap color from a given color image (32 bits image).")
-    ("input-file,i", po::value<std::string>(), "2d input image representing the height map (given as grayscape image cast into 8 bits)." );
+  
+  // parse command line using CLI ----------------------------------------------
+  CLI::App app;
+  std::string inputFileName;
+  double scale {1.0};
+  bool colorMap {false};
+  std::string colorTextureImage;
+  app.description("Displays 2D image as heightmap by using QGLviewer.\n Exemple of use:  visualisation/3dHeightMapViewer -i ${DGtal}/examples/samples/church.pgm -s 0.2");
+  
+  app.add_option("-i,--input,1", inputFileName, "2d input image representing the height map (given as grayscape image cast into 8 bits)." )
+  ->required()
+  ->check(CLI::ExistingFile);
+  app.add_option("--scale,-s",scale,  "set the scale of the maximal level. (default 1.0)");
+  app.add_flag("--colorMap,-c", colorMap, "define the heightmap color with a pre-defined colormap (GradientColorMap)");
+  app.add_option("--colorTextureImage,-t", colorTextureImage,  "define the heightmap color from a given color image (32 bits image).");
+  
+  
+  
+  app.get_formatter()->column_width(40);
+  CLI11_PARSE(app, argc, argv);
+  // END parse command line using CLI ----------------------------------------------
 
-  bool parseOK=true;
-  po::variables_map vm;
-  try{
-    po::store(po::parse_command_line(argc, argv, general_opt), vm);
-  }catch(const std::exception& ex){
-    parseOK=false;
-    trace.info()<< "Error checking program options: "<< ex.what()<< endl;
-  }
-  po::notify(vm);
-  if( !parseOK || vm.count("help")||argc<=1)
-    {
-      std::cout << "Usage: " << argv[0] << " [input-file]\n"
-                << "Displays 2D image as heightmap by using QGLviewer. "<< endl
-                << general_opt << "\n" <<
-                "Exemple of use:  visualisation/3dHeightMapViewer -i ${DGtal}/examples/samples/church.pgm -s 0.2" << std::endl;
-
-      return 0;
-    }
-
-  if(! vm.count("input-file"))
-    {
-      trace.error() << " The file name was defined" << endl;
-      return 0;
-    }
-
-
-  string inputFilename = vm["input-file"].as<std::string>();
-  double scale = vm["scale"].as<double>();
-
-
+  
   typedef DGtal::ImageContainerBySTLVector<Z2i::Domain, unsigned char> Image2DG ;
   typedef DGtal::ImageContainerBySTLVector<Z2i::Domain, unsigned int> Image2DCol ;
 
-  Image2DG image = GenericReader<Image2DG>::import( inputFilename );
+  Image2DG image = GenericReader<Image2DG>::import( inputFileName );
   Image2DCol imageTexture(image.domain());
   int maxHeight = (int)(std::numeric_limits<Image2DG::Value>::max()*scale);
   trace.info()<< "Max height from scale:" << maxHeight << std::endl;
 
-  if(vm.count("colorTextureImage")){
-    imageTexture =  GenericReader<Image2DCol>::import( vm["colorTextureImage"].as<std::string>() );
+  if(colorTextureImage != ""){
+    imageTexture =  GenericReader<Image2DCol>::import( colorTextureImage );
   }
 
   QApplication application(argc,argv);
@@ -280,7 +258,7 @@ int main( int argc, char** argv )
   Image3DPredicatFrom2DImage<Image2DG, Z3i::Point> image3Dpredicate(image, scale);
   trace.info() << "Constructing boundary... ";
   Surfaces<KSpace>::sMakeBoundary (boundVect, K, image3Dpredicate, Z3i::Point(0,0,0),
-                                   Z3i::Point(image.domain().upperBound()[0], image.domain().upperBound()[1], maxHeight+1)  );
+                                   Z3i::Point(image.domain().upperBound()[0], image.domain().upperBound()[1], maxHeight+1));
   trace.info() << "[done]"<< std::endl;
 
   viewer << SetMode3D((*(boundVect.begin())).className(), "Basic" );
@@ -293,9 +271,9 @@ int main( int argc, char** argv )
     Z3i::Point pt = K.sCoords(K.sDirectIncident( *it, 2 ));
     functors::Projector<SpaceND<2,int> > proj;
     Image2DG::Value val = image(proj(pt));
-    if(vm.count("colorMap")){
+    if(colorMap){
       viewer.setFillColor(gradientShade(val));
-    }else if (vm.count("colorTextureImage")) {
+    }else if (colorTextureImage != "") {
       viewer.setFillColor(Color(imageTexture(proj(pt))));
     }else{
       viewer.setFillColor(grayShade(val));

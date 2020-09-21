@@ -41,27 +41,23 @@
  @b Allowed @b options @b are :
  
  @code
-  -h [ --help ]                 display this message
-  -i [ --input ] arg            the name of the text file containing the list 
-                                of 3D points (x y z per line)
-  -b [ --box ] arg (=0)         specifies the the tightness of the bounding box
-                                around the curve with a given integer 
-                                displacement <arg> to enlarge it (0 is tight)
-  -v [ --viewBox ] arg (=WIRED) displays the bounding box, <arg>=WIRED means 
-                                that only edges are displayed, <arg>=COLORED 
-                                adds colors for planes (XY is red, XZ green, 
-                                YZ, blue).
-  -C [ --curve3d ]              displays the 3D curve
-  -c [ --curve2d ]              displays the 2D projections of the 3D curve on 
-                                the bounding box
-  -3 [ --cover3d ]              displays the 3D tangential cover of the curve
-  -2 [ --cover2d ]              displays the 2D projections of the 3D 
-                                tangential cover of the curve
-  -n [ --nbColors ] arg (=3)    sets the number of successive colors used for 
-                                displaying 2d and 3d maximal segments (default 
-                                is 3: red, green, blue)
-  -t [ --tangent ]              displays the tangents to the curve
 
+ Positionals:
+   1 TEXT:FILE REQUIRED                  the name of the text file containing the list of 3D points (x y z per line).
+
+ Options:
+   -h,--help                             Print this help message and exit
+   -i,--input TEXT:FILE REQUIRED         the name of the text file containing the list of 3D points (x y z per line).
+   -b,--box INT=0                        specifies the the tightness of the bounding box around the curve with a given integer displacement <arg> to enlarge it (0 is tight)
+   -v,--viewBox TEXT:{WIRED,COLORED}=WIRED
+                                         displays the bounding box, <arg>=WIRED means that only edges are displayed, <arg>=COLORED adds colors for planes (XY is red, XZ green, YZ, blue).
+   -C,--curve3d                          displays the 3D curve.
+   -c,--curve2d                          displays the 2D projections of the 3D curve on the bounding box.
+   -3,--cover3d                          displays the 3D tangential cover of the curve.
+   -2,--cover2d                          displays the 2D projections of the 3D tangential cover of the curve
+   -n,--nbColors INT=3                   sets the number of successive colors used for displaying 2d and 3d maximal segments (default is 3: red, green, blue)
+   -t,--tangent                          displays the tangents to the curve
+   
  @endcode
 
 
@@ -88,9 +84,7 @@
 #include <fstream>
 #include <vector>
 
-#include <boost/program_options/options_description.hpp>
-#include <boost/program_options/parsers.hpp>
-#include <boost/program_options/variables_map.hpp>
+#include "CLI11.hpp"
 
 #include "DGtal/base/Common.h"
 #include "DGtal/base/Exceptions.h"
@@ -361,10 +355,6 @@ bool displayCover( Viewer3D<space, kspace> & viewer,
   return true;
 }
 
-
-///////////////////////////////////////////////////////////////////////////////
-namespace po = boost::program_options;
-
 /**
    Main function.
 
@@ -379,54 +369,48 @@ int main(int argc, char **argv)
   typedef KhalimskySpaceND<3,int> K3;
   typedef Z3::Point Point;
   typedef Z3::RealPoint RealPoint;
-
-  // specify command line ----------------------------------------------
   QApplication application(argc,argv); // remove Qt arguments.
-  po::options_description general_opt("Specific allowed options (for Qt options, see Qt official site) are");
-  general_opt.add_options()
-    ("help,h", "display this message")
-    ("input,i", po::value<std::string>(), "the name of the text file containing the list of 3D points (x y z per line)" )
-    ("box,b",  po::value<int>()->default_value( 0 ), "specifies the the tightness of the bounding box around the curve with a given integer displacement <arg> to enlarge it (0 is tight)" )
-    ("viewBox,v",  po::value<string>()->default_value( "WIRED" ), "displays the bounding box, <arg>=WIRED means that only edges are displayed, <arg>=COLORED adds colors for planes (XY is red, XZ green, YZ, blue)." )
-    ("curve3d,C", "displays the 3D curve")
-    ("curve2d,c", "displays the 2D projections of the 3D curve on the bounding box")
-    ("cover3d,3", "displays the 3D tangential cover of the curve" )
-    ("cover2d,2", "displays the 2D projections of the 3D tangential cover of the curve" )
-    ("nbColors,n",  po::value<int>()->default_value( 3 ), "sets the number of successive colors used for displaying 2d and 3d maximal segments (default is 3: red, green, blue)" )
-    ("tangent,t", "displays the tangents to the curve" )
-    ;
-  po::positional_options_description pos_opt;
-  pos_opt.add("input", 1);
+  
+  // parse command line using CLI ----------------------------------------------
+  CLI::App app;
+  std::string inputFileName;
+  int b {0};
+  std::string viewBox {"WIRED"};
+  bool curve3d {false};
+  bool curve2d {false};
+  bool cover3d {false};
+  bool cover2d {false};
+  bool tangent {false};
+  int nbColors {3};
+  
+  app.description("Display a 3D curve given as the <input> filename (with possibly projections and/or tangent information) by using QGLviewer.\n Example:\n 3dCurveViewer -C -b 1 -3 -2 -c ${DGtal}/examples/samples/sinus.dat\n");
+  app.add_option("-i,--input,1", inputFileName, "the name of the text file containing the list of 3D points (x y z per line)." )
+  ->required()
+  ->check(CLI::ExistingFile);
+  app.add_option("--box,-b",b, "specifies the the tightness of the bounding box around the curve with a given integer displacement <arg> to enlarge it (0 is tight)", true);
+  app.add_option("--viewBox,-v",viewBox, "displays the bounding box, <arg>=WIRED means that only edges are displayed, <arg>=COLORED adds colors for planes (XY is red, XZ green, YZ, blue).", true )
+   -> check(CLI::IsMember({"WIRED", "COLORED"}));
+  
+  app.add_flag("--curve3d,-C", curve3d, "displays the 3D curve.");
+  app.add_flag("--curve2d,-c", curve2d, "displays the 2D projections of the 3D curve on the bounding box.");
+  app.add_flag("--cover3d,-3", curve2d, "displays the 3D tangential cover of the curve.");
+  app.add_flag("--cover2d,-2", cover2d, "displays the 2D projections of the 3D tangential cover of the curve" );
+  app.add_option("--nbColors,-n", nbColors, "sets the number of successive colors used for displaying 2d and 3d maximal segments (default is 3: red, green, blue)", true);
 
-  // parse command line ----------------------------------------------
-  bool parseOK=true;
-  po::variables_map vm;
-  try {
-    po::command_line_parser clp( argc, argv );
-    clp.options( general_opt ).positional( pos_opt );
-    po::store( clp.run(), vm );
-  } catch( const std::exception& ex ) {
-    parseOK = false;
-    trace.info() << "Error checking program options: "<< ex.what() << endl;
-  }
-  po::notify( vm );
-  if( !parseOK || vm.count("help")||argc<=1)
-    {
-      std::cout << "Usage: " << argv[0] << " [options] input\n"
-    << "Display a 3D curve given as the <input> filename (with possibly projections and/or tangent information) by using QGLviewer.\n"
-    << general_opt << "\n\n";
-      std::cout << "Example:\n"
-    << "3dCurveViewer -C -b 1 -3 -2 -c ${DGtal}/examples/samples/sinus.dat\n";
-      return 0;
-    }
+  app.add_flag("--tangent,-t", tangent, "displays the tangents to the curve" );
 
-  // process command line ----------------------------------------------
-  string input = vm["input"].as<std::string>();
-  int b = vm["box"].as<int>();
+
+  
+  app.get_formatter()->column_width(40);
+  CLI11_PARSE(app, argc, argv);
+  // END parse command line using CLI ----------------------------------------------
+
+  
+  
   // Create curve 3D.
   vector<Point> sequence;
   fstream inputStream;
-  inputStream.open ( input.c_str(), ios::in);
+  inputStream.open ( inputFileName.c_str(), ios::in);
   try {
     sequence = PointListReader<Point>::getPointsFromInputStream( inputStream );
     if ( sequence.size() == 0) throw IOException();
@@ -457,24 +441,19 @@ int main(int argc, char **argv)
     gc.initFromPointsVector( sequence );
   } catch (DGtal::ConnectivityException& /*ce*/) {
     throw ConnectivityException();
-    return false;
   }
 
   // ----------------------------------------------------------------------
   // Displays everything.
   viewer.show();
   // Display axes.
-  if ( vm.count( "viewBox" ) )
-    displayAxes<Point,RealPoint, Z3i::Space, Z3i::KSpace>( viewer, lowerBound, upperBound, vm[ "viewBox" ].as<std::string>() );
+  if ( viewBox != "" )
+    displayAxes<Point,RealPoint, Z3i::Space, Z3i::KSpace>( viewer, lowerBound, upperBound, viewBox );
   // Display 3D tangential cover.
   bool res = displayCover( viewer, ks, sequence.begin(), sequence.end(),
-         vm.count( "cover3d" ),
-         vm.count( "curve2d" ),
-         vm.count( "cover2d" ),
-         vm.count( "tangent" ),
-         vm["nbColors"].as<int>() );
+                           cover3d,  curve2d, cover2d, tangent, nbColors );
   // Display 3D curve points.
-  if ( vm.count( "curve3d" ) )
+  if ( curve3d )
     viewer << CustomColors3D( CURVE3D_COLOR, CURVE3D_COLOR )
      << gc.getPointsRange()
      << sequence.back(); // curiously, last point is not displayed.

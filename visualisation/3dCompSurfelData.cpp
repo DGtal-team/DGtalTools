@@ -48,18 +48,14 @@
 #include "DGtal/io/colormaps/GradientColorMap.h"
 #include "DGtal/io/readers/GenericReader.h"
 
-#include <boost/program_options/options_description.hpp>
-#include <boost/program_options/parsers.hpp>
-#include <boost/program_options/variables_map.hpp>
+#include "CLI11.hpp"
+
 
 #include <limits>
 
 using namespace std;
 using namespace DGtal;
 using namespace Z3i;
-
-///////////////////////////////////////////////////////////////////////////////
-namespace po = boost::program_options;
 
 
 
@@ -76,29 +72,21 @@ namespace po = boost::program_options;
  @b Allowed @b options @b are:
  
  @code
-  -h [ --help ]                    display this message
-  -i [ --input ] arg               input file: sdp (sequence of discrete 
-                                   points with attribute)
-  -r [ --reference ] arg           input reference file: sdp (sequence of 
-                                   discrete points with attribute)
-  -l [ --compAccordingLabels ]     apply the comparisons only on points with 
-                                   same labels (by default fifth colomn)
-  -a [ --drawSurfelAssociations ]  Draw the surfel association.
-  -o [ --fileMeasureOutput ] arg   specify the output file to store (append) 
-                                   the error stats else the result is given to 
-                                   std output. 
-  -n [ --noWindows ]               Don't display Viewer windows.
-  -d [ --doSnapShotAndExit ] arg   save display snapshot into file. Notes that 
-                                   the camera setting is set by default 
-                                   according the last saved configuration (use 
-                                   SHIFT+Key_M to save current camera setting 
-                                   in the Viewer3D).
-  --fixMaxColorValue arg           fix the maximal color value for the scale 
-                                   error display (else the scale is set from 
-                                   the maximal value)
-  --labelIndex arg                 set the index of the label (by default set 
-                                   to 4)  
-  --SDPindex arg                   specify the sdp index (by default 0,1,2,3).
+
+ Options:
+   -h,--help                             Print this help message and exit
+   -i,--input TEXT:FILE REQUIRED         input file: sdpa (sequence of discrete points with attribute)
+   -r,--reference TEXT:FILE REQUIRED     input file: sdpa (sequence of discrete points with attribute)
+   -l,--compAccordingLabels              apply the comparisos only on points with same labels (by default fifth colomn)
+   -a,--drawSurfelAssociations           Draw the surfel association.
+   -o,--fileMeasureOutput TEXT           specify the output file to store (append) the error stats else the result is given to std output.
+   -n,--noWindows                        Don't display Viewer windows.
+   -d,--doSnapShotAndExit TEXT           save display snapshot into file. Notes that  the camera setting is set by default according the last saved configuration (use SHIFT+Key_M to save current camera setting in the Viewer3D).
+   --fixMaxColorValue FLOAT              fix the maximal color value for the scale error display (else the scale is set from the maximal value)
+   --labelIndex UINT                     set the index of the label (by default set to 4)
+   --SDPindex UINT x 4                   specify the sdp index (by default 0,1,2,3).
+
+
  @endcode
 
  @b Example: 
@@ -173,95 +161,77 @@ getBoundingUpperAndLowerPoint(const std::vector<Point> &vectorPt, Point &ptLower
 
 int main( int argc, char** argv )
 {
-
   typedef PointVector<4, double> Point4D;
   typedef PointVector<1, int> Point1D;
+  
+  // parse command line using CLI ----------------------------------------------
+  CLI::App app;
+  std::string inputFileName;
+  std::string referenceFileName;
+  std::string fileMeasureOutput;
+  std::string snapShotName;
+  bool useLabels {false};
+  bool drawSurfelAssociations {false};
+  bool noWindows {false};
+  double maxVal;
+  unsigned int labelIndex {4};
+  std::vector<unsigned int> vectSDPindex;
+  
+  app.description("Computes generic scalar surfel data comparisons (squared error) (given from an input data file and from a reference one).\n Each surfels are associated to the nearest one of the reference surfels (computed by a 'brut force' search). This association can also be limited to surfel of same label (if available in the data and by using the --compAccordingLabels option). The comparison and surfel association can be displayed and result statistics are saved on output file (--fileMeasureOutput). You can also remove the interactive 3d view by just doing a snapshot and exit with option --doSnapShotAndExit.\n \t  Example of use: \n \t \t 3dCompSurfelData -i surfelCurvatureInput.dat -r surfelCurvatureRef.dat  --fixMaxColorValue 0.8 -d visuSEcurvature.png -o  statMeasures.dat \n \n  \t \t => From the two compared files you should obtain the result of the comparison (statMeasures.dat) with the associated visualisation (visuSEcurvature.png).\n");
+  
+  app.add_option("-i,--input,1", inputFileName, "input file: sdpa (sequence of discrete points with attribute)" )
+  ->required()
+  ->check(CLI::ExistingFile);
+  
+  app.add_option("-r,--reference,2", referenceFileName, "input file: sdpa (sequence of discrete points with attribute)" )
+  ->required()
+  ->check(CLI::ExistingFile);
+  app.add_flag("-l,--compAccordingLabels", useLabels, "apply the comparisos only on points with same labels (by default fifth colomn)" );
+  app.add_flag("-a,--drawSurfelAssociations", drawSurfelAssociations, "Draw the surfel association.");
+  app.add_option("-o,--fileMeasureOutput",fileMeasureOutput,  "specify the output file to store (append) the error stats else the result is given to std output. ");
+  
+  app.add_flag("-n,--noWindows","Don't display Viewer windows." );
+    
+  app.add_option("-d,--doSnapShotAndExit", snapShotName, "save display snapshot into file. Notes that  the camera setting is set by default according the last saved configuration (use SHIFT+Key_M to save current camera setting in the Viewer3D).");
+  auto maxValSpe = app.add_option("--fixMaxColorValue", maxVal, "fix the maximal color value for the scale error display (else the scale is set from the maximal value)");
+  auto labOptio = app.add_option("--labelIndex", labelIndex,"set the index of the label (by default set to 4)  " );
+  app.add_option("--SDPindex",vectSDPindex, "specify the sdp index (by default 0,1,2,3).")
+   ->expected(4);
+  
+  app.get_formatter()->column_width(40);
+  CLI11_PARSE(app, argc, argv);
+  // END parse command line using CLI ----------------------------------------------
 
-  // parse command line ----------------------------------------------
-  po::options_description general_opt("Allowed options are: ");
-  general_opt.add_options()
-    ("help,h", "display this message")
-    ("input,i", po::value<std::string>(), "input file: sdpa (sequence of discrete points with attribute)" )
-    ("reference,r", po::value<std::string>(), "input reference file: sdpa (sequence of discrete points with attribute)" )
-    ("compAccordingLabels,l", "apply the comparisos only on points with same labels (by default fifth colomn)" )
-    ("drawSurfelAssociations,a", "Draw the surfel association." )
-    ("fileMeasureOutput,o", po::value<std::string>(), "specify the output file to store (append) the error stats else the result is given to std output. " )
-    ("noWindows,n", "Don't display Viewer windows." )
-    ("doSnapShotAndExit,d", po::value<std::string>(), "save display snapshot into file. Notes that  the camera setting is set by default according the last saved configuration (use SHIFT+Key_M to save current camera setting in the Viewer3D)." )
-    ("fixMaxColorValue", po::value<double>(), "fix the maximal color value for the scale error display (else the scale is set from the maximal value)" )
-    ("labelIndex", po::value<unsigned int>(), "set the index of the label (by default set to 4)  " )
-    ("SDPindex", po::value<std::vector <unsigned int> >()->multitoken(), "specify the sdp index (by default 0,1,2,3).");
 
 
-  bool parseOK=true;
-  bool cannotStart= false;
-  po::variables_map vm;
-
-
-  try{
-    po::store(po::parse_command_line(argc, argv, general_opt), vm);
-  }catch(const std::exception& ex){
-    parseOK=false;
-    trace.error()<< "Error checking program options: "<< ex.what()<< endl;
-  }
-  po::notify(vm);
-  if(parseOK && ! vm.count("input"))
-    {
-      trace.error() << " The input file name was not defined" << endl;
-      cannotStart = true;
-    }
-
-
-  if( !parseOK || cannotStart ||  vm.count("help")||argc<=1)
-    {
-      trace.info() << "Usage: " << argv[0] << " [input]\n"
-                   << "It computes generic scalar surfel data comparisons (squared error) ( given from an input data file and from a reference one). \n \n"
-                   << "Each surfels are associated to the nearest one of the reference surfels (computed by a 'brut force' search) "
-                   << "This association can also be limited to surfel of same label (if available in the data and by using the --compAccordingLabels option  )."
-                   << "The comparison and surfel association can be displayed and result statistics are saved on output file (--fileMeasureOutput)."
-                   << "You can also remove the interactive 3d view by just doing a snapshot and exit with option --doSnapShotAndExit. \n \n"
-                   << "Example of use: \n \n"
-                   << "3dCompSurfelData -i surfelCurvatureInput.dat -r surfelCurvatureRef.dat  --fixMaxColorValue 0.8 -d visuSEcurvature.png -o  statMeasures.dat \n \n "
-                   << "=> From the two compared files you should obtain the result of the comparison (statMeasures.dat) with the associated visualisation (visuSEcurvature.png). \n \n \n "
-                   << general_opt << "\n";
-      return 0;
-    }
 
   Z3i::KSpace K;
-  string inputFilename = vm["input"].as<std::string>();
-  string referenceFilename = vm["reference"].as<std::string>();
 
+  
   std::vector<Point4D> surfelAndScalarInput;
   std::vector<Point4D> surfelAndScalarReference;
   std::vector<Point1D> vectLabelsInput;
   std::vector<Point1D> vectLabelsReference;
-  bool useLabels = vm.count("compAccordingLabels");
 
   if(useLabels){
-    if(vm.count("labelIndex")){
+    if(labOptio->count() > 0){
       std::vector<unsigned int > vectIndex;
-      vectIndex.push_back(vm["lSDPindex"].as<unsigned int >());
-      vectLabelsInput = PointListReader<Point1D>::getPointsFromFile(inputFilename, vectIndex);
-      vectLabelsReference = PointListReader<Point1D>::getPointsFromFile(referenceFilename, vectIndex);
+      vectIndex.push_back(labelIndex);
+      vectLabelsInput = PointListReader<Point1D>::getPointsFromFile(inputFileName, vectIndex);
+      vectLabelsReference = PointListReader<Point1D>::getPointsFromFile(referenceFileName, vectIndex);
     }else{
-      vectLabelsInput = PointListReader<Point1D>::getPointsFromFile(inputFilename);
-      vectLabelsReference = PointListReader<Point1D>::getPointsFromFile(referenceFilename);
+      vectLabelsInput = PointListReader<Point1D>::getPointsFromFile(inputFileName);
+      vectLabelsReference = PointListReader<Point1D>::getPointsFromFile(referenceFileName);
     }
   }
 
 
-
-  if(vm.count("SDPindex")) {
-    std::vector<unsigned int > vectIndex = vm["SDPindex"].as<std::vector<unsigned int > >();
-    if(vectIndex.size()!=4){
-      trace.error() << "you need to specify the three indexes of vertex." << std::endl;
-      return 0;
-    }
-    surfelAndScalarInput = PointListReader<Point4D>::getPointsFromFile(inputFilename, vectIndex);
-    surfelAndScalarReference = PointListReader<Point4D>::getPointsFromFile(referenceFilename, vectIndex);
+  if(vectSDPindex.size() == 4) {
+    surfelAndScalarInput = PointListReader<Point4D>::getPointsFromFile(inputFileName, vectSDPindex);
+    surfelAndScalarReference = PointListReader<Point4D>::getPointsFromFile(referenceFileName, vectSDPindex);
   }else{
-    surfelAndScalarInput = PointListReader<Point4D>::getPointsFromFile(inputFilename);
-    surfelAndScalarReference = PointListReader<Point4D>::getPointsFromFile(referenceFilename);
+    surfelAndScalarInput = PointListReader<Point4D>::getPointsFromFile(inputFileName);
+    surfelAndScalarReference = PointListReader<Point4D>::getPointsFromFile(referenceFileName);
   }
 
 
@@ -334,17 +304,18 @@ int main( int argc, char** argv )
   typedef ViewerSnap<> Viewer;
 
 
-  Viewer viewer(K, vm.count("doSnapShotAndExit"));
-  if(vm.count("doSnapShotAndExit")){
-    viewer.setSnapshotFileName(QString(vm["doSnapShotAndExit"].as<std::string>().c_str()));
+  Viewer viewer(K, snapShotName!="");
+  if(snapShotName!=""){
+    viewer.setSnapshotFileName(snapShotName.c_str());
   }
   viewer.setWindowTitle("3dCompSurfel Viewer");
   viewer.show();
 
   Statistic<double> statErrors(true);
   std::ofstream outputStatStream;
-  if(vm.count("fileMeasureOutput")){
-    outputStatStream.open(vm["fileMeasureOutput"].as<std::string>().c_str(), ios::app );
+  
+  if(fileMeasureOutput != ""){
+    outputStatStream.open(fileMeasureOutput.c_str(), ios::app );
   }
 
 
@@ -359,7 +330,11 @@ int main( int argc, char** argv )
       maxSqError =sqError;
     }
   }
-  double maxVal = vm.count("fixMaxColorValue")? vm["fixMaxColorValue"].as<double>():  maxSqError;
+  if (maxValSpe->count() == 0 )
+  {
+    maxVal = maxSqError;
+  }
+  
 
   GradientColorMap<double> gradientColorMap( 0, maxVal );
   gradientColorMap.addColor( Color(255,255,255,100 ));
@@ -379,26 +354,25 @@ int main( int argc, char** argv )
     viewer.setFillColor(gradientColorMap(sqError));
     
     viewer << vectSurfelsInput.at(i);
-    if(vm.count("drawSurfelAssociations")){
+    if(drawSurfelAssociations){
       viewer.addLine(embeder(vectSurfelsInput.at(i)),embeder(vectSurfelsReference.at(vectIndexMinToReference.at(i))));
     }
   }
 
   statErrors.terminate();
-  if(vm.count("fileMeasureOutput")){
-    outputStatStream << "input= " <<  inputFilename << " reference=" << referenceFilename << " " ;
+  if(fileMeasureOutput != ""){
+    outputStatStream << "input= " <<  inputFileName << " reference=" << referenceFileName << " " ;
     outputStatStream << statErrors << std::endl;
   }else{
     trace.info()  << statErrors;
   }
   viewer << Viewer::updateDisplay;
   
-  if(vm.count("doSnapShotAndExit")){
+  if(snapShotName != ""){
     // Appy cleaning just save the last snap
     viewer.restoreStateFromFile();
-    std::string name = vm["doSnapShotAndExit"].as<std::string>();
-    std::string extension = name.substr(name.find_last_of(".") + 1);
-    std::string basename = name.substr(0, name.find_last_of("."));
+    std::string extension = snapShotName.substr(snapShotName.find_last_of(".") + 1);
+    std::string basename = snapShotName.substr(0, snapShotName.find_last_of("."));
     for(int i=0; i< viewer.snapshotCounter()-1; i++){
       std::stringstream s;
       s << basename << "-"<< setfill('0') << setw(4)<<  i << "." << extension;
@@ -407,11 +381,11 @@ int main( int argc, char** argv )
     }
     std::stringstream s;
     s << basename << "-"<< setfill('0') << setw(4)<<  viewer.snapshotCounter()-1 << "." << extension;
-    rename(s.str().c_str(), name.c_str());
+    rename(s.str().c_str(), snapShotName.c_str());
     return 0;
   }
 
-  if(vm.count("noWindows")){
+  if(noWindows){
     return 0;
   }else{
     return application.exec();

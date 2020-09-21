@@ -36,9 +36,8 @@
 #include "DGtal/base/Clock.h"
 #include "DGtal/helpers/StdDefs.h"
 
-#include <boost/program_options/options_description.hpp>
-#include <boost/program_options/parsers.hpp>
-#include <boost/program_options/variables_map.hpp>
+#include "CLI11.hpp"
+
 
 //shapes
 #include "DGtal/shapes/implicit/ImplicitBall.h"
@@ -90,24 +89,19 @@ using namespace functors;
 
  @b Allowed @b options @b are :
  @code
-   -h [ --help ]                      display this message
-   -s [ --shape ] arg                 Shape
-   -o [ --output ] arg                Output file
-   -r [ --radius ] arg                Kernel radius for IntegralInvariant
-   --alpha arg (=0.33333333333333331) Alpha parameter for Integral Invariant
-                                      computation
-   --h arg                            Grid step
-   -a [ --minAABB ] arg (=-10)        Min value of the AABB bounding box
-                                      (domain)
-   -A [ --maxAABB ] arg (=10)         Max value of the AABB bounding box
-                                      (domain)
-   -n [ --noise ] arg (=0)            Level of noise to perturb the shape
-   -l [ --lambda ] arg (=0)           Use the shape to get a better
-                                      approximation of the surface (optional)
-   --properties arg (=110)            the i-th property is disabled iff there is
-                                      a 0 at position i
-   -e [ --estimators ] arg (=110)     the i-th estimator is disabled iff there
-                                      is a 0 at position i
+ -h,--help                             Print this help message and exit
+ -s,--shape TEXT REQUIRED              Shape
+ -o,--output TEXT=result.dat REQUIRED  Output file
+ -r,--radius FLOAT REQUIRED            Kernel radius for IntegralInvariant
+ --alpha FLOAT=0.333333                Alpha parameter for Integral Invariant computation
+ --h FLOAT REQUIRED                    Grid step
+ -a,--minAABB FLOAT=-10                Min value of the AABB bounding box (domain)
+ -A,--maxAABB FLOAT=10                 Max value of the AABB bounding box (domain)
+ -n,--noise FLOAT=0                    Level of noise to perturb the shape
+ -l,--lambda                           Use the shape to get a better approximation of the surface (optional)
+ --properties TEXT=110                 the i-th property is disabled iff there is a 0 at position i
+ -e,--estimators TEXT=110              the i-th estimator is disabled iff there is a 0 at position i
+
  @endcode
 
  @b Example:
@@ -149,6 +143,7 @@ estimateTrueMeanCurvatureQuantity( const ConstIterator & it_begin,
     ++output;
   }
 }
+
 
 template < typename Shape, typename KSpace, typename ConstIterator, typename OutputIterator >
 void
@@ -1174,12 +1169,9 @@ void missingParam( std::string param )
   exit( 1 );
 }
 
-namespace po = boost::program_options;
 
 int main( int argc, char** argv )
 {
-  
-  
 #ifndef WITH_CGAL
 #error You need to have activated CGAL (WITH_CGAL) to include this file.
 #endif
@@ -1188,86 +1180,46 @@ int main( int argc, char** argv )
 #endif
   
   // parse command line ----------------------------------------------
-  po::options_description general_opt("Allowed options are");
-  general_opt.add_options()
-  ("help,h", "display this message")
-  ("shape,s", po::value< std::string >(), "Shape")
-  ("output,o", po::value< std::string >(), "Output file")
-  ("radius,r",  po::value< double >(), "Kernel radius for IntegralInvariant" )
-  ("alpha",  po::value<double>()->default_value(1.0/3.0), "Alpha parameter for Integral Invariant computation" )
-  ("h",  po::value< double >(), "Grid step" )
-  ("minAABB,a",  po::value< double >()->default_value( -10.0 ), "Min value of the AABB bounding box (domain)" )
-  ("maxAABB,A",  po::value< double >()->default_value( 10.0 ), "Max value of the AABB bounding box (domain)" )
-  ("noise,n",  po::value<double>()->default_value(0.0), "Level of noise to perturb the shape" )
-  ("lambda,l",  po::value< bool >()->default_value( false ), "Use the shape to get a better approximation of the surface (optional)" )
-  ("properties",  po::value<std::string>()->default_value("110"), "the i-th property is disabled iff there is a 0 at position i" )
-  ("estimators,e",  po::value< std::string >()->default_value("110"), "the i-th estimator is disabled iff there is a 0 at position i" );
+  // parse command line using CLI ----------------------------------------------
+  CLI::App app;
+  
+  app.description("Compare local estimators on implicit shapes using DGtal library\n Basic usage:\n \t3dlocalEstimators --shape <shape> --h <h> --radius <radius> --estimators <binaryWord> --output <output> \n \n Below are the different available families of estimators: \n \t - Integral Invariant Mean \n \t - Integral Invariant Gaussian\n \t - Monge Jet Fitting Mean\n\t - Monge Jet Fitting Gaussian\n The i-th family of estimators is enabled if the i-th character of the binary word is not 0. The default binary word is '1100'. This means that the first family of estimators, ie. Integral Invariant, is enabled, whereas the next ones are disabled. Below are the different available properties:\n \t - Mean Curvature\n \t - Gaussian Curvature\n \t - k1/k2 \n \n Example: \n ./estimators/3dlocalEstimators --shape \"z^2-x^2-y^2\" --output result --h 0.4 --radius 1.0" );
   
   
-  bool parseOK = true;
-  po::variables_map vm;
-  try
-  {
-    po::store( po::parse_command_line( argc, argv, general_opt ), vm );
-  }
-  catch( const std::exception & ex )
-  {
-    parseOK = false;
-    trace.info() << "Error checking program options: " << ex.what() << std::endl;
-  }
-  po::notify( vm );
-  if( !parseOK || vm.count("help") || argc <= 1 )
-  {
-    trace.info()<< "Compare local estimators on implicit shapes using DGtal library" <<std::endl
-    << "Basic usage: "<<std::endl
-    << "\t3dlocalEstimators --shape <shape> --h <h> --radius <radius> --estimators <binaryWord> --output <output>"<<std::endl
-    << std::endl
-    << "Below are the different available families of estimators: " << std::endl
-    << "\t - Integral Invariant Mean" << std::endl
-    << "\t - Integral Invariant Gaussian" << std::endl
-    << "\t - Monge Jet Fitting Mean" << std::endl
-    << "\t - Monge Jet Fitting Gaussian" << std::endl
-    << std::endl
-    << "The i-th family of estimators is enabled if the i-th character of the binary word is not 0. "
-    << "The default binary word is '1100'. This means that the first family of estimators, "
-    << "ie. Integral Invariant, is enabled, whereas the next ones are disabled. "
-    << "Below are the different available properties: " << std::endl
-    << "\t - Mean Curvature" << std::endl
-    << "\t - Gaussian Curvature" << std::endl
-    << "\t - k1/k2" << std::endl
-    << std::endl
-    << general_opt
-    << "Example: \n ./estimators/3dlocalEstimators --shape \"z^2-x^2-y^2\" --output result --h 0.4 --radius 1.0"
-    << std::endl;
-    return 0;
-  }
+  std::string poly_str;
+  std::string file_export {"result.dat"};
+  std::string properties {"110"};
+  std::string options {"110"};
   
-  if (!(vm.count("output"))) missingParam("--output");
-  if (!(vm.count("shape"))) missingParam("--shape");
-  if (!(vm.count("h"))) missingParam("--h");
-  if (!(vm.count("radius"))) missingParam("--radius");
+  double radius;
+  double h;
+  double alpha {1.0/3.0};
+  double border_minV {-10.0};
+  double border_maxV {10.0};
+  double noiseLevel {0.0};
+  bool lambda_optimized {false};
+
+  app.add_option("--shape,-s", poly_str, "Shape") ->required();
+  app.add_option("--output,-o", file_export, "Output file", true) ->required();
   
+  app.add_option("--radius,-r", radius,"Kernel radius for IntegralInvariant") ->required();
+  app.add_option("--alpha",alpha, "Alpha parameter for Integral Invariant computation", true );
+  app.add_option("--h", h, "Grid step") ->required();
+  app.add_option("--minAABB,-a", border_minV,  "Min value of the AABB bounding box (domain)", true);
+  app.add_option("--maxAABB,-A", border_maxV,  "Max value of the AABB bounding box (domain)", true);
+  app.add_option("--noise,-n", noiseLevel, "Level of noise to perturb the shape", true );
   
-  std::string file_export = vm["output"].as< std::string >();
-  int nb = 3;
-  std::string options = vm["estimators"].as< std::string >();
-  if (options.size() < nb)
-  {
-    trace.error() << " At least " << nb
-    << " characters are required "
-    << " with option --estimators.";
-    trace.info() << std::endl;
-    exit(1);
-  }
-  double h = vm["h"].as< double >();
-  double radius = vm["radius"].as< double >();
-  double alpha = vm["alpha"].as< double >();
-  std::string poly_str = vm["shape"].as< std::string >();
-  bool lambda_optimized = vm["lambda"].as< bool >();
-  double noiseLevel = vm["noise"].as<double>();
+  app.add_flag("--lambda,-l", lambda_optimized, "Use the shape to get a better approximation of the surface (optional)");
+  app.add_option("--properties", properties, "the i-th property is disabled iff there is a 0 at position i", true);
+  app.add_option("--estimators,-e", options, "the i-th estimator is disabled iff there is a 0 at position i", true);
   
-  nb = 3; //number of available properties
-  std::string properties = vm["properties"].as<std::string>();
+  app.get_formatter()->column_width(40);
+  CLI11_PARSE(app, argc, argv);
+  // END parse command line using CLI ----------------------------------------------
+
+
+
+  int nb = 3; //number of available properties
   if (properties.size() < nb)
   {
     trace.error() << " At least " << nb
@@ -1280,8 +1232,8 @@ int main( int argc, char** argv )
   typedef Z3i::Space::RealPoint RealPoint;
   typedef Z3i::Space::RealPoint::Coordinate Ring;
   
-  RealPoint border_min( vm["minAABB"].as< double >(), vm["minAABB"].as< double >(), vm["minAABB"].as< double >() );
-  RealPoint border_max( vm["maxAABB"].as< double >(), vm["maxAABB"].as< double >(), vm["maxAABB"].as< double >() );
+  RealPoint border_min( border_minV, border_minV, border_minV );
+  RealPoint border_max( border_maxV, border_maxV, border_maxV );
   
   /// Construction of the polynomial shape
   

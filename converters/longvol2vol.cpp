@@ -15,7 +15,7 @@
  **/
 
 /**
- * @file vol2raw.cpp
+ * @file longvol2vol.cpp
  * @author David Coeurjolly (\c david.coeurjolly@liris.cnrs.fr )
  * Laboratoire d'InfoRmatique en Image et Systèmes d'information - LIRIS (CNRS, UMR 5205), CNRS, France
  *
@@ -33,14 +33,12 @@
 #include <DGtal/images/Image.h>
 #include <DGtal/images/ImageContainerBySTLVector.h>
 #include <DGtal/base/BasicFunctors.h>
-#include <boost/program_options/options_description.hpp>
-#include <boost/program_options/parsers.hpp>
-#include <boost/program_options/variables_map.hpp>
+
+#include "CLI11.hpp"
 
 using namespace DGtal;
 using namespace Z3i;
 
-namespace po = boost::program_options;
 
 /**
  @page longvol2vol longvol2vol
@@ -51,13 +49,18 @@ namespace po = boost::program_options;
 @b Allowed @b options @b are:
 
 @code
-  -h [ --help ]          display this message.
-  -i [ --input ] arg     Input longvol filename.
-  -o [ --output ] arg    Output vole filename.
-  -m [ --mode ] arg (=0) Conversion mode:
-                          0 = cast (default)
-                          1 = Linear Scaling
-                          2 = Grayscale cycle (32 steps, except 0 values).
+Positionals:
+  1 TEXT:FILE REQUIRED                  Input longvol filename ( .longvol)
+  2 TEXT                                Output vol filename.
+
+Options:
+  -h,--help                             Print this help message and exit
+  -i,--input TEXT:FILE REQUIRED         Input longvol filename ( .longvol)
+  -o,--output TEXT                      Output vol filename.
+  -m,--mode UINT:{0,1,2}                Conversion mode:
+                                        	 0 = cast (default)
+                                        	 1 = Linear Scaling
+                                        	 2 = Grayscale cycle (32 steps, except 0 values).
 @endcode
 
 @b Example:
@@ -104,59 +107,33 @@ struct LinearFunctor
 };
 
 
-
-/**
- * Missing parameter error message.
- *
- * @param param
- */
-void missingParam ( std::string param )
-{
-  trace.error() <<" Parameter: "<<param<<" is required..";
-  trace.info() <<std::endl;
-  exit ( 1 );
-}
-
 int main(int argc, char**argv)
 {
   
-  // parse command line ----------------------------------------------
-  po::options_description general_opt ( "Allowed options are: " );
-  general_opt.add_options()
-  ( "help,h", "display this message." )
-  ( "input,i", po::value<std::string>(), "Input longvol filename." )
-  ( "output,o", po::value<std::string>(),"Output vole filename." )
-  ( "mode,m", po::value<unsigned int>()->default_value(0),"Conversion mode:\n\t 0 = cast (default)\n\t 1 = Linear Scaling\n\t 2 = Grayscale cycle (32 steps, except 0 values)." )
-  ;
-  bool parseOK=true;
-  po::variables_map vm;
-  try{
-    po::store(po::parse_command_line(argc, argv, general_opt), vm);
-  }catch(const std::exception& ex){
-    parseOK=false;
-    trace.info()<< "Error checking program options: "<< ex.what()<< std::endl;
-  }
-  po::notify ( vm );
-  if (!parseOK || vm.count ( "help" ) ||argc<=1 )
-  {
-    trace.info() << "Converts a longvol (long int) to a vol file (unsigned char)."<<std::endl
-    << std::endl << "Basic usage: "<<std::endl
-    << "\tlongvol2vol --input <LongvolFileName> --o <VolOutputFileName> "<<std::endl
-    << general_opt << "\n";
-    return 0;
-  }
+
+   // parse command line using CLI ----------------------------------------------
+   CLI::App app;
+   std::string inputFileName;
+   std::string outputFileName {"result.vol"};
+   unsigned int mode {0};
+   
+   app.description("Converts a longvol (long int) to a vol file (unsigned char). \n Basic example:\n\t longvol2vol --input <LongvolFileName> --o <VolOutputFileName> ");
+   app.add_option("-i,--input,1", inputFileName, "Input longvol filename ( .longvol)" )
+    ->required()
+    ->check(CLI::ExistingFile);
+   app.add_option("-o,--output,2",outputFileName,"Output vol filename." );
+   app.add_option("-m,--mode", mode, "Conversion mode:\n\t 0 = cast (default)\n\t 1 = Linear Scaling\n\t 2 = Grayscale cycle (32 steps, except 0 values).")
+     -> check(CLI::IsMember({0, 1, 2}));
+
   
-  //Parse options
-  if ( ! ( vm.count ( "input" ) ) ) missingParam ( "--input" );
-  std::string filename = vm["input"].as<std::string>();
-  if ( ! ( vm.count ( "output" ) ) ) missingParam ( "--output" );
-  std::string outputFileName = vm["output"].as<std::string>();
-  unsigned int mode = vm["mode"].as<unsigned int>();
-  
+  app.get_formatter()->column_width(40);
+  CLI11_PARSE(app, argc, argv);
+  // END parse command line using CLI ----------------------------------------------
+
   
   //Main program
   typedef ImageContainerBySTLVector<Z3i::Domain, DGtal::uint64_t>  MyImageC;
-  MyImageC  imageC = LongvolReader< MyImageC >::importLongvol ( filename );
+  MyImageC  imageC = LongvolReader< MyImageC >::importLongvol ( inputFileName );
   bool res = false;
   
   if (mode == 0)
@@ -175,11 +152,12 @@ int main(int argc, char**argv)
     res = VolWriter<MyImageC, CycleFunctor>::exportVol(outputFileName, imageC);
   
   if (res)
-    return 0;
+    return EXIT_SUCCESS;
+  
   else
   {
     trace.error()<<"Error while exporting the Vol.";
     trace.info()<<std::endl;
-    return 1;
+    return EXIT_FAILURE;
   }
 }

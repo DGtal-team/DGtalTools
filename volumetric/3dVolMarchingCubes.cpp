@@ -47,11 +47,13 @@
 #include <DGtal/geometry/volumes/KanungoNoise.h>
 //! [3dVolMarchingCubes-basicIncludes]
 
+
+#include "CLI11.hpp"
+
 ///////////////////////////////////////////////////////////////////////////////
 
 using namespace DGtal;
 using namespace Z3i;
-namespace po = boost::program_options;
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -69,20 +71,19 @@ namespace po = boost::program_options;
  
  @b Allowed @b options @b are :
  @code
- -h [ --help ]                         display this message
- -i [ --input ] arg                    the volume file (.vol)
- -t [ --threshold ] arg (=1)           the value that defines the isosurface
-                                       in the image (an integer between 0 and
-                                       255).
- -a [ --adjacency ] arg (=0)           0: interior adjacency, 1: exterior
-                                       adjacency
- -o [ --output ] arg (=marching-cubes.off)
-                                       the output OFF file that represents the
-                                       geometry of the isosurface
- -n [ --noise ] arg                    Kanungo noise level in ]0,1[. Note that
-                                       only the largest connected component is
-                                       considered and that no specific
-                                       embedder is used.
+
+ Positionals:
+   1 TEXT:FILE REQUIRED                  the volume file (.vol).
+   2 TEXT=marching-cubes.off             the output OFF file that represents the geometry of the isosurface
+
+ Options:
+   -h,--help                             Print this help message and exit
+   -i,--input TEXT:FILE REQUIRED         the volume file (.vol).
+   -t,--threshold FLOAT=1                the value that defines the isosurface in the image (an integer between 0 and 255).
+   -a,--adjacency UINT=0                 0: interior adjacency, 1: exterior adjacency
+   -o,--output TEXT=marching-cubes.off   the output OFF file that represents the geometry of the isosurface
+   -n,--noise FLOAT                      Kanungo noise level in ]0,1[. Note that only the largest connected component is considered and that no specific embedder is used.
+   
  @endcode
  
  @b Example:
@@ -115,56 +116,41 @@ namespace po = boost::program_options;
 int main( int argc, char** argv )
 {
   //! [3dVolMarchingCubes-parseCommandLine]
-  // parse command line ----------------------------------------------
-  po::options_description general_opt("Allowed options are ");
-  general_opt.add_options()
-  ("help,h", "display this message")
-  ("input,i", po::value<std::string>(), "the volume file (.vol)" )
-  ("threshold,t",  po::value<double>()->default_value(1.0), "the value that defines the isosurface in the image (an integer between 0 and 255)." )
-  ("adjacency,a",  po::value<unsigned int>()->default_value(0), "0: interior adjacency, 1: exterior adjacency")
-  ("output,o",  po::value<std::string>()->default_value( "marching-cubes.off" ), "the output OFF file that represents the geometry of the isosurface")
-  ("noise,n",  po::value<double>(), "Kanungo noise level in ]0,1[. Note that only the largest connected component is considered and that no specific embedder is used.");
+ 
+  // parse command line using CLI ----------------------------------------------
+  CLI::App app;
+  std::string inputFileName;
+  std::string outputFileName {"marching-cubes.off"};
+  double noise;
+  double threshold {1.0};
+  unsigned int intAdjacency = 0;
   
+  app.description("Outputs the isosurface of value <threshold> of the volume <fileName.vol>  as an OFF file <output.off>. The <adjacency> (0/1) allows to choose between interior (6,18) and exterior (18,6) adjacency.");
+  app.add_option("-i,--input,1", inputFileName, "the volume file (.vol)." )
+  ->required()
+  ->check(CLI::ExistingFile);
+  app.add_option("--threshold,-t",threshold, "the value that defines the isosurface in the image (an integer between 0 and 255).", true);
+  app.add_option("--adjacency,-a",intAdjacency, "0: interior adjacency, 1: exterior adjacency", true);
+  app.add_option("-o,--output,2", outputFileName, "the output OFF file that represents the geometry of the isosurface", true );
+  auto noiseOpt = app.add_option("--noise,-n", noise, "Kanungo noise level in ]0,1[. Note that only the largest connected component is considered and that no specific embedder is used.");
   
-  bool parseOK=true;
-  po::variables_map vm;
-  try{
-    po::store(po::parse_command_line(argc, argv, general_opt), vm);
-  }catch(const std::exception& ex){
-    parseOK=false;
-    trace.info()<< "Error checking program options: "<< ex.what()<< std::endl;
-  }
-  po::notify(vm);
-  if ( !parseOK || vm.count("help") || ( argc <= 1 ) )
-  {
-    std::cout << "Usage: " << argv[0]
-    << " [-i <fileName.vol>] [-t <threshold>] [-a <adjacency>] [-o <output.off>]" << std::endl
-    << "Outputs the isosurface of value <threshold> of the volume <fileName.vol>  as an OFF file <output.off>. The <adjacency> (0/1) allows to choose between interior (6,18) and exterior (18,6) adjacency." << std::endl
-    << general_opt << std::endl;
-    return 0;
-  }
-  if ( ! vm.count("input") )
-  {
-    trace.error() << "The input file name was defined." << std::endl;
-    return 1;
-  }
-  std::string inputFilename = vm["input"].as<std::string>();
-  double threshold = vm["threshold"].as<double>();
-  bool intAdjacency = ( vm["adjacency"].as<unsigned int>() == 0 );
-  std::string outputFilename = vm["output"].as<std::string>();
-  double noise ;
+  app.get_formatter()->column_width(40);
+  CLI11_PARSE(app, argc, argv);
+  // END parse command line using CLI ----------------------------------------------
+
+  
+
   bool addNoise=false;
-  if (vm.count("noise") )
+  if (noiseOpt->count() > 0 )
   {
     addNoise=true;
-    noise = vm["noise"].as<double>();
   }
   //! [3dVolMarchingCubes-parseCommandLine]
   
   //! [3dVolMarchingCubes-readVol]
   trace.beginBlock( "Reading vol file into an image." );
   typedef ImageSelector < Domain, int>::Type Image;
-  Image image = VolReader<Image>::importVol(inputFilename);
+  Image image = VolReader<Image>::importVol(inputFileName);
   
   typedef functors::SimpleThresholdForegroundPredicate<Image> ThresholdedImage;
   ThresholdedImage thresholdedImage( image, threshold );
@@ -252,7 +238,7 @@ int main( int argc, char** argv )
   for(auto p: image.domain())
     largerImage.setValue( p, image(p));
   
-  std::ofstream out( outputFilename.c_str() );
+  std::ofstream out( outputFileName.c_str() );
   if (addNoise)
   {
     if ( out.good() )

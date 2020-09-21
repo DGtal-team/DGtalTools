@@ -47,10 +47,7 @@
 #include "DGtal/geometry/curves/estimation/MostCenteredMaximalSegmentEstimator.h"
 #include "DGtal/geometry/curves/estimation/SegmentComputerEstimators.h"
 
-
-#include <boost/program_options/options_description.hpp>
-#include <boost/program_options/parsers.hpp>
-#include <boost/program_options/variables_map.hpp>
+#include "CLI11.hpp"
 
 #include <vector>
 #include <string>
@@ -71,10 +68,9 @@ using namespace std;
 
  @b Allowed @b options @b are : 
  @code
-  -h [ --help ]              display this message
-  -i [ --input ] arg         input FreemanChain file name
-  -s [ --GridStep ] arg (=1) Grid step
-
+  -h,--help                             Print this help message and exit
+  -i,--input TEXT:FILE REQUIRED         Input FreemanChain file name
+  --GridStep FLOAT=1                    Grid step
  @endcode
 
  @b Example: 
@@ -152,97 +148,75 @@ void estimationFromLengthAndWidth( double h, const I& itb, const I& ite, const O
 
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace po = boost::program_options;
 
 int main( int argc, char** argv )
 {
-  // parse command line ----------------------------------------------
-  po::options_description general_opt("Allowed options are");
-  general_opt.add_options()
-    ("help,h", "display this message")
-    ("input,i", po::value<std::string>(), "input FreemanChain file name")
-    ("GridStep,step", po::value<double>()->default_value(1.0), "Grid step");
+  // parse command line CLI ----------------------------------------------
+  CLI::App app;
+  string fileName;
+  double h {1.0};
+
+  app.description("Estimates curvature using length of most centered segment computers.\n Typical use example:\n \t curvatureMCMS [options] --input  <fileName>\n");
+  app.add_option("-i,--input",fileName,"Input FreemanChain file name")->required()->check(CLI::ExistingFile);
+  app.add_option("--GridStep", h, "Grid step",true);
   
-  
-  bool parseOK=true;
-  po::variables_map vm;
-  try{
-    po::store(po::parse_command_line(argc, argv, general_opt), vm);  
-  }catch(const std::exception& ex){
-    parseOK=false;
-    trace.info()<< "Error checking program options: "<< ex.what()<< endl;
-  }
+  app.get_formatter()->column_width(40);
+  CLI11_PARSE(app, argc, argv);
+  // END parse command line using CLI ----------------------------------------------  
 
-  po::notify(vm);    
-  if(!parseOK || vm.count("help")||argc<=1 || (!(vm.count("input"))) )
-    {
-      trace.info() << "Estimates curvature using length of most centered segment computers. " << std::endl; 
-      trace.info() << "Basic usage: " << std::endl
-		   << "\t curvatureMCMS [options] --input  <fileName> "<< std::endl
-		   << general_opt << "\n";
-      return 0;
-    }
-  
-  
-  double h = vm["GridStep"].as<double>();  
- 
-  if(vm.count("input")){
-    string fileName = vm["input"].as<string>();
+  typedef Z2i::Space Space; 
+  typedef Space::Point Point; 
+  typedef Space::Integer Integer;  
+  typedef Z2i::KSpace KSpace; 
+  typedef FreemanChain<Integer> FreemanChain; 
 
-    typedef Z2i::Space Space; 
-    typedef Space::Point Point; 
-    typedef Space::Integer Integer;  
-    typedef Z2i::KSpace KSpace; 
-    typedef FreemanChain<Integer> FreemanChain; 
+  vector< FreemanChain > vectFcs =  PointListReader< Point >::getFreemanChainsFromFile<Integer> (fileName);  
 
-    vector< FreemanChain > vectFcs =  PointListReader< Point >::getFreemanChainsFromFile<Integer> (fileName);  
+  for(unsigned int i=0; i<vectFcs.size(); i++){
 
-    for(unsigned int i=0; i<vectFcs.size(); i++){
+    // Freeman chain
+    FreemanChain fc = vectFcs.at(i); 
+    // Create GridCurve
+    GridCurve<> gridcurve;
+    gridcurve.initFromPointsRange( fc.begin(), fc.end() );
 
-      // Freeman chain
-      FreemanChain fc = vectFcs.at(i); 
-      // Create GridCurve
-      GridCurve<> gridcurve;
-      gridcurve.initFromPointsRange( fc.begin(), fc.end() );
+    cout << "# grid curve " << i+1 << "/" 
+   << gridcurve.size() << " "
+   << ( (gridcurve.isClosed())?"closed":"open" ) << endl;
 
-      cout << "# grid curve " << i+1 << "/" 
-	   << gridcurve.size() << " "
-	   << ( (gridcurve.isClosed())?"closed":"open" ) << endl;
+    // Create range of incident points
+    typedef GridCurve<KSpace>::PointsRange Range;
+    Range r = gridcurve.getPointsRange();//building range
 
-      // Create range of incident points
-      typedef GridCurve<KSpace>::PointsRange Range;
-      Range r = gridcurve.getPointsRange();//building range
- 
-      // Estimation
-      cout << "# Curvature estimation from maximal segments" << endl; 
-      std::vector<double> estimations1; 
-      std::vector<double> estimations2; 
-      if (gridcurve.isOpen())
-        { 
-	  cout << "# open grid curve" << endl;
-	  estimationFromLength( h, r.begin(), r.end(), back_inserter(estimations1) ); 
-	  estimationFromLengthAndWidth( h, r.begin(), r.end(), back_inserter(estimations2) ); 
-        }
-      else
-        { 
-	  cout << "# closed grid curve" << endl;
-	  estimationFromLength( h, r.c(), r.c(), back_inserter(estimations1) ); 
-	  estimationFromLengthAndWidth( h, r.c(), r.c(), back_inserter(estimations2) ); 
-        }
-
-      // Output
-      cout << "# id curvatureFromLength curvatureFromLengthAndWidth" << endl;  
-      unsigned int j = 0;
-      for ( Range::ConstIterator it = r.begin(), itEnd = r.end();
-      it != itEnd; ++it, ++j ) {
-	cout << j << setprecision( 15 )
-	     << " " << estimations1[ j ]
-	     << " " << estimations2[ j ] << endl;
+    // Estimation
+    cout << "# Curvature estimation from maximal segments" << endl; 
+    std::vector<double> estimations1; 
+    std::vector<double> estimations2; 
+    if (gridcurve.isOpen())
+      { 
+  cout << "# open grid curve" << endl;
+  estimationFromLength( h, r.begin(), r.end(), back_inserter(estimations1) ); 
+  estimationFromLengthAndWidth( h, r.begin(), r.end(), back_inserter(estimations2) ); 
+      }
+    else
+      { 
+  cout << "# closed grid curve" << endl;
+  estimationFromLength( h, r.c(), r.c(), back_inserter(estimations1) ); 
+  estimationFromLengthAndWidth( h, r.c(), r.c(), back_inserter(estimations2) ); 
       }
 
-   }
+    // Output
+    cout << "# id curvatureFromLength curvatureFromLengthAndWidth" << endl;  
+    unsigned int j = 0;
+    for ( Range::ConstIterator it = r.begin(), itEnd = r.end();
+    it != itEnd; ++it, ++j ) {
+cout << j << setprecision( 15 )
+     << " " << estimations1[ j ]
+     << " " << estimations2[ j ] << endl;
+    }
 
  }
+
  
   return 0;
 }

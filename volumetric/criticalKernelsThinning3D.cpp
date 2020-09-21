@@ -26,34 +26,35 @@
 
  @b Allowed @b options @b are :
  @code
-  -h [ --help ]                    display this message.
-  -i [ --input ] arg               Input vol file.
-  -s [ --skel] arg                 Skeletonization: only keep certain voxels during thinning.
-                                   Options: ulti,end, 1isthmus, isthmusulti: delete all voxels except those that change topology.
-                                   end: keep voxels with only one neighbor.
-                                   1isthmus: keep voxels that are one-isthmus (using LookUpTables) [faster]
-                                   isthmus: keep voxels that are one-isthmus or two-isthmus (using LookUpTables) [faster]
+ Positionals:
+   1 TEXT:FILE REQUIRED                  Input vol file.
 
-  -s [ --skel ] arg                type of skeletonization
-  -c [ --select] arg               Select: order in which select voxels in the process.
-                                   Options: dmax, first, random
-                                   dmax: Use distance map, selecting voxel with max value.
-                                   first: Select first pixel (lexicographical order)
-                                   random: Select voxel at random.
-  -f [ --foreground ] arg (=black) foreground color in binary image
-  -m [ --thresholdMin ] arg (=0)   threshold min (excluded) to define binary 
-                                   shape
-  -M [ --thresholdMax ] arg (=255) threshold max (included) to define binary 
-                                   shape
-  -p [ --persistence ] arg (=0)    persistence value, implies use of 
-                                   persistence algorithm if p>=1
-  --profile                        profile algorithm
-  -v [ --verbose ]                 verbose output
-  -o [ --exportImage ] arg         Export the resulting set of points to a 
-                                   image compatible with GenericWriter.
-  -e [ --exportSDP ] arg           Export the resulting set of points in a 
-                                   simple (sequence of discrete point (sdp)).
-  -t [ --visualize ]               visualize result in viewer
+ Options:
+   -h,--help                             Print this help message and exit
+   -i,--input TEXT:FILE REQUIRED         Input vol file.
+   -s,--skel TEXT:{ulti,end,isthmus,1isthmus}=1isthmus
+                                         Type of skeletonization. Options: 1isthmus, isthmus, end, ulti.
+                                         Options: ulti,end, 1isthmus, isthmusulti: delete all voxels except those that change topology.
+                                         end: keep voxels with only one neighbor.
+                                         1isthmus: keep voxels that are one-isthmus (using LookUpTables) [faster]
+                                         isthmus: keep voxels that are one-isthmus or two-isthmus (using LookUpTables) [faster]
+   -c,--select TEXT:{random,dmax,first}=dmax
+                                         Select the ordering for skeletonization. Options: dmax, random, first
+                                          Options: dmax, first, random
+                                          dmax: Use distance map, selecting voxel with max value.
+                                          first: Select first pixel (lexicographical order)
+                                          random: Select voxel at random.
+   -f,--foreground TEXT:{white,black}=black
+                                         Foreground color in binary image
+   -m,--thresholdMin INT=0               Threshold min (excluded) to define binary shape
+   -M,--thresholdMax INT=255             Threshold max (included) to define binary shape
+   -p,--persistence INT:POSITIVE=0       Persistence value, implies use of persistence algorithm if p>=1
+   --profile                             Profile algorithm
+   -v,--verbose                          Verbose output
+   -o,--exportImage TEXT                 Export the resulting set of points to a image compatible with GenericWriter.
+   -e,--exportSDP TEXT                   Export the resulting set of points in a simple (sequence of discrete point (sdp)).
+   -t,--visualize                        Visualize result in viewer
+
 
 
  @endcode
@@ -95,101 +96,73 @@
 #include "DGtal/topology/NeighborhoodConfigurations.h"
 #include "DGtal/topology/tables/NeighborhoodTables.h"
 
-// boost::program_options
-#include <boost/program_options/options_description.hpp>
-#include <boost/program_options/parsers.hpp>
-#include <boost/program_options/variables_map.hpp>
 // Distance Map
 #include "DGtal/geometry/volumes/distance/ExactPredicateLpSeparableMetric.h"
 #include "DGtal/geometry/volumes/distance/VoronoiMap.h"
 #include "DGtal/geometry/volumes/distance/DistanceTransformation.h"
+
+#include "CLI11.hpp"
+
+
 using namespace DGtal;
 using namespace std;
 using namespace DGtal::Z3i;
-namespace po = boost::program_options;
 
 int main(int argc, char* const argv[]){
+  
+  // parse command line using CLI ----------------------------------------------
+  CLI::App app;
+  std::string inputFileName;
+  std::string sk_string {"1isthmus"};
+  string select_string {"dmax"};
+  string foreground {"black"};
+  string outputFilenameImg;
+  string outputFilenameSDP;
 
-  /*-------------- Parse command line -----------------------------*/
-  po::options_description general_opt ( "Allowed options are: " );
-  general_opt.add_options()
-    ( "help,h", "Display this message." )
-    ( "input,i", po::value<string>()->required(), "Input vol file." )
-    ( "skel,s",  po::value<string>()->default_value("1isthmus"), "Type of skeletonization. Options: 1isthmus, isthmus, end, ulti." )
-    ( "select,c",  po::value<string>()->default_value("dmax"), "Select the ordering for skeletonization. Options: dmax, random, first" )
-    ( "foreground,f",  po::value<string>()->default_value("black"), "Foreground color in binary image" )
-    ( "thresholdMin,m",  po::value<int>()->default_value(0), "Threshold min (excluded) to define binary shape" )
-    ( "thresholdMax,M",  po::value<int>()->default_value(255), "Threshold max (included) to define binary shape" )
-    ( "persistence,p",  po::value<int>()->default_value(0), "Persistence value, implies use of persistence algorithm if p>=1" )
-    ( "profile",  po::bool_switch()->default_value(false), "Profile algorithm" )
-    ( "verbose,v",  po::bool_switch()->default_value(false), "Verbose output" )
-    ( "exportImage,o", po::value<std::string>(), "Export the resulting set of points to a image compatible with GenericWriter.")
-    ( "exportSDP,e", po::value<std::string>(), "Export the resulting set of points in a simple (sequence of discrete point (sdp)).")
-    ( "visualize,t",  po::bool_switch()->default_value(false), "Visualize result in viewer" );
-  bool parseOK=true;
-  po::variables_map vm;
+  int thresholdMin {0};
+  int thresholdMax {255};
+  int persistence {0};
+  bool profile {false};
+  bool verbose  {false};
+  bool visualize {false};
+  
+  app.description("Compute the thinning of a volume using the CriticalKernels framework\nBasic usage: criticalKernelsThinning3D --input <volFileName> --skel <ulti,end, 1isthmus, isthmus> --select [ -f <white,black> -m <minlevel> -M <maxlevel> -v ] [--persistence <value> ] --persistence <value> ] \n options for --skel {ulti end 1isthmus isthmus} \n options for --select = {dmax random first} \n Example: \n criticalKernelsThinning3D --input ${DGtal}/examples/samples/Al.100.vol --select dmax --skel 1isthmus --persistence 1 --visualize --verbose --exportImage ./Al100_dmax_1isthmus_p1.vol \n");
+  app.add_option("-i,--input,1", inputFileName, "Input vol file." )
+  ->required()
+  ->check(CLI::ExistingFile);
 
-  try {
-    po::store(po::parse_command_line(argc, argv, general_opt), vm);
-    po::notify ( vm );
-  } catch(const exception& ex) {
-    parseOK=false;
-    trace.info()<< "Error checking program options: "<< ex.what()<< std::endl;
-  }
+  app.add_option("--skel,-s", sk_string,"Type of skeletonization. Options: 1isthmus, isthmus, end, ulti.", true )
+   -> check(CLI::IsMember({"ulti", "end","isthmus", "1isthmus"}));
+  app.add_option("--select,-c", select_string, "Select the ordering for skeletonization. Options: dmax, random, first", true)
+   -> check(CLI::IsMember({"random", "dmax", "first"}));
+  app.add_option("--foreground,-f",foreground, "Foreground color in binary image", true )
+   -> check(CLI::IsMember({"white", "black"}));
+  app.add_option("--thresholdMin,-m", thresholdMin, "Threshold min (excluded) to define binary shape", true );
+  app.add_option("--thresholdMax,-M", thresholdMax, "Threshold max (included) to define binary shape", true );
+  app.add_option("--persistence,-p",persistence,"Persistence value, implies use of persistence algorithm if p>=1", true )
+  ->check(CLI::PositiveNumber);
+  app.add_flag("--profile", profile, "Profile algorithm");
+  app.add_flag("--verbose,-v",verbose, "Verbose output");
+  app.add_option("--exportImage,-o",outputFilenameImg, "Export the resulting set of points to a image compatible with GenericWriter.");
+  app.add_option("--exportSDP,-e",outputFilenameSDP, "Export the resulting set of points in a simple (sequence of discrete point (sdp))." );
+  app.add_flag("--visualize,-t", visualize, "Visualize result in viewer");
+    
+  app.get_formatter()->column_width(40);
+  CLI11_PARSE(app, argc, argv);
+  // END parse command line using CLI ----------------------------------------------
 
-  if (!parseOK || vm.count ( "help" ) || !vm.count("input"))
-  {
-    trace.info() <<
-    "Compute the thinning of a volume using the CriticalKernels framework"<< std::endl
-    << std::endl << "Basic usage: "<< std::endl
-    << "criticalKernelsThinning3D --input <volFileName> --skel <ulti,end, 1isthmus, isthmus> --select "
-    " [ -f <white,black> -m <minlevel> -M <maxlevel> -v ] "
-    " [--persistence <value> ]" << std::endl
-    << "options for --skel {ulti end 1isthmus isthmus}" << std::endl
-    << "options for --select = {dmax random first}" << std::endl
-    << general_opt << "\n"
-    << " Example: \n"
-      << "criticalKernelsThinning3D --input ${DGtal}/examples/samples/Al.100.vol --select dmax --skel 1isthmus --persistence 1 --visualize --verbose --outputImage ./Al100_dmax_1isthmus_p1.vol \n";
-    return 0;
-  }
-  //Parse options
-  string filename = vm["input"].as<string>();
-  bool verbose = vm["verbose"].as<bool>();
-  bool visualize = vm["visualize"].as<bool>();
-  bool profile = vm["profile"].as<bool>();
-  int thresholdMin = vm["thresholdMin"].as<int>();
-  int thresholdMax = vm["thresholdMax"].as<int>();
-  int persistence = vm["persistence"].as<int>();
-  if (vm.count("persistence") && persistence < 0 )
-    throw po::validation_error(po::validation_error::invalid_option_value, "persistence");
-  string foreground = vm["foreground"].as<string>();
-  if (vm.count("foreground") && (!(foreground == "white" || foreground == "black")))
-    throw po::validation_error(po::validation_error::invalid_option_value, "foreground");
-
-  string sk_string = vm["skel"].as<string>();
-  if (vm.count("skel") &&
-     (!( sk_string == "ulti" || sk_string == "end" ||
-         sk_string == "isthmus" || sk_string == "1isthmus"))
-     )
-     throw po::validation_error(po::validation_error::invalid_option_value, "skel");
-  string select_string = vm["select"].as<string>();
-  if (vm.count("select") &&
-     (!( select_string == "random" || select_string == "dmax" ||
-         select_string == "first" ))
-     )
-     throw po::validation_error(po::validation_error::invalid_option_value, "select");
-  /*-------------- End of parse -----------------------------*/
-
+  
+  
   if(verbose){
     std::cout << "Skel: " << sk_string << std::endl;
     std::cout << "Select: " << select_string << std::endl;
     std::cout << "Persistence: " << persistence << std::endl;
-    std::cout << "Input: " << filename << std::endl;
+    std::cout << "Input: " << inputFileName << std::endl;
   }
   trace.beginBlock("Reading input");
   using Domain = Z3i::Domain ;
   using Image = ImageSelector < Z3i::Domain, unsigned char>::Type ;
-  Image image = GenericReader<Image>::import(filename);
+  Image image = GenericReader<Image>::import(inputFileName);
   trace.endBlock();
 
   DigitalSet image_set (image.domain());
@@ -279,32 +252,25 @@ int main(int argc, char* const argv[]){
   vc_new.dumpVoxels(thin_set);
   const auto & all_set = image_set;
 
-  if (vm.count("exportSDP"))
+  if (outputFilenameSDP != "")
   {
     std::ofstream out;
-    out.open(vm["exportSDP"].as<std::string>().c_str());
+    out.open(outputFilenameSDP.c_str());
     for (auto &p : thin_set)
     {
       out << p[0] << " " << p[1] << " " << p[2] << std::endl;
     }
   }
 
-  if (vm.count("exportImage"))
+  if (outputFilenameImg != "")
   {
-    auto outputFilename = vm["exportImage"].as<std::string>();
     if(verbose)
-      std::cout << "outputFilename" << outputFilename << std::endl;
+      std::cout << "outputFilename" << outputFilenameImg << std::endl;
 
     unsigned int foreground_value = 255;
     auto thin_image = ImageFromSet<Image>::create(thin_set, foreground_value);
-    thin_image >> outputFilename;
-    // // ITK output
-    // typedef itk::ImageFileWriter<Image::ITKImage> ITKImageWriter;
-    // typename ITKImageWriter::Pointer writer = ITKImageWriter::New();
-    // writer->SetFileName(outputFilename.c_str());
-    // writer->SetInput(thin_image.getITKImagePointer());
-    // writer->Update();
-  }
+    thin_image >> outputFilenameImg;
+   }
 
   if(visualize)
   {

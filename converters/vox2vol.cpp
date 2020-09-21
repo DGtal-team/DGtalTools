@@ -32,37 +32,43 @@
 #include <DGtal/images/Image.h>
 #include <DGtal/images/ImageContainerBySTLVector.h>
 #include <DGtal/io/writers/GenericWriter.h>
-#include <boost/program_options/options_description.hpp>
-#include <boost/program_options/parsers.hpp>
-#include <boost/program_options/variables_map.hpp>
+
+#include "CLI11.hpp"
+
+
 
 using namespace std;
 using namespace DGtal;
 using namespace Z3i;
 
-namespace po = boost::program_options;
 
 /**
- @page vox2vol
- @brief  Converts a MagicaVoxel VOX file (https://ephtracy.github.io) to a vol file.
+   @page vox2vol
+   @brief  Converts a MagicaVoxel VOX file (https://ephtracy.github.io) to a vol file.
 
 
- @b Usage: vox2vol -i [input] -o [output]
+   @b Usage: vox2vol -i [input] -o [output]
 
- @b Allowed @b options @b are:
+   @b Allowed @b options @b are:
 
- @code
- -h [ --help ]                   display this message
- -i [ --input ] arg              Input vox file.
- -o [ --output ] arg             Ouput vol file.
- @endcode
+   @code
 
- @b Example:
- @code
- $ vox2vol -i Al.100.vox -o Al.100.vol
+   Positionals:
+   1 TEXT:FILE REQUIRED                  
+   2 TEXT=result.vol                     
+   
+   Options:
+   -h,--help                             Print this help message and exit
+   -i,--input TEXT:FILE REQUIRED         
+   -o,--ouput TEXT=result.vol            
+   @endcode
 
- @endcode
- */
+   @b Example:
+   @code
+   $ vox2vol -i Al.100.vox -o Al.100.vol
+
+   @endcode
+*/
 /**
  * Missing parameter error message.
  *
@@ -107,9 +113,9 @@ std::ostream& write_word( std::ostream& outs, Word value )
 }
 
 DGtal::uint32_t toInt(const char a,
-               const char b,
-               const char c,
-               const char d)
+                      const char b,
+                      const char c,
+                      const char d)
 {
   return (static_cast<DGtal::uint32_t>((unsigned char)a) +
           ((static_cast<DGtal::uint32_t>((unsigned char) b)) <<8) +
@@ -121,62 +127,48 @@ DGtal::uint32_t toInt(const char a,
 int main(int argc, char**argv)
 {
 
-  // parse command line ----------------------------------------------
-  po::options_description general_opt ( "Allowed options are: " );
-  general_opt.add_options()
-  ( "help,h", "display this message." )
-  ( "input,i", po::value<std::string>(), "Input vox file." )
-  ( "output,o", po::value<string>(),"Output vol filename." );
-  bool parseOK=true;
-  po::variables_map vm;
-  try{
-    po::store(po::parse_command_line(argc, argv, general_opt), vm);
-  }catch(const std::exception& ex){
-    parseOK=false;
-    trace.info()<< "Error checking program options: "<< ex.what()<< endl;
-  }
-  po::notify ( vm );
-  if ( !parseOK || vm.count ( "help" ) ||argc<=1 )
-  {
-    trace.info() << "Convert a vox file to a vol."<<std::endl
-    << std::endl << "Basic usage: "<<std::endl
-    << "\tvox2vol --input <volFileName> --o <volOutputFileName> "<<std::endl
-    << general_opt << "\n";
-    return 0;
-  }
+  // parse command line using CLI ----------------------------------------------
+  CLI::App app;
+  std::string inputFileName;
+  std::string outputFileName {"result.vol"};
 
-  //Parse options
-  if ( ! ( vm.count ( "input" ) ) ) missingParam ( "--input" );
-  std::string filename = vm["input"].as<std::string>();
-  if ( ! ( vm.count ( "output" ) ) ) missingParam ( "--output" );
-  std::string outputFileName = vm["output"].as<std::string>();
 
+  app.description("Convert a vox file to a vol. Basic usage:\n vox2vol --input <volFileName> --o <volOutputFileName> ");
+  app.add_option("-i,--input,1", inputFileName, "" )
+    ->required()
+    ->check(CLI::ExistingFile);
+  app.add_option("-o,--ouput,2", outputFileName, "", true );   
+
+   
+  app.get_formatter()->column_width(40);
+  CLI11_PARSE(app, argc, argv);
+  // END parse command line using CLI ----------------------------------------------
 
   trace.beginBlock("Loading...");
   ifstream myfile;
-  myfile.open (filename, ios::in | ios::binary);
-
+  myfile.open (inputFileName, ios::in | ios::binary);
+   
   /* VOX file format:
    *
    4b VOX' '
    4b version (150)
-
+    
    4b MAIN (chunckid)
    4b size chucnk content (n)
    4b size chunck children (m)
-
+    
    4b SIZE (chunckid)
    4b chunck content
    4b chunck children
    4bx3  x,y,z
-
+    
    4b VOXEL (chunckid)
    4b chunck content
    4b chunck children
    4b number of voxels
    1b x 4 (x,y,z,idcol)  x numVoxels
-
-   */
+    
+  */
 
   //HEADER
   char a,b,c,d;
@@ -245,12 +237,11 @@ int main(int argc, char**argv)
     image.setValue(Z3i::Point((unsigned int)(unsigned char)a,
                               (unsigned int)(unsigned char)b,
                               (unsigned int)(unsigned char)c),
-                              (unsigned char) d);
+                   (unsigned char) d);
   }
 
   image >> outputFileName;
 
-
-  return 0;
+  return EXIT_SUCCESS;
 
 }

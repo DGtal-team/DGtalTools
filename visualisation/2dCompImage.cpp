@@ -42,9 +42,9 @@
 #include "DGtal/io/colormaps/GradientColorMap.h"
 #include <DGtal/math/Statistic.h>
 
-#include <boost/program_options/options_description.hpp>
-#include <boost/program_options/parsers.hpp>
-#include <boost/program_options/variables_map.hpp>
+#include "CLI11.hpp"
+
+
 ///////////////////////////////////////////////////////////////////////////////
 using namespace std;
 using namespace DGtal;
@@ -54,7 +54,6 @@ typedef ImageContainerBySTLVector < Z2i::Domain,  unsigned char > Image2D;
 typedef ImageContainerBySTLVector < Z2i::Domain,  unsigned int > Image2DErr;
 typedef GradientColorMap<unsigned int, CMAP_JET, 1 > JetMap;
 
-namespace po = boost::program_options;
 
 
 /**
@@ -68,18 +67,19 @@ namespace po = boost::program_options;
  @b Allowed @b options @b are :
  
  @code
-  -h [ --help ]                    display this message
-  -a [ --imageA ] arg              Input filename of image A.
-  -b [ --imageB ] arg              Input filename of image B.
-  -e [ --imageError ] arg          Output error image basename (will generate 
-                                   two images <basename>MSE.ppm and 
-                                   <basename>MAE.ppm).
-  -S [ --setMaxColorValueMSE ] arg Set the maximal color value for the scale 
-                                   display of MSE (else the scale is set the 
-                                   maximal MSE value).
-  -A [ --setMaxColorValueMAE ] arg Set the maximal color value for the scale 
-                                   display of MAE (else the scale is set from 
-                                   the maximal MAE value).
+
+ Positionals:
+   1 TEXT:FILE REQUIRED                  Input filename of image A.
+   2 TEXT:FILE REQUIRED                  Input filename of image B.
+
+ Options:
+   -h,--help                             Print this help message and exit
+   -a,--imageA TEXT:FILE REQUIRED        Input filename of image A.
+   -b,--imageB TEXT:FILE REQUIRED        Input filename of image B.
+   -e,--imageError TEXT                  Output error image basename (will generate two images <basename>MSE.ppm and <basename>MAE.ppm).
+   -S,--setMaxColorValueMSE INT          Set the maximal color value for the scale display of MSE (else the scale is set the maximal MSE value).
+   -A,--setMaxColorValueMAE INT          Set the maximal color value for the scale display of MAE (else the scale is set from the maximal MAE value).
+   
  @endcode
 
  @b Example: 
@@ -153,59 +153,38 @@ displayStats(const StatisticT &aStat, const string &type)
 
 int main( int argc, char** argv )
 {
-  // parse command line -------------------------------------------------------
-  po::options_description general_opt("Allowed options are");
-  general_opt.add_options()
-    ("help,h", "display this message")
-    ("imageA,a", po::value<std::string >(), "Input filename of image A." )
-    ("imageB,b", po::value<std::string >(), "Input filename of image B." )
-    ("imageError,e", po::value<std::string >(), "Output error image basename (will generate two images <basename>MSE.ppm and <basename>MAE.ppm)." )
-    ("setMaxColorValueMSE,S", po::value<int>(), "Set the maximal color value for the scale display of MSE (else the scale is set the maximal MSE value)." )
-    ("setMaxColorValueMAE,A", po::value<int>(), "Set the maximal color value for the scale display of MAE (else the scale is set from the maximal MAE value).");
-
-
-  bool parseOK=true;
-  po::variables_map vm;
-  try
-    {
-      po::store(po::parse_command_line(argc, argv, general_opt), vm);
-    }
-  catch(const std::exception& ex)
-    {
-      parseOK=false;
-      trace.info()<< "Error checking program options: "<< ex.what()<< endl;
-    }
   
+  // parse command line using CLI ----------------------------------------------
+  CLI::App app;
+  std::string inputFileNameA;
+  std::string inputFileNameB;
+  std::string basenameOutput;
+  int maxValueMAE;
+  int maxValueMSE;
+  
+  app.description("Compare images and displays differences (squared and absolute differences).\n Typical use example:\n \t 2dCompImage -a imageA.pgm -b imageB.pgm -e errorImage -S 100 \n");
+  app.add_option("-a,--imageA,1", inputFileNameA, "Input filename of image A." )
+  ->required()
+  ->check(CLI::ExistingFile);
+  app.add_option("-b,--imageB,2", inputFileNameA, "Input filename of image B." )
+   ->required()
+   ->check(CLI::ExistingFile);
 
-  // check if min arguments are given and tools description ------------------
-  po::notify(vm);
-  if( !parseOK || vm.count("help")|| argc<=1 || !vm.count("imageA")
-      ||  !vm.count("imageB") )
-    {
-      std::cout << "Usage: " << argv[0] << " --imageA <imageA>.pgm --imageB <imageB>.pgm -imageError <name> \n"
-                << "Compare images and displays differences (squared and absolute differences).  \n"
-                << general_opt << "\n"
-                << "Typical use example:\n \t 2dCompImage -a imageA.pgm -b imageB.pgm -e errorImage -S 100 \n";
-      return 0;
-    }  
- if(!vm.count("imageA") ||  !vm.count("imageB"))
-    {
-      trace.error() << " The two images filename are needed to be defined" << endl;      
-      return 0;
-    }
+  
+  app.add_option("--imageError,-e",basenameOutput, "Output error image basename (will generate two images <basename>MSE.ppm and <basename>MAE.ppm).");
+  
+  auto setMaxMSEOpt = app.add_option("--setMaxColorValueMSE,-S",maxValueMSE, "Set the maximal color value for the scale display of MSE (else the scale is set the maximal MSE value).");
+  auto setMaxMAEOpt = app.add_option("--setMaxColorValueMAE,-A",maxValueMAE, "Set the maximal color value for the scale display of MAE (else the scale is set from the maximal MAE value).");
 
-
-  //  recover the  args -----------------------------------------------
-  string inputFileNameA = vm["imageA"].as<string>();
-  string inputFileNameB = vm["imageB"].as<string>();
-  string basenameOutput  =vm["imageError"].as<string>();
-
+  
+  app.get_formatter()->column_width(40);
+  CLI11_PARSE(app, argc, argv);
+  // END parse command line using CLI ----------------------------------------------
 
   
   //  Input images ----------------------------------------------------
   Image2D imageA = GenericReader<Image2D>::import(inputFileNameA);
   Image2D imageB = GenericReader<Image2D>::import(inputFileNameB);
-
   
   Image2DErr imageErr (imageA.domain());  
 
@@ -213,9 +192,9 @@ int main( int argc, char** argv )
   //  Absolute Error between imageA and imageB -------------------------
   Statistic<int> statMA = getMAEstats(imageA, imageB, imageErr); 
   int maxVal = statMA.max();
-  if(vm.count("setMaxColorValueMAE"))
+  if(setMaxMAEOpt->count() > 0)
   {
-    maxVal = vm["setMaxColorValueMAE"].as<int>();
+    maxVal = maxValueMAE;
   }
   JetMap jmapMA(0, maxVal);
   displayStats(statMA, "Absolute errror");
@@ -223,21 +202,18 @@ int main( int argc, char** argv )
   maeName << "MAE.ppm";
   PPMWriter<Image2DErr, JetMap>::exportPPM(maeName.str(), imageErr,  jmapMA);
 
-
   //  Squared Error between imageA and imageB -------------------------
   Statistic<int> statSE = getMSEstats(imageA, imageB, imageErr); 
   maxVal = statMA.max();
-  if(vm.count("fixMaxColorValueMSE"))
+  if(setMaxMSEOpt->count()>0)
   {
-    maxVal = vm["fixMaxColorValueMSE"].as<int>();
+    maxVal = maxValueMSE;
   }    
   JetMap jmapSE(0, maxVal);
-  displayStats(statSE, "Squared errror");
+  displayStats(statSE, "Squared error");
   stringstream mseName; mseName << basenameOutput;
   mseName << "MSE.ppm";
   PPMWriter<Image2DErr, JetMap>::exportPPM(mseName.str(), imageErr,  jmapSE);
-
- 
 
   return 0;
 }

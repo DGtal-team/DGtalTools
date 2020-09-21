@@ -14,7 +14,7 @@
  *
  **/
 /**
- * @file volCrop.cpp
+ * @file volFlip.cpp
  * @ingroup volumetric/voltools
  * @author Bertrand Kerautret (\c kerautre@loria.fr )
  * LORIA (CNRS, UMR 7503), University of Nancy, France
@@ -34,17 +34,12 @@
 
 #include <DGtal/images/ImageContainerBySTLVector.h>
 #include <DGtal/images/ConstImageAdapter.h>
-#include <boost/program_options/options_description.hpp>
-#include <boost/program_options/parsers.hpp>
-#include <boost/program_options/variables_map.hpp>
 
+#include "CLI11.hpp"
 
 using namespace std;
 using namespace DGtal;
 using namespace Z3i;
-
-namespace po = boost::program_options;
-
 
 
 /**
@@ -58,15 +53,18 @@ namespace po = boost::program_options;
 
  @b Allowed @b options @b are : 
  @code
-  -h [ --help ]                     display this message.
-  -i [ --input ] arg                Input vol file.
-  --imagePlane arg                  arg=  {0,1,2} x {0,1,2} defines the axis of
-                                    the slice image which will be transformed 
-                                    (by default arg= 0 1  i.e. the slice image 
-                                    defined in the X,Y plane (Z=cst)
-  --flipDimension arg               specify which axis will be used to apply 
-                                    the flip.
-  -o [ --output ] arg (=output.vol) Output filename.
+ Positionals:
+   1 TEXT:FILE REQUIRED                  Input vol file.
+
+ Options:
+   -h,--help                             Print this help message and exit
+   -i,--input TEXT:FILE REQUIRED         Input vol file.
+   --imagePlane UINT=[0,1] x 2           arg=  {0,1,2} x {0,1,2} defines the axis of the slice image which will be transformed (by default arg= 0 1  i.e. the slice image defined in the X,Y plane (Z=cst)
+   --flipDimension UINT=0                specify which axis will be used to apply the flip.
+   -o,--output TEXT=result.vol           Output filename.
+   
+ 
+ 
  @endcode
 
  @b Example: 
@@ -100,61 +98,40 @@ void missingParam ( std::string param )
 
 int main(int argc, char**argv)
 {
-
-  // parse command line ----------------------------------------------
-  po::options_description general_opt ( "Allowed options are: " );
-  general_opt.add_options()
-    ( "help,h", "display this message." )
-    ( "input,i", po::value<std::string>(), "Input vol file." )
-    ( "imagePlane",po::value<std::vector <unsigned int> >()->multitoken(),
-      "arg=  {0,1,2} x {0,1,2} defines the axis of the slice image which will be transformed (by default arg= 0 1  i.e. the slice image defined in the X,Y plane (Z=cst)" )
-    ( "flipDimension", po::value<unsigned int>(), "specify which axis will be used to apply the flip." )
-    ( "output,o", po::value<string>()->default_value("output.vol"),"Output filename." );
-  bool parseOK=true;
   
-  po::variables_map vm;
+  // parse command line using CLI ----------------------------------------------
+  CLI::App app;
+  std::string inputFileName;
+  std::string outputFileName {"result.vol"};
   
+  std::vector <unsigned int> vectImgPlane {0,1};
+  unsigned int dimFlip {0};
   
-  try{
-    po::store ( po::parse_command_line ( argc, argv, general_opt ), vm );
-  }catch(const std::exception& ex){
-    parseOK=false;
-    trace.info()<< "Error checking program options: "<< ex.what()<< endl;
-  }
-  po::notify ( vm );
-  if (!parseOK || ! ( vm.count ( "input" ) ) || ! ( vm.count ( "output" ) ) || ! ( vm.count ( "imagePlane" ) ) 
-      || ! ( vm.count ( "flipDimension" ) ) || vm.count ( "help" ))
-    {
-      trace.info() << "Flip 2D slice image of an 3D vol image (mirror transformation)"<<std::endl
-                   << std::endl << "Basic usage: "<<std::endl
-                   << "\t volFlip --input <volFileName> --imagePlane 0 1 --flipDimension 0 --o <volOutputFileName> (vol, longvol, p3d format)"<<std::endl
-                   << general_opt << "\n";
-      std::cout << "Example:\n"
-		<< "volFlip --imagePlane 0 1 --flipDimension 0 -i ${DGtal}/examples/samples/lobster.vol -o flippedXxyLobster.p3d \n The resulting Z slice images (Z= cst) of flippedXxyLobster.p3d will appears flipped according the x axis.  ";
-      return 0;
-    }
-
-
-  //Parse options
-  if ( ! ( vm.count ( "input" ) ) ) missingParam ( "--input" );
-  if ( ! ( vm.count ( "output" ) ) ) missingParam ( "--output" );
-  if ( ! ( vm.count ( "imagePlane" ) ) || vm["imagePlane"].as<std::vector<unsigned int > >().size()!=2 ) missingParam ( "--imagePlane" );
-  if ( ! ( vm.count ( "flipDimension" ) ) ) missingParam ( "--flipDimension" );
-
-
-  std::string inputFilename = vm["input"].as<std::string>();
-  std::string outputFileName = vm["output"].as<std::string>();
+  app.description("Flip 2D slice image of an 3D vol image (mirror transformation)\nBasic usage:\n \t volFlip --input <volFileName> --imagePlane 0 1 --flipDimension 0 --o <volOutputFileName> (vol, longvol, p3d format)\n Example:\n volFlip --imagePlane 0 1 --flipDimension 0 -i ${DGtal}/examples/samples/lobster.vol -o flippedXxyLobster.vol \n The resulting Z slice images (Z= cst) of flippedXxyLobster.p3d will appears flipped according the x axis. \n");
+  app.add_option("-i,--input,1", inputFileName, "Input vol file." )
+  ->required()
+  ->check(CLI::ExistingFile);
   
-  unsigned int dimFirstImg = vm["imagePlane"].as<std::vector<unsigned int > >().at(0);
-  unsigned int dimSecondImg = vm["imagePlane"].as<std::vector<unsigned int > >().at(1);
-  unsigned int dimFlip = vm["flipDimension"].as<unsigned int>();
+  app.add_option("--imagePlane", vectImgPlane, "arg=  {0,1,2} x {0,1,2} defines the axis of the slice image which will be transformed (by default arg= 0 1  i.e. the slice image defined in the X,Y plane (Z=cst)", true)
+   ->expected(2);
+  app.add_option("--flipDimension",dimFlip,"specify which axis will be used to apply the flip.", true);
+  app.add_option("-o,--output",outputFileName, "Output filename.", true );
+
+ 
+  app.get_formatter()->column_width(40);
+  CLI11_PARSE(app, argc, argv);
+  // END parse command line using CLI ----------------------------------------------
+
+  
+  unsigned int dimFirstImg = vectImgPlane.at(0);
+  unsigned int dimSecondImg = vectImgPlane.at(1);
   
   unsigned int normalImgDim = (dimFirstImg!=2 && dimSecondImg!=2)? 2 :( (dimFirstImg!=1 && dimSecondImg!=1)? 1:  0    );  
     
     
   trace.beginBlock("Loading file");
   typedef ImageContainerBySTLVector<Z3i::Domain, unsigned char>  Image3D;
-  Image3D  imageSRC =  GenericReader<Image3D>::import ( inputFilename );
+  Image3D  imageSRC =  GenericReader<Image3D>::import ( inputFileName );
   trace.endBlock();
   Image3D  imageRes(imageSRC.domain());
   for(int i=0; i <= imageSRC.domain().upperBound()[normalImgDim]; i++){
@@ -169,15 +146,10 @@ int main(int argc, char**argv)
       pt[dimFlip]= imageSRC.domain().upperBound()[dimFlip] - pt[dimFlip] ;
       imageRes.setValue(*it, imageSRC(pt)); 
     }
-  }  
-  
+  }
 
   trace.beginBlock("Exporting...");
   bool res =  VolWriter< Image3D>::exportVol(outputFileName, imageRes);
   trace.endBlock();
   if (res) return 0; else return 1;
 }
-
-
-
-

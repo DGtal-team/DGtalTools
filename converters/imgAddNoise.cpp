@@ -32,19 +32,16 @@
 #include "DGtal/images/ImageSelector.h"
 #include <DGtal/geometry/volumes/KanungoNoise.h>
 #include <DGtal/images/IntervalForegroundPredicate.h>
-#include <boost/program_options/options_description.hpp>
-#include <boost/program_options/parsers.hpp>
-#include <boost/program_options/variables_map.hpp>
+
+#include "CLI11.hpp"
 
 #include <vector>
 #include <string>
 #include <climits>
 
- 
-using namespace DGtal;
 
-///////////////////////////////////////////////////////////////////////////////
-namespace po = boost::program_options;
+
+using namespace DGtal;
 
 
 /**
@@ -56,13 +53,16 @@ namespace po = boost::program_options;
 @b Allowed @b options @b are:
 
 @code
-  -h [ --help ]             display this message
-  -i [ --input ] arg        input image file name (any 2D image format accepted
-                            by DGtal::GenericReader)
-  -o [ --output ] arg       output image file name (any 2D image format 
-                            accepted by DGtal::GenericWriter)
-  -n [ --noise ] arg (=0.5) Kanungo noise level in ]0,1[ (default 0.5)
-                                      resulting volumetric file.
+
+Positionals:
+  1 TEXT:FILE REQUIRED                  input image file name (any 2D image format accepted by DGtal::GenericReader).
+  2 TEXT=result.png                     output image file name (any 2D image format accepted by DGtal::GenericWriter)
+
+Options:
+  -h,--help                             Print this help message and exit
+  -i,--input TEXT:FILE REQUIRED         input image file name (any 2D image format accepted by DGtal::GenericReader).
+  -o,--output TEXT=result.png           output image file name (any 2D image format accepted by DGtal::GenericWriter)
+  -n,--noise FLOAT=0.5                  Kanungo noise level in ]0,1[ (default 0.5)
 @endcode
 
 @b Example:
@@ -94,50 +94,28 @@ typedef ImageSelector < Z2i::Domain, unsigned char>::Type MyImage;
 
 int main( int argc, char** argv )
 {
-  // parse command line ----------------------------------------------
-  po::options_description general_opt("Allowed options are: ");
-  general_opt.add_options()
-    ("help,h", "display this message")
-    ("input,i", po::value<std::string>(), "input image file name (any 2D image format accepted by DGtal::GenericReader)")
-    ("output,o", po::value<std::string>(), "output image file name (any 2D image format accepted by DGtal::GenericWriter)")
-    ("noise,n", po::value<double>()->default_value(0.5), "Kanungo noise level in ]0,1[ (default 0.5)")  ;
-  
-  bool parseOK=true;
-  po::variables_map vm;
-  try{
-    po::store(po::parse_command_line(argc, argv, general_opt), vm);  
-  }catch(const std::exception& ex){
-    trace.info()<< "Error checking program options: "<< ex.what()<< std::endl;
-    parseOK=false;
-  }
-  po::notify(vm);    
-  if(vm.count("help")||argc<=1|| !parseOK)
-    {
-      trace.info()<< "Add Kanungo noise to a binary object with 0 values "
-                  << "as background points and values >0 for the foreground ones."
-                  <<std::endl << "Basic usage: "<<std::endl
-                  << "\t imgAddNoi0se [options] --input <imageName> --output <outputImage>"
-                  << "-noise 0.3" <<std::endl
-                  << general_opt << "\n"
-                  << "Example: \n"
-                  << "imgAddNoise -i ${DGtal}/examples/samples/klokan.pgm -o noise.pgm "
-                  << std::endl;
+// parse command line using CLI ----------------------------------------------
+  CLI::App app;
+  std::string inputFileName;
+  std::string outputFileName {"result.png"};
+  double noise {0.5};
 
-      return 0;
-    }
-  
-  //Parameters
-  if ( ! ( vm.count ( "input" ) ) ) missingParam ( "--input" );
-  const std::string input = vm["input"].as<std::string>();
-  if ( ! ( vm.count ( "output" ) ) ) missingParam ( "--output" );
-  const std::string  output = vm["output"].as<std::string>();
-  const double noise = vm["noise"].as<double>();
-  
+  app.description("Add Kanungo noise to a binary object with 0 values as background points and values >0 for the foreground ones.\n Example: \n imgAddNoise -i ${DGtal}/examples/samples/klokan.pgm -o noise.pgm ");
+  app.add_option("-i,--input,1", inputFileName, "input image file name (any 2D image format accepted by DGtal::GenericReader)." )
+    ->required()
+    ->check(CLI::ExistingFile);
+  app.add_option("-o,--output,2", outputFileName, "output image file name (any 2D image format accepted by DGtal::GenericWriter)", true);
+  app.add_option("-n,--noise", noise, "Kanungo noise level in ]0,1[ (default 0.5)", true);
+
+  app.get_formatter()->column_width(40);
+  CLI11_PARSE(app, argc, argv);
+  // END parse command line using CLI ----------------------------------------------
+
+    
   typedef functors::IntervalForegroundPredicate<MyImage> Binarizer;
-  MyImage image = GenericReader<MyImage>::import( input );
+  MyImage image = GenericReader<MyImage>::import( inputFileName );
   trace.info() <<"Input image: "<< image<<std::endl;
   Binarizer predicate(image, 0,255);
-  
   
   KanungoNoise<Binarizer, Z2i::Domain> kanungo(predicate, image.domain(), noise);
   
@@ -150,9 +128,9 @@ int main( int argc, char** argv )
       result  .setValue(*it, 0);
   }
 
-  result >> output;
+  result >> outputFileName;
   
-  return 0;
+  return EXIT_SUCCESS;
 }
 
 

@@ -46,6 +46,10 @@ endif (CMAKE_CXX_FLAGS MATCHES "-ftemplate-depth-[0-9]*")
 
 
 
+# CLI11
+include_directories( "${PROJECT_SOURCE_DIR}/ext/" )
+
+
 
 # -----------------------------------------------------------------------------
 # Define variables and cmake parameters, and display some information
@@ -58,24 +62,28 @@ SET(DGTALTOOLS_VERSION "${DGtalTools_VERSION_MAJOR}.${DGtalTools_VERSION_MINOR}.
 SET(PROJECT_VERSION "${DGtalTools_VERSION_MAJOR}.${DGtalTools_VERSION_MINOR}.${DGtalTools_VERSION_PATCH}")
 SET(VERSION ${DGtalTools_VERSION_MAJOR}.${DGtalTools_VERSION_MINOR}.${DGtalTools_VERSION_PATCH})
 
-OPTION(Boost_USE_STATIC_LIBS "Use boost static lib" ON)
-SET(Boost_USE_MULTITHREADED ON)
-SET(Boost_USE_STATIC_RUNTIME OFF)
-SET(Boost_FOUND FALSE)
-FIND_PACKAGE(Boost 1.46.0 REQUIRED COMPONENTS program_options)
+
+
+
+
+ # -----------------------------------------------------------------------------
+ # Looking for boost
+ # -----------------------------------------------------------------------------
+
+set(Boost_USE_STATIC_LIBS   ON)
+set(Boost_USE_MULTITHREADED ON)
+set(Boost_USE_STATIC_RUNTIME OFF)
+set(Boost_FOUND FALSE)
+FIND_PACKAGE(Boost 1.50.0 REQUIRED)
 if ( Boost_FOUND )
-  message(STATUS "Boost and boost_program_options found.")
-  ADD_DEFINITIONS(${BOOST_DEFINITIONS} -DBOOST_ALL_NO_LIB)    
-  include_directories( ${Boost_INCLUDE_DIRS} )
+  ADD_DEFINITIONS(${BOOST_DEFINITIONS} -DBOOST_ALL_NO_LIB)
+  # SYSTEM to avoid warnings from boost.
+  include_directories(SYSTEM ${Boost_INCLUDE_DIRS} )
   SET(DGtalToolsLibDependencies ${DGtalToolsLibDependencies}
-     ${Boost_LIBRAIRIES}
-     ${Boost_PROGRAM_OPTIONS_LIBRARY} Boost::program_options)
-   SET(DGtalLibInc ${Boost_INCLUDE_DIRS})
-   ## Used to avoid ld warnings (to be removed when using CLI11 instead program_options)
-   if(APPLE)
-      set (CMAKE_CXX_FLAGS "-fvisibility=hidden")
-   endif(APPLE)
+     ${Boost_LIBRAIRIES})
+   SET(DGtalLibInc ${Boost_INCLUDE_DIRS})  
 endif( Boost_FOUND )
+
 
 
 

@@ -43,9 +43,7 @@
 #include "DGtal/images/SimpleThresholdForegroundPredicate.h"
 #include "DGtal/images/ImageSelector.h"
 
-#include <boost/program_options/options_description.hpp>
-#include <boost/program_options/parsers.hpp>
-#include <boost/program_options/variables_map.hpp>
+#include "CLI11.hpp"
 
 #include "DGtal/geometry/volumes/distance/DistanceTransformation.h"
 
@@ -55,7 +53,6 @@ using namespace std;
 using namespace DGtal;
 using namespace Z3i;
 
-namespace po = boost::program_options;
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -69,16 +66,20 @@ namespace po = boost::program_options;
 
  @b Allowed @b options @b are : 
  @code
-  -h [ --help ]              display this message.
-  -i [ --input ] arg         Input volumetric file (.vol, .pgm3d or p3d)
-  -m [ --min ] arg (=0)      Minimum (excluded) value for threshold.
-  -M [ --max ] arg (=255)    Maximum (included) value for threshold.
-  -e [ --exportSDP ] arg     Export the resulting set of points in a simple 
-                             (sequence of discrete point (sdp)).
-  --fixedPoints arg          defines the coordinates of points which should not
-                             be removed.
-  -s [ --fixedPointSDP ] arg use fixed points from a file.
 
+ Positionals:
+   1 TEXT:FILE REQUIRED                  Input volumetric file (.vol, .pgm3d or p3d)
+
+ Options:
+   -h,--help                             Print this help message and exit
+   -i,--input TEXT:FILE REQUIRED         Input volumetric file (.vol, .pgm3d or p3d)
+   -m,--min FLOAT=0                      Minimum (excluded) value for threshold.
+   -M,--max FLOAT=255                    Maximum (included) value for threshold.
+   -e,--exportSDP TEXT                   Export the resulting set of points in a simple (sequence of discrete point (sdp)).
+   --fixedPoints INT ...                 defines the coordinates of points which should not be removed.
+   -s,--fixedPointSDP TEXT:FILE          use fixed points from a file.
+   
+ 
  @endcode
 
  @b Example: 
@@ -111,57 +112,41 @@ void missingParam ( std::string param )
 }
 
 
-
 int main( int argc, char** argv )
 {
-
-  // parse command line ----------------------------------------------
-  po::options_description general_opt ( "Allowed options are: " );
-  general_opt.add_options()
-    ( "help,h", "display this message." )
-    ( "input,i", po::value<std::string>(), "Input volumetric file (.vol, .pgm3d or p3d)" )
-    ( "min,m", po::value<int>()->default_value( 0 ), "Minimum (excluded) value for threshold.")
-    ( "max,M", po::value<int>()->default_value( 255 ), "Maximum (included) value for threshold.")
-    ( "exportSDP,e", po::value<std::string>(), "Export the resulting set of points in a simple (sequence of discrete point (sdp)).")
-    ("fixedPoints", po::value<std::vector <int> >()->multitoken(), "defines the coordinates of points which should not be removed." )
-    ( "fixedPointSDP,s", po::value<std::string>(), "use fixed points from a file.");
-
-
-  bool parseOK=true;
-  po::variables_map vm;
-  try{
-    po::store(po::parse_command_line(argc, argv, general_opt), vm);
-  }catch(const std::exception& ex){
-    parseOK=false;
-    trace.info()<< "Error checking program options: "<< ex.what()<< endl;
-  }
-  po::notify ( vm );
-  if ( !parseOK || vm.count ( "help" ) ||argc<=1 )
-    {
-      trace.info() << "Illustration of homotopic thinning of a 3d image file (vol,longvol,pgm3d...) with 3D viewer."<<std::endl
-                   << std::endl << "Basic usage: "<<std::endl
-                   << "\thomotopicThinning3d [options] --input <3dImageFileName>  {vol,longvol,pgm3d...} "<<std::endl
-                   << general_opt << "\n"
-                   << " Usage by forcing point to be left by the thinning: \n"
-                   << "homotopicThinning3D --input ${DGtal}/examples/samples/Al.100.vol  --fixedPoints 56 35 5  56 61 5  57 91 38  58 8 38  45 50 97 \n";
-
-
-
-
-      return 0;
-    }
-
-  //Parse options
-  if ( ! ( vm.count ( "input" ) ) ) missingParam ( "--input" );
-  std::string filename = vm["input"].as<std::string>();
+  // parse command line using CLI ----------------------------------------------
+  CLI::App app;
+  std::string inputFileName;
+  std::string exportSDPName;
+  std::string fixedPointSDPName;
+  double min {0};
+  double max {255};
+  
+  std::vector<int> vectFixedPoints;
+  
+  app.description("Applies an homotopic thinning of a 3d image file (vol,longvol,pgm3d...) with 3D viewer. \n Basic usage: \t homotopicThinning3d [options] --input <3dImageFileName>  {vol,longvol,pgm3d...}  \n Usage by forcing point to be left by the thinning: \n homotopicThinning3D --input ${DGtal}/examples/samples/Al.100.vol  --fixedPoints 56 35 5  56 61 5  57 91 38  58 8 38  45 50 97 \n");
+  app.add_option("-i,--input,1", inputFileName, "Input volumetric file (.vol, .pgm3d or p3d)" )
+  ->required()
+  ->check(CLI::ExistingFile);
+  app.add_option("--min,-m", min, "Minimum (excluded) value for threshold.", true);
+  app.add_option("--max,-M", max, "Maximum (included) value for threshold.", true);
+  app.add_option("--exportSDP,-e",exportSDPName, "Export the resulting set of points in a simple (sequence of discrete point (sdp)).");
+  app.add_option("--fixedPoints",vectFixedPoints, "defines the coordinates of points which should not be removed.");
+  app.add_option("--fixedPointSDP,-s",fixedPointSDPName,  "use fixed points from a file.")
+   ->check(CLI::ExistingFile);
+  
+  
+  app.get_formatter()->column_width(40);
+  CLI11_PARSE(app, argc, argv);
+  // END parse command line using CLI ----------------------------------------------
 
   
   typedef ImageSelector < Z3i::Domain, unsigned char>::Type Image;
-  Image image = GenericReader<Image>::import ( filename );
+  Image image = GenericReader<Image>::import ( inputFileName );
 
   trace.beginBlock("DT Computation");
   typedef functors::IntervalForegroundPredicate<Image> Predicate;
-  Predicate aPredicate(image, vm[ "min" ].as<int>(), vm[ "max" ].as<int>() );
+  Predicate aPredicate(image, min, max );
 
   const Z3i::L2Metric aMetric{};
   DistanceTransformation<Z3i::Space, Predicate , Z3i::L2Metric> dt(image.domain(), aPredicate, aMetric );
@@ -169,40 +154,37 @@ int main( int argc, char** argv )
   trace.info() <<image<<std::endl;
 
   // Domain creation from two bounding points.
-
   trace.beginBlock("Constructing Set");
   DigitalSet shape_set( image.domain() );
   DigitalSet fixedSet( image.domain() );
 
   // Get the optional fixed points
-  if( vm.count("fixedPoints")){
-    std::vector<int> vectC = vm["fixedPoints"].as<std::vector<int> >();
-    if(vectC.size()%3==0){
-      for( unsigned int i=0; i < vectC.size()-2; i=i+3)
+  if(vectFixedPoints.size() > 0){
+    if(vectFixedPoints.size()%3==0){
+      for( unsigned int i=0; i < vectFixedPoints.size()-2; i=i+3)
         {
-          Z3i::Point pt(vectC.at(i), vectC.at(i+1), vectC.at(i+2));
+          Z3i::Point pt(vectFixedPoints.at(i), vectFixedPoints.at(i+1), vectFixedPoints.at(i+2));
           fixedSet.insertNew(pt);
         }
-    }else{
+    }
+    else
+    {
       trace.error()<< " The coordinates should be 3d coordinates, ignoring fixedPoints option." << std::endl;
     }
   }
-  if(vm.count("fixedPointSDP"))
+  
+  if(fixedPointSDPName != "")
     {
-      std::vector<Z3i::Point> vPt = PointListReader<Z3i::Point>::getPointsFromFile(vm["fixedPointSDP"].as<std::string>());
+      std::vector<Z3i::Point> vPt = PointListReader<Z3i::Point>::getPointsFromFile(fixedPointSDPName);
       for( auto &p: vPt)
         {
           fixedSet.insert(p);
         }
     }
   
-  SetFromImage<DigitalSet>::append<Image>(shape_set, image,
-                                          vm[ "min" ].as<int>(), vm[ "max" ].as<int>() );
+  SetFromImage<DigitalSet>::append<Image>(shape_set, image, min, max );
   trace.info() << shape_set<<std::endl;
   trace.endBlock();
-
-
-
 
   trace.beginBlock("Computing skeleton");
   // (6,18), (18,6), (26,6) seem ok.
@@ -264,13 +246,12 @@ int main( int argc, char** argv )
   viewer << SetMode3D( shape_set.className(), "PavingTransp" );
   viewer << CustomColors3D(Color(250, 0,0, 25), Color(250, 0,0, 5));
   viewer << shape_set;
-
   viewer<< Viewer3D<>::updateDisplay;
   
-  if (vm.count("exportSDP"))
+  if (exportSDPName != "")
     {
       std::ofstream out;
-      out.open(vm["exportSDP"].as<std::string>().c_str());
+      out.open(exportSDPName.c_str());
       for (auto &p : S)
         {
           out << p[0] << " " << p[1] << " " << p[2] << std::endl;

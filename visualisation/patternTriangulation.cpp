@@ -43,10 +43,6 @@
 #include <fstream>
 #include <vector>
 
-#include <boost/program_options/options_description.hpp>
-#include <boost/program_options/parsers.hpp>
-#include <boost/program_options/variables_map.hpp>
-
 #include "DGtal/base/Common.h"
 #include "DGtal/helpers/StdDefs.h"
 
@@ -56,11 +52,14 @@
 #include "DGtal/io/boards/Board2D.h"
 #include "DGtal/io/Color.h"
 
+#include "CLI11.hpp"
+
+
 using namespace DGtal;
 using namespace std;
 
-namespace po = boost::program_options;
-///////////////////////////////////////////////////////////////////////////////
+
+
 /**
  @page patternTriangulation patternTriangulation
  
@@ -71,14 +70,16 @@ namespace po = boost::program_options;
  @b Allowed @b options @b are :
  
  @code
-  -h [ --help ]                    display this message
-  -a [ --aparam ] arg              pattern a parameter
-  -b [ --bparam ] arg              pattern b parameter
-  -d [ --delta ] arg (=1)          number of repetitions
-  -t [ --triangulation ] arg (=CH) output:
-                                   Closest-point Delaunay triangulation {CDT}
-                                   Farthest-point Delaunay triangulation {FDT}
-                                   Convex hull {CH}
+
+Options:
+  -h,--help                             Print this help message and exit
+  -a,--aparam INT REQUIRED              pattern a parameter
+  -b,--bparam INT REQUIRED              pattern b parameter
+  -d,--delta INT                        number of repetitions
+  -t,--triangulation TEXT=CH            output:
+                                        	Closest-point Delaunay triangulation {CDT}
+                                        	Farthest-point Delaunay triangulation {FDT}
+                                        	Convex hull {CH}
  @endcode
 
 
@@ -652,41 +653,32 @@ void missingParam(std::string param)
 */
 int main(int argc, char **argv)
 {
-  // parse command line ----------------------------------------------
-  po::options_description general_opt("Allowed options are");
-  general_opt.add_options()
-    ("help,h", "display this message")
-    ("aparam,a",   po::value<int>(), "pattern a parameter" )
-    ("bparam,b",   po::value<int>(), "pattern b parameter" )
-    ("delta,d",   po::value<int>()->default_value(1), "number of repetitions" )
-    ("triangulation,t",   po::value<string>()->default_value("CH"), "output:\n\tClosest-point Delaunay triangulation {CDT}\n\tFarthest-point Delaunay triangulation {FDT}\n\tConvex hull {CH}" );
-
-  bool parseOK=true;
-  po::variables_map vm;
-  try{
-    po::store(po::parse_command_line(argc, argv, general_opt), vm);  
-  }catch(const std::exception& ex){
-    parseOK=false;
-    trace.info()<< "Error checking program options: "<< ex.what()<< endl;
-  }
- 
-  po::notify(vm);    
-  if(!parseOK || vm.count("help")||argc<=1)
-    {
-      trace.info()<< "Draw the Delaunay triangulation of a pattern using DGtal library" <<std::endl 
-		  << "Basic usage: "<<std::endl
-		  << "\t" << argv[0] << " -a 5 -b 8 "<<std::endl
-		  << general_opt << "\n";
-      return 0;
-    }
-
-
-  if (!(vm.count("aparam"))) missingParam("-a");
-  if (!(vm.count("bparam"))) missingParam("-b");
-
   typedef DGtal::int32_t Integer;
-  Integer a = vm["aparam"].as<int>();
-  Integer b = vm["bparam"].as<int>();
+
+  Integer a;
+  Integer b;
+  Integer d {1};
+  string type {"CH"};
+
+  
+  // parse command line using CLI ----------------------------------------------
+  CLI::App app;
+  app.description("Draw the Delaunay triangulation of a pattern using DGtal library. Example: patternTriangulation -a 5 -b 8  ");
+  app.add_option("-a,--aparam",a,"pattern a parameter")
+    ->required();
+  app.add_option("-b,--bparam",b,"pattern b parameter")
+    ->required();
+  app.add_option("-d,--delta",d,"number of repetitions");
+  app.add_option("--triangulation,-t",type,"output:\n\tClosest-point Delaunay triangulation {CDT}\n\tFarthest-point Delaunay triangulation {FDT}\n\tConvex hull {CH}", true);
+  
+
+  app.get_formatter()->column_width(40);
+  CLI11_PARSE(app, argc, argv);
+  // END parse command line using CLI ----------------------------------------------
+
+
+
+  
   if ( (a < 0) || (b <= 0) )
     {
       trace.error() << " parameters a and b should be strictly positive.";
@@ -699,7 +691,7 @@ int main(int argc, char **argv)
       trace.info() << std::endl;
       return 0;
     }
-  Integer d = vm["delta"].as<int>(); 
+
   if (d <= 0)
     {
       trace.error() << " parameter d should be strictly positive";
@@ -715,7 +707,6 @@ int main(int argc, char **argv)
  
   Pattern pattern( a, b );
 
-  string type = vm["triangulation"].as<string>();
   if (type == "CDT")
     {
       displayCDT(pattern, d); 
@@ -732,8 +723,8 @@ int main(int argc, char **argv)
     {
       trace.error() << " unknown output type. Try -h option. ";
       trace.info() << std::endl;
-      return 0;
+      return EXIT_FAILURE;
     }
 
-  return 1;
+  return EXIT_SUCCESS;
 }

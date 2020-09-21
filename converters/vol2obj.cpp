@@ -35,9 +35,8 @@
 
 #include "DGtal/images/ImageSelector.h"
 
-#include <boost/program_options/options_description.hpp>
-#include <boost/program_options/parsers.hpp>
-#include <boost/program_options/variables_map.hpp>
+#include "CLI11.hpp"
+
 
 using namespace std;
 using namespace DGtal;
@@ -50,25 +49,25 @@ between
  [@a thresholdMin,@a thresholdMax] is exported as a unit cube.
 
 
-@b Usage: vol2obj [input-file]
+@b Usage: ./converters/vol2obj [OPTIONS] 1 [2]
 
 @b Allowed @b options @b are:
 
 @code
-   -h [ --help ]                    display this message
-   -i [ --input ] arg               vol file (.vol, .longvol .p3d, .pgm3d and if
-                                    WITH_ITK is selected: dicom, dcm, mha, mhd)
-                                    or sdp (sequence of discrete points).
-   -o [ --output ] arg              Output OBJ filename
-   -m [ --thresholdMin ] arg (=0)   threshold min to define binary shape
-   -M [ --thresholdMax ] arg (=255) threshold max to define binary shape
 
-   --rescaleInputMin arg (=0)       min value used to rescale the input
-                                    intensity (to avoid basic cast into 8  bits
-                                    image).
-   --rescaleInputMax arg (=255)     max value used to rescale the input
-                                    intensity (to avoid basic cast into 8 bits
-                                    image).
+Positionals:
+  1 TEXT:FILE REQUIRED                  vol file (.vol, .longvol .p3d, .pgm3d or .sdp and if WITH_ITK is selected: dicom, dcm, mha, mhd). For longvol, dicom, dcm, mha or mhd formats, the input values are linearly scaled between 0 and 255.
+  2 TEXT                                output file (.obj or .off).
+
+Options:
+  -h,--help                             Print this help message and exit
+  -i,--input TEXT:FILE REQUIRED         vol file (.vol, .longvol .p3d, .pgm3d or .sdp and if WITH_ITK is selected: dicom, dcm, mha, mhd). For longvol, dicom, dcm, mha or mhd formats, the input values are linearly scaled between 0 and 255.
+  -o,--output TEXT                      output file (.obj or .off).
+  -m,--thresholdMin INT=128             threshold min (excluded) to define binary shape.
+  -M,--thresholdMax INT=255             threshold max (included) to define binary shape.
+  --rescaleInputMin INT=0               min value used to rescale the input intensity (to avoid basic cast into 8  bits image).
+  --rescaleInputMax INT=255             max value used to rescale the input intensity (to avoid basic cast into 8  bits image).
+
 @endcode
 
 @see
@@ -76,70 +75,46 @@ vol2obj.cpp
 
 */
 ///////////////////////////////////////////////////////////////////////////////
-namespace po = boost::program_options;
+
 
 int main( int argc, char** argv )
 {
-  // parse command line ----------------------------------------------
-  po::options_description general_opt("Allowed options are: ");
-  general_opt.add_options()( "help,h", "display this message" )
-  ("input,i", po::value<std::string>(), "vol file (.vol, .longvol .p3d, .pgm3d and if WITH_ITK is selected: dicom, dcm, mha, mhd) or sdp (sequence of discrete points)." )
-  ("output,o", po::value<std::string>(),
-  "Output OBJ filename (each grid point with value between [ @a thresholdMin, @a thresholdMax ] is exported as a unit cube ) " )
-  ( "thresholdMin,m", po::value<int>()->default_value( 0 ),"threshold min to define binary shape" )
-  ("thresholdMax,M", po::value<int>()->default_value( 255 ),"threshold max to define binary shape" )
-  ("rescaleInputMin", po::value<DGtal::int64_t>()->default_value( 0 ), "min value used to rescale the input intensity (to avoid basic cast into 8 bits image)." )
-  ( "rescaleInputMax",po::value<DGtal::int64_t>()->default_value( 255 ),
-                    "max value used to rescale the input intensity (to avoid "
-                    "basic cast into 8 bits image)." );
 
-  bool parseOK=true;
-  po::variables_map vm;
-  try
-    {
-      po::store(po::parse_command_line(argc, argv, general_opt), vm);
-    } catch(const std::exception& ex)
-    {
-      parseOK=false;
-      trace.info()<< "Error checking program options: "<< ex.what()<< endl;
-    }
-  po::notify(vm);
-  if( !parseOK || vm.count("help")||argc<=1)
-    {
-      std::cout << "Usage: " << argv[0] << " [input-file]\n"
-                << "Convert a  volume file into OBJ format\n"
-                << general_opt << "\n";
-      return 0;
-    }
+  // parse command line using CLI ----------------------------------------------
+   CLI::App app;
+   std::string inputFileName;
+   std::string outputFileName {"result.obj"};
+   int thresholdMin {128};
+   int thresholdMax {255};  
+   DGtal::int64_t rescaleInputMin {0};
+   DGtal::int64_t rescaleInputMax {255};
 
-  if(! vm.count("input"))
-    {
-      trace.error() << " The input filename was defined" << endl;
-      return 0;
-    }
-  if(! vm.count("output"))
-    {
-      trace.error() << " The output filename was defined" << endl;
-      return 0;
-    }
+   
+  app.description(" Converts any volumetric file (or .sdp file) to an OBJ one. Each grid point with value between [thresholdMin, thresholdMax] is exported as a unit cube.");
+  app.add_option("-i,--input,1", inputFileName, "vol file (.vol, .longvol .p3d, .pgm3d or .sdp and if WITH_ITK is selected: dicom, dcm, mha, mhd). For longvol, dicom, dcm, mha or mhd formats, the input values are linearly scaled between 0 and 255." )
+    ->required()
+    ->check(CLI::ExistingFile);
+  app.add_option("--output,-o,2",outputFileName ,"output file (.obj or .off).");
+  app.add_option("--thresholdMin,-m", thresholdMin, "threshold min (excluded) to define binary shape.", true);
+  app.add_option("--thresholdMax,-M", thresholdMax, "threshold max (included) to define binary shape.", true);
+  app.add_option("--rescaleInputMin", rescaleInputMin, "min value used to rescale the input intensity (to avoid basic cast into 8  bits image).", true);
+  app.add_option("--rescaleInputMax", rescaleInputMax, "max value used to rescale the input intensity (to avoid basic cast into 8  bits image).", true);
 
-  string inputFilename = vm["input"].as<std::string>();
-  string outputFilename = vm["output"].as<std::string>();
-  int thresholdMin = vm["thresholdMin"].as<int>();
-  int thresholdMax = vm["thresholdMax"].as<int>();
+
+  app.get_formatter()->column_width(40);
+  CLI11_PARSE(app, argc, argv);
+  // END parse command line using CLI ----------------------------------------------
+
 
   Board3D<> board;
 
   typedef ImageSelector<Domain, unsigned char>::Type Image;
-  string extension = inputFilename.substr(inputFilename.find_last_of(".") + 1);
+  string extension = inputFileName.substr(inputFileName.find_last_of(".") + 1);
 
   if(extension!="sdp")
     {
-      DGtal::int64_t rescaleInputMin = vm["rescaleInputMin"].as<DGtal::int64_t>();
-      DGtal::int64_t rescaleInputMax = vm["rescaleInputMax"].as<DGtal::int64_t>();
-
       typedef DGtal::functors::Rescaling<DGtal::int64_t ,unsigned char > RescalFCT;
-      Image image =  GenericReader< Image >::importWithValueFunctor( inputFilename,RescalFCT(rescaleInputMin,
+      Image image =  GenericReader< Image >::importWithValueFunctor( inputFileName,RescalFCT(rescaleInputMin,
                                                                                              rescaleInputMax,
                                                                                              0, 255) );
       trace.info() << "Image loaded: "<<image<< std::endl;
@@ -154,13 +129,12 @@ int main( int argc, char** argv )
   else
     if(extension=="sdp")
       {
-        vector<Z3i::Point> vectVoxels = PointListReader<Z3i::Point>::getPointsFromFile(inputFilename);
+        vector<Z3i::Point> vectVoxels = PointListReader<Z3i::Point>::getPointsFromFile(inputFileName);
         for(unsigned int i=0;i< vectVoxels.size(); i++){
           board << vectVoxels.at(i);
         }
       }
 
-
-  board.saveOBJ(outputFilename);
-  return 0;
+  board.saveOBJ(outputFileName);
+  return EXIT_SUCCESS;
 }
