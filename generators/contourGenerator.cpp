@@ -2,15 +2,15 @@
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Lesser General Public License as
  *  published by the Free Software Foundation, either version 3 of the
- *  License, or  (at your option) any later version.
+ *  License, or (at your option) any later version.
  *
  *  This program is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  *  GNU General Public License for more details.
  *
  *  You should have received a copy of the GNU General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *  along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  **/
 /**
@@ -68,7 +68,7 @@ using namespace DGtal;
  *
  @page contourGenerator contourGenerator
  
- @brief  Generates multigrid contours of 2d digital shapes using DGtal library.
+ @brief Generates multigrid contours of 2d digital shapes using DGtal library.
  
  The associated geometric information like contour, curvature can also be displayed. 
 
@@ -103,11 +103,11 @@ using namespace DGtal;
  contourGenerator --list
  2D Shapes:
 	ball	Ball for the Euclidean metric.
-		Required parameter(s): --radius [-R]   
+		Required parameter(s): --radius [-R]
 	square	square (no signature).
-		Required parameter(s): --width [-w]   
+		Required parameter(s): --width [-w]
 	lpball	Ball for the l_power metric (no signature).
-		Required parameter(s): --radius [-R], --power [-p]  
+		Required parameter(s): --radius [-R], --power [-p]
 	flower	Flower with k petals with radius ranging from R+/-v.
 		Required parameter(s): --radius [-R], --varsmallradius [-v], --k [-k], --phi
 	ngon	Regular k-gon.
@@ -122,11 +122,11 @@ using namespace DGtal;
  @b Example:
  @code
  # generate a flower contour with 5 petals of maximal radius 5 and small radius 3 with grid size = 0.1:
- ./shapeGenerator/contourGenerator -s flower -R 5 -v 3  -k 5 --outputGeometry result   -g 0.1
+ ./shapeGenerator/contourGenerator -s flower -R 5 -v 3 -k 5 --outputGeometry result -g 0.1
  # Display the results using gnuplot:
  $gnuplot
- [gnuplot>  plot [][-5:2]'res.geom'  using 1:6 w l  t "curvature"
- [gnuplot>  plot 'res.geom'  using 2:3 w l  t "contour flower"
+ [gnuplot> plot [][-5:2]'res.geom' using 1:6 w l t "curvature"
+ [gnuplot> plot 'res.geom' using 2:3 w l t "contour flower"
 @endcode
 
  
@@ -163,50 +163,48 @@ void createList()
   shapesParam2.push_back("");
   shapesParam3.push_back("");
   shapesParam4.push_back("");
-  
+
   shapes2D.push_back("square");
   shapesDesc.push_back("square (no signature).");
   shapesParam1.push_back("--width [-w]");
   shapesParam2.push_back("");
   shapesParam3.push_back("");
   shapesParam4.push_back("");
-  
+
   shapes2D.push_back("lpball");
   shapesDesc.push_back("Ball for the l_power metric (no signature).");
   shapesParam1.push_back("--radius [-R],");
   shapesParam2.push_back("--power [-p]");
   shapesParam3.push_back("");
   shapesParam4.push_back("");
-  
+
   shapes2D.push_back("flower");
   shapesDesc.push_back("Flower with k petals with radius ranging from R+/-v.");
   shapesParam1.push_back("--radius [-R],");
   shapesParam2.push_back("--varsmallradius [-v],");
   shapesParam3.push_back("--k [-k],");
   shapesParam4.push_back("--phi");
-  
+
   shapes2D.push_back("ngon");
   shapesDesc.push_back("Regular k-gon.");
   shapesParam1.push_back("--radius [-R],");
   shapesParam2.push_back("--k [-k],");
   shapesParam3.push_back("--phi");
   shapesParam4.push_back("");
-  
+
   shapes2D.push_back("accflower");
   shapesDesc.push_back("Accelerated Flower with k petals.");
   shapesParam1.push_back("--radius [-R],");
   shapesParam2.push_back("--varsmallradius [-v],");
   shapesParam3.push_back("--k [-k],");
   shapesParam4.push_back("--phi");
-  
+
   shapes2D.push_back("ellipse");
   shapesDesc.push_back("Ellipse.");
   shapesParam1.push_back("--axis1 [-A],");
   shapesParam2.push_back("--axis2 [-a],");
   shapesParam3.push_back("--phi");
   shapesParam4.push_back("");
-  
-  
 }
 
 /**
@@ -218,13 +216,12 @@ void displayList()
   trace.emphase()<<"2D Shapes:"<<std::endl;
   for(unsigned int i=0; i<shapes2D.size(); ++i)
     trace.info()<<"\t"<<shapes2D[i]<<"\t"
-    <<shapesDesc[i]<<std::endl
+    << shapesDesc[i]<<std::endl
     <<"\t\tRequired parameter(s): "
     << shapesParam1[i]<<" "
     << shapesParam2[i]<<" "
     << shapesParam3[i]<<" "
     << shapesParam4[i]<<std::endl;
-  
 }
 
 
@@ -239,17 +236,17 @@ void displayList()
 unsigned int checkAndReturnIndex(const std::string &shapeName)
 {
   unsigned int pos=0;
-  
+
   while ((pos < shapes2D.size()) && (shapes2D[pos] != shapeName))
-    pos++;
-  
+  pos++;
+
   if (pos == shapes2D.size())
   {
     trace.error() << "The specified shape has not found.";
     trace.info()<<std::endl;
     exit(1);
   }
-  
+
   return pos;
 }
 
@@ -273,30 +270,28 @@ estimateGeometry(Shape& s,
                  std::vector<Point>& points,
                  std::vector<Point>& tangents,
                  std::vector<Quantity>& curvatures) {
-  
+
   typedef typename Range::ConstIterator ConstIterator;
-  for (ConstIterator i = r.begin(); i != r.end(); ++i) {
+  for (ConstIterator i = r.begin(); i != r.end(); ++i)
+  {
     Point p( *i );
     p *= h;
     points.push_back(p);
   }
-  
+
   typedef typename Range::ConstCirculator ConstCirculator;
-  
+
   typedef ParametricShapeTangentFunctor< Shape > TangentFunctor;
   TrueLocalEstimatorOnPoints< ConstCirculator, Shape, TangentFunctor >
   trueTangentEstimator;
-  trueTangentEstimator.attach(&s);
-  trueTangentEstimator.init( h, r.c(), r.c());
-  trueTangentEstimator.eval(r.c(), r.c(), std::back_inserter(tangents) );
-  
+  trueTangentEstimator.attach( s );
+  trueTangentEstimator.eval( r.c(), r.c(), std::back_inserter(tangents), h );
+
   typedef ParametricShapeCurvatureFunctor< Shape > CurvatureFunctor;
   TrueLocalEstimatorOnPoints< ConstCirculator, Shape, CurvatureFunctor >
   trueCurvatureEstimator;
-  trueCurvatureEstimator.attach(&s);
-  trueCurvatureEstimator.init( h, r.c(), r.c());
-  trueCurvatureEstimator.eval(r.c(), r.c(), std::back_inserter(curvatures) );
-  
+  trueCurvatureEstimator.attach( s );
+  trueCurvatureEstimator.eval( r.c(), r.c(), std::back_inserter(curvatures), h );
 }
 
 template <typename Space, typename Shape>
@@ -306,7 +301,7 @@ generateContour(
                 double h,
                 const std::string & outputFormat,
                 bool withGeom,
-                const std::string & outputFileName  )
+                const std::string & outputFileName )
 {
   // Types
   typedef typename Space::Point Point;
@@ -319,7 +314,7 @@ generateContour(
   typedef typename GridCurve<KSpace>::PointsRange Range;
   typedef typename Range::ConstIterator ConstIteratorOnPoints;
   typedef typename GridCurve<KSpace>::MidPointsRange MidPointsRange;
-  
+
   // Digitizer
   GaussDigitizer<Space,Shape> dig;
   dig.attach( aShape ); // attaches the shape.
@@ -335,7 +330,8 @@ generateContour(
     << " error in creating KSpace." << std::endl;
     return false;
   }
-  try {
+  try
+  {
     // Extracts shape boundary
     SurfelAdjacency<KSpace::dimension> SAdj( true );
     SCell bel = Surfaces<KSpace>::findABel( K, dig, 10000 );
@@ -347,10 +343,9 @@ generateContour(
     gridcurve.initFromVector( points );
     // gridcurve contains the digital boundary to analyze.
     Range r = gridcurve.getPointsRange(); //building range
-    
+
     if ( outputFormat == "pts" )
     {
-      
       for ( ConstIteratorOnPoints it = r.begin(), it_end = r.end();
            it != it_end; ++it )
       {
@@ -393,25 +388,27 @@ generateContour(
       s << outputFileName << ".geom";
       std::ofstream outstream(s.str().c_str()); //output stream
       if (!outstream.is_open()) return false;
-      else {
+      else
+      {
         outstream << "# " << outputFileName << std::endl;
         outstream << "# Pointel (x,y), Midpoint of the following linel (x',y')" << std::endl;
         outstream << "# id x y tangentx tangenty curvaturexy"
         << " x' y' tangentx' tangenty' curvaturex'y'" << std::endl;
-        
+
         std::vector<RealPoint> truePoints, truePoints2;
         std::vector<RealPoint> trueTangents, trueTangents2;
         std::vector<double> trueCurvatures, trueCurvatures2;
-        
+
         estimateGeometry<Shape, Range, RealPoint, double>
         (aShape, h, r, truePoints, trueTangents, trueCurvatures);
-        
+
         estimateGeometry<Shape, MidPointsRange, RealPoint, double>
         (aShape, h, gridcurve.getMidPointsRange(), truePoints2, trueTangents2, trueCurvatures2);
-        
-        
+
+
         unsigned int n = (unsigned int)r.size();
-        for (unsigned int i = 0; i < n; ++i ) {
+        for (unsigned int i = 0; i < n; ++i )
+        {
           outstream << std::setprecision( 15 ) << i
           << " " << truePoints[ i ][ 0 ]
           << " " << truePoints[ i ][ 1 ]
@@ -425,13 +422,12 @@ generateContour(
           << " " << trueCurvatures2[ i ]
           << std::endl;
         }
-        
       }
       outstream.close();
     }
-    
+
     /////////////////
-    
+
   }
   catch ( InputException e )
   {
@@ -511,7 +507,7 @@ int main( int argc, char** argv )
   
   //We check that the shape is known
   unsigned int id = checkAndReturnIndex(shapeName);
-  
+
   // standard types
   typedef Z2i::Space Space;
   typedef Space::RealPoint RealPoint;
@@ -524,14 +520,14 @@ int main( int argc, char** argv )
     Ball2D<Space> ball(Z2i::Point(0,0), radius);
     generateContour<Space>( ball, h, outputFormat, withGeom, outputFileName );
   }
-  else if (id ==1)
+  else if (id == 1)
   {
     //if (widthOpt->count()==0) missingParam("--width");
     ImplicitHyperCube<Space> object(Z2i::Point(0,0), width/2);
     trace.error()<< "Not available.";
     trace.info()<<std::endl;
   }
-  else if (id ==2)
+  else if (id == 2)
   {
     //if (powerOpt->count()==0) missingParam("--power");
     if (radiusOpt->count()==0) missingParam("--radius");
@@ -539,33 +535,33 @@ int main( int argc, char** argv )
     trace.error()<< "Not available.";
     trace.info()<<std::endl;
   }
-  else if (id ==3)
+  else if (id == 3)
   {
     //if (varsmallradiusOpt->count()==0) missingParam("--varsmallradius");
     if (radiusOpt->count()==0) missingParam("--radius");
     //if (kOpt->count()==0) missingParam("--k");
     //if (phiOpt->count()==0) missingParam("--phi");
     Flower2D<Space> flower( center, radius, varsmallradius, k, phi );
-    generateContour<Space>( flower, h, outputFormat, withGeom, outputFileName  );
+    generateContour<Space>( flower, h, outputFormat, withGeom, outputFileName );
   }
-  else if (id ==4)
+  else if (id == 4)
   {
     if (radiusOpt->count()==0) missingParam("--radius");
     //if (kOpt->count()==0) missingParam("--k");
     //if (phiOpt->count()==0) missingParam("--phi");
     NGon2D<Space> object( center, radius, k, phi );
-    generateContour<Space>( object, h, outputFormat, withGeom, outputFileName  );
+    generateContour<Space>( object, h, outputFormat, withGeom, outputFileName );
   }
-  else if (id ==5)
+  else if (id == 5)
   {
     //if (varsmallradiusOpt->count()==0) missingParam("--varsmallradius");
     if (radiusOpt->count()==0) missingParam("--radius");
     //if (kOpt->count()==0) missingParam("--k");
     //if (phiOpt->count()==0) missingParam("--phi");
     AccFlower2D<Space> accflower( center, radius, varsmallradius, k, phi );
-    generateContour<Space>( accflower, h, outputFormat, withGeom, outputFileName  );
+    generateContour<Space>( accflower, h, outputFormat, withGeom, outputFileName );
   }
-  else if (id ==6)
+  else if (id == 6)
   {
     if (axis1Opt->count()==0) missingParam("--axis1");
     if (axis2Opt->count()==0) missingParam("--axis2");
