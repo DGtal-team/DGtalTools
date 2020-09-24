@@ -66,7 +66,7 @@ before_script:
   fi
 - if [ $CONFIG == "Debug,QGLVIEWER" AND  $TRAVIS_OS_NAME == linux  ]; then export
   DGTALTYPE="-DBUILD_EXAMPLES=OFF -DDGTAL_BUILD_TESTING=OFF -DCMAKE_BUILD_TYPE=Debug
-  -DWITH_QGLVIEWER=true  -DWITH_ITK=false -DWITH_EIGEN=true -DEIGEN3_INCLUDE_DIR='$EIGEN_ROOT/include/eigen3'";
+  -DWITH_QGLVIEWER=true  -DWITH_ITK=false -DWITH_EIGEN=true -DWITH_QT5=true -DEIGEN3_INCLUDE_DIR='$EIGEN_ROOT/include/eigen3'";
   fi
 - cd $SRC_DIR
 - git clone --depth=1 git://github.com/DGtal-team/DGtal.git
