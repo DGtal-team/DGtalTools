@@ -1048,10 +1048,6 @@ int main( int argc, char** argv )
     //if (kOpt->count()==0) missingParam("--k");
     //if (phiOpt->count()==0) missingParam("--phi");
     //if (!(vm.count("kernelradius"))) missingParam("--kernelradius");
-    double radius = vm["radius"].as<double>();
-    double varsmallradius = vm["varsmallradius"].as<double>();
-    unsigned int k = vm["k"].as<unsigned int>();
-    double phi = vm["phi"].as<double>();
 
     Flower2D<Space> flower( center, radius, varsmallradius, k, phi );
     computeLocalEstimations<Space>( filename, flower, h, optII, options, properties, outShape, noiseLevel );
@@ -1073,11 +1069,7 @@ int main( int argc, char** argv )
     //if (kOpt->count()==0) missingParam("--k");
     //if (phiOpt->count()==0) missingParam("--phi");
     //if (!(vm.count("kernelradius"))) missingParam("--kernelradius");
-    double radius = vm["radius"].as<double>();
-    double varsmallradius = vm["varsmallradius"].as<double>();
-    unsigned int k = vm["k"].as<unsigned int>();
-    double phi = vm["phi"].as<double>();
-
+    
     AccFlower2D<Space> accflower( center, radius, varsmallradius, k, phi );
     computeLocalEstimations<Space>( filename, accflower, h, optII, options, properties, outShape, noiseLevel );
   }
@@ -1087,11 +1079,9 @@ int main( int argc, char** argv )
     if (axis2Opt->count()==0) missingParam("--axis2");
     //if (phiOpt->count()==0) missingParam("--phi");
     //if (!(vm.count("kernelradius"))) missingParam("--kernelradius");
-    double a1 = vm["axis1"].as<double>();
-    double a2 = vm["axis2"].as<double>();
-    double phi = vm["phi"].as<double>();
 
-    Ellipse2D<Space> ellipse( center, a1, a2, phi );
+
+    Ellipse2D<Space> ellipse( center, axis1, axis2, phi );
     computeLocalEstimations<Space>( filename, ellipse, h, optII, options, properties, outShape, noiseLevel );
   }
 }
