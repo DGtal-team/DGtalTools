@@ -332,8 +332,7 @@ estimation( Estimator & estimator, double h,
 {
   Clock c;
   c.startClock();
-  estimator.init( h, itb, ite );
-  estimator.eval( itb, ite, ito );
+  estimator.eval( itb, ite, ito, h );
   double time = c.stopClock();
   std::cout << "# Time: " << time << std::endl;
 }
@@ -384,7 +383,7 @@ unsigned int suggestedSizeIntegralInvariant( const double h,
 template <typename Space, typename Shape>
 bool
 computeLocalEstimations( const std::string & filename,
-                         Shape * aShape,
+                         const Shape& aShape,
                          const double & h,
                          struct OptionsIntegralInvariant< Z2i::RealPoint > optionsII,
                          const std::string & options,
@@ -413,9 +412,9 @@ computeLocalEstimations( const std::string & filename,
 
   // Digitizer
   Digitizer* dig = new Digitizer();
-  dig->attach( *aShape ); // attaches the shape.
+  dig->attach( aShape ); // attaches the shape.
   Vector vlow(-1,-1); Vector vup(1,1);
-  dig->init( aShape->getLowerBound()+vlow, aShape->getUpperBound()+vup, h );
+  dig->init( aShape.getLowerBound()+vlow, aShape.getUpperBound()+vup, h );
   Domain domain = dig->getDomain();
 
   //Noise
@@ -1021,10 +1020,9 @@ int main( int argc, char** argv )
   {
     if (radiusOpt->count()==0) missingParam("--radius");
     //if (!(vm.count("kernelradius"))) missingParam("--kernelradius");
-    
-    Ball2D<Space> * ball = new Ball2D<Space>( center, radius);
+
+    Ball2D<Space> ball( center, radius );
     computeLocalEstimations<Space>( filename, ball, h, optII, options, properties, outShape, noiseLevel );
-    delete ball;
   }
   else if (id ==1)
   {
@@ -1050,10 +1048,9 @@ int main( int argc, char** argv )
     //if (kOpt->count()==0) missingParam("--k");
     //if (phiOpt->count()==0) missingParam("--phi");
     //if (!(vm.count("kernelradius"))) missingParam("--kernelradius");
-    
-    Flower2D<Space> * flower = new Flower2D<Space>( center, radius, varsmallradius, k, phi );
+
+    Flower2D<Space> flower( center, radius, varsmallradius, k, phi );
     computeLocalEstimations<Space>( filename, flower, h, optII, options, properties, outShape, noiseLevel );
-    delete flower;
   }
   else if (id ==4)
   {
@@ -1061,10 +1058,9 @@ int main( int argc, char** argv )
     //if (kOpt->count()==0) missingParam("--k");
     //if (phiOpt->count()==0) missingParam("--phi");
     //if (!(vm.count("kernelradius"))) missingParam("--kernelradius");
-    
-    NGon2D<Space> * object = new NGon2D<Space>( center, radius, k, phi );
+
+    NGon2D<Space> object( center, radius, k, phi );
     computeLocalEstimations<Space>( filename, object, h, optII, options, properties, outShape, noiseLevel );
-    delete object;
   }
   else if (id ==5)
   {
@@ -1073,10 +1069,9 @@ int main( int argc, char** argv )
     //if (kOpt->count()==0) missingParam("--k");
     //if (phiOpt->count()==0) missingParam("--phi");
     //if (!(vm.count("kernelradius"))) missingParam("--kernelradius");
-  
-    AccFlower2D<Space> * accflower = new AccFlower2D<Space>( center, radius, varsmallradius, k, phi );
+    
+    AccFlower2D<Space> accflower( center, radius, varsmallradius, k, phi );
     computeLocalEstimations<Space>( filename, accflower, h, optII, options, properties, outShape, noiseLevel );
-    delete accflower;
   }
   else if (id ==6)
   {
@@ -1084,9 +1079,9 @@ int main( int argc, char** argv )
     if (axis2Opt->count()==0) missingParam("--axis2");
     //if (phiOpt->count()==0) missingParam("--phi");
     //if (!(vm.count("kernelradius"))) missingParam("--kernelradius");
-    
-    Ellipse2D<Space> * ellipse = new Ellipse2D<Space>( center, axis1, axis2, phi );
+
+
+    Ellipse2D<Space> ellipse( center, axis1, axis2, phi );
     computeLocalEstimations<Space>( filename, ellipse, h, optII, options, properties, outShape, noiseLevel );
-    delete ellipse;
   }
 }
