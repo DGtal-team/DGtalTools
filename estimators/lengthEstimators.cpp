@@ -67,7 +67,6 @@
 #include "DGtal/geometry/curves/estimation/FPLengthEstimator.h"
 #include "DGtal/geometry/curves/estimation/DSSLengthEstimator.h"
 
-
 using namespace DGtal;
 
 
@@ -104,32 +103,32 @@ It will output length estimations (and timings) using several algorithms for dec
 
  The list of 2D shape are :
   -ball	Ball for the Euclidean metric.
-       	Required parameter(s): --radius [-R]   
+       	Required parameter(s): --radius [-R]
   - square	square (no signature).
-		Required parameter(s): --width [-w]   
+    Required parameter(s): --width [-w]
   - lpball	Ball for the l_power metric (no signature).
-		Required parameter(s): --radius [-R], --power [-p]  
+    Required parameter(s): --radius [-R], --power [-p]
   - flower	Flower with k petals.
-		Required parameter(s): --radius [-R], --varsmallradius [-v], --k [-k], --phi
+    Required parameter(s): --radius [-R], --varsmallradius [-v], --k [-k], --phi
   - ngon	Regular k-gon.
-		Required parameter(s): --radius [-R], --k [-k], --phi 
+    Required parameter(s): --radius [-R], --k [-k], --phi 
   - accflower	Accelerated Flower with k petals.
-		Required parameter(s): --radius [-R], --varsmallradius [-v], --k [-k], --phi
+    Required parameter(s): --radius [-R], --varsmallradius [-v], --k [-k], --phi
   - ellipse	Ellipse.
-		Required parameter(s): --axis1 [-A], --axis2 [-a], --phi 
+    Required parameter(s): --axis1 [-A], --axis2 [-a], --phi 
 
  @b Example: 
 
 Application of the multigrid length estimation on a flower shape with 5 petals and maximal radius 20 and min 5: 
 @code
-$ lengthEstimators -s flower -k 5 -R 20 -r 5  --steps 256 > length.dat 
+$ lengthEstimators -s flower -k 5 -R 20 -r 5 --steps 256 > length.dat 
 @endcode
 
 You can display using gnuplot:
 
 @code
 $ gnuplot 
-gnuplot> plot [0:][-0.5: 90] 'length.dat' using 1:(($7-$3)*($7-$3)) w l title  "squared error length estimation using DSS", 'length.dat' using 1:(($8-$3)*($8-$3)) w l title  "squared error length estimation using MLP", 'length.dat' using  1:(($9-$3)*($9-$3)) w l title  "squared error length estimation using FP" linewidth 2
+gnuplot> plot [0:][-0.5: 90] 'length.dat' using 1:(($7-$3)*($7-$3)) w l title "squared error length estimation using DSS", 'length.dat' using 1:(($8-$3)*($8-$3)) w l title "squared error length estimation using MLP", 'length.dat' using 1:(($9-$3)*($9-$3)) w l title "squared error length estimation using FP" linewidth 2
 @endcode
 
 
@@ -174,14 +173,14 @@ void createList()
   shapesParam2.push_back("");
   shapesParam3.push_back("");
   shapesParam4.push_back("");
-  
+
   shapes2D.push_back("lpball");
   shapesDesc.push_back("Ball for the l_power metric (no signature).");
   shapesParam1.push_back("--radius [-R],");
   shapesParam2.push_back("--power [-p]");
   shapesParam3.push_back("");
   shapesParam4.push_back("");
-  
+
   shapes2D.push_back("flower");
   shapesDesc.push_back("Flower with k petals.");
   shapesParam1.push_back("--radius [-R],");
@@ -222,12 +221,12 @@ void displayList()
   trace.emphase()<<"2D Shapes:"<<std::endl;
   for(unsigned int i=0; i<shapes2D.size(); ++i)
     trace.info()<<"\t"<<shapes2D[i]<<"\t"
-    <<shapesDesc[i]<<std::endl
-    <<"\t\tRequired parameter(s): "
+    << shapesDesc[i]<<std::endl
+    << "\t\tRequired parameter(s): "
     << shapesParam1[i]<<" "
-          << shapesParam2[i]<<" "
-          << shapesParam3[i]<<" "
-          << shapesParam4[i]<<std::endl;
+    << shapesParam2[i]<<" "
+    << shapesParam3[i]<<" "
+    << shapesParam4[i]<<std::endl;
   
 }
 
@@ -243,17 +242,17 @@ void displayList()
 unsigned int checkAndRetrunIndex(const std::string &shapeName)
 {
   unsigned int pos=0;
-  
+
   while ((pos < shapes2D.size()) && (shapes2D[pos] != shapeName))
     pos++;
-  
+
   if (pos == shapes2D.size())
     {
       trace.error() << "The specified shape has not found.";
       trace.info()<<std::endl;
       exit(1);
     }
-  
+
   return pos;
 }
 
@@ -287,7 +286,7 @@ lengthEstimators( const std::string & /*name*/,
   typedef typename GridCurve<KSpace>::ArrowsRange ArrowsRange;
 
   // Digitizer
-  GaussDigitizer<Space,Shape> dig;  
+  GaussDigitizer<Space,Shape> dig;
   dig.attach( aShape ); // attaches the shape.
   Vector vlow(-1,-1); Vector vup(1,1);
   dig.init( aShape.getLowerBound()+vlow, aShape.getUpperBound()+vup, h ); 
@@ -297,12 +296,13 @@ lengthEstimators( const std::string & /*name*/,
   KSpace K;
   bool ok = K.init( dig.getLowerBound(), dig.getUpperBound(), true );
   if ( ! ok )
-    {
-      std::cerr << "[lengthEstimators]"
+  {
+    std::cerr << "[lengthEstimators]"
     << " error in creating KSpace." << std::endl;
-      return false;
-    }
-  try {
+    return false;
+  }
+  try
+  {
     // Extracts shape boundary
     SurfelAdjacency<KSpace::dimension> SAdj( true );
     SCell bel = Surfaces<KSpace>::findABel( K, dig, 10000 );
@@ -316,20 +316,19 @@ lengthEstimators( const std::string & /*name*/,
     ArrowsRange ra = gridcurve.getArrowsRange(); 
     PointsRange rp = gridcurve.getPointsRange(); 
 
-
     // Estimations
     typedef typename PointsRange::ConstIterator ConstIteratorOnPoints; 
     typedef ParametricShapeArcLengthFunctor< Shape > Length;
     TrueGlobalEstimatorOnPoints< ConstIteratorOnPoints, Shape, Length  >  trueLengthEstimator;
-    trueLengthEstimator.init( h, rp.begin(), rp.end(), &aShape, gridcurve.isClosed());
+    trueLengthEstimator.attach( aShape );
 
-    L1LengthEstimator< typename ArrowsRange::ConstCirculator > l1length;
+    L1LengthEstimator< typename PointsRange::ConstCirculator > l1length;
     DSSLengthEstimator< typename PointsRange::ConstCirculator > DSSlength;
-    MLPLengthEstimator< typename PointsRange::ConstIterator > MLPlength;
-    FPLengthEstimator< typename PointsRange::ConstIterator > FPlength;
-    BLUELocalLengthEstimator< typename ArrowsRange::ConstIterator > BLUElength;
-    RosenProffittLocalLengthEstimator< typename ArrowsRange::ConstIterator > RosenProffittlength;
-  
+    MLPLengthEstimator< typename PointsRange::ConstCirculator > MLPlength;
+    FPLengthEstimator< typename PointsRange::ConstCirculator > FPlength;
+    BLUELocalLengthEstimator< typename ArrowsRange::ConstCirculator > BLUElength;
+    RosenProffittLocalLengthEstimator< typename ArrowsRange::ConstCirculator > RosenProffittlength;
+
     // Output
     double trueValue = trueLengthEstimator.eval();
     double l1, blue, rosen,dss,mlp,fp;
@@ -339,57 +338,51 @@ lengthEstimators( const std::string & /*name*/,
 
     //Length evaluation & timing
     c.startClock();
-    l1length.init(h, ra.c(), ra.c());
-    l1 = l1length.eval();
+    l1 = l1length.eval( rp.c(), rp.c(), h );
     Tl1 = c.stopClock();
-    
+
     c.startClock();
-    BLUElength.init(h, ra.begin(), ra.end(), gridcurve.isClosed());
-    blue = BLUElength.eval();
+    blue = BLUElength.eval( ra.c(), ra.c(), h );
     Tblue = c.stopClock();
-    
+
     c.startClock();
-    RosenProffittlength.init(h, ra.begin(), ra.end(), gridcurve.isClosed());
-    rosen = RosenProffittlength.eval();
+    rosen = RosenProffittlength.eval( ra.c(), ra.c(), h );
     Trosen = c.stopClock();
-    
+
     c.startClock();
-    DSSlength.init(h, rp.c(), rp.c());
-    dss = DSSlength.eval();
+    dss = DSSlength.eval( rp.c(), rp.c(), h );
     Tdss = c.stopClock();
-    
+
     c.startClock();
-    MLPlength.init(h, rp.begin(), rp.end(), gridcurve.isClosed());
-    mlp = MLPlength.eval();
+    mlp = MLPlength.eval( rp.c(), rp.c(), h );
     Tmlp = c.stopClock();
 
     c.startClock();
-    FPlength.init(h, rp.begin(), rp.end(), gridcurve.isClosed());
-    fp = FPlength.eval();
+    fp = FPlength.eval( rp.c(), rp.c(), h );
     Tfp = c.stopClock();
 
     std::cout << std::setprecision( 15 ) << h << " " << rp.size() << " " << trueValue 
-   << " " << l1
-   << " " << blue
-   << " " << rosen
-   << " " << dss
-   << " " << mlp   
-   << " " << fp
-         << " " << Tl1
-   << " " << Tblue
-   << " " << Trosen
-   << " " << Tdss
-   << " " << Tmlp
-   << " " << Tfp     
-   << std::endl;
+    << " " << l1
+    << " " << blue
+    << " " << rosen
+    << " " << dss
+    << " " << mlp
+    << " " << fp
+    << " " << Tl1
+    << " " << Tblue
+    << " " << Trosen
+    << " " << Tdss
+    << " " << Tmlp
+    << " " << Tfp
+    << std::endl;
     return true;
-  }    
+  }
   catch ( InputException e )
-    {
-      std::cerr << "[lengthEstimators]"
-    << " error in finding a bel." << std::endl;
-      return false;
-    }
+  {
+    std::cerr << "[lengthEstimators]"
+     << " error in finding a bel." << std::endl;
+    return false;
+  }
 }
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -447,9 +440,9 @@ int main( int argc, char** argv )
 ///////////////////////////////////
   std::cout << "#h nbPoints true-length L1 BLUE RosenProffit "
        << "DSS MLP FP Time-L1 Time-BLUE Time-RosenProffitt "
-       << "Time-DSS Time-MLP Time-FP" <<std::endl;
-  std::cout << "# timings are given in msec." <<std::endl;
-  
+       << "Time-DSS Time-MLP Time-FP" << std::endl;
+  std::cout << "# timings are given in msec." << std::endl;
+
   double h = 1; 
   double step = exp( log(hMin) / (double)nbSteps);
   while (h > hMin) {
@@ -528,9 +521,8 @@ int main( int argc, char** argv )
             
             Ellipse2D<Z2i::Space> ell(Z2i::Point(0,0), axis1, axis2,phi);
 
-            lengthEstimators<Ellipse2D<Z2i::Space>,Z2i::Space>("Ellipse",ell,h); 
-
-          } 
+      lengthEstimators<Ellipse2D<Z2i::Space>,Z2i::Space>("Ellipse",ell,h); 
+    } 
 
     h = h * step;
   }
