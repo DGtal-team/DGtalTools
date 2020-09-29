@@ -33,15 +33,14 @@
 #include <DGtal/images/Image.h>
 #include <DGtal/images/ImageContainerBySTLVector.h>
 
-#include <boost/program_options/options_description.hpp>
-#include <boost/program_options/parsers.hpp>
-#include <boost/program_options/variables_map.hpp>
+#include "CLI11.hpp"
+
 
 using namespace std;
 using namespace DGtal;
 using namespace Z3i;
 
-namespace po = boost::program_options;
+
 
 /**
  @page raw2HDF5 raw2HDF5
@@ -52,12 +51,17 @@ namespace po = boost::program_options;
 @b Allowed @b options @b are:
 
 @code
-  -h [ --help ]             display this message
-  -i [ --input ] arg        Input raw file.
-  -o [ --output ] arg       Output HDF5 filename.
-  -x [ --x ] arg            x extent.
-  -y [ --y ] arg            y extent.
-  -z [ --z ] arg            z extent.
+
+Positionals:
+  1 TEXT:FILE REQUIRED                  Input raw file.
+
+Options:
+  -h,--help                             Print this help message and exit
+  -i,--input TEXT:FILE REQUIRED         Input raw file.
+  -o,--output TEXT=result.hdf5           Output hdf5 filename.
+  --x UINT REQUIRED                     x extent.
+  --y UINT REQUIRED                     y extent.
+  --z UINT REQUIRED                     z extent.
 
 @endcode
 
@@ -87,58 +91,43 @@ void missingParam ( std::string param )
 int main(int argc, char**argv)
 {
 
-  // parse command line ----------------------------------------------
-  po::options_description general_opt ( "Allowed options are: " );
-  general_opt.add_options()
-    ( "help,h", "display this message." )
-    ( "input,i", po::value<std::string>(), "Input raw file." )
-    ( "output,o", po::value<string>(),"Output HDF5 filename." )
-    ( "x,x", po::value<unsigned int>(),"x extent." )
-    ( "y,y", po::value<unsigned int >(),"y extent." )
-    ( "z,z", po::value<unsigned int>(),"z extent." );
-  
-  bool parseOK=true;
-  po::variables_map vm;
-  try{
-    po::store(po::parse_command_line(argc, argv, general_opt), vm);  
-  }catch(const std::exception& ex){
-    parseOK=false;
-    trace.info()<< "Error checking program options: "<< ex.what()<< endl;
-  }
 
-  po::notify ( vm );
-  if (!parseOK || vm.count ( "help" ) ||argc<=1 )
-    {
-      trace.info() << "Converts a 3D 8-bit raw file to HDF5."<<std::endl
-                   << std::endl << "Basic usage: "<<std::endl
-                   << "\traw2HDF5 -x 128 -y 128 -z 128 --input <RawFileName> --output <HDF5OutputFileName> "<<std::endl
-                   << general_opt << "\n";
-      return 0;
-    }
+// parse command line using CLI ----------------------------------------------
+  CLI::App app;
+  std::string inputFileName;
+  std::string outputFileName {"result.hdf5"};
+  unsigned int x, y, z;
+   
+  app.description("Converts a 3D 8-bit raw file to HDF5.\n Basic usage \n \traw2HDF5 -x 128 -y 128 -z 128 --input <RawFileName> --output <HDF5OutputFileName>");
+   
+  app.add_option("-i,--input,1", inputFileName, "Input raw file." )
+    ->required()
+    ->check(CLI::ExistingFile);
+   app.add_option("-o,--output,2",outputFileName,"Output hdf5 filename.", true);
+   app.add_option("--x,-x", x, "x extent." )
+   ->required();
+   app.add_option("--y,-y", y, "y extent." )
+     ->required();
+   app.add_option("--z,-z", z, "z extent." )
+     ->required(); 
+   
+  app.get_formatter()->column_width(40);
+  CLI11_PARSE(app, argc, argv);
+  // END parse command line using CLI ----------------------------------------------
 
-  //Parse options
-  if ( ! ( vm.count ( "input" ) ) ) missingParam ( "--input" );
-  std::string filename = vm["input"].as<std::string>();
-  if ( ! ( vm.count ( "output" ) ) ) missingParam ( "--output" );
-  std::string outputFileName = vm["output"].as<std::string>();
- if ( ! ( vm.count ( "x" ) ) ) missingParam ( "--x" );
-  unsigned int x =  vm["x"].as<unsigned int>();
- if ( ! ( vm.count ( "y" ) ) ) missingParam ( "--y" );
-  unsigned int y =  vm["y"].as<unsigned int>();
- if ( ! ( vm.count ( "z" ) ) ) missingParam ( "--z" );
-  unsigned int z =  vm["z"].as<unsigned int>();
- 
 
   typedef ImageContainerBySTLVector<Z3i::Domain, unsigned char>  MyImageC;
 
-  MyImageC  imageC = RawReader< MyImageC >::importRaw8 ( filename, Z3i::Vector(x,y,z) );
+  MyImageC  imageC = RawReader< MyImageC >::importRaw8 ( inputFileName, Z3i::Vector(x,y,z) );
   bool res =  HDF5Writer< MyImageC>::exportHDF5_3D(outputFileName, imageC, "/UInt8Array3D");
 
+
   if (res)
-    return 0;
+     return EXIT_SUCCESS;
   else 
     {
-      trace.error()<< "Error while exporting the HDF5 file."<<std::endl;
-      return 1;
+      trace.error()<< "Error while exporting the volume."<<std::endl;
+      return EXIT_FAILURE;
     }
+
 }

@@ -36,10 +36,7 @@
 #include <functional>
 #include <boost/format.hpp>
 
-#include <boost/program_options/options_description.hpp>
-#include <boost/program_options/parsers.hpp>
-#include <boost/program_options/variables_map.hpp>
-
+#include "CLI11.hpp"
 
 #include "DGtal/base/Common.h"
 #include "DGtal/helpers/StdDefs.h"
@@ -114,33 +111,30 @@ For more details, see \ref moduleAT
 \b Allowed \b options \b are:
 
 \code
-  -h [ --help ]                         display this message
-  -i [ --input ] arg                    the input image PPM filename.
-  -m [ --inpainting-mask ] arg          the input inpainting mask filename.
-  -o [ --output ] arg (=AT)             the output image basename.
-  -l [ --lambda ] arg                   the parameter lambda.
-  -1 [ --lambda-1 ] arg (=0.3125)       the initial parameter lambda (l1).
-  -2 [ --lambda-2 ] arg (=0.0005)       the final parameter lambda (l2).
-  -q [ --lambda-ratio ] arg (=1.414213) the division ratio for lambda from l1 
-                                        to l2.
-  -a [ --alpha ] arg (=1)               the parameter alpha.
-  -e [ --epsilon ] arg                  the initial and final parameter epsilon
-                                        of AT functional at the same time.
-  --epsilon-1 arg (=2)                  the initial parameter epsilon.
-  --epsilon-2 arg (=0.25)               the final parameter epsilon.
-  --epsilon-r arg (=2)                  sets the ratio between two consecutive 
-                                        epsilon values of AT functional.
-  -n [ --nbiter ] arg (=10)             the maximum number of iterations.
-  --image-snr arg                       the input image without deterioration 
-                                        if you wish to compute the SNR.
-  -p [ --pixel-size ] arg (=1)          the pixel size for outputing images 
-                                        (useful when one wants to see the 
-                                        discontinuities v on top of u).
-  -c [ --color-v ] arg (=0xff0000)      the color chosen for displaying the 
-                                        singularities v (e.g. red is 0xff0000).
-  -v [ --verbose ] arg (=0)             the verbose level (0: silent, 1: less 
-                                        silent, etc).
-\endcode
+ 
+ Positionals:
+   1 TEXT:FILE REQUIRED                  the input image PPM filename.
+
+ Options:
+   -h,--help                             Print this help message and exit
+   -i,--input TEXT:FILE REQUIRED         the input image PPM filename.
+   -m,--inpainting-mask TEXT             the input inpainting mask filename.
+   -o,--output TEXT=AT                   the output image basename.
+   -l,--lambda FLOAT                     the parameter lambda.
+   -1,--lambda-1 FLOAT=0.3125            the initial parameter lambda (l1).
+   -2,--lambda-2 FLOAT=0.0005            the final parameter lambda (l2).
+   -q,--lambda-ratio FLOAT=1.41421       the division ratio for lambda from l1 to l2.
+   -a,--alpha FLOAT=1                    the parameter alpha.
+   -e,--epsilon                          the initial and final parameter epsilon of AT functional at the same time.
+   --epsilon-1 FLOAT=2                   the initial parameter epsilon.
+   --epsilon-2 FLOAT=0.25                the final parameter epsilon.
+   --epsilon-r FLOAT=2                   sets the ratio between two consecutive epsilon values of AT functional.
+   -n,--nbiter INT=10                    the maximum number of iterations.
+   --image-snr TEXT                      the input image without deterioration if you wish to compute the SNR.
+   -p,--pixel-size INT=1                 the pixel size for outputing images (useful when one wants to see the discontinuities v on top of u).
+   -c,--color-v TEXT=0xff0000            the color chosen for displaying the singularities v (e.g. red is 0xff0000).
+   -v,--verbose INT=0                    the verbose level (0: silent, 1: less silent, etc).
+ \endcode
 
 @b example:
 
@@ -197,82 +191,89 @@ int main( int argc, char* argv[] )
 {
   using namespace Z2i;
 
-  // parse command line ----------------------------------------------
-  namespace po = boost::program_options;
-  po::options_description general_opt("Allowed options are: ");
-  general_opt.add_options()
-    ("help,h", "display this message")
-    ("input,i", po::value<string>(), "the input image PPM filename." )
-    ("inpainting-mask,m", po::value<string>(), "the input inpainting mask filename." )
-    ("output,o", po::value<string>()->default_value( "AT" ), "the output image basename." )
-    ("lambda,l", po::value<double>(), "the parameter lambda." )
-    ("lambda-1,1", po::value<double>()->default_value( 0.3125 ), "the initial parameter lambda (l1)." )
-    ("lambda-2,2", po::value<double>()->default_value( 0.0005 ), "the final parameter lambda (l2)." )
-    ("lambda-ratio,q", po::value<double>()->default_value( sqrt(2) ), "the division ratio for lambda from l1 to l2." )
-    ("alpha,a", po::value<double>()->default_value( 1.0 ), "the parameter alpha." )
-    ("epsilon,e", po::value<double>(), "the initial and final parameter epsilon of AT functional at the same time." )
-    ("epsilon-1", po::value<double>()->default_value( 2.0 ), "the initial parameter epsilon." )
-    ("epsilon-2", po::value<double>()->default_value( 0.25 ), "the final parameter epsilon." )
-    ("epsilon-r", po::value<double>()->default_value( 2.0 ), "sets the ratio between two consecutive epsilon values of AT functional." )
-    ("nbiter,n", po::value<int>()->default_value( 10 ), "the maximum number of iterations." )
-    ("image-snr", po::value<string>(), "the input image without deterioration if you wish to compute the SNR." )
-    ("pixel-size,p", po::value<int>()->default_value( 1 ), "the pixel size for outputing images (useful when one wants to see the discontinuities v on top of u)." )
-    ("color-v,c", po::value<string>()->default_value( "0xff0000" ), "the color chosen for displaying the singularities v (e.g. red is 0xff0000)." )
-    ("verbose,v", po::value<int>()->default_value( 0 ), "the verbose level (0: silent, 1: less silent, etc)." )
-    ;
 
-  bool parseOK=true;
-  po::variables_map vm;
-  try {
-    po::store(po::parse_command_line(argc, argv, general_opt), vm);
-  } catch ( const exception& ex ) {
-    parseOK = false;
-    cerr << "Error checking program options: "<< ex.what()<< endl;
-  }
-  po::notify(vm);
-  if ( ! parseOK || vm.count("help") || !vm.count("input") )
-    {
-      cerr << "Usage: " << argv[0] << " -i toto.pgm\n"
-           << "Computes the Ambrosio-Tortorelli reconstruction/segmentation of an input image."
-           << "It outputs 2 or 3 images (of basename given by option --output) giving the"
-           << " reconstructed image u, and other images superposing u and the discontinuities v."
-           << endl << endl
-           << " / "
-           << endl
-           << " | a.(u-g)^2 + v^2 |grad u|^2 + le.|grad v|^2 + (l/4e).(1-v)^2 "
-           << endl
-           << " / "
-           << endl
-           << "Discretized as (u 0-form, v 1-form, A vertex-edge bdry, B edge-face bdy)" << endl
-           << "E(u,v) = a(u-g)^t (u-g) +  u^t A^t diag(v)^2 A^t u + l e v^t (A A^t + B^t B) v + l/(4e) (1-v)^t (1-v)" << endl
-           << endl
-           << general_opt << "\n"
-           << "Example: ./at-u0-v1 -i ../Images/cerclesTriangle64b02.pgm -o tmp -a 0.05 -e 1 --lambda-1 0.1 --lambda-2 0.00001 -g"
-           << endl;
-      return 1;
-    }
-  string f1  = vm[ "input" ].as<string>();
-  string f2  = vm[ "output" ].as<string>();
-  double l1  = vm[ "lambda-1" ].as<double>();
-  double l2  = vm[ "lambda-2" ].as<double>();
-  double lr  = vm[ "lambda-ratio" ].as<double>();
-  if ( vm.count( "lambda" ) ) l1 = l2 = vm[ "lambda" ].as<double>();
+  // parse command line using CLI ----------------------------------------------
+  CLI::App app;
+  string f1;
+  string f2 {"AT"};
+  string inpainting_mask;
+  double l;
+  double l1 {0.3125};
+  double l2 {0.0005};
+  double lr {sqrt(2)};
+  double a   {1.0};
+  double epsilon;
+  
+  double e1  {2.0};
+  double e2 {0.25};
+  double er  {2.0};
+  int  verb  {0};
+  int nbiter = {10};
+  int pix_sz = {1};
+  string scv {"0xff0000"};
+  string isnr;
+  
+  
+  stringstream ssDescr;
+  ssDescr << "Computes a piecewise smooth approximation of a grey-level or color image, by optimizing the Ambrosio-Tortorelli functional (with u a 0-form and v a 1-form).";
+  ssDescr << "Usage: " << argv[0] << " -i toto.pgm\n"
+       << "Computes the Ambrosio-Tortorelli reconstruction/segmentation of an input image."
+       << "It outputs 2 or 3 images (of basename given by option --output) giving the"
+       << " reconstructed image u, and other images superposing u and the discontinuities v."
+       << endl << endl
+       << " / "
+       << endl
+       << " | a.(u-g)^2 + v^2 |grad u|^2 + le.|grad v|^2 + (l/4e).(1-v)^2 "
+       << endl
+       << " / "
+       << endl
+       << "Discretized as (u 0-form, v 1-form, A vertex-edge bdry, B edge-face bdy)" << endl
+       << "E(u,v) = a(u-g)^t (u-g) +  u^t A^t diag(v)^2 A^t u + l e v^t (A A^t + B^t B) v + l/(4e) (1-v)^t (1-v)" << endl
+       << endl
+       << "Example: ./at-u0-v1 -i ../Images/cerclesTriangle64b02.pgm -o tmp -a 0.05 -e 1 --lambda-1 0.1 --lambda-2 0.00001";
+  app.description(ssDescr.str());
+  
+  
+
+  app.add_option("-i,--input,1", f1, "the input image PPM filename." )
+      ->required()
+      ->check(CLI::ExistingFile);
+  app.add_option("--inpainting-mask,-m", inpainting_mask, "the input inpainting mask filename." );
+  app.add_option("--output,-o", f2, "the output image basename.", true);
+  auto lambdaOpt = app.add_option("--lambda,-l",l, "the parameter lambda.");
+  app.add_option("--lambda-1,-1",l1, "the initial parameter lambda (l1).", true);
+  app.add_option("--lambda-2,-2",l2, "the final parameter lambda (l2).", true );
+  app.add_option("--lambda-ratio,-q",lr,  "the division ratio for lambda from l1 to l2.", true);
+  app.add_option("--alpha,-a",a, "the parameter alpha.", true);
+  auto epsOpt = app.add_option("--epsilon,-e", "the initial and final parameter epsilon of AT functional at the same time.");
+
+  app.add_option("--epsilon-1",e1, "the initial parameter epsilon.", true);
+  app.add_option("--epsilon-2",e2, "the final parameter epsilon.", true);
+  app.add_option("--epsilon-r",er,  "sets the ratio between two consecutive epsilon values of AT functional.", true);
+  
+  app.add_option("--nbiter,-n",nbiter, "the maximum number of iterations.", true );
+  auto snrOpt = app.add_option("--image-snr", isnr, "the input image without deterioration if you wish to compute the SNR.");
+  app.add_option("--pixel-size,-p", pix_sz, "the pixel size for outputing images (useful when one wants to see the discontinuities v on top of u).", true);
+  app.add_option("--color-v,-c",scv, "the color chosen for displaying the singularities v (e.g. red is 0xff0000).", true );
+  app.add_option("--verbose,-v", verb, "the verbose level (0: silent, 1: less silent, etc).", true );
+  
+  app.get_formatter()->column_width(40);
+  CLI11_PARSE(app, argc, argv);
+  // END parse command line using CLI ----------------------------------------------
+
+
+
+  Color color_v( (unsigned int) std::stoul( scv, nullptr, 16 ), 255 );
+  if ( lambdaOpt->count()) l1 = l2 = l;
   if ( l2 > l1 ) l2 = l1;
   if ( lr <= 1.0 ) lr = sqrt(2);
-  double a   = vm[ "alpha" ].as<double>();
-  double e1  = vm[ "epsilon-1" ].as<double>();
-  double e2  = vm[ "epsilon-2" ].as<double>();
-  if ( vm.count( "epsilon" ) )
-    e1 = e2 =  vm[ "epsilon" ].as<double>();
-  double er  = vm[ "epsilon-r" ].as<double>();
-  int  verb  = vm[ "verbose" ].as<int>();
-  int nbiter = vm[ "nbiter" ].as<int>();
-  int pix_sz = vm[ "pixel-size" ].as<int>();
-  string scv = vm[ "color-v" ].as<string>();
-  bool snr   = vm.count( "image-snr" );
-  string isnr= snr ? vm[ "image-snr" ].as<string>() : "";
-  Color color_v( (unsigned int) std::stoul( scv, nullptr, 16 ), 255 );
+  if ( epsOpt->count() > 0 ){
+    e1 = e2 =  epsilon;
 
+  }
+  bool snr   = snrOpt->count() > 0;
+
+  
   bool color_image = f1.size() > 4 && f1.compare( f1.size() - 4, 4, ".ppm" ) == 0;
   bool grey_image  = f1.size() > 4 && f1.compare( f1.size() - 4, 4, ".pgm" ) == 0;
   if ( ! color_image && ! grey_image ) 
@@ -343,9 +344,9 @@ int main( int argc, char* argv[] )
   AT.setUFromInput();
   double g_snr = snr ? AT.computeSNR() : 0.0;
 
-  if ( vm.count( "inpainting-mask" ) )
+  if ( inpainting_mask.size() > 0 )
     {
-      string fm  = vm[ "inpainting-mask" ].as<string>();
+      string fm  = inpainting_mask;
       trace.beginBlock("Reading inpainting mask");
       GreyLevelImage mask = GenericReader<GreyLevelImage>::import( fm );
       trace.endBlock();

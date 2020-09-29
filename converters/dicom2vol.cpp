@@ -36,9 +36,9 @@
 #include "DGtal/io/writers/GenericWriter.h"
 #include "DGtal/io/readers/DicomReader.h"
 
-#include <boost/program_options/options_description.hpp>
-#include <boost/program_options/parsers.hpp>
-#include <boost/program_options/variables_map.hpp>
+
+#include "CLI11.hpp"
+
 
 using namespace std;
 using namespace DGtal;
@@ -53,16 +53,20 @@ using namespace DGtal;
 @b Allowed @b options @b are:
 
 @code
-  -h [ --help ]           display this message
-  -i [ --input ] arg      dicom image  (.dcm) 
-  -o [ --output ] arg     volumetric file (.vol, .longvol .pgm3d) 
-  --dicomMin arg (=-1000) set minimum density threshold on Hounsfield scale
-  --dicomMax arg (=3000)  set maximum density threshold on Hounsfield scale
+Positionals:
+  1 TEXT:FILE REQUIRED                  dicom image  (.dcm).
+
+Options:
+  -h,--help                             Print this help message and exit
+  -i,--input TEXT:FILE REQUIRED         dicom image  (.dcm).
+  -o,--output TEXT                      volumetric file (.vol, .longvol .pgm3d, .raw)
+  --dicomMin INT                        set minimum density threshold on Hounsfield scale
+  --dicomMax INT                        set maximum density threshold on Hounsfield scale
 @endcode
 
 @b Example:
 @code  
-$ dicom2vol -i ${DGtal}/tests/samples/dicomSample/1629.dcm --dicomMin -500 --dicomMax -100 -o sample.vol
+$  dicom2vol -i ${DGtal}/tests/samples/dicomSample/1629.dcm --dicomMin 0 --dicomMax 300 -o sample.vol
 @endcode
 
 @see dicom2vol.cpp
@@ -70,68 +74,41 @@ $ dicom2vol -i ${DGtal}/tests/samples/dicomSample/1629.dcm --dicomMin -500 --dic
 */
 
 
-///////////////////////////////////////////////////////////////////////////////
-namespace po = boost::program_options;
 
 int main( int argc, char** argv )
 {
   typedef ImageContainerBySTLVector < Z3i::Domain, unsigned char > Image3D;
+  
+   // parse command line using CLI ----------------------------------------------
+   CLI::App app;
+   std::string inputFileName;
+   std::string outputFileName {"result.raw"};
+   DGtal::int64_t dicomMin {-1000};
+   DGtal::int64_t dicomMax {3000};
 
-  
-  // parse command line ----------------------------------------------
-  po::options_description general_opt("Allowed options are: ");
-  general_opt.add_options()
-    ("help,h", "display this message")
-    ("input,i", po::value<std::string>(), "dicom image  (.dcm) " )
-    ("output,o", po::value<std::string>(), "volumetric file (.vol, .longvol .pgm3d) " )
-    ("dicomMin", po::value<int>()->default_value(-1000), "set minimum density threshold on Hounsfield scale")
-    ("dicomMax", po::value<int>()->default_value(3000), "set maximum density threshold on Hounsfield scale");
+   app.description("Convert dicom file into a volumetric file (.vol, .longvol .pgm3d).\n Example:\n dicom2vol -i ${DGtal}/tests/samples/dicomSample/1629.dcm --dicomMin 0 --dicomMax 300 -o sample.vol.");
+   app.add_option("-i,--input,1", inputFileName, "dicom image  (.dcm)." )
+    ->required()
+    ->check(CLI::ExistingFile);
+   app.add_option("-o,--output,2", outputFileName, "volumetric file (.vol, .longvol .pgm3d, .raw)", true);
+   app.add_option("--dicomMin",dicomMin,"set minimum density threshold on Hounsfield scale" );
+   app.add_option("--dicomMax",dicomMax,"set maximum density threshold on Hounsfield scale" );
 
+   app.get_formatter()->column_width(40);
+   CLI11_PARSE(app, argc, argv);
+   // END parse command line using CLI ----------------------------------------------
+   
+   typedef DGtal::functors::Rescaling<int ,unsigned char > RescalFCT;
   
-  
-  bool parseOK=true;
-  po::variables_map vm;
-  try{
-    po::store(po::parse_command_line(argc, argv, general_opt), vm);  
-  }catch(const std::exception& ex){
-    parseOK=false;
-    trace.info()<< "Error checking program options: "<< ex.what()<< endl;
-  }
-  po::notify(vm);    
-  if( !parseOK || vm.count("help")||argc<=1)
-    {
-      std::cout << "Usage: " << argv[0] << " [input] [output]\n"
-		<< "Convert dicom file into a volumetric file (.vol, .longvol .pgm3d) ."
-		<< general_opt << "\n";
-      std::cout << "Example:\n"
-		<< "dicom2vol -i ${DGtal}/tests/samples/dicomSample/1629.dcm --dicomMin -500 --dicomMax -100 -o sample.vol \n";
-      return 0;
-    }
-  
-  if(! vm.count("input") ||! vm.count("output"))
-    {
-      trace.error() << " Input and output filename are needed to be defined" << endl;      
-      return 0;
-    }
-
-  
-  string inputFilename = vm["input"].as<std::string>();
-  string outputFilename = vm["output"].as<std::string>();
-  int dicomMin = vm["dicomMin"].as<int>();
-  int dicomMax = vm["dicomMax"].as<int>();
-  typedef DGtal::functors::Rescaling<int ,unsigned char > RescalFCT;
-  
-  trace.info() << "Reading input dicom file " << inputFilename ; 
-  Image3D inputImage = DicomReader< Image3D,  RescalFCT  >::importDicom(inputFilename, 
+   trace.info() << "Reading input dicom file " << inputFileName ; 
+  Image3D inputImage = DicomReader< Image3D,  RescalFCT  >::importDicom(inputFileName, 
 									RescalFCT(dicomMin,dicomMax, 0, 255) );
   trace.info() << " [done] " << std::endl ; 
   trace.info() << " converting into vol file... " ; 
-  inputImage >> outputFilename; 
+  inputImage >> outputFileName; 
   trace.info() << " [done] " << std::endl ;   
 
-
-  return 0;
-  
+  return EXIT_SUCCESS;
 }
 
 

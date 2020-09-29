@@ -44,25 +44,30 @@ This is done by minimizing a quadratic energy function as decribed in ??. The va
 
  @b Allowed @b options @b are :
  @code
-File options:
-  -i [ --image-filename ] arg           input vol filename for image shape (object voxels
-                                        have values > 0) or input cvs filename for surfels and
-                                        normals
-  -o [ --regularized-obj-filename ] arg output regularized obj
-  -n [ --cubical-obj-filename ] arg     output cubical obj
-  -k [ --shape-noise ] arg (=0)         noise shape parameter
+ 
+ Positionals:
+   1 TEXT REQUIRED                       input vol filename for image shape (object voxels have values > 0) or input cvs filename for surfels and normals
+   1 TEXT REQUIRED                       output regularized obj
 
-Normal field estimator options:
-  -r [ --normal-radius ] arg (=4) radius of normal estimator
-
-Surface approximation options:
-  -p [ --regularization-position ] arg (=1e-3)
-                                        vertex position regularization coeff
-  -c [ --regularization-center ] arg (=1e-2)
-                                        face center regularization coeff
-  -a [ --align ] arg (=1)               normal alignment coeff
-  -f [ --fairness ] arg (=0)            face fairness coeff
-  -b [ --barycenter ] arg (=1e-1)       barycenter fairness coeff
+ Options:
+   -h,--help                             Print this help message and exit
+   -i,--image-filename TEXT REQUIRED     input vol filename for image shape (object voxels have values > 0) or input cvs filename for surfels and normals
+   -o,--regularized-obj-filename TEXT REQUIRED
+                                         output regularized obj
+   -n,--cubical-obj-filename TEXT        output cubical obj
+   -k,--shape-noise FLOAT=0              noise shape parameter
+ [Option Group: Normal field estimator options]
+   Options:
+     -r,--normal-radius FLOAT=4            radius of normal estimator
+ [Option Group: Surface approximation options]
+   Options:
+     -p,--regularization-position FLOAT=0.001
+                                           vertex position regularization coeff
+     -c,--regularization-center FLOAT=0.01 face center regularization coeff
+     -a,--align FLOAT=1                    normal alignment coeff
+     -f,--fairness FLOAT=0                 face fairness coeff
+     -b,--barycenter FLOAT=0.1             barycenter fairness coeff
+     
  @endcode
 
  @b Example:
@@ -83,11 +88,9 @@ Surface approximation options:
 
 #include <DGtal/base/Common.h>
 #include <DGtal/helpers/StdDefs.h>
-#include <boost/program_options/options_description.hpp>
-#include <boost/program_options/positional_options.hpp>
-#include <boost/program_options/variables_map.hpp>
-#include <boost/program_options/parsers.hpp>
-#include <boost/program_options/errors.hpp>
+
+#include "CLI11.hpp"
+
 #include <DGtal/images/ImageSelector.h>
 #include <DGtal/io/readers/GenericReader.h>
 #include <DGtal/topology/SurfelNeighborhood.h>
@@ -103,92 +106,53 @@ Surface approximation options:
 
 struct Options
 {
-    double noise_level;
-    std::string image_filename;
-    double normal_radius;
-    double regularization_position;
-    double regularization_center;
-    double align;
-    double fairness;
-    double barycenter;
-    std::string regularized_obj_filename;
-    std::string cubical_obj_filename;
+  double noise_level {0};
+  std::string image_filename;
+  double normal_radius {4} ;
+  double regularization_position {1e-3};
+  double regularization_center {1e-2};
+  double align {1.0};
+  double fairness{0.0};
+  double barycenter{1e-1};
+  std::string regularized_obj_filename;
+  std::string cubical_obj_filename;
 };
 
-Options
-parse_options(int argc, char* argv[])
-{
-    namespace po = boost::program_options;
 
-    using DGtal::trace;
-    using std::endl;
 
-    Options options;
-    po::options_description po_shape("File options");
-    po_shape.add_options()
-        ("image-filename,i", po::value<std::string>(&options.image_filename)->default_value(""), "input vol filename for image shape (object voxels have values > 0) or input cvs filename for surfels and normals")
-        ("regularized-obj-filename,o", po::value<std::string>(&options.regularized_obj_filename)->default_value(""), "output regularized obj")
-        ("cubical-obj-filename,n", po::value<std::string>(&options.cubical_obj_filename)->default_value(""), "output cubical obj")
-        ("shape-noise,k", po::value<double>(&options.noise_level)->default_value(0), "noise shape parameter")
-        ;
-
-    po::options_description po_normal("Normal field estimator options");
-    po_normal.add_options()
-        ("normal-radius,r", po::value<double>(&options.normal_radius)->default_value(4), "radius of normal estimator")
-        ;
-
-    po::options_description po_approx("Surface approximation options");
-    po_approx.add_options()
-        ("regularization-position,p", po::value<double>(&options.regularization_position)->default_value(1e-3, "1e-3"), "vertex position regularization coeff")
-        ("regularization-center,c", po::value<double>(&options.regularization_center)->default_value(1e-2, "1e-2"), "face center regularization coeff")
-        ("align,a", po::value<double>(&options.align)->default_value(1), "normal alignment coeff")
-        ("fairness,f", po::value<double>(&options.fairness)->default_value(0), "face fairness coeff")
-        ("barycenter,b", po::value<double>(&options.barycenter)->default_value(1e-1, "1e-1"), "barycenter fairness coeff")
-        ;
-
-    po::options_description po_options("surfaceApprox [options]");
-    po_options.add(po_shape).add(po_normal).add(po_approx).add_options()
-        ("help,h", "display this message")
-        ;
-
-    po::positional_options_description positional;
-    positional.add("image-filename",1);
-    positional.add("regularized-obj-filename",1);
-
-    try
-    {
-        po::variables_map vm;
-        po::store(po::command_line_parser(argc, argv).options(po_options).positional(positional).run(), vm);
-        po::notify(vm);
-
-        if (vm.count("help"))
-        {
-            trace.info() << po_options;
-            std::exit(0);
-        }
-
-        if (options.image_filename.empty()) throw po::validation_error(po::validation_error::invalid_option_value);
-        if (options.regularized_obj_filename.empty()) throw po::validation_error(po::validation_error::invalid_option_value);
-    }
-    catch (std::exception& ex)
-    {
-        trace.error() << ex.what() << endl;
-        trace.info() << po_options;
-        std::exit(1);
-    }
-
-    return options;
-}
+  
 
 
 int main(int argc, char* argv[])
 {
-    using DGtal::trace;
-    using std::endl;
-    using DGtal::PRIMAL;
-    using DGtal::DUAL;
+  using DGtal::trace;
+  using std::endl;
+  using DGtal::PRIMAL;
+  using DGtal::DUAL;
+  
+  // parse command line using CLI ----------------------------------------------
+  CLI::App app;
+  Options options;
+  
+  app.description("Regularize a cubical complex into a smooth quadrangulated complex.");
+  
+  app.add_option("--image-filename,-i,1",options.image_filename, "input vol filename for image shape (object voxels have values > 0) or input cvs filename for surfels and normals") -> required();
+  app.add_option("--regularized-obj-filename,-o,1", options.regularized_obj_filename, "output regularized obj") -> required();
+  app.add_option("--cubical-obj-filename,-n", options.cubical_obj_filename, "output cubical obj");
+  app.add_option("--shape-noise,-k", options.noise_level,"noise shape parameter", true );
+  auto groupNormEst = app.add_option_group("Normal field estimator options");
+  groupNormEst->add_option("--normal-radius,-r", options.normal_radius, "radius of normal estimator", true);
 
-    const Options options = parse_options(argc, argv);
+  auto groupApprox = app.add_option_group("Surface approximation options");
+  groupApprox->add_option("--regularization-position,-p", options.regularization_position, "vertex position regularization coeff", true );
+  groupApprox->add_option("--regularization-center,-c",options.regularization_center, "face center regularization coeff", true);
+  groupApprox->add_option("--align,-a", options.align, "normal alignment coeff", true);
+  groupApprox->add_option("--fairness,-f",options.fairness,"face fairness coeff" ,true);
+  groupApprox->add_option("--barycenter,-b", options.barycenter, "barycenter fairness coeff", true);
+
+  app.get_formatter()->column_width(40);
+  CLI11_PARSE(app, argc, argv);
+  // END parse command line using CLI ----------------------------------------------
 
     const KSpace kspace;
 

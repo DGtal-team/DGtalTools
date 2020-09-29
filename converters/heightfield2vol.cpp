@@ -37,37 +37,35 @@
 #include "DGtal/images/ConstImageAdapter.h"
 #include "DGtal/kernel/BasicPointFunctors.h"
 
+#include "CLI11.hpp"
 
-#include <boost/program_options/options_description.hpp>
-#include <boost/program_options/parsers.hpp>
-#include <boost/program_options/variables_map.hpp>
 
 using namespace std;
 using namespace DGtal;
 
 
-///////////////////////////////////////////////////////////////////////////////
-namespace po = boost::program_options;
 
 /**
  @page heightfield2vol heightfield2vol
  @brief  Converts a 2D heightfield image into a volumetric file.
 
-@b Usage: heightfield2vol [input] [output]
+@b Usage: heightfield2vol [OPTIONS] 1 [2]
 
 @b Allowed @b options @b are:
 
 @code
-  -h [ --help ]                       display this message
-  -i [ --input ] arg                  heightfield file.
-  -o [ --output ] arg                 volumetric file 
-  -s [ --scale ] arg (=1)             set the scale factor on height values. 
-                                      (default 1.0)
-  -z [ --volZ ] arg (=255)            set the Z max value of domain.
-  -f [ --foregroundValue ] arg (=128) specify the foreground value of the 
-                                      resulting voxel.
-  -b [ --backgroundValue ] arg (=0)   specify the background value of the 
-                                      resulting volumetric file.
+Positionals:
+  1 TEXT REQUIRED                       input heightfield file (2D image).
+  2 TEXT                                output volumetric file.
+
+Options:
+  -h,--help                             Print this help message and exit
+  -i,--input TEXT REQUIRED              input heightfield file (2D image).
+  -o,--output TEXT                      output volumetric file.
+  -s,--scale FLOAT                      set the scale factor on height values (default 1.0)
+  -z,--volZ UINT                        set the Z max value of domain.
+  -f,--foregroundValue UINT             specify the foreground value of the resulting voxel.
+  -b,--backgroundValue UINT             specify the background value of the resulting volumetric file.
 @endcode
 
 @b Example:
@@ -125,61 +123,42 @@ int main( int argc, char** argv )
 {
   typedef ImageContainerBySTLVector < Z2i::Domain, unsigned char> Image2D;
 
-  
-  // parse command line ----------------------------------------------
-  po::options_description general_opt("Allowed options are: ");
-  general_opt.add_options()
-    ("help,h", "display this message")
-    ("input,i", po::value<std::string>(), "heightfield file." )
-    ("output,o", po::value<std::string>(), "volumetric file ") 
-    ("scale,s", po::value<double>()->default_value(1.0), "set the scale factor on height values. (default 1.0)")
-    ("volZ,z", po::value<unsigned int>()->default_value(255), "set the Z max value of domain.")    
-    ("foregroundValue,f", po::value<unsigned int>()->default_value(128), "specify the foreground value of the resulting voxel." )
-    ("backgroundValue,b", po::value<unsigned int>()->default_value(0), "specify the background value of the resulting volumetric file.");
-  
-  bool parseOK=true;
-  po::variables_map vm;
-  try{
-    po::store(po::parse_command_line(argc, argv, general_opt), vm);  
-  }catch(const std::exception& ex){
-    parseOK=false;
-    trace.info()<< "Error checking program options: "<< ex.what()<< endl;
-  }
-  po::notify(vm);    
-  if( !parseOK || vm.count("help")||argc<=1)
-    {
-      std::cout << "Usage: " << argv[0] << " [input] [output]\n"
-		<< "Convert a 2D heightfield image into a volumetric file. "
-		<< general_opt << "\n";
-      std::cout << "Example:\n"
-		<< "heightfield2vol -i ${DGtal}/examples/samples/church.pgm -o volResu.vol -s 0.3 -z 50  \n";
-      return 0;
-    }
-  
-  if(! vm.count("input") ||! vm.count("output"))
-    {
-      trace.error() << " Input and output filename are needed to be defined" << endl;      
-      return 0;
-    }
-  
-  string inputFilename = vm["input"].as<std::string>();
-  string outputFilename = vm["output"].as<std::string>();
+// parse command line using CLI ----------------------------------------------
+   CLI::App app;
+   std::string inputFileName;
+   std::string outputFileName {"result.vol"};
+    
+   unsigned int foregroundValue = {128};
+   unsigned int backgroundValue = {0};
+   double scale {1.0};
+   unsigned int  maxZ {255};
+ 
 
-  trace.info() << "Reading input file " << inputFilename ; 
-  Image2D inputImage = DGtal::GenericReader<Image2D>::import(inputFilename);  
-  double scale = vm["scale"].as<double>(); 
-  unsigned int  maxZ = vm["volZ"].as<unsigned int>();
+   app.description("Convert a 2D heightfield image into a volumetric file.\n Example: \n heightfield2vol -i ${DGtal}/examples/samples/church.pgm -o volResu.vol -s 0.3 -z 50  \n");
+   app.add_option("-i,--input,1", inputFileName, "input heightfield file (2D image).")
+     ->required();
+   app.add_option("-o,--output,2", outputFileName,"output volumetric file.", true);
+   app.add_option("-s,--scale", scale, "set the scale factor on height values (default 1.0)");
+   app.add_option("-z,--volZ", maxZ, "set the Z max value of domain.");
+   app.add_option("-f,--foregroundValue", foregroundValue, "specify the foreground value of the resulting voxel.");
+   app.add_option("-b,--backgroundValue", backgroundValue, "specify the background value of the resulting volumetric file.");
+
+   app.get_formatter()->column_width(40);
+   CLI11_PARSE(app, argc, argv);
+   // END parse command line using CLI ----------------------------------------------
+  
+   
+  trace.info() << "Reading input file " << inputFileName ; 
+  Image2D inputImage = DGtal::GenericReader<Image2D>::import(inputFileName);  
+
   trace.info() << " [done] " << std::endl ; 
   
-  unsigned int foregroundValue = vm["foregroundValue"].as<unsigned int>();
-  unsigned int backgroundValue = vm["backgroundValue"].as<unsigned int>();
   
   typedef Image3DPredicatFrom2DImage<Image2D, Z3i::Point> HeightMapVol;
   Image3DPredicatFrom2DImage<Image2D, Z3i::Point> image3Dpredicate(inputImage, scale, maxZ, foregroundValue, backgroundValue);  
-  trace.info() << "Processing image to output file " << outputFilename ; 
+  trace.info() << "Processing image to output file " << outputFileName ; 
     
-  VolWriter<HeightMapVol>::exportVol(outputFilename, image3Dpredicate);
-
+  VolWriter<HeightMapVol>::exportVol(outputFileName, image3Dpredicate);
   trace.info() << " [done] " << std::endl ;   
-  return 0;  
+  return EXIT_SUCCESS;  
 }

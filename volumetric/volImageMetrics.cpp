@@ -22,7 +22,6 @@
  *
  * @date 2013/07/20
  *
- *
  * This file is part of the DGtal library.
  */
 
@@ -37,11 +36,16 @@
 
  @b Allowed @b options @b are : 
  @code
-  -h [ --help ]         display this message.
-  -a [ --volA ] arg     Input filename of volume A (vol format, and other pgm3d
-                        can also be used).
-  -b [ --volB ] arg     Input filename of volume B (vol format, and other pgm3d
-                        can also be used).
+ 
+  Positionals:
+    1 TEXT:FILE REQUIRED                  Input filename of volume A (vol format, and other pgm3d can also be used).
+    2 TEXT:FILE REQUIRED                  Input filename of volume B (vol format, and other pgm3d can also be used).
+
+  Options:
+    -h,--help                             Print this help message and exit
+    -a,--volA TEXT:FILE REQUIRED          Input filename of volume A (vol format, and other pgm3d can also be used).
+    -b,--volB TEXT:FILE REQUIRED          Input filename of volume B (vol format, and other pgm3d can also be used).
+
  @endcode
 
  @b Example: 
@@ -65,8 +69,9 @@
 
  */
 
-
 #include <iostream>
+#include <limits>
+
 #include <DGtal/base/Common.h>
 #include <DGtal/io/readers/GenericReader.h>
 #include <DGtal/io/writers/GenericWriter.h>
@@ -76,21 +81,14 @@
 #include <DGtal/images/imagesSetsUtils/SetFromImage.h>
 #include <DGtal/math/Statistic.h>
 
-#include <boost/program_options/options_description.hpp>
-#include <boost/program_options/parsers.hpp>
-#include <boost/program_options/variables_map.hpp>
-#include <limits>
-
+#include "CLI11.hpp"
 
 using namespace std;
 using namespace DGtal;
 using namespace Z3i;
 
-namespace po = boost::program_options;
-
 typedef ImageContainerBySTLVector < Z3i::Domain,  int > Image3D;
 typedef ImageContainerBySTLVector < Z2i::Domain,  int > Image2D;
-
 
 double
 getRMSE(const Image3D & imageA, const Image3D &imageB){
@@ -101,7 +99,6 @@ getRMSE(const Image3D & imageA, const Image3D &imageB){
   return sqrt(sumDiff/imageA.domain().size());
 }
 
-
 double
 getPSNR(const Image3D & imageA, const Image3D &imageB, double rmsd){
   unsigned long long int d =  std::numeric_limits<Image3D::Value>::max();
@@ -109,59 +106,35 @@ getPSNR(const Image3D & imageA, const Image3D &imageB, double rmsd){
 }
 
 
-
-
 int main(int argc, char**argv)
 {
   
-  po::options_description general_opt ( "Allowed options are: " );
-  general_opt.add_options()
-    ( "help,h", "display this message." )
-    ( "volA,a", po::value<std::string>(), "Input filename of volume A (vol format, and other pgm3d can also be used)." )
-    ( "volB,b", po::value<std::string>(), "Input filename of volume B (vol format, and other pgm3d can also be used)." );
-  
-  bool parseOK=true;
-  po::variables_map vm;
-  try{
-    po::store(po::parse_command_line(argc, argv, general_opt), vm);  
-  }catch(const std::exception& ex){
-    parseOK=false;
-    trace.info()<< "Error checking program options: "<< ex.what()<< endl;
-  }
-  po::notify(vm);    
-  
-  if ( !parseOK || vm.count ( "help" ) || ! vm.count("volA")||! vm.count("volB")  )
-    {
-      trace.info() << "Apply basic image measures (RMSE, PSNR) between two volumetric images A and B."<<std::endl
-		   << std::endl << "Basic usage: "<<std::endl
-		   << "\t volImageMetrics --volA <volAFilename> --volB <volBFilename> "<<std::endl
-		   << general_opt << "\n"
-		   << "Typical use :\n  volImageMetrics -a imageA.vol  -b imageB.vol \n" ;
+  // parse command line using CLI ----------------------------------------------
+  CLI::App app;
+  std::string inputFileNameVolA;
+  std::string inputFileNameVolB;
 
-      return 0;
-    }
+  app.description("Apply basic image measures (RMSE, PSNR) between two volumetric images A and B. \n Basic usage:\n \t volImageMetrics --volA <volAFilename> --volB <volBFilename> \n Typical use :\n  volImageMetrics -a imageA.vol  -b imageB.vol \n");
+  app.add_option("-a,--volA,1", inputFileNameVolA, "Input filename of volume A (vol format, and other pgm3d can also be used)." )
+  ->required()
+  ->check(CLI::ExistingFile);
+  app.add_option("-b,--volB,2", inputFileNameVolB, "Input filename of volume B (vol format, and other pgm3d can also be used)." )
+  ->required()
+  ->check(CLI::ExistingFile);
+  
+  app.get_formatter()->column_width(40);
+  CLI11_PARSE(app, argc, argv);
+  // END parse command line using CLI ----------------------------------------------
 
-  if(! vm.count("volA")||! vm.count("volB"))
-    {
-      trace.error() << " The two volume filename are needed to be defined" << endl;      
-      return 0;
-    }
- 
-  std::string volAFilename = vm["volA"].as<std::string>();
-  std::string volBFilename = vm["volB"].as<std::string>();
-  
-  Image3D imageA = GenericReader<Image3D>::import(volAFilename);
-  Image3D imageB = GenericReader<Image3D>::import(volBFilename);
- 
-  
-  std::cout << "# Image based measures (generated with volImageMetrics) given with the image A: "<< volAFilename<< " and the image B: "<< volBFilename << endl;
+  Image3D imageA = GenericReader<Image3D>::import(inputFileNameVolA);
+  Image3D imageB = GenericReader<Image3D>::import(inputFileNameVolB);
+   
+  std::cout << "# Image based measures (generated with volImageMetrics) given with the image A: "<< inputFileNameVolA<< " and the image B: "<< inputFileNameVolB << endl;
   std::cout << "#  RMSE PSNR "<< endl;    
   
   double rmse= getRMSE(imageA, imageB);
   double psnr= getPSNR(imageA, imageB, rmse);
     
   std::cout << " " << rmse << " " << psnr << endl;
-  
   return 1;
 }
-

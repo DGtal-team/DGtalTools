@@ -30,25 +30,20 @@
 #include <iostream>
 #include "DGtal/base/Common.h"
 #include "DGtal/helpers/StdDefs.h"
+#include <boost/format.hpp>
 
 #include "DGtal/io/readers/GenericReader.h"
 #include "DGtal/io/writers/GenericWriter.h"
 #include "DGtal/images/ConstImageAdapter.h"
 #include "DGtal/kernel/BasicPointFunctors.h"
 
-#include <boost/program_options/options_description.hpp>
-#include <boost/program_options/parsers.hpp>
-#include <boost/program_options/variables_map.hpp>
-#include <boost/format.hpp>
-
-
+#include "CLI11.hpp"
 
 using namespace std;
 using namespace DGtal;
 
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace po = boost::program_options;
 
 /**
  @page vol2slice vol2slice
@@ -59,28 +54,26 @@ namespace po = boost::program_options;
 @b Allowed @b options @b are:
 
 @code
-  -h [ --help ]                      display this message
-  -i [ --input ] arg                 vol file (.vol, .longvol .p3d, .pgm3d and 
-                                     if WITH_ITK is selected: dicom, dcm, mha, 
-                                     mhd). For longvol, dicom, dcm, mha or mhd 
-                                     formats, the input values are linearly 
-                                     scaled between 0 and 255.
-  -o [ --output ] arg                base_name.extension:  extracted 2D slice 
-                                     volumetric files (will result n files 
-                                     base_name_xxx.extension) 
-  -f [ --setFirstSlice ] arg (=0)    Set the first slice index to be extracted.
-  -l [ --setLastSlice ] arg          Set the last slice index to be extracted 
-                                     (by default set to maximal value according
-                                     to the given volume).
-  -s [ --sliceOrientation ] arg (=2) specify the slice orientation for which 
-                                     the slice are defined (by default =2 (Z 
-                                     direction))
-  --rescaleInputMin arg (=0)         min value used to rescale the input 
-                                     intensity (to avoid basic cast into 8  
-                                     bits image).
-  --rescaleInputMax arg (=255)       max value used to rescale the input 
-                                     intensity (to avoid basic cast into 8 bits
-                                     image).
+ Typical use: to extract all slices defined in Y plane (y=cst): 
+ vol2slice -i image3d.vol -s 1  -o slice.pgm 
+
+Usage: ./converters/vol2slice [OPTIONS] 1 [2]
+
+Positionals:
+  1 TEXT:FILE REQUIRED                  vol file (.vol, .longvol .p3d, .pgm3d and if WITH_ITK is selected: dicom, dcm, mha, mhd). For longvol, dicom, dcm, mha                                         or mhd formats, the input values are linearly scaled between 0 and 255.
+  2 TEXT=result.pgm                     base_name.extension:  extracted 2D slice volumetric files (will result n files base_name_xxx.extension)
+
+Options:
+  -h,--help                             Print this help message and exit
+  -i,--input TEXT:FILE REQUIRED         vol file (.vol, .longvol .p3d, .pgm3d and if WITH_ITK is selected: dicom, dcm, mha, mhd). For longvol, dicom, dcm, mha                                         or mhd formats, the input values are linearly scaled between 0 and 255.
+  -o,--output TEXT=result.pgm           base_name.extension:  extracted 2D slice volumetric files (will result n files base_name_xxx.extension)
+  -f,--setFirstSlice INT:NUMBER=0       Set the first slice index to be extracted.
+  -l,--setLastSlice INT:NUMBER          Set the last slice index to be extracted (by default set to maximal value according to the given volume).
+  -s,--sliceOrientation UINT:{0,1,2}=2  specify the slice orientation for which the slice are defined (by default =2 (Z direction))
+  --rescaleInputMin INT=0               min value used to rescale the input intensity (to avoid basic cast into 8  bits image).
+  --rescaleInputMax INT=255             max value used to rescale the input intensity (to avoid basic cast into 8  bits image).
+
+
 
 @endcode
 
@@ -106,60 +99,41 @@ int main( int argc, char** argv )
   typedef DGtal::ConstImageAdapter<Image3D, Image2D::Domain, DGtal::functors::Projector< DGtal::Z3i::Space>,
 				   Image3D::Value,  DGtal::functors::Identity >  SliceImageAdapter;
 
-
-  // parse command line ----------------------------------------------
-  po::options_description general_opt("Allowed options are: ");
-  general_opt.add_options()
-    ("help,h", "display this message")
-    ("input,i", po::value<std::string>(), "vol file (.vol, .longvol .p3d, .pgm3d and if WITH_ITK is selected: dicom, dcm, mha, mhd). For longvol, dicom, dcm, mha or mhd formats, the input values are linearly scaled between 0 and 255." )
-    ("output,o", po::value<std::string>(), "base_name.extension:  extracted 2D slice volumetric files (will result n files base_name_xxx.extension) " )
-    ("setFirstSlice,f", po::value<unsigned int>()->default_value(0), "Set the first slice index to be extracted.") 
-    ("setLastSlice,l", po::value<unsigned int>(), "Set the last slice index to be extracted (by default set to maximal value according to the given volume).") 
-    ("sliceOrientation,s", po::value<unsigned int>()->default_value(2), "specify the slice orientation for which the slice are defined (by default =2 (Z direction))" )
-    ("rescaleInputMin", po::value<DGtal::int64_t>()->default_value(0), "min value used to rescale the input intensity (to avoid basic cast into 8  bits image).")
-    ("rescaleInputMax", po::value<DGtal::int64_t>()->default_value(255), "max value used to rescale the input intensity (to avoid basic cast into 8 bits image).");
+  CLI::App app;
 
 
-  bool parseOK=true;
-  po::variables_map vm;
-  try{
-    po::store(po::parse_command_line(argc, argv, general_opt), vm);
-  }catch(const std::exception& ex){
-    parseOK=false;
-    trace.info()<< "Error checking program options: "<< ex.what()<< endl;
-  }
-  po::notify(vm);
+  std::string inputFileName;
+  std::string outputFileName = "result.pgm";
+  DGtal::int64_t rescaleInputMin {0};
+  DGtal::int64_t rescaleInputMax {255};
+  int userStartSlice {0};
+  int userEndSlice;
+  unsigned int sliceOrientation {2};
+  
 
+  app.description("Convert a volumetric file (.vol, .longvol, .pgm3d) into a set of 2D slice  images. \n Typical use: to extract all slices defined in Y plane (y=cst): \n vol2slice -i image3d.vol -s 1  -o slice.pgm \n");
 
-  if( !parseOK || !  vm.count("input")||! vm.count("output") || vm.count("help"))
-    {
-      std::cout << "Usage: " << argv[0] << " [inputs] [output]\n"
-		<< "Convert a volumetric file (.vol, .longvol, .pgm3d) into a set of 2D slice  images."
-		<< general_opt << "\n";
-      std::cout << "Example: to extract all slices defined in Y plane (y=cst): \n"
-		<< "vol2slice -i image3d.vol -s 1  -o slice.pgm \n"
-                << "see slice2vol"<< endl;
-      return 0;
-    }
+  app.add_option("-i,--input,1", inputFileName, "vol file (.vol, .longvol .p3d, .pgm3d and if WITH_ITK is selected: dicom, dcm, mha, mhd). For longvol, dicom, dcm, mha or mhd formats, the input values are linearly scaled between 0 and 255.")
+    ->required()
+    ->check(CLI::ExistingFile);
+  
+  app.add_option("--output,-o,2",outputFileName ,"base_name.extension:  extracted 2D slice volumetric files (will result n files base_name_xxx.extension)", true);
+  app.add_option("--setFirstSlice,-f", userStartSlice, "Set the first slice index to be extracted.", true)
+    -> check(CLI::Number);
+  app.add_option("--setLastSlice,-l", userEndSlice, "Set the last slice index to be extracted (by default set to maximal value according to the given volume).")
+    -> check(CLI::Number);
+  app.add_option("--sliceOrientation,-s", sliceOrientation, "specify the slice orientation for which the slice are defined (by default =2 (Z direction))", true)
+    -> check(CLI::IsMember({0, 1, 2}));
+  app.add_option("--rescaleInputMin", rescaleInputMin, "min value used to rescale the input intensity (to avoid basic cast into 8  bits image).", true);
+  app.add_option("--rescaleInputMax", rescaleInputMax, "max value used to rescale the input intensity (to avoid basic cast into 8  bits image).", true);
+  app.get_formatter()->column_width(40);
 
-  if(! vm.count("input")||! vm.count("output"))
-    {
-      trace.error() << " Input and output filename are needed to be defined" << endl;
-      return 0;
-    }
-
-
-
-
-  std::string inputFileName = vm["input"].as<std::string>();
-  std::string outputFileName = vm["output"].as<std::string>();
+  CLI11_PARSE(app, argc, argv);
+  
   std::string outputExt = outputFileName.substr(outputFileName.find_last_of(".")+1);
   std::string outputBasename = outputFileName.substr(0, outputFileName.find_last_of("."));
-  unsigned int sliceOrientation = vm["sliceOrientation"].as<unsigned int>();
-  DGtal::int64_t rescaleInputMin = vm["rescaleInputMin"].as<DGtal::int64_t>();
-  DGtal::int64_t rescaleInputMax = vm["rescaleInputMax"].as<DGtal::int64_t>();
+     
 
-  
   trace.info()<< "Importing volume file base name:  " << outputBasename << " extension: " << outputExt << " ..." ;
   typedef DGtal::functors::Rescaling<DGtal::int64_t ,unsigned char > RescalFCT;
   Image3D input3dImage =  GenericReader< Image3D >::importWithValueFunctor( inputFileName,RescalFCT(rescaleInputMin,
@@ -171,11 +145,11 @@ int main( int argc, char** argv )
   unsigned int startSlice=0;
   unsigned int endSlice=input3dImage.domain().upperBound()[sliceOrientation];
 
-  if(vm.count("setFirstSlice")){
-    startSlice = vm["setFirstSlice"].as<unsigned int>();
+  if(userStartSlice !=0){
+    startSlice = userStartSlice;
   }
-  if(vm.count("setLastSlice")){
-    endSlice = vm["setLastSlice"].as<unsigned int>();    
+  if(userEndSlice != 0){
+    endSlice = userEndSlice;
   }
 
   //Processing each slice

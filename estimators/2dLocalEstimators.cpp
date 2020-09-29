@@ -42,9 +42,7 @@
 #include <string>
 #include <fstream>
 
-#include <boost/program_options/options_description.hpp>
-#include <boost/program_options/parsers.hpp>
-#include <boost/program_options/variables_map.hpp>
+#include "CLI11.hpp"
 
 #include "DGtal/base/Common.h"
 #include "DGtal/base/Clock.h"
@@ -112,34 +110,29 @@ Below are the different available properties:
 
  @b Allowed @b options @b are : 
  @code
-  -h [ --help ]                      display this message
-  -l [ --list ]                      List all available shapes
-  -o [ --output ] arg                Output
-  -s [ --shape ] arg                 Shape name
-  -R [ --radius ] arg                Radius of the shape
-  -K [ --kernelradius ] arg (=0)     Radius of the convolution kernel (Integral
-                                     invariants estimators)
-  --alpha arg (=0.33333333333333331) Alpha parameter for Integral Invariant 
-                                     computation
-  -A [ --axis1 ] arg                 Half big axis of the shape (ellipse)
-  -a [ --axis2 ] arg                 Half small axis of the shape (ellipse)
-  -r [ --smallradius ] arg (=5)      Small radius of the shape
-  -v [ --varsmallradius ] arg (=5)   Variable small radius of the shape
-  -k [ --k ] arg (=3)                Number of branches or corners the shape
-  --phi arg (=0)                     Phase of the shape (in radian)
-  -w [ --width ] arg (=10)           Width of the shape
-  -p [ --power ] arg (=2)            Power of the metric (double)
-  -x [ --center_x ] arg (=0)         x-coordinate of the shape center (double)
-  -y [ --center_y ] arg (=0)         y-coordinate of the shape center (double)
-  -g [ --gridstep ] arg (=1)         Grid step for the digitization
-  -n [ --noise ] arg (=0)            Level of noise to perturb the shape
-  --properties arg (=11)             the i-th property is disabled iff there is
-                                     a 0 at position i
-  -e [ --estimators ] arg (=10000)   the i-th estimator is disabled iff there 
-                                     is a 0 at position i
-  -l [ --lambda ] arg (=0)           Use the shape to get a better 
-                                     approximation of the surface (optional)
-   -E [exportShape ] arf             Exports the contour of the source shape as a sequence of discrete points (.sdp)." )
+  -h,--help                             Print this help message and exit
+  -l,--list                             List all available shapes
+  -o,--output TEXT REQUIRED             Output
+  -s,--shape TEXT REQUIRED              Shape name
+  -R,--radius FLOAT                     Radius of the shape
+  -K,--kernelradius FLOAT=2.35162e-314  Radius of the convolution kernel (Integral invariants estimators)
+  --alpha FLOAT=0.333333                Alpha parameter for Integral Invariant computation
+  -A,--axis1 FLOAT                      Half big axis of the shape (ellipse)
+  -a,--axis2 FLOAT                      Half small axis of the shape (ellipse)
+  -r,--smallradius FLOAT=5              Small radius of the shape
+  -v,--varsmallradius FLOAT=5           Variable small radius of the shape
+  -k UINT=3                             Number of branches or corners the shape (default 3)
+  --phi FLOAT=0                         Phase of the shape (in radian)
+  -w,--width FLOAT=10                   Width of the shape
+  -p,--power FLOAT=2                    Power of the metric
+  -x,--center_x FLOAT=0                 x-coordinate of the shape center
+  -y,--center_y FLOAT=0                 y-coordinate of the shape center
+  -g,--gridstep FLOAT=1                 Gridstep for the digitization
+  -n,--noise FLOAT=0                    Level of noise to perturb the shape
+  --properties TEXT=11                  the i-th property is disabled iff there is a 0 at position i
+  -e,--estimators TEXT=1000             the i-th estimator is disabled iff there is a 0 at position i
+  -E,--exportShape TEXT                 Exports the contour of the source shape as a sequence of discrete points (.sdp)
+  --lambda BOOLEAN=0                    Use the shape to get a better approximation of the surface (optional)
  @endcode
 
  @b Example: 
@@ -926,93 +919,69 @@ computeLocalEstimations( const std::string & filename,
 
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace po = boost::program_options;
+
 
 int main( int argc, char** argv )
 {
-  // parse command line ----------------------------------------------
-  po::options_description general_opt("Allowed options are");
-  general_opt.add_options()
-      ("help,h", "display this message")
-      ("list,l",  "List all available shapes")
-      ("output,o", po::value<std::string>(), "Output")
-      ("shape,s", po::value<std::string>(), "Shape name")
-      ("radius,R",  po::value<double>(), "Radius of the shape" )
-      ("kernelradius,K",  po::value<double>()->default_value(0.0), "Radius of the convolution kernel (Integral invariants estimators)" )
-      ("alpha",  po::value<double>()->default_value(1.0/3.0), "Alpha parameter for Integral Invariant computation" )
-      ("axis1,A",  po::value<double>(), "Half big axis of the shape (ellipse)" )
-      ("axis2,a",  po::value<double>(), "Half small axis of the shape (ellipse)" )
-      ("smallradius,r",  po::value<double>()->default_value(5), "Small radius of the shape" )
-      ("varsmallradius,v",  po::value<double>()->default_value(5), "Variable small radius of the shape" )
-      ("k,k",  po::value<unsigned int>()->default_value(3), "Number of branches or corners the shape" )
-      ("phi",  po::value<double>()->default_value(0.0), "Phase of the shape (in radian)" )
-      ("width,w",  po::value<double>()->default_value(10.0), "Width of the shape" )
-      ("power,p",   po::value<double>()->default_value(2.0), "Power of the metric (double)" )
-      ("center_x,x",   po::value<double>()->default_value(0.0), "x-coordinate of the shape center (double)" )
-      ("center_y,y",   po::value<double>()->default_value(0.0), "y-coordinate of the shape center (double)" )
-      ("gridstep,g",  po::value<double>()->default_value(1.0), "Grid step for the digitization" )
-      ("noise,n",  po::value<double>()->default_value(0.0), "Level of noise to perturb the shape" )
-      ("properties",  po::value<std::string>()->default_value("11"), "the i-th property is disabled iff there is a 0 at position i" )
-      ("estimators,e",  po::value<std::string>()->default_value("10000"), "the i-th estimator is disabled iff there is a 0 at position i" )
-      ("exportShape,E",  po::value<std::string>(), "Exports the contour of the source shape as a sequence of discrete points (.sdp)" )
-      ("lambda,l",  po::value< bool >()->default_value( false ), "Use the shape to get a better approximation of the surface (optional)" );
+  // parse command line CLI ----------------------------------------------
+  CLI::App app;
+  std::string shapeName;
+  std::string filename;
+  double radius, kernelradius;
+  double power {2.0};
+  double smallradius {5};
+  double varsmallradius {5};
+  double cx {0.0}, cy {0.0};
+  double h {1.0};
+  unsigned int k {3};
+  double phi {0.0};
+  double width {10.0};
+  double axis1, axis2;
+  double alpha {1.0/3.0};
+  double noiseLevel {0.0};
+  std::string properties {"11"};
+  std::string outShape {""};
+  bool lambda {false};
+  std::string options {"1000"};
 
+  app.description("Compares local estimators on implicit shapes using DGtal library.\n Typical use example:\n \t 2dlocalEstimators --output <output> --shape <shapeName> [required parameters] --estimators <binaryWord> --properties <binaryWord>\n");
+  auto listOpt = app.add_flag("--list,-l","List all available shapes");
+  auto outputOpt = app.add_option("--output,-o", filename, "Output")->required();
+  auto shapeNameOpt = app.add_option("--shape,-s", shapeName, "Shape name")->required();
+  auto radiusOpt = app.add_option("--radius,-R", radius, "Radius of the shape" );
+  auto kernelradiusOpt = app.add_option("--kernelradius,-K", radius, "Radius of the convolution kernel (Integral invariants estimators)", true);
+  auto alphaOpt = app.add_option("--alpha", alpha, "Alpha parameter for Integral Invariant computation", true);
+  auto axis1Opt = app.add_option("--axis1,-A", axis1, "Half big axis of the shape (ellipse)" );
+  auto axis2Opt = app.add_option("--axis2,-a", axis2, "Half small axis of the shape (ellipse)" );
+  auto smallradiusOpt = app.add_option("--smallradius,-r", smallradius, "Small radius of the shape", true);
+  auto varsmallradiusOpt = app.add_option("--varsmallradius,-v", varsmallradius, "Variable small radius of the shape", true );
+  auto kOpt = app.add_option("-k", k, "Number of branches or corners the shape (default 3)", true );
+  auto phiOpt = app.add_option("--phi", phi, "Phase of the shape (in radian)", true );
+  auto widthOpt = app.add_option("--width,-w", width, "Width of the shape", true );
+  auto powerOpt = app.add_option("--power,-p", power, "Power of the metric", true );
+  app.add_option("--center_x,-x", cx, "x-coordinate of the shape center", true );
+  app.add_option("--center_y,-y", cy, "y-coordinate of the shape center", true );
+  app.add_option("--gridstep,-g", h, "Gridstep for the digitization", true );
+  app.add_option("--noise,-n", noiseLevel, "Level of noise to perturb the shape", true);
+  app.add_option("--properties", properties, "the i-th property is disabled iff there is a 0 at position i", true);
+  app.add_option("--estimators,-e", options, "the i-th estimator is disabled iff there is a 0 at position i", true);
+  app.add_option("--exportShape,-E", outShape, "Exports the contour of the source shape as a sequence of discrete points (.sdp)", true);
+  app.add_option("--lambda", lambda, "Use the shape to get a better approximation of the surface (optional)", true);
 
-  bool parseOK=true;
-  po::variables_map vm;
-  try{
-    po::store(po::parse_command_line(argc, argv, general_opt), vm);
-  }catch(const std::exception& ex){
-    parseOK=false;
-    trace.info()<< "Error checking program options: "<< ex.what()<< std::endl;
-  }
-  po::notify(vm);
-  if(!parseOK || vm.count("help")||argc<=1)
-  {
-    trace.info()<< "Compare local estimators on implicit shapes using DGtal library" <<std::endl
-                << "Basic usage: "<<std::endl
-                << "\t2dlocalEstimators --output <output> --shape <shapeName> [required parameters] --estimators <binaryWord> --properties <binaryWord>"<<std::endl
-                << std::endl
-                << "Below are the different available families of estimators: " << std::endl
-                << "\t - True estimators" << std::endl
-                << "\t - Maximal DSS based estimators" << std::endl
-                << "\t - Maximal DCA based estimators" << std::endl
-                << "\t - Binomial convolver based estimators" << std::endl
-                << "\t - Integral Invariants based estimators" << std::endl
-                << std::endl
-                << "The i-th family of estimators is enabled if the i-th character of the binary word is not 0. "
-                << "The default binary word is '10000'. This means that the first family of estimators, "
-                << "ie. true estimators, is enabled, whereas the next ones are disabled. "
-                << std::endl
-                << "Below are the different available properties: " << std::endl
-                << "\t - Tangent" << std::endl
-                << "\t - Curvature" << std::endl
-                << std::endl
-                << "Example: "<<std::endl
-                << "\t2dlocalEstimators --output curvature --shape ellipse --axis1 20 --axis2 7 --gridstep 0.1 --kernelradius 5 --estimators 10001 --properties 01"<<std::endl
-                << std::endl
-                << general_opt << std::endl;
-    return 0;
-  }
+  app.get_formatter()->column_width(40);
+  CLI11_PARSE(app, argc, argv);
+  // END parse command line using CLI
 
   //List creation
   createList();
 
-  if (vm.count("list"))
+  if ( listOpt->count() > 0 )
   {
     displayList();
     return 0;
   }
 
-  //Parse options
-  if (!(vm.count("shape"))) missingParam("--shape");
-  if (!(vm.count("output"))) missingParam("--output");
-
-  std::string shapeName = vm["shape"].as<std::string>();
-  std::string filename = vm["output"].as<std::string>();
-
   unsigned int nb = 4; //number of available methods
-  std::string options = vm["estimators"].as< std::string >();
   if (options.size() < nb)
   {
     trace.error() << " At least " << nb
@@ -1023,7 +992,6 @@ int main( int argc, char** argv )
   }
 
   nb = 2; //number of available properties
-  std::string properties = vm["properties"].as<std::string>();
   if (properties.size() < nb)
   {
     trace.error() << " At least " << nb
@@ -1040,102 +1008,80 @@ int main( int argc, char** argv )
   typedef Z2i::Space Space;
   typedef Space::RealPoint RealPoint;
 
-  RealPoint center( vm["center_x"].as<double>(),
-      vm["center_y"].as<double>() );
-  double h = vm["gridstep"].as<double>();
-
+  RealPoint center( cx, cy );
+  
   struct OptionsIntegralInvariant< RealPoint > optII;
-  optII.radius = vm["kernelradius"].as<double>();
-  optII.alpha = vm["alpha"].as<double>();
-  optII.lambda_optimized = vm["lambda"].as< bool >();
+  optII.radius = kernelradius;
+  optII.alpha = alpha;
+  optII.lambda_optimized = lambda;
   optII.center = center;
-
-  std::string outShape = vm.count("exportShape")? vm["exportShape"].as<std::string>(): "";
-  double noiseLevel = vm["noise"].as<double>();
 
   if (id ==0)
   {
-    if (!(vm.count("radius"))) missingParam("--radius");
+    if (radiusOpt->count()==0) missingParam("--radius");
     //if (!(vm.count("kernelradius"))) missingParam("--kernelradius");
-    double radius = vm["radius"].as<double>();
 
     Ball2D<Space> ball( center, radius );
     computeLocalEstimations<Space>( filename, ball, h, optII, options, properties, outShape, noiseLevel );
   }
   else if (id ==1)
   {
-    if (!(vm.count("width"))) missingParam("--width");
-    double width = vm["width"].as<double>();
-
+    //if (widthOpt->count()==0) missingParam("--width");
+    
     ImplicitHyperCube<Space> object(Z2i::Point(0,0), width/2);
     trace.error()<< "Not available.";
     trace.info()<<std::endl;
   }
   else if (id ==2)
   {
-    if (!(vm.count("power"))) missingParam("--power");
-    if (!(vm.count("radius"))) missingParam("--radius");
-    double radius = vm["radius"].as<double>();
-    double power = vm["power"].as<double>();
-
+    //if (powerOpt->count()==0) missingParam("--power");
+    if (radiusOpt->count()==0) missingParam("--radius");
+    
     ImplicitRoundedHyperCube<Space> ball( Z2i::Point(0,0), radius, power );
     trace.error()<< "Not available.";
     trace.info()<<std::endl;
   }
   else if (id ==3)
   {
-    if (!(vm.count("varsmallradius"))) missingParam("--varsmallradius");
-    if (!(vm.count("radius"))) missingParam("--radius");
-    if (!(vm.count("k"))) missingParam("--k");
-    if (!(vm.count("phi"))) missingParam("--phi");
+    //if (varsmallradiusOpt->count()==0) missingParam("--varsmallradius");
+    if (radiusOpt->count()==0) missingParam("--radius");
+    //if (kOpt->count()==0) missingParam("--k");
+    //if (phiOpt->count()==0) missingParam("--phi");
     //if (!(vm.count("kernelradius"))) missingParam("--kernelradius");
-    double radius = vm["radius"].as<double>();
-    double varsmallradius = vm["varsmallradius"].as<double>();
-    unsigned int k = vm["k"].as<unsigned int>();
-    double phi = vm["phi"].as<double>();
 
     Flower2D<Space> flower( center, radius, varsmallradius, k, phi );
     computeLocalEstimations<Space>( filename, flower, h, optII, options, properties, outShape, noiseLevel );
   }
   else if (id ==4)
   {
-    if (!(vm.count("radius"))) missingParam("--radius");
-    if (!(vm.count("k"))) missingParam("--k");
-    if (!(vm.count("phi"))) missingParam("--phi");
+    if (radiusOpt->count()==0) missingParam("--radius");
+    //if (kOpt->count()==0) missingParam("--k");
+    //if (phiOpt->count()==0) missingParam("--phi");
     //if (!(vm.count("kernelradius"))) missingParam("--kernelradius");
-    double radius = vm["radius"].as<double>();
-    unsigned int k = vm["k"].as<unsigned int>();
-    double phi = vm["phi"].as<double>();
 
     NGon2D<Space> object( center, radius, k, phi );
     computeLocalEstimations<Space>( filename, object, h, optII, options, properties, outShape, noiseLevel );
   }
   else if (id ==5)
   {
-    if (!(vm.count("varsmallradius"))) missingParam("--varsmallradius");
-    if (!(vm.count("radius"))) missingParam("--radius");
-    if (!(vm.count("k"))) missingParam("--k");
-    if (!(vm.count("phi"))) missingParam("--phi");
+    //if (varsmallradiusOpt->count()==0) missingParam("--varsmallradius");
+    if (radiusOpt->count()==0) missingParam("--radius");
+    //if (kOpt->count()==0) missingParam("--k");
+    //if (phiOpt->count()==0) missingParam("--phi");
     //if (!(vm.count("kernelradius"))) missingParam("--kernelradius");
-    double radius = vm["radius"].as<double>();
-    double varsmallradius = vm["varsmallradius"].as<double>();
-    unsigned int k = vm["k"].as<unsigned int>();
-    double phi = vm["phi"].as<double>();
-
+    
     AccFlower2D<Space> accflower( center, radius, varsmallradius, k, phi );
     computeLocalEstimations<Space>( filename, accflower, h, optII, options, properties, outShape, noiseLevel );
   }
   else if (id ==6)
   {
-    if (!(vm.count("axis1"))) missingParam("--axis1");
-    if (!(vm.count("axis2"))) missingParam("--axis2");
-    if (!(vm.count("phi"))) missingParam("--phi");
+    if (axis1Opt->count()==0) missingParam("--axis1");
+    if (axis2Opt->count()==0) missingParam("--axis2");
+    //if (phiOpt->count()==0) missingParam("--phi");
     //if (!(vm.count("kernelradius"))) missingParam("--kernelradius");
-    double a1 = vm["axis1"].as<double>();
-    double a2 = vm["axis2"].as<double>();
-    double phi = vm["phi"].as<double>();
 
-    Ellipse2D<Space> ellipse( center, a1, a2, phi );
+
+    Ellipse2D<Space> ellipse( center, axis1, axis2, phi );
     computeLocalEstimations<Space>( filename, ellipse, h, optII, options, properties, outShape, noiseLevel );
   }
 }

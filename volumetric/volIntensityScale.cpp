@@ -33,16 +33,13 @@
 #include <DGtal/helpers/StdDefs.h>
 #include <DGtal/images/ImageContainerBySTLVector.h>
 #include <DGtal/images/ConstImageAdapter.h>
-#include <boost/program_options/options_description.hpp>
-#include <boost/program_options/parsers.hpp>
-#include <boost/program_options/variables_map.hpp>
+
+#include "CLI11.hpp"
 
 
 using namespace std;
 using namespace DGtal;
 using namespace Z3i;
-
-namespace po = boost::program_options;
 
 
 /**
@@ -50,21 +47,24 @@ namespace po = boost::program_options;
  
  @brief Applies a linear rescaling of the image intensity from an input intensity interval [InMin, InMax] into an output interval [OutMin, OutMax].
 
- @b Usage: 	 volIntensityScale --input \<volFileName\> --output \<volOutputFileName\>  (both files can be independently in vol, pgm3D, p3d format)
-
+ @b Usage: 	  ./volumetric/volIntensityScale [OPTIONS] 1 (image files can be independently in vol, pgm3D, p3d format)
 
 
  @b Allowed @b options @b are : 
  @code
-  -h [ --help ]             display this message.
-  -i [ --input ] arg        Input vol file.
-  -o [ --output ] arg       volumetric output file (.vol, .pgm, .pgm3d, 
-                            .longvol) 
-  -m [ --inMin ] arg (=0)   the min value of the input image.
-  -M [ --inMax ] arg (=255) the max value of the input image.
-  --outMin arg (=0)         the min value of the output image.
-  --outMax arg (=255)       the max value of the output image.
 
+ Positionals:
+   1 TEXT:FILE REQUIRED                  Input vol file.
+
+ Options:
+   -h,--help                             Print this help message and exit
+   -i,--input TEXT:FILE REQUIRED         Input vol file.
+   -o,--output TEXT=result.vol           volumetric output file (.vol, .pgm, .pgm3d, .longvol)
+   -m,--inMin INT=0                      the min value of the input image.
+   -M,--inMax INT=255                    the max value of the input image.
+   --outMin INT=0                        the min value of the output image.
+   --outMax INT=255                      the max value of the output image.
+   
  @endcode
 
  @b Example: 
@@ -100,70 +100,45 @@ void missingParam ( std::string param )
 int main(int argc, char**argv)
 {
 
-  // parse command line ----------------------------------------------
-  po::options_description general_opt ( "Allowed options are: " );
-  general_opt.add_options()
-    ( "help,h", "display this message." )
-    ( "input,i", po::value<std::string>(), "Input vol file." )
-    ( "output,o", po::value<std::string>(), "volumetric output file (.vol, .pgm, .pgm3d, .longvol) " )
-    ( "inMin,m", po::value<int>()->default_value(0), "the min value of the input image." )
-    ( "inMax,M", po::value<int>()->default_value(255), "the max value of the input image." )
-    ( "outMin", po::value<int>()->default_value(0), "the min value of the output image." )
-    ( "outMax", po::value<int>()->default_value(255), "the max value of the output image." );
+  // parse command line using CLI ----------------------------------------------
+  CLI::App app;
+  std::string inputFileName;
+  std::string outputFileName {"result.vol"};
+  int inMin {0};
+  int inMax {255};
+  int outMin {0};
+  int outMax {255};
   
-  bool parseOK=true;
-  po::variables_map vm;
   
-  try{
-    po::store ( po::parse_command_line ( argc, argv, general_opt ), vm );
-  }catch(const std::exception& ex){
-    parseOK=false;
-    trace.info()<< "Error checking program options: "<< ex.what()<< endl;
-  }
-    //Parse options
-  if (parseOK &&  ! ( vm.count ( "input" ) ) ) {parseOK=false; missingParam ( "--input" );};
-  if (parseOK && ! ( vm.count ( "output" ) ) ) {parseOK=false; missingParam ( "--output" );};
+  app.description("Apply a linear rescaling of the image intensity from an input intensity interval [InMin, InMax] into an output interval [OutMin, OutMax].\n Basic usage:\n volIntensityScale --input <volFileName> --output <volOutputFileName>  (both files can be independently in vol, pgm3D, p3d format)\n Example: \n volIntensityScale -i  ${DGtal}/examples/samples/lobster.vol  --inMin 0 --inMax 100 -o lobster0-100.vol");
   
-
-  po::notify ( vm );
-  if (!parseOK || vm.count ( "help" ))
-    {
-      trace.info() << "Apply a linear rescaling of the image intensity from an input intensity interval [InMin, InMax] into an output interval [OutMin, OutMax]." <<std::endl
-                   << std::endl << "Basic usage: "<<std::endl
-                   << "\t volIntensityScale --input <volFileName> --output <volOutputFileName>  (both files can be independently in vol, pgm3D, p3d format)"<<std::endl
-                   << general_opt << "\n";
-      std::cout << "Example:\n"
-		<< "volIntensityScale -i  ${DGtal}/examples/samples/lobster.vol  --inMin 0 --inMax 100 -o lobster0-100.vol \n";
-      return 0;
-    }
-
-
-
-  std::string filename = vm["input"].as<std::string>();
-  std::string outputFileName = vm["output"].as<std::string>();
+  app.add_option("-i,--input,1", inputFileName, "Input vol file." )
+  ->required()
+  ->check(CLI::ExistingFile);
   
-  int inMin = vm["inMin"].as<int>();
-  int inMax = vm["inMax"].as<int>();
-  int outMin = vm["outMin"].as<int>();
-  int outMax = vm["outMax"].as<int>();
-    
+  app.add_option("-o,--output",outputFileName, "volumetric output file (.vol, .pgm, .pgm3d, .longvol) ", true);
+  app.add_option("-m,--inMin", inMin,  "the min value of the input image.", true);
+  app.add_option("-M,--inMax", inMax,  "the max value of the input image.", true);
+  app.add_option("--outMin", outMin,  "the min value of the output image.", true);
+  app.add_option("--outMax", outMax,  "the max value of the output image.", true);
+  
+  app.get_formatter()->column_width(40);
+  CLI11_PARSE(app, argc, argv);
+  // END parse command line using CLI ----------------------------------------------
+
+  
   trace.beginBlock("Loading file");
 
   typedef ImageContainerBySTLVector<Z3i::Domain, unsigned char>  MyImageC;
   typedef DGtal::functors::Rescaling<int ,unsigned char > RescalFCT;
-  MyImageC image = VolReader< MyImageC,  RescalFCT  >::importVol( filename, 
+  MyImageC image = VolReader< MyImageC,  RescalFCT  >::importVol( inputFileName,
                                                                   RescalFCT(inMin,
                                                                             inMax,
                                                                             outMin, outMax));  
   trace.endBlock();
 
-  
   trace.beginBlock("Exporting...");
   bool res =  GenericWriter<MyImageC>::exportFile(outputFileName, image);
   trace.endBlock();
   if (res) return 0; else return 1;   
 }
-
-
-
-

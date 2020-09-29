@@ -34,10 +34,7 @@
 #include "DGtal/io/readers/GenericReader.h"
 #include "DGtal/io/writers/GenericWriter.h"
 
-
-#include <boost/program_options/options_description.hpp>
-#include <boost/program_options/parsers.hpp>
-#include <boost/program_options/variables_map.hpp>
+#include "CLI11.hpp"
 
 using namespace std;
 using namespace DGtal;
@@ -46,15 +43,19 @@ using namespace DGtal;
  @page convertVol convertVol
  @brief Converts volumetric file into volumetric file from different formats (pgm3d, vol, longvol). This tool can also be used to upgrade a Version-2 Vol or Longvol file to the new (compressed) Version-3.
 
-
 @b Usage: convertVol [input] [output]
 
 @b Allowed @b options @b are:
 
 @code
-  -h [ --help ]         display this message
-  -i [ --input ] arg    volumetric file (.pgm3d, .vol, .longvol) 
-  -o [ --output ] arg   volumetric file (.pgm3d, .vol, .longvol) 
+Positionals:
+  1 TEXT:FILE REQUIRED                  volumetric file (.pgm3d, .vol, .longvol).
+
+Options:
+  -h,--help                             Print this help message and exit
+  -i,--input TEXT:FILE REQUIRED         volumetric file (.pgm3d, .vol, .longvol).
+  -o,--output TEXT                      volumetric file (.pgm3d, .vol, .longvol)
+
 @endcode
 
 @b Examples:
@@ -73,60 +74,33 @@ $ convertVol -i ${DGtal}/examples/samples/lobster.vol -o convertedVol.p3d
 */
 
 
-///////////////////////////////////////////////////////////////////////////////
-namespace po = boost::program_options;
-
 int main( int argc, char** argv )
 {
   typedef ImageContainerBySTLVector < Z3i::Domain, unsigned char> Image3D;
 
-  // parse command line ----------------------------------------------
-  po::options_description general_opt("Allowed options are: ");
-  general_opt.add_options()
-    ("help,h", "display this message")
-    ("input,i", po::value<std::string>(), "volumetric file (.pgm3d, .vol, .longvol) " )
-    ("output,o", po::value<std::string>(), "volumetric file (.pgm3d, .vol, .longvol) " );
-    
+  // parse command line using CLI ----------------------------------------------
+  CLI::App app;
+  std::string inputFileName;
+  std::string outputFileName {"result.vol"};
   
-  bool parseOK=true;
-  po::variables_map vm;
-  try{
-    po::store(po::parse_command_line(argc, argv, general_opt), vm);  
-  }catch(const std::exception& ex){
-    parseOK=false;
-    trace.info()<< "Error checking program options: "<< ex.what()<< endl;
-  }
-  po::notify(vm);    
-  if( !parseOK || vm.count("help")||argc<=1)
-    {
-      std::cout << "Usage: " << argv[0] << " [input] [output]\n"
-		<< "Convert volumetric file into volumetric file from different formats (pgm3d, vol, longvol) "
-		<< general_opt << "\n";
-      std::cout << "Example:\n"
-		<< "convertVol -i ${DGtal}/examples/samples/lobster.vol -o convertedVol.p3d \n";
-      return 0;
-    }
-  
-  if(! vm.count("input")||! vm.count("output"))
-    {
-      trace.error() << " Input and output filename are needed to be defined" << endl;      
-      return 0;
-    }
+  app.description("Convert volumetric file into volumetric file from different formats (pgm3d, vol, longvol)\n ");
+  app.add_option("-i,--input,1", inputFileName, "volumetric file (.pgm3d, .vol, .longvol)." )
+    ->required()
+    ->check(CLI::ExistingFile);
+  app.add_option("-o,--output,2", outputFileName, "volumetric file (.pgm3d, .vol, .longvol)", true);
 
-  
-  string inputFilename = vm["input"].as<std::string>();
-  string outputFilename = vm["output"].as<std::string>();
-  
-  trace.info() << "Reading input file " << inputFilename ; 
-  Image3D inputImage = DGtal::GenericReader<Image3D>::import(inputFilename);
+  app.get_formatter()->column_width(40);
+  CLI11_PARSE(app, argc, argv);
+  // END parse command line using CLI ----------------------------------------------
+
+  trace.info() << "Reading input file " << inputFileName ; 
+  Image3D inputImage = DGtal::GenericReader<Image3D>::import(inputFileName);
   trace.info() << " [done] " << std::endl ; 
-  trace.info() << "Writing output file " << outputFilename ; 
-  DGtal::GenericWriter<Image3D>::exportFile(outputFilename,  inputImage);
+  trace.info() << "Writing output file " << outputFileName ; 
+  DGtal::GenericWriter<Image3D>::exportFile(outputFileName,  inputImage);
   trace.info() << " [done] " << std::endl ;   
 
-
-  return 0;
-  
+  return EXIT_SUCCESS;  
 }
 
 

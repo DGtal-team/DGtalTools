@@ -34,18 +34,14 @@
 #include <DGtal/helpers/StdDefs.h>
 #include <DGtal/images/ImageContainerBySTLVector.h>
 #include <DGtal/images/ConstImageAdapter.h>
-#include <boost/program_options/options_description.hpp>
-#include <boost/program_options/parsers.hpp>
-#include <boost/program_options/variables_map.hpp>
 
+#include "CLI11.hpp"
 
 using namespace std;
 using namespace DGtal;
 using namespace Z3i;
 
-namespace po = boost::program_options;
-
-
+ 
 /**
  @page volTrValues volTrValues
  
@@ -58,15 +54,23 @@ namespace po = boost::program_options;
 
  @b Allowed @b options @b are : 
  @code
-  -h [ --help ]                     display this message.
-  -i [ --input ] arg                Input vol file.
-  -o [ --output ] arg (=output.vol) Output filename.
-  -s [ --inputVals ] arg            specify the values which will be 
-                                    transformed with the output values (given 
-                                    with --outputVals).
-  -r [ --outputVals ] arg           specify the output values to transformed 
-                                    according to the input values (given with 
-                                    --inputVals).
+
+ Positionals:
+   1 TEXT:FILE REQUIRED                  Input vol file.
+
+ Options:
+
+ Positionals:
+   1 TEXT:FILE REQUIRED                  Input vol file.
+   2 TEXT=result.vol                     Output filename.
+
+ Options:
+   -h,--help                             Print this help message and exit
+   -i,--input TEXT:FILE REQUIRED         Input vol file.
+   -o,--output TEXT=result.vol           Output filename.
+   -s,--inputVals UINT ... REQUIRED      specify the values which will be transformed with the output values (given with --outputVals).
+   -r,--outputVals UINT ... REQUIRED     specify the values which will be transformed with the output values (given with --outputVals).
+   
  @endcode
 
  @b Example: 
@@ -88,76 +92,32 @@ namespace po = boost::program_options;
  */
 
 
-
-/**
- * Missing parameter error message.
- *
- * @param param
- */
-void missingParam ( std::string param )
-{
-  trace.error() <<" Parameter: "<<param<<" is required..";
-  trace.info() <<std::endl;
-  exit ( 1 );
-}
-
-
 int main(int argc, char**argv)
 {
 
   // parse command line ----------------------------------------------
-  po::options_description general_opt ( "Allowed options are: " );
-  general_opt.add_options()
-    ( "help,h", "display this message." )
-    ( "input,i", po::value<std::string>(), "Input vol file." )
-    ( "output,o", po::value<std::string>()->default_value("output.vol"),"Output filename." )
-    ("inputVals,s", po::value<std::vector<unsigned int > >()->multitoken(), "specify the values which will be transformed with the output values (given with --outputVals)." ) 
-    ("outputVals,r", po::value<std::vector<unsigned int > >()->multitoken(), "specify the output values to transformed according to the input values (given with --inputVals)." ) ;
-  bool parseOK=true;
+  // parse command line using CLI ----------------------------------------------
+  CLI::App app;
+  std::string inputFileName;
+  std::string outputFileName {"result.vol"};
+  std::vector<unsigned int> inputVals;
+  std::vector<unsigned int>  outputVals;
+
+  app.description("Apply basic vol image transform from the input values to output values.\n Basic usage:\n \t volTrValues --input <volFileName> --o <volOutputFileName> -s 1 99 -r 100 200 \n\t => all voxel of values 1 (resp. 99) will be 100 (resp. 200) in the resulting image.");
   
-  po::variables_map vm;
+  app.add_option("-i,--input,1", inputFileName, "Input vol file." )
+  ->required()
+  ->check(CLI::ExistingFile);
   
+  app.add_option("--output,-o,2",outputFileName, "Output filename.", true);
+  app.add_option("--inputVals,-s", inputVals, "specify the values which will be transformed with the output values (given with --outputVals).") ->required();
+  app.add_option("--outputVals,-r", outputVals, "specify the values which will be transformed with the output values (given with --outputVals).") ->required();
   
-  try{
-    po::store ( po::parse_command_line ( argc, argv, general_opt ), vm );
-  }catch(const std::exception& ex){
-    parseOK=false;
-    trace.info()<< "Error checking program options: "<< ex.what()<< endl;
-  }
-  po::notify ( vm );
-  if (!parseOK || !vm.count("inputVals")|| !vm.count("outputVals") || !vm.count("input") || !vm.count("output")   || vm.count ( "help" ))
-    {
-      trace.info() << "Apply basic vol image transform from the input values to output values."<<std::endl
-                   << std::endl << "Basic usage: "<<std::endl
-                   << "\t volTrValues --input <volFileName> --o <volOutputFileName> -s 1 99 -r 100 200  "<<std::endl
-                   << "\t => all voxel of values 1 (resp. 99) will be 100 (resp. 200) in the resulting image.   "<<std::endl
-                   << general_opt << "\n";
-      if( !vm.count("inputVals")){
-        missingParam("inputVals");
-      }
-      if( !vm.count("outputVals")){
-        missingParam("outputVals");
-      }
-      if( !vm.count("input")){
-        missingParam("input");
-      }
-      if( !vm.count("output")){
-        missingParam("output");
-      }
-    return 0;
-    }
+ 
+  app.get_formatter()->column_width(40);
+  CLI11_PARSE(app, argc, argv);
+  // END parse command line using CLI ----------------------------------------------
 
-
-  //Parse options
-
-  
-  std::string filename = vm["input"].as<std::string>();
-  if ( ! ( vm.count ( "output" ) ) ) missingParam ( "--output" );
-  std::string outputFileName = vm["output"].as<std::string>();
-
-
-  std::vector<unsigned int> inputVals = vm["inputVals"].as<std::vector<unsigned int > >();
-  std::vector<unsigned int>  outputVals = vm["outputVals"].as<std::vector<unsigned int > >();
 
   if(inputVals.size()!=outputVals.size()){
     trace.error()<< "Transformation not possible the two sets of input/output values should have the same size." << std::endl;
@@ -166,7 +126,7 @@ int main(int argc, char**argv)
   
   trace.beginBlock("Loading file");
   typedef ImageContainerBySTLVector<Z3i::Domain, unsigned char>  MyImageC;
-  MyImageC  image = GenericReader< MyImageC >::import( filename );
+  MyImageC  image = GenericReader< MyImageC >::import( inputFileName );
   trace.endBlock();  
   unsigned int val;
   for(MyImageC::Domain::ConstIterator it = image.domain().begin(),
@@ -179,7 +139,6 @@ int main(int argc, char**argv)
         }
       }
     } 
-  
 
   trace.beginBlock("Exporting...");
   bool res =  GenericWriter<MyImageC>::exportFile(outputFileName, image);
@@ -187,7 +146,3 @@ int main(int argc, char**argv)
 
   if (res) return 0; else return 1;
 }
-
-
-
-

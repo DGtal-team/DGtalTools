@@ -1,6 +1,9 @@
 # DGtalTools 1.1
 
 - *global*
+  -  New way to handle command line options of DGtalTools by using CLI11 instead boost program option.
+     (Bertrand Kerautret and Phuc Ngo
+     [#373](https://github.com/DGtal-team/DGtalTools/pull/373))     
   -  Fix issue of link with boost program option.  (Bertrand Kerautret
     [#356](https://github.com/DGtal-team/DGtalTools/pull/356))
   - set cmake  based CPP11 check instead the manual DGtal check. (Bertrand

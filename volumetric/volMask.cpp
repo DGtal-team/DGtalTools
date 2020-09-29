@@ -35,22 +35,19 @@
 
 #include <DGtal/io/readers/GenericReader.h>
 #include <DGtal/io/writers/GenericWriter.h>
-#include <boost/program_options/options_description.hpp>
-#include <boost/program_options/parsers.hpp>
-#include <boost/program_options/variables_map.hpp>
+
+#include "CLI11.hpp"
+
 #ifdef WITH_ITK
 #include "DGtal/io/readers/ITKReader.h"
 #include "DGtal/io/writers/ITKWriter.h"
 
 #endif
 
-
 ///////////////////////////////////////////////////////////////////////////////
 using namespace std;
 using namespace DGtal;
 ///////////////////////////////////////////////////////////////////////////////
-namespace po = boost::program_options;
-
 
 /**
  @page volMask volMask
@@ -62,15 +59,18 @@ namespace po = boost::program_options;
  @b Allowed @b options @b are :
  
  @code
- -h [ --help ]               display this message
- -i [ --input ] arg          an input vol (or ITK: .nii, mha, ... ) file.
- -t [ --inputType ] arg      to specify the input image type (int or double).
- -a [ --mask ] arg           the mask image that represents the elements that
-                             are copied as output in the resulting image (by
-                             default set to 1 you can change this value by
-                             using --maskValue).
- -o [ --output ] arg         the output masked image.
- -m [ --maskValue ] arg (=1) the masking value.
+ Positionals:
+   1 TEXT:FILE REQUIRED                  an input 3D image vol (or ITK: .nii, mha, ... ) file.
+   2 TEXT=result.vol                     the output masked image.
+
+ Options:
+   -h,--help                             Print this help message and exit
+   -i,--input TEXT:FILE REQUIRED         an input 3D image vol (or ITK: .nii, mha, ... ) file.
+   -t,--inputType TEXT                   to specify the input image type (int or double).
+   -a,--mask TEXT:FILE                   the mask image that represents the elements that are copied as output in the resulting image (by default set to 1 you can change this value by using --maskValue).
+   -o,--output TEXT=result.vol           the output masked image.
+   -f,--offsetBorder UINT=0              add a border offset to the bounding box of the masked value domain.
+   -m,--maskValue INT=1                  the masking value.
  @endcode
  
  @b Example:
@@ -172,64 +172,41 @@ processImage(const TImage &inputImage, const TImageMask &maskImage,
 
 int main( int argc, char** argv )
 {
-  // parse command line -------------------------------------------------------
-  po::options_description general_opt("Allowed options are");
-  general_opt.add_options()
-    ("help,h", "display this message")
+
+  // parse command line using CLI ----------------------------------------------
+  CLI::App app;
+  std::string inputFileName;
+  std::string outputFileName {"result.vol"};
+  std::string inputType;
+  std::string maskFileName;
+  unsigned int offsetBorder {0};
+  int maskValue {1};
+  
+  app.description("Outputs a new image from two input images, one representing the data, one representing the selection mask. The size of output image is the size of the bounding box of selected values, plus the chosen border offset. \n Typical use example:\n \t volMask -i ${DGtal}/examples/samples/lobster.vol  -a ${DGtal}/examples/samples/lobster.vol -o lobsMasked.vol -m 100  \n");
+  
 #ifdef WITH_ITK
-    ("input,i", po::value<std::string >(), "an input 3D image vol (or ITK: .nii, mha, ... ) file. " )
-    ("inputType,t", po::value<std::string>()->default_value(""), "to specify the input image type (int or double)." )
-#else 
-    ("input,i", po::value<std::string >(), "an input vol file. " )
+  app.add_option("-i,--input,1", inputFileName, "an input 3D image vol (or ITK: .nii, mha, ... ) file." )
+      ->required()
+      ->check(CLI::ExistingFile);
+  app.add_option("--inputType,-t",inputType, "to specify the input image type (int or double).");
+
+  #else
+  app.add_option("-i,--input,1", inputFileName, "an input vol file." )
+      ->required()
+      ->check(CLI::ExistingFile);
 #endif
-    ("mask,a", po::value<std::string >(), "the mask image that represents the elements that are copied as output in the resulting image (by default set to 1 you can change this value by using --maskValue). " )
-  ("output,o", po::value<std::string >()->default_value("result.vol"), "the output masked image." )
-  ("offsetBorder,f", po::value<unsigned int>()->default_value(0), "add a border offset to the bounding box of the masked value domain." )
-  ("maskValue,m", po::value<int>()->default_value(1), "the masking value." );
+  
+  app.add_option("--mask,-a",maskFileName, "the mask image that represents the elements that are copied as output in the resulting image (by default set to 1 you can change this value by using --maskValue). ")
+  ->check(CLI::ExistingFile);
+  app.add_option("-o,--output,2", outputFileName, "the output masked image.", true );
+  app.add_option("--offsetBorder,-f", offsetBorder, "add a border offset to the bounding box of the masked value domain.", true);
+  app.add_option("--maskValue,-m", maskValue, "the masking value.", true);
+  app.get_formatter()->column_width(40);
+  CLI11_PARSE(app, argc, argv);
+  // END parse command line using CLI ----------------------------------------------
+
   
   
-  bool parseOK=true;
-  po::variables_map vm;
-  try
-  {
-    po::store(po::parse_command_line(argc, argv, general_opt), vm);
-  }
-  catch(const std::exception& ex)
-  {
-    parseOK=false;
-    trace.info()<< "Error checking program options: "<< ex.what()<< endl;
-  }
-  
-  
-  // check if min arguments are given and tools description ------------------
-  po::notify(vm);
-  if( !parseOK || vm.count("help")||argc<=1)
-  {
-    std::cout << "Usage: " << argv[0] << " [input]\n"
-    << "Outputs a new image from two input images, one representing the data, one representing the selection mask. The size of output image is the size of the bounding box of selected values, plus the chosen border offset. \n"
-    << general_opt << "\n"
-    << "Typical use example:\n \t volMask -i ${DGtal}/examples/samples/lobster.vol  -a ${DGtal}/examples/samples/lobster.vol -o lobsMasked.vol -m 100  \n";
-    return 0;
-  }
-  if(! vm.count("input"))
-  {
-    trace.error() << " The file name was not defined" << endl;
-    return 1;
-  }
-  
-  
-  
-  //  recover the  args ----------------------------------------------------
-  string inputFileName = vm["input"].as<string>();
-  string maskFileName = vm["mask"].as<string>();
-  string outputFileName = vm["output"].as<string>();
-#ifdef WITH_ITK
-  string inputType = vm["inputType"].as<std::string>();
-#endif
-  unsigned int offsetBorder = vm["offsetBorder"].as<unsigned int>();
-  
-  
-  int maskValue = vm["maskValue"].as<int>();
   trace.info() << "Reading mask image...";
   Image3D maskImage = DGtal::GenericReader<Image3D>::import(maskFileName);
   trace.info() << "[done]"<< std::endl;

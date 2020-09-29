@@ -32,9 +32,8 @@
 #include <string>
 #include <iterator>
 
-#include <boost/program_options/options_description.hpp>
-#include <boost/program_options/parsers.hpp>
-#include <boost/program_options/variables_map.hpp>
+#include "CLI11.hpp"
+
 #include "DGtal/base/Common.h"
 #include "DGtal/helpers/StdDefs.h"
 #include "DGtal/kernel/BasicPointFunctors.h"
@@ -66,24 +65,24 @@ using namespace DGtal;
  @b Allowed @b options @b are:
 
  @code
-  -h  [ --help ]                   Display this message
-  --param1                  First parameter e.g. a radius or a scaling factor
-  --param2                  Second parameter e.g. a radius or a scaling factor
-  --param3                  Third parameter e.g. a distance between consecutive turns or a scaling factor
-  -ts [ --tstart]                  Start time
-  -te [ --tend]                    End time
-  -s  [ --step]                    Step
-  -k  [ --knext]                   K_NEXT value
-  -l  [ --list ]                   List all available curves
-  -c  [ --curve]                   A curve to digitize
-  -a [--angle],                    Rotation angle in radians
-  -ox                              X coordinate of origin
-  -oy                              Y coordinate of origin
-  -oz                              Z coordinate of origin
-  -ax                              X component of rotation axis
-  -ay                              Y component of rotation axis
-  -az                              Z component of rotation axis
-  -o  [ --output ] arg             Basename of the output file
+  -h,--help                             Print this help message and exit
+  --param1 FLOAT=1                      a radius or a scaling factor (default 0)
+  --param2 FLOAT=1                      a radius or a scaling factor (default 0)
+  --param3 FLOAT=1                      a radius or a scaling factor (default 0)
+  --tstart FLOAT                        start time
+  --tend FLOAT                          end time
+  -s,--step FLOAT                       step
+  -k,--knext UINT=5                     K_NEXT value (default 5)
+  -l,--list                             List all available shapes
+  -c,--curve TEXT                       Shape name
+  -a,--angle FLOAT=0                    Rotation angle in radians(default 0)
+  --ox FLOAT=0                          X coordinate of origin (default 0)
+  --oy FLOAT=0                          Y coordinate of origin (default 0)
+  --oz FLOAT=0                          Z coordinate of origin (default 0)
+  --ax FLOAT=1                          X component of rotation axis (default 1)
+  --ay FLOAT=0                          Y component of rotation axis (default 0)
+  --az FLOAT=0                          Z component of rotation axis (default 0)
+  -o,--output TEXT                      Basename of the output file
 
  @endcode
  You can list the potential curves:
@@ -234,105 +233,69 @@ struct Exporter
  *
  * @param param
  */
-void missingParam ( std::string param )
+void missingParam(std::string param)
 {
-  trace.error ( ) <<" Parameter: "<< param <<" is required..";
-  trace.info ( ) << std::endl;
-  exit ( 1 );
+  trace.error() <<" Parameter: "<<param<<" is required..";
+  trace.info()<<std::endl;
+  exit(1);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace po = boost::program_options;
 
 int main( int argc, char** argv )
 {
-  // parse command line ----------------------------------------------
-  po::options_description general_opt("Allowed options are: ");
-  general_opt.add_options()
-  ("help,h", "display this message")
-  ("param1", po::value<double>()->default_value(1), "a radius or a scaling factor")
-  ("param2", po::value<double>()->default_value(1), "a radius or a scaling factor")
-  ("param3", po::value<double>()->default_value(1), "a radius or a scaling factor")
-  ("tstart,ts", po::value<double>(), "start time")
-  ("tend,te", po::value<double>(), "end time")
-  ("step,s", po::value<double>(), "step")
-  ("knext,k",  po::value<unsigned int>()->default_value(5), "K_NEXT value" )
-  ("list,l",  "List all available shapes")
-  ("curve,c", po::value<std::string>(), "Shape name")
-  ( "angle,a", po::value<double>()->default_value(0),"Rotation angle in radians." )
-  ( "ox", po::value<double>()->default_value(0),"X coordinate of origin." )
-  ( "oy", po::value<double>()->default_value(0),"Y coordinate of origin." )
-  ( "oz", po::value<double>()->default_value(0),"Z coordinate of origin." )
-  ( "ax", po::value<double>()->default_value(1),"X component of rotation axis." )
-  ( "ay", po::value<double>()->default_value(0),"Y component of rotation axis." )
-  ( "az", po::value<double>()->default_value(0),"Z component of rotation axis." )
-  ("output,o", po::value<std::string>(), "Basename of the output file");
+  // parse command line CLI ----------------------------------------------
+  CLI::App app;
+  std::string curveName;
+  std::string outputName;
+  double param1 {1};
+  double param2 {1};
+  double param3 {1};
+  double tstart;
+  double tend;
+  double step;
+  unsigned int knext {5};
+  double angle;
+  double ox {0}, oy {0}, oz {0};
+  double ax {1}, ay {0}, az {0}; 
 
-  bool parseOK = true;
-  po::variables_map vm;
-  try
-  {
-    po::store ( po::parse_command_line ( argc, argv, general_opt ), vm );
-  }
-  catch ( const std::exception& ex )
-  {
-    parseOK = false;
-    trace.info ( ) << "Error checking program options: "<< ex.what ( ) << std::endl;
-  }
+  app.description("Digitizes 3D parametric curves using DGtal library.\n Typical use example:\n \t 3dParametricCurveDigitizer [options] --curve <curve> --param1 <double> --param2 <double> --param3 <double> --tstart <double> --tend <double> --step <double> --output <basename>\n");
+  app.add_option("--param1",param1,"a radius or a scaling factor (default 0)",true);
+  app.add_option("--param2",param2,"a radius or a scaling factor (default 0)",true);
+  app.add_option("--param3",param3,"a radius or a scaling factor (default 0)",true);
+  auto tstartOpt = app.add_option("--tstart",tstart,"start time");
+  auto tendOpt = app.add_option("--tend",tend,"end time");
+  auto stepOpt = app.add_option("--step, -s",step,"step");
+  app.add_option("--knext, -k",knext,"K_NEXT value (default 5)",true);
+  auto listOpt = app.add_flag("--list,-l","List all available shapes");
+  auto curveNameOpt = app.add_option("--curve,-c",curveName,"Shape name");
+  app.add_option("--angle,-a",angle,"Rotation angle in radians(default 0)",true);
+  app.add_option("--ox",ox,"X coordinate of origin (default 0)",true);
+  app.add_option("--oy",oy,"Y coordinate of origin (default 0)",true);
+  app.add_option("--oz",oz,"Z coordinate of origin (default 0)",true);
+  app.add_option("--ax",ax,"X component of rotation axis (default 1)",true);
+  app.add_option("--ay",ay,"Y component of rotation axis (default 0)",true);
+  app.add_option("--az",az,"Z component of rotation axis (default 0)",true);
+  auto outputNameOpt = app.add_option("--output,-o",outputName,"Basename of the output file");
 
-  po::notify ( vm );
-  if ( ! parseOK || vm.count("help") || argc <= 1 )
-  {
-    trace.info()<< "Digitizes curves using DGtal library" <<std::endl << "Basic usage: "<<std::endl
-    << "\t3dParametricCurveDigitize [options] --curve <curveName> --tstart <double> --tend <double> --step <double> --knext <unsigned int> --output <outputBasename>"<<std::endl
-    << general_opt << "\n Example: 3dParametricCurveDigitizer --curve Knot_3_1 --param1 10 --param2 10 --param3 10 --tstart -2.2 --tend 2.2 --step 0.001 --output knot_3_1 " << std::endl;
-    return 0;
-  }
+  app.get_formatter()->column_width(40);
+  CLI11_PARSE(app, argc, argv);
+  // END parse command line using CLI ----------------------------------------------
 
   //List creation
   createList();
 
-  if ( vm.count ( "list" ) )
+  if ( listOpt->count() > 0 )
   {
     displayList();
     return 0;
   }
 
-  //Parse options
-  if ( !( vm.count ( "curve" ) ) ) missingParam ( "--curve" );
-  std::string curveName = vm["curve"].as < std::string > ( );
-
-  if ( !( vm.count ( "param1" ) ) ) missingParam ( "--param1" );
-  double param1 = vm["param1"].as < double > ( );
-
-  if ( !( vm.count ( "param2" ) ) ) missingParam ( "--param2" );
-  double param2 = vm["param2"].as < double > ( );
-
-  if ( !( vm.count ( "param3" ) ) ) missingParam ( "--param3" );
-  double param3 = vm["param3"].as < double > ( );
-
-  if ( !( vm.count ( "tstart" ) ) ) missingParam ( "--tstart" );
-  double tstart = vm["tstart"].as < double > ( );
-
-  if ( !( vm.count ( "tend" ) ) ) missingParam ( "--tend" );
-  double tend = vm["tend"].as < double > ( );
-
-  if ( !( vm.count ( "step" ) ) ) missingParam ( "--step" );
-  double step = vm["step"].as < double > ( );
-
-  unsigned int knext = vm["knext"].as < unsigned int > ( );
-
-  if ( !( vm.count ( "output" ) ) ) missingParam ( "--output" );
-  std::string outputName = vm["output"].as < std::string > ( );
-
-  double angle =  vm["angle"].as<double>();
-  double ox =  vm["ox"].as<double>();
-  double oy =  vm["oy"].as<double>();
-  double oz =  vm["oz"].as<double>();
-  double ax =  vm["ax"].as<double>();
-  double ay =  vm["ay"].as<double>();
-  double az =  vm["az"].as<double>();
-
+  if ( curveNameOpt->count() == 0) missingParam("--curve");
+  if ( outputNameOpt->count() == 0) missingParam("--output");
+  if ( tstartOpt->count() == 0) missingParam("--tstart");
+  if ( tendOpt->count() == 0) missingParam("--tend");
+  if ( stepOpt->count() == 0) missingParam("--step");
 
   typedef functors::ForwardRigidTransformation3D < Z3i::Space, Z3i::RealPoint, Z3i::RealPoint, functors::Identity > ForwardTrans;
   ForwardTrans trans ( Z3i::RealPoint ( ox, oy, oz ), Z3i::RealPoint ( ax, ay, az ), angle, Z3i::RealVector ( 0, 0, 0 ) );
