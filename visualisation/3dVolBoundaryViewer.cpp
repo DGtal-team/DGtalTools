@@ -28,9 +28,6 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 #include <iostream>
-#include <boost/program_options/options_description.hpp>
-#include <boost/program_options/parsers.hpp>
-#include <boost/program_options/variables_map.hpp>
 
 #include "DGtal/base/Common.h"
 #include "DGtal/base/BasicFunctors.h"
@@ -50,6 +47,8 @@
 #include "DGtal/io/Color.h"
 #include "DGtal/io/colormaps/GradientColorMap.h"
 
+#include "CLI11.hpp"
+
 
 using namespace std;
 using namespace DGtal;
@@ -59,52 +58,47 @@ using namespace DGtal;
  @page Doc3dVolBoundaryViewer 3dVolBoundaryViewer
  
  @brief  Display the boundary of a volume file by using QGLviewer.
-
+ 
  The mode  specifies if you wish to see surface elements (BDRY), the inner
  voxels (INNER) or the outer voxels (OUTER) that touch the boundary.
-
+ 
  @b Usage:   3dVolBoundaryViewer -i [input]
-
+ 
  @b Allowed @b options @b are :
  
  @code
-  -h [ --help ]                    display this message
-  -i [ --input ] arg               vol file (.vol) , pgm3d (.p3d or .pgm3d, pgm
-                                   (with 3 dims)) file or sdp (sequence of 
-                                   discrete points)
-  -m [ --thresholdMin ] arg (=0)   threshold min (excluded) to define binary 
-                                   shape
-  -M [ --thresholdMax ] arg (=255) threshold max (included) to define binary 
-                                   shape
-  --dicomMin arg (=-1000)          set minimum density threshold on Hounsfield 
-                                   scale
-  --dicomMax arg (=3000)           set maximum density threshold on Hounsfield 
-                                   scale
-  --mode arg (=INNER)              set mode for display: INNER: inner voxels, 
-                                   OUTER: outer voxels, BDRY: surfels
-
+ 
+ Positionals:
+ 1 TEXT:FILE REQUIRED                  vol file (.vol, .longvol .p3d, .pgm3d and if WITH_ITK is selected: dicom, dcm, mha, mhd). For longvol, dicom, dcm, mha or mhd formats, the input values are linearly scaled between 0 and 255.
+ 
+ Options:
+ -h,--help                             Print this help message and exit
+ -i,--input TEXT:FILE REQUIRED         vol file (.vol, .longvol .p3d, .pgm3d and if WITH_ITK is selected: dicom, dcm, mha, mhd). For longvol, dicom, dcm, mha or mhd formats, the input values are linearly scaled between 0 and 255.
+ -m,--thresholdMin INT=0               threshold min (excluded) to define binary shape.
+ -M,--thresholdMax INT=255             threshold max (included) to define binary shape.
+ --mode TEXT:{INNER,OUTER,BDRY}=INNER  set mode for display: INNER: inner voxels, OUTER: outer voxels, BDRY: surfels
+ OUTER: outer voxels, BDRY: surfels
  @endcode
-
-
- @b Example: 
-
-
+ 
+ 
+ @b Example:
+ 
+ 
  @code
-    3dVolBoundaryViewer  -i $DGtal/examples/samples/lobster.vol -m 60
+ 3dVolBoundaryViewer  -i $DGtal/examples/samples/lobster.vol -m 60
  @endcode
-
+ 
  You should obtain such a result:
-
+ 
  @image html res3dVolBoundaryViewer.png "Resulting visualization."
  
-
+ 
  @see
  @ref 3dVolBoundaryViewer.cpp
-
+ 
  */
 
-///////////////////////////////////////////////////////////////////////////////
-namespace po = boost::program_options;
+
 
 int main( int argc, char** argv )
 {
@@ -114,50 +108,42 @@ int main( int argc, char** argv )
   typedef ImageSelector<Domain, unsigned char>::Type Image;
   typedef DigitalSetSelector< Domain, BIG_DS+HIGH_BEL_DS >::Type DigitalSet;
   typedef SurfelAdjacency<KSpace::dimension> MySurfelAdjacency;
-
-  // parse command line ----------------------------------------------
-  po::options_description general_opt("Allowed options are: ");
-  general_opt.add_options()
-    ("help,h", "display this message")
-    ("input,i", po::value<std::string>(), "vol file (.vol) , pgm3d (.p3d or .pgm3d, pgm (with 3 dims)) file or sdp (sequence of discrete points)" )
-    ("thresholdMin,m",  po::value<int>()->default_value(0), "threshold min (excluded) to define binary shape" )
-    ("thresholdMax,M",  po::value<int>()->default_value(255), "threshold max (included) to define binary shape" )
+  
+  // parse command line using CLI ----------------------------------------------
+  CLI::App app;
+  app.description("Display the boundary of a volume file by using QGLviewer. The mode specifies if you wish to see surface elements (BDRY), the inner voxels (INNER) or the outer voxels (OUTER) that touch the boundary. \n \t Example: 3dVolBoundaryViewer  -i $DGtal/examples/samples/lobster.vol -m 60");
+  std::string inputFileName;
+  DGtal::int64_t rescaleInputMin {0};
+  DGtal::int64_t rescaleInputMax {255};
+  int dicomMin {-1000};
+  int dicomMax {3000};
+  int thresholdMin {0};
+  int thresholdMax {255};
+  std::string mode {"INNER"};
+  
+  app.add_option("-i,--input,1", inputFileName, "vol file (.vol, .longvol .p3d, .pgm3d and if WITH_ITK is selected: dicom, dcm, mha, mhd). For longvol, dicom, dcm, mha or mhd formats, the input values are linearly scaled between 0 and 255." )
+  ->required()
+  ->check(CLI::ExistingFile);
+  
+  app.add_option("--thresholdMin,-m", thresholdMin, "threshold min (excluded) to define binary shape.", true);
+  app.add_option("--thresholdMax,-M", thresholdMax, "threshold max (included) to define binary shape.", true);
 #ifdef WITH_ITK
-    ("dicomMin", po::value<int>()->default_value(-1000), "set minimum density threshold on Hounsfield scale")
-    ("dicomMax", po::value<int>()->default_value(3000), "set maximum density threshold on Hounsfield scale")
+  app.add_option("--dicomMin",dicomMin,"set minimum density threshold on Hounsfield scale", true );
+  app.add_option("--dicomMax",dicomMin,"set maximum density threshold on Hounsfield scale", true );
 #endif
-    ("mode",  po::value<std::string>()->default_value("INNER"), "set mode for display: INNER: inner voxels, OUTER: outer voxels, BDRY: surfels") ;
-
-  bool parseOK=true;
-  po::variables_map vm;
-  try{
-    po::store(po::parse_command_line(argc, argv, general_opt), vm);
-  }catch(const std::exception& ex){
-    parseOK=false;
-    trace.info()<< "Error checking program options: "<< ex.what()<< endl;
-  }
-  po::notify(vm);
-  if( !parseOK || vm.count("help")||argc<=1)
-    {
-      std::cout << "Usage: " << argv[0] << " -i [input]\n"
-                << "Display the boundary of a volume file by using QGLviewer. The mode specifies if you wish to see surface elements (BDRY), the inner voxels (INNER) or the outer voxels (OUTER) that touch the boundary."<< endl
-                << general_opt << "\n";
-      return 0;
-    }
-
-  if(! vm.count("input"))
-    {
-      trace.error() << " The file name was defined" << endl;
-      return 0;
-    }
-  string inputFilename = vm["input"].as<std::string>();
-  int thresholdMin = vm["thresholdMin"].as<int>();
-  int thresholdMax = vm["thresholdMax"].as<int>();
-  string mode = vm["mode"].as<string>();
-
+  app.add_option("--mode", mode,"set mode for display: INNER: inner voxels, OUTER: outer voxels, BDRY: surfels", true )
+  -> check(CLI::IsMember({"INNER", "OUTER", "BDRY"}));
+  
+  
+  app.get_formatter()->column_width(40);
+  CLI11_PARSE(app, argc, argv);
+  // END parse command line using CLI ----------------------------------------------
+  
+  
+  
   QApplication application(argc,argv);
-
-  string extension = inputFilename.substr(inputFilename.find_last_of(".") + 1);
+  
+  string extension = inputFileName.substr(inputFileName.find_last_of(".") + 1);
   if(extension!="vol" && extension != "p3d" && extension != "pgm3D" && extension != "pgm3d" && extension != "sdp" && extension != "pgm"
 #ifdef WITH_ITK
      && extension !="dcm"
@@ -166,7 +152,7 @@ int main( int argc, char** argv )
     trace.info() << "File extension not recognized: "<< extension << std::endl;
     return 0;
   }
-
+  
   if(extension=="vol" || extension=="pgm3d" || extension=="pgm3D"
 #ifdef WITH_ITK
      || extension =="dcm"
@@ -178,36 +164,36 @@ int main( int argc, char** argv )
     int dicomMax = vm["dicomMax"].as<int>();
     typedef DGtal::functors::Rescaling<int ,unsigned char > RescalFCT;
     Image image = extension == "dcm" ? DicomReader< Image,  RescalFCT  >::importDicom( inputFilename,
-                           RescalFCT(dicomMin,
-                         dicomMax,
-                         0, 255) ) :
-      GenericReader<Image>::import( inputFilename );
+                                                                                      RescalFCT(dicomMin,
+                                                                                                dicomMax,
+                                                                                                0, 255) ) :
+    GenericReader<Image>::import( inputFilename );
 #else
-    Image image = GenericReader<Image>::import (inputFilename );
+    Image image = GenericReader<Image>::import (inputFileName );
 #endif
     trace.info() << "Image loaded: "<<image<< std::endl;
     trace.endBlock();
-
+    
     //! [3dVolBoundaryViewer-KSpace]
     trace.beginBlock( "Construct the Khalimsky space from the image domain." );
     Domain domain = image.domain();
     KSpace ks;
     bool space_ok = ks.init( domain.lowerBound(), domain.upperBound(), true );
     if (!space_ok)
-      {
-  trace.error() << "Error in the Khamisky space construction."<<std::endl;
-  return 2;
-      }
+    {
+      trace.error() << "Error in the Khamisky space construction."<<std::endl;
+      return 2;
+    }
     trace.endBlock();
     //! [3dVolBoundaryViewer-KSpace]
-
+    
     //! [3dVolBoundaryViewer-Set3D]
     trace.beginBlock( "Wrapping a digital set around image. " );
     typedef functors::IntervalForegroundPredicate<Image> ThresholdedImage;
     ThresholdedImage thresholdedImage( image, thresholdMin, thresholdMax );
     trace.endBlock();
     //! [3dVolBoundaryViewer-Set3D]
-
+    
     //! [3dVolBoundaryViewer-ExtractingSurface]
     trace.beginBlock( "Extracting boundary by scanning the space. " );
     typedef KSpace::SurfelSet SurfelSet;
@@ -216,31 +202,32 @@ int main( int argc, char** argv )
     MySurfelAdjacency surfAdj( true ); // interior in all directions.
     MySetOfSurfels theSetOfSurfels( ks, surfAdj );
     Surfaces<KSpace>::sMakeBoundary( theSetOfSurfels.surfelSet(),
-             ks, thresholdedImage,
-             domain.lowerBound(),
-             domain.upperBound() );
+                                    ks, thresholdedImage,
+                                    domain.lowerBound(),
+                                    domain.upperBound() );
     MyDigitalSurface digSurf( theSetOfSurfels );
     trace.info() << "Digital surface has " << digSurf.size() << " surfels."
-     << std::endl;
+    << std::endl;
     trace.endBlock();
     //! [3dVolBoundaryViewer-ExtractingSurface]
-
+    
     //! [3dVolBoundaryViewer-ViewingSurface]
     trace.beginBlock( "Displaying everything. " );
     Viewer3D<Space,KSpace> viewer(ks);
     viewer.setWindowTitle("Simple boundary of volume Viewer");
     viewer.show();
     typedef MyDigitalSurface::ConstIterator ConstIterator;
-    if ( mode == "BDRY" ){
+    if ( mode == "BDRY" )
+    {
       viewer << SetMode3D(ks.unsigns( *(digSurf.begin()) ).className(), "Basic");
       for ( ConstIterator it = digSurf.begin(), itE = digSurf.end(); it != itE; ++it )
-  viewer << ks.unsigns( *it );
+        viewer << ks.unsigns( *it );
     }else if ( mode == "INNER" )
       for ( ConstIterator it = digSurf.begin(), itE = digSurf.end(); it != itE; ++it )
-  viewer << ks.sCoords( ks.sDirectIncident( *it, ks.sOrthDir( *it ) ) );
+        viewer << ks.sCoords( ks.sDirectIncident( *it, ks.sOrthDir( *it ) ) );
     else if ( mode == "OUTER" )
       for ( ConstIterator it = digSurf.begin(), itE = digSurf.end(); it != itE; ++it )
-  viewer << ks.sCoords( ks.sIndirectIncident( *it, ks.sOrthDir( *it ) ) );
+        viewer << ks.sCoords( ks.sIndirectIncident( *it, ks.sOrthDir( *it ) ) );
     else{
       trace.error() << "Warning display mode (" << mode << ") not implemented." << std::endl;
       trace.error() << "The display will be empty." << std::endl;

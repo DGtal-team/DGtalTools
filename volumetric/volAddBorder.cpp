@@ -21,7 +21,6 @@
  *
  * @date 2012/05/01
  *
- *
  * This file is part of the DGtal library.
  */
 
@@ -33,18 +32,11 @@
 #include <DGtal/images/Image.h>
 #include <DGtal/images/ImageContainerBySTLVector.h>
 
-#include <boost/program_options/options_description.hpp>
-#include <boost/program_options/parsers.hpp>
-#include <boost/program_options/variables_map.hpp>
+#include "CLI11.hpp"
 
 using namespace std;
 using namespace DGtal;
 using namespace Z3i;
-
-namespace po = boost::program_options;
-
-
-
 
 /**
  @page volAddBorder volAddBorder
@@ -56,9 +48,15 @@ namespace po = boost::program_options;
 
  @b Allowed @b options @b are : 
  @code
-  -h [ --help ]         display this message.
-  -i [ --input ] arg    Input vol file.
-  -o [ --output ] arg   Output filename.
+
+ Positionals:
+   1 TEXT:FILE REQUIRED                  Input vol file.
+
+ Options:
+   -h,--help                             Print this help message and exit
+   -i,--input TEXT:FILE REQUIRED         Input vol file.
+   --inside                              Sets zero value to domain boundary voxels without changing the domain extent.
+   -o,--output TEXT                      Output filename.
 
  @endcode
 
@@ -68,17 +66,13 @@ namespace po = boost::program_options;
  $  volAddBorder -i $DGtal/examples/samples/Al.100.vol -o Al.100border.vol
  @endcode
  
-
  You should obtain an resulting image with domain:
 -1, -1, -1 x 100, 100, 100 instead  0, 0, 0 x 99, 99, 99
 
- 
  @see
  @ref volAddBorder.cpp
 
  */
-
-
 
 
 /**
@@ -96,50 +90,55 @@ void missingParam ( std::string param )
 
 int main(int argc, char**argv)
 {
-
-  // parse command line ----------------------------------------------
-  po::options_description general_opt ( "Allowed options are " );
-  general_opt.add_options()
-    ( "help,h", "display this message." )
-    ( "input,i", po::value<std::string>(), "Input vol file." )
-    ( "output,o", po::value<string>(),"Output filename." );
-  bool parseOK=true;
-  po::variables_map vm;
-  try{
-    po::store(po::parse_command_line(argc, argv, general_opt), vm);  
-  }catch(const std::exception& ex){
-    parseOK=false;
-    trace.info()<< "Error checking program options: "<< ex.what()<< endl;
-  }
-  po::notify ( vm );
-  if ( !parseOK || vm.count ( "help" ) ||argc<=1 )
-    {
-      trace.info() << "Add a border of one voxel with value 0 around a vol file."<<std::endl
-                   << std::endl << "Basic usage: "<<std::endl
-                   << "\tvolAddBorder --input <volFileName> --o <volOutputFileName> "<<std::endl
-                   << general_opt << "\n"
-                   << "Example: \n \t volAddBorder -i $DGtal/examples/samples/Al.100.vol -o Al.100border.vol";
-      return 0;
-    }
-
-  //Parse options
-  if ( ! ( vm.count ( "input" ) ) ) missingParam ( "--input" );
-  std::string filename = vm["input"].as<std::string>();
-  if ( ! ( vm.count ( "output" ) ) ) missingParam ( "--output" );
-  std::string outputFileName = vm["output"].as<std::string>();
-
-  typedef ImageContainerBySTLVector<Z3i::Domain, unsigned char>  MyImageC;
-
-  MyImageC  imageC = VolReader< MyImageC >::importVol ( filename );
-  MyImageC  outputImage( Z3i::Domain( imageC.domain().lowerBound() - Vector().diagonal(1),
-                                      imageC.domain().upperBound() + Vector().diagonal(1)));
   
+  // parse command line using CLI ----------------------------------------------
+  CLI::App app;
+  std::string inputFileName;
+  std::string outputFileName {"result.vol"};
+  bool addInside {false};
+
+  app.description("Add a border of one voxel with value 0 around a vol file.\n \tvolAddBorder --input <volFileName> --o <volOutputFileName>\n Example: \n \t volAddBorder -i $DGtal/examples/samples/Al.100.vol -o Al.100border.vol");
+  
+  app.add_option("-i,--input,1", inputFileName, "Input vol file." )
+  ->required()
+  ->check(CLI::ExistingFile);
+  app.add_flag("--inside", addInside , "Sets zero value to domain boundary voxels without changing the domain extent.");
+  app.add_option("--output,-o,2", outputFileName, "Output filename.");
+  
+  app.get_formatter()->column_width(40);
+  CLI11_PARSE(app, argc, argv);
+  // END parse command line using CLI ----------------------------------------------
+
+  
+  typedef ImageContainerBySTLVector<Z3i::Domain, unsigned char>  MyImageC;
+  
+  MyImageC  imageC = VolReader< MyImageC >::importVol ( inputFileName );
+  Z3i::Domain rDom  ( imageC.domain().lowerBound() -  Vector().diagonal(addInside ? 0: 1),
+                      imageC.domain().upperBound() + Vector().diagonal(addInside ? 0: 1));
+  MyImageC  outputImage(rDom);
+  Z3i::Domain iDom  ( imageC.domain().lowerBound() +  Vector().diagonal( 1),
+                      imageC.domain().upperBound() - Vector().diagonal( 1));
+
   //Fast Copy
   for(MyImageC::Domain::ConstIterator it = imageC.domain().begin(),
-        itend = imageC.domain().end(); it != itend; ++it)
-    outputImage.setValue( *it , imageC(*it));
-  
-
-  bool res =  VolWriter< MyImageC>::exportVol(outputFileName, outputImage);
+          itend = imageC.domain().end(); it != itend; ++it){
+     if(!addInside){
+          outputImage.setValue( *it , imageC(*it));
+     }
+     else
+     {
+       if (!iDom.isInside(*it)){
+         imageC.setValue( *it , 0); 
+       }
+     }      
+     
+  }  
+  bool res = true;
+  if (!addInside) {
+    res=  VolWriter< MyImageC>::exportVol(outputFileName, outputImage);
+  }
+  else{
+    res=  VolWriter< MyImageC>::exportVol(outputFileName, imageC);
+  }
   if (res) return 0; else return 1;
 }

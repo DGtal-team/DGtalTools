@@ -14,11 +14,12 @@
  *
  **/
 /**
- * @file 3dVolBoundaryViewer.cpp
+ * @file volBoundary2obj.cpp
  * @ingroup Tools
  * @author Jacques-Olivier Lachaud (\c jacques-olivier.lachaud@univ-savoie.fr )
  * Laboratory of Mathematics (CNRS, UMR 5127), University of Savoie, France
  * @author David Coeurjolly (\c david.coeurjolly@liris.cnrs.fr )
+ * @author Bertrand Kerautret (\c bertrand.kerautret@liris.cnrs.fr )
  *
  * @date 2013/11/15
  *
@@ -29,9 +30,8 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 #include <iostream>
-#include <boost/program_options/options_description.hpp>
-#include <boost/program_options/parsers.hpp>
-#include <boost/program_options/variables_map.hpp>
+#include <set>
+#include "CLI11.hpp"
 
 #include "DGtal/base/Common.h"
 #include "DGtal/base/BasicFunctors.h"
@@ -51,199 +51,152 @@
 #include "DGtal/io/Color.h"
 #include "DGtal/io/colormaps/GradientColorMap.h"
 
+#include "DGtal/helpers/StdDefs.h"
+#include "DGtal/helpers/Shortcuts.h"
+#include "DGtal/helpers/ShortcutsGeometry.h"
 
 using namespace std;
 using namespace DGtal;
 //using namespace Z3i;
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace po = boost::program_options;
+
 
 /**
  @page volBoundary2obj volBoundary2obj
- @brief  Extracts digital points from 3d vol files.
+ @brief Export the boundary of a volume file to OBJ format. By default the resulting mesh is defined from the surfels of the surface elements, a triangulated (dual)
+ 
+ @b Usage: converters/volBoundary2obj [OPTIONS] 1 [2]
+ 
+ @b Allowed @b options @b are:
+ 
+ @code
 
-@b Usage: volBoundary2obj [input] [output]
 
-@b Allowed @b options @b are:
+Positionals:
+  1 TEXT:FILE REQUIRED                  vol file (.vol, .longvol .p3d, .pgm3d and if WITH_ITK is selected: dicom, dcm, mha, mhd). For longvol, dicom, dcm, mha or mhd formats, the input values are linearly scaled between 0 and 255.
+  2 TEXT                                output file (.obj or .off).
 
-@code
-  -h [ --help ]                    display this message
-  -i [ --input ] arg               vol file (.vol) , pgm3d (.p3d or .pgm3d, pgm
-                                   (with 3 dims)) file or sdp (sequence of 
-                                   discrete points)
-  -o [ --output ] arg              output obj file (.obj)
-  -m [ --thresholdMin ] arg (=0)   threshold min (excluded) to define binary 
-                                   shape
-  -M [ --thresholdMax ] arg (=255) threshold max (included) to define binary 
-                                   shape
-  --dicomMin arg (=-1000)          set minimum density threshold on Hounsfield 
-                                   scale
-  --dicomMax arg (=3000)           set maximum density threshold on Hounsfield 
-                                   scale
-  --mode arg (=INNER)              set mode for display: INNER: inner voxels, 
-                                   OUTER: outer voxels, BDRY: surfels
-  -n [ --normalization ]           Normalization so that the geometry fits in 
-                                   [-1/2,1/2]^3
-@endcode
+Options:
+  -h,--help                             Print this help message and exit
+  -i,--input TEXT:FILE REQUIRED         vol file (.vol, .longvol .p3d, .pgm3d and if WITH_ITK is selected: dicom, dcm, mha, mhd). For longvol, dicom, dcm, mha or mhd formats, the input values are linearly scaled between 0 and 255.
+  -o,--output TEXT                      output file (.obj or .off).
+  -m,--thresholdMin INT=128             threshold min (excluded) to define binary shape.
+  -M,--thresholdMax INT=255             threshold max (included) to define binary shape.
+  --rescaleInputMin INT=0               min value used to rescale the input intensity (to avoid basic cast into 8  bits image).
+  --rescaleInputMax INT=255             max value used to rescale the input intensity (to avoid basic cast into 8  bits image).
+  -c,--customDiffuse UINT=[230,230,230,255] x 4
+                                        set the R, G, B, A components of the diffuse colors of the mesh faces.
+  -t,--triangulatedSurface              save the dual triangulated surface instead instead the default digital surface.
 
-@b Example:
-@code 
-   $ volBoundary2obj -i $DGtal/examples/samples/lobster.vol -m 80 -o out.obj
-@endcode
 
-You should obtain such a visualization:
-@image html resVolBoundary2obj.png "resulting visualisation."
-
-@see
-@ref volBoundary2obj.cpp
-
-*/
+ @endcode
+ 
+ @b Example:
+ @code
+ $ volBoundary2obj -i $DGtal/examples/samples/lobster.vol -m 80 -o out.obj
+ @endcode
+ 
+ You should obtain such a visualization:
+ @image html resVolBoundary2obj.png "resulting visualisation."
+ 
+ @see
+ @ref volBoundary2obj.cpp
+ 
+ */
 
 
 int main( int argc, char** argv )
 {
-  typedef SpaceND<3,int> Space;
-  typedef KhalimskySpaceND<3,int> KSpace;
-  typedef HyperRectDomain<Space> Domain;
-  typedef ImageSelector<Domain, unsigned char>::Type Image;
-  typedef DigitalSetSelector< Domain, BIG_DS+HIGH_BEL_DS >::Type DigitalSet;
-  typedef SurfelAdjacency<KSpace::dimension> MySurfelAdjacency;
 
-  // parse command line ----------------------------------------------
-  po::options_description general_opt("Allowed options are: ");
-  general_opt.add_options()
-    ("help,h", "display this message")
-    ("input,i", po::value<std::string>(), "vol file (.vol) , pgm3d (.p3d or .pgm3d, pgm (with 3 dims)) file or sdp (sequence of discrete points)" )
-    ("output,o", po::value<std::string>(), "output obj file (.obj)" )
-    ("thresholdMin,m",  po::value<int>()->default_value(0), "threshold min (excluded) to define binary shape" )
-    ("thresholdMax,M",  po::value<int>()->default_value(255), "threshold max (included) to define binary shape" )
-#ifdef WITH_ITK
-    ("dicomMin", po::value<int>()->default_value(-1000), "set minimum density threshold on Hounsfield scale")
-    ("dicomMax", po::value<int>()->default_value(3000), "set maximum density threshold on Hounsfield scale")
-#endif
-    ("mode",  po::value<std::string>()->default_value("INNER"), "set mode for display: INNER: inner voxels, OUTER: outer voxels, BDRY: surfels") 
-   ("normalization,n", "Normalization so that the geometry fits in [-1/2,1/2]^3") ;
-
-  bool parseOK=true;
-  po::variables_map vm;
-  try{
-    po::store(po::parse_command_line(argc, argv, general_opt), vm);
-  }catch(const std::exception& ex){
-    parseOK=false;
-    trace.info()<< "Error checking program options: "<< ex.what()<< endl;
-  }
-  po::notify(vm);
-  if( !parseOK || vm.count("help")||argc<=1)
-    {
-      std::cout << "Usage: " << argv[0] << " -i [input] -o [output]\n"
-                << "Export the boundary of a volume file to OBJ format. The mode specifies if you wish to see surface elements (BDRY), the inner voxels (INNER) or the outer voxels (OUTER) that touch the boundary."<< endl
-                << general_opt << "\n";
-      return 0;
-    }
-
-  if(! vm.count("input"))
-    {
-      trace.error() << " The file name was defined" << endl;
-      return 0;
-    }
-
-  if(! vm.count("output"))
-    {
-      trace.error() << " The output filename was defined" << endl;
-      return 0;
-    }
-
-  string inputFilename = vm["input"].as<std::string>();
-  int thresholdMin = vm["thresholdMin"].as<int>();
-  int thresholdMax = vm["thresholdMax"].as<int>();
-  string mode = vm["mode"].as<string>();
-  bool normalization = false;
-  if  (vm.count("normalization"))
-    normalization = true;
+  CLI::App app;
   
-  string extension = inputFilename.substr(inputFilename.find_last_of(".") + 1);
-  if(extension!="vol" && extension != "p3d" && extension != "pgm3D" && extension != "pgm3d" && extension != "sdp" && extension != "pgm"
-#ifdef WITH_ITK
-     && extension !="dcm"
-#endif
-     ){
-    trace.info() << "File extension not recognized: "<< extension << std::endl;
-    return 0;
+  
+  // Using standard 3D digital space.
+  typedef Shortcuts<Z3i::KSpace> SH3;
+  typedef ShortcutsGeometry<Z3i::KSpace> SHG3;
+  auto params = SH3::defaultParameters() | SHG3::defaultParameters();
+  
+  int thresholdMin {128};
+  int thresholdMax {255};  
+  string inputFilename;
+  DGtal::int64_t rescaleInputMin {0};
+  DGtal::int64_t rescaleInputMax {255};
+  std::vector<unsigned int > vectCol=  {230, 230, 230, 255};
+  bool triangulatedSurface {false};
+  std::string outputFilename = "result.obj";
+ 
+  app.description("Export the boundary of a volume file to OBJ format. By default the resulting mesh is defined from the surfels of the surface elements, a triangulated (dual)");
+  
+  app.add_option("-i,--input,1", inputFilename, "vol file (.vol, .longvol .p3d, .pgm3d and if WITH_ITK is selected: dicom, dcm, mha, mhd). For longvol, dicom, dcm, mha or mhd formats, the input values are linearly scaled between 0 and 255." )
+    ->required()
+    ->check(CLI::ExistingFile);
+  app.add_option("--output,-o,2",outputFilename ,"output file (.obj or .off).");
+  app.add_option("--thresholdMin,-m", thresholdMin, "threshold min (excluded) to define binary shape.", true);
+  app.add_option("--thresholdMax,-M", thresholdMax, "threshold max (included) to define binary shape.", true);
+  app.add_option("--rescaleInputMin", rescaleInputMin, "min value used to rescale the input intensity (to avoid basic cast into 8  bits image).", true);
+  app.add_option("--rescaleInputMax", rescaleInputMax, "max value used to rescale the input intensity (to avoid basic cast into 8  bits image).", true);
+  app.add_option("--customDiffuse,-c", vectCol, "set the R, G, B, A components of the diffuse colors of the mesh faces.", true)
+    ->expected(4);
+  app.add_flag("--triangulatedSurface,-t", triangulatedSurface, "save the dual triangulated surface instead instead the default digital surface.");
+  app.get_formatter()->column_width(40);
+  CLI11_PARSE(app, argc, argv);
+  
+
+
+  typedef DGtal::functors::Rescaling<DGtal::int64_t ,unsigned char > RescalFCT;
+  RescalFCT f (rescaleInputMin, rescaleInputMax,0, 255);
+
+  trace.beginBlock( "Loading file.." );
+  SH3::GrayScaleImage image =
+  GenericReader< SH3::GrayScaleImage >::importWithValueFunctor(inputFilename, f );
+  
+  auto gimage = CountedPtr<SH3::GrayScaleImage>( new SH3::GrayScaleImage( image ) );
+  auto bimage = SH3::makeBinaryImage(gimage,params( "thresholdMin", thresholdMin )
+                                                  ( "thresholdMax", thresholdMax ) );
+  
+  
+  trace.info() << "Image loaded: "<<gimage<< std::endl;
+  trace.endBlock();
+  params( "faceSubdivision", "Centroid" )( "surfelAdjacency", 1);
+  auto K         = SH3::getKSpace( bimage);
+
+  SH3::Color cD (vectCol[0], vectCol[1], vectCol[2], vectCol[3]);
+  
+  
+  auto surface = SH3::makeDigitalSurface( bimage, K );
+  const std::string extension = outputFilename.substr( outputFilename.find_last_of(".") + 1 );  
+  if (extension != "obj" && extension != "off")
+  {
+    trace.warning() << "File extension not recognized, saving by default in objg format"<< std::endl;
   }
-
-  if(extension=="vol" || extension=="pgm3d" || extension=="pgm3D"
-#ifdef WITH_ITK
-     || extension =="dcm"
-#endif
-     ){
-    trace.beginBlock( "Loading image into memory." );
-#ifdef WITH_ITK
-    int dicomMin = vm["dicomMin"].as<int>();
-    int dicomMax = vm["dicomMax"].as<int>();
-    typedef DGtal::functors::Rescaling<int ,unsigned char > RescalFCT;
-    Image image = extension == "dcm" ? DicomReader< Image,  RescalFCT  >::importDicom( inputFilename,
-										       RescalFCT(dicomMin,
-												 dicomMax,
-												 0, 255) ) :
-      GenericReader<Image>::import( inputFilename );
-#else
-    Image image = GenericReader<Image>::import (inputFilename );
-#endif
-    trace.info() << "Image loaded: "<<image<< std::endl;
-    trace.endBlock();
-
-    trace.beginBlock( "Construct the Khalimsky space from the image domain." );
-    Domain domain = image.domain();
-    KSpace ks;
-    bool space_ok = ks.init( domain.lowerBound(), domain.upperBound(), true );
-    if (!space_ok)
-      {
-	trace.error() << "Error in the Khamisky space construction."<<std::endl;
-	return 2;
-      }
-    trace.endBlock();
-
-    trace.beginBlock( "Wrapping a digital set around image. " );
-    typedef functors::IntervalForegroundPredicate<Image> ThresholdedImage;
-    ThresholdedImage thresholdedImage( image, thresholdMin, thresholdMax );
-    trace.endBlock();
-
-    trace.beginBlock( "Extracting boundary by scanning the space. " );
-    typedef KSpace::SurfelSet SurfelSet;
-    typedef SetOfSurfels< KSpace, SurfelSet > MySetOfSurfels;
-    typedef DigitalSurface< MySetOfSurfels > MyDigitalSurface;
-    MySurfelAdjacency surfAdj( true ); // interior in all directions.
-    MySetOfSurfels theSetOfSurfels( ks, surfAdj );
-    Surfaces<KSpace>::sMakeBoundary( theSetOfSurfels.surfelSet(),
-				     ks, thresholdedImage,
-				     domain.lowerBound(),
-				     domain.upperBound() );
-    MyDigitalSurface digSurf( theSetOfSurfels );
-    trace.info() << "Digital surface has " << digSurf.size() << " surfels."
-		 << std::endl;
-    trace.endBlock();
-
-    trace.beginBlock( "Displaying everything. " );
-    Board3D<Space,KSpace> board(ks);
-
-    board << SetMode3D(  ks.unsigns( *digSurf.begin() ).className(), "Basic" );
-
-    typedef MyDigitalSurface::ConstIterator ConstIterator;
-    if ( mode == "BDRY" )
-      for ( ConstIterator it = digSurf.begin(), itE = digSurf.end(); it != itE; ++it )
-	board << ks.unsigns( *it );
-    else if ( mode == "INNER" )
-      for ( ConstIterator it = digSurf.begin(), itE = digSurf.end(); it != itE; ++it )
-	board << ks.sCoords( ks.sDirectIncident( *it, ks.sOrthDir( *it ) ) );
-    else if ( mode == "OUTER" )
-      for ( ConstIterator it = digSurf.begin(), itE = digSurf.end(); it != itE; ++it )
-	board << ks.sCoords( ks.sIndirectIncident( *it, ks.sOrthDir( *it ) ) );
-
-    string outputFilename = vm["output"].as<std::string>();
-
-    board.saveOBJ(outputFilename, normalization);
-    trace.endBlock();
+  if (triangulatedSurface)
+  {
+    auto tr = SH3::makeTriangulatedSurface(surface);
+    bool ok = true;
+    if (extension!="off")
+    {
+      ok  = SH3::saveOBJ( tr, SH3::RealVectors(), SH3::Colors(), outputFilename, Color( 32, 32, 32 ), cD );
+    }
+    else 
+    {
+      ok  = SH3::saveOFF( tr, outputFilename, cD);
+    }
+    return ok ? EXIT_SUCCESS : EXIT_FAILURE ;
   }
-  return 0;
+  else
+  {
+    bool ok = true;
+    if (extension!="off")
+    {
+      ok  = SH3::saveOBJ( surface, SH3::RealVectors(), SH3::Colors(), outputFilename, Color( 32, 32, 32 ), cD);
+    } else
+    {
+      ok  = SH3::saveOFF( surface, outputFilename, cD);
+    }
+    return  ok ? EXIT_SUCCESS : EXIT_FAILURE;
+  }
+  return EXIT_SUCCESS;
 }
+
+

@@ -14,7 +14,7 @@
  *
  **/
 /**
- * @file volResSample.cpp
+ * @file volReSample.cpp
  * @ingroup volumetric
  * @author Bertrand Kerautret (\c kerautre@loria.fr )
  * LORIA (CNRS, UMR 7503), University of Nancy, France
@@ -36,15 +36,11 @@
 #include "DGtal/images/ConstImageAdapter.h"
 #include "DGtal/kernel/BasicPointFunctors.h"
 
-#include <boost/program_options/options_description.hpp>
-#include <boost/program_options/parsers.hpp>
-#include <boost/program_options/variables_map.hpp>
-
+#include "CLI11.hpp"
 
 
 using namespace std;
 using namespace DGtal;
-
 
 
 /**
@@ -52,15 +48,20 @@ using namespace DGtal;
  
  @brief Re samples a 3D volumetric image (.vol, .longvol, .pgm3d)  with a given grid size.
 
- @b Usage: volReSample [input-files] [output-file]
+ @b Usage: v ./volumetric/volReSample [OPTIONS] 1 [2]
 
 
  @b Allowed @b options @b are : 
  @code
-  -h [ --help ]         display this message
-  -i [ --input ] arg    input volumetric file (.vol, .longvol, .pgm3d) 
-  -o [ --output ] arg   the new volumetric file (.vol, .longvol, .pgm3d) 
-  -g [ --gridSize ] arg size_x size_y size_z : the grid size of the re sampling
+  Positionals:
+    1 TEXT:FILE REQUIRED                  input volumetric file (.vol, .longvol, .pgm3d).
+    2 TEXT                                the new volumetric file (.vol, .longvol, .pgm3d).
+
+  Options:
+    -h,--help                             Print this help message and exit
+    -i,--input TEXT:FILE REQUIRED         input volumetric file (.vol, .longvol, .pgm3d).
+    -o,--output TEXT                      the new volumetric file (.vol, .longvol, .pgm3d).
+    -g,--gridSize FLOAT x 3               size_x size_y size_z : the grid size of the re sampling
  @endcode
 
  @b Example: 
@@ -94,10 +95,6 @@ $ cat AlRS{1,2,4,8}.sdp >> AlRS1_2_4_8.sdp
 
  */
 
-
-///////////////////////////////////////////////////////////////////////////////
-namespace po = boost::program_options;
-
 int main( int argc, char** argv )
 {
   typedef ImageContainerBySTLVector < Z3i::Domain, unsigned char > Image3D;
@@ -107,65 +104,35 @@ int main( int argc, char** argv )
 				   Image3D::Value,  DGtal::functors::Identity >  SamplerImageAdapter;
 
 
-  // parse command line ----------------------------------------------
-  po::options_description general_opt("Allowed options are: ");
-  general_opt.add_options()
-    ("help,h", "display this message")
-    ("input,i", po::value<std::string >(), "input volumetric file (.vol, .longvol, .pgm3d) " )
-    ("output,o", po::value<std::string>(), "the new volumetric file (.vol, .longvol, .pgm3d) " )
-    ("gridSize,g", po::value<std::vector<double> >()->multitoken(), "size_x size_y size_z : the grid size of the re sampling ");
+  
+  // parse command line using CLI ----------------------------------------------
+  CLI::App app;
+  std::string inputFileName;
+  std::string outputFileName {"result.vol"};
+  std::vector<double> aGridSizeReSample;
+  
+  app.description("Re sample a 3D volumetric image (.vol, .longvol, .pgm3d)  with a given grid size. \n Example:\n to re sample an image with scale x,y,z  = 0.98, 0.98, 5.0,  you can do:\n volResSample -i image3d.vol -g 1 1 2  -o imageReSampled.vol \n ");
+  app.add_option("-i,--input,1", inputFileName, "input volumetric file (.vol, .longvol, .pgm3d)." )
+  ->required()
+  ->check(CLI::ExistingFile);
+  app.add_option("-o,--output,2", inputFileName, "the new volumetric file (.vol, .longvol, .pgm3d).", true );
+  app.add_option("-g,--gridSize", aGridSizeReSample, "size_x size_y size_z : the grid size of the re sampling ")
+   ->expected(3);
+  app.get_formatter()->column_width(40);
+  CLI11_PARSE(app, argc, argv);
+  // END parse command line using CLI ----------------------------------------------
 
   
-  bool parseOK=true;
-  po::variables_map vm;
-  try{
-    po::store(po::parse_command_line(argc, argv, general_opt), vm);
-  }catch(const std::exception& ex){
-    parseOK=false;
-    trace.info()<< "Error checking program options: "<< ex.what()<< endl;
-  }
-  po::notify(vm);
-
-
-
-  if( !parseOK || vm.count("help") || !vm.count("gridSize") || ! vm.count("input")||! vm.count("output") )
-    {
-      std::cout << "Usage: " << argv[0] << " [input-files] [output-file]\n"
-		<< "Re sample a 3D volumetric image (.vol, .longvol, .pgm3d)  with a given grid size. \n"
-		<< general_opt << "\n";
-      std::cout << "Example:\n to re sample an image with scale x,y,z  = 0.98, 0.98, 5.0,  you can do: \n"
-		<< "volResSample -i image3d.vol -g 1 1 2  -o imageReSampled.vol \n" << endl;
-      
-      return 0;
-    }
-
-
-
-
-  std::vector<  double > aGridSizeReSample = vm["gridSize"].as<std::vector<double > >();
-  if(aGridSizeReSample.size()!=3){
-    trace.error() << "The grid size should contains 3 elements" << std::endl;
-    return 0;
-  }
-
-  std::string inputFileName = vm["input"].as<std::string>();
-  std::string outputFileName = vm["output"].as<std::string>();
- 
- 
   trace.info()<< "Importing volume file :  " << inputFileName<< " ... " ;
   Image3D input3dImage = GenericReader<Image3D>::import(inputFileName);
   trace.info()<< "[done]" << endl;
   
-  
   PointVector<3,int> shiftVector3D(0 ,0, 0);      
   DGtal::functors::BasicDomainSubSampler< HyperRectDomain<SpaceND<3, int> >,  
                                           DGtal::int32_t, double > reSampler(input3dImage.domain(),
-                                                                             aGridSizeReSample,  shiftVector3D);  
-
+                                                                             aGridSizeReSample,  shiftVector3D);
   const functors::Identity aFunctor{};
   SamplerImageAdapter sampledImage ( input3dImage, reSampler.getSubSampledDomain(), reSampler, aFunctor );
   GenericWriter<SamplerImageAdapter>::exportFile(outputFileName, sampledImage);
-  
-
   return 0;
 }

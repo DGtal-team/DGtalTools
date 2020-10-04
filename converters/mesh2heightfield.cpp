@@ -37,18 +37,17 @@
 #include "DGtal/io/writers/MeshWriter.h"
 #include "DGtal/images/ConstImageAdapter.h"
 #include "DGtal/kernel/BasicPointFunctors.h"
+#include <DGtal/base/BasicFunctors.h>
 #include "DGtal/math/linalg/SimpleMatrix.h"
 
-#include <boost/program_options/options_description.hpp>
-#include <boost/program_options/parsers.hpp>
-#include <boost/program_options/variables_map.hpp>
+#include "CLI11.hpp"
+
+
 
 using namespace std;
 using namespace DGtal;
 
 
-///////////////////////////////////////////////////////////////////////////////
-namespace po = boost::program_options;
 
 /**
  @page mesh2heightfield mesh2heightfield
@@ -62,41 +61,32 @@ namespace po = boost::program_options;
 @b Allowed @b options @b are:
 
 @code
-  -h [ --help ]                   display this message
-  -i [ --input ] arg              mesh file (.off) 
-  -s [ --meshScale ] arg (=1)     change the default mesh scale (each vertex 
-                                  multiplied by the scale) 
-  -o [ --output ] arg             sequence of discrete point file (.sdp) 
-  --orientAutoFrontX              automatically orients the camera in front 
-                                  according the x axis.
-  --orientAutoFrontY              automatically orients the camera in front 
-                                  according the y axis.
-  --orientAutoFrontZ              automatically orients the camera in front 
-                                  according the z axis.
-  --orientBack                    change the camera direction to back instead 
-                                  front as given in  orientAutoFront{X,Y,Z} 
-                                  options.
-  --nx arg (=0)                   set the x component of the projection 
-                                  direction.
-  --ny arg (=0)                   set the y component of the projection 
-                                  direction.
-  --nz arg (=1)                   set the z component of the projection 
-                                  direction.
-  -x [ --centerX ] arg (=0)       choose x center of the projected image.
-  -y [ --centerY ] arg (=0)       choose y center of the projected image.
-  -z [ --centerZ ] arg (=1)       choose z center of the projected image.
-  --width arg (=100)              set the width of the area to be extracted as 
-                                  an height field image.
-  --height arg (=100)             set the height of the area to extracted  as 
-                                  an height field image.
-  --heightFieldMaxScan arg (=255) set the maximal scan deep.
-  --exportNormals                 export mesh normal vectors (given in the 
-                                  image height field basis).
-  --backgroundNormalBack          set the normals of background in camera 
-                                  opposite direction (to obtain a black 
-                                  background in rendering). 
-  --setBackgroundLastDepth        change the default background (black with the
-                                  last filled intensity).
+
+ositionals:
+  1 TEXT:FILE REQUIRED                  mesh file (.off)
+  2 TEXT=result.pgm                     sequence of discrete point file (.sdp) 
+
+Options:
+  -h,--help                             Print this help message and exit
+  -i,--input TEXT:FILE REQUIRED         mesh file (.off)
+  -o,--output TEXT=result.pgm           sequence of discrete point file (.sdp) 
+  -s,--meshScale FLOAT                  change the default mesh scale (each vertex multiplied by the scale) 
+  --heightFieldMaxScan INT=255          set the maximal scan deep.
+  -x,--centerX INT=0                    choose x center of the projected image.
+  -y,--centerY INT=0                    choose y center of the projected image.
+  -z,--centerZ INT=1                    choose z center of the projected image.
+  --nx FLOAT=0                          set the x component of the projection direction.
+  --ny FLOAT=0                          set the y component of the projection direction.
+  --nz FLOAT=1                          set the z component of the projection direction.
+  --width UINT=100                      set the width of the area to be extracted as an height field image.
+  --height UINT=100                     set the height of the area to extracted  as an height field image.
+  --orientAutoFrontX                    automatically orients the camera in front according the x axis.
+  --orientAutoFrontY                    automatically orients the camera in front according the y axis.
+  --orientAutoFrontZ                    automatically orients the camera in front according the z axis.
+  --orientBack                          change the camera direction to back instead front as given in  orientAutoFront{X,Y,Z} options.
+  --exportNormals                       export mesh normal vectors (given in the image height field basis).
+  --backgroundNormalBack                set the normals of background in camera opposite direction (to obtain a black background in rendering).
+  --setBackgroundLastDepth              change the default background (black with the last filled intensity).
 
 @endcode
 
@@ -155,66 +145,71 @@ int main( int argc, char** argv )
   typedef DGtal::ConstImageAdapter<Image3D, Z2i::Domain, DGtal::functors::Point2DEmbedderIn3D<DGtal::Z3i::Domain>,
                                    Image3D::Value,  DGtal::functors::Identity >  ImageAdapterExtractor;
   
-  // parse command line ----------------------------------------------
-  po::options_description general_opt("\nAllowed options are");
-  general_opt.add_options()
-    ("help,h", "display this message")
-    ("input,i", po::value<std::string>(), "mesh file (.off) " )
-    ("meshScale,s", po::value<double>()->default_value(1.0),
-     "change the default mesh scale (each vertex multiplied by the scale) " )
-    ("output,o", po::value<std::string>(), "sequence of discrete point file (.sdp) ") 
-    ("orientAutoFrontX",  "automatically orients the camera in front according the x axis." )
-    ("orientAutoFrontY",  "automatically orients the camera in front according the y axis." )
-    ("orientAutoFrontZ",  "automatically orients the camera in front according the z axis." )
-    ("orientBack",  "change the camera direction to back instead front as given in  orientAutoFront{X,Y,Z} options." )
-    ("nx", po::value<double>()->default_value(0), "set the x component of the projection direction." )
-    ("ny", po::value<double>()->default_value(0), "set the y component of the projection direction." )
-    ("nz", po::value<double>()->default_value(1), "set the z component of the projection direction." )
-    ("centerX,x", po::value<unsigned int>()->default_value(0), "choose x center of the projected image." )
-    ("centerY,y", po::value<unsigned int>()->default_value(0), "choose y center of the projected image." )
-    ("centerZ,z", po::value<unsigned int>()->default_value(1), "choose z center of the projected image." )
-    ("width", po::value<unsigned int>()->default_value(100), "set the width of the area to be extracted as an height field image." )
-    ("height", po::value<unsigned int>()->default_value(100), "set the height of the area to extracted  as an height field image." )
-    ("heightFieldMaxScan", po::value<unsigned int>()->default_value(255), "set the maximal scan deep." )
-    ("exportNormals",  "export mesh normal vectors (given in the image height field basis)." )
-    ("backgroundNormalBack",  "set the normals of background in camera opposite direction (to obtain a black background in rendering). " )
-  
-    ("setBackgroundLastDepth", "change the default background (black with the last filled intensity).");
-  
-  
+
+// parse command line using CLI ----------------------------------------------
+  CLI::App app;
+  std::string inputFileName;
+  std::string outputFileName {"result.pgm"};
+  double meshScale = 1.0;
   double triangleAreaUnit = 0.5;
-  bool parseOK=true;
-  po::variables_map vm;
-  try{
-    po::store(po::parse_command_line(argc, argv, general_opt), vm);  
-  }catch(const std::exception& ex){
-    parseOK=false;
-    trace.info()<< "Error checking program options: "<< ex.what()<< endl;
-  }
-  po::notify(vm);    
-  if( !parseOK || vm.count("help")||argc<=1)
-    {
-      std::cout << "Usage: " << argv[0] << " [input] [output]\n"
-		<< "Convert a mesh file into a projected 2D image given from a normal direction N and from a starting point P. The 3D mesh discretized and scanned in the normal direction N, starting from P with a step 1."
-		<< general_opt << "\n";
-      std::cout << "Example:\n"
-		<< "mesh2heightfield -i ${DGtal}/examples/samples/tref.off --orientAutoFrontZ --width 25 --height 25 -o heighMap.pgm -s 10  \n";
-      return 0;
-    }
+  unsigned int widthImageScan = {100};
+  unsigned int heightImageScan = {100};
+  bool orientAutoFrontX = false;
+  bool orientAutoFrontY = false;
+  bool orientAutoFrontZ = false;
+  bool orientBack = false;
+  bool exportNormals = false;
+  bool setBackgroundLastDepth = false;
+  bool backgroundNormalBack = false;
+  int maxScan {255};
+  int centerX {0};
+  int centerY {0};
+  int centerZ {1};
   
-  if(! vm.count("input") ||! vm.count("output"))
-    {
-      trace.error() << " Input and output filename are needed to be defined" << endl;      
-      return 0;
-    }
+  double nx{0};
+  double ny{0};
+  double nz{1};
+
   
-  string inputFilename = vm["input"].as<std::string>();
-  string outputFilename = vm["output"].as<std::string>();
-  double meshScale = vm["meshScale"].as<double>();
-  trace.info() << "Reading input file " << inputFilename ; 
+  app.description("Convert a mesh file into a projected 2D image given from a normal direction N and from a starting point P. The 3D mesh discretized and scanned in the normal direction N, starting from P with a step 1.\n   Example:\n mesh2heightfield -i ${DGtal}/examples/samples/tref.off --orientAutoFrontZ --width 25 --height 25 -o heighMap.pgm -s 10  \n");  
+  app.add_option("-i,--input,1", inputFileName, "mesh file (.off)" )
+    ->required()
+    ->check(CLI::ExistingFile);
+  app.add_option("-o,--output,2", outputFileName, "sequence of discrete point file (.sdp) ", true );
+  app.add_option("--meshScale,-s", meshScale, "change the default mesh scale (each vertex multiplied by the scale) ");
+  app.add_option("--heightFieldMaxScan", maxScan, "set the maximal scan deep.", true );
+  app.add_option("-x,--centerX",centerX, "choose x center of the projected image.", true);
+  app.add_option("-y,--centerY",centerY, "choose y center of the projected image.", true);
+  app.add_option("-z,--centerZ",centerZ, "choose z center of the projected image.", true);
+  app.add_option("--nx", nx, "set the x component of the projection direction.", true);
+  app.add_option("--ny", ny, "set the y component of the projection direction.", true);
+  app.add_option("--nz", nz, "set the z component of the projection direction.", true);
+  app.add_option("--width", widthImageScan, "set the width of the area to be extracted as an height field image.", true );
+  app.add_option("--height", heightImageScan, "set the height of the area to extracted  as an height field image.", true );
+  app.add_flag("--orientAutoFrontX", orientAutoFrontX,"automatically orients the camera in front according the x axis." );
+  app.add_flag("--orientAutoFrontY", orientAutoFrontY,"automatically orients the camera in front according the y axis." );
+  app.add_flag("--orientAutoFrontZ", orientAutoFrontZ,"automatically orients the camera in front according the z axis." );
+  app.add_flag("--orientBack", orientBack, "change the camera direction to back instead front as given in  orientAutoFront{X,Y,Z} options.");
+  app.add_flag("--exportNormals", exportNormals, "export mesh normal vectors (given in the image height field basis).");
+  app.add_flag("--backgroundNormalBack", backgroundNormalBack, "set the normals of background in camera opposite direction (to obtain a black background in rendering).");
+  app.add_flag("--setBackgroundLastDepth", setBackgroundLastDepth, "change the default background (black with the last filled intensity).");
+  
+  app.get_formatter()->column_width(40);
+  CLI11_PARSE(app, argc, argv);
+  // END parse command line using CLI ----------------------------------------------
+
+  widthImageScan *= meshScale;
+  heightImageScan *= meshScale;
+  maxScan *= meshScale;  
+  centerX *= meshScale;
+  centerY *= meshScale;
+  centerZ *= meshScale;
+  
+  
+  trace.info() << "Reading input file " << inputFileName ; 
   Mesh<Z3i::RealPoint> inputMesh(true);
       
-  DGtal::MeshReader<Z3i::RealPoint>::importOFFFile(inputFilename, inputMesh);
+  DGtal::MeshReader<Z3i::RealPoint>::importOFFFile(inputFileName, inputMesh);
   std::pair<Z3i::RealPoint, Z3i::RealPoint> b = inputMesh.getBoundingBox();
   double diagDist = (b.first-b.second).norm();
   if(diagDist<2.0*sqrt(2.0)){
@@ -267,20 +262,8 @@ int main( int argc, char** argv )
         }
     }
     
-  unsigned int widthImageScan = vm["height"].as<unsigned int>()*meshScale;
-  unsigned int heightImageScan = vm["width"].as<unsigned int>()*meshScale;
 
-  int maxScan = vm["heightFieldMaxScan"].as<unsigned int>()*meshScale;  
-  int centerX = vm["centerX"].as<unsigned int>()*meshScale;
-  int centerY = vm["centerY"].as<unsigned int>()*meshScale;
-  int centerZ = vm["centerZ"].as<unsigned int>()*meshScale;
-  
-  double nx = vm["nx"].as<double>();
-  double ny = vm["ny"].as<double>();
-  double nz = vm["nz"].as<double>();
-
-  if(vm.count("orientAutoFrontX")|| vm.count("orientAutoFrontY") ||
-     vm.count("orientAutoFrontZ"))
+  if(orientAutoFrontX || orientAutoFrontY || orientAutoFrontZ)
     {
       Z3i::Point ptL = meshVolImage.domain().lowerBound();
       Z3i::Point ptU = meshVolImage.domain().upperBound();     
@@ -288,24 +271,24 @@ int main( int argc, char** argv )
       centerX=ptC[0]; centerY=ptC[1]; centerZ=ptC[2];
       nx=0; ny=0; nz=0;
     }  
-  bool opp = vm.count("orientBack");
-  if(vm.count("orientAutoFrontX"))
+
+  if(orientAutoFrontX)
     {
-      nx=(opp?-1.0:1.0); 
+      nx=(orientBack?-1.0:1.0); 
       maxScan = meshVolImage.domain().upperBound()[0]- meshVolImage.domain().lowerBound()[0];
-      centerX = centerX + (opp? maxScan/2: -maxScan/2) ;
+      centerX = centerX + (orientBack? maxScan/2: -maxScan/2) ;
     }
-  if(vm.count("orientAutoFrontY"))
+  if(orientAutoFrontY)
     {
-      ny=(opp?-1.0:1.0); 
+      ny=(orientBack?-1.0:1.0); 
       maxScan = meshVolImage.domain().upperBound()[1]- meshVolImage.domain().lowerBound()[1];
-      centerY = centerY + (opp? maxScan/2: -maxScan/2);
+      centerY = centerY + (orientBack? maxScan/2: -maxScan/2);
     }
-  if(vm.count("orientAutoFrontZ"))
+  if(orientAutoFrontZ)
     {
-      nz=(opp?-1.0:1.0); 
+      nz=(orientBack?-1.0:1.0); 
       maxScan = meshVolImage.domain().upperBound()[2]-meshVolImage.domain().lowerBound()[2];
-      centerZ = centerZ + (opp? maxScan/2: -maxScan/2);
+      centerZ = centerZ + (orientBack? maxScan/2: -maxScan/2);
     }
   
   functors::Rescaling<unsigned int, Image2D::Value> scaleFctDepth(0, maxScan, 0, 255);  
@@ -314,7 +297,7 @@ int main( int argc, char** argv )
       trace.info()<< "Max depth value outside image intensity range: " << maxScan 
                   << " (use a rescaling functor which implies a loss of precision)"  << std::endl; 
     }  
-  trace.info() << "Processing image to output file " << outputFilename; 
+  trace.info() << "Processing image to output file " << outputFileName; 
     
   Image2D::Domain aDomain2D(DGtal::Z2i::Point(0,0), 
                             DGtal::Z2i::Point(widthImageScan, heightImageScan));
@@ -335,8 +318,9 @@ int main( int argc, char** argv )
   for(unsigned int k=0; k < maxScan; k++)
     {
       trace.progressBar(k, maxScan);
+      Z3i::Point c (ptCenter+normalDir*k, DGtal::functors::Round<>());
       DGtal::functors::Point2DEmbedderIn3D<DGtal::Z3i::Domain >  embedder(meshVolImage.domain(), 
-                                                                          ptCenter+normalDir*k,
+                                                                          c,
                                                                           normalDir,
                                                                           widthImageScan);
       ImageAdapterExtractor extractedImage(meshVolImage, aDomain2D, embedder, idV);
@@ -351,7 +335,7 @@ int main( int argc, char** argv )
             }
         }    
     }
-  if (vm.count("setBackgroundLastDepth"))
+  if (setBackgroundLastDepth)
     {
       for(Image2D::Domain::ConstIterator it = resultingImage.domain().begin(); 
           it != resultingImage.domain().end(); it++){
@@ -361,7 +345,7 @@ int main( int argc, char** argv )
           }
       }
     } 
-  bool inverBgNormal = vm.count("backgroundNormalBack");
+  bool inverBgNormal = backgroundNormalBack;
   for(Image2D::Domain::ConstIterator it = resultingImage.domain().begin(); 
       it != resultingImage.domain().end(); it++){
     if(resultingVectorField(*it)==Z3i::RealPoint(0.0, 0.0, 0.0))      
@@ -369,10 +353,10 @@ int main( int argc, char** argv )
         resultingVectorField.setValue(*it,Z3i::RealPoint(0, 0, inverBgNormal?-1: 1));         
       }
   }
-  resultingImage >> outputFilename;
-  if(vm.count("exportNormals")){ 
+  resultingImage >> outputFileName;
+  if(exportNormals){ 
     std::stringstream ss;
-    ss << outputFilename << ".normals";
+    ss << outputFileName << ".normals";
     std::ofstream outN;
     outN.open(ss.str().c_str(), std::ofstream::out);
     for(Image2D::Domain::ConstIterator it = resultingImage.domain().begin(); 
@@ -384,7 +368,5 @@ int main( int argc, char** argv )
       outN << std::endl;
     }
   }
-
-  return 0;  
+  return EXIT_SUCCESS;;  
 }
-

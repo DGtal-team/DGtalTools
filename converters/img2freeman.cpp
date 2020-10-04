@@ -1,19 +1,12 @@
 #include "DGtal/io/colormaps/GrayscaleColorMap.h"
 #include "DGtal/io/readers/GenericReader.h"
-
-
 #include "DGtal/images/ImageContainerBySTLVector.h"
-
 #include "DGtal/images/ImageSelector.h"
-
 #include "DGtal/geometry/curves/FreemanChain.h"
 #include "DGtal/geometry/helpers/ContourHelper.h"
-
 #include "DGtal/topology/helpers/Surfaces.h"
 
-#include <boost/program_options/options_description.hpp>
-#include <boost/program_options/parsers.hpp>
-#include <boost/program_options/variables_map.hpp>
+#include "CLI11.hpp"
 
 #include <vector>
 #include <string>
@@ -30,34 +23,25 @@ using namespace DGtal;
 @b Allowed @b options @b are:
 
 @code
-  -h [ --help ]                  display this message
-  -i [ --input ] arg             image file name
-  -m [ --min ] arg               min image threshold value (default 128)
-  -M [ --max ] arg               max image threshold value (default 255)
-  --sort                         to sort the resulting freemanchain by 
-                                 decreasing size.
-  -s [ --minSize ] arg           minSize of the extracted freeman chain 
-                                 (default 0)
-  -c [ --contourSelect ] arg     Select contour according reference point and 
-                                 maximal distance:  ex. --contourSelect X Y 
-                                 distanceMax
-  -r [ --thresholdRangeMin ] arg use a range interval as threshold (from min) :
-                                 --thresholdRangeMin min increment max : for 
-                                 each possible i, it define a digital sets 
-                                 [min, min+((i+1)*increment)] such that 
-                                 min+((i+1)*increment)< max  and extract their 
-                                 boundary. 
-  -R [ --thresholdRangeMax ] arg use a range interval as threshold (from max) :
-                                 --thresholdRangeMax min increment max : for 
-                                 each possible i, it define a digital sets [ 
-                                 max-((i)*increment), max] such that 
-                                 max-((i)*increment)>min  and extract their 
-                                 boundary. 
+
+Positionals:
+  1 TEXT:FILE REQUIRED                  input image file name (any 2D image format accepted by DGtal::GenericReader).
+  contourSelect INT x 3                 Select contour according reference point and maximal distance:  ex. --contourSelect X Y distanceMax
+
+Options:
+  -h,--help                             Print this help message and exit
+  -i,--input TEXT:FILE REQUIRED         input image file name (any 2D image format accepted by DGtal::GenericReader).
+  -m,--min FLOAT                        min image threshold value (default 128)
+  -M,--max FLOAT                        max image threshold value (default 255)
+  --sort                                to sort the resulting freemanchain by decreasing size.
+  -s,--minSize UINT                     minSize of the extracted freeman chain (default 0)
+  -r,--thresholdRangeMin INT x 3        use a range interval as threshold (from min) : --thresholdRangeMin min increment max : for each possible i, it define a digital sets [min, min+((i+1)*increment)] such that min+((i+1)*increment)< max  and extract their boundary.
+  -R,--thresholdRangeMax INT x 3        use a range interval as threshold (from max) : --thresholdRangeMax min increment max : for each possible i, it define a digital sets [ max-((i)*increment), max] such that max-((i)*increment)>min  and extract their boundary.
 @endcode
 
 @b Example:
 @code
-  $ img2freeman -i ${DGtal}/examples/samples/church.pgm -o contours.fc  
+  $ img2freeman -i ${DGtal}/examples/samples/church.pgm > contours.fc  
 
 @endcode
 You will obtain such results:
@@ -91,9 +75,6 @@ more contours.fc
 
 
 
-
-///////////////////////////////////////////////////////////////////////////////
-namespace po = boost::program_options;
 
 
 typedef ImageSelector < Z2i::Domain, unsigned char>::Type Image;
@@ -181,8 +162,8 @@ void saveSelContoursAsFC(std::vector< std::vector< Z2i::Point >  >  vectContours
 
   for(unsigned int k=0; k<vectContoursBdryPointels.size(); k++){
     if(vectContoursBdryPointels.at(k).size()>minSize){
-      Z2i::Point ptMean = ContourHelper::getMeanPoint(vectContoursBdryPointels.at(k));
-      unsigned int distance = (unsigned int)ceil(sqrt((double)(ptMean[0]-refPoint[0])*(ptMean[0]-refPoint[0])+
+      Z2i::RealPoint ptMean = ContourHelper::getBarycenter(vectContoursBdryPointels.at(k));
+      unsigned int distance = (unsigned int)ceil(sqrt((ptMean[0]-refPoint[0])*(ptMean[0]-refPoint[0])+
 						      (ptMean[1]-refPoint[1])*(ptMean[1]-refPoint[1])));
       if(distance<=selectDistanceMax){
 	FreemanChain<Z2i::Integer> fc (vectContoursBdryPointels.at(k));    
@@ -197,87 +178,61 @@ void saveSelContoursAsFC(std::vector< std::vector< Z2i::Point >  >  vectContours
 
 int main( int argc, char** argv )
 {
-  // parse command line ----------------------------------------------
-  po::options_description general_opt("Allowed options are ");
-  general_opt.add_options()
-    ("help,h", "display this message")
-    ("input,i", po::value<std::string>(), "image file name")
-    ("min,m", po::value<int>(), "min image threshold value (default 128)")
-    ("max,M", po::value<int>(), "max image threshold value (default 255)")
-    ("sort", "to sort the resulting freemanchain by decreasing size.") 
-    ("minSize,s", po::value<int>(), "minSize of the extracted freeman chain (default 0)")
-    ("contourSelect,c", po::value<std::vector <int> >()->multitoken(), 
-     "Select contour according reference point and maximal distance:  ex. --contourSelect X Y distanceMax")
-    ("thresholdRangeMin,r", po::value<std::vector <int> >()->multitoken(), 
-     "use a range interval as threshold (from min) : --thresholdRangeMin min increment max : for each possible i, it define a digital sets [min, min+((i+1)*increment)] such that min+((i+1)*increment)< max  and extract their boundary. ")
-    ("thresholdRangeMax,R", po::value<std::vector <int> >()->multitoken(), 
-     "use a range interval as threshold (from max) : --thresholdRangeMax min increment max : for each possible i, it define a digital sets [ max-((i)*increment), max] such that max-((i)*increment)>min  and extract their boundary. ");
+  // parse command line using CLI ----------------------------------------------
+  CLI::App app;
+  std::string inputFileName;
+  std::string outputFileName {"result.fc"};
   
-  bool parseOK=true;
-  po::variables_map vm;
-  try{
-    po::store(po::parse_command_line(argc, argv, general_opt), vm);  
-  }catch(const std::exception& ex){
-    trace.info()<< "Error checking program options: "<< ex.what()<< std::endl;
-    parseOK=false;
-  }
-  po::notify(vm);    
-  if(vm.count("help")||argc<=1|| !parseOK)
-    {
-      trace.info()<< "Extract FreemanChains from thresholded image" <<std::endl << "Basic usage: "<<std::endl
-      << "\t img2freeman [options] --input <imageName> -min 128 -max 255 > contours.fc"<<std::endl
-      << "Note that if you don't specify any threshold a threshold threshold max is automatically defined from the Otsu algorithm with min=0. "<<std::endl
-      << general_opt << "\n";
-      return 0;
-    }
-  
-  double minThreshold = 128;
-  double maxThreshold = 255;
-  unsigned int minSize =0;
-  bool select=false;
-  bool sortCnt = vm.count("sort");
-  bool thresholdRange=vm.count("thresholdRangeMin")||vm.count("thresholdRangeMax");
+  double minThreshold {128};
+  double maxThreshold {255};
+  unsigned int minSize {0};
+  bool select {false};
+  bool sortCnt {false};
+
   Z2i::Point selectCenter;
   unsigned int selectDistanceMax = 0; 
- 
+  std::vector<int> cntConstraints;
+  std::vector<int> vectRangeMin, vectRangeMax, vectRange;
+    
+  app.description("Extract FreemanChains from thresholded image.\n Basic example: \t img2freeman [options] --input <imageName> -min 128 -max 255 > contours.fc \n  Note that if you don't specify any threshold a threshold threshold max is automatically defined from the Otsu algorithm with min=0. ");
+  app.add_option("-i,--input,1", inputFileName, "input image file name (any 2D image format accepted by DGtal::GenericReader)." )
+    ->required()
+    ->check(CLI::ExistingFile);
+  app.add_option("-m,--min", minThreshold, "min image threshold value (default 128)");
+  app.add_option("-M,--max", maxThreshold, "max image threshold value (default 255)");
+  app.add_flag("--sort", sortCnt,"to sort the resulting freemanchain by decreasing size." );
+  app.add_option("-s,--minSize", minSize,"minSize of the extracted freeman chain (default 0)" );
+  app.add_option("contourSelect",cntConstraints,"Select contour according reference point and maximal distance:  ex. --contourSelect X Y distanceMax" )
+    -> expected(3);
+  app.add_option("-r,--thresholdRangeMin",vectRangeMin, "use a range interval as threshold (from min) : --thresholdRangeMin min increment max : for each possible i, it define a digital sets [min, min+((i+1)*increment)] such that min+((i+1)*increment)< max  and extract their boundary." )
+  -> expected(3);
+  app.add_option("-R,--thresholdRangeMax",vectRangeMax, "use a range interval as threshold (from max) : --thresholdRangeMax min increment max : for each possible i, it define a digital sets [ max-((i)*increment), max] such that max-((i)*increment)>min  and extract their boundary." )
+  -> expected(3);
+
+
+  app.get_formatter()->column_width(40);
+  CLI11_PARSE(app, argc, argv);
+  // END parse command line using CLI ----------------------------------------------
+
+
+  bool thresholdRange=vectRangeMax.size()==3 || vectRangeMin.size()==3;
   typedef functors::IntervalThresholder<Image::Value> Binarizer; 
-  std::string imageFileName = vm["input"].as<std::string>();
-
-  Image image = GenericReader<Image>::import( imageFileName ); 
+  Image image = GenericReader<Image>::import( inputFileName ); 
   
-
-  //Parse options
-  if (!(vm.count("input"))){
-    trace.info() << "Image file name needed"<< std::endl;
-    return 0;
-  } 
-  if(vm.count("min")){
-    minThreshold= vm["min"].as<int>();
-  } 
-  if(vm.count("max")){
-    maxThreshold= vm["max"].as<int>();
-  } 
-  if(vm.count("minSize")){
-    minSize = vm["minSize"].as<int>();
-  } 
-  if(vm.count("contourSelect")){
+  
+  if(cntConstraints.size()==3){
     select=true;
-    std::vector<int> cntConstraints= vm["contourSelect"].as<std::vector <int> >();
-    if(cntConstraints.size()!=3){
-      trace.info() << "Incomplete option \"--contourSelect\""<< std::endl;
-      return 0;
-    }
     selectCenter[0]= cntConstraints.at(0);
     selectCenter[1]= cntConstraints.at(1);
     selectDistanceMax= (unsigned int) cntConstraints.at(2);
   }
-
+  
   int min, max, increment;
   if(! thresholdRange){
     min=(int)minThreshold;
     max= (int)maxThreshold;
     increment =  (int)(maxThreshold - minThreshold);
-    if(!vm.count("min")&&!vm.count("max")) {
+    if(minThreshold == 128 && maxThreshold == 255) {
       min=0;
       trace.info() << "Min/Max threshold values not specified, set min to 0 and computing max with the otsu algorithm...";     
       max = getOtsuThreshold(image);
@@ -285,16 +240,7 @@ int main( int argc, char** argv )
     }
     
   }else{
-    std::vector<int> vectRange;
-    if ( vm.count("thresholdRangeMax")){
-      vectRange= vm["thresholdRangeMax"].as<std::vector <int> >();
-    }else{
-      vectRange= vm["thresholdRangeMin"].as<std::vector <int> >();
-    }
-    if(vectRange.size()!=3){
-      trace.info() << "Incomplete option \"--thresholdRange\""<< std::endl;
-      return 0;
-    }
+    vectRange = (vectRangeMin.size()==3) ? vectRangeMin : vectRangeMax;
     min=vectRange.at(0);
     increment=vectRange.at(1);
     max = vectRange.at(2);
@@ -302,9 +248,7 @@ int main( int argc, char** argv )
     maxThreshold=max;
   }
 
- 
-
- 
+  
   Z2i::KSpace ks;
   if(! ks.init( image.domain().lowerBound(), 
 		image.domain().upperBound(), true )){
@@ -327,10 +271,10 @@ int main( int argc, char** argv )
     }
   }else{
     for(int i=0; minThreshold+i*increment< maxThreshold; i++){
-      if(vm.count("thresholdRangeMin")){
+      if(vectRangeMin.size()==3){
 	min = (int)(minThreshold+(i)*increment);
       }
-      if(vm.count("thresholdRangeMax")){
+      if(vectRangeMax.size()==3){
 	max = (int)(maxThreshold-(i)*increment);
       }
       Binarizer b(min, max); 

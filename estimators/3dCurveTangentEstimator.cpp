@@ -39,12 +39,13 @@
 #include <iterator>
 #include <cstdio>
 #include <cmath>
+#include <string>
+#include <map>
 #include <fstream>
 #include <vector>
+#include <utility>
 
-#include <boost/program_options/options_description.hpp>
-#include <boost/program_options/parsers.hpp>
-#include <boost/program_options/variables_map.hpp>
+#include "CLI11.hpp"
 
 #include "DGtal/base/Common.h"
 #include "DGtal/base/Exceptions.h"
@@ -90,45 +91,31 @@ This program can also displays the curve and tangent estimations, and it can als
 @b Allowed @b options are :
 
  @code
-  -h [ --help ]                         display this message
-  -i [ --input ] arg                    the name of the text file containing 
-                                        the list of 3D points: (x y z) per 
-                                        line.
-  -V [ --view ] arg (=OFF)              toggles display ON/OFF
-  -b [ --box ] arg (=0)                 specifies the the tightness of the 
-                                        bounding box around the curve with a 
-                                        given integer displacement <arg> to 
-                                        enlarge it (0 is tight)
-  -v [ --viewBox ] arg (=WIRED)         displays the bounding box, <arg>=WIRED 
-                                        means that only edges are displayed, 
-                                        <arg>=COLORED adds colors for planes 
-                                        (XY is red, XZ green, YZ, blue).
-  -T [ --connectivity ] arg (=6)        specifies whether it is a 6-connected 
-                                        curve or a 26-connected curve: arg=6 | 
-                                        26.
-  -C [ --curve3d ]                      displays the 3D curve
-  -c [ --curve2d ]                      displays the 2D projections of the 3D 
-                                        curve on the bounding box
-  -3 [ --cover3d ]                      displays the 3D tangential cover of the
-                                        curve
-  -2 [ --cover2d ]                      displays the 2D projections of the 3D 
-                                        tangential cover of the curve
-  -n [ --nbColors ] arg (=3)            sets the number of successive colors 
-                                        used for displaying 2d and 3d maximal 
-                                        segments (default is 3: red, green, 
-                                        blue)
-  -t [ --tangent ]                      displays the tangents to the curve
-  -R [ --big-radius ] arg (=10)         the radius parameter R in the VCM 
-                                        estimator.
-  -r [ --small-radius ] arg (=3)        the radius parameter r in the VCM 
-                                        estimator.
-  -m [ --method ] arg (=VCM)            the method of tangent computation: VCM 
-                                        (default), L-MST.
-  -o [ --output ] arg (=3d-curve-tangent-estimations)
-                                        the basename of the output text file 
-                                        which will contain points and tangent 
-                                        vectors: (x y z tx ty tz) per line
 
+ Positionals:
+   1 TEXT:FILE REQUIRED                  the name of the text file containing the list of 3D points: (x y z) per line.
+
+ Options:
+   -h,--help                             Print this help message and exit
+   -i,--input TEXT:FILE REQUIRED         the name of the text file containing the list of 3D points: (x y z) per line.
+   -V,--view TEXT=OFF                    toggles display ON/OFF
+   -b,--box INT=0                        specifies  the tightness of the bounding box around the curve with a given integer displacement <arg> to enlarge it (0 is tight)
+   -v,--viewBox TEXT:{WIRED,COLORED}=WIRED
+                                         displays the bounding box, <arg>=WIRED means that only edges are displayed, <arg>=COLORED adds colors for planes (XY is red, XZ green, YZ, blue).
+   -T,--connectivity TEXT:{6,26}=6       specifies whether it is a 6-connected curve or a 26-connected curve: arg=6 | 26.
+   -C,--curve3d                          displays the 3D curve
+   -c,--curve2d                          displays the 2D projections of the 3D curve on the bounding box
+   -3,--cover3d                          displays the 3D tangential cover of the curve
+   -2,--cover2d                          displays the 2D projections of the 3D tangential cover of the curve
+   -t,--tangent                          displays the tangents to the curve.
+   -n,--nbColors UINT=3                  sets the number of successive colors used for displaying 2d and 3d maximal segments (default is 3: red, green, blue)
+   -R,--big-radius FLOAT=10              the radius parameter R in the VCM estimator.
+   -r,--small-radius FLOAT=3             the radius parameter r in the VCM estimator.
+   -m,--method TEXT:{VCM,L-MST}=VCM      the method of tangent computation: VCM (default), L-MST.
+   -a,--axes TEXT:{ON,OFF}=OFF           show main axes - prints list of axes for each point and color points color = (if X => 255, if Y => 255, if Z => 255)
+   -o,--output TEXT=3d-curve-tangent-estimations
+                                         the basename of the output text file which will contain points and tangent vectors: (x y z tx ty tz) per line
+      
  @endcode
 
  @b Example: 
@@ -666,8 +653,64 @@ void ComputeLMST26 ( const PointIterator & begin, const PointIterator & end, Tan
   }
 }
 
-///////////////////////////////////////////////////////////////////////////////
-namespace po = boost::program_options;
+template < typename PointIterator, typename Space, int CONNECT = 8  >
+void find_main_axes ( PointIterator begin, PointIterator end, multimap < typename Space::Point, string > & axes )
+{
+    typedef Naive3DDSSComputer < PointIterator, int, CONNECT > SegmentComputer;
+    typedef SaturatedSegmentation < SegmentComputer > Segmentation;
+
+    Segmentation segmenter ( begin, end, SegmentComputer ( ) );
+
+    for ( auto it = begin; it != end; ++it )
+    {
+        unsigned int cX = 0, cY = 0, cZ = 0;
+        for ( typename Segmentation::SegmentComputerIterator idss = segmenter.begin ( ); idss != segmenter.end ( ); ++idss )
+        {
+            if ( idss->isInDSS ( *it ) )
+            {
+                const typename SegmentComputer::ArithmeticalDSSComputer2d & dssXY = (*idss).arithmeticalDSS2dXY();
+                const typename SegmentComputer::ArithmeticalDSSComputer2d & dssXZ = (*idss).arithmeticalDSS2dXZ();
+                const typename SegmentComputer::ArithmeticalDSSComputer2d & dssYZ = (*idss).arithmeticalDSS2dYZ();
+                unsigned int lenXY = distance ( dssXY.begin(), dssXY.end() );
+                unsigned int lenXZ = distance ( dssXZ.begin(), dssXZ.end() );
+                unsigned int lenYZ = distance ( dssYZ.begin(), dssYZ.end() );
+
+                if ( lenXY >= lenYZ && lenXZ >= lenYZ )
+                    cX++;
+                else if ( lenXY >= lenXZ && lenYZ >= lenXZ )
+                    cY++;
+                else
+                    cZ++;
+            }
+        }
+        if ( cX > 0 )
+          axes.insert (  pair <typename Space::Point, string > ( *it, string ( "X" ) ) );
+        if ( cY > 0 )
+          axes.insert (  pair <typename Space::Point, string > ( *it, string ( "Y" ) ) );
+        if ( cZ > 0 )
+          axes.insert (  pair <typename Space::Point, string > ( *it, string ( "Z" ) ) );
+
+    }
+}
+
+template < typename PointIterator, typename Space >
+void print_main_axes ( PointIterator begin, PointIterator end, multimap < typename Space::Point, string > & axes )
+{
+    for ( PointIterator itt = begin; itt != end; ++itt )
+    {
+        typename std::multimap<typename Space::Point, string>::const_iterator it = axes.lower_bound(*itt);
+        typename std::multimap<typename Space::Point, string>::const_iterator it2 = axes.upper_bound(*itt);
+        cout << "(" << it->first[0] << ", " << it->first[1] << ", " << it->first[2] << "); MAIN_AXES = (";
+        for (; it != it2; it++ )
+        {
+            if ( distance( it, it2 ) > 1 )
+                cout << it->second << ", ";
+            else
+                cout << it->second << ")";
+        }
+    cout << endl;
+    }
+}
 
 /**
  * Main function.
@@ -691,70 +734,63 @@ int main(int argc, char **argv)
   
   // specify command line ----------------------------------------------
   QApplication application(argc,argv); // remove Qt arguments.
-  po::options_description general_opt("Specific allowed options are ");
-  general_opt.add_options()
-  ("help,h", "display this message")
-  ("input,i", po::value<string>(), "the name of the text file containing the list of 3D points: (x y z) per line." )
-  ("view,V", po::value<string>()->default_value( "OFF" ), "toggles display ON/OFF" )
-  ("box,b",  po::value<int>()->default_value( 0 ), "specifies the the tightness of the bounding box around the curve with a given integer displacement <arg> to enlarge it (0 is tight)" )
-  ("viewBox,v",  po::value<string>()->default_value( "WIRED" ), "displays the bounding box, <arg>=WIRED means that only edges are displayed, <arg>=COLORED adds colors for planes (XY is red, XZ green, YZ, blue)." )
-  ("connectivity,T", po::value<string>()->default_value( "6" ), "specifies whether it is a 6-connected curve or a 26-connected curve: arg=6 | 26.")
-  ("curve3d,C", "displays the 3D curve")
-  ("curve2d,c", "displays the 2D projections of the 3D curve on the bounding box")
-  ("cover3d,3", "displays the 3D tangential cover of the curve" )
-  ("cover2d,2", "displays the 2D projections of the 3D tangential cover of the curve" )
-  ("nbColors,n",  po::value<int>()->default_value( 3 ), "sets the number of successive colors used for displaying 2d and 3d maximal segments (default is 3: red, green, blue)" )
-  ("tangent,t", "displays the tangents to the curve" )
-  ("big-radius,R", po::value<double>()->default_value( 10.0 ), "the radius parameter R in the VCM estimator." )
-  ("small-radius,r", po::value<double>()->default_value( 3.0 ), "the radius parameter r in the VCM estimator." )
-  ("method,m", po::value<string>()->default_value( "VCM" ), "the method of tangent computation: VCM (default), L-MST." )
-  ("output,o", po::value<string>()->default_value( "3d-curve-tangent-estimations"), "the basename of the output text file which will contain points and tangent vectors: (x y z tx ty tz) per line" )
-  ;
-  po::positional_options_description pos_opt;
-  pos_opt.add("input", 1);
   
-  // parse command line ----------------------------------------------
-  bool parseOK=true;
-  po::variables_map vm;
-  try 
-  {
-    po::command_line_parser clp( argc, argv );
-    clp.options( general_opt ).positional( pos_opt );
-    po::store( clp.run(), vm );
-  } 
-  catch( const exception& ex ) 
-  {
-    parseOK = false;
-    trace.info() << "Error checking program options: "<< ex.what() << endl;
-  }
-  po::notify( vm );
-  if( !parseOK || vm.count("help")||argc<=1)
-  {
-    cout << "Usage: " << argv[0] << " [options] --input  <filename>\n"
-    << "This program estimates the tangent vector to a set of 3D integer points, which are supposed to approximate a 3D curve. "
-    << "This set of points is given as a list of points in file <input>."
-    << endl 
-    << "The tangent estimator uses either the digital Voronoi Covariance Measure (VCM) or the 3D lambda-Maximal Segment Tangent (L-MST)." 
-    << endl
-    << "This program can also displays the curve and tangent estimations, "
-    << "and it can also extract maximal digital straight segments (2D and 3D)."
-    << endl
-    << "Note: It is not compulsory for the points to be ordered in sequence, except if you wish to compute maximal digital straight segments." 
-    << endl
-    << "In this case, you can select the connectivity of your curve between 6 (standard) or 26 (naive).\n"
-    << general_opt << "\n\n";
-    cout << "Example:\n"
-    << "3dCurveTangentEstimator -i ${DGtal}/examples/samples/sinus.dat -V ON -c -R 20 -r 3 -T 6\n";
-    return 0;
-  }
+  // parse command line using CLI ----------------------------------------------
+  CLI::App app;
+  std::string inputFileName;
+  std::string viewFlag {"OFF"};
+  std::string viewBox {"WIRED"};
+  std::string connectivity {"6"};
+  std::string method {"VCM"};
+  std::string axesFlag {"OFF"};
+  std::string outputFileName {"3d-curve-tangent-estimations"};
+  bool curve3d {false};
+  bool curve2d {false};
+  bool cover3d {false};
+  bool cover2d {false};
+  bool displayTangent {false};
+  double bigRad {10.0};
+  double smallRad {3.0};
+  int box {0};
+  unsigned int nbColors {3};
+  app.description("This program estimates the tangent vector to a set of 3D integer points, which are supposed to approximate a 3D curve. This set of points is given as a list of points in file <input>.\n The tangent estimator uses either the digital Voronoi Covariance Measure (VCM) or the 3D lambda-Maximal Segment Tangent (L-MST).\n This program can also displays the curve and tangent estimations, and it can also extract maximal digital straight segments (2D and 3D).\n Note: It is not compulsory for the points to be ordered in sequence, except if you wish to compute maximal digital straight segments. In this case, you can select the connectivity of your curve between 6 (standard) or 26 (naive).\n Example:\n 3dCurveTangentEstimator -i ${DGtal}/examples/samples/sinus.dat -V ON -c -R 20 -r 3 -T 6\n" );
+  app.add_option("-i,--input,1", inputFileName, "the name of the text file containing the list of 3D points: (x y z) per line." )
+  ->required()
+  ->check(CLI::ExistingFile);
+
+  app.add_option("--view,-V", viewFlag, "toggles display ON/OFF",true );
+  app.add_option("--box,-b", box, "specifies  the tightness of the bounding box around the curve with a given integer displacement <arg> to enlarge it (0 is tight)", true);
+  app.add_option("--viewBox,-v", viewBox, "displays the bounding box, <arg>=WIRED means that only edges are displayed, <arg>=COLORED adds colors for planes (XY is red, XZ green, YZ, blue).", true)
+   -> check(CLI::IsMember({"WIRED" , "COLORED"}));
+  app.add_option("--connectivity,-T",connectivity, "specifies whether it is a 6-connected curve or a 26-connected curve: arg=6 | 26.", true )
+   -> check(CLI::IsMember({"6", "26"}));
+  app.add_flag("--curve3d,-C", curve3d, "displays the 3D curve" );
+  app.add_flag("--curve2d,-c", curve2d, "displays the 2D projections of the 3D curve on the bounding box" );
+  app.add_flag("--cover3d,-3", cover3d, "displays the 3D tangential cover of the curve");
+  app.add_flag("--cover2d,-2", cover2d, "displays the 2D projections of the 3D tangential cover of the curve");
+  app.add_flag("--tangent,-t", displayTangent, "displays the tangents to the curve.");
+  app.add_option("--nbColors,-n", nbColors, "sets the number of successive colors used for displaying 2d and 3d maximal segments (default is 3: red, green, blue)", true);
+  
+  app.add_option("--big-radius,-R",bigRad, "the radius parameter R in the VCM estimator.",true);
+  app.add_option("--small-radius,-r",smallRad, "the radius parameter r in the VCM estimator.",true);
+  app.add_option("--method,-m", method, "the method of tangent computation: VCM (default), L-MST.", true)
+   -> check(CLI::IsMember({"VCM", "L-MST"}));
+  app.add_option("--axes,-a", axesFlag, "show main axes - prints list of axes for each point and color points color = (if X => 255, if Y => 255, if Z => 255)", true)
+   -> check(CLI::IsMember({"ON","OFF"}));
+  app.add_option("--output,-o",outputFileName, "the basename of the output text file which will contain points and tangent vectors: (x y z tx ty tz) per line", true);
+ 
+  
+  
+  app.get_formatter()->column_width(40);
+  CLI11_PARSE(app, argc, argv);
+  // END parse command line using CLI ----------------------------------------------
+
+  
   
   // process command line ----------------------------------------------
-  string input = vm["input"].as<string>();
-  int b = vm["box"].as<int>();
-  // Create curve 3D.
   vector<Point> sequence;
   fstream inputStream;
-  inputStream.open ( input.c_str(), ios::in);
+  inputStream.open ( inputFileName.c_str(), ios::in);
   try 
   {
     sequence = PointListReader<Point>::getPointsFromInputStream( inputStream );
@@ -767,8 +803,23 @@ int main(int argc, char **argv)
   inputStream.close();
   
   // start viewer
-  bool view = vm[ "view" ].as<string>() == "ON";
-  
+  bool view = viewFlag == "ON";
+
+  // axes
+  bool axes = axesFlag == "ON";
+  multimap < Z3i::Point, string > mainAxes;
+
+  if ( axes && connectivity == "26" )
+  {
+      find_main_axes<PointIterator, Z3i::Space>(sequence.begin(), sequence.end(), mainAxes);
+      print_main_axes<PointIterator, Z3i::Space>(sequence.begin(), sequence.end(), mainAxes);
+  }
+  else if ( axes && connectivity == "6" )
+  {
+    find_main_axes < PointIterator, Z3i::Space, 4 > ( sequence.begin ( ), sequence.end ( ), mainAxes );
+    print_main_axes<PointIterator, Z3i::Space>(sequence.begin(), sequence.end(), mainAxes);
+  }
+
   // ----------------------------------------------------------------------
   // Create domain and curve.
   Point lowerBound = sequence[ 0 ];
@@ -778,32 +829,30 @@ int main(int argc, char **argv)
     lowerBound = lowerBound.inf( sequence[ j ] );
     upperBound = upperBound.sup( sequence[ j ] );
   }
-  lowerBound -= Point::diagonal( b );
-  upperBound += Point::diagonal( b + 1 );
+  lowerBound -= Point::diagonal( box );
+  upperBound += Point::diagonal( box + 1 );
   K3 ks; ks.init( lowerBound, upperBound, true );
   Viewer3D<Z3,K3> viewer( ks );
   trace.beginBlock ( "Tool 3dCurveTangentEstimator" );
   
   std::vector< RealVector > tangents;
-  string output = vm["output"].as<string>();
-  string method = vm["method"].as<string>();
   
   if ( method == "VCM" )
   {
     // input points of the curve are in sequence vector.
-    const double R = vm["big-radius"].as<double>();
+    const double R = bigRad;
     trace.info() << "Big radius   R = " << R << endl;
-    const double r = vm["small-radius"].as<double>();
+    const double r = smallRad;
     trace.info() << "Small radius r = " << r << endl;
     
-    ComputeVCM < PointIterator, Z3, std::vector< RealVector > > ( R, r, sequence.begin(), sequence.end(), tangents, output );
+    ComputeVCM < PointIterator, Z3, std::vector< RealVector > > ( R, r, sequence.begin(), sequence.end(), tangents, outputFileName );
   }
   else if ( method == "L-MST" )
   {
-    if (vm[ "connectivity" ].as<string>() == "6")
-      ComputeLMST6  < PointIterator, Z3, std::vector< RealVector > > ( sequence.begin(), sequence.end(), tangents, output );
+    if (connectivity == "6")
+      ComputeLMST6  < PointIterator, Z3, std::vector< RealVector > > ( sequence.begin(), sequence.end(), tangents, outputFileName );
     else
-      ComputeLMST26  < PointIterator, Z3, std::vector< RealVector > > ( sequence.begin(), sequence.end(), tangents, output );
+      ComputeLMST26  < PointIterator, Z3, std::vector< RealVector > > ( sequence.begin(), sequence.end(), tangents, outputFileName );
   }
   else
   {
@@ -844,29 +893,50 @@ int main(int argc, char **argv)
   {
     viewer.show();
     // Display axes.
-    if ( vm.count( "viewBox" ) )
-      displayAxes<Point,RealPoint, Z3i::Space, Z3i::KSpace>( viewer, lowerBound, upperBound, vm[ "viewBox" ].as<std::string>() );
+    if ( viewBox != "" )
+      displayAxes<Point,RealPoint, Z3i::Space, Z3i::KSpace>( viewer, lowerBound, upperBound, viewBox );
     // Display 3D tangential cover.
-    res = vm[ "connectivity" ].as<string>() == "6"
+    res = connectivity == "6"
     ? displayCover6( viewer, ks, sequence.begin(), sequence.end(),
-		     vm.count( "cover3d" ),
-		     vm.count( "curve2d" ),
-		     vm.count( "cover2d" ),
-		     vm.count( "tangent" ),
-		     vm["nbColors"].as<int>() )
+		     cover3d,
+		     curve2d,
+		     cover2d,
+		     displayTangent,
+		     nbColors )
     : displayCover26( viewer, ks, sequence.begin(), sequence.end(),
-		      vm.count( "cover3d" ),
-		      vm.count( "curve2d" ),
-		      vm.count( "cover2d" ),
-		      vm.count( "tangent" ),
-		      vm["nbColors"].as<int>() );
+		      cover3d,
+		      curve2d,
+		      cover2d,
+		      displayTangent,
+		      nbColors );
     // Display 3D curve points.
-    if ( vm.count( "curve3d" ) )
+    if ( curve3d && ! axes )
     {
       viewer << CustomColors3D( CURVE3D_COLOR, CURVE3D_COLOR );
-      for ( vector<Point>::const_iterator it = sequence.begin(), itE = sequence.end();
-	   it != itE; ++it )
+      for ( vector<Point>::const_iterator it = sequence.begin(); it != sequence.end(); ++it )
 	   viewer << *it;  
+    }
+    else if ( curve3d && axes )
+    {
+        for ( vector<Point>::const_iterator itt = sequence.begin(); itt != sequence.end(); ++itt ) {
+
+            typename std::multimap<typename Z3i::Point, string>::const_iterator it = mainAxes.lower_bound(*itt);
+            typename std::multimap<typename Z3i::Point, string>::const_iterator it2 = mainAxes.upper_bound(*itt);
+            Z3i::Point pColor;
+            for (; it != it2; it++ )
+            {
+                if (it->second == "X")
+                    pColor[0] = 255;
+                if (it->second == "Y")
+                    pColor[1] = 255;
+                if (it->second == "Z")
+                    pColor[2] = 255;
+
+            }
+            Color c ( pColor[0], pColor[1], pColor[2], 255 );
+            viewer.setFillColor(c);
+            viewer << *itt;
+        }
     }
     // ----------------------------------------------------------------------
     // User "interaction".

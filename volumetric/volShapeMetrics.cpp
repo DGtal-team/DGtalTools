@@ -37,18 +37,13 @@
 #include <DGtal/geometry/volumes/distance/DistanceTransformation.h>
 #include <DGtal/math/Statistic.h>
 
-#include <boost/program_options/options_description.hpp>
-#include <boost/program_options/parsers.hpp>
-#include <boost/program_options/variables_map.hpp>
-#include <limits>
+#include "CLI11.hpp"
 
+#include <limits>
 
 using namespace std;
 using namespace DGtal;
 using namespace Z3i;
-
-namespace po = boost::program_options;
-
 
 
 /**
@@ -65,33 +60,23 @@ namespace po = boost::program_options;
 
  @b Allowed @b options @b are : 
  @code
-  -h [ --help ]               display this message.
-  -a [ --volA ] arg           Input filename of volume A (vol format, and other
-                              pgm3d can also be used).
-  -b [ --volB ] arg           Input filename of volume B (vol format, and other
-                              pgm3d can also be used).
-  --aMin arg (=0)             min threshold for a voxel to be considered as 
-                              belonging to the object of volume A. (default 0)
-  --aMax arg (=128)           max threshold for a voxel to be considered as 
-                              belonging to the object of volume A. (default 
-                              128)
-  --bMin arg (=0)             min threshold for a voxel to be considered as 
-                              belonging to the object of volume B. (default 0)
-  --bMax arg (=128)           max threshold for a voxel to be considered as 
-                              belonging to the object of volume B. (default 
-                              128)
-  --noDistanceComparisons     to avoid to apply distance map computation if the
-                              distance comparaison are not needed.
-  --distancesFromBnotInAOnly  apply distance map measures only for voxels of B 
-                              which are not in A (else the measure are given 
-                              from all distances of the object B).
-  --displayTFstats            Change the comparison diplay by using the  
-                              true/false/positive/negative notation and 
-                              considering the shape A as reference. It also 
-                              display precision/recall/f-mean statistics.
-  --exportSDP                 Export voxels belonging to each categorie (voxels
-                              of ( B in A) , (NOT in B and NOT in A),   (B and 
-                              NOT in A) and (Voxels of NOT in B and in A)). 
+
+ Positionals:
+   1 TEXT:FILE REQUIRED                  Input filename of volume A (vol format, and other pgm3d can also be used).
+   2 TEXT:FILE REQUIRED                  Input filename of volume B (vol format, and other pgm3d can also be used).
+
+ Options:
+   -h,--help                             Print this help message and exit
+   -a,--volA TEXT:FILE REQUIRED          Input filename of volume A (vol format, and other pgm3d can also be used).
+   -b,--volB TEXT:FILE REQUIRED          Input filename of volume B (vol format, and other pgm3d can also be used).
+   --aMin INT=0                          min threshold for a voxel to be considered as belonging to the object of volume A. (default 0)
+   --aMax INT=128                        max threshold for a voxel to be considered as belonging to the object of volume A. (default 128)
+   --bMin INT=0                          min threshold for a voxel to be considered as belonging to the object of volume B. (default 0)
+   --bMax INT=128                        max threshold for a voxel to be considered as belonging to the object of volume B. (default 128)
+   --noDistanceComparisons               to avoid to apply distance map computation if the distance comparaison are not needed.
+   --distancesFromBnotInAOnly            apply distance map measures only for voxels of B which are not in A (else the measure are given from all distances of the object B).
+   --displayTFstats                      Change the comparison diplay by using the  true/false/positive/negative notation and considering the shape A as reference. It also display precision/recall/f-mean statistics.
+   --exportSDP                           Export voxels belonging to each categorie (voxels of ( B in A) , (NOT in B and NOT in A),   (B and NOT in A) and (Voxels of NOT in B and in A)).
 
  @endcode
 
@@ -181,7 +166,6 @@ getStatsFromDistanceMap(Statistic<double> & stats, const Image3D &imageA, int aM
 }
 
 
-
 void
 getVoxelsStats(const Image3D &imageA,  int aMin, int aMax, const Image3D &imageB, 
 	       int bMin, int bMax, bool exportStatVoxels,  std::vector<Point> &vectPtBinA,  
@@ -238,10 +222,6 @@ getVoxelsStats(const Image3D &imageA,  int aMin, int aMax, const Image3D &imageB
 }
 
 
-
-
-
-
 // total ref: True Positive, True Negative, False Positive, False Negative
 void
 getVoxelsStats(const Image3D &imageA,  int aMin, int aMax, const Image3D &imageB, 
@@ -267,10 +247,6 @@ exportSetofPoints(string filename, std::vector<Point> aVectPoint){
 
 
 
-
-
-
-
 int main(int argc, char**argv)
 {
 
@@ -278,84 +254,74 @@ int main(int argc, char**argv)
   // parse command line ----------------------------------------------
   // A = ref
   // B= comp
-  po::options_description general_opt ( "Allowed options are: " );
-  general_opt.add_options()
-    ( "help,h", "display this message." )
-    ( "volA,a", po::value<std::string>(), "Input filename of volume A (vol format, and other pgm3d can also be used)." )
-    ( "volB,b", po::value<std::string>(), "Input filename of volume B (vol format, and other pgm3d can also be used)." )
-    ( "aMin", po::value<int>()->default_value(0), "min threshold for a voxel to be considered as belonging to the object of volume A. (default 0)" )
-    ( "aMax", po::value<int>()->default_value(128), "max threshold for a voxel to be considered as belonging to the object of volume A. (default 128)" )
-    ( "bMin", po::value<int>()->default_value(0), "min threshold for a voxel to be considered as belonging to the object of volume B. (default 0)" )
-    ( "bMax", po::value<int>()->default_value(128), "max threshold for a voxel to be considered as belonging to the object of volume B. (default 128)" )
-    ( "noDistanceComparisons", "to avoid to apply distance map computation if the distance comparaison are not needed.") 
-    ("distancesFromBnotInAOnly", "apply distance map measures only for voxels of B which are not in A (else the measure are given from all distances of the object B).")
-    ("displayTFstats", "Change the comparison diplay by using the  true/false/positive/negative notation and considering the shape A as reference. It also display precision/recall/f-mean statistics.")
-    ("exportSDP", "Export voxels belonging to each categorie (voxels of ( B in A) , (NOT in B and NOT in A),   (B and NOT in A) and (Voxels of NOT in B and in A)). ") ;
-  bool parseOK=true;
-  po::variables_map vm;
-  try{
-    po::store(po::parse_command_line(argc, argv, general_opt), vm);  
-  }catch(const std::exception& ex){
-    parseOK=false;
-    trace.info()<< "Error checking program options: "<< ex.what()<< endl;
-  }
-  po::notify(vm);    
-  
-  if ( !parseOK || vm.count ( "help" ) || ! vm.count("volA")||! vm.count("volB") )
-    {
-      trace.info() << "Apply shape measures for comparing two volumetric images A and B (shape defined from thresholds). " << std::endl
-                   << "It can compute:" << std::endl
-                   << "      - voxel count from voxel partition (number of voxel from (B-A), (A-B) ...): usefull to determine classical statistics like false positive related stats."<<std::endl
-		   << "      - euclidean distance between two volumetric images A and B " << std::endl
-		   << std::endl << "Basic usage: "<< std::endl
-		   << "\t volShapeMetrics --volA <volAFilename> --volB <volBFilename> "<< std::endl
-		   << general_opt << "\n"
-		   << "Typical use :\n  volShapeMetrics -a imageA.vol --aMin 128 --aMax 255 -b imageB.vol --bMin 128 --bMax 255 --distancesFromBnotInAOnly \n" ;
- 
-      return 0;
-    }
+  // parse command line using CLI ----------------------------------------------
+  CLI::App app;
+  std::string volAFilename;
+  std::string volBFilename;
 
-  if(! vm.count("volA")||! vm.count("volB"))
-    {
-      trace.error() << " The two volume filename are needed to be defined" << endl;      
-      return 0;
-    }
- 
-  std::string volAFilename = vm["volA"].as<std::string>();
-  std::string volBFilename = vm["volB"].as<std::string>();
- 
-  int aMin = vm["aMin"].as<int>();
-  int aMax = vm["aMax"].as<int>();
-  int bMin = vm["bMin"].as<int>();
-  int bMax = vm["bMax"].as<int>();
- 
+  int aMin {0};
+  int aMax {128} ;
+  int bMin {0};
+  int bMax {128};
+  bool noDistanceComparisons {false};
+  bool distancesFromBnotInAOnly {false};
+  bool displayTFstats {false};
+  bool exportSDP {false};
+  
+  app.description("Apply shape measures for comparing two volumetric images A and B (shape defined from thresholds).\n It can compute: \n  - voxel count from voxel partition (number of voxel from (B-A), (A-B) ...): usefull to determine classical statistics like false positive related stats.\n - euclidean distance between two volumetric images A and B\n Basic usage: \t volShapeMetrics --volA <volAFilename> --volB <volBFilename>\nTypical use :\n  volShapeMetrics -a imageA.vol --aMin 128 --aMax 255 -b imageB.vol --bMin 128 --bMax 255 --distancesFromBnotInAOnly \n");
+  
+  
+  
+  app.add_option("-a,--volA,1", volAFilename, "Input filename of volume A (vol format, and other pgm3d can also be used)." )
+  ->required()
+  ->check(CLI::ExistingFile);
+  
+  app.add_option("-b,--volB,2", volBFilename, "Input filename of volume B (vol format, and other pgm3d can also be used).")
+  ->required()
+  ->check(CLI::ExistingFile);
+  app.add_option("--aMin",aMin, "min threshold for a voxel to be considered as belonging to the object of volume A. (default 0)",true);
+  app.add_option("--aMax",aMax, "max threshold for a voxel to be considered as belonging to the object of volume A. (default 128)",true);
+
+  app.add_option("--bMin",bMin, "min threshold for a voxel to be considered as belonging to the object of volume B. (default 0)",true);
+  app.add_option("--bMax",bMax, "max threshold for a voxel to be considered as belonging to the object of volume B. (default 128)",true);
+
+  app.add_flag("--noDistanceComparisons", noDistanceComparisons, "to avoid to apply distance map computation if the distance comparaison are not needed.");
+
+  app.add_flag("--distancesFromBnotInAOnly",distancesFromBnotInAOnly, "apply distance map measures only for voxels of B which are not in A (else the measure are given from all distances of the object B).");
+  
+  app.add_flag("--displayTFstats", displayTFstats, "Change the comparison diplay by using the  true/false/positive/negative notation and considering the shape A as reference. It also display precision/recall/f-mean statistics.");
+  app.add_flag("--exportSDP", exportSDP, "Export voxels belonging to each categorie (voxels of ( B in A) , (NOT in B and NOT in A),   (B and NOT in A) and (Voxels of NOT in B and in A)).");
+  
+  
+  app.get_formatter()->column_width(40);
+  CLI11_PARSE(app, argc, argv);
+  // END parse command line using CLI ----------------------------------------------
+
+  
   Image3D imageA = GenericReader<Image3D>::import(volAFilename);
   Image3D imageB = GenericReader<Image3D>::import(volBFilename);
 
-  
   std::cout << "# Shape comparisons (generated with volShapeMetrics) given with the reference shape A: "<< volAFilename
 	    << " (defined with threshold min: " << aMin << " and max: " << aMax << " )"<< endl
 	    << "# and with the compared shape B: "<< volBFilename << "  (defined with threshold min: " << bMin << " and max: " << bMax << " )"<< endl;
-  if(vm.count("displayTFstats")){
+  if(displayTFstats){
     std::cout << "# #True_Positive #TrueNegative #FalsePositive #FalseNegative  #TotalinA #TotalInB #TotalComplementOfRef #TotalComplementOfComp Precision Recall F-Mean  ";
   }else{
     std::cout << "# #(Voxels of B in A) #(Voxels of NOT in B and NOT in A) #(Voxels of B and NOT in A)  #(Voxels of NOT in B and in A) #(Voxels in A) #(Voxels in B) #(Voxels not in A) #(Voxels not in B) ";
   }
   
-  
-  if(!vm.count("noDistanceComparisons")){
+  if(!noDistanceComparisons){
     std::cout << " Max(MinDistance(shape B to shape A) Mean(MinDistance(shape B to shape A) Variance(MinDistance(shape B to shape A)) "
 	      << " Mediane(MinDistance(shape B to shape A)  Farthest point of B to A ";
-    if(vm.count("distancesFromBnotInAOnly")){
+    if(distancesFromBnotInAOnly){
       std::cout << "*** for parts of B which are not in A only ***" ;
     }
   }
   std::cout << std::endl; 
 
-  
-  if(vm.count("exportSDP")){
+  if(exportSDP){
     std::vector<Point> voxelsBinA, voxelsNotInBNotInA, voxelsBNotInA, voxelsNotInBInA; 
-    if(vm.count("displayTFstats")){
+    if(displayTFstats){
       getVoxelsStats(imageA, aMin, aMax,  imageB,  bMin, bMax, true, voxelsBinA, voxelsNotInBNotInA, voxelsBNotInA, voxelsNotInBInA, true);    
       exportSetofPoints("truePos.sdp",  voxelsBinA);
       exportSetofPoints("trueNeg.sdp",  voxelsNotInBNotInA);
@@ -370,20 +336,18 @@ int main(int argc, char**argv)
       exportSetofPoints("notinBinA.sdp", voxelsNotInBInA);
     }
   }else{
-    getVoxelsStats(imageA, aMin, aMax,  imageB,  bMin, bMax, vm.count("displayTFstats"));
+    getVoxelsStats(imageA, aMin, aMax,  imageB,  bMin, bMax, displayTFstats);
   }
   
-  
-  if(!vm.count("noDistanceComparisons")){
+  if(!noDistanceComparisons){
     trace.info() << "Computing Distance Map stats ...";
     Statistic<double> statDistances(true); 
     Point ptMax;
-    getStatsFromDistanceMap(statDistances, imageA, aMin, aMax, imageB, bMin, bMax, vm.count("statsFromFalsePosOnly"), &ptMax );    
+    getStatsFromDistanceMap(statDistances, imageA, aMin, aMax, imageB, bMin, bMax, false, &ptMax );
     std::cout << " " << statDistances.max() << " " << statDistances.mean()  << " " << statDistances.variance()  << "  "<< statDistances.median() << " " << ptMax[0] << " " << ptMax[1] << " " << ptMax[2] << std::endl; 
 
     trace.info() << " [done] " << std::endl;
   }    
    
    return 1;
-      
 }

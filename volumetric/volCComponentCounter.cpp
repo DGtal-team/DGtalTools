@@ -36,17 +36,12 @@
 #include "DGtal/helpers/StdDefs.h"
 
 #include <boost/pending/disjoint_sets.hpp>
-#include <boost/program_options/options_description.hpp>
-#include <boost/program_options/parsers.hpp>
-#include <boost/program_options/variables_map.hpp>
 
+#include "CLI11.hpp"
 
 using namespace std;
 using namespace DGtal;
 using namespace Z3i;
-
-///////////////////////////////////////////////////////////////////////////////
-namespace po = boost::program_options;
 
 
 /**
@@ -54,14 +49,20 @@ namespace po = boost::program_options;
  
  @brief Counts the number of connected component (same values) in a  volume (Vol) file image.
 
- @b Usage:  volCComponentCounter [input]
+ @b Usage:   ./volumetric/volCComponentCounter [OPTIONS] 1
 
 
  @b Allowed @b options @b are : 
  @code
-  -h [ --help ]                  display this message
-  -c [ --connectivity ] arg (=6) object connectivity (6,18,26) (default: 6 )
-  -i [ --input ] arg             volume file (Vol) (default: standard input)
+
+ Positionals:
+     1 TEXT:FILE REQUIRED                  volume file (.vol).
+
+   Options:
+     -h,--help                             Print this help message and exit
+     -i,--input TEXT:FILE REQUIRED         volume file (.vol).
+     -c,--connectivity UINT:{6,18,26}=6    object connectivity (6,18,26) (default: 6 ).
+
  @endcode
 
  @b Example: 
@@ -104,42 +105,40 @@ void CCCounter(Rank& r, Parent& p, const Image& elements, const unsigned int con
   typename Image::Point decz(0,0,1);
   
   //Merging process
-  for(typename Image::Domain::ConstIterator e = elements.domain().begin();
-      e !=elements.domain().end(); ++e)
-    {
-      if ( elements.domain().isInside(*e+decx) &&  
-           (elements(*e) == elements(*e+decx)))
-        dsets.union_set(*e,*e+decx);
-      
-      if ( elements.domain().isInside(*e+decy) &&  
-           (elements(*e) == elements(*e+decy)))
-        dsets.union_set(*e,*e+decy);
-      
-      if ( elements.domain().isInside(*e+decz) &&  
-           (elements(*e) == elements(*e+decz)))
-        dsets.union_set(*e,*e+decz);
+  for ( typename Image::Domain::ConstIterator e = elements.domain().begin();
+        e != elements.domain().end(); ++e )
+  {
+    if ( elements.domain().isInside( *e + decx ) &&
+         ( elements( *e ) == elements( *e + decx ) ) )
+      dsets.union_set( *e, *e + decx );
 
-      if (connectivity > 6)
-        {
-          if ( elements.domain().isInside(*e+decx+decy) &&  
-               (elements(*e) == elements(*e+decx+decy)))
-            dsets.union_set(*e,*e+decx+decy);
-      
-          if ( elements.domain().isInside(*e+decx+decz) &&  
-               (elements(*e) == elements(*e+decx+decz)))
-            dsets.union_set(*e,*e+decx+decz);
-  
-          if ( elements.domain().isInside(*e+decy+decz) &&  
-               (elements(*e) == elements(*e+decy+decz)))
-            dsets.union_set(*e,*e+decy+decz);
-  
-          if (connectivity == 26)
-            if ( elements.domain().isInside(*e+decy+decz+decx) &&  
-                 (elements(*e) == elements(*e+decy+decz+decx)))
-              dsets.union_set(*e,*e+decy+decz+decx);
-    
-        }
-      
+    if ( elements.domain().isInside( *e + decy ) &&
+         ( elements( *e ) == elements( *e + decy ) ) )
+      dsets.union_set( *e, *e + decy );
+
+    if ( elements.domain().isInside( *e + decz ) &&
+         ( elements( *e ) == elements( *e + decz ) ) )
+      dsets.union_set( *e, *e + decz );
+
+    if ( connectivity > 6 )
+    {
+      if ( elements.domain().isInside( *e + decx + decy ) &&
+           ( elements( *e ) == elements( *e + decx + decy ) ) )
+        dsets.union_set( *e, *e + decx + decy );
+
+      if ( elements.domain().isInside( *e + decx + decz ) &&
+           ( elements( *e ) == elements( *e + decx + decz ) ) )
+        dsets.union_set( *e, *e + decx + decz );
+
+      if ( elements.domain().isInside( *e + decy + decz ) &&
+           ( elements( *e ) == elements( *e + decy + decz ) ) )
+        dsets.union_set( *e, *e + decy + decz );
+
+      if ( connectivity == 26 )
+        if ( elements.domain().isInside( *e + decy + decz + decx ) &&
+             ( elements( *e ) == elements( *e + decy + decz + decx ) ) )
+          dsets.union_set( *e, *e + decy + decz + decx );
+    }
     }
   trace.endBlock();
   std::cout << "Number of disjoint "<<connectivity<<"-components = "
@@ -149,44 +148,28 @@ void CCCounter(Rank& r, Parent& p, const Image& elements, const unsigned int con
 }
 
 
-
 int main( int argc, char** argv )
 {
-  // parse command line ----------------------------------------------
-  po::options_description general_opt("Allowed options are");
-  general_opt.add_options()
-    ("help,h", "display this message")
-    ("connectivity,c", po::value<unsigned int>()->default_value(6), "object connectivity (6,18,26)"    " (default: 6 )")
-    ("input,i", po::value<std::string>(), "volume file (Vol)"    " (default: standard input)");
-  bool parseOK=true;
-  po::variables_map vm;
-  try{
-    po::store(po::parse_command_line(argc, argv, general_opt), vm);  
-  }catch(const std::exception& ex){
-    parseOK=false;
-    trace.info()<< "Error checking program options: "<< ex.what()<< endl;
-  }  
-  po::notify(vm);    
-  if( !parseOK || vm.count("help")||argc<=1)
-    {
-      std::cout << "Usage: " << argv[0] << " [input]\n"
-                << "Count the number of connected component (same values) in a  volume (Vol) file image\n"
-                << general_opt << "\n"
-                << "Example : \n \t volCComponentCounter -i $DGtal/examples/samples/Al.100.vol ";
-      return 0;
-    }
-  string inputFilename = vm["input"].as<std::string>();
-  unsigned int connectivity = vm["connectivity"].as<unsigned int>();
+    
+  // parse command line using CLI ----------------------------------------------
+  CLI::App app;
+  std::string inputFileName;
+  unsigned int connectivity {6};
+  
+  app.description("Count the number of connected component (same values) in a  volume (Vol) file image\n\n Example : \n \t volCComponentCounter -i $DGtal/examples/samples/Al.100.vol\n");
+  app.add_option("-i,--input,1", inputFileName, "volume file (.vol)." )
+  ->required()
+  ->check(CLI::ExistingFile);
+  app.add_option("--connectivity,-c",connectivity,"object connectivity (6,18,26) (default: 6 ).", true)
+   -> check(CLI::IsMember({6, 18, 26}));
  
-  if ((connectivity != 6) && (connectivity != 18) && (connectivity != 26))
-    {
-      trace.error() << "Bad connectivity value.";
-      trace.info() << std::endl;
-      exit(1);
-    }
+  app.get_formatter()->column_width(40);
+  CLI11_PARSE(app, argc, argv);
+  // END parse command line using CLI ----------------------------------------------
+
 
   typedef ImageSelector<Domain, unsigned char>::Type Image;
-  Image image = VolReader<Image>::importVol( inputFilename );
+  Image image = VolReader<Image>::importVol( inputFileName );
 
   trace.info() << "Image loaded: "<<image<< std::endl;
 
@@ -200,6 +183,5 @@ int main( int argc, char** argv )
  
   CCCounter(rank_pmap, parent_pmap, image, connectivity);
  
-
   return 0;
 }

@@ -3,6 +3,7 @@ SET(DGTAL_TOOLS_SRC
         patternTriangulation
         3dCurvatureViewer
         3dCurvatureViewerNoise
+        2dCompImage
 )
 
 foreach (FILE ${DGTAL_TOOLS_SRC})
@@ -15,8 +16,8 @@ foreach (FILE ${DGTAL_TOOLS_SRC})
 ENDFOREACH(FILE)
 
 if (  WITH_VISU3D_QGLVIEWER )
-
-  SET(DGTAL_EXAMPLES_QGL_SRC
+    set_property(SOURCE ui_sliceViewer.h PROPERTY SKIP_AUTOMOC ON)
+    SET(DGTAL_EXAMPLES_QGL_SRC
     3dVolViewer
     3dVolBoundaryViewer
     3dCurveViewer
@@ -48,7 +49,6 @@ if (  WITH_VISU3D_QGLVIEWER )
   if (WITH_QT4)
     QT4_WRAP_UI(ui_sliceViewer_FORMS_HEADERS sliceViewer.ui)
     QT4_WRAP_CPP(sliceViewer_HEADERS_MOC sliceViewer.h OPTIONS -DBOOST_TT_HAS_OPERATOR_HPP_INCLUDED)
-
     add_executable(sliceViewer sliceViewer.cpp ${sliceViewer_HEADERS_MOC}
                                                ${ui_sliceViewer_FORMS_HEADERS})
     target_link_libraries (sliceViewer ${DGTAL_LIBRARIES}  ${DGtalToolsLibDependencies})
@@ -63,7 +63,6 @@ if (  WITH_VISU3D_QGLVIEWER )
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${Qt5Xml_EXECUTABLE_COMPILE_FLAGS}")
     add_executable(sliceViewer sliceViewer.cpp ${ui_sliceViewer_FORMS_HEADERS})
     target_link_libraries(sliceViewer ${DGTAL_LIBRARIES}  ${DGtalToolsLibDependencies})
-    qt5_use_modules(sliceViewer Widgets OpenGL Xml)
   endif (WITH_QT4)
 
   install(TARGETS sliceViewer RUNTIME DESTINATION bin

@@ -11,6 +11,15 @@ SET(DGTAL_TOOLS_SRC
   eulerCharacteristic
 )
 
+if (WITH_EIGEN)
+    add_executable(volSurfaceRegularization volSurfaceRegularization.cpp volSurfaceRegularization-details/surface_approx.cpp)
+    target_link_libraries(volSurfaceRegularization ${DGTAL_LIBRARIES} ${DGtalToolsLibDependencies})
+    install(TARGETS volSurfaceRegularization
+        RUNTIME DESTINATION bin
+        LIBRARY DESTINATION lib
+        ARCHIVE DESTINATION lib)
+endif()
+
 if ( WITH_VISU3D_QGLVIEWER )
   SET(VISU3D_TESTS_SRC
       3dCurveTangentEstimator
@@ -18,12 +27,16 @@ if ( WITH_VISU3D_QGLVIEWER )
   FOREACH(FILE ${VISU3D_TESTS_SRC})
     add_executable(${FILE} ${FILE})
     target_link_libraries (${FILE}  ${DGTAL_LIBRARIES} ${DGtalToolsLibDependencies})
+    install(TARGETS ${FILE}
+        RUNTIME DESTINATION bin
+        LIBRARY DESTINATION lib
+        ARCHIVE DESTINATION lib)
   ENDFOREACH(FILE)
 endif ( WITH_VISU3D_QGLVIEWER )
 
 if (  WITH_CGAL )
   SET(CGAL_TESTS_SRC
-#    3dLocalEstimators 
+    3dLocalEstimators
      )
   FOREACH(FILE ${CGAL_TESTS_SRC})
     add_executable(${FILE} ${FILE})
@@ -32,6 +45,9 @@ if (  WITH_CGAL )
 endif ( WITH_CGAL )
 
 FOREACH(FILE ${DGTAL_TOOLS_SRC})
+  if(MSVC)
+    set_source_files_properties( ${FILE} PROPERTIES COMPILE_FLAGS "/bigobj" )
+  endif(MSVC)
   add_executable(${FILE} ${FILE})
   target_link_libraries (${FILE}  ${DGTAL_LIBRARIES} ${DGtalToolsLibDependencies})
   install(TARGETS ${FILE}

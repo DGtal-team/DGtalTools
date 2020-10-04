@@ -35,10 +35,7 @@
 #include "DGtal/io/writers/GenericWriter.h"
 #include "DGtal/kernel/BasicPointFunctors.h"
 
-#include <boost/program_options/options_description.hpp>
-#include <boost/program_options/parsers.hpp>
-#include <boost/program_options/variables_map.hpp>
-
+#include "CLI11.hpp"
 
 
 using namespace std;
@@ -54,10 +51,12 @@ using namespace DGtal;
 @b Allowed @b options @b are:
 
 @code
-  -h [ --help ]                      display this message
-  -s [ --sliceOrientation ] arg (=2) specify the slice orientation for which the slice are considered (by default =2 (Z direction))
-  -i [ --input ] arg                 input 2D files (.pgm) 
-  -o [ --output ] arg                volumetric file (.vol, .longvol .pgm3d) 
+
+Options:
+  -h,--help                             Print this help message and exit
+  -i,--input TEXT ... REQUIRED          input 2D files (.pgm)
+  -o,--output TEXT                      volumetric file (.vol, .longvol .pgm3d)
+  -s,--sliceOrientation UINT:{0,1,2}=2  specify the slice orientation for which the slice are defined (by default =2 (Z direction))
 @endcode
 
 @b Example:
@@ -71,58 +70,32 @@ slice2vol.cpp
 */
 
 
-///////////////////////////////////////////////////////////////////////////////
-namespace po = boost::program_options;
 
 int main( int argc, char** argv )
 {
   typedef ImageContainerBySTLVector < Z3i::Domain, unsigned char > Image3D;
   typedef ImageContainerBySTLVector < Z2i::Domain, unsigned char > Image2D;
   
+  // parse command line using CLI ----------------------------------------------
+   CLI::App app;
+   std::vector<std::string> vectImage2DNames;
+   std::string outputFileName {"result.vol"};
+   unsigned int sliceOrientation {2};
+
+   app.description("Converts set of 2D images into volumetric file  (pgm3d, vol, longvol).\nExample:\n slice2vol -i slice1.pgm slice2.pgm slice3.pgm  -o out.vol see vol2slice");
+   app.add_option("-i,--input", vectImage2DNames, "input 2D files (.pgm)")
+     -> required();
+   app.add_option("-o,--output", outputFileName, "volumetric file (.vol, .longvol .pgm3d)");
+   app.add_option("--sliceOrientation,-s", sliceOrientation, "specify the slice orientation for which the slice are defined (by default =2 (Z direction))", true)
+     -> check(CLI::IsMember({0, 1, 2}));
+   
   
-  // parse command line ----------------------------------------------
-  po::options_description general_opt("Allowed options are: ");
-  general_opt.add_options()
-    ("help,h", "display this message")
-    ("sliceOrientation,s", po::value<unsigned int>()->default_value(2), "specify the slice orientation for which the slice are considered (by default =2 (Z direction))" )
-    ("input,i", po::value<std::vector <std::string> >()->multitoken(), "input 2D files (.pgm) " )
-    ("output,o", po::value<std::string>(), "volumetric file (.vol, .longvol .pgm3d) " );
-  
-  
-  bool parseOK=true;
-  po::variables_map vm;
-  try{
-    po::store(po::parse_command_line(argc, argv, general_opt), vm);  
-  }catch(const std::exception& ex){
-    parseOK=false;
-    trace.info()<< "Error checking program options: "<< ex.what()<< endl;
-  }
-  po::notify(vm);    
+  app.get_formatter()->column_width(40);
+  CLI11_PARSE(app, argc, argv);
+  // END parse command line using CLI ----------------------------------------------
   
 
-  if( ! vm.count("input") || ! vm.count("output") || !parseOK || vm.count("help"))
-    {
-      std::cout << "Usage: " << argv[0] << " [input-files] [output]\n"
-		<< "Converts set of 2D images into volumetric file  (pgm3d, vol, longvol). "
-		<< general_opt << "\n";
-      std::cout << "Example:\n"
-                << "slice2vol -i slice1.pgm slice2.pgm slice3.pgm  -o out.vol \n"
-                << "see vol2slice"<<endl; 
-       
-      return 0;
-    }
-  
-  if(! (vm.count("input") && vm.count("output")) )
-    {
-      trace.error() << " Input and output filename are needed to be defined" << endl;      
-      return 0;
-    }
 
-
-
-  std::string outputFileName = vm["output"].as<std::string>();
-  std::vector<string> vectImage2DNames = vm["input"].as<std::vector<std::string> >();
-  unsigned int sliceOrientation = vm["sliceOrientation"].as<unsigned int>();
   std::vector<Image2D> vectImages2D; 
   // Reading all images
   for(unsigned int i=0; i< vectImage2DNames.size(); i++){
@@ -154,7 +127,8 @@ int main( int argc, char** argv )
   trace.info() << "Exporting 3d image ... " << std::endl ;
   GenericWriter<Image3D>::exportFile(outputFileName, imageResult);
   trace.info()  << "[done]";
-  return 0;  
+  return EXIT_SUCCESS;
+
 }
 
 

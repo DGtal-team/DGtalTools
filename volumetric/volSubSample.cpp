@@ -33,16 +33,12 @@
 #include <DGtal/images/Image.h>
 #include <DGtal/images/ImageContainerBySTLVector.h>
 
-#include <boost/program_options/options_description.hpp>
-#include <boost/program_options/parsers.hpp>
-#include <boost/program_options/variables_map.hpp>
+#include "CLI11.hpp"
+
 
 using namespace std;
 using namespace DGtal;
 using namespace Z3i;
-
-namespace po = boost::program_options;
-
 
 
 /**
@@ -51,15 +47,33 @@ namespace po = boost::program_options;
  @brief Brutally sub samples a vol file (division by 2 in each direction).
 
 
- @b Usage: 	volSubSample --input <volFileName> --o <volOutputFileName>
+ @b Usage: 	./volumetric/volSubSample [OPTIONS] 1 [2]
 
 
  @b Allowed @b options @b are : 
  @code
-  -h [ --help ]                 display this message.
-  -i [ --input ] arg            Input vol file.
-  -o [ --output ] arg           Output filename.
-  -f [ --function ] arg (=mean) Function used to the down-sampling: {none,max, min, mean}
+ Positionals:
+   1 TEXT:FILE REQUIRED                  Input vol file.
+   2 TEXT=result.vol                     Output filename.
+
+ Options:
+   -h,--help                             Print this help message and exit
+   -i,--input TEXT:FILE REQUIRED         Input vol file.
+   -o,--output TEXT=result.vol           Output filename.
+   -f,--function TEXT:{mean,none,max,min,mean}=mean
+                                         Function used to the down-sampling: {none,max, min, mean}
+
+ Positionals:
+   1 TEXT:FILE REQUIRED                  Input vol file.
+   2 TEXT=result.vol                     Output filename.
+
+ Options:
+   -h,--help                             Print this help message and exit
+   -i,--input TEXT:FILE REQUIRED         Input vol file.
+   -o,--output TEXT=result.vol           Output filename.
+   -f,--function TEXT:{mean,none,max,min,mean}=mean
+                                         Function used to the down-sampling: {none,max, min, mean}
+
  @endcode
 
  @b Example: 
@@ -103,7 +117,7 @@ void missingParam ( std::string param )
 }
 
 template<typename Val, typename Image, typename Point, typename Domain>
-Val maxVal(Image &image, Point &p, Domain& domain)
+Val maxVal(Image const& image, Point const& p, Domain const& domain)
 {
   typename Image::Domain dom( p*2, p*2 + Point::diagonal(1));
   Val v=image(p*2);
@@ -115,7 +129,7 @@ Val maxVal(Image &image, Point &p, Domain& domain)
   return v;    
 } 
 template<typename Val, typename Image, typename Point, typename Domain>
-Val minVal(Image &image, Point &p, Domain& domain)
+Val minVal(Image const& image, Point const& p, Domain const& domain)
 {
   typename Image::Domain dom( p*2, p*2 + Point::diagonal(1));
   Val v=image(p*2);
@@ -127,7 +141,7 @@ Val minVal(Image &image, Point &p, Domain& domain)
   return v;    
 } 
 template<typename Val, typename Image, typename Point, typename Domain>
-Val meanVal(Image &image, Point &p, Domain& domain)
+Val meanVal(Image const& image, Point const& p, Domain const& domain)
 {
   typename Image::Domain dom( p*2, p*2 + Point::diagonal(1));
   int v=0;
@@ -146,40 +160,33 @@ Val meanVal(Image &image, Point &p, Domain& domain)
 
 int main(int argc, char**argv)
 {
-
+  
   // parse command line ----------------------------------------------
-  po::options_description general_opt ( "Allowed options are: " );
-  general_opt.add_options()
-    ( "help,h", "display this message." )
-    ( "input,i", po::value<std::string>(), "Input vol file." )
-    ( "output,o", po::value<string>(),"Output filename." )
-    ("function,f",   po::value<string>()->default_value("mean"), "Function used to the down-sampling: {none,max, min, mean}" );
+  // parse command line using CLI ----------------------------------------------
+  CLI::App app;
+  std::string inputFileName;
+  std::string outputFileName {"result.vol"};
+  std::string function {"mean"};
   
+  app.description("Brutally sub sample a vol file (division by 2 in each direction).\n Basic usage: \n \tvolSubSample --input <volFileName> --o <volOutputFileName> ");
 
-  po::variables_map vm;
-  po::store ( po::parse_command_line ( argc, argv, general_opt ), vm );
-  po::notify ( vm );
-  if ( vm.count ( "help" ) ||argc<=1 )
-    {
-      trace.info() << "Brutally sub sample a vol file (division by 2 in each direction)."<<std::endl
-                   << std::endl << "Basic usage: "<<std::endl
-                   << "\tvolSubSample --input <volFileName> --o <volOutputFileName> "<<std::endl
-                   << general_opt << "\n";
-      return 0;
-    }
-
-  //Parse options
-  if ( ! ( vm.count ( "input" ) ) ) missingParam ( "--input" );
-  std::string filename = vm["input"].as<std::string>();
-  std::string function = vm["function"].as<std::string>();
-  if ( ! ( vm.count ( "output" ) ) ) missingParam ( "--output" );
-  std::string outputFileName = vm["output"].as<std::string>();
   
+  app.add_option("-i,--input,1", inputFileName, "Input vol file." )
+  ->required()
+  ->check(CLI::ExistingFile);
+  app.add_option("-o,--output,2", outputFileName, "Output filename.",true);
+  app.add_option("-f,--function", function, "Function used to the down-sampling: {none,max, min, mean}", true)
+   -> check(CLI::IsMember({"mean", "none", "max", "min", "mean"}));
+  
+  app.get_formatter()->column_width(40);
+  CLI11_PARSE(app, argc, argv);
+  // END parse command line using CLI ----------------------------------------------
+
   
   trace.beginBlock("Loading file");
   typedef ImageContainerBySTLVector<Z3i::Domain, unsigned char>  MyImageC;
 
-  MyImageC  imageC = VolReader< MyImageC >::importVol ( filename );
+  MyImageC  imageC = VolReader< MyImageC >::importVol ( inputFileName );
   MyImageC  outputImage( Z3i::Domain( imageC.domain().lowerBound(),
                                       (imageC.domain().upperBound()-imageC.domain().lowerBound())/Vector().diagonal(2)));
 

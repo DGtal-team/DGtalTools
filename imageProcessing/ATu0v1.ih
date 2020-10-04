@@ -1,0 +1,338 @@
+/**
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU Lesser General Public License as
+ *  published by the Free Software Foundation, either version 3 of the
+ *  License, or  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ **/
+
+/**
+ * @file
+ * @author Jacques-Olivier Lachaud (\c jacques-olivier.lachaud@univ-savoie.fr )
+ * Laboratory of Mathematics (CNRS, UMR 5127), University of Savoie, France
+ * @author Marion Foare (\c marion.foare@univ-savoie.fr )
+ * Laboratory of Mathematics (CNRS, UMR 5127), University of Savoie, France
+ *
+ * @date 2016/10/12
+ *
+ * Implementation of inline methods defined in ATu0v1.h
+ *
+ * This file is part of the DGtal library.
+ */
+
+
+//////////////////////////////////////////////////////////////////////////////
+#include <cstdlib>
+//////////////////////////////////////////////////////////////////////////////
+
+///////////////////////////////////////////////////////////////////////////////
+// IMPLEMENTATION of inline methods.
+///////////////////////////////////////////////////////////////////////////////
+
+///////////////////////////////////////////////////////////////////////////////
+// ----------------------- Standard services ------------------------------
+template <typename TKSpace, typename TLinearAlgebra>
+DGtal::ATu0v1<TKSpace, TLinearAlgebra>::
+ATu0v1( int _verbose )
+  : Base( _verbose ),
+    v1( calculus ), former_v1( calculus ), 
+    L1( calculus ), alpha_Id0( calculus ),
+    l_L1( calculus ), l_1_over_4( calculus ), 
+    left_V1( calculus ), l_1_over_4e( calculus )
+{}
+
+template <typename TKSpace, typename TLinearAlgebra>
+void
+DGtal::ATu0v1<TKSpace, TLinearAlgebra>::
+init( Clone<KSpace> aKSpace )
+{
+  Base::init( aKSpace );
+  if ( verbose > 0 ) trace.beginBlock( "Initialize DEC specific operators" );
+  if ( verbose > 1 ) trace.info() << "primal_L1" << std::endl;
+  L1 = -1.0 * ( D0 * dual_h2 * dual_D1 * primal_h1
+                + dual_h1 * dual_D0 * primal_h2 * D1 );
+  // JOL: Does not work ! Sign problem ?
+  // L1  = -1.0 * ( D0 * AD1 + AD2 * D1 ); 
+  if ( verbose > 1 ) trace.info() << "v1" << std::endl;
+  v1 = KForm<Calculus, 1, PRIMAL>::ones( calculus );
+  if ( verbose > 0 ) trace.endBlock();
+}
+
+//-----------------------------------------------------------------------------
+template <typename TKSpace, typename TLinearAlgebra>
+template <typename Image, typename Function>
+void 
+DGtal::ATu0v1<TKSpace, TLinearAlgebra>::
+addInput( const Image& image, 
+          const Function& f,
+          bool perfect_data )
+{
+  if ( perfect_data ) i0.push_back( PrimalForm0( calculus ) );
+  else                g0.push_back( PrimalForm0( calculus ) );
+  PrimalForm0& g  = perfect_data ? i0.back() : g0.back();
+  const KSpace& K = calculus.myKSpace; 
+  for ( Index index = 0; index < g.myContainer.rows(); index++)
+    {
+      SCell cell = g.getSCell( index );
+      g.myContainer( index ) = f( image( K.sCoords( cell ) ) );
+    }
+}
+
+//-----------------------------------------------------------------------------
+template <typename TKSpace, typename TLinearAlgebra>
+typename DGtal::ATu0v1<TKSpace, TLinearAlgebra>::Scalar
+DGtal::ATu0v1<TKSpace, TLinearAlgebra>::
+computeSNR() const
+{
+  Scalar MSE = 0.0;
+  for ( Dimension i = 0; i < i0.size(); ++i )
+    {
+      Scalar MSEi = 0.0;
+      const PrimalForm0 u_minus_i_snr = u0[ i ] - i0[ i ];
+      for ( Index j = 0; j < u_minus_i_snr.length(); ++j )
+        MSEi += u_minus_i_snr.myContainer( j ) * u_minus_i_snr.myContainer( j );
+      MSE += MSEi / (Scalar) u_minus_i_snr.length();
+    }
+  MSE /= 3.0;
+  return 10.0 * log10(1.0 / MSE);
+}
+
+//-----------------------------------------------------------------------------
+template <typename TKSpace, typename TLinearAlgebra>
+void 
+DGtal::ATu0v1<TKSpace, TLinearAlgebra>::
+setAlpha( Scalar _alpha )
+{
+  ASSERT( _alpha >= 0.0 );
+  alpha = _alpha;
+  // Building alpha_Id0
+  alpha_Id0 = _alpha * calculus.template identity<0, PRIMAL>();
+  alpha_g0.clear();
+  for ( unsigned int i = 0; i < g0.size(); i++ )
+    alpha_g0.push_back( alpha_Id0 * g0[ i ] );
+}
+
+//-----------------------------------------------------------------------------
+template <typename TKSpace, typename TLinearAlgebra>
+void 
+DGtal::ATu0v1<TKSpace, TLinearAlgebra>::
+setAlpha( Scalar _alpha, const PrimalForm0& m )
+{
+  ASSERT( _alpha >= 0.0 );
+  alpha = _alpha;
+  // Building alpha_Id0
+  alpha_Id0 = _alpha * functions::dec::diagonal( m ) * calculus.template identity<0, PRIMAL>();
+  alpha_g0.clear();
+  for ( unsigned int i = 0; i < g0.size(); i++ )
+    alpha_g0.push_back( alpha_Id0 * g0[ i ] );
+}
+
+//-----------------------------------------------------------------------------
+template <typename TKSpace, typename TLinearAlgebra>
+void 
+DGtal::ATu0v1<TKSpace, TLinearAlgebra>::
+setLambda( Scalar _lambda )
+{
+  ASSERT( _lambda >= 0.0 );
+  lambda     = _lambda;
+  l_L1       = lambda * L1;
+  l_1_over_4 = (lambda / 4.0 ) * KForm< Calculus, 1, PRIMAL >::ones( calculus );
+}
+
+//-----------------------------------------------------------------------------
+template <typename TKSpace, typename TLinearAlgebra>
+void 
+DGtal::ATu0v1<TKSpace, TLinearAlgebra>::
+setEpsilon( Scalar _epsilon )
+{
+  ASSERT( _epsilon > 0.0 );
+  epsilon     = _epsilon;
+  left_V1     = epsilon * l_L1 + 
+    ( lambda/(4.0*epsilon) ) * calculus.template identity<1, PRIMAL>();
+  l_1_over_4e = (1.0/epsilon) * l_1_over_4;
+}
+ 
+//-----------------------------------------------------------------------------
+template <typename TKSpace, typename TLinearAlgebra>
+void 
+DGtal::ATu0v1<TKSpace, TLinearAlgebra>::
+setUFromInput()
+{
+  u0 = g0;
+}
+
+//-----------------------------------------------------------------------------
+template <typename TKSpace, typename TLinearAlgebra>
+bool
+DGtal::ATu0v1<TKSpace, TLinearAlgebra>::
+solveU()
+{
+  if ( verbose > 0 ) trace.beginBlock("Solving for u");
+  if ( verbose > 1 ) trace.info() << "- building matrix M : = alpha_Id0 - tA_Diag(v)^2_A" << std::endl;
+  
+  PrimalIdentity1 diag_vv = functions::dec::squaredDiagonal( v1 );
+  PrimalIdentity0 Av2A    = D0.transpose() * diag_vv * D0 +  alpha_Id0;
+  if ( verbose > 1 ) trace.info() << "- prefactoring matrix M" << std::endl;
+  solver_u.compute( Av2A );
+  bool ok = true;
+  for ( Dimension i = 0; i < u0.size(); ++i )
+    {
+      if ( verbose > 1 ) trace.info() << "- solving M u[" << i << "] = alpha g[" << i << "]" << std::endl;
+      u0[ i ] = solver_u.solve( alpha_g0[ i ] );
+      if ( verbose > 1 ) trace.info() << ( solver_u.isValid() ? "=> OK" : "ERROR" ) << " " << solver_u.myLinearAlgebraSolver.info() << std::endl;
+      ok = ok && solver_u.isValid();
+    }
+  if ( verbose > 0 ) trace.endBlock();
+  return ok;
+}
+
+//-----------------------------------------------------------------------------
+template <typename TKSpace, typename TLinearAlgebra>
+bool
+DGtal::ATu0v1<TKSpace, TLinearAlgebra>::
+solveV()
+{
+  former_v1 = v1;
+  if ( verbose > 0 ) trace.beginBlock("Solving for v");
+  if ( verbose > 1 ) trace.info() << "- building matrix N := l/4e Id1 + le (tA' A' + tB B) + sum Diag(Au_i)^2" << std::endl;
+  // Not the same result as below ! Seems the "good" way of doing it.
+  PrimalIdentity1 N  = left_V1;
+  for ( Dimension i = 0; i < u0.size(); ++i )
+    {
+      PrimalIdentity1 U2 = functions::dec::squaredDiagonal( D0 * u0[ i ] );
+      N.myContainer += U2.myContainer;
+    }
+  // Seems the "bad" way of doing it.
+  // PrimalIdentity0 U2 = functions::dec::squaredDiagonal( u0[ 0 ] );
+  // for ( Dimension i = 1; i < u0.size(); ++i )
+  //   U2.myContainer += functions::dec::squaredDiagonal( u0[ i ] ).myContainer;
+  // PrimalIdentity1 N  = left_V1 + D0 * U2 * D0.transpose();
+  typedef typename PrimalIdentity1::Container Matrix; 
+  const Matrix & M = N.myContainer;
+  if ( verbose > 2 )
+    for (int k = 0; k < M.outerSize(); ++k)
+      for ( typename Matrix::InnerIterator it( M, k ); it; ++it )
+        if ( ( verbose > 3 ) || ( it.row() == it.col() ) )
+          trace.info() << "[" << it.row() << "," << it.col() << "] = " << it.value() << std::endl;
+  if ( verbose > 1 ) trace.info() << "- prefactoring matrix N" << std::endl;
+  solver_v.compute( N );
+  if ( verbose > 1 ) trace.info() << "- solving N v = l/4e 1" << std::endl;
+  v1 = solver_v.solve( l_1_over_4e );
+  if ( verbose > 1 ) trace.info() << ( solver_v.isValid() ? "OK" : "ERROR" )
+                                  << " " << solver_v.myLinearAlgebraSolver.info()
+                                  << std::endl;
+  if ( verbose > 0 ) trace.endBlock();
+  return solver_v.isValid();
+}
+
+//-----------------------------------------------------------------------------
+template <typename TKSpace, typename TLinearAlgebra>
+typename DGtal::ATu0v1<TKSpace, TLinearAlgebra>::Scalar
+DGtal::ATu0v1<TKSpace, TLinearAlgebra>::
+computeVariation()
+{
+  if ( verbose > 0 ) trace.beginBlock( "Compute variation of v.");
+  delta_v_l1  = 0.0;
+  delta_v_l2  = 0.0;
+  delta_v_loo = 0.0;
+  for ( Index index = 0; index < size1(); index++)
+    {
+      delta_v_loo = std::max( delta_v_loo, std::fabs( v1.myContainer( index )
+                                                      - former_v1.myContainer( index ) ) );
+      delta_v_l2 += ( v1.myContainer( index ) - former_v1.myContainer( index ) )
+        * ( v1.myContainer( index ) - former_v1.myContainer( index ) );
+      delta_v_l1 += fabs( v1.myContainer( index )
+                          - former_v1.myContainer( index ) );
+    }
+  delta_v_l1 /= size1();
+  delta_v_l2  = sqrt( delta_v_l2 / size1() );
+  if ( verbose > 0 ) {
+    trace.info() << "Variation |v^k+1 - v^k|_oo = " << delta_v_loo << std::endl;
+    trace.info() << "Variation |v^k+1 - v^k|_2  = " << delta_v_l2  << std::endl;
+    trace.info() << "Variation |v^k+1 - v^k|_1  = " << delta_v_l1  << std::endl;
+  }
+  if ( verbose > 0 ) trace.endBlock();
+  return delta_v_loo;
+}
+
+//-----------------------------------------------------------------------------
+template <typename TKSpace, typename TLinearAlgebra>
+typename DGtal::ATu0v1<TKSpace, TLinearAlgebra>::Scalar
+DGtal::ATu0v1<TKSpace, TLinearAlgebra>::
+checkV()
+{
+  if ( verbose > 0 ) trace.beginBlock("Checking v");
+  Scalar m1 = 1.0;
+  Scalar m2 = 0.0;
+  Scalar ma = 0.0;
+  for ( Index index = 0; index < size1(); index++)
+    {
+      Scalar val = v1.myContainer( index );
+      m1 = std::min( m1, val );
+      m2 = std::max( m2, val );
+      ma += val;
+    }
+  if ( verbose > 0 ) 
+    trace.info() << "1-form v: min=" << m1 << " avg=" << ( ma / size1() )
+                 << " max=" << m2 << std::endl;
+  // for ( Index index = 0; index < size1(); index++)
+  //   v1.myContainer( index ) = std::min( std::max(v1.myContainer( index ), 0.0) , 1.0 );
+  if ( verbose > 0 ) trace.endBlock();
+  return std::max( std::fabs( m1 ), std::fabs( m2 - 1.0 ) );
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Interface - public :
+
+/**
+ * Writes/Displays the object on an output stream.
+ * @param out the output stream where the object is written.
+ */
+template <typename TKSpace, typename TLinearAlgebra>
+inline
+void
+DGtal::ATu0v1<TKSpace, TLinearAlgebra>::selfDisplay ( std::ostream & out ) const
+{
+  out << "[ ATu0v1 #g=" << g0.size() << " dec=" << calculus << " ]";
+}
+
+/**
+ * Checks the validity/consistency of the object.
+ * @return 'true' if the object is valid, 'false' otherwise.
+ */
+template <typename TKSpace, typename TLinearAlgebra>
+inline
+bool
+DGtal::ATu0v1<TKSpace, TLinearAlgebra>::isValid() const
+{
+    return true;
+}
+
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Implementation of inline functions                                        //
+
+template <typename TKSpace, typename TLinearAlgebra>
+inline
+std::ostream&
+DGtal::operator<< ( std::ostream & out,
+                  const ATu0v1<TKSpace, TLinearAlgebra> & object )
+{
+  object.selfDisplay( out );
+  return out;
+}
+
+//                                                                           //
+///////////////////////////////////////////////////////////////////////////////
+
+

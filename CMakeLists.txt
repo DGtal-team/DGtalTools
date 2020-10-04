@@ -1,10 +1,11 @@
+
 #David Coeurjolly <david.coeurjolly@liris.cnrs.fr>
 # -----------------------------------------------------------------------------
 # Project definition
 # -----------------------------------------------------------------------------
 PROJECT(DGtalTools)
 
-cmake_minimum_required (VERSION 2.6)
+cmake_minimum_required (VERSION 3.1)
 
 SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake")
 
@@ -14,11 +15,21 @@ SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake")
 # -----------------------------------------------------------------------------
 message(STATUS "-------------------------------------------------------------------------------")
 message(STATUS "Checking if DGtal is installed:")
-FIND_PACKAGE(DGtal 0.9.2 REQUIRED)
+FIND_PACKAGE(DGtal 1.0 REQUIRED)
 INCLUDE_DIRECTORIES(${DGTAL_INCLUDE_DIRS})
 LINK_DIRECTORIES(${DGTAL_LIBRARY_DIRS})
 SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 message(STATUS "DGtal found.")
+
+
+
+ # -----------------------------------------------------------------------------
+ # CPP11 
+ # -----------------------------------------------------------------------------
+ set (CMAKE_CXX_STANDARD 11)
+ set (CMAKE_CXX_STANDARD_REQUIRED TRUE)
+
+
 
 # -------------------------------------------------------------------------
 # This test is for instance used for ITK v3.x. ITK forces a limited
@@ -35,30 +46,42 @@ endif (CMAKE_CXX_FLAGS MATCHES "-ftemplate-depth-[0-9]*")
 
 
 
+# CLI11
+include_directories( "${PROJECT_SOURCE_DIR}/ext/" )
+
+
 
 # -----------------------------------------------------------------------------
 # Define variables and cmake parameters, and display some information
 # -----------------------------------------------------------------------------
 SET(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
-SET(DGtalTools_VERSION_MAJOR 0)
-SET(DGtalTools_VERSION_MINOR 9)
-SET(DGtalTools_VERSION_PATCH beta3)
+SET(DGtalTools_VERSION_MAJOR 1)
+SET(DGtalTools_VERSION_MINOR 1)
+SET(DGtalTools_VERSION_PATCH beta)
 SET(DGTALTOOLS_VERSION "${DGtalTools_VERSION_MAJOR}.${DGtalTools_VERSION_MINOR}.${DGtalTools_VERSION_PATCH}")
 SET(PROJECT_VERSION "${DGtalTools_VERSION_MAJOR}.${DGtalTools_VERSION_MINOR}.${DGtalTools_VERSION_PATCH}")
 SET(VERSION ${DGtalTools_VERSION_MAJOR}.${DGtalTools_VERSION_MINOR}.${DGtalTools_VERSION_PATCH})
 
-SET(Boost_USE_STATIC_LIBS   ON)
-SET(Boost_USE_MULTITHREADED ON)
-SET(Boost_USE_STATIC_RUNTIME OFF)
-SET(Boost_FOUND FALSE)
-FIND_PACKAGE(Boost 1.46.0 REQUIRED COMPONENTS program_options)
+
+
+
+
+ # -----------------------------------------------------------------------------
+ # Looking for boost
+ # -----------------------------------------------------------------------------
+
+set(Boost_USE_STATIC_LIBS   ON)
+set(Boost_USE_MULTITHREADED ON)
+set(Boost_USE_STATIC_RUNTIME OFF)
+set(Boost_FOUND FALSE)
+FIND_PACKAGE(Boost 1.50.0 REQUIRED)
 if ( Boost_FOUND )
-  message(STATUS "Boost and boost_program_options found.")
-  include_directories( ${Boost_INCLUDE_DIRS} )
+  ADD_DEFINITIONS(${BOOST_DEFINITIONS} -DBOOST_ALL_NO_LIB)
+  # SYSTEM to avoid warnings from boost.
+  include_directories(SYSTEM ${Boost_INCLUDE_DIRS} )
   SET(DGtalToolsLibDependencies ${DGtalToolsLibDependencies}
-     ${Boost_LIBRAIRIES}
-     ${Boost_PROGRAM_OPTIONS_LIBRARY})
-   SET(DGtalLibInc ${Boost_INCLUDE_DIRS})
+     ${Boost_LIBRAIRIES})
+   SET(DGtalLibInc ${Boost_INCLUDE_DIRS})  
 endif( Boost_FOUND )
 
 
@@ -81,3 +104,4 @@ add_subdirectory(estimators)
 add_subdirectory(converters)
 add_subdirectory(visualisation)
 add_subdirectory(geometricTransform)
+add_subdirectory(imageProcessing)

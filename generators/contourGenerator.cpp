@@ -2,15 +2,15 @@
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Lesser General Public License as
  *  published by the Free Software Foundation, either version 3 of the
- *  License, or  (at your option) any later version.
+ *  License, or (at your option) any later version.
  *
  *  This program is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  *  GNU General Public License for more details.
  *
  *  You should have received a copy of the GNU General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *  along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  **/
 /**
@@ -35,9 +35,7 @@
 #include <vector>
 #include <string>
 
-#include <boost/program_options/options_description.hpp>
-#include <boost/program_options/parsers.hpp>
-#include <boost/program_options/variables_map.hpp>
+#include "CLI11.hpp"
 
 #include "DGtal/base/Common.h"
 #include "DGtal/kernel/domains/HyperRectDomain.h"
@@ -70,7 +68,7 @@ using namespace DGtal;
  *
  @page contourGenerator contourGenerator
  
- @brief  Generates multigrid contours of 2d digital shapes using DGtal library.
+ @brief Generates multigrid contours of 2d digital shapes using DGtal library.
  
  The associated geometric information like contour, curvature can also be displayed. 
 
@@ -79,26 +77,25 @@ using namespace DGtal;
  @b Allowed @b options @b are:
  
  @code
- -h [ --help ]                    display this message
- -l [ --list ]                    List all available shapes
- -s [ --shape ] arg               Shape name
- -R [ --radius ] arg              Radius of the shape
- -A [ --axis1 ] arg               Half big axis of the shape (ellipse)
- -a [ --axis2 ] arg               Half small axis of the shape (ellipse)
- -r [ --smallradius ] arg (=5)    Small radius of the shape
- -v [ --varsmallradius ] arg (=5) Variable small radius of the shape
- -k [ --k ] arg (=3)              Number of branches or corners the shape
- --phi arg (=0)                   Phase of the shape (in radian)
- -w [ --width ] arg (=10)         Width of the shape
- -p [ --power ] arg (=2)          Power of the metric (double)
- -x [ --center_x ] arg (=0)       x-coordinate of the shape center (double)
- -y [ --center_y ] arg (=0)       y-coordinate of the shape center (double)
- -g [ --gridstep ] arg (=1)       Gridstep for the digitization
- -f [ --format ] arg (=pts)       Output format:
- List of pointel coordinates {pts}
- Freman chaincode Vector {fc}
- -o [ --outputGeometry ] arg      Base name of the file containing the shape
- geometry (points, tangents, curvature)
+  -h,--help                             Print this help message and exit
+  -l,--list                             List all available shapes
+  -s,--shape TEXT                       Shape name
+  -R,--radius FLOAT                     Radius of the shape
+  -A,--axis1 FLOAT                      Half big axis of the shape (ellipse)
+  -a,--axis2 FLOAT                      Half small axis of the shape (ellipse)
+  -r,--smallradius FLOAT=5              Small radius of the shape (default 5)
+  -v,--varsmallradius FLOAT=5           Variable small radius of the shape (default 5)
+  -k UINT=3                             Number of branches or corners the shape (default 3)
+  --phi FLOAT=0                         Phase of the shape (in radian, default 0.0)
+  -w,--width FLOAT=10                   Width of the shape (default 10.0)
+  -p,--power FLOAT=2                    Power of the metric (default 2.0)
+  -x,--center_x FLOAT=0                 x-coordinate of the shape center (default 0.0)
+  -y,--center_y FLOAT=0                 y-coordinate of the shape center (default 0.0)
+  -g,--gridstep FLOAT=1                 Gridstep for the digitization (default 1.0)
+  -f,--format TEXT=pts                  Output format:
+                                            List of pointel coordinates {pts}
+                                            Freeman chaincode Vector {fc} (default pts)
+  -o,--outputGeometry TEXT              Base name of the file containing the shape geometry (points, tangents, curvature)
  @endcode
 
  You can also list all possible shapes:
@@ -106,11 +103,11 @@ using namespace DGtal;
  contourGenerator --list
  2D Shapes:
 	ball	Ball for the Euclidean metric.
-		Required parameter(s): --radius [-R]   
+		Required parameter(s): --radius [-R]
 	square	square (no signature).
-		Required parameter(s): --width [-w]   
+		Required parameter(s): --width [-w]
 	lpball	Ball for the l_power metric (no signature).
-		Required parameter(s): --radius [-R], --power [-p]  
+		Required parameter(s): --radius [-R], --power [-p]
 	flower	Flower with k petals with radius ranging from R+/-v.
 		Required parameter(s): --radius [-R], --varsmallradius [-v], --k [-k], --phi
 	ngon	Regular k-gon.
@@ -125,11 +122,11 @@ using namespace DGtal;
  @b Example:
  @code
  # generate a flower contour with 5 petals of maximal radius 5 and small radius 3 with grid size = 0.1:
- ./shapeGenerator/contourGenerator -s flower -R 5 -v 3  -k 5 --outputGeometry result   -g 0.1
+ ./shapeGenerator/contourGenerator -s flower -R 5 -v 3 -k 5 --outputGeometry result -g 0.1
  # Display the results using gnuplot:
  $gnuplot
- [gnuplot>  plot [][-5:2]'res.geom'  using 1:6 w l  t "curvature"
- [gnuplot>  plot 'res.geom'  using 2:3 w l  t "contour flower"
+ [gnuplot> plot [][-5:2]'res.geom' using 1:6 w l t "curvature"
+ [gnuplot> plot 'res.geom' using 2:3 w l t "contour flower"
 @endcode
 
  
@@ -166,50 +163,48 @@ void createList()
   shapesParam2.push_back("");
   shapesParam3.push_back("");
   shapesParam4.push_back("");
-  
+
   shapes2D.push_back("square");
   shapesDesc.push_back("square (no signature).");
   shapesParam1.push_back("--width [-w]");
   shapesParam2.push_back("");
   shapesParam3.push_back("");
   shapesParam4.push_back("");
-  
+
   shapes2D.push_back("lpball");
   shapesDesc.push_back("Ball for the l_power metric (no signature).");
   shapesParam1.push_back("--radius [-R],");
   shapesParam2.push_back("--power [-p]");
   shapesParam3.push_back("");
   shapesParam4.push_back("");
-  
+
   shapes2D.push_back("flower");
   shapesDesc.push_back("Flower with k petals with radius ranging from R+/-v.");
   shapesParam1.push_back("--radius [-R],");
   shapesParam2.push_back("--varsmallradius [-v],");
   shapesParam3.push_back("--k [-k],");
   shapesParam4.push_back("--phi");
-  
+
   shapes2D.push_back("ngon");
   shapesDesc.push_back("Regular k-gon.");
   shapesParam1.push_back("--radius [-R],");
   shapesParam2.push_back("--k [-k],");
   shapesParam3.push_back("--phi");
   shapesParam4.push_back("");
-  
+
   shapes2D.push_back("accflower");
   shapesDesc.push_back("Accelerated Flower with k petals.");
   shapesParam1.push_back("--radius [-R],");
   shapesParam2.push_back("--varsmallradius [-v],");
   shapesParam3.push_back("--k [-k],");
   shapesParam4.push_back("--phi");
-  
+
   shapes2D.push_back("ellipse");
   shapesDesc.push_back("Ellipse.");
   shapesParam1.push_back("--axis1 [-A],");
   shapesParam2.push_back("--axis2 [-a],");
   shapesParam3.push_back("--phi");
   shapesParam4.push_back("");
-  
-  
 }
 
 /**
@@ -221,13 +216,12 @@ void displayList()
   trace.emphase()<<"2D Shapes:"<<std::endl;
   for(unsigned int i=0; i<shapes2D.size(); ++i)
     trace.info()<<"\t"<<shapes2D[i]<<"\t"
-    <<shapesDesc[i]<<std::endl
+    << shapesDesc[i]<<std::endl
     <<"\t\tRequired parameter(s): "
     << shapesParam1[i]<<" "
     << shapesParam2[i]<<" "
     << shapesParam3[i]<<" "
     << shapesParam4[i]<<std::endl;
-  
 }
 
 
@@ -242,17 +236,17 @@ void displayList()
 unsigned int checkAndReturnIndex(const std::string &shapeName)
 {
   unsigned int pos=0;
-  
+
   while ((pos < shapes2D.size()) && (shapes2D[pos] != shapeName))
-    pos++;
-  
+  pos++;
+
   if (pos == shapes2D.size())
   {
     trace.error() << "The specified shape has not found.";
     trace.info()<<std::endl;
     exit(1);
   }
-  
+
   return pos;
 }
 
@@ -276,30 +270,28 @@ estimateGeometry(Shape& s,
                  std::vector<Point>& points,
                  std::vector<Point>& tangents,
                  std::vector<Quantity>& curvatures) {
-  
+
   typedef typename Range::ConstIterator ConstIterator;
-  for (ConstIterator i = r.begin(); i != r.end(); ++i) {
+  for (ConstIterator i = r.begin(); i != r.end(); ++i)
+  {
     Point p( *i );
     p *= h;
     points.push_back(p);
   }
-  
+
   typedef typename Range::ConstCirculator ConstCirculator;
-  
+
   typedef ParametricShapeTangentFunctor< Shape > TangentFunctor;
   TrueLocalEstimatorOnPoints< ConstCirculator, Shape, TangentFunctor >
   trueTangentEstimator;
-  trueTangentEstimator.attach(&s);
-  trueTangentEstimator.init( h, r.c(), r.c());
-  trueTangentEstimator.eval(r.c(), r.c(), std::back_inserter(tangents) );
-  
+  trueTangentEstimator.attach( s );
+  trueTangentEstimator.eval( r.c(), r.c(), std::back_inserter(tangents), h );
+
   typedef ParametricShapeCurvatureFunctor< Shape > CurvatureFunctor;
   TrueLocalEstimatorOnPoints< ConstCirculator, Shape, CurvatureFunctor >
   trueCurvatureEstimator;
-  trueCurvatureEstimator.attach(&s);
-  trueCurvatureEstimator.init( h, r.c(), r.c());
-  trueCurvatureEstimator.eval(r.c(), r.c(), std::back_inserter(curvatures) );
-  
+  trueCurvatureEstimator.attach( s );
+  trueCurvatureEstimator.eval( r.c(), r.c(), std::back_inserter(curvatures), h );
 }
 
 template <typename Space, typename Shape>
@@ -309,7 +301,7 @@ generateContour(
                 double h,
                 const std::string & outputFormat,
                 bool withGeom,
-                const std::string & outputFileName  )
+                const std::string & outputFileName )
 {
   // Types
   typedef typename Space::Point Point;
@@ -322,7 +314,7 @@ generateContour(
   typedef typename GridCurve<KSpace>::PointsRange Range;
   typedef typename Range::ConstIterator ConstIteratorOnPoints;
   typedef typename GridCurve<KSpace>::MidPointsRange MidPointsRange;
-  
+
   // Digitizer
   GaussDigitizer<Space,Shape> dig;
   dig.attach( aShape ); // attaches the shape.
@@ -338,7 +330,8 @@ generateContour(
     << " error in creating KSpace." << std::endl;
     return false;
   }
-  try {
+  try
+  {
     // Extracts shape boundary
     SurfelAdjacency<KSpace::dimension> SAdj( true );
     SCell bel = Surfaces<KSpace>::findABel( K, dig, 10000 );
@@ -350,10 +343,9 @@ generateContour(
     gridcurve.initFromVector( points );
     // gridcurve contains the digital boundary to analyze.
     Range r = gridcurve.getPointsRange(); //building range
-    
+
     if ( outputFormat == "pts" )
     {
-      
       for ( ConstIteratorOnPoints it = r.begin(), it_end = r.end();
            it != it_end; ++it )
       {
@@ -396,25 +388,27 @@ generateContour(
       s << outputFileName << ".geom";
       std::ofstream outstream(s.str().c_str()); //output stream
       if (!outstream.is_open()) return false;
-      else {
+      else
+      {
         outstream << "# " << outputFileName << std::endl;
         outstream << "# Pointel (x,y), Midpoint of the following linel (x',y')" << std::endl;
         outstream << "# id x y tangentx tangenty curvaturexy"
         << " x' y' tangentx' tangenty' curvaturex'y'" << std::endl;
-        
+
         std::vector<RealPoint> truePoints, truePoints2;
         std::vector<RealPoint> trueTangents, trueTangents2;
         std::vector<double> trueCurvatures, trueCurvatures2;
-        
+
         estimateGeometry<Shape, Range, RealPoint, double>
         (aShape, h, r, truePoints, trueTangents, trueCurvatures);
-        
+
         estimateGeometry<Shape, MidPointsRange, RealPoint, double>
         (aShape, h, gridcurve.getMidPointsRange(), truePoints2, trueTangents2, trueCurvatures2);
-        
-        
+
+
         unsigned int n = (unsigned int)r.size();
-        for (unsigned int i = 0; i < n; ++i ) {
+        for (unsigned int i = 0; i < n; ++i )
+        {
           outstream << std::setprecision( 15 ) << i
           << " " << truePoints[ i ][ 0 ]
           << " " << truePoints[ i ][ 1 ]
@@ -428,13 +422,12 @@ generateContour(
           << " " << trueCurvatures2[ i ]
           << std::endl;
         }
-        
       }
       outstream.close();
     }
-    
+
     /////////////////
-    
+
   }
   catch ( InputException e )
   {
@@ -458,153 +451,122 @@ void missingParam(std::string param)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace po = boost::program_options;
 
 int main( int argc, char** argv )
 {
-  // parse command line ----------------------------------------------
-  po::options_description general_opt("Allowed options are");
-  general_opt.add_options()
-  ("help,h", "display this message")
-  ("list,l",  "List all available shapes")
-  ("shape,s", po::value<std::string>(), "Shape name")
-  ("radius,R",  po::value<double>(), "Radius of the shape" )
-  ("axis1,A",  po::value<double>(), "Half big axis of the shape (ellipse)" )
-  ("axis2,a",  po::value<double>(), "Half small axis of the shape (ellipse)" )
-  ("smallradius,r",  po::value<double>()->default_value(5), "Small radius of the shape" )
-  ("varsmallradius,v",  po::value<double>()->default_value(5), "Variable small radius of the shape" )
-  ("k,k",  po::value<unsigned int>()->default_value(3), "Number of branches or corners the shape" )
-  ("phi",  po::value<double>()->default_value(0.0), "Phase of the shape (in radian)" )
-  ("width,w",  po::value<double>()->default_value(10.0), "Width of the shape" )
-  ("power,p",   po::value<double>()->default_value(2.0), "Power of the metric (double)" )
-  ("center_x,x",   po::value<double>()->default_value(0.0), "x-coordinate of the shape center (double)" )
-  ("center_y,y",   po::value<double>()->default_value(0.0), "y-coordinate of the shape center (double)" )
-  ("gridstep,g",  po::value<double>()->default_value(1.0), "Gridstep for the digitization" )
-  ("format,f",   po::value<std::string>()->default_value("pts"), "Output format:\n\t  List of pointel coordinates {pts}\n\t  Freman chaincode Vector {fc}" )
-  ("outputGeometry,o",   po::value<std::string>(), "Base name of the file containing the shape geometry (points, tangents, curvature)" );
+  // parse command line CLI ----------------------------------------------
+  CLI::App app;
+  std::string shapeName;
+  std::string outputFileName;
+  std::string outputFormat {"pts"};
+  double radius;
+  double power {2.0};
+  double smallradius {5};
+  double varsmallradius {5};
+  double cx {0.0}, cy {0.0};
+  double h {1.0};
+  unsigned int k {3};
+  double phi {0.0};
+  double width {10.0};
+  double axis1, axis2;
+
+  app.description("Generates multigrid contours of 2d digital shapes using DGtal library.\n Typical use example:\n \t contourGenerator --shape <shapeName> [requiredParam] [otherOptions]\n");
+  auto listOpt = app.add_flag("--list,-l","List all available shapes");
+  auto shapeNameOpt = app.add_option("--shape,-s", shapeName, "Shape name");
+  auto radiusOpt = app.add_option("--radius,-R", radius, "Radius of the shape" );
+  auto axis1Opt = app.add_option("--axis1,-A", axis1, "Half big axis of the shape (ellipse)" );
+  auto axis2Opt = app.add_option("--axis2,-a", axis2, "Half small axis of the shape (ellipse)" );
+  auto smallradiusOpt = app.add_option("--smallradius,-r", smallradius, "Small radius of the shape (default 5)", true);
+  auto varsmallradiusOpt = app.add_option("--varsmallradius,-v", varsmallradius, "Variable small radius of the shape (default 5)", true );
+  auto kOpt = app.add_option("-k", k, "Number of branches or corners the shape (default 3)", true );
+  auto phiOpt = app.add_option("--phi", phi, "Phase of the shape (in radian, default 0.0)", true );
+  auto widthOpt = app.add_option("--width,-w", width, "Width of the shape (default 10.0)", true );
+  auto powerOpt = app.add_option("--power,-p", power, "Power of the metric (default 2.0)", true );
+  app.add_option("--center_x,-x", cx, "x-coordinate of the shape center (default 0.0)", true );
+  app.add_option("--center_y,-y", cy, "y-coordinate of the shape center (default 0.0)", true );
+  app.add_option("--gridstep,-g", h, "Gridstep for the digitization (default 1.0)", true );
+  auto outputFormatOpt = app.add_option("--format,-f", outputFormat, "Output format:\n\t  List of pointel coordinates {pts}\n\t  Freeman chaincode Vector {fc} (default pts)", true );
+  auto outputFileNameOpt = app.add_option("--outputGeometry,-o", outputFileName, "Base name of the file containing the shape geometry (points, tangents, curvature)" );
   
-  bool parseOK=true;
-  po::variables_map vm;
-  try{
-    po::store(po::parse_command_line(argc, argv, general_opt), vm);
-  }catch(const std::exception& ex){
-    parseOK=false;
-    trace.info()<< "Error checking program options: "<< ex.what()<< std::endl;
-  }
-  
-  po::notify(vm);
-  if(!parseOK || vm.count("help")||argc<=1)
-  {
-    trace.info()<< "Generate contours of 2d digital shapes using DGtal library" <<std::endl
-		  << "Basic usage: "<<std::endl
-		  << "\tcontourGenerator --shape <shapeName> [requiredParam] [otherOptions]"<<std::endl
-		  << general_opt << "\n";
-    return 0;
-  }
-  
+  app.get_formatter()->column_width(40);
+  CLI11_PARSE(app, argc, argv);
+  // END parse command line using CLI ----------------------------------------------
+
   //List creation
   createList();
-  
-  if (vm.count("list"))
+
+  if ( listOpt->count() > 0 )
   {
     displayList();
     return 0;
   }
   
-  //Parse options
-  if (!(vm.count("shape"))) missingParam("--shape");
-  std::string shapeName = vm["shape"].as<std::string>();
-  
+  if(shapeNameOpt->count()==0) missingParam("--shape");
   bool withGeom = true;
-  std::string outputFileName;
-  if (!(vm.count("outputGeometry"))) withGeom = false;
-  else outputFileName = vm["outputGeometry"].as<std::string>();
-  
-  if (!(vm.count("format"))) missingParam("--format");
-  std::string outputFormat = vm["format"].as<std::string>();
+  if (outputFileNameOpt->count()==0) withGeom = false;
   
   //We check that the shape is known
   unsigned int id = checkAndReturnIndex(shapeName);
-  
+
   // standard types
   typedef Z2i::Space Space;
-  typedef Space::Point Point;
   typedef Space::RealPoint RealPoint;
   
-  RealPoint center( vm["center_x"].as<double>(),
-                   vm["center_y"].as<double>() );
-  double h = vm["gridstep"].as<double>();
+  RealPoint center( cx, cy );
+
   if (id ==0)
   {
-    if (!(vm.count("radius"))) missingParam("--radius");
-    double radius = vm["radius"].as<double>();
+    if (radiusOpt->count()==0) missingParam("--radius");
     Ball2D<Space> ball(Z2i::Point(0,0), radius);
     generateContour<Space>( ball, h, outputFormat, withGeom, outputFileName );
   }
-  else if (id ==1)
+  else if (id == 1)
   {
-    if (!(vm.count("width"))) missingParam("--width");
-    double width = vm["width"].as<double>();
+    //if (widthOpt->count()==0) missingParam("--width");
     ImplicitHyperCube<Space> object(Z2i::Point(0,0), width/2);
     trace.error()<< "Not available.";
     trace.info()<<std::endl;
   }
-  else if (id ==2)
+  else if (id == 2)
   {
-    if (!(vm.count("power"))) missingParam("--power");
-    if (!(vm.count("radius"))) missingParam("--radius");
-    double radius = vm["radius"].as<double>();
-    double power = vm["power"].as<double>();
+    //if (powerOpt->count()==0) missingParam("--power");
+    if (radiusOpt->count()==0) missingParam("--radius");
     ImplicitRoundedHyperCube<Space> ball(Z2i::Point(0,0), radius, power);
     trace.error()<< "Not available.";
     trace.info()<<std::endl;
   }
-  else if (id ==3)
+  else if (id == 3)
   {
-    if (!(vm.count("varsmallradius"))) missingParam("--varsmallradius");
-    if (!(vm.count("radius"))) missingParam("--radius");
-    if (!(vm.count("k"))) missingParam("--k");
-    if (!(vm.count("phi"))) missingParam("--phi");
-    double radius = vm["radius"].as<double>();
-    double varsmallradius = vm["varsmallradius"].as<double>();
-    unsigned int k = vm["k"].as<unsigned int>();
-    double phi = vm["phi"].as<double>();
+    //if (varsmallradiusOpt->count()==0) missingParam("--varsmallradius");
+    if (radiusOpt->count()==0) missingParam("--radius");
+    //if (kOpt->count()==0) missingParam("--k");
+    //if (phiOpt->count()==0) missingParam("--phi");
     Flower2D<Space> flower( center, radius, varsmallradius, k, phi );
-    generateContour<Space>( flower, h, outputFormat, withGeom, outputFileName  );
+    generateContour<Space>( flower, h, outputFormat, withGeom, outputFileName );
   }
-  else if (id ==4)
+  else if (id == 4)
   {
-    if (!(vm.count("radius"))) missingParam("--radius");
-    if (!(vm.count("k"))) missingParam("--k");
-    if (!(vm.count("phi"))) missingParam("--phi");
-    double radius = vm["radius"].as<double>();
-    unsigned int k = vm["k"].as<unsigned int>();
-    double phi = vm["phi"].as<double>();
+    if (radiusOpt->count()==0) missingParam("--radius");
+    //if (kOpt->count()==0) missingParam("--k");
+    //if (phiOpt->count()==0) missingParam("--phi");
     NGon2D<Space> object( center, radius, k, phi );
-    generateContour<Space>( object, h, outputFormat, withGeom, outputFileName  );
+    generateContour<Space>( object, h, outputFormat, withGeom, outputFileName );
   }
-  else if (id ==5)
+  else if (id == 5)
   {
-    if (!(vm.count("varsmallradius"))) missingParam("--varsmallradius");
-    if (!(vm.count("radius"))) missingParam("--radius");
-    if (!(vm.count("k"))) missingParam("--k");
-    if (!(vm.count("phi"))) missingParam("--phi");
-    double radius = vm["radius"].as<double>();
-    double varsmallradius = vm["varsmallradius"].as<double>();
-    unsigned int k = vm["k"].as<unsigned int>();
-    double phi = vm["phi"].as<double>();
+    //if (varsmallradiusOpt->count()==0) missingParam("--varsmallradius");
+    if (radiusOpt->count()==0) missingParam("--radius");
+    //if (kOpt->count()==0) missingParam("--k");
+    //if (phiOpt->count()==0) missingParam("--phi");
     AccFlower2D<Space> accflower( center, radius, varsmallradius, k, phi );
-    generateContour<Space>( accflower, h, outputFormat, withGeom, outputFileName  );
+    generateContour<Space>( accflower, h, outputFormat, withGeom, outputFileName );
   }
-  else if (id ==6)
+  else if (id == 6)
   {
-    if (!(vm.count("axis1"))) missingParam("--axis1");
-    if (!(vm.count("axis2"))) missingParam("--axis2");
-    if (!(vm.count("phi"))) missingParam("--phi");
-    double a1 = vm["axis1"].as<double>();
-    double a2 = vm["axis2"].as<double>();
-    double phi = vm["phi"].as<double>();
-    Ellipse2D<Space> ellipse( center, a1, a2, phi );
+    if (axis1Opt->count()==0) missingParam("--axis1");
+    if (axis2Opt->count()==0) missingParam("--axis2");
+    //if (phiOpt->count()==0) missingParam("--phi");
+    Ellipse2D<Space> ellipse( center, axis1, axis2, phi );
     generateContour<Space>( ellipse, h, outputFormat, withGeom, outputFileName  ); 
   } 
 }

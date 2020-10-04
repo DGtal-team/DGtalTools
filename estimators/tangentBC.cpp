@@ -32,13 +32,12 @@
 #include <iostream>
 #include <vector>
 #include <string>
-#include <boost/program_options/options_description.hpp>
-#include <boost/program_options/parsers.hpp>
-#include <boost/program_options/variables_map.hpp>
 
+#include "CLI11.hpp"
 
 #include "DGtal/base/Common.h"
 #include "DGtal/helpers/StdDefs.h"
+#include "DGtal/io/readers/PointListReader.h"
 
 //Grid curve
 #include "DGtal/geometry/curves/FreemanChain.h"
@@ -50,9 +49,6 @@
 using namespace DGtal;
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace po = boost::program_options;
-
-
 
 /**
  @page tangentBC tangentBC
@@ -64,9 +60,13 @@ namespace po = boost::program_options;
 
  @b Allowed @b options @b are : 
  @code
-  -h [ --help ]              display this message
-  -i [ --input ] arg         input FreemanChain file name
-  -s [ --GridStep ] arg (=1) Grid step
+  Positionals:
+  1 TEXT:FILE REQUIRED                  input file name: FreemanChain (.fc) or a sequence of discrete points (.sdp).
+
+  Options:
+  -h,--help                             Print this help message and exit
+  -i,--input TEXT:FILE REQUIRED         input file name: FreemanChain (.fc) or a sequence of discrete points (.sdp).
+  --GridStep FLOAT=1                    Grid step (default 1.0)
  @endcode
 
 @note The file may contain several freeman chains.
@@ -101,41 +101,22 @@ gnuplot> plot [] [-1.2:1.2]'tangentsBC.dat' using 1:3  w lines title "tangents w
 
 int main( int argc, char** argv )
 {
-  // parse command line ----------------------------------------------
-  po::options_description general_opt("Allowed options are: ");
-  general_opt.add_options()
-    ("help,h", "display this message")
-    ("input,i", po::value<std::string>(), "input FreemanChain file name")
-    ("GridStep,step", po::value<double>()->default_value(1.0), "Grid step");
-  
-  
-  bool parseOK=true;
-  po::variables_map vm;
-  try{
-    po::store(po::parse_command_line(argc, argv, general_opt), vm);  
-  }catch(const std::exception& ex){
-    parseOK=false;
-    trace.info()<< "Error checking program options: "<< ex.what()<< std::endl;
-  }
+  // parse command line CLI ----------------------------------------------
+  CLI::App app;
+  std::string fileName;
+  double h {1.0};
 
-  po::notify(vm);    
-  if(!parseOK || vm.count("help")||argc<=1 || (!(vm.count("input"))) )
-    {
-      trace.info()<< "Tangent using a binomial convolver " <<std::endl << "Basic usage: "<<std::endl
-      << "\t tangentBC [options] --input  <fileName> "<<std::endl
-      << general_opt << "\n"
-      << "NB: the file may contain several freeman chains." << "\n";
-      return 0;
-    }
-  
-  
-  double h = vm["GridStep"].as<double>();  
+  app.description("Estimates tangent using a binomial convolver.\n Typical use example:\n \t tangentBC [options] --input  <fileName>\n");
+  auto filenameOpt = app.add_option("--input,-i,1",fileName,"input file name: FreemanChain (.fc) or a sequence of discrete points (.sdp).")->required()->check(CLI::ExistingFile);
+  app.add_option("--GridStep", h, "Grid step (default 1.0)", true);
+   
+  app.get_formatter()->column_width(40);
+  CLI11_PARSE(app, argc, argv);
+  // END parse command line using CLI ----------------------------------------------  
 
-
- 
-  if(vm.count("input")){
-    std::string fileName = vm["input"].as<std::string>();
-
+  if(filenameOpt->count()>0){
+    std::string extension =  fileName.substr( fileName.find_last_of(".") + 1 );
+    bool isSDP = extension == "sdp";
     typedef Z2i::Space Space; 
     typedef Space::Point Point; 
     typedef PointVector<2, double> RealPoint; 
@@ -144,18 +125,30 @@ int main( int argc, char** argv )
     typedef std::vector< Point > Storage;
     typedef Storage::const_iterator ConstIteratorOnPoints; 
 
-    std::vector< FreemanChain > vectFcs =  
-      PointListReader< Point >:: getFreemanChainsFromFile<Integer> (fileName); 
-    
-    for(unsigned int i=0; i<vectFcs.size(); i++){
-
-      bool isClosed = vectFcs.at(i).isClosed(); 
-      std::cout << "# grid curve " << i << "/" << vectFcs.size() << " "
-                << ( (isClosed)?"closed":"open" ) << std::endl;
-
+    std::vector< FreemanChain > vectFcs;
+    if(!isSDP)
+      {
+        vectFcs =   
+          PointListReader< Point >:: getFreemanChainsFromFile<Integer> (fileName); 
+      }
+    for(unsigned int i=0; i<vectFcs.size() || (i==0 && isSDP); i++){
       Storage vectPts; 
-      FreemanChain::getContourPoints( vectFcs.at(i), vectPts ); 
-
+      bool isClosed;
+      if(!isSDP)
+        {
+          isClosed = vectFcs.at(i).isClosed(); 
+          std::cout << "# grid curve " << i << "/" << vectFcs.size() << " "
+                    << ( (isClosed)?"closed":"open" ) << std::endl;
+          FreemanChain::getContourPoints( vectFcs.at(i), vectPts ); 
+        }
+      else
+        {
+          vectPts = PointListReader<Z2i::Point>::getPointsFromFile(fileName);
+          Z2i::Point pf =vectPts[0];
+          Z2i::Point pl =vectPts[vectPts.size()-1];
+          isClosed = (pf[0]-pl[0])+(pf[1]-pl[1]) <= 1;
+        }
+      
       // Binomial
       std::cout << "# Curvature estimation from binomial convolution" << std::endl;
       typedef BinomialConvolver<ConstIteratorOnPoints, double> MyBinomialConvolver;
@@ -174,7 +167,7 @@ int main( int argc, char** argv )
              tangents.begin() ); 
 
       // Output
-      std::cout << "# id tangent.x tangent.y angle(atan2(y,x))" << std::endl;  
+      std::cout << "# id tangent.x tangent.y angle(atan2(y,x)) x y" << std::endl;  
       unsigned int j = 0;
       for ( ConstIteratorOnPoints 
         it = vectPts.begin(), it_end = vectPts.end();
@@ -184,7 +177,7 @@ int main( int argc, char** argv )
     double y = tangents[ j ][ 1 ];
     std::cout << j << std::setprecision( 15 )
               << " " << x << " " << y 
-              << " " << atan2( y, x )
+              << " " << atan2( y, x ) << " " << (*it)[0] << " " << (*it)[1]
               << std::endl;
   }
 
