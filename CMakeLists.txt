@@ -24,7 +24,7 @@ message(STATUS "DGtal found.")
 
 
  # -----------------------------------------------------------------------------
- # CPP11 
+ # CPP11
  # -----------------------------------------------------------------------------
  set (CMAKE_CXX_STANDARD 11)
  set (CMAKE_CXX_STANDARD_REQUIRED TRUE)
@@ -57,7 +57,7 @@ include_directories( "${PROJECT_SOURCE_DIR}/ext/" )
 SET(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
 SET(DGtalTools_VERSION_MAJOR 1)
 SET(DGtalTools_VERSION_MINOR 1)
-SET(DGtalTools_VERSION_PATCH beta)
+SET(DGtalTools_VERSION_PATCH 0)
 SET(DGTALTOOLS_VERSION "${DGtalTools_VERSION_MAJOR}.${DGtalTools_VERSION_MINOR}.${DGtalTools_VERSION_PATCH}")
 SET(PROJECT_VERSION "${DGtalTools_VERSION_MAJOR}.${DGtalTools_VERSION_MINOR}.${DGtalTools_VERSION_PATCH}")
 SET(VERSION ${DGtalTools_VERSION_MAJOR}.${DGtalTools_VERSION_MINOR}.${DGtalTools_VERSION_PATCH})
@@ -81,7 +81,7 @@ if ( Boost_FOUND )
   include_directories(SYSTEM ${Boost_INCLUDE_DIRS} )
   SET(DGtalToolsLibDependencies ${DGtalToolsLibDependencies}
      ${Boost_LIBRAIRIES})
-   SET(DGtalLibInc ${Boost_INCLUDE_DIRS})  
+   SET(DGtalLibInc ${Boost_INCLUDE_DIRS})
 endif( Boost_FOUND )
 
 
