@@ -1,3 +1,7 @@
+# DGtalTools 1.2
+
+
+
 # DGtalTools 1.1
 
 - *global*
@@ -12,13 +16,43 @@
      (Pablo Hernandez and Bertrand Kerautret
      [#373](https://github.com/DGtal-team/DGtal/pull/#373))
 
+- *converters*
+  - itk2vol: change the type of the threshold parameter in order to be able to
+    convert ITK images of type double, it also adds a new option to mask the
+    source image using another image.  (Bertrand Kerautret,
+    [#367](https://github.com/DGtal-team/DGtalTools/pull/367))
+  - volBoundary2obj improved using new Shortcuts helpers.
+    (Bertrand Kerautret
+    [#370](https://github.com/DGtal-team/DGtalTools/pull/370))
+
+
+- *documentations*
+  -  Fix doc link to the DGtal lib in the tool source (from new github website).
+     (Bertrand Kerautret [#372](https://github.com/DGtal-team/DGtalTools/pull/372))
+  -  Fix missing title page and various small doc corrections.
+     (Bertrand Kerautret [#381](https://github.com/DGtal-team/DGtalTools/pull/381))
+
+- *estimators*
+  - volSurfaceRegularization now in the "make install" command. (David
+    Coeurjolly, [#376](https://github.com/DGtal-team/DGtalTools/pull/376))
+  - 3dLocalEstimators now included in the main build and fix compilation issues
+    and documentation added.
+    [#382](https://github.com/DGtal-team/DGtalTools/issues/382).
+    (Bertrand Kerautret [#383](https://github.com/DGtal-team/DGtalTools/pull/383))
+
+
+- *imageProcessing*:
+  - Add a variant of Ambrosio-Tortorelli functional for image
+    restoration and inpainting, using Laplacian of discontinuity
+    function instead of gradient and based on discrete calculus.
+    (Jacques-Olivier Lachaud
+    [#363](https://github.com/DGtal-team/DGtalTools/pull/363))
+
 - *volumetric*
   - fix ld boost program options macos warnings. (Bertrand
     Kerautret [#366](https://github.com/DGtal-team/DGtalTools/pull/366))
   - curvatureScaleSpaceBCC: better use of exportFile with template specialisation.
     (Bertrand Kerautret, [#375](https://github.com/DGtal-team/DGtalTools/pull/375))
-
-- *volumetric:
   - Passing argument by const reference in (min|max|mean)Val of volSubSample.
     (Roland Denis, [#359](https://github.com/DGtal-team/DGtalTools/pull/359/files))
   - Using SourceForge to download doxygen sources during Travis CI jobs.
@@ -31,38 +65,6 @@
   - Fix a wrong error message that appears when using the tool (wrong IO error)
     (Bertrand Kerautret
     [#368](https://github.com/DGtal-team/DGtalTools/pull/368))
-
-- *documentations*
-  -  Fix doc link to the DGtal lib in the tool source (from new github website).
-     (Bertrand Kerautret [#372](https://github.com/DGtal-team/DGtalTools/pull/372))
-  -  Fix missing title page and various small doc corrections.
-     (Bertrand Kerautret [#381](https://github.com/DGtal-team/DGtalTools/pull/381))
-
-- *converters*
-  - itk2vol: change the type of the threshold parameter in order to be able to
-    convert ITK images of type double, it also adds a new option to mask the
-    source image using another image.  (Bertrand Kerautret,
-    [#367](https://github.com/DGtal-team/DGtalTools/pull/367))
-
-- *estimators*
-  - volSurfaceRegularization now in the "make install" command. (David
-    Coeurjolly, [#376](https://github.com/DGtal-team/DGtalTools/pull/376))
-  - 3dLocalEstimators now included in the main build and fix compilation issues
-    and documentation added.
-    [#382](https://github.com/DGtal-team/DGtalTools/issues/382).
-    (Bertrand Kerautret [#383](https://github.com/DGtal-team/DGtalTools/pull/383))
-
-- *converters*
-  - volBoundary2obj improved using new Shortcuts helpers.
-    (Bertrand Kerautret
-    [#370](https://github.com/DGtal-team/DGtalTools/pull/370))
-
-- *imageProcessing*:
-  - Add a variant of Ambrosio-Tortorelli functional for image
-    restoration and inpainting, using Laplacian of discontinuity
-    function instead of gradient and based on discrete calculus.
-    (Jacques-Olivier Lachaud
-    [#363](https://github.com/DGtal-team/DGtalTools/pull/363))
 
 
 # DGtalTools 1.0
