@@ -15,6 +15,7 @@ SET(DGTAL_TOOLS_SRC
   volIntensityScale
   volFillInterior
   volMask
+  volEuclideanDT
 )
 
 
