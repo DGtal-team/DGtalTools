@@ -6,6 +6,7 @@
 PROJECT(DGtalTools)
 
 cmake_minimum_required (VERSION 3.1)
+cmake_policy(SET CMP0057 NEW)
 
 SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake")
 
