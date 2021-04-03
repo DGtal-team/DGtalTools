@@ -160,14 +160,12 @@ int main( int argc, char** argv )
      ){
     trace.beginBlock( "Loading image into memory." );
 #ifdef WITH_ITK
-    int dicomMin = vm["dicomMin"].as<int>();
-    int dicomMax = vm["dicomMax"].as<int>();
     typedef DGtal::functors::Rescaling<int ,unsigned char > RescalFCT;
-    Image image = extension == "dcm" ? DicomReader< Image,  RescalFCT  >::importDicom( inputFilename,
+    Image image = extension == "dcm" ? DicomReader< Image,  RescalFCT  >::importDicom( inputFileName,
                                                                                       RescalFCT(dicomMin,
                                                                                                 dicomMax,
                                                                                                 0, 255) ) :
-    GenericReader<Image>::import( inputFilename );
+    GenericReader<Image>::import( inputFileName );
 #else
     Image image = GenericReader<Image>::import (inputFileName );
 #endif
