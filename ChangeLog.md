@@ -1,5 +1,8 @@
 # DGtalTools 1.2
 
+- *visualisation*
+  - 3dVolBoundaryViewer: fix compiliation issue (related to CLI11 change) when ITK is activated.
+   (Bertrand Kerautret [#395](https://github.com/DGtal-team/DGtalTools/pull/395))
 
 
 # DGtalTools 1.1
