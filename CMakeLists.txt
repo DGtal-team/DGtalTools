@@ -9,6 +9,7 @@ cmake_minimum_required (VERSION 3.1)
 
 SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake")
 
+cmake_policy(SET CMP0048 OLD) # project() doesn't have VERSION
 
 # -----------------------------------------------------------------------------
 # DGtal dependencies
