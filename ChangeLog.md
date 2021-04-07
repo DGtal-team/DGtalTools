@@ -3,7 +3,8 @@
 - *global*
   - Fix itk2vol and fix ITK cmake configuaration that was making wrong the ITK image read.
   (Bertrand Kerautret [#393](https://github.com/DGtal-team/DGtalTools/pull/393))
-  
+
+
 
 
 
