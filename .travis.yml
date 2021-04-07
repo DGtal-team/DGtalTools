@@ -15,6 +15,10 @@ env:
   - CONFIG="DOCUMENTATION"
   global:
   - secure: vlOUtR3/PnDG/+oYWGqg2f4rSPSgISCumDarhfE8vQqIisLYRsWgMBH+oHEIsdcMsvQ33/c9W7G4K3QM2/1USSaPqk12/O5yzOfPi/Kx4+XPE3OLp5diSaXm98HAHV8q2HpVYfHiqiNrA1d/3exkOxyQKiqhxPIczi68qkgln8LqQuL0ffmmb8zg4+CufbG6mKvK276AxnUQyLtzd5ZfWkVaifST8gyY5fLKqrQ2X7CYcIBvVb52Uvg5pq1MRSqkyt/nbNKhmMGCuD3A4j4j2hCgpXEUFRtTAq92rLvQQMTzamMymVbDoKyIkDlMGBzzN1iHAMiVshliBfq13LqwTLH6hEwsxc9Wwb0r94YpTE37P6punJJzIWoyAA7mzq4OaLX7XSBMPIZTKxEqw9DwxWeGh4YxiJKlunHmrENE34jlJXBEvP0QHEHUBCI0Rzck/f3FFFbLzj5irz/tljFFu3NQvTgQ2XCn0OnIbCrrP2fsLycU2lnEcf/hW8136QxyDT8rtT6LniI3GZ7aX6Dpn5H0tTaadXkYDZOZu0wKM9/7OtEBv2i8VGREOGCtGfkvvkidfvlY1UpRZvzR7j94X58PFnASHN5/L7lOChzyvgMcG1jSBI9CghDw9xRTyu4p1piVkOP1Qpb7eOwpTor2JgAUx0DWdVn4RPYdg16H828=
+- os: osx
+  - language: c
+  - ccache
+  
 matrix:
   fast_finish: true
   exclude:
