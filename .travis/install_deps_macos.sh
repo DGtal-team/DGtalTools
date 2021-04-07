@@ -3,6 +3,9 @@
 #
 # Note: gmp and boost already installed
 #
+brew install ccache
+export PATH="/usr/local/opt/ccache/libexec:$PATH"
+
 brew update > brew.log
 #brew install qt5 doxygen homebrew/science/hdf5 graphviz graphicsmagick fftw eigen
 brew install qt5 graphicsmagick fftw eigen
