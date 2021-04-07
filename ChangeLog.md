@@ -1,12 +1,16 @@
 # DGtalTools 1.2
-
 - *global*
   - Fix itk2vol and fix ITK cmake configuaration that was making wrong the ITK image read.
   (Bertrand Kerautret [#393](https://github.com/DGtal-team/DGtalTools/pull/393))
+<<<<<<< HEAD
 
 
 
 
+=======
+  - Travis: Fix old default osx_image with xcode12.2 and remove non used boost
+    cmake references. (Bertrand Kerautret [#394](https://github.com/DGtal-team/DGtalTools/pull/394)) 
+>>>>>>> bf6f26204de31698d991a81f19627f225426d146
 
 # DGtalTools 1.1
 
