@@ -69,6 +69,13 @@ SET(VERSION ${DGtalTools_VERSION_MAJOR}.${DGtalTools_VERSION_MINOR}.${DGtalTools
 
 
 
+#-----------------------------------------------------------------------------
+# ITK setting
+#-----------------------------------------------------------------------------
+if (  WITH_ITK )
+    include(${ITK_USE_FILE})
+ENDIF( WITH_ITK )
+
 
 # -----------------------------------------------------------------------------
 # Documentation

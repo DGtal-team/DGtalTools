@@ -7,6 +7,10 @@
   - 3dVolBoundaryViewer: fix compilation issue (related to CLI11 change) when ITK is activated.
    (Bertrand Kerautret [#395](https://github.com/DGtal-team/DGtalTools/pull/395))
 
+- Fix itk2vol and fix ITK cmake configuaration that was making wrong the ITK image read.
+  (Bertrand Kerautret [#393](https://github.com/DGtal-team/DGtalTools/pull/393))
+
+
 # DGtalTools 1.1
 
 - *global*

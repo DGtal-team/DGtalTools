@@ -73,6 +73,7 @@ $itk2vol -i image.mhd --dicomMin -500 --dicomMax -100 -o sample.vol
 
 */
 
+typedef ImageContainerBySTLVector < Z3i::Domain, unsigned char > Image3DChar;
 
 
 template<typename TImage, typename TImageMask>
@@ -90,12 +91,22 @@ applyMaskImage( TImage &imageInput,  const  TImageMask &maskImage,
   
 }
 
+template<typename TImage, typename TRescale>
+void
+exportImageUCHAR(TImage img, const std::string resName, TRescale rScale)
+{
+  Image3DChar res ( img.domain() );
+  
+  for (const auto p: img.domain() ) {
+    res.setValue(p, rScale(img(p)));
+  }
+  DGtal::GenericWriter<Image3DChar, 3, unsigned char>::exportFile(resName, res);
+}
 
 
 
 int main( int argc, char** argv )
 {
-  typedef ImageContainerBySTLVector < Z3i::Domain, unsigned char > Image3DChar;
   typedef ImageContainerBySTLVector < Z3i::Domain,  double > Image3D_D;
   typedef ImageContainerBySTLVector < Z3i::Domain,  int > Image3D_I;
 
@@ -119,7 +130,7 @@ int main( int argc, char** argv )
    app.add_option("-r,--maskRemoveLabel", maskRemoveLabel,"Change the label value that defines the part of input image to be removed by the option --maskImage." );
    app.add_option("--inputMin", inputMin, "set minimum density threshold on Hounsfield scale.");
    app.add_option("--inputMax", inputMax, "set maximum density threshold on Hounsfield scale.");
-   app.add_option("-t,--inputType", inputType, "to sepcify the input image type (int or double).")
+   app.add_option("-t,--inputType", inputType, "to specify the input image type (int or double).")
      -> check(CLI::IsMember({"int", "double"}));
    
    app.get_formatter()->column_width(40);
@@ -129,8 +140,8 @@ int main( int argc, char** argv )
    
   if (inputType == "double") {
       typedef DGtal::functors::Rescaling<double ,unsigned char > RescalFCT;
-      trace.info() << "Reading input input file " << inputFileName ; 
-      Image3D_D inputImage = ITKReader< Image3D_D  >::importITK(inputFileName);
+      trace.info() << "Reading input file (of type double)" << inputFileName ;
+      Image3D_D inputImage = ITKReader< Image3D_D  >::importITK(inputFileName, true);
       trace.info() << " [done] " << std::endl ; 
       trace.info() << " converting into vol file... " ; 
       if ( inputMask != "")
@@ -138,30 +149,18 @@ int main( int argc, char** argv )
         Image3D_I maskImage = ITKReader< Image3D_I  >::importITK(inputMask);
         applyMaskImage(inputImage, maskImage, maskRemoveLabel);
       }
-
       RescalFCT rescaleCustom(inputMin, inputMax, 0, 255);
-      DGtal::GenericWriter<Image3D_D, 3, unsigned char, RescalFCT>::exportFile(outputFileName,
-                                                                               inputImage,
-                                                                               "UInt8Array3D",
-                                                                               rescaleCustom);
+      exportImageUCHAR(inputImage,outputFileName, rescaleCustom );
   }else {
      typedef DGtal::functors::Rescaling<int ,unsigned char > RescalFCT;
-      trace.info() << "Reading input input file " << inputFileName ; 
-      Image3D_I inputImage = ITKReader< Image3D_I  >::importITK(inputFileName);
+      trace.info() << "Reading input file (of type int) " << inputFileName ;
+      Image3D_I inputImage = ITKReader< Image3D_I  >::importITK(inputFileName, true);
       trace.info() << " [done] " << std::endl ; 
       trace.info() << " converting into vol file... " ; 
       RescalFCT rescaleCustom(inputMin, inputMax, 0, 255);
-      if (inputMask != "")
-      {
-        Image3D_I maskImage = ITKReader< Image3D_I  >::importITK(inputMask);
-        applyMaskImage(inputImage, maskImage, maskRemoveLabel);
+      exportImageUCHAR(inputImage,outputFileName, rescaleCustom );
+
       }
-      
-      DGtal::GenericWriter<Image3D_I, 3, unsigned char, RescalFCT>::exportFile(outputFileName,
-                                                                               inputImage,
-                                                                               "UInt8Array3D",
-                                                                               rescaleCustom);
-  }
   trace.info() << " [done] " << std::endl ;   
   return EXIT_SUCCESS;  
 }
