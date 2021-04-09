@@ -230,7 +230,7 @@ Galleries
    </tr>
    <tr>
    <!-- <td align=center  ><a href="https://raw.github.com/DGtal&#45;team/DGtalTools/master/doc/images/resCriticalKernelsThinning3D_select&#45;first_skel&#45;1isthmus_persistence&#45;1.png"> criticalKernelsThinning3D </a> </td> -->
-   <td align=center  ><a href="https://dgtal.org/doc/tools/nightly/criticalKernelsThinning3D.html"> criticalKernelsThinning3D </a> </td>
+   <td align=center  ><a href="https://dgtal-team.github.io/doctools-nightly/criticalKernelsThinning3D.html"> criticalKernelsThinning3D </a> </td>
    </tr>
    </table>
    </center>
