@@ -3,9 +3,13 @@
   - Fix itk2vol and fix ITK cmake configuaration that was making wrong the ITK image read.
   (Bertrand Kerautret [#393](https://github.com/DGtal-team/DGtalTools/pull/393))
 
-
   - Travis: Fix old default osx_image with xcode12.2 and remove non used boost
     cmake references. (Bertrand Kerautret [#394](https://github.com/DGtal-team/DGtalTools/pull/394)) 
+
+- *visualisation*
+  - 3dVolBoundaryViewer: fix compilation issue (related to CLI11 change) when ITK is activated.
+   (Bertrand Kerautret [#395](https://github.com/DGtal-team/DGtalTools/pull/395))
+
 
 
 
