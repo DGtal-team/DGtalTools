@@ -32,7 +32,7 @@
  @brief  Fills the interior of a voxel shape. The process can be sketched as follows: First the volume is filled in a
  breath-first approach from the point (0,0,0) (supposed to be exterior) using 6-adjacency. Then the complement is returned.
  
- @b Usage:  volFillInterior --input \<volFileName\> -o \<volOutputFileName\> (vol, longvol, p3d format)
+ @b Usage:  volFillInterior  \<volFileName\>  \<volOutputFileName\> (vol, longvol, p3d format)
  
  
  
@@ -92,7 +92,7 @@ int main(int argc, char**argv)
   std::string inputFileName;
   std::string outputFileName {"result.vol"};
 
-  app.description("Fill the interior of a voxel set by filling the exterior using the 6-adjacency.\nThe exterior is the set of voxels with value zero and the interior voxels have value 128\n Basic usage:\n\tvolFillInterior --input <volFileName> --o <volOutputFileName> ");
+  app.description("Fill the interior of a voxel set by filling the exterior using the 6-adjacency.\nThe exterior is the set of voxels with value zero and the interior voxels have value 128\n Basic usage:\n\tvolFillInterior <volFileName> <volOutputFileName> ");
   
   app.add_option("-i,--input,1", inputFileName, "Input vol file." )
   ->required()
