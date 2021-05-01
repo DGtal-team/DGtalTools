@@ -6,7 +6,7 @@
     cmake references. (Bertrand Kerautret [#394](https://github.com/DGtal-team/DGtalTools/pull/394)) 
 
 - *visualisation*:
-  - 3dVolViewer: improvement with the possibility to read input image of type double (with ITK).
+  - 3dVolViewer: improvement of the possibility to read input image of type double (with ITK).
     New possibility to select the voxel in order to display image intensity.    
     (Bertrand Kerautret [#402](https://github.com/DGtal-team/DGtalTools/pull/402))
   - 3dVolBoundaryViewer: fix compilation issue (related to CLI11 change) when ITK is activated.
