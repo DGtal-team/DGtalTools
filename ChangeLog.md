@@ -7,7 +7,7 @@
 
 - *visualisation*:
   - 3dVolViewer: improvement with the possibility to read input image of type double (with ITK).
-    New possibility to selection the voxel in order to display image intensity.    
+    New possibility to select the voxel in order to display image intensity.    
     (Bertrand Kerautret [#402](https://github.com/DGtal-team/DGtalTools/pull/402))
   - 3dVolBoundaryViewer: fix compilation issue (related to CLI11 change) when ITK is activated.
     (Bertrand Kerautret [#395](https://github.com/DGtal-team/DGtalTools/pull/395))
