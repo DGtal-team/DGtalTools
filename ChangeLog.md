@@ -1,14 +1,16 @@
 # DGtalTools 1.2
 - *global*
+  - Fix itk2vol and fix ITK cmake configuaration that was making issues with the ITK image read.
+    (Bertrand Kerautret [#393](https://github.com/DGtal-team/DGtalTools/pull/393))
   - Travis: Fix old default osx_image with xcode12.2 and remove non used boost
     cmake references. (Bertrand Kerautret [#394](https://github.com/DGtal-team/DGtalTools/pull/394)) 
 
-- *visualisation*
+- *visualisation*:
+  - 3dVolViewer: improvement of the possibility to read input image of type double (with ITK).
+    New possibility to select the voxel in order to display image intensity.    
+    (Bertrand Kerautret [#402](https://github.com/DGtal-team/DGtalTools/pull/402))
   - 3dVolBoundaryViewer: fix compilation issue (related to CLI11 change) when ITK is activated.
-   (Bertrand Kerautret [#395](https://github.com/DGtal-team/DGtalTools/pull/395))
-
-- Fix itk2vol and fix ITK cmake configuaration that was making wrong the ITK image read.
-  (Bertrand Kerautret [#393](https://github.com/DGtal-team/DGtalTools/pull/393))
+    (Bertrand Kerautret [#395](https://github.com/DGtal-team/DGtalTools/pull/395))
 
 
 # DGtalTools 1.1
