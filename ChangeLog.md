@@ -5,12 +5,18 @@
   - Travis: Fix old default osx_image with xcode12.2 and remove non used boost
     cmake references. (Bertrand Kerautret [#394](https://github.com/DGtal-team/DGtalTools/pull/394)) 
 
-- *visualisation*:
+- *visualisation*
   - 3dVolViewer: improvement of the possibility to read input image of type double (with ITK).
     New possibility to select the voxel in order to display image intensity.    
     (Bertrand Kerautret [#402](https://github.com/DGtal-team/DGtalTools/pull/402))
   - 3dVolBoundaryViewer: fix compilation issue (related to CLI11 change) when ITK is activated.
     (Bertrand Kerautret [#395](https://github.com/DGtal-team/DGtalTools/pull/395))
+
+- *volumetric*
+  - volReSample: it can now export image including ITK image spacing.
+    (Bertrand Kerautret [#404](https://github.com/DGtal-team/DGtalTools/pull/404))
+  
+
 
 
 # DGtalTools 1.1
