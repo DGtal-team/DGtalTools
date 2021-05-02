@@ -30,7 +30,7 @@ SET(DGTAL_TOOLS_SRC ${DGTAL_TOOLS_SRC}
 endif( WITH_HDF5 )
 
 FOREACH(FILE ${DGTAL_TOOLS_SRC})
-  add_executable(${FILE} ${FILE})
+  add_executable(${FILE} ${FILE}.cpp)
   target_link_libraries (${FILE} ${DGTAL_LIBRARIES} ${DGtalToolsLibDependencies} )
   install(TARGETS ${FILE}
         RUNTIME DESTINATION bin
@@ -44,7 +44,7 @@ if (  WITH_ITK )
     dicom2vol
     itk2vol)
   FOREACH(FILE ${DGTAL_TOOLS_ITK})
-     add_executable(${FILE} ${FILE})
+     add_executable(${FILE} ${FILE}.cpp)
      target_link_libraries (${FILE} ${DGTAL_LIBRARIES} ${DGtalToolsLibDependencies} )
      install(TARGETS ${FILE}
         RUNTIME DESTINATION bin
