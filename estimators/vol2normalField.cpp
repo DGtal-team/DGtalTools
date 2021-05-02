@@ -106,7 +106,7 @@ using namespace Z3i;
 
  You can use the too meshViewer to display the resulting vector field with the Iso-level surface:
 @code
-$ meshViewer -i lobTreshold40.off -f lobTreshold40.txt  --vectorFieldIndex 2 3 4 5 6 7  -n
+$ meshViewer lobTreshold40.off -f lobTreshold40.txt  --vectorFieldIndex 2 3 4 5 6 7  -n
 @endcode
 
  You should obtain such a result:

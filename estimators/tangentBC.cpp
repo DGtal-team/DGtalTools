@@ -76,12 +76,12 @@ using namespace DGtal;
 
 We consider as input shape the freeman chain of the DGtal/examples/sample directory. The contour can be displayed with @ref displayContours : 
  @code
-$  displayContours -i $DGtal/examples/samples/contourS.fc -o contourS.png  --drawPointOfIndex 0
+$  displayContours $DGtal/examples/samples/contourS.fc  contourS.png  --drawPointOfIndex 0
  @endcode
 
 The tangents can be computed as follows:
 @code 
-$ tangentBC -i $DGtal/examples/samples/contourS.fc  > tangentsBC.dat
+$ tangentBC $DGtal/examples/samples/contourS.fc  > tangentsBC.dat
 $ gnuplot 
 gnuplot> plot [] [-1.2:1.2]'tangentsBC.dat' using 1:3  w lines title "tangents with Binomial Convolution estimator"
 @endcode

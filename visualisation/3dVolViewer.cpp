@@ -86,7 +86,7 @@ using namespace Z3i;
  
  
  @code
- $ 3dVolViewer -i $DGtal/examples/samples/lobster.vol -m 60 -t 10
+ $ 3dVolViewer $DGtal/examples/samples/lobster.vol -m 60 -t 10
  @endcode
  
  You should obtain such a result:
@@ -128,7 +128,7 @@ int main( int argc, char** argv )
   
   // parse command line using CLI ----------------------------------------------
   CLI::App app;
-  app.description("Display volume file as a voxel set by using QGLviewer. \n Example: \n \t 3dVolViewer -i $DGtal/examples/samples/lobster.vol -m 60 -t 10");
+  app.description("Display volume file as a voxel set by using QGLviewer. \n Example: \n \t 3dVolViewer  $DGtal/examples/samples/lobster.vol -m 60 -t 10");
   std::string inputFileName;
   DGtal::int64_t rescaleInputMin {0};
   DGtal::int64_t rescaleInputMax {255};

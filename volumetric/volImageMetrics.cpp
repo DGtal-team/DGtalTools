@@ -54,7 +54,7 @@
  # generating another input vol file using tutorial example (eroded.vol):
  $DGtal/build/examples/tutorial-examples/FMMErosion
  # compare the two images:
- $ volImageMetrics -a eroded.vol -b $DGtal/examples/samples/cat10.vol 
+ $ volImageMetrics eroded.vol $DGtal/examples/samples/cat10.vol 
  @endcode
 
 

@@ -127,7 +127,7 @@ using namespace functors;
 
  Now we compare the different curvature values from the two shapes:
  @code
-   3dCurvatureViewer -i $DGtal/examples/samples/lobster.vol -r 10 -l 40 -u 255 -m mean
+   3dCurvatureViewer  $DGtal/examples/samples/lobster.vol -r 10 -l 40 -u 255 -m mean
  @endcode
 
  You should obtain such a visualisation:
@@ -174,7 +174,7 @@ int main( int argc, char** argv )
   std::vector< double> vectScale;
   bool normalization {false};
   
-  app.description("Visualisation of 3d curvature from .vol file using curvature from Integral Invarian\nBasic usage:\n \t3dCurvatureViewerNoise -i file.vol --radius 5 --mode mean  \n Below are the different available modes: \n\t - \"mean\" for the mean curvature \n \t - \"mean\" for the mean curvature\n\t - \"gaussian\" for the Gaussian curvature\n\t - \"k1\" for the first principal curvature\n\t - \"k2\" for the second principal curvature\n\t - \"prindir1\" for the first principal curvature direction\n\t - \"prindir2\" for the second principal curvature direction\n\t - \"normal\" for the normal vector");
+  app.description("Visualisation of 3d curvature from .vol file using curvature from Integral Invarian\nBasic usage:\n \t3dCurvatureViewerNoise file.vol --radius 5 --mode mean  \n Below are the different available modes: \n\t - \"mean\" for the mean curvature \n \t - \"mean\" for the mean curvature\n\t - \"gaussian\" for the Gaussian curvature\n\t - \"k1\" for the first principal curvature\n\t - \"k2\" for the second principal curvature\n\t - \"prindir1\" for the first principal curvature direction\n\t - \"prindir2\" for the second principal curvature direction\n\t - \"normal\" for the normal vector");
 
    
    
