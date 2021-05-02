@@ -3,6 +3,9 @@
   - Travis: Fix old default osx_image with xcode12.2 and remove non used boost
     cmake references. (Bertrand Kerautret [#394](https://github.com/DGtal-team/DGtalTools/pull/394)) 
 
+  - Uniform input/output option with previous use of CLI11 (issue #405).
+    (Bertrand Kerautret [#406](https://github.com/DGtal-team/DGtalTools/pull/406)) 
+
 - *visualisation*
   - 3dVolBoundaryViewer: fix compilation issue (related to CLI11 change) when ITK is activated.
    (Bertrand Kerautret [#395](https://github.com/DGtal-team/DGtalTools/pull/395))
