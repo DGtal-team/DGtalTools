@@ -25,7 +25,7 @@ if ( WITH_VISU3D_QGLVIEWER )
       3dCurveTangentEstimator
   )
   FOREACH(FILE ${VISU3D_TESTS_SRC})
-    add_executable(${FILE} ${FILE})
+    add_executable(${FILE} ${FILE}.cpp)
     target_link_libraries (${FILE}  ${DGTAL_LIBRARIES} ${DGtalToolsLibDependencies})
     install(TARGETS ${FILE}
         RUNTIME DESTINATION bin
@@ -39,7 +39,7 @@ if (  WITH_CGAL )
     3dLocalEstimators
      )
   FOREACH(FILE ${CGAL_TESTS_SRC})
-    add_executable(${FILE} ${FILE})
+    add_executable(${FILE} ${FILE}.cpp)
     target_link_libraries (${FILE}  ${DGTAL_LIBRARIES} ${DGtalToolsLibDependencies})
   ENDFOREACH(FILE)
 endif ( WITH_CGAL )
@@ -48,7 +48,7 @@ FOREACH(FILE ${DGTAL_TOOLS_SRC})
   if(MSVC)
     set_source_files_properties( ${FILE} PROPERTIES COMPILE_FLAGS "/bigobj" )
   endif(MSVC)
-  add_executable(${FILE} ${FILE})
+  add_executable(${FILE} ${FILE}.cpp)
   target_link_libraries (${FILE}  ${DGTAL_LIBRARIES} ${DGtalToolsLibDependencies})
   install(TARGETS ${FILE}
         RUNTIME DESTINATION bin

@@ -4,6 +4,8 @@
     (Bertrand Kerautret [#393](https://github.com/DGtal-team/DGtalTools/pull/393))
   - Travis: Fix old default osx_image with xcode12.2 and remove non used boost
     cmake references. (Bertrand Kerautret [#394](https://github.com/DGtal-team/DGtalTools/pull/394)) 
+  - Comply with cmake Policy CMP0115 "Source file extensions must be
+     explicit". (Bertrand Kerautret and David Coeurjolly, [#407](https://github.com/DGtal-team/DGtal/pull/407))
 
 - *visualisation*
   - 3dVolViewer: improvement of the possibility to read input image of type double (with ITK).
