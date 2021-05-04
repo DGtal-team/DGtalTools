@@ -16,6 +16,12 @@
   - 3dVolBoundaryViewer: fix compilation issue (related to CLI11 change) when ITK is activated.
     (Bertrand Kerautret [#395](https://github.com/DGtal-team/DGtalTools/pull/395))
 
+- *volumetric*
+  - volReSample: it can now export image including ITK image spacing.
+    (Bertrand Kerautret [#404](https://github.com/DGtal-team/DGtalTools/pull/404))
+  
+
+
 
 # DGtalTools 1.1
 
