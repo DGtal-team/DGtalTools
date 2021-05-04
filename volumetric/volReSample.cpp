@@ -85,7 +85,7 @@ $ cat AlRS{1,2,4,8}.sdp >> AlRS1_2_4_8.sdp
 3dSDPViewer -i  AlRS1_2_4_8.sdp    
 @endcode
 
-
+ Note that if DGtal is compiled with the  option WITH_ITK set to ON, you can export the image in format ITK format and integrating image spacing.
 
  You should obtain such a result:
  @image html resVolReSample.png "Resulting of re sampling with grid size = 2, 4 and 8."
@@ -111,11 +111,12 @@ int main( int argc, char** argv )
   std::string outputFileName {"result.vol"};
   std::vector<double> aGridSizeReSample;
   
-  app.description("Re sample a 3D volumetric image (.vol, .longvol, .pgm3d)  with a given grid size. \n Example:\n to re sample an image with scale x,y,z  = 0.98, 0.98, 5.0,  you can do:\n volResSample -i image3d.vol -g 1 1 2  -o imageReSampled.vol \n ");
+  app.description("Re sample a 3D volumetric image (.vol, .longvol, .pgm3d)  with a given grid size. \n Example:\n to re sample an image with scale x,y,z  = 0.98, 0.98, 5.0,  you can do:\n volResSample -i image3d.vol -g 1 1 2  -o imageReSampled.vol \n " 
+      "Note that if DGtal is compiled with the  option WITH_ITK set to ON, you can export the image in format ITK format and integrating image spacing.");
   app.add_option("-i,--input,1", inputFileName, "input volumetric file (.vol, .longvol, .pgm3d)." )
   ->required()
   ->check(CLI::ExistingFile);
-  app.add_option("-o,--output,2", inputFileName, "the new volumetric file (.vol, .longvol, .pgm3d).", true );
+  app.add_option("-o,--output,2", outputFileName, "the new volumetric file (.vol, .longvol, .pgm3d).", true );
   app.add_option("-g,--gridSize", aGridSizeReSample, "size_x size_y size_z : the grid size of the re sampling ")
    ->expected(3);
   app.get_formatter()->column_width(40);
@@ -130,9 +131,18 @@ int main( int argc, char** argv )
   PointVector<3,int> shiftVector3D(0 ,0, 0);      
   DGtal::functors::BasicDomainSubSampler< HyperRectDomain<SpaceND<3, int> >,  
                                           DGtal::int32_t, double > reSampler(input3dImage.domain(),
-                                                                             aGridSizeReSample,  shiftVector3D);
+                                                                             aGridSizeReSample,    shiftVector3D);
   const functors::Identity aFunctor{};
   SamplerImageAdapter sampledImage ( input3dImage, reSampler.getSubSampledDomain(), reSampler, aFunctor );
+#ifdef WITH_ITK
+  ITKWriter<SamplerImageAdapter>::exportITK(outputFileName, sampledImage,
+                                            Z3i::RealPoint(aGridSizeReSample[0],
+                                                           aGridSizeReSample[1],
+                                                           aGridSizeReSample[2]));
+#else
   GenericWriter<SamplerImageAdapter>::exportFile(outputFileName, sampledImage);
+
+#endif
+  
   return 0;
 }
