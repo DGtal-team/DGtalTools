@@ -65,7 +65,7 @@ Options:
 
 @b Example:
 @code
-  $ sdp2vol -i volumePoints.sdp -o volume.vol -d 0 0 0 10 10 10
+  $ sdp2vol volumePoints.sdp volume.vol -d 0 0 0 10 10 10
 @endcode
 
 @see sdp2vol.cpp
@@ -92,7 +92,7 @@ int main( int argc, char** argv )
    bool invertY {false};
    std::vector<int> domainCoords;
 
-   app.description("Convert digital set of points into a volumic file.\n Example:\n sdp2vol -i volumePoints.sdp -o volume.vol -d 0 0 0 10 10 10 \n");
+   app.description("Convert digital set of points into a volumic file.\n Example:\n sdp2vol volumePoints.sdp volume.vol -d 0 0 0 10 10 10 \n");
    app.add_option("-i,--input,1", inputSDP, "Sequence of 3d Discrete points (.sdp)." )
     ->required()
     ->check(CLI::ExistingFile);

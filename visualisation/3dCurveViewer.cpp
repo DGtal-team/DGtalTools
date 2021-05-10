@@ -27,8 +27,6 @@
  */
 
 
-
-
 /**
  @page Doc3dCurveViewer 3dCurveViewer
  

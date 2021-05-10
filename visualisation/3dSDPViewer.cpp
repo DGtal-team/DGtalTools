@@ -104,7 +104,7 @@ typedef Viewer3D<Z3i::Space, Z3i::KSpace> Viewer;
 
  You can display a set of 3D points with sphere primitive and lines:
  @code
- $  3DSDPViewer -i $DGtal/tests/samples/sinus3D.dat -p sphere -s 0.3 --drawLines --lineSize 5 
+ $  3DSDPViewer  $DGtal/tests/samples/sinus3D.dat -p sphere -s 0.3 --drawLines --lineSize 5
  @endcode
 
  You should obtain such a result:
@@ -116,7 +116,7 @@ typedef Viewer3D<Z3i::Space, Z3i::KSpace> Viewer;
 
 This tool can be useful to recover coordinates from a set of voxels. To do it, you have to add the option allowing to activate the interactive selection (with --interactiveDisplayVoxCoords), for instance if you apply:
 @code 
-$ 3dSDPViewer -i $DGtal/tests/samples/sinus3D.dat  --interactiveDisplayVoxCoords
+$ 3dSDPViewer  $DGtal/tests/samples/sinus3D.dat  --interactiveDisplayVoxCoords
  
 @endcode 
 you should be able to select a voxel by using the SHIFT key and by clicking on a voxel:

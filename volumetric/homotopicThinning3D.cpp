@@ -61,7 +61,7 @@ using namespace Z3i;
  
  @brief Applies an homotopic thinning of a 3d image file (vol,longvol,pgm3d...) with 3D viewer.
 
- @b Usage: homotopicThinning3d [options] --input <3dImageFileName>  {vol,longvol,pgm3d...}
+ @b Usage: homotopicThinning3d [options]  <3dImageFileName>  {vol,longvol,pgm3d...}
 
 
  @b Allowed @b options @b are : 
@@ -87,7 +87,7 @@ using namespace Z3i;
  Usage by forcing point to be left by the thinning: 
  
 @code
- $  homotopicThinning3D --input ${DGtal}/examples/samples/Al.100.vol  --fixedPoints 56 35 5  56 61 5  57 91 38  58 8 38  45 50 97 
+ $  homotopicThinning3D  ${DGtal}/examples/samples/Al.100.vol  --fixedPoints 56 35 5  56 61 5  57 91 38  58 8 38  45 50 97
  @endcode
 
 

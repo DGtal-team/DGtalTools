@@ -56,6 +56,7 @@ Allowed options are: :
 
 Positionals:
   1 TEXT:FILE REQUIRED                  Input raw file.
+  2 TEXT:FILE REQUIRED                  Input raw file.
 
 Options:
   -h,--help                             Print this help message and exit
@@ -99,7 +100,7 @@ int main(int argc, char**argv)
    std::string inputFileName;
    std::string outputFileName {"result.vol"};
    unsigned int x, y, z;
-   app.description("Converts a  8-bit raw file to  vol.\n Basic example:\n \t raw2vol -x 128 -y 128 -z 128 --input <RawFileName> --output <VolOutputFileName>");
+   app.description("Converts a  8-bit raw file to  vol.\n Basic example:\n \t raw2vol <RawFileName>  <VolOutputFileName> -x 128 -y 128 -z 128");
    app.add_option("-i,--input,1", inputFileName, "Input raw file." )
     ->required()
     ->check(CLI::ExistingFile);

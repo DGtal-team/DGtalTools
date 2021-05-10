@@ -130,7 +130,7 @@ using namespace functors;
  @b Example:
 
  @code
-$ 3dCurvatureViewerNoise -i $DGtal/examples/samples/Al.100.vol -r 15 -m mean -k 0.5
+$ 3dCurvatureViewerNoise $DGtal/examples/samples/Al.100.vol -r 15 -m mean -k 0.5
  @endcode
 
  You should obtain such a visualisation:
@@ -180,7 +180,7 @@ int main( int argc, char** argv )
   bool normalization {false};
 
   
-  app.description("Visualisation of 3d curvature from .vol file using curvature from Integral Invariant\nBasic usage:\n \t3dCurvatureViewerNoise -i file.vol --radius 5 --mode mean --noise 0.5 \n Below are the different available modes: \n\t - \"mean\" for the mean curvature \n \t - \"mean\" for the mean curvature\n\t - \"gaussian\" for the Gaussian curvature\n\t - \"k1\" for the first principal curvature\n\t - \"k2\" for the second principal curvature\n\t - \"prindir1\" for the first principal curvature direction\n\t - \"prindir2\" for the second principal curvature direction\n\t - \"normal\" for the normal vector");
+  app.description("Visualisation of 3d curvature from .vol file using curvature from Integral Invariant\nBasic usage:\n \t3dCurvatureViewerNoise file.vol --radius 5 --mode mean --noise 0.5 \n Below are the different available modes: \n\t - \"mean\" for the mean curvature \n \t - \"mean\" for the mean curvature\n\t - \"gaussian\" for the Gaussian curvature\n\t - \"k1\" for the first principal curvature\n\t - \"k2\" for the second principal curvature\n\t - \"prindir1\" for the first principal curvature direction\n\t - \"prindir2\" for the second principal curvature direction\n\t - \"normal\" for the normal vector");
 
   
   

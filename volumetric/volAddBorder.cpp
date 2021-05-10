@@ -43,7 +43,7 @@ using namespace Z3i;
  
  @brief Adds a border of one voxel with value 0 around a vol file.
 
- @b Usage: 	volAddBorder --input \<volFileName\> --o \<volOutputFileName\> 
+ @b Usage: 	volAddBorder \<volFileName\> \<volOutputFileName\> 
 
 
  @b Allowed @b options @b are : 

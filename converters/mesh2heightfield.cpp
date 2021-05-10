@@ -171,7 +171,7 @@ int main( int argc, char** argv )
   double nz{1};
 
   
-  app.description("Convert a mesh file into a projected 2D image given from a normal direction N and from a starting point P. The 3D mesh discretized and scanned in the normal direction N, starting from P with a step 1.\n   Example:\n mesh2heightfield -i ${DGtal}/examples/samples/tref.off --orientAutoFrontZ --width 25 --height 25 -o heighMap.pgm -s 10  \n");  
+  app.description("Convert a mesh file into a projected 2D image given from a normal direction N and from a starting point P. The 3D mesh discretized and scanned in the normal direction N, starting from P with a step 1.\n   Example:\n mesh2heightfield ${DGtal}/examples/samples/tref.off heighMap.pgm --orientAutoFrontZ --width 25 --height 25  -s 10  \n");  
   app.add_option("-i,--input,1", inputFileName, "mesh file (.off)" )
     ->required()
     ->check(CLI::ExistingFile);

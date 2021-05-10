@@ -59,11 +59,13 @@ using namespace DGtal;
 
 Positionals:
   1 TEXT:FILE REQUIRED                  vol file (.vol, .longvol .p3d, .pgm3d and if WITH_ITK is selected: dicom, dcm, mha, mhd). For longvol, dicom, dcm, mha or mhd formats, the input values are linearly scaled between 0 and 255.
+  2 TEXT=result.pgm                     resulting image filename (in pgm or other).
 
+ 
 Options:
   -h,--help                             Print this help message and exit
   -i,--input TEXT:FILE REQUIRED         vol file (.vol, .longvol .p3d, .pgm3d and if WITH_ITK is selected: dicom, dcm, mha, mhd). For longvol, dicom, dcm, mha or mhd formats, the input values are linearly scaled between 0 and 255.
-  -o,--output TEXT                      sequence of discrete point file (.sdp)
+  -o,--output TEXT                      resulting image filename (in pgm or other)
   -m,--thresholdMin INT=128             threshold min (excluded) to define binary shape.
   -M,--thresholdMax INT=255             threshold max (included) to define binary shape.
   --rescaleInputMin INT=0               min value used to rescale the input intensity (to avoid basic cast into 8  bits image).
@@ -83,7 +85,7 @@ Options:
 
 @b Example:
 @code 
-$ vol2heightfield -i ${DGtal}/examples/samples/lobster.vol -m 60 -M 500  --nx 0 --ny 0.7 --nz -1 -x 150 -y 0 -z 150 --width 300 --height 300 --heightFieldMaxScan 350  -o resultingHeightMap.pgm 
+$ vol2heightfield ${DGtal}/examples/samples/lobster.vol resultingHeightMap.pgm -m 60 -M 500  --nx 0 --ny 0.7 --nz -1 -x 150 -y 0 -z 150 --width 300 --height 300 --heightFieldMaxScan 350  resultingHeightMap.pgm
 @endcode
 
 You should obtain such a resulting image:
@@ -104,7 +106,7 @@ int main( int argc, char** argv )
 // parse command line using CLI ----------------------------------------------
    CLI::App app;
    std::string inputFileName;
-   std::string outputFileName {"result.raw"};
+   std::string outputFileName {"result.pgm"};
    int thresholdMin {128};
    int thresholdMax {255};
    DGtal::int64_t rescaleInputMin {0};
@@ -125,7 +127,7 @@ int main( int argc, char** argv )
    app.add_option("-i,--input,1", inputFileName, "vol file (.vol, .longvol .p3d, .pgm3d and if WITH_ITK is selected: dicom, dcm, mha, mhd). For longvol, dicom, dcm, mha or mhd formats, the input values are linearly scaled between 0 and 255." )
     ->required()
     ->check(CLI::ExistingFile);
-  app.add_option("-o,--output", outputFileName, "sequence of discrete point file (.sdp)");
+  app.add_option("-o,--output,2", outputFileName, "resulting image filename (in pgm or other).");
   app.add_option("--thresholdMin,-m", thresholdMin, "threshold min (excluded) to define binary shape.", true);
   app.add_option("--thresholdMax,-M", thresholdMax, "threshold max (included) to define binary shape.", true);
   app.add_option("--rescaleInputMin", rescaleInputMin, "min value used to rescale the input intensity (to avoid basic cast into 8  bits image).", true);
@@ -208,7 +210,3 @@ int main( int argc, char** argv )
   trace.info() << " [done] " << std::endl ;   
   return EXIT_SUCCESS;
 }
-
-
-
-
