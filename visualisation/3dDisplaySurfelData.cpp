@@ -72,9 +72,7 @@ using namespace Z3i;
 
  Positionals:
    1 TEXT:FILE REQUIRED                  input file: sdp (sequence of discrete points with attribute)
-   fixMaxColorValue FLOAT                fix manually the maximal color value for the scale error display (else the scale is set from the maximal value)
-   fixMinColorValue FLOAT                fix manually the maximal color value for the scale error display (else the scale is set from the minimal value)
-
+  
  Options:
    -h,--help                             Print this help message and exit
    -i,--input TEXT:FILE REQUIRED         input file: sdp (sequence of discrete points with attribute)
@@ -82,7 +80,9 @@ using namespace Z3i;
    -d,--doSnapShotAndExit TEXT           save display snapshot into file.
    --labelIndex UINT                     set the index of the label (by default set to 3)
    --SDPindex UINT ...                   specify the sdp index (by default 0,1,2).
-  
+   --fixMaxColorValue FLOAT              fix manually the maximal color value for the scale error display (else the scale is set from the maximal value)
+  --fixMinColorValue FLOAT               fix manually the maximal color value for the scale error display (else the scale is set from the minimal value)
+
  @endcode
 
 
@@ -182,8 +182,8 @@ int main( int argc, char** argv )
   ->check(CLI::ExistingFile);
   app.add_flag("--noWindows,-n",noWindows, "Don't display Viewer windows.");
   app.add_option("--doSnapShotAndExit,-d", doSnapShotName, "save display snapshot into file.");
-  auto fixMaxOption =  app.add_option("fixMaxColorValue", maxScalarVal, "fix manually the maximal color value for the scale error display (else the scale is set from the maximal value)");
-  auto fixMinOption =  app.add_option("fixMinColorValue", minScalarVal, "fix manually the maximal color value for the scale error display (else the scale is set from the minimal value)");
+  auto fixMaxOption =  app.add_option("--fixMaxColorValue,-M", maxScalarVal, "fix manually the maximal color value for the scale error display (else the scale is set from the maximal value)");
+  auto fixMinOption =  app.add_option("--fixMinColorValue,-m", minScalarVal, "fix manually the maximal color value for the scale error display (else the scale is set from the minimal value)");
   app.add_option("--labelIndex", labelIndex , "set the index of the label.", true);
   app.add_option("--SDPindex", vectSDPindex, "specify the sdp index.", true);
   

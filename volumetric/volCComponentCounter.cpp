@@ -68,7 +68,7 @@ using namespace Z3i;
  @b Example: 
 
  @code
- $ volCComponentCounter -i $DGtal/examples/samples/Al.100.vol 
+ $ volCComponentCounter $DGtal/examples/samples/Al.100.vol
  @endcode
 
 
@@ -156,7 +156,7 @@ int main( int argc, char** argv )
   std::string inputFileName;
   unsigned int connectivity {6};
   
-  app.description("Count the number of connected component (same values) in a  volume (Vol) file image\n\n Example : \n \t volCComponentCounter -i $DGtal/examples/samples/Al.100.vol\n");
+  app.description("Count the number of connected component (same values) in a volume (Vol) file image\n\n Example : \n \t volCComponentCounter $DGtal/examples/samples/Al.100.vol\n");
   app.add_option("-i,--input,1", inputFileName, "volume file (.vol)." )
   ->required()
   ->check(CLI::ExistingFile);

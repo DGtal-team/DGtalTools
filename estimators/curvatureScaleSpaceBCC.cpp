@@ -90,7 +90,7 @@ The x axis is associated to the contour point and the y axis to the scale. The c
 
  @b Example: 
  @code
-$ curvatureScaleSpaceBCC -i ${DGtal}/examples/samples/contourS.fc --gridStepInit 0.001 --gridStepIncrement  0.0005 --gridStepFinal 0.1 -o cssResu.ppm
+$ curvatureScaleSpaceBCC ${DGtal}/examples/samples/contourS.fc --gridStepInit 0.001 --gridStepIncrement  0.0005 --gridStepFinal 0.1 -o cssResu.ppm
  @endcode
 
 
@@ -136,7 +136,7 @@ int main( int argc, char** argv )
   double h_final {1.0};
   double curvatureCutOff {10};
 
-  app.description("Generate the Curvature Scale Space image using a binomial convolver based estimator.\n Typical use example:\n \t curvatureScaleSpaceBCC --input <filename>  --output <filename>\n");
+  app.description("Generate the Curvature Scale Space image using a binomial convolver based estimator.\n Typical use example:\n \t curvatureScaleSpaceBCC <input filename>  <output filename>\n");
   app.add_option("-i,--input,1",fileName,"Input FreemanChain file name")->required()->check(CLI::ExistingFile);
   app.add_option("-o,--output,2",outputFileName,"Set the output name")->required();  
   app.add_option("--gridStepInit", h_initial, "Grid step initial", true);

@@ -66,7 +66,7 @@ Options:
 
 @b Example:
 @code
-$itk2vol -i image.mhd --dicomMin -500 --dicomMax -100 -o sample.vol 
+$itk2vol image.mhd sample.vol  --dicomMin -500 --dicomMax -100
 @endcode
 
 @see itk2vol.cpp
@@ -121,7 +121,7 @@ int main( int argc, char** argv )
    string inputMask {""};
    string inputType {""};
    
-   app.description("Converts itk file into a volumetric file (.vol, .pgm3d). \n Example:\n itk2vol -i image.mhd --inputMin -500 --inputMax -100 -o sample.vol \n");
+   app.description("Converts itk file into a volumetric file (.vol, .pgm3d). \n Example:\n itk2vol  image.mhd sample.vol --inputMin -500 --inputMax -100 \n");
    app.add_option("-i,--input,1", inputFileName, "Any file format in the ITK library (mhd, mha, ...)." )
     ->required()
     ->check(CLI::ExistingFile);

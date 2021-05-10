@@ -65,23 +65,20 @@ using namespace DGtal;
 
 Positionals:
   1 TEXT:FILE REQUIRED                  Input freeman chain file name.
+  2 TEXT:FILE                           the output file name.
 
-Options:
-
-Positionals:
-  1 TEXT:FILE REQUIRED                  Input freeman chain file name.
 
 Options:
   -h,--help                             Print this help message and exit
   -i,--input TEXT:FILE REQUIRED         Input freeman chain file name.
   -b,--border UINT                      add a border in the resulting image (used only in the automatic mode i.e when --space is not used.
-  -o,--output TEXT=result.pgm           the output fileName
+  -o,--output TEXT=result.pgm           the output file name
   -s,--space INT x 4                    Define the space from its bounding box (lower and upper coordinates) else the space is automatically defined from the freemanchain bounding boxes.
 @endcode
 
 @b Example:
 @code
-  $freeman2img -i ${DGtal}/tests/samples/contourS.fc -o sample.pgm
+  $freeman2img ${DGtal}/tests/samples/contourS.fc sample.pgm
 @endcode
 You will obtain such image:
 @image html  resFreeman2img.png "Resulting image"
@@ -92,7 +89,7 @@ You will obtain such image:
 The file located in $DGtal/examples/samples/contourS2.fc contains different contours with some ones corresponds to hole.  We can apply the same conversion as the previous example:
 
 @code
-$ freeman2img -i  $DGtal/examples/samples/contourS2.fc  -o sample2.pgm
+$ freeman2img $DGtal/examples/samples/contourS2.fc  sample2.pgm
 @endcode
 
 You will obtain such image:
@@ -121,7 +118,7 @@ int main( int argc, char** argv )
     ->required()
     ->check(CLI::ExistingFile);
   app.add_option("-b,--border",border, "add a border in the resulting image (used only in the automatic mode i.e when --space is not used.");
-  app.add_option("-o,--output", outputFileName, "the output fileName", true);
+  app.add_option("-o,--output,2", outputFileName, "the output fileName", true);
   app.add_option("-s,--space", space, "Define the space from its bounding box (lower and upper coordinates) else the space is automatically defined from the freemanchain bounding boxes." )
     ->expected(4);
 
@@ -177,7 +174,6 @@ int main( int argc, char** argv )
     Image2D imageResult (Z2i::Domain(Z2i::Point(minx, miny), Z2i::Point(maxx, maxy))); 
     Surfaces<KSpace>::uFillInterior(aKSpace, functors::SurfelSetPredicate<std::set<SCell>,SCell>(boundarySCell), imageResult, 255, false, false );  
     imageResult >> outputFileName;
-  
 
 }
 

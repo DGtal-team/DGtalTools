@@ -85,7 +85,7 @@ using namespace DGtal;
  
  @b Example: 
  @code
- 3dImplicitSurfaceExtractorByThickening -p "x^2-y*z^2" -g 0.1 -a -2 -A 2 -v Singular
+ 3dImplicitSurfaceExtractorByThickening "x^2-y*z^2" -g 0.1 -a -2 -A 2 -v Singular
  @endcode
 
 
@@ -104,8 +104,8 @@ using namespace DGtal;
 
 Some other examples (more difficult):
 @code 
-3dImplicitSurfaceExtractorByThickening -a -2 -A 2 -p "((y^2+z^2-1)^2-(x^2+y^2-1)^3)*(y*(x-1)^2-z*(x+1))^2" -g 0.025 -e 1e-6 -n 50000 -v Singular -t 0.5 -P Newton
-3dImplicitSurfaceExtractorByThickening -a -2 -A 2 -p "(x^5-4*z^3*y^2)*((x+y)^2-(z-x)^3)" -g 0.025 -e 1e-6 -n 50000 -v Singular -t 0.05 -P Newton
+3dImplicitSurfaceExtractorByThickening -a -2 -A 2  "((y^2+z^2-1)^2-(x^2+y^2-1)^3)*(y*(x-1)^2-z*(x+1))^2" -g 0.025 -e 1e-6 -n 50000 -v Singular -t 0.5 -P Newton
+3dImplicitSurfaceExtractorByThickening -a -2 -A 2  "(x^5-4*z^3*y^2)*((x+y)^2-(z-x)^3)" -g 0.025 -e 1e-6 -n 50000 -v Singular -t 0.05 -P Newton
  
  @endcode
  @see

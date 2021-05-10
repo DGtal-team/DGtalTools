@@ -65,7 +65,7 @@ using namespace Z3i;
 
    @b Example:
    @code
-   $ vox2vol -i Al.100.vox -o Al.100.vol
+   $ vox2vol  Al.100.vox Al.100.vol
 
    @endcode
 */
@@ -131,14 +131,11 @@ int main(int argc, char**argv)
   CLI::App app;
   std::string inputFileName;
   std::string outputFileName {"result.vol"};
-
-
-  app.description("Convert a vox file to a vol. Basic usage:\n vox2vol --input <volFileName> --o <volOutputFileName> ");
+  app.description("Convert a vox file to a vol. Basic usage:\n vox2vol  <volFileName> <volOutputFileName> ");
   app.add_option("-i,--input,1", inputFileName, "" )
     ->required()
     ->check(CLI::ExistingFile);
-  app.add_option("-o,--ouput,2", outputFileName, "", true );   
-
+  app.add_option("-o,--ouput,2", outputFileName, "", true );
    
   app.get_formatter()->column_width(40);
   CLI11_PARSE(app, argc, argv);

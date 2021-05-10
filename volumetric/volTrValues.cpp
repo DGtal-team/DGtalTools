@@ -79,8 +79,8 @@ using namespace Z3i;
  instance if you want to transform all intensities starting from 0 to 50 into interval 200 250 you can do as follows:
 
  @code
- $ volTrValues -i $DGtal/examples/samples/lobster.vol -s {0..50} -r {200..250} -o lobsterTr.vol
- $ 3dImageViewer -i  lobsterTr.vol
+ $ volTrValues  $DGtal/examples/samples/lobster.vol lobsterTr.vol -s {0..50} -r {200..250}  
+ $ 3dImageViewer lobsterTr.vol
  @endcode
 
  By using  @ref Doc3dImageViewer ou should obtain such a result:

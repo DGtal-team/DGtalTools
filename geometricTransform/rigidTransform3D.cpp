@@ -89,7 +89,7 @@ int main(int argc, char**argv)
   double ax {1}, ay {0}, az {0};
   double tx {0}, ty {0}, tz {0};
 
-  app.description("Apply rigid transformation on a given volumic image.\n Typical use example:\n \t rigidTrans3D --input <RawFileName> --output <VolOutputFileName> --ox 1.0 --oy 1.0 --oz 1 -a 1.2 --ax 1 --ay 1 --az 0 --tx 1 --ty 0 --tz 0 --m <forward|backward>\n");
+  app.description("Apply rigid transformation on a given volumic image.\n Typical use example:\n \t rigidTrans3D  <RawFileName>  <VolOutputFileName> --ox 1.0 --oy 1.0 --oz 1 -a 1.2 --ax 1 --ay 1 --az 0 --tx 1 --ty 0 --tz 0 --m <forward|backward>\n");
   app.add_option("-i,--input,1",filename,"Input file.")->required()->check(CLI::ExistingFile);
   app.add_option("-o,--output,2",outputFileName,"Output file.")->required();
   app.add_option("-m,--model",model,"Transformation model: backward, forward.")->required();

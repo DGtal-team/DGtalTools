@@ -138,7 +138,7 @@ int main( int argc, char** argv )
    unsigned int separation {6};
    unsigned int resolution {128};
  
-   app.description("Convert a mesh file into a 26-separated or 6-separated volumetric voxelization in a given resolution grid. \n Example:\n mesh2vol -i ${DGtal}/examples/samples/tref.off -o output.vol --separation 26 --resolution 256 ");
+   app.description("Convert a mesh file into a 26-separated or 6-separated volumetric voxelization in a given resolution grid. \n Example:\n mesh2vol ${DGtal}/examples/samples/tref.off output.vol --separation 26 --resolution 256 ");
    
    app.add_option("-i,--input,1", inputFileName, "mesh file (.off)." )
      ->required()

@@ -60,12 +60,12 @@ Options:
 
 @b Examples:
 @code 
-$ convertVol -i ${DGtal}/examples/samples/lobster.vol -o convertedVol.p3d 
+$ convertVol ${DGtal}/examples/samples/lobster.vol convertedVol.p3d
 @endcode
 
  To upgrade a "Version-2" vol file to a "Version-3" (default Vol writer):
  @code
- $ convertVol -i ${DGtal}/examples/samples/lobster.vol -o ${DGtal}/examples/samples/lobster.vol
+ $ convertVol ${DGtal}/examples/samples/lobster.vol ${DGtal}/examples/samples/lobster.vol
  @endcode
  
 
@@ -102,7 +102,3 @@ int main( int argc, char** argv )
 
   return EXIT_SUCCESS;  
 }
-
-
-
-

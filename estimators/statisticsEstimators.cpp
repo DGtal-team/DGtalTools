@@ -259,7 +259,7 @@ int main( int argc, char** argv )
     app.add_option("-F,--file2,2",filename2,"File 2.")->required()->check(CLI::ExistingFile);
     app.add_option("--column1,-c", column1, "Column of file 1" )->required();
     app.add_option("--column2,-C", column2, "Column of file 2" )->required();
-    app.add_option("--output,-o", output_filename, "Output file")->required();
+    app.add_option("--output,-o,2", output_filename, "Output file")->required();
     app.add_option("--monge,-m", isMongeMean, "Is from Monge mean computation (optional, default false)", true);
 
     app.get_formatter()->column_width(40);

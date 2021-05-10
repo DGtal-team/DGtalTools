@@ -86,7 +86,7 @@ using namespace DGtal;
  @code
 
  Positionals:
-   1 TEXT:FILE                           input FreemanChain file name
+   1 TEXT:FILE REQUIRED                 input FreemanChain file name
 
  Options:
    -h,--help                             Print this help message and exit
@@ -128,13 +128,13 @@ using namespace DGtal;
  using the tool
  
  @code
- $ img2freeman -i $DGtal/examples/samples/church.pgm  -R 0 20 255 -s 200  > church.fc
+ $ img2freeman $DGtal/examples/samples/church.pgm  -R 0 20 255 -s 200  > church.fc
  @endcode
  
  Then, we display the set of contours with the background images (you need to have compiled DGTal with the options (-DWITH_MAGICK=true and -DWITH_CAIRO=true) :
  
  @code
- $  displayContours -i church.fc   --backgroundImage $DGtal/examples/samples/church.png --alphaBG 0.75 --outputFile church.pdf
+ $  displayContours church.fc   --backgroundImage $DGtal/examples/samples/church.png --alphaBG 0.75 --outputFile church.pdf
  @endcode
  
  
@@ -179,6 +179,7 @@ int main( int argc, char** argv )
   std::string backgroundImage;
   
   app.add_option("-i,--input,1", inputFileName, "input FreemanChain file name" )
+  ->required()
   ->check(CLI::ExistingFile);
   app.add_option("--outputFile,-o", outputFileName, "save output file automatically according the file format extension.");
   
