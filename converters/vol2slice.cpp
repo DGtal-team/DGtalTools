@@ -80,7 +80,7 @@ Options:
 @b Example:
 @code 
    # Export Z slice images (-s 2): 
-   $ vol2slice -i ${DGtal}/examples/samples/lobster.vol -o slice.pgm  -f 10 -l 15 -s 2
+   $ vol2slice ${DGtal}/examples/samples/lobster.vol slice.pgm  -f 10 -l 15 -s 2
 @endcode
 
 You should obtain such a visualization:
@@ -111,7 +111,7 @@ int main( int argc, char** argv )
   unsigned int sliceOrientation {2};
   
 
-  app.description("Convert a volumetric file (.vol, .longvol, .pgm3d) into a set of 2D slice  images. \n Typical use: to extract all slices defined in Y plane (y=cst): \n vol2slice -i image3d.vol -s 1  -o slice.pgm \n");
+  app.description("Convert a volumetric file (.vol, .longvol, .pgm3d) into a set of 2D slice  images. \n Typical use: to extract all slices defined in Y plane (y=cst): \n vol2slice  image3d.vol slice.pgm -s 1  \n");
 
   app.add_option("-i,--input,1", inputFileName, "vol file (.vol, .longvol .p3d, .pgm3d and if WITH_ITK is selected: dicom, dcm, mha, mhd). For longvol, dicom, dcm, mha or mhd formats, the input values are linearly scaled between 0 and 255.")
     ->required()

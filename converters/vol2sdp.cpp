@@ -52,7 +52,7 @@ using namespace DGtal;
 
    @code
    
-   vol2sdp -i ${DGtal}/examples/samples/lobster.vol -o volumeList.sdp
+   vol2sdp  ${DGtal}/examples/samples/lobster.vol volumeList.sdp
    Usage: ./converters/vol2sdp [OPTIONS] 1 [2]
 
    Positionals:
@@ -75,9 +75,9 @@ using namespace DGtal;
 
    @b Example:
    @code 
-   $ vol2sdp -i ${DGtal}/examples/samples/lobster.vol -o volumeList.sdp -m 70
+   $ vol2sdp  ${DGtal}/examples/samples/lobster.vol volumeList.sdp -m 70
    # Visualisation:
-   $ 3dSDPViewer -i volumeList.sdp
+   $ 3dSDPViewer volumeList.sdp
    @endcode
 
    You should obtain such a visualization:
@@ -117,9 +117,10 @@ int main( int argc, char** argv )
   // END parse command line using CLI ----------------------------------------------
 
   typedef DGtal::functors::Rescaling<DGtal::int64_t ,unsigned char > RescalFCT;
-  Image3D inputImage =  GenericReader< Image3D >::importWithValueFunctor( inputFilename,RescalFCT(rescaleInputMin,
-                                                                                                  rescaleInputMax,
-                                                                                                  0, 255) );
+  Image3D inputImage =  GenericReader< Image3D >::importWithValueFunctor( inputFilename,
+                                                                          RescalFCT(rescaleInputMin,
+                                                                                    rescaleInputMax,
+                                                                                    0, 255) );
   trace.info() << " [done] " << std::endl ; 
   std::ofstream outStream;
   outStream.open(outputFilename.c_str());
@@ -134,8 +135,6 @@ int main( int argc, char** argv )
   }
   outStream << std::endl;
   
-
-  
   for(Image3D::Domain::ConstIterator it=inputImage.domain().begin(); it != inputImage.domain().end(); ++it){
     if(inputImage(*it) >= thresholdMin && inputImage(*it) <= thresholdMax ){
       outStream << (*it)[0] << " " << (*it)[1] << " " << (*it)[2];
@@ -149,6 +148,5 @@ int main( int argc, char** argv )
   outStream.close();
   trace.info() << " [done] " << std::endl ;   
   return EXIT_SUCCESS;
-  
 }
 

@@ -121,7 +121,7 @@ This program can also displays the curve and tangent estimations, and it can als
  @b Example: 
  This command line show an example of tangent estimation with the VCM estimator.
  @code
-  3dCurveTangentEstimator -i ${DGtal}/examples/samples/sinus.dat -V ON -c -R 20 -r 3 -T 6
+  3dCurveTangentEstimator  ${DGtal}/examples/samples/sinus.dat -V ON -c -R 20 -r 3 -T 6
  @endcode
 
 

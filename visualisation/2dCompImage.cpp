@@ -62,7 +62,7 @@ typedef GradientColorMap<unsigned int, CMAP_JET, 1 > JetMap;
  @brief Compare images and displays differences (squared and absolute differences). 
 
 
- @b Usage:  2dCompImage --imageA <imageA>.pgm --imageB <imageB>.pgm --imageError <name> 
+ @b Usage:  2dCompImage <imageA>.pgm <imageB>.pgm --imageError <name>
 
  @b Allowed @b options @b are :
  
@@ -85,7 +85,7 @@ typedef GradientColorMap<unsigned int, CMAP_JET, 1 > JetMap;
  @b Example: 
  Typical use example:
  @code
-       2dCompImage -a imageA.pgm -b imageB.pgm -e errorImage -S 100 
+       2dCompImage  imageA.pgm imageB.pgm -e errorImage -S 100
  @endcode
 
 You should obtain such a visualisation:
@@ -162,7 +162,7 @@ int main( int argc, char** argv )
   int maxValueMAE;
   int maxValueMSE;
   
-  app.description("Compare images and displays differences (squared and absolute differences).\n Typical use example:\n \t 2dCompImage -a imageA.pgm -b imageB.pgm -e errorImage -S 100 \n");
+  app.description("Compare images and displays differences (squared and absolute differences).\n Typical use example:\n \t 2dCompImage imageA.pgm imageB.pgm -e errorImage -S 100 \n");
   app.add_option("-a,--imageA,1", inputFileNameA, "Input filename of image A." )
   ->required()
   ->check(CLI::ExistingFile);

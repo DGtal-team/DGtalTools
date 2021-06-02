@@ -79,13 +79,12 @@ using namespace DGtal;
  --mode TEXT:{INNER,OUTER,BDRY}=INNER  set mode for display: INNER: inner voxels, OUTER: outer voxels, BDRY: surfels
  OUTER: outer voxels, BDRY: surfels
  @endcode
- 
+
  
  @b Example:
  
- 
  @code
- 3dVolBoundaryViewer  -i $DGtal/examples/samples/lobster.vol -m 60
+ 3dVolBoundaryViewer  $DGtal/examples/samples/lobster.vol -m 60
  @endcode
  
  You should obtain such a result:
@@ -111,7 +110,7 @@ int main( int argc, char** argv )
   
   // parse command line using CLI ----------------------------------------------
   CLI::App app;
-  app.description("Display the boundary of a volume file by using QGLviewer. The mode specifies if you wish to see surface elements (BDRY), the inner voxels (INNER) or the outer voxels (OUTER) that touch the boundary. \n \t Example: 3dVolBoundaryViewer  -i $DGtal/examples/samples/lobster.vol -m 60");
+  app.description("Display the boundary of a volume file by using QGLviewer. The mode specifies if you wish to see surface elements (BDRY), the inner voxels (INNER) or the outer voxels (OUTER) that touch the boundary. \n \t Example: 3dVolBoundaryViewer  $DGtal/examples/samples/lobster.vol -m 60");
   std::string inputFileName;
   DGtal::int64_t rescaleInputMin {0};
   DGtal::int64_t rescaleInputMax {255};
@@ -138,7 +137,6 @@ int main( int argc, char** argv )
   app.get_formatter()->column_width(40);
   CLI11_PARSE(app, argc, argv);
   // END parse command line using CLI ----------------------------------------------
-  
   
   
   QApplication application(argc,argv);

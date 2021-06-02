@@ -47,18 +47,19 @@ using namespace Z3i;
  
  @brief  Flips 2D slice image of an 3D vol image (mirror transformation).
 
- @b Usage:  volFlip --input \<volFileName\> --imagePlane 0 1 --flipDimension 0 --o \<volOutputFileName\> (vol, longvol, p3d format)
+ @b Usage:  volFlip  \<volFileName\> --imagePlane 0 1 --flipDimension 0  \<volOutputFileName\> (vol, longvol, p3d format)
 
 
 
  @b Allowed @b options @b are : 
  @code
  Positionals:
-   1 TEXT:FILE REQUIRED                  Input vol file.
+   1 TEXT:FILE REQUIRED                  Input vol filename.
+   2 TEXT:FILE REQUIRED                  Output vol filename.
 
  Options:
    -h,--help                             Print this help message and exit
-   -i,--input TEXT:FILE REQUIRED         Input vol file.
+   -i,--input TEXT:FILE REQUIRED         Input vol filename.
    --imagePlane UINT=[0,1] x 2           arg=  {0,1,2} x {0,1,2} defines the axis of the slice image which will be transformed (by default arg= 0 1  i.e. the slice image defined in the X,Y plane (Z=cst)
    --flipDimension UINT=0                specify which axis will be used to apply the flip.
    -o,--output TEXT=result.vol           Output filename.
@@ -115,7 +116,7 @@ int main(int argc, char**argv)
   app.add_option("--imagePlane", vectImgPlane, "arg=  {0,1,2} x {0,1,2} defines the axis of the slice image which will be transformed (by default arg= 0 1  i.e. the slice image defined in the X,Y plane (Z=cst)", true)
    ->expected(2);
   app.add_option("--flipDimension",dimFlip,"specify which axis will be used to apply the flip.", true);
-  app.add_option("-o,--output",outputFileName, "Output filename.", true );
+  app.add_option("-o,--output, 2",outputFileName, "Output filename.", true );
 
  
   app.get_formatter()->column_width(40);
@@ -149,7 +150,7 @@ int main(int argc, char**argv)
   }
 
   trace.beginBlock("Exporting...");
-  bool res =  VolWriter< Image3D>::exportVol(outputFileName, imageRes);
+  bool res =  VolWriter<Image3D>::exportVol(outputFileName, imageRes);
   trace.endBlock();
   if (res) return 0; else return 1;
 }

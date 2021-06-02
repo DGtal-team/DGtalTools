@@ -64,7 +64,6 @@ using namespace Z3i;
 
  @brief  Computes generic scalar surfel data comparisons (squared error) (given from an input data file and from a reference one). 
  
- 
 
  @b Usage: 3dCompSurfelData [input] [reference]
  
@@ -72,8 +71,11 @@ using namespace Z3i;
  @b Allowed @b options @b are:
  
  @code
+ Positionals:
+   1 TEXT:FILE REQUIRED                  input file: sdpa (sequence of discrete points with attribute)
+   s TEXT:FILE                           input file: sdpa (sequence of discrete points with attribute)
 
- Options:
+ Optionals:
    -h,--help                             Print this help message and exit
    -i,--input TEXT:FILE REQUIRED         input file: sdpa (sequence of discrete points with attribute)
    -r,--reference TEXT:FILE REQUIRED     input file: sdpa (sequence of discrete points with attribute)
@@ -101,7 +103,7 @@ using namespace Z3i;
  @endcode
  Now we compare the different curvature values from the two shapes:
  @code
-  ./visualisation/3dCompSurfelData -i curvatureCat10ErodedR3.dat -r curvatureCat10R3.dat --fixMaxColorValue 1.0  -o  statMeasures.dat                       
+  ./visualisation/3dCompSurfelData  curvatureCat10ErodedR3.dat curvatureCat10R3.dat --fixMaxColorValue 1.0  -o  statMeasures.dat                       
  @endcode
 
  You should obtain such a visualisation:

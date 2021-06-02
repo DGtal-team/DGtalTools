@@ -57,7 +57,6 @@
 
 using namespace std;
 using namespace DGtal;
-//using namespace Z3i;
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -94,7 +93,7 @@ Options:
  
  @b Example:
  @code
- $ volBoundary2obj -i $DGtal/examples/samples/lobster.vol -m 80 -o out.obj
+ $ volBoundary2obj  $DGtal/examples/samples/lobster.vol out.obj -m 80 
  @endcode
  
  You should obtain such a visualization:

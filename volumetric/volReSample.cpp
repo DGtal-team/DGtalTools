@@ -69,20 +69,20 @@ using namespace DGtal;
 Here is an example of re sampling with different grid sizes 2, 4 and 8:
 
  @code
- $ volReSample -i $DGtal/examples/samples/Al.100.vol -g 2 2 2  -o AlRS2.vol
- $ volReSample -i $DGtal/examples/samples/Al.100.vol -g 4 4 4  -o AlRS4.vol
- $ volReSample -i $DGtal/examples/samples/Al.100.vol -g 8 8 8  -o AlRS8.vol
+ $ volReSample  $DGtal/examples/samples/Al.100.vol AlRS2.vol -g 2 2 2
+ $ volReSample  $DGtal/examples/samples/Al.100.vol AlRS4.vol -g 4 4 4
+ $ volReSample  $DGtal/examples/samples/Al.100.vol AlRS8.vol -g 8 8 8
  @endcode
 
 We can convert the resulting volumetric files into a sequence of discrete points with the tool  @ref vol2sdp :
 @code 
-$ vol2sdp -i $DGtal/examples/samples/Al.100.vol -m 1 -o AlRS1.sdp
-$ vol2sdp -i  AlRS2.vol -m 1 -o AlRS2.sdp
-$ vol2sdp -i  AlRS4.vol -m 1 -o AlRS4.sdp
-$ vol2sdp -i  AlRS8.vol -m 1 -o AlRS8.sdp
+$ vol2sdp $DGtal/examples/samples/Al.100.vol -m 1 -o AlRS1.sdp
+$ vol2sdp AlRS2.vol -m 1 -o AlRS2.sdp
+$ vol2sdp AlRS4.vol -m 1 -o AlRS4.sdp
+$ vol2sdp AlRS8.vol -m 1 -o AlRS8.sdp
 $ cat AlRS{1,2,4,8}.sdp >> AlRS1_2_4_8.sdp
 # display the resulting file:
-3dSDPViewer -i  AlRS1_2_4_8.sdp    
+3dSDPViewer AlRS1_2_4_8.sdp    
 @endcode
 
  Note that if DGtal is compiled with the  option WITH_ITK set to ON, you can export the image in format ITK format and integrating image spacing.

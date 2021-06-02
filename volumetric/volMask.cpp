@@ -76,7 +76,7 @@ using namespace DGtal;
  @b Example:
  
  @code
- volMask -i ${DGtal}/examples/samples/lobster.vol  -a ${DGtal}/examples/samples/lobster.vol -o lobsMasked.vol -m 100
+ volMask  ${DGtal}/examples/samples/lobster.vol lobsMasked.vol  -a ${DGtal}/examples/samples/lobster.vol   -m 100
  @endcode
  
  @image html resvolMask.png "Example of result. "
@@ -182,7 +182,7 @@ int main( int argc, char** argv )
   unsigned int offsetBorder {0};
   int maskValue {1};
   
-  app.description("Outputs a new image from two input images, one representing the data, one representing the selection mask. The size of output image is the size of the bounding box of selected values, plus the chosen border offset. \n Typical use example:\n \t volMask -i ${DGtal}/examples/samples/lobster.vol  -a ${DGtal}/examples/samples/lobster.vol -o lobsMasked.vol -m 100  \n");
+  app.description("Outputs a new image from two input images, one representing the data, one representing the selection mask. The size of output image is the size of the bounding box of selected values, plus the chosen border offset. \n Typical use example:\n \t volMask  ${DGtal}/examples/samples/lobster.vol lobsMasked.vol -a ${DGtal}/examples/samples/lobster.vol  -m 100  \n");
   
 #ifdef WITH_ITK
   app.add_option("-i,--input,1", inputFileName, "an input 3D image vol (or ITK: .nii, mha, ... ) file." )

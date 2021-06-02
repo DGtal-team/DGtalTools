@@ -82,7 +82,7 @@ using namespace Z3i;
  @b Example: 
  
  @code
- $ visualisation/3dHeightMapViewer -i ${DGtal}/examples/samples/church.pgm -s 0.2
+ $ visualisation/3dHeightMapViewer ${DGtal}/examples/samples/church.pgm -s 0.2
  @endcode 
 
  You should obtain such a result:
@@ -212,7 +212,7 @@ int main( int argc, char** argv )
   double scale {1.0};
   bool colorMap {false};
   std::string colorTextureImage;
-  app.description("Displays 2D image as heightmap by using QGLviewer.\n Exemple of use:  visualisation/3dHeightMapViewer -i ${DGtal}/examples/samples/church.pgm -s 0.2");
+  app.description("Displays 2D image as heightmap by using QGLviewer.\n Exemple of use:  visualisation/3dHeightMapViewer  ${DGtal}/examples/samples/church.pgm -s 0.2");
   
   app.add_option("-i,--input,1", inputFileName, "2d input image representing the height map (given as grayscape image cast into 8 bits)." )
   ->required()
