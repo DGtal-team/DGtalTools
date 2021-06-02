@@ -1,3 +1,8 @@
+# DGtalTools 1.3(beta)
+
+
+
+
 # DGtalTools 1.2
 - *global*
   - Fix itk2vol and fix ITK cmake configuaration that was making issues with the ITK image read.
