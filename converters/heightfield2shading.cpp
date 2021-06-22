@@ -281,7 +281,7 @@ int main( int argc, char** argv )
   std::vector<double> lPos;
   
   
-  app.description("Render a 2D heightfield image into a shading image. You can choose between lambertian model (diffuse reflectance) and specular model (Nayar reflectance model). You can also choose between a single directional light source (using --lightDir option) or use light source which emits in all direction (by specifying the light source position with --lightPos} option). Another rendering mode is given from a bitmap reflectance map which represents the rendering for a normal vector value (mapped according the x/y coordinates).\nExample:\n   ${DGtal}/examples/samples/bunnyHeightField.pgm  shading.pgm --lPos 10.0  -120.0 550.0 --importNormal ${DGtal}/examples/samples/bunnyHeightField_normals.sdp -s 1.0 0.2 0.8 \n");
+  app.description("Render a 2D heightfield image into a shading image. You can choose between lambertian model (diffuse reflectance) and specular model (Nayar reflectance model). You can also choose between a single directional light source (using --lightDir option) or use light source which emits in all direction (by specifying the light source position with --lightPos} option). Another rendering mode is given from a bitmap reflectance map which represents the rendering for a normal vector value (mapped according the x/y coordinates).\nExample:\n heightfield2shading   ${DGtal}/examples/samples/bunnyHeightField.pgm  shading.pgm --lPos 10.0  -120.0 550.0 --importNormal ${DGtal}/examples/samples/bunnyHeightField_normals.sdp -s 1.0 0.2 0.8 \n");
   app.add_option("-i,--input,1", inputFileName, "input heightfield file (2D image).")
      ->check(CLI::ExistingFile)
      ->required();
