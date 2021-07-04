@@ -71,14 +71,17 @@ Positionals:
   2 TEXT                                output image.
 
 Options:
-  -h,--help                             Print this help message and exit
-  -i,--input TEXT:FILE REQUIRED         input heightfield file (2D image).
+ -h,--help                             Print this help message and exit
+  -i,--input TEXT:FILE                  input heightfield file (2D image).
+  -d,--domain UINT x 2                  specify the domain (required when normal are imported and if --inout is not given).
   -o,--output TEXT                      output image.
   --importNormal TEXT                   import normals from file.
+  --orderedNormalsImport                Use ordered normals.
   --lightDir,--lDir,--ld FLOAT x 3      light source direction: lx ly lz.
   --lightPos,--lPos,--lp FLOAT x 3      light source position: px py pz.
   -s,--specularModel FLOAT x 3          use specular Nayar model with 3 param Kdiff, Kspec, sigma.
   -r,--reflectanceMap TEXT:FILE         specify a image as reflectance map.
+  --hsvShading                          use shading with HSV shading (given from the normal vector)
 
 @endcode
 
@@ -88,6 +91,13 @@ Options:
 @endcode
 You will obtain such image:
 @image html  resHeightfield2shading.png "Resulting image with a 90° ccw rotation"
+
+@b Other example:
+@code
+  $ heightfield2shading   ${DGtal}/examples/samples/bunnyHeightField.pgm  shading.ppm  --importNormal ${DGtal}/examples/samples/bunnyHeightField_normals.sdp --hsvShading
+@endcode
+You will obtain such image:
+@image html  resHueHeightfield2shading.png "Resulting image with a 90° ccw rotation (and conversion to png)"
 @see heightfield2shading.cpp
 
 */
@@ -348,7 +358,8 @@ int main( int argc, char** argv )
   std::vector<double> lPos;
   std::vector<unsigned int> domain;  
   
-  app.description("Render a 2D heightfield image into a shading image. You can choose between lambertian model (diffuse reflectance) and specular model (Nayar reflectance model). You can also choose between a single directional light source (using --lightDir option) or use light source which emits in all direction (by specifying the light source position with --lightPos} option). Another rendering mode is given from a bitmap reflectance map which represents the rendering for a normal vector value (mapped according the x/y coordinates).\nExample:\n heightfield2shading   ${DGtal}/examples/samples/bunnyHeightField.pgm  shading.pgm --lPos 10.0  -120.0 550.0 --importNormal ${DGtal}/examples/samples/bunnyHeightField_normals.sdp -s 1.0 0.2 0.8 \n");
+  app.description("Render a 2D heightfield image into a shading image. You can choose between lambertian model (diffuse reflectance) and specular model (Nayar reflectance model). You can also choose between a single directional light source (using --lightDir option) or use light source which emits in all direction (by specifying the light source position with --lightPos} option). Another rendering mode is given from a bitmap reflectance map which represents the rendering for a normal vector value (mapped according the x/y coordinates).\nExample:\n heightfield2shading   ${DGtal}/examples/samples/bunnyHeightField.pgm  shading.pgm --lPos 10.0  -120.0 550.0 --importNormal ${DGtal}/examples/samples/bunnyHeightField_normals.sdp -s 1.0 0.2 0.8 \n"
+    "Other example: heightfield2shading   ${DGtal}/examples/samples/bunnyHeightField.pgm  shading.ppm  --importNormal ${DGtal}/examples/samples/bunnyHeightField_normals.sdp --hsvShading\n");
   auto opt1 = app.add_option("-i,--input,1", inputFileName, "input heightfield file (2D image).")
     ->check(CLI::ExistingFile);
   auto domOpt =  app.add_option("--domain,-d", domain , "specify the domain (required when normal are imported and if --inout is not given).")
