@@ -1,6 +1,11 @@
-# DGtalTools 1.3(beta)
+# DGtalTools 1.3 (beta)
 
 
+- *converters*
+  - heightfield2shading: new option to add an hue based rendering (from normal
+    direction interpreted as HSV vector)
+    (Bertrand Kerautret [#399](https://github.com/DGtal-team/DGtalTools/pull/399))
+ 
 
 
 # DGtalTools 1.2
