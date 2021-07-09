@@ -48,6 +48,7 @@
 #include "DGtal/topology/helpers/Surfaces.h"
 #include "DGtal/shapes/GaussDigitizer.h"
 #include "DGtal/shapes/Mesh.h"
+#include "DGtal/io/boards/Board3D.h"
 #include "DGtal/shapes/implicit/ImplicitPolynomial3Shape.h"
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -79,6 +80,7 @@ using namespace DGtal;
    -P,--project TEXT:{No,Newton}=Newton  defines the projection: either No or Newton.
    -e,--epsilon FLOAT=1e-06              the maximum precision relative to the implicit surface in the Newton approximation of F=0.
    -n,--max_iter UINT=500                the maximum number of iteration in the Newton approximation of F=0.
+   -o,--obj TEXT                         OBJ export filename.
    -v,--view TEXT:{Singular,Normal,Hide}=Normal
                                          specifies if the surface is viewed as is (Normal) or if places close to singularities are highlighted (Singular), or if unsure places should not be displayed (Hide).
  @endcode
@@ -303,7 +305,8 @@ int main( int argc, char** argv )
   double epsilon {1e-6};
   unsigned int max_iter {500};
   std::string view {"Normal"};
-
+  std::string OBJexport="";
+  
   app.description( "Computes the zero level set of the given polynomial. Usage:  3dImplicitSurfaceExtractorByThickening -p <polynomial> [options]\n Example:\n 3dImplicitSurfaceExtractorByThickening -p \"x^2-y*z^2\" -g 0.1 -a -2 -A 2 -v Singular\n - whitney  : x^2-y*z^2 \n - 4lines   : x*y*(y-x)*(y-z*x) \n - cone     : z^2-x^2-y^2 \n - simonU   : x^2-z*y^2+x^4+y^4 \n - cayley3  : 4*(x^2 + y^2 + z^2) + 16*x*y*z - 1 \n - crixxi   : -0.9*(y^2+z^2-1)^2-(x^2+y^2-1)^3 \n Some other examples (more difficult): \n 3dImplicitSurfaceExtractorByThickening -a -2 -A 2 -p \"((y^2+z^2-1)^2-(x^2+y^2-1)^3)*(y*(x-1)^2-z*(x+1))^2\" -g 0.025 -e 1e-6 -n 50000 -v Singular -t 0.5 -P Newton \n 3dImplicitSurfaceExtractorByThickening -a -2 -A 2 -p \"(x^5-4*z^3*y^2)*((x+y)^2-(z-x)^3)\" -g 0.025 -e 1e-6 -n 50000 -v Singular -t 0.05 -P Newton ");
   app.add_option("-p,--polynomial,1", poly_str, "the implicit polynomial whose zero-level defines the shape of interest." )
   ->required();
@@ -314,6 +317,7 @@ int main( int argc, char** argv )
   app.add_option("--project,-P", project, "defines the projection: either No or Newton.", true)
    -> check(CLI::IsMember({"No", "Newton"}));
   app.add_option("--epsilon,-e", epsilon, "the maximum precision relative to the implicit surface in the Newton approximation of F=0.", true);
+  app.add_option("--obj,-o", OBJexport, "OBJ export filename.");
   app.add_option("--max_iter,-n", max_iter, "the maximum number of iteration in the Newton approximation of F=0.", true );
   app.add_option("--view,-v", view, "specifies if the surface is viewed as is (Normal) or if places close to singularities are highlighted (Singular), or if unsure places should not be displayed (Hide).",true )
    -> check(CLI::IsMember({"Singular", "Normal", "Hide"}));
@@ -496,6 +500,34 @@ int main( int argc, char** argv )
      }
   trace.endBlock();
 
+  
+  //-------------- export OBJ -------------------------------------------
+  if (OBJexport != "")
+  {
+    Board3D<Space3,KSpace3> board( K3 );
+    // Display lines that are not in the mesh.
+    board<<mesh;
+    for ( CellMapConstIterator it = complex3.begin( 1 ), itE = complex3.end( 1 ); it != itE; ++it )
+    {
+      Cell3 cell  = it->first;
+      bool fixed  = it->second.data & CC3::FIXED;
+      std::vector<Cell3> dummy;
+      std::back_insert_iterator< std::vector<Cell3> > outIt( dummy );
+      complex3.directCoFaces( outIt, cell );
+      if ( ! dummy.empty() )     continue;
+
+      Cells3 bdry = complex3.cellBoundary( cell, true );
+      Cell3 v0    = *(bdry.begin() );
+      Cell3 v1    = *(bdry.begin() + 1);
+      if ( ( ! fixed ) && hide ) continue;
+      Color color = highlight
+      ? ( fixed ? Color::White : Color(128,255,128) )
+      : Color::White;
+      board.setLineColor( color );
+      board.addLine( points[ indices[ v0 ] ], points[ indices[ v1 ] ], h/2.0 );
+    }
+    board.saveOBJ(OBJexport);
+  }
   //-------------- View surface -------------------------------------------
   QApplication application(argc,argv);
   Viewer3D<Space3,KSpace3> viewer( K3 );
