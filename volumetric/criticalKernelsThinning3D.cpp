@@ -79,6 +79,7 @@
 #include <DGtal/io/viewers/Viewer3D.h>
 #include <DGtal/base/Common.h>
 #include <DGtal/helpers/StdDefs.h>
+#include <DGtal/io/Color.h>
 #include <DGtal/io/readers/GenericReader.h>
 #include <DGtal/io/writers/GenericWriter.h>
 #include "DGtal/images/imagesSetsUtils/SetFromImage.h"
@@ -87,9 +88,9 @@
 #include "DGtal/images/imagesSetsUtils/ImageFromSet.h"
 
 #include <DGtal/topology/SurfelAdjacency.h>
-#include <DGtal/io/boards/Board2D.h>
 #include <DGtal/topology/CubicalComplex.h>
 #include <DGtal/topology/CubicalComplexFunctions.h>
+#include <DGtal/io/boards/Board3D.h>
 
 #include <DGtal/topology/VoxelComplex.h>
 #include <DGtal/topology/VoxelComplexFunctions.h>
@@ -118,7 +119,9 @@ int main(int argc, char* const argv[]){
   string foreground {"black"};
   string outputFilenameImg;
   string outputFilenameSDP;
-
+  string outputFilenameOBJ;
+  string outputFilenameInputOBJ;
+  
   int thresholdMin {0};
   int thresholdMax {255};
   int persistence {0};
@@ -145,6 +148,8 @@ int main(int argc, char* const argv[]){
   app.add_flag("--verbose,-v",verbose, "Verbose output");
   app.add_option("--exportImage,-o",outputFilenameImg, "Export the resulting set of points to a image compatible with GenericWriter.");
   app.add_option("--exportSDP,-e",outputFilenameSDP, "Export the resulting set of points in a simple (sequence of discrete point (sdp))." );
+  app.add_option("--exportOBJ,-O",outputFilenameOBJ, "Export the resulting set of points in an OBJ file." );
+  app.add_option("--exportInputOBJ,-I",outputFilenameInputOBJ, "Export the input set of points in an OBJ file." );
   app.add_flag("--visualize,-t", visualize, "Visualize result in viewer");
     
   app.get_formatter()->column_width(40);
@@ -272,12 +277,62 @@ int main(int argc, char* const argv[]){
     thin_image >> outputFilenameImg;
    }
 
+  //-------------- export OBJ -------------------------------------------
+  if ( outputFilenameInputOBJ != "" )
+    {
+      Board3D< Space,KSpace > board( ks );
+      // Display lines that are not in the mesh.
+      SCell surfel;
+      board << SetMode3D( surfel.className(), "Basic");
+      board.setLineColor( Color::Black );
+      board.setFillColor( Color( 200, 200, 255, 255 ) );
+      for ( auto p : all_set )
+        {
+          SCell voxel  = ks.sSpel( p );
+          for ( Dimension k = 0; k < 3; k++ ) {
+            Point q = p;
+            q[ k ] += 1;
+            if ( all_set.find( q ) == all_set.end() )
+              board << ks.sIncident( voxel, k, true );
+            q[ k ] -= 2;
+            if ( all_set.find( q ) == all_set.end() )
+              board << ks.sIncident( voxel, k, false );
+          }
+        }
+      board.saveOBJ( outputFilenameInputOBJ );
+    }
+
+  //-------------- export OBJ -------------------------------------------
+  if ( outputFilenameOBJ != "" )
+    {
+      Board3D< Space,KSpace > board( ks );
+      // Display lines that are not in the mesh.
+      SCell surfel;
+      board << SetMode3D( surfel.className(), "Basic");
+      board.setLineColor( Color::Black );
+      board.setFillColor( Color::Red );
+      for ( auto p : thin_set )
+        {
+          SCell voxel  = ks.sSpel( p );
+          for ( Dimension k = 0; k < 3; k++ ) {
+            Point q = p;
+            q[ k ] += 1;
+            if ( thin_set.find( q ) == thin_set.end() )
+              board << ks.sIncident( voxel, k, true );
+            q[ k ] -= 2;
+            if ( thin_set.find( q ) == thin_set.end() )
+              board << ks.sIncident( voxel, k, false );
+          }
+        }
+      board.saveOBJ( outputFilenameOBJ );
+    }
+
   if(visualize)
   {
     int argc(1);
     char** argv(nullptr);
     QApplication app(argc, argv);
-    Viewer3D<> viewer;
+    Viewer3D<> viewer( ks );
     viewer.setWindowTitle("criticalKernelsThinning3D");
     viewer.show();
 
