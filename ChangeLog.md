@@ -1,6 +1,10 @@
 # DGtalTools 1.3(beta)
 
 
+- *volumetric*
+  - criticalKernelsThinning3d: it can now export OBJ files for input surface and
+    output skeletons
+    (Jacques-Olivier Lachaud [#414](https://github.com/DGtal-team/DGtalTools/pull/414))
 
 
 # DGtalTools 1.2
