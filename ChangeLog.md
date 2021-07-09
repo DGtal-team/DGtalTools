@@ -1,4 +1,11 @@
 # DGtalTools 1.2
+
+- *visualisation*
+  - 3dImplicitSurfaceExtractorByThickening: adding OBJ export.
+    (David Coeurjolly [#413](https://github.com/DGtal-team/DGtalTools/pull/413))
+
+
+# DGtalTools 1.2
 - *global*
   - Fix itk2vol and fix ITK cmake configuaration that was making issues with the ITK image read.
     (Bertrand Kerautret [#393](https://github.com/DGtal-team/DGtalTools/pull/393))
