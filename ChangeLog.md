@@ -1,3 +1,8 @@
+# DGtalTools 1.3(beta)
+
+
+
+
 # DGtalTools 1.2
 
 - *visualisation*
