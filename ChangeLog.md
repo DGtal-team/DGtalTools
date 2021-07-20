@@ -2,7 +2,6 @@
 
 
 
-
 # DGtalTools 1.2
 
 - *visualisation*
