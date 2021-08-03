@@ -24,7 +24,6 @@
 - *volumetric*
   - volReSample: it can now export image including ITK image spacing.
     (Bertrand Kerautret [#404](https://github.com/DGtal-team/DGtalTools/pull/404))
-  
 
 
 
