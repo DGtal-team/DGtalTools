@@ -46,9 +46,6 @@ if (  WITH_VISU3D_QGLVIEWER )
     DGtalTools_add_tool(sliceViewer ${ui_sliceViewer_FORMS_HEADERS})
   endif (WITH_QT4)
 
-  install(TARGETS sliceViewer RUNTIME DESTINATION bin
-                              LIBRARY DESTINATION lib
-                              ARCHIVE DESTINATION lib)
 endif (WITH_VISU3D_QGLVIEWER)
 
 

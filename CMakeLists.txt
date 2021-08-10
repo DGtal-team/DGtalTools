@@ -67,6 +67,19 @@ SET(VERSION ${DGtalTools_VERSION_MAJOR}.${DGtalTools_VERSION_MINOR}.${DGtalTools
 
 
 
+ # -----------------------------------------------------------------------------
+ # Randomized build.
+ # -----------------------------------------------------------------------------
+
+message(STATUS "Randomized build")
+if (DGTALTOOLS_RANDOMIZED_BUILD_THRESHOLD EQUAL "100")
+   message(STATUS "All examples or unit-tests will be compiled (cmake variable DGTALTOOLS_RANDOMIZED_BUILD_THRESHOLD)")
+else()
+   message(STATUS "Only ~${DGTALTOOLS_RANDOMIZED_BUILD_THRESHOLD}% of the (randomly selected) tools will be  compiled.")
+   message(STATUS "  (you can adjust this with the cmake variable DGTALTOOLS_RANDOMIZED_BUILD_THRESHOLD)")
+   message(STATUS " Whitelist: ${DGTALTOOLS_RANDOMIZED_BUILD_WHITELIST}")
+ endif()
+message(STATUS "-------------------------------------------------------------------------------")
 
 
 
