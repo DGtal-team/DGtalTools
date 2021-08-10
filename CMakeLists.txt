@@ -9,7 +9,8 @@ cmake_minimum_required (VERSION 3.1)
 cmake_policy(SET CMP0057 NEW)
 
 SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake")
-
+SET(DGTALTOOLS_RANDOMIZED_BUILD_THRESHOLD "100" CACHE INTERNAL "Threshold for the random selection of tools to build.")
+SET(DGTALTOOLS_RANDOMIZED_BUIL_WHITELIST "" CACHE INTERNAL "List of whitelisted tools to build.")
 
 # -----------------------------------------------------------------------------
 # DGtal dependencies
@@ -87,7 +88,9 @@ INCLUDE(doxygen)
 INCLUDE(TargetDoxygenDoc OPTIONAL)
 message(STATUS "-------------------------------------------------------------------------------")
 
+
 #------Tools subdirectories ------
+include(cmake/AddToolsFunction.cmake)
 add_subdirectory(volumetric)
 add_subdirectory(generators)
 add_subdirectory(estimators)
