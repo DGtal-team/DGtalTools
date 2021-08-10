@@ -28,7 +28,7 @@ if (  WITH_VISU3D_QGLVIEWER )
     DGtalTools_add_tool(${FILE})
   endforeach (FILE)
 
-  DGtalTools_add_tool(3dImageViewer specificClasses/Viewer3DImage)
+  DGtalTools_add_tool(3dImageViewer specificClasses/Viewer3DImage.cpp)
 
   include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
