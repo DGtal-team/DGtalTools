@@ -78,6 +78,7 @@ else()
    message(STATUS "Only ~${DGTALTOOLS_RANDOMIZED_BUILD_THRESHOLD}% of the (randomly selected) tools will be  compiled.")
    message(STATUS "  (you can adjust this with the cmake variable DGTALTOOLS_RANDOMIZED_BUILD_THRESHOLD)")
    message(STATUS " Whitelist: ${DGTALTOOLS_RANDOMIZED_BUILD_WHITELIST}")
+   message(STATUS "  (you can adjust this with the cmake variable DGTALTOOLS_RANDOMIZED_BUILD_WHITELIST)")
  endif()
 message(STATUS "-------------------------------------------------------------------------------")
 

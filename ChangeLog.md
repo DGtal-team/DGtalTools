@@ -1,7 +1,10 @@
 # DGtalTools 1.3(beta)
 
-
-
+- *build*
+  - New cmake option (DGTAL_RANDOMIZED_BUILD_THRESHOLD) to set the
+    (approximated) % of tools build
+    (Bertrand Kerautret [#415](https://github.com/DGtal-team/DGtal/pull/415))
+       
 
 # DGtalTools 1.2
 - *global*
