@@ -2,6 +2,12 @@
 
 
 
+# DGtalTools 1.2
+
+- *visualisation*
+  - 3dImplicitSurfaceExtractorByThickening: adding OBJ export.
+    (David Coeurjolly [#413](https://github.com/DGtal-team/DGtalTools/pull/413))
+
 
 # DGtalTools 1.2
 - *global*
