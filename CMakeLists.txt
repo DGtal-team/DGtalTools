@@ -6,7 +6,7 @@
 PROJECT(DGtalTools)
 
 cmake_minimum_required (VERSION 3.1)
-cmake_policy(SET CMP0057 NEW)
+cmake_policy(SET CMP0057 NEW) # the new interpretation of IN_LIST is by default not set (at least until  3.21.1).
 
 SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake")
 SET(DGTALTOOLS_RANDOMIZED_BUILD_THRESHOLD "100" CACHE INTERNAL "Threshold for the random selection of tools to build.")
