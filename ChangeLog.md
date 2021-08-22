@@ -2,7 +2,7 @@
 
 
 - *converters*
-  - heightfield2shading: new option to add an hue based rendering (from normal
+  - heightfield2shading: new option to add a matcap rendering (from normal
     direction interpreted as HSV vector)
     (Bertrand Kerautret [#399](https://github.com/DGtal-team/DGtalTools/pull/399))
  
