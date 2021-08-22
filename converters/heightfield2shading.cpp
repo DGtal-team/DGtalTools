@@ -288,48 +288,11 @@ struct IdColor{
 };
 
 
-void
-HSVtoRGB
-( double & r, double & g, double & b,
-  const double h, const double s, const double v)
-{
-  int i;
-  double f, p, q, t;
-  if( s == 0 ) {                     // achromatic (gray)
-    r = g = b = v;
-    return;
-  }
-  i = static_cast<int>( floor( h / 60 ) );
-  f = ( h / 60 ) - i;                        // factorial part of h
-  p = v * ( 1.0 - s );
-  q = v * ( 1.0 - s * f );
-  t = v * ( 1.0 - s * ( 1.0 - f ) );
-  switch( i ) {
-  case 0:
-    r = v; g = t; b = p;
-    break;
-  case 1:
-    r = q; g = v; b = p;
-    break;
-  case 2:
-    r = p; g = v; b = t;
-    break;
-   case 3:
-     r = p; g = q; b = v;
-     break;
-  case 4:
-    r = t;  g = p; b = v;
-    break;
-  default:    // case 5:
-    r = v; g = p; b = q;
-    break;
-  }
-}
 
 DGtal::Color
 colorFromHSB(double h, double saturation, double value){
   double r, g, b;
-  HSVtoRGB(r, g, b, h,saturation, value);
+  DGtal::Color::HSVtoRGB(r, g, b, h,saturation, value);
   return DGtal::Color(r*255.0,g*255.0,b*255.0);
   
 }
