@@ -5,6 +5,10 @@
     (approximated) % of tools build
     (Bertrand Kerautret [#416](https://github.com/DGtal-team/DGtal/pull/416))
        
+- *visualisation*
+  - 3dImplicitSurfaceExtractorByThickening: adding OBJ export.
+    (David Coeurjolly [#413](https://github.com/DGtal-team/DGtalTools/pull/413))
+
 
 # DGtalTools 1.2
 - *global*
