@@ -22,16 +22,17 @@ jobs:
 
      - uses: actions/checkout@v2
 
+     - name: Install linux deps
+       if: matrix.os == 'ubuntu-latest'
+       run: | 
+           sudo apt-get update
+           sudo apt-get install zsh libqglviewer-dev-qt5 libboost-dev libeigen3-dev ninja-build libhdf5-serial-dev libboost-dev libcairo2-dev libgmp-dev libgraphicsmagick++1-dev libfftw3-dev
+
      - name: Get white list tools
        run : |
          echo "::set-output name=WHITE_LIST_TOOLS::$(cat ${{runner.workspace}}/DGtalTools/cmake/whiteListBuildTools.txt | tr -d '\n' ; ${{runner.workspace}}/DGtalTools/cmake/create_whitelist.sh)"
        id: whitelisttools
 
-     - name: Install linux deps
-       if: matrix.os == 'ubuntu-latest'
-       run: | 
-           sudo apt-get update
-           sudo apt-get install libqglviewer-dev-qt5 libboost-dev libeigen3-dev ninja-build libhdf5-serial-dev libboost-dev libcairo2-dev libgmp-dev libgraphicsmagick++1-dev libfftw3-dev
 
      - name: Install macOS deps
        if: matrix.os == 'macOS-latest'
