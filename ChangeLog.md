@@ -1,9 +1,10 @@
 # DGtalTools 1.3(beta)
 
-
-
-# DGtalTools 1.2
-
+- *build*
+  - New cmake option (DGTAL_RANDOMIZED_BUILD_THRESHOLD) to set the
+    (approximated) % of tools build
+    (Bertrand Kerautret [#416](https://github.com/DGtal-team/DGtal/pull/416))
+       
 - *visualisation*
   - 3dImplicitSurfaceExtractorByThickening: adding OBJ export.
     (David Coeurjolly [#413](https://github.com/DGtal-team/DGtalTools/pull/413))
@@ -30,7 +31,6 @@
 - *volumetric*
   - volReSample: it can now export image including ITK image spacing.
     (Bertrand Kerautret [#404](https://github.com/DGtal-team/DGtalTools/pull/404))
-  
 
 
 

@@ -6,10 +6,11 @@
 PROJECT(DGtalTools)
 
 cmake_minimum_required (VERSION 3.1)
-cmake_policy(SET CMP0057 NEW)
+cmake_policy(SET CMP0057 NEW) # the new interpretation of IN_LIST is by default not set (at least until  3.21.1).
 
 SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake")
-
+SET(DGTALTOOLS_RANDOMIZED_BUILD_THRESHOLD "100" CACHE INTERNAL "Threshold for the random selection of tools to build.")
+SET(DGTALTOOLS_RANDOMIZED_BUIL_WHITELIST "" CACHE INTERNAL "List of whitelisted tools to build.")
 
 # -----------------------------------------------------------------------------
 # DGtal dependencies
@@ -66,6 +67,20 @@ SET(VERSION ${DGtalTools_VERSION_MAJOR}.${DGtalTools_VERSION_MINOR}.${DGtalTools
 
 
 
+ # -----------------------------------------------------------------------------
+ # Randomized build.
+ # -----------------------------------------------------------------------------
+
+message(STATUS "Randomized build")
+if (DGTALTOOLS_RANDOMIZED_BUILD_THRESHOLD EQUAL "100")
+   message(STATUS "All tools will be compiled (cmake variable DGTALTOOLS_RANDOMIZED_BUILD_THRESHOLD)")
+else()
+   message(STATUS "Only ~${DGTALTOOLS_RANDOMIZED_BUILD_THRESHOLD}% of the (randomly selected) tools will be  compiled.")
+   message(STATUS "  (you can adjust this with the cmake variable DGTALTOOLS_RANDOMIZED_BUILD_THRESHOLD)")
+   message(STATUS " Whitelist: ${DGTALTOOLS_RANDOMIZED_BUILD_WHITELIST}")
+   message(STATUS "  (you can adjust this with the cmake variable DGTALTOOLS_RANDOMIZED_BUILD_WHITELIST)")
+ endif()
+message(STATUS "-------------------------------------------------------------------------------")
 
 
 
@@ -87,7 +102,9 @@ INCLUDE(doxygen)
 INCLUDE(TargetDoxygenDoc OPTIONAL)
 message(STATUS "-------------------------------------------------------------------------------")
 
+
 #------Tools subdirectories ------
+include(cmake/AddToolsFunction.cmake)
 add_subdirectory(volumetric)
 add_subdirectory(generators)
 add_subdirectory(estimators)
