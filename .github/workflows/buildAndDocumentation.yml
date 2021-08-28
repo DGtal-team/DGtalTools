@@ -24,6 +24,7 @@ jobs:
 
      - name: Get white list tools
        run : |
+         shell: zsh
          echo "::set-output name=WHITE_LIST_TOOLS::$(cat ${{runner.workspace}}/DGtalTools/cmake/whiteListBuildTools.txt | tr -d '\n' ; ${{runner.workspace}}/DGtalTools/cmake/create_whitelist.sh)"
        id: whitelisttools
 
