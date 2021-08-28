@@ -22,7 +22,7 @@ jobs:
 
      - uses: actions/checkout@v2
        with:
-          fetch-depth: 5
+          fetch-depth: 10
           
      - name: Install linux deps
        if: matrix.os == 'ubuntu-latest'
@@ -74,13 +74,13 @@ jobs:
        if: matrix.os == 'ubuntu-latest'
        shell: bash
        working-directory: ${{runner.workspace}}/build
-       run: cmake $GITHUB_WORKSPACE  -DDGtal_DIR=${{runner.workspace}}/build/DGtal/buildDGtal -DCMAKE_BUILD_TYPE=$BUILD_TYPE $CONFIG_GLOBAL $CONFIG_LINUX -DDGTALTOOLS_RANDOMIZED_BUILD_THRESHOLD=25  -DDGTALTOOLS_RANDOMIZED_BUILD_WHITELIST=${{ steps.whitelisttools.outputs.WHITE_LIST_TOOLS }}  -G Ninja
+       run: cmake $GITHUB_WORKSPACE  -DDGtal_DIR=${{runner.workspace}}/build/DGtal/buildDGtal -DCMAKE_BUILD_TYPE=$BUILD_TYPE $CONFIG_GLOBAL $CONFIG_LINUX -DDGTALTOOLS_RANDOMIZED_BUILD_THRESHOLD=25  -DDGTALTOOLS_RANDOMIZED_BUILD_WHITELIST="${{ steps.whitelisttools.outputs.WHITE_LIST_TOOLS }}"  -G Ninja
 
      - name: Configure CMake (macOS)
        if: matrix.os == 'macOS-latest'
        shell: bash
        working-directory: ${{runner.workspace}}/build
-       run: cmake $GITHUB_WORKSPACE  -DDGtal_DIR=${{runner.workspace}}/build/DGtal/buildDGtal -DCMAKE_BUILD_TYPE=$BUILD_TYPE $CONFIG_GLOBAL -DDGTALTOOLS_RANDOMIZED_BUILD_THRESHOLD=25  -DDGTALTOOLS_RANDOMIZED_BUILD_WHITELIST=${{ steps.whitelisttools.outputs.WHITE_LIST_TOOLS }} $CONFIG_MAC -G Ninja
+       run: cmake $GITHUB_WORKSPACE  -DDGtal_DIR=${{runner.workspace}}/build/DGtal/buildDGtal -DCMAKE_BUILD_TYPE=$BUILD_TYPE $CONFIG_GLOBAL -DDGTALTOOLS_RANDOMIZED_BUILD_THRESHOLD=25  -DDGTALTOOLS_RANDOMIZED_BUILD_WHITELIST="${{ steps.whitelisttools.outputs.WHITE_LIST_TOOLS }}" $CONFIG_MAC -G Ninja
               
      - name: Build
        working-directory: ${{runner.workspace}}/build
