@@ -24,7 +24,7 @@ jobs:
 
      - name: Get white list tools
        run : |
-         echo "::set-output name=WHITE_LIST_TOOLS::$(cat ${{runner.workspace}}/DGtalTools/cmake/whiteListBuildTools.txt | tr -d '\n' ; ${{runner.workspace}}/DGtalTools//cmake/create_whitelist.sh)"
+         echo "::set-output name=WHITE_LIST_TOOLS::$(cat ${{runner.workspace}}/DGtalTools/cmake/whiteListBuildTools.txt | tr -d '\n' ; ${{runner.workspace}}/DGtalTools/cmake/create_whitelist.sh)"
        id: whitelisttools
 
      - name: Install linux deps
