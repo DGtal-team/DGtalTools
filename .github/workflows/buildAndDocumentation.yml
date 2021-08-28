@@ -20,13 +20,12 @@ jobs:
 
     steps:
 
+     - uses: actions/checkout@v2
+
      - name: Get white list tools
        run : |
          echo "::set-output name=WHITE_LIST_TOOLS::$(cat ${{runner.workspace}}/cmake/whiteListBuildTools.txt | tr -d '\n' ; ${{runner.workspace}}/cmake/create_whitelist.sh)"
        id: whitelisttools
-
-
-     - uses: actions/checkout@v2
 
      - name: Install linux deps
        if: matrix.os == 'ubuntu-latest'
