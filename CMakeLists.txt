@@ -10,7 +10,7 @@ cmake_policy(SET CMP0057 NEW) # the new interpretation of IN_LIST is by default 
 
 SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake")
 SET(DGTALTOOLS_RANDOMIZED_BUILD_THRESHOLD "100" CACHE INTERNAL "Threshold for the random selection of tools to build.")
-SET(DGTALTOOLS_RANDOMIZED_BUIL_WHITELIST "" CACHE INTERNAL "List of whitelisted tools to build.")
+SET(DGTALTOOLS_RANDOMIZED_BUILD_WHITELIST "" CACHE INTERNAL "List of whitelisted tools to build.")
 
 # -----------------------------------------------------------------------------
 # DGtal dependencies
