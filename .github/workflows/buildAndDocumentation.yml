@@ -87,3 +87,42 @@ jobs:
        shell: bash
        # Execute the build.  You can specify a specific target with "--target <NAME>"
        run: cmake --build . --config $BUILD_TYPE  
+
+
+
+
+
+ # Documentatin (build, check and deploy)
+  Documentation:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up
+      run:  sudo apt-get install libboost-dev graphviz texlive doxygen
+
+    - name: Building pages
+      run: |
+         mkdir build
+         cd build
+         cmake ..
+         wget --no-check-certificate -O "${{runner.workspace}}/DGtalTools/build/DGtal-tagfile"  http://dgtal.org/doc/tags/DGtal-tagfile;
+         make doc > buildDoc.log
+    - name: Checking doc
+      run: |
+          pwd
+          export BUILD_DIR=${{runner.workspace}}/DGtalTools/build
+          export SRC_DIR=${{runner.workspace}}/DGtalTools/
+          .github/workflows/checkDoxygenDocumentation.sh
+
+    - name: Deploy to GitHub Pages
+      uses: JamesIves/github-pages-deploy-action@4.1.4
+      if: github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == true
+      with:
+        token: ${{ secrets.DEPLOYTOKEN }}
+        branch: master
+        repository-name: DGtal-team/doctools-nightly
+        folder: build/html
+        single-comit: true
+        clean: true
