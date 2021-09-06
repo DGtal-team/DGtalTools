@@ -95,7 +95,7 @@ jobs:
  # Documentatin (build, check and deploy)
   Documentation:
     runs-on: ubuntu-latest
-
+    needs: Build
     steps:
     - uses: actions/checkout@v2
 
