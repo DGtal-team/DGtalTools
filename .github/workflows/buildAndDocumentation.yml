@@ -95,26 +95,32 @@ jobs:
  # Documentatin (build, check and deploy)
   Documentation:
     runs-on: ubuntu-latest
-    needs: Build
     steps:
     - uses: actions/checkout@v2
 
     - name: Set up
-      run:  sudo apt-get install libboost-dev graphviz texlive doxygen
+      run:  sudo apt-get install libboost-dev graphviz texlive doxygen  libqglviewer-dev-qt5 libeigen3-dev ninja-build libhdf5-serial-dev libboost-dev libcairo2-dev libgmp-dev libgraphicsmagick++1-dev libfftw3-dev
+
+    - name: DGtalBuild (linux)
+      shell: bash
+      working-directory: ${{runner.workspace}}
+      run: |
+         git clone --depth 1 https://github.com/DGtal-team/DGtal.git
+         cd DGtal
+         mkdir buildDGtal
+         cd buildDGtal
+         echo  cmake .. $CONFIG_LINUX -DBUILD_EXAMPLES=false -DBUILD_TESTING=false  -G Ninja
+         cmake .. $CONFIG_LINUX -DBUILD_EXAMPLES=false -DBUILD_TESTING=false  -G Ninja
+         ninja
 
     - name: Building pages
+      working-directory: ${{runner.workspace}}/DGtalTools
       run: |
          mkdir build
          cd build
-         cmake ..   -DDGtal_DIR=${{runner.workspace}}/build/DGtal/buildDGtal
+         cmake ..   -DDGtal_DIR=${{runner.workspace}}/DGtal/buildDGtal
          wget --no-check-certificate -O "${{runner.workspace}}/DGtalTools/build/DGtal-tagfile"  http://dgtal.org/doc/tags/DGtal-tagfile;
          make doc > buildDoc.log
-    - name: Checking doc
-      run: |
-          pwd
-          export BUILD_DIR=${{runner.workspace}}/DGtalTools/build
-          export SRC_DIR=${{runner.workspace}}/DGtalTools/
-          .github/workflows/checkDoxygenDocumentation.sh
 
     - name: Deploy to GitHub Pages
       uses: JamesIves/github-pages-deploy-action@4.1.4
