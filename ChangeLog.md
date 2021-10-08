@@ -9,6 +9,10 @@
   - 3dImplicitSurfaceExtractorByThickening: adding OBJ export.
     (David Coeurjolly [#413](https://github.com/DGtal-team/DGtalTools/pull/413))
 
+- *volumetric*
+  - volSegment: adding new option to get long int images as output (for
+    longvol exporting). (Bertrand Kerautret [#420](https://github.com/DGtal-team/DGtalTools/pull/420))
+
 
 # DGtalTools 1.2
 - *global*
