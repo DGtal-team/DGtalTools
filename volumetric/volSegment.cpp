@@ -36,7 +36,6 @@
 #include "DGtal/images/ImageContainerBySTLVector.h"
 #include "DGtal/io/readers/GenericReader.h"
 #include "DGtal/io/writers/GenericWriter.h"
-#include "DGtal/io/writers/Longvolwriter.h"
 
 #include "DGtal/images/IntervalForegroundPredicate.h"
 #include <DGtal/topology/SetOfSurfels.h>
