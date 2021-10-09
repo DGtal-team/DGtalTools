@@ -14,6 +14,7 @@
     longvol exporting). (Bertrand Kerautret [#420](https://github.com/DGtal-team/DGtalTools/pull/420))
 
 
+
 # DGtalTools 1.2
 - *global*
   - Fix itk2vol and fix ITK cmake configuaration that was making issues with the ITK image read.
