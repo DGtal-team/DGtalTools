@@ -52,21 +52,21 @@ using namespace Z3i;
  @page volEuclideanDT volEuclideanDT
  
  @brief Tool to compute and output Euclidean distance related quantitites (the distance transform, the Voronoi map, the RDMA...).
-
-
+ 
+ 
  @b Usage: 	./volumetric/volEuclideanDT [OPTIONS] 1 [2]
-
-
- @b Allowed @b options @b are : 
+ 
+ 
+ @b Allowed @b options @b are :
  @code
  
  @endcode
-
- @b Example: 
-
+ 
+ @b Example:
+ 
  @see
  @ref volEuclideanDT.cpp
-
+ 
  */
 
 template<typename T>
@@ -94,7 +94,7 @@ int main(int argc, char**argv)
   CLI::App app;
   
   app.description("Brutally sub sample a vol file (division by 2 in each direction).\n Basic usage: \n \tvolSubSample --input <volFileName> --o <volOutputFileName> ");
-
+  
   std::string inputFileName;
   app.add_option("-i,--input,1", inputFileName, "Input vol file." )->required()->check(CLI::ExistingFile);
   std::string outputFileName;
@@ -105,14 +105,14 @@ int main(int argc, char**argv)
   
   app.get_formatter()->column_width(40);
   CLI11_PARSE(app, argc, argv);
-
+  
   
   trace.beginBlock("Loading file");
   typedef ImageContainerBySTLVector<Z3i::Domain, unsigned char>  Image;
   Image image = VolReader< Image >::importVol ( inputFileName );
   trace.info()<<image<<std::endl;
   trace.endBlock();
-
+  
   
   
   
@@ -155,78 +155,49 @@ int main(int argc, char**argv)
       std::string rawname = outputFileName.substr(0, lastindex);
       LongvolWriter< ImageContainerBySTLVector<Z3i::Domain, uint64_t>>::exportLongvol(rawname+".longvol", output);
     }
-  else
-    if (mode == "voronoi")
-    {
-      auto myhash=[](const Z3i::Point &p){return (((p[0])*43 + p[1]*1777)*123 + p[2]) % 256;};
-      Image output(image.domain());
-      for(auto &voxel: image.domain())
+    else
+      if (mode == "voronoi")
       {
-        auto site = dt.getVoronoiVector(voxel);
-        unsigned char v=0;
-        if (site == voxel)
-          v = 0;
-        else
-          v = myhash(site);
-        output.setValue(voxel, v);
+        auto myhash=[](const Z3i::Point &p){return (((p[0])*43 + p[1]*1777)*123 + p[2]) % 256;};
+        Image output(image.domain());
+        for(auto &voxel: image.domain())
+        {
+          auto site = dt.getVoronoiVector(voxel);
+          unsigned char v=0;
+          if (site == voxel)
+            v = 0;
+          else
+            v = myhash(site);
+          output.setValue(voxel, v);
+        }
+        VolWriter<Image>::exportVol(outputFileName, output);
       }
-      VolWriter<Image>::exportVol(outputFileName, output);
-    }
- else
-   if (mode == "rdma")
-   {
-     typedef ImageContainerBySTLVector<Z3i::Domain, uint64_t> ImageLong;
-     ImageLong rawDT(image.domain());
-     for(auto &voxel: image.domain())
-     {
-       auto val = l2Metric.rawDistance(voxel, dt.getVoronoiVector(voxel));
-       rawDT.setValue(voxel, val);
-     }
-     PowerMap<ImageLong, Z3i::L2PowerMetric> powermap(rawDT.domain(), rawDT, l2PowerMetric);
-     ReducedMedialAxis<PowerMap<ImageLong, Z3i::L2PowerMetric> >::Type  rdma = ReducedMedialAxis< PowerMap<ImageLong, Z3i::L2PowerMetric> >::getReducedMedialAxisFromPowerMap(powermap);
-     auto cpt2=0;
-     for(auto v: dt.constRange())
-       if (v!=0) cpt2++;
-     auto cpt=0;
-    
-     Image out(image.domain());
-     std::vector<std::pair<Point,double>> ma;
-     for(auto &voxel: rdma.domain())
-     {
-       out.setValue(voxel, rdma(voxel) % 256);
-       if (rdma(voxel) != 0)
-       ma.push_back( std::pair<Point,double>(voxel ,std::sqrt(rdma(voxel))) );
-     }
-     VolWriter<Image>::exportVol(outputFileName, out);
-     
-     std::ofstream ofs ("trace.json", std::ofstream::out);
-     ofs.precision(8);
-     ofs<<std::fixed;
-     ofs <<"scale(radius) union() {"<<std::endl;
-     auto maxMA=100;
-     cpt=0;
-     std::sort(ma.begin(), ma.end(), [=](std::pair<Point, double>& a, std::pair<Point, double>& b)
-               {return a.second > b.second;});
-     
-     //Extent
-     double scale= (rdma.domain().upperBound()-rdma.domain().lowerBound()).normInfinity();
-     
-     for(cpt=0; cpt< ma.size(); cpt++)
-     {
-       Point voxel;
-       double d;
-       std::tie(voxel,d) = ma[ cpt ];
-       RealPoint p(voxel);
-       if (d < 2.0) {std::cout<<"+"<<std::flush; continue;}
-       p = (p-rdma.domain().lowerBound()) / (scale);
-       ofs<< "translate(["<<p[0]<<","<<p[1]<<","<<p[2]<<"]) sphere("<<d / scale<<");"<<std::endl;
-     }
-     ofs<<"}"<<std::endl;
-     ofs.close();
-     trace.info()<<"Found "<<cpt<<" spheres out of "<<cpt2<<std::endl;
-     
-   }
-  
-
+      else
+        if (mode == "rdma")
+        {
+          typedef ImageContainerBySTLVector<Z3i::Domain, uint64_t> ImageLong;
+          ImageLong rawDT(image.domain());
+          for(auto &voxel: image.domain())
+          {
+            auto val = l2Metric.rawDistance(voxel, dt.getVoronoiVector(voxel));
+            rawDT.setValue(voxel, val);
+          }
+          PowerMap<ImageLong, Z3i::L2PowerMetric> powermap(rawDT.domain(), rawDT, l2PowerMetric);
+          ReducedMedialAxis<PowerMap<ImageLong, Z3i::L2PowerMetric> >::Type  rdma = ReducedMedialAxis< PowerMap<ImageLong, Z3i::L2PowerMetric> >::getReducedMedialAxisFromPowerMap(powermap);
+          auto cpt2=0;
+          for(auto v: dt.constRange())
+            if (v!=0) cpt2++;
+          auto cpt=0;
+          
+          Image out(image.domain());
+          std::vector<std::pair<Point,double>> ma;
+          for(auto &voxel: rdma.domain())
+          {
+            out.setValue(voxel, rdma(voxel) % 256);
+            if (rdma(voxel) != 0)
+              ma.push_back( std::pair<Point,double>(voxel ,std::sqrt(rdma(voxel))) );
+          }
+          VolWriter<Image>::exportVol(outputFileName, out);
+        }
   return 0;
 }
