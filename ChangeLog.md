@@ -8,7 +8,8 @@
 - *visualisation*
   - 3dImplicitSurfaceExtractorByThickening: adding OBJ export.
     (David Coeurjolly [#413](https://github.com/DGtal-team/DGtalTools/pull/413))
-
+  - 3dVolViewer: adding new option to interprate intensity as transparency.
+    (Bertrand Kerautret [#425](https://github.com/DGtal-team/DGtalTools/pull/425))
 
 # DGtalTools 1.2
 - *global*
