@@ -19,7 +19,7 @@
   - Uniform input/output option with previous use of CLI11 (issue #405).
     (Bertrand Kerautret [#406](https://github.com/DGtal-team/DGtalTools/pull/406)) 
   - Comply with cmake Policy CMP0115 "Source file extensions must be
-     explicit". (Bertrand Kerautret and David Coeurjolly, [#407](https://github.com/DGtal-team/DGtal/pull/407))
+     explicit". (Bertrand Kerautret and David Coeurjolly, [#407](https://github.com/DGtal-team/DGtalTools/pull/407))
 
 - *visualisation*
   - 3dVolViewer: improvement of the possibility to read input image of type double (with ITK).
