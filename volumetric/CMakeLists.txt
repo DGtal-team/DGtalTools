@@ -19,12 +19,7 @@ SET(DGTAL_TOOLS_SRC
 
 
 FOREACH(FILE ${DGTAL_TOOLS_SRC})
-  add_executable(${FILE} ${FILE}.cpp)
-  target_link_libraries (${FILE} ${DGTAL_LIBRARIES} ${DGtalToolsLibDependencies})
-  install(TARGETS ${FILE}
-        RUNTIME DESTINATION bin
-        LIBRARY DESTINATION lib
-        ARCHIVE DESTINATION lib)
+  DGtalTools_add_tool(${FILE})
 ENDFOREACH(FILE)
 
 
@@ -33,11 +28,6 @@ if (  WITH_VISU3D_QGLVIEWER )
     homotopicThinning3D
     criticalKernelsThinning3D )
   FOREACH(FILE ${DGTAL_EXAMPLES_QGL_SRC})
-    add_executable(${FILE} ${FILE}.cpp)
-    target_link_libraries ( ${FILE} ${DGTAL_LIBRARIES} ${DGtalToolsLibDependencies})
-    install(TARGETS ${FILE}
-        RUNTIME DESTINATION bin
-        LIBRARY DESTINATION lib
-        ARCHIVE DESTINATION lib)
+    DGtalTools_add_tool(${FILE})
   ENDFOREACH(FILE)
-endif ( WITH_VISU3D_QGLVIEWER   )
+endif ( WITH_VISU3D_QGLVIEWER )

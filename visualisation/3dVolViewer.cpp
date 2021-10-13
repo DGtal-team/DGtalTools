@@ -145,7 +145,9 @@ processDisplay(ViewerSnap<> &viewer,  TImage &image,
                const typename TImage::Value &thresholdMax,
                unsigned int numDisplayedMax,
                unsigned int transparency,
-              bool interDisplay=false)
+               bool useTransIntensity=false,
+               bool interDisplay=false,
+               bool squaredTransp=false)
 {
   Domain domain = image.domain();
   GradientColorMap<typename TImage::Value> gradient( thresholdMin, thresholdMax);
@@ -154,15 +156,27 @@ processDisplay(ViewerSnap<> &viewer,  TImage &image,
   gradient.addColor(Color::Green);
   gradient.addColor(Color::Yellow);
   gradient.addColor(Color::Red);
+  typename TImage::Value varInt = 0;
+  if (useTransIntensity){
+    varInt = thresholdMax-thresholdMin;
+  }
   for(Domain::ConstIterator it = domain.begin(), itend=domain.end(); it!=itend; ++it){
+    double trInt = 1.0;
+    if (useTransIntensity){
+      trInt = ((float)(image( (*it) )-thresholdMin)/(float)varInt);
+    }
     typename TImage::Value val= image( (*it) );
     if(numDisplayed > numDisplayedMax)
       break;
+    
     Color c= gradient(val);
     if(val<=thresholdMax && val >=thresholdMin)
     {
-      viewer <<  CustomColors3D(Color((float)(c.red()), (float)(c.green()),(float)(c.blue()), transparency),
-                                Color((float)(c.red()), (float)(c.green()),(float)(c.blue()), transparency));
+      
+      viewer <<  CustomColors3D(Color(c.red(), c.green(),c.blue(),
+                                      static_cast<unsigned int>(transparency*trInt*(squaredTransp? trInt : 1.0))),
+                                Color(c.red(), c.green(),c.blue(),
+                                      static_cast<unsigned int>(transparency*trInt*(squaredTransp? trInt: 1.0))));
       if (interDisplay)
       {
         auto p = *it;
@@ -199,6 +213,8 @@ int main( int argc, char** argv )
   std::vector<unsigned int> colorMesh;
   string inputType {""};
   bool interactiveDisplayVoxCoords {false};
+  bool transIntensity {false};
+  bool transIntensitySq {false};
 
   app.add_option("-i,--input,1", inputFileName, "vol file (.vol, .longvol .p3d, .pgm3d and if WITH_ITK is selected: dicom, dcm, mha, mhd). For longvol, dicom, dcm, mha or mhd formats, the input values are linearly scaled between 0 and 255." )
   ->required()
@@ -217,6 +233,9 @@ int main( int argc, char** argv )
    ->expected(4);
   app.add_flag("--doSnapShotAndExit,-d",snapShotFile, "save display snapshot into file. Notes that the camera setting is set by default according the last saved configuration (use SHIFT+Key_M to save current camera setting in the Viewer3D). If the camera setting was not saved it will use the default camera setting." );
   app.add_option("--transparency,-t", transparency, "change the defaukt transparency", true);
+  app.add_flag("--transIntensity",transIntensity , "Used vocel intensity to define transparency valeue");
+  app.add_flag("--transIntensitySq",transIntensitySq , "Used squared vocel intensity to define transparency valeue");
+
   app.add_flag("--interactiveDisplayVoxCoords,-c", interactiveDisplayVoxCoords, " by using this option the coordinates can be displayed after selection (shift+left click on voxel).");
   app.get_formatter()->column_width(40);
   CLI11_PARSE(app, argc, argv);
@@ -257,14 +276,14 @@ int main( int argc, char** argv )
     trace.info() << "[done]"<< std::endl;
     trace.info() << "Image loaded:  D "<<imageD<< std::endl;
     processDisplay(viewer, imageD, thresholdMin, thresholdMax, numDisplayedMax, transparency,
-                   interactiveDisplayVoxCoords);
+                   transIntensity||transIntensitySq, interactiveDisplayVoxCoords, transIntensitySq);
   }
   else if (inputType=="int")
   {
     imageI= DGtal::GenericReader<Image3D_I>::import(inputFileName);
     trace.info() << "Image loaded: "<<image<< std::endl;
     processDisplay(viewer, imageI, (int)thresholdMin, (int)thresholdMax, numDisplayedMax, transparency,
-                   interactiveDisplayVoxCoords);
+                   transIntensity||transIntensitySq, interactiveDisplayVoxCoords, transIntensitySq);
   } else {
     typedef DGtal::functors::Rescaling<DGtal::int64_t ,unsigned char > RescalFCT;
     image =  GenericReader< Image >::importWithValueFunctor( inputFileName,RescalFCT(rescaleInputMin,
@@ -272,7 +291,7 @@ int main( int argc, char** argv )
                                                                                      0, 255) );
     trace.info() << "Image loaded: "<<image<< std::endl;
     processDisplay(viewer, image, thresholdMin, thresholdMax, numDisplayedMax, transparency,
-                   interactiveDisplayVoxCoords);
+                   transIntensity||transIntensitySq, interactiveDisplayVoxCoords, transIntensitySq);
   }
 #else
     typedef DGtal::functors::Rescaling<DGtal::int64_t ,unsigned char > RescalFCT;
@@ -281,7 +300,7 @@ int main( int argc, char** argv )
                                                                                      0, 255) );
     trace.info() << "Image loaded: "<<image<< std::endl;
     processDisplay(viewer, image, thresholdMin, thresholdMax, numDisplayedMax, transparency,
-                   interactiveDisplayVoxCoords);
+                   transIntensity||transIntensitySq, interactiveDisplayVoxCoords, transIntensitySq);
 #endif
   }
   else if(extension=="sdp")

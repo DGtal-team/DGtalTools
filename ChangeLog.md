@@ -5,6 +5,16 @@
   - criticalKernelsThinning3d: it can now export OBJ files for input surface and
     output skeletons
     (Jacques-Olivier Lachaud [#414](https://github.com/DGtal-team/DGtalTools/pull/414))
+- *build*
+  - New cmake option (DGTAL_RANDOMIZED_BUILD_THRESHOLD) to set the
+    (approximated) % of tools build
+    (Bertrand Kerautret [#416](https://github.com/DGtal-team/DGtal/pull/416))
+       
+- *visualisation*
+  - 3dImplicitSurfaceExtractorByThickening: adding OBJ export.
+    (David Coeurjolly [#413](https://github.com/DGtal-team/DGtalTools/pull/413))
+  - 3dVolViewer: adding new option to interprate intensity as transparency.
+    (Bertrand Kerautret [#425](https://github.com/DGtal-team/DGtalTools/pull/425))
 
 
 # DGtalTools 1.2
@@ -16,7 +26,7 @@
   - Uniform input/output option with previous use of CLI11 (issue #405).
     (Bertrand Kerautret [#406](https://github.com/DGtal-team/DGtalTools/pull/406)) 
   - Comply with cmake Policy CMP0115 "Source file extensions must be
-     explicit". (Bertrand Kerautret and David Coeurjolly, [#407](https://github.com/DGtal-team/DGtal/pull/407))
+     explicit". (Bertrand Kerautret and David Coeurjolly, [#407](https://github.com/DGtal-team/DGtalTools/pull/407))
 
 - *visualisation*
   - 3dVolViewer: improvement of the possibility to read input image of type double (with ITK).
@@ -28,7 +38,6 @@
 - *volumetric*
   - volReSample: it can now export image including ITK image spacing.
     (Bertrand Kerautret [#404](https://github.com/DGtal-team/DGtalTools/pull/404))
-  
 
 
 
