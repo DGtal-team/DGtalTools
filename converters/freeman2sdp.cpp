@@ -108,7 +108,7 @@ int main( int argc, char** argv )
   bool oneline {false};
   bool info {false};
   
-  app.description("Transform freeman chain into a Sequence of Discrete Points. Result is given to std output.\n Example:\n freeman2sdp -i ${DGtal}/tests/samples/contourS.fc > contourS.sdp \n");
+  app.description("Transform freeman chain into a Sequence of Discrete Points. Result is given to std output.\n Example:\n freeman2sdp ${DGtal}/tests/samples/contourS.fc > contourS.sdp \n");
   app.add_option("-i,--input,1", inputFileName, "Input freeman chain file name." )
     ->required()
     ->check(CLI::ExistingFile);

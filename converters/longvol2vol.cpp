@@ -65,7 +65,7 @@ Options:
 
 @b Example:
 @code
-  $ longvol2vol -i ${DGtal}/tests/samples/test.longvol -o out.vol 
+  $ longvol2vol ${DGtal}/tests/samples/test.longvol out.vol 
 @endcode
 
 @see longvol2vol.cpp

@@ -61,11 +61,12 @@ using namespace DGtal;
  @code
 
  Positionals:
-   1 TEXT:FILE REQUIRED                  volumetric input file (.vol, .pgm, .pgm3d, .longvol).
+   1 TEXT:FILE REQUIRED                  volumetric input file (.vol, .pgm, .pgm3d, .longvol)
+   2 TEXT:FILE REQUIRED                  volumetric output file (.vol, .pgm, .pgm3d, .longvol)
 
  Options:
-   -h,--help                             Print this help message and exit
-   -i,--input TEXT:FILE REQUIRED         volumetric input file (.vol, .pgm, .pgm3d, .longvol).
+   -h,--help                             Print this help message and exit.
+   -i,--input TEXT:FILE REQUIRED         volumetric input file (.vol, .pgm, .pgm3d, .longvol)
    -o,--output TEXT=result.vol           volumetric output file (.vol, .pgm, .pgm3d, .longvol)
    --labelBackground                     option to define a label to regions associated to object background.
    -m,--thresholdMin INT=0               min threshold (if not given the max threshold is computed with Otsu algorithm).
@@ -77,18 +78,18 @@ using namespace DGtal;
  You can test the segmentation in the lobster volume file:
 
  @code
- $ volSegment -i ${DGtal}/examples/samples/lobster.vol  -o segmentation.vol  -m 70 -M 255
+ $ volSegment ${DGtal}/examples/samples/lobster.vol  segmentation.vol  -m 70 -M 255
  @endcode
 
 You will obtain a volumetric file representing for each voxel a label associated to a connected component. You can display this segmentation results by extracting it in SDP format with the @ref vol2sdp tool (with option -e to export also the image labels): 
 @code
- $ vol2sdp -i segmentation.vol -o segmentation.sdp  -e -m 1 -M 255
+ $ vol2sdp segmentation.vol segmentation.sdp  -e -m 1 -M 255
 @endcode
 
 and display them with @ref Doc3DSDPViewer :
 
  @code
- $ 3dSDPViewer -i segmentation.sdp  --importColorLabels
+ $ 3dSDPViewer segmentation.sdp  --importColorLabels
  @endcode
 
 
@@ -152,10 +153,8 @@ getOtsuThreshold(const Image3D &image){
 
 int main( int argc, char** argv )
 {
-  
   typedef Z3i::KSpace::SurfelSet SurfelSet;
   typedef SetOfSurfels< Z3i::KSpace, SurfelSet > MySetOfSurfels;
-  
   
   // parse command line using CLI ----------------------------------------------
   CLI::App app;
@@ -165,14 +164,11 @@ int main( int argc, char** argv )
   int minTh {0};
   int maxTh {255};
   
-  app.description("Segment volumetric file from a simple threshold which can be set automatically from the otsu estimation.\n The segmentation result is given by an integer label given in the resulting image. Example:\n volSegment -i ${DGtal}/examples/samples/lobster.vol -o segmentation.vol \n");
-  
-  
+  app.description("Segment volumetric file from a simple threshold which can be set automatically from the otsu estimation.\n The segmentation result is given by an integer label given in the resulting image. Example:\n volSegment ${DGtal}/examples/samples/lobster.vol segmentation.vol \n");
   app.add_option("-i,--input,1", inputFileName, "volumetric input file (.vol, .pgm, .pgm3d, .longvol)." )
   ->required()
   ->check(CLI::ExistingFile);
-
-  app.add_option("-o,--output", outputFileName, "volumetric output file (.vol, .pgm, .pgm3d, .longvol)", true);
+  app.add_option("-o,--output,2", outputFileName, "volumetric output file (.vol, .pgm, .pgm3d, .longvol)", true);
   auto labelOpt = app.add_flag("--labelBackground",labelBackground, "option to define a label to regions associated to object background.");
   app.add_option("-m,--thresholdMin",minTh, "min threshold (if not given the max threshold is computed with Otsu algorithm).", true );
   auto maxThOpt = app.add_option("-M,--thresholdMax", maxTh, "max threshold", true );
@@ -182,7 +178,6 @@ int main( int argc, char** argv )
   CLI11_PARSE(app, argc, argv);
   // END parse command line using CLI ----------------------------------------------
 
-  
   trace.info() << "Reading input file " << inputFileName ;
   Image3D inputImage = DGtal::GenericReader<Image3D>::import(inputFileName);
   Image3D imageResuSegmentation(inputImage.domain());

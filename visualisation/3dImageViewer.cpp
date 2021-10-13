@@ -106,7 +106,7 @@ using namespace Z3i;
    @b Example: 
    With the image display you can also threshold the image and display a set of voxel:  
    @code
-   3dImageViewer -i $DGtal/examples/samples/lobster.vol --thresholdImage -m 180
+   3dImageViewer $DGtal/examples/samples/lobster.vol --thresholdImage -m 180
    @endcode
 
    You should obtain such a result:
@@ -152,7 +152,7 @@ int main( int argc, char** argv )
   unsigned char transp {255};
 
   
-  app.description("Displays volume file as a voxel set by using QGLviewer\n 3dImageViewer -i $DGtal/examples/samples/lobster.vol --thresholdImage -m 180");
+  app.description("Displays volume file as a voxel set by using QGLviewer\n 3dImageViewer  $DGtal/examples/samples/lobster.vol --thresholdImage -m 180");
   
   app.add_option("-i,--input,1", inputFileName, "vol file (.vol, .longvol .p3d, .pgm3d and if WITH_ITK is selected: dicom, dcm, mha, mhd). For longvol, dicom, dcm, mha or mhd formats, the input values are linearly scaled between 0 and 255." )
   ->required()

@@ -21,7 +21,6 @@
  *
  * @date 2015/03/18
  *
- * 
  *
  * This file is part of the DGtalTools.
  */
@@ -70,7 +69,7 @@ Options:
 
 @b Example:
 @code
-  $ heightfield2vol -i ${DGtal}/examples/samples/church.pgm -o volResu.vol -s 0.3 -z 50  
+  $ heightfield2vol ${DGtal}/examples/samples/church.pgm volResu.vol -s 0.3 -z 50
 
 @endcode
 You will obtain such image:
@@ -134,8 +133,9 @@ int main( int argc, char** argv )
    unsigned int  maxZ {255};
  
 
-   app.description("Convert a 2D heightfield image into a volumetric file.\n Example: \n heightfield2vol -i ${DGtal}/examples/samples/church.pgm -o volResu.vol -s 0.3 -z 50  \n");
+   app.description("Convert a 2D heightfield image into a volumetric file.\n Example: \n heightfield2vol ${DGtal}/examples/samples/church.pgm volResu.vol -s 0.3 -z 50  \n");
    app.add_option("-i,--input,1", inputFileName, "input heightfield file (2D image).")
+     ->check(CLI::ExistingFile)
      ->required();
    app.add_option("-o,--output,2", outputFileName,"output volumetric file.", true);
    app.add_option("-s,--scale", scale, "set the scale factor on height values (default 1.0)");

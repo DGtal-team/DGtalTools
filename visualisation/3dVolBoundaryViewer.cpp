@@ -79,13 +79,12 @@ using namespace DGtal;
  --mode TEXT:{INNER,OUTER,BDRY}=INNER  set mode for display: INNER: inner voxels, OUTER: outer voxels, BDRY: surfels
  OUTER: outer voxels, BDRY: surfels
  @endcode
- 
+
  
  @b Example:
  
- 
  @code
- 3dVolBoundaryViewer  -i $DGtal/examples/samples/lobster.vol -m 60
+ 3dVolBoundaryViewer  $DGtal/examples/samples/lobster.vol -m 60
  @endcode
  
  You should obtain such a result:
@@ -111,7 +110,7 @@ int main( int argc, char** argv )
   
   // parse command line using CLI ----------------------------------------------
   CLI::App app;
-  app.description("Display the boundary of a volume file by using QGLviewer. The mode specifies if you wish to see surface elements (BDRY), the inner voxels (INNER) or the outer voxels (OUTER) that touch the boundary. \n \t Example: 3dVolBoundaryViewer  -i $DGtal/examples/samples/lobster.vol -m 60");
+  app.description("Display the boundary of a volume file by using QGLviewer. The mode specifies if you wish to see surface elements (BDRY), the inner voxels (INNER) or the outer voxels (OUTER) that touch the boundary. \n \t Example: 3dVolBoundaryViewer  $DGtal/examples/samples/lobster.vol -m 60");
   std::string inputFileName;
   DGtal::int64_t rescaleInputMin {0};
   DGtal::int64_t rescaleInputMax {255};
@@ -140,7 +139,6 @@ int main( int argc, char** argv )
   // END parse command line using CLI ----------------------------------------------
   
   
-  
   QApplication application(argc,argv);
   
   string extension = inputFileName.substr(inputFileName.find_last_of(".") + 1);
@@ -160,14 +158,12 @@ int main( int argc, char** argv )
      ){
     trace.beginBlock( "Loading image into memory." );
 #ifdef WITH_ITK
-    int dicomMin = vm["dicomMin"].as<int>();
-    int dicomMax = vm["dicomMax"].as<int>();
     typedef DGtal::functors::Rescaling<int ,unsigned char > RescalFCT;
-    Image image = extension == "dcm" ? DicomReader< Image,  RescalFCT  >::importDicom( inputFilename,
+    Image image = extension == "dcm" ? DicomReader< Image,  RescalFCT  >::importDicom( inputFileName,
                                                                                       RescalFCT(dicomMin,
                                                                                                 dicomMax,
                                                                                                 0, 255) ) :
-    GenericReader<Image>::import( inputFilename );
+    GenericReader<Image>::import( inputFileName );
 #else
     Image image = GenericReader<Image>::import (inputFileName );
 #endif

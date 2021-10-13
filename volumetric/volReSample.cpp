@@ -69,23 +69,23 @@ using namespace DGtal;
 Here is an example of re sampling with different grid sizes 2, 4 and 8:
 
  @code
- $ volReSample -i $DGtal/examples/samples/Al.100.vol -g 2 2 2  -o AlRS2.vol
- $ volReSample -i $DGtal/examples/samples/Al.100.vol -g 4 4 4  -o AlRS4.vol
- $ volReSample -i $DGtal/examples/samples/Al.100.vol -g 8 8 8  -o AlRS8.vol
+ $ volReSample  $DGtal/examples/samples/Al.100.vol AlRS2.vol -g 2 2 2
+ $ volReSample  $DGtal/examples/samples/Al.100.vol AlRS4.vol -g 4 4 4
+ $ volReSample  $DGtal/examples/samples/Al.100.vol AlRS8.vol -g 8 8 8
  @endcode
 
 We can convert the resulting volumetric files into a sequence of discrete points with the tool  @ref vol2sdp :
 @code 
-$ vol2sdp -i $DGtal/examples/samples/Al.100.vol -m 1 -o AlRS1.sdp
-$ vol2sdp -i  AlRS2.vol -m 1 -o AlRS2.sdp
-$ vol2sdp -i  AlRS4.vol -m 1 -o AlRS4.sdp
-$ vol2sdp -i  AlRS8.vol -m 1 -o AlRS8.sdp
+$ vol2sdp $DGtal/examples/samples/Al.100.vol -m 1 -o AlRS1.sdp
+$ vol2sdp AlRS2.vol -m 1 -o AlRS2.sdp
+$ vol2sdp AlRS4.vol -m 1 -o AlRS4.sdp
+$ vol2sdp AlRS8.vol -m 1 -o AlRS8.sdp
 $ cat AlRS{1,2,4,8}.sdp >> AlRS1_2_4_8.sdp
 # display the resulting file:
-3dSDPViewer -i  AlRS1_2_4_8.sdp    
+3dSDPViewer AlRS1_2_4_8.sdp    
 @endcode
 
-
+ Note that if DGtal is compiled with the  option WITH_ITK set to ON, you can export the image in format ITK format and integrating image spacing.
 
  You should obtain such a result:
  @image html resVolReSample.png "Resulting of re sampling with grid size = 2, 4 and 8."
@@ -111,11 +111,12 @@ int main( int argc, char** argv )
   std::string outputFileName {"result.vol"};
   std::vector<double> aGridSizeReSample;
   
-  app.description("Re sample a 3D volumetric image (.vol, .longvol, .pgm3d)  with a given grid size. \n Example:\n to re sample an image with scale x,y,z  = 0.98, 0.98, 5.0,  you can do:\n volResSample -i image3d.vol -g 1 1 2  -o imageReSampled.vol \n ");
+  app.description("Re sample a 3D volumetric image (.vol, .longvol, .pgm3d)  with a given grid size. \n Example:\n to re sample an image with scale x,y,z  = 0.98, 0.98, 5.0,  you can do:\n volResSample -i image3d.vol -g 1 1 2  -o imageReSampled.vol \n " 
+      "Note that if DGtal is compiled with the  option WITH_ITK set to ON, you can export the image in format ITK format and integrating image spacing.");
   app.add_option("-i,--input,1", inputFileName, "input volumetric file (.vol, .longvol, .pgm3d)." )
   ->required()
   ->check(CLI::ExistingFile);
-  app.add_option("-o,--output,2", inputFileName, "the new volumetric file (.vol, .longvol, .pgm3d).", true );
+  app.add_option("-o,--output,2", outputFileName, "the new volumetric file (.vol, .longvol, .pgm3d).", true );
   app.add_option("-g,--gridSize", aGridSizeReSample, "size_x size_y size_z : the grid size of the re sampling ")
    ->expected(3);
   app.get_formatter()->column_width(40);
@@ -130,9 +131,18 @@ int main( int argc, char** argv )
   PointVector<3,int> shiftVector3D(0 ,0, 0);      
   DGtal::functors::BasicDomainSubSampler< HyperRectDomain<SpaceND<3, int> >,  
                                           DGtal::int32_t, double > reSampler(input3dImage.domain(),
-                                                                             aGridSizeReSample,  shiftVector3D);
+                                                                             aGridSizeReSample,    shiftVector3D);
   const functors::Identity aFunctor{};
   SamplerImageAdapter sampledImage ( input3dImage, reSampler.getSubSampledDomain(), reSampler, aFunctor );
+#ifdef WITH_ITK
+  ITKWriter<SamplerImageAdapter>::exportITK(outputFileName, sampledImage,
+                                            Z3i::RealPoint(aGridSizeReSample[0],
+                                                           aGridSizeReSample[1],
+                                                           aGridSizeReSample[2]));
+#else
   GenericWriter<SamplerImageAdapter>::exportFile(outputFileName, sampledImage);
+
+#endif
+  
   return 0;
 }

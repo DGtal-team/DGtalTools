@@ -70,7 +70,7 @@ Options:
 @b Example
 @code
 # transform lena.pgm
-./rigidTransform2D -i lena.pgm -o lena_transf.pgm -m backward -a 0.5 --ox 0.5 --oy 0.3 --tx 0.1 --ty 0.1
+./rigidTransform2D  lena.pgm lena_transf.pgm -m backward -a 0.5 --ox 0.5 --oy 0.3 --tx 0.1 --ty 0.1
 
 **/
 

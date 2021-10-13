@@ -52,6 +52,7 @@ using namespace DGtal;
 @code
 Positionals:
   1 TEXT:FILE REQUIRED                  ofs file (.ofs).
+  2 TEXT:FILE                           ofs file (.ofs).
 
 Options:
   -h,--help                             Print this help message and exit
@@ -61,7 +62,7 @@ Options:
 
 @b Example:
 @code
-  $ ofs2off -i input.ofs -o output.off 
+  $ ofs2off input.ofs output.off 
 @endcode
 
 @see ofs2off.cpp

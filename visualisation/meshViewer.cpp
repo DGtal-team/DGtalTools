@@ -85,7 +85,7 @@ using namespace DGtal;
  @b Example:
  
  @code
- $ meshViewer -i bunny.off
+ $ meshViewer bunny.off
  
  @endcode
  

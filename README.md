@@ -26,6 +26,7 @@ own source code (in complement of DGtal tutorial https://dgtal-team.github.io/do
 More Information
 ----------------
 * Related DGtalTools-contrib: https://github.com/DGtal-team/DGtalTools-contrib
+* Release 1.2 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.4893597.svg)](https://doi.org/10.5281/zenodo.4893597)
 * Release 1.1 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.4079375.svg)](https://doi.org/10.5281/zenodo.4079375)
 * Release 1.0 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.2704747.svg)](https://doi.org/10.5281/zenodo.2704747)
 * Release 0.9.4.1 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.1207828.svg)](https://doi.org/10.5281/zenodo.1207828)
@@ -35,7 +36,7 @@ More Information
 * Release 0.9.1 [![DOI](https://zenodo.org/badge/doi/10.5281/zenodo.45130.svg)](http://dx.doi.org/10.5281/zenodo.45130)
 * Release 0.9 [![DOI](https://zenodo.org/badge/doi/10.5281/zenodo.31882.svg)](http://dx.doi.org/10.5281/zenodo.31882)
 * Release 0.8 [![DOI](https://zenodo.org/badge/doi/10.5281/zenodo.11587.svg)](http://dx.doi.org/10.5281/zenodo.11587)
-* Linux/MacOS [![Build Status](https://api.travis-ci.org/DGtal-team/DGtalTools.svg?branch=master)](https://travis-ci.org/DGtal-team/DGtalTools)
+* Continuous Integration (Linux/MacOS) ![Build status](https://github.com/DGtal-team/DGtalTools/actions/workflows/buildAndDocumentation.yml/badge.svg)
 * Windows [![Build status](https://ci.appveyor.com/api/projects/status/o156pe96bd02sdr5/branch/master?svg=true)](https://ci.appveyor.com/project/kerautret/dgtaltools-7x999/branch/master)
 
 Documentation
@@ -230,7 +231,7 @@ Galleries
    </tr>
    <tr>
    <!-- <td align=center  ><a href="https://raw.github.com/DGtal&#45;team/DGtalTools/master/doc/images/resCriticalKernelsThinning3D_select&#45;first_skel&#45;1isthmus_persistence&#45;1.png"> criticalKernelsThinning3D </a> </td> -->
-   <td align=center  ><a href="https://dgtal.org/doc/tools/nightly/criticalKernelsThinning3D.html"> criticalKernelsThinning3D </a> </td>
+   <td align=center  ><a href="https://dgtal-team.github.io/doctools-nightly/criticalKernelsThinning3D.html"> criticalKernelsThinning3D </a> </td>
    </tr>
    </table>
    </center>

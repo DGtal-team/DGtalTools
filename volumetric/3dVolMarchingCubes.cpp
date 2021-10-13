@@ -89,7 +89,7 @@ using namespace Z3i;
  @b Example:
  
  @code
- $ 3dVolMarchingCubes -i $DGtal/examples/samples/lobster.vol -t 30
+ $ 3dVolMarchingCubes $DGtal/examples/samples/lobster.vol -t 30
  # we invert the default normol orientation to improve display (-n option):
  $ meshViewer -i marching-cubes.off -n
  @endcode

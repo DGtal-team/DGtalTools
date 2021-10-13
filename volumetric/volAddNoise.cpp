@@ -71,11 +71,11 @@ using namespace DGtal;
 
  @b Example:
  @code
- $ volAddNoise -i $DGtal/examples/samples/Al.100.vol -o AlNoisy0.4.vol  -n 0.4
+ $ volAddNoise  $DGtal/examples/samples/Al.100.vol  AlNoisy0.4.vol  -n 0.4
  # Converting in sdp to display:
- $ vol2sdp -i AlNoisy0.4.vol -o AlNoisy0.4.sdp
+ $ vol2sdp  AlNoisy0.4.vol AlNoisy0.4.sdp
  # displaying sequence of points:
- $ 3dSDPViewer -i tmp.sdp
+ $ 3dSDPViewer  tmp.sdp
  @endcode
 
  You should obtain such a visualization:
