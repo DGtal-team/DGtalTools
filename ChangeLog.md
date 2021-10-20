@@ -1,4 +1,11 @@
-# DGtalTools 1.3(beta)
+# DGtalTools 1.3 (beta)
+
+
+
+- *converters*
+  - heightfield2shading: new option to add a matcap rendering (from normal
+    direction interpreted as HSV vector)
+    (Bertrand Kerautret [#399](https://github.com/DGtal-team/DGtalTools/pull/399))
 
 - *build*
   - New cmake option (DGTAL_RANDOMIZED_BUILD_THRESHOLD) to set the
