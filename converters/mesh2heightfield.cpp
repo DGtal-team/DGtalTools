@@ -40,6 +40,11 @@
 #include <DGtal/base/BasicFunctors.h>
 #include "DGtal/math/linalg/SimpleMatrix.h"
 
+#include <DGtal/math/linalg/SimpleMatrix.h>
+#include <DGtal/math/linalg/EigenDecomposition.h>
+
+
+
 #include "CLI11.hpp"
 
 
@@ -99,8 +104,52 @@ You will obtain such image:
 @image html  resMesh2heightfield.png "Resulting heightfield."
 @see mesh2heightfield.cpp
 
-*/
+ */
+typedef PointVector<9, double> Matrix3x3Point;
+typedef SimpleMatrix<double, 3, 3 > CoVarianceMat;
 
+/**
+ * Order natural (book reading from upper left to lower right)
+ **/
+static CoVarianceMat
+getCoVarianceMatFrom(const Matrix3x3Point &aMatrixPt){
+  CoVarianceMat res;
+  for(unsigned int i = 0; i<3; i++){
+    for(unsigned int j = 0; j<3; j++){
+      res.setComponent(i, j, aMatrixPt[j+i*3] );
+    }
+  }
+  return res;
+}
+
+
+DGtal::Z3i::RealPoint
+getMainDirsCoVar(Mesh<Z3i::RealPoint>::Iterator begin, Mesh<Z3i::RealPoint>::Iterator end )
+{
+  Matrix3x3Point c ;
+  unsigned int nb = 0;
+  for(auto it=begin; it != end; it++)
+    {
+      c[0] += ((*it)[0]*(*it)[0]);
+      c[1] += ((*it)[0]*(*it)[1]);
+      c[2] += ((*it)[0]*(*it)[2]);
+      
+      c[3] += ((*it)[1]*(*it)[0]);
+      c[4] += ((*it)[1]*(*it)[1]);
+      c[5] += ((*it)[1]*(*it)[2]);
+         
+      c[6] += ((*it)[2]*(*it)[0]);
+      c[7] += ((*it)[2]*(*it)[1]);
+      c[8] += ((*it)[2]*(*it)[2]);
+      nb++;
+    }
+  c = c/nb;
+  CoVarianceMat covar = getCoVarianceMatFrom(c);
+  SimpleMatrix<double, 3, 3 > eVects;
+  PointVector<3, double> eVals;
+  DGtal::EigenDecomposition<3, double, CoVarianceMat>::getEigenDecomposition (covar, eVects, eVals);
+  return eVects.column(2);
+}
 
 template<typename TPoint, typename TEmbeder>
 TPoint
@@ -215,7 +264,14 @@ int main( int argc, char** argv )
   if(diagDist<2.0*sqrt(2.0)){
     inputMesh.changeScale(2.0*sqrt(2.0)/diagDist);  
   }
- 
+  // get vertex
+  inputMesh.vertexBegin();
+  trace.info() << "Computing main dir...";
+  auto dir = getMainDirsCoVar(inputMesh.vertexBegin(), inputMesh.vertexEnd());
+  trace.info() << "[done]"<<std::endl;
+  trace.info() << "main dir : "<< dir <<std::endl;
+
+  
   inputMesh.quadToTriangularFaces();
   inputMesh.changeScale(meshScale);  
   trace.info() << " [done] " << std::endl ; 
