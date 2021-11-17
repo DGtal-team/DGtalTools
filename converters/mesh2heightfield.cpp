@@ -83,8 +83,8 @@ Options:
   --nx FLOAT=0                          set the x component of the projection direction.
   --ny FLOAT=0                          set the y component of the projection direction.
   --nz FLOAT=1                          set the z component of the projection direction.
-  --width UINT=100                      set the width of the area to be extracted as an height field image.
-  --height UINT=100                     set the height of the area to extracted  as an height field image.
+  --width FLOAT=100                     set the width of the area to be extracted as an height field image (note that the resulting image width also depends of the scale parameter (option --meshScale)).
+  --height FLOAT=100                    set the height of the area to be extracted as an height field image (note that the resulting image height also depends of the scale parameter (option --meshScale)).
   --orientAutoFrontX                    automatically orients the camera in front according the x axis.
   --orientAutoFrontY                    automatically orients the camera in front according the y axis.
   --orientAutoFrontZ                    automatically orients the camera in front according the z axis.
@@ -201,8 +201,8 @@ int main( int argc, char** argv )
   std::string outputFileName {"result.pgm"};
   double meshScale = 1.0;
   double triangleAreaUnit = 0.5;
-  unsigned int widthImageScan = {100};
-  unsigned int heightImageScan = {100};
+  double widthImageScan = {100};
+  double heightImageScan = {100};
   bool orientAutoFrontX = false;
   bool orientAutoFrontY = false;
   bool orientAutoFrontZ = false;
@@ -233,8 +233,8 @@ int main( int argc, char** argv )
   app.add_option("--nx", nx, "set the x component of the projection direction.", true);
   app.add_option("--ny", ny, "set the y component of the projection direction.", true);
   app.add_option("--nz", nz, "set the z component of the projection direction.", true);
-  app.add_option("--width", widthImageScan, "set the width of the area to be extracted as an height field image.", true );
-  app.add_option("--height", heightImageScan, "set the height of the area to extracted  as an height field image.", true );
+  app.add_option("--width", widthImageScan, "set the width of the area to be extracted as an height field image. (note that the resulting image width also depends of the scale parameter (option --meshScale))", true );
+  app.add_option("--height", heightImageScan, "set the height of the area to extracted  as an height field image. (note that the resulting image height also depends of the scale parameter (option --meshScale))", true );
   app.add_flag("--orientAutoFrontX", orientAutoFrontX,"automatically orients the camera in front according the x axis." );
   app.add_flag("--orientAutoFrontY", orientAutoFrontY,"automatically orients the camera in front according the y axis." );
   app.add_flag("--orientAutoFrontZ", orientAutoFrontZ,"automatically orients the camera in front according the z axis." );
