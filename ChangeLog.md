@@ -1,4 +1,11 @@
-# DGtalTools 1.3(beta)
+# DGtalTools 1.3 (beta)
+
+
+
+- *converters*
+  - heightfield2shading: new option to add a matcap rendering (from normal
+    direction interpreted as HSV vector)
+    (Bertrand Kerautret [#399](https://github.com/DGtal-team/DGtalTools/pull/399))
 
 - *build*
   - New cmake option (DGTAL_RANDOMIZED_BUILD_THRESHOLD) to set the
@@ -10,6 +17,11 @@
     (David Coeurjolly [#413](https://github.com/DGtal-team/DGtalTools/pull/413))
   - 3dVolViewer: adding new option to interprate intensity as transparency.
     (Bertrand Kerautret [#425](https://github.com/DGtal-team/DGtalTools/pull/425))
+
+- *volumetric*
+  - volSegment: adding new option to get long int images as output (for
+    longvol exporting). (Bertrand Kerautret [#420](https://github.com/DGtal-team/DGtalTools/pull/420))
+
 
 # DGtalTools 1.2
 - *global*
