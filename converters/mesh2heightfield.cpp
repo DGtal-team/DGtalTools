@@ -166,8 +166,7 @@ getNormal(const TPoint &vect, const TEmbeder &emb ){
   SimpleMatrix<double, 3, 3> t;
   t.setComponent(0,0, u[0]);  t.setComponent(0,1, v[0]); t.setComponent(0, 2, w[0]);
   t.setComponent(1,0, u[1]);  t.setComponent(1,1, v[1]); t.setComponent(1, 2, w[1]);  
-  t.setComponent(2,0, u[2]);  t.setComponent(2,1, v[2]); t.setComponent(2, 2, w[2]);  
-
+  t.setComponent(2,0, u[2]);  t.setComponent(2,1, v[2]); t.setComponent(2, 2, w[2]);
   return ((t.inverse())*vect);
 }
 
@@ -209,7 +208,7 @@ int main( int argc, char** argv )
   bool orientAutoFrontX = false;
   bool orientAutoFrontY = false;
   bool orientAutoFrontZ = false;
-  bool orientAuto = false;
+  bool orientAuto = true;
 
   bool orientBack = false;
   bool exportNormals = false;
@@ -218,7 +217,7 @@ int main( int argc, char** argv )
   int maxScan {255};
   int centerX {0};
   int centerY {0};
-  int centerZ {1};
+  int centerZ {200};
   
   double nx{0};
   double ny{0};
@@ -232,15 +231,20 @@ int main( int argc, char** argv )
   app.add_option("-o,--output,2", outputFileName, "sequence of discrete point file (.sdp) ", true );
   app.add_option("--meshScale,-s", meshScale, "change the default mesh scale (each vertex multiplied by the scale) ");
   app.add_option("--heightFieldMaxScan", maxScan, "set the maximal scan deep.", true );
-  app.add_option("-x,--centerX",centerX, "choose x center of the projected image.", true);
-  app.add_option("-y,--centerY",centerY, "choose y center of the projected image.", true);
-  app.add_option("-z,--centerZ",centerZ, "choose z center of the projected image.", true);
-  app.add_option("--nx", nx, "set the x component of the projection direction.", true);
-  app.add_option("--ny", ny, "set the y component of the projection direction.", true);
-  app.add_option("--nz", nz, "set the z component of the projection direction.", true);
+  app.add_option("-x,--centerX",
+                              centerX, "choose x center of the projected image.", true);
+  app.add_option("-y,--centerY",
+                              centerY, "choose y center of the projected image.", true);
+  app.add_option("-z,--centerZ",
+                              centerZ, "choose z center of the projected image.", true);
+  auto optNx = app.add_option("--nx",
+                              nx, "set the x component of the projection direction.", true);
+  auto optNy = app.add_option("--ny",
+                              ny, "set the y component of the projection direction.", true);
+  auto optNz = app.add_option("--nz",
+                              nz, "set the z component of the projection direction.", true);
   app.add_option("--width", widthImageScan, "set the width of the area to be extracted as an height field image. (note that the resulting image width also depends of the scale parameter (option --meshScale))", true );
   app.add_option("--height", heightImageScan, "set the height of the area to extracted  as an height field image. (note that the resulting image height also depends of the scale parameter (option --meshScale))", true );
-  app.add_flag("--orientAuto", orientAuto,"automatically orients the camera in front according main object axis." );
   app.add_flag("--orientAutoFrontX", orientAutoFrontX,"automatically orients the camera in front according the x axis." );
   app.add_flag("--orientAutoFrontY", orientAutoFrontY,"automatically orients the camera in front according the y axis." );
   app.add_flag("--orientAutoFrontZ", orientAutoFrontZ,"automatically orients the camera in front according the z axis." );
@@ -253,9 +257,9 @@ int main( int argc, char** argv )
   CLI11_PARSE(app, argc, argv);
   // END parse command line using CLI ----------------------------------------------
 
-   
-  
-  trace.info() << "Reading input file " << inputFileName ; 
+  orientAuto = optNx->count() == 0 && optNy->count() == 0 && optNy->count() == 0;
+ 
+  trace.info() << "Reading input file " << inputFileName ;
   Mesh<Z3i::RealPoint> inputMesh(true);
   inputMesh << inputFileName;
   std::pair<Z3i::RealPoint, Z3i::RealPoint> b = inputMesh.getBoundingBox();
@@ -351,6 +355,7 @@ int main( int argc, char** argv )
     int maxScanY = meshVolImage.domain().upperBound()[1]-meshVolImage.domain().lowerBound()[1];
     int maxScanX = meshVolImage.domain().upperBound()[0]-meshVolImage.domain().lowerBound()[0];
     maxScan = std::max(std::max(maxScanX, maxScanY), maxScanZ);
+    trace.info() << "Automatic orientation on volume of bounds: " << ptL << " " << ptU << std::endl;
     trace.info() << "Computing main dir...";
     auto dir = getMainDirsCoVar(inputMesh.vertexBegin(), inputMesh.vertexEnd());
     trace.info() << "[done]"<<std::endl;
@@ -358,7 +363,10 @@ int main( int argc, char** argv )
     ny = dir.first[1];
     nz = dir.first[2];
     secDir = dir.second;
-    centerX=ptC[0]-maxScan*nx/2; centerY=ptC[1]-maxScan*ny/2; centerZ=ptC[2]-maxScan*nz/2;
+    centerX=ptC[0]-(double)maxScan*nx/2;
+    centerY=ptC[1]-(double)maxScan*ny/2;
+    centerZ=ptC[2]-(double)maxScan*nz/2;
+    
 
   }
   functors::Rescaling<unsigned int, Image2D::Value> scaleFctDepth(0, maxScan, 0, 255);  
@@ -398,9 +406,9 @@ int main( int argc, char** argv )
                                                                         secDir,
                                                                         widthImageScan);
   }
-
-  for( int k=0; k < maxScan; k++)
-    {
+  int k = 0;
+  bool firstFound = false;
+  while (k < maxScan || !firstFound){
       embedder.shiftOriginPoint(normalDir);
       trace.progressBar(k, maxScan);
       ImageAdapterExtractor extractedImage(meshVolImage, aDomain2D, embedder, idV);
@@ -409,12 +417,19 @@ int main( int argc, char** argv )
         {
           if(resultingImage(*it)== 0 &&  extractedImage(*it)!=0)
             {
+              
+              if (!firstFound) {
+                firstFound = true;
+              }
               maxDepthFound = k;
               resultingImage.setValue(*it, scaleFctDepth(maxScan-k));
               resultingVectorField.setValue(*it, getNormal(meshNormalImage(embedder(*it)), embedder));
             }
-        }    
+        }
+    if (firstFound){
+      k++;
     }
+  }
   if (setBackgroundLastDepth)
     {
       for(Image2D::Domain::ConstIterator it = resultingImage.domain().begin(); 

@@ -317,7 +317,7 @@ int main( int argc, char** argv )
   bool hsvShading = false;
   std::vector<double> specularModel;
   std::string reflectanceMap;
-  std::vector<double> lDir;
+  std::vector<double> lDir = {0, 0, 1}; 
   std::vector<double> lPos;
   std::vector<unsigned int> domain;  
   
