@@ -275,7 +275,7 @@ int main( int argc, char** argv )
   while (maxArea> triangleAreaUnit)
     {
       trace.info()<< "Iterating mesh subdivision ... "<< maxArea;
-      maxArea = inputMesh.subDivideTriangularFaces(é);
+      maxArea = inputMesh.subDivideTriangularFaces(triangleAreaUnit);
       trace.info() << " [done]"<< std::endl;
     }
 
