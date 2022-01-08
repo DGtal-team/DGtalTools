@@ -202,7 +202,7 @@ int main( int argc, char** argv )
   std::string inputFileName;
   std::string outputFileName {"result.pgm"};
   double meshScale = 1.0;
-  double triangleAreaUnit = 0.1;
+  double triangleAreaUnit = 0.01;
   double widthImageScan = {500};
   double heightImageScan = {500};
   bool orientAutoFrontX = false;

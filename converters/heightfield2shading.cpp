@@ -315,9 +315,10 @@ int main( int argc, char** argv )
   bool usingAllDirectionLightSource = false;
   bool useOrderedImportNormal = false;
   bool hsvShading = false;
+  bool normalMap = false;
   std::vector<double> specularModel;
   std::string reflectanceMap;
-  std::vector<double> lDir = {0, 0, 1}; 
+  std::vector<double> lDir = {0, 0, 1};
   std::vector<double> lPos;
   std::vector<unsigned int> domain;  
   
@@ -339,6 +340,7 @@ int main( int argc, char** argv )
   app.add_option("-r,--reflectanceMap",reflectanceMap, "specify a image as reflectance map.")
     ->check(CLI::ExistingFile);
   app.add_flag("--hsvShading", hsvShading, "use shading with HSV shading (given from the normal vector)");
+  app.add_flag("--normalMap", normalMap, "generates normal map.");
   
   app.get_formatter()->column_width(40);
   CLI11_PARSE(app, argc, argv);
@@ -363,7 +365,7 @@ int main( int argc, char** argv )
       pz = lPos[2];  
       usingAllDirectionLightSource = true;
     }
-  else if (reflectanceMap == "" && ! hsvShading)
+  else if (reflectanceMap == "" && ! hsvShading && !normalMap)
     {
       trace.error() << "You need to specify either the light source direction or position (if you use a all directions model)." << std::endl;
       exit(0);
@@ -409,17 +411,21 @@ int main( int argc, char** argv )
   Image2DC resultC (inputImage.domain());
 
   if(normalFileName != ""){
-    trace.info() << "Import normal file " << inputFileName << vectNormals.domain() ; 
-    if (useOrderedImportNormal){
+    trace.info() << "Import normal file " << inputFileName << vectNormals.domain(); 
+    if (useOrderedImportNormal)
+    {
       importNormalsOrdDir(normalFileName, vectNormals,
                           inputImage.domain().upperBound()[0]+1,
                           inputImage.domain().upperBound()[1]+1);
     }
-    else {
+    else
+    {
       importNormals(normalFileName, vectNormals);
     }
     trace.info() << "[done]" << std::endl;
-  }else{
+  }
+  else
+  {
     computerBasicNormalsFromHeightField(inputImage, vectNormals);
   }
   if (hsvShading)
@@ -436,15 +442,26 @@ int main( int argc, char** argv )
     }
     IdColor id;
     PPMWriter<Image2DC, IdColor  >::exportPPM(outputFileName, resultC, id);
-  }else if(reflectanceMap != "")
+  }
+  else if (normalMap)
+  {
+    DGtal::functors::Rescaling<double, unsigned int> rgRescale (-1.0, 1.0, 0, 255);
+    DGtal::functors::Rescaling<double, unsigned int> bRescale (0.0, -1.0, 128, 255);
+    for(typename Image2D::Domain::ConstIterator it = inputImage.domain().begin();
+        it != inputImage.domain().end(); it++){
+        auto n = vectNormals(*it);
+        DGtal::Color c (rgRescale(n[0]), rgRescale(n[1]), bRescale(n[2]) );
+        resultC.setValue(*it, c.getRGB());
+    }
+    IdColor id;
+    PPMWriter<Image2DC, IdColor  >::exportPPM(outputFileName, resultC, id);
+  }
+  else if(reflectanceMap != "")
     {
       ImageMapReflectance<Image2D, Z3i::RealPoint> lMap(reflectanceMap);
       for(typename Image2D::Domain::ConstIterator it = inputImage.domain().begin(); 
           it != inputImage.domain().end(); it++){
-        if(reflectanceMap != "")
-          {
-            result.setValue(*it, lMap(vectNormals(*it)));           
-          }       
+            result.setValue(*it, lMap(vectNormals(*it)));
       }        
       IdColor id;
       PPMWriter<Image2D, IdColor  >::exportPPM(outputFileName, result, id);
