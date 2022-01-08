@@ -209,7 +209,7 @@ int main( int argc, char** argv )
   bool orientAutoFrontY = false;
   bool orientAutoFrontZ = false;
   bool orientAuto = true;
-
+  bool invertNormal = false;
   bool orientBack = false;
   bool exportNormals = false;
   bool setBackgroundLastDepth = false;
@@ -218,6 +218,7 @@ int main( int argc, char** argv )
   int centerX {0};
   int centerY {0};
   int centerZ {200};
+  
   
   double nx{0};
   double ny{0};
@@ -230,6 +231,8 @@ int main( int argc, char** argv )
     ->check(CLI::ExistingFile);
   app.add_option("-o,--output,2", outputFileName, "sequence of discrete point file (.sdp) ", true );
   app.add_option("--meshScale,-s", meshScale, "change the default mesh scale (each vertex multiplied by the scale) ");
+  app.add_option("--remeshMinArea,-a", triangleAreaUnit, "ajust the remeshing min triangle are used to avoid empty areas", true);
+  
   app.add_option("--heightFieldMaxScan", maxScan, "set the maximal scan deep.", true );
   app.add_option("-x,--centerX",
                               centerX, "choose x center of the projected image.", true);
@@ -243,6 +246,7 @@ int main( int argc, char** argv )
                               ny, "set the y component of the projection direction.", true);
   auto optNz = app.add_option("--nz",
                               nz, "set the z component of the projection direction.", true);
+  app.add_flag("--invertNormals,-v", invertNormal, "invert normal vector of the mesh");
   app.add_option("--width", widthImageScan, "set the width of the area to be extracted as an height field image. (note that the resulting image width also depends of the scale parameter (option --meshScale))", true );
   app.add_option("--height", heightImageScan, "set the height of the area to extracted  as an height field image. (note that the resulting image height also depends of the scale parameter (option --meshScale))", true );
   app.add_flag("--orientAutoFrontX", orientAutoFrontX,"automatically orients the camera in front according the x axis." );
@@ -309,7 +313,7 @@ int main( int argc, char** argv )
           Z3i::RealPoint p2 = inputMesh.getVertex(aFace[1]);
           Z3i::RealPoint p3 = inputMesh.getVertex(aFace[2]);
           Z3i::RealPoint n = (p2-p1).crossProduct(p3-p1); 
-          n /= n.norm();
+          n /= invertNormal? -n.norm():  n.norm();
           Z3i::RealPoint c = (p1+p2+p3)/3.0;
           fillPointArea(meshVolImage, meshNormalImage, p1, 1, 1, n);          
           fillPointArea(meshVolImage, meshNormalImage, p2, 1, 1, n);          

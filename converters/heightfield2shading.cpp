@@ -106,7 +106,8 @@ You will obtain such image:
 
 template<typename TImage, typename TImageVector>
 void 
-computerBasicNormalsFromHeightField(const TImage &anHeightMap, TImageVector &vectorField)
+computerBasicNormalsFromHeightField(const TImage &anHeightMap, TImageVector &vectorField,
+                                    bool invertN = false)
 {
   for(typename TImage::Domain::ConstIterator it = anHeightMap.domain().begin(); 
       it != anHeightMap.domain().end(); it++){
@@ -116,7 +117,7 @@ computerBasicNormalsFromHeightField(const TImage &anHeightMap, TImageVector &vec
       double dy = (anHeightMap(*it-Z2i::Point(0,1))-anHeightMap(*it+Z2i::Point(0,1)))/2.0;
       Z3i::RealPoint n (dx, dy, 1);
       n /= n.norm();
-      vectorField.setValue(*it,n);
+      vectorField.setValue(*it,invertN? -n : n);
     }
   }
 }
@@ -125,7 +126,8 @@ computerBasicNormalsFromHeightField(const TImage &anHeightMap, TImageVector &vec
 
 template<typename TImageVector>
 void 
-importNormals(std::string file, TImageVector &vectorField)
+importNormals(std::string file, TImageVector &vectorField,
+              bool invertN = false)
 {
   std::vector<Z3i::RealPoint> vp = PointListReader<Z3i::RealPoint>::getPointsFromFile(file);
   trace.info() << "import done: " << vp.size() <<  std::endl;
@@ -133,7 +135,7 @@ importNormals(std::string file, TImageVector &vectorField)
         Z3i::RealPoint p = vp.at(i);
         Z3i::RealPoint q = vp.at(i+1);
         Z3i::RealPoint n = (q-p)/(p-q).norm();
-        vectorField.setValue(Z2i::Point(p[0], p[1]),n);
+        vectorField.setValue(Z2i::Point(p[0], p[1]),invertN? -n : n);
   }
   trace.info() <<endl;
 }
@@ -142,14 +144,14 @@ importNormals(std::string file, TImageVector &vectorField)
 template<typename TImageVector>
 void 
 importNormalsOrdDir(std::string file, TImageVector &vectorField,
-                    unsigned int width, unsigned int height)
+                    unsigned int width, unsigned int height, bool invertN = false)
 {
   std::vector<Z3i::RealPoint> vp = PointListReader<Z3i::RealPoint>::getPointsFromFile(file);
 
   for(unsigned int i = 0; i< vp.size()-1; i++){
     Z2i::Point p ( i-(width*floor((i/width))), i/width);
     Z3i::RealPoint n = vp[i];
-    vectorField.setValue(p,n);
+    vectorField.setValue(p,invertN? -n : n);
   }
   trace.info() <<endl;
 }
@@ -316,6 +318,7 @@ int main( int argc, char** argv )
   bool useOrderedImportNormal = false;
   bool hsvShading = false;
   bool normalMap = false;
+  bool invertNormals = false;
   std::vector<double> specularModel;
   std::string reflectanceMap;
   std::vector<double> lDir = {0, 0, 1};
@@ -341,7 +344,7 @@ int main( int argc, char** argv )
     ->check(CLI::ExistingFile);
   app.add_flag("--hsvShading", hsvShading, "use shading with HSV shading (given from the normal vector)");
   app.add_flag("--normalMap", normalMap, "generates normal map.");
-  
+  app.add_flag("--invertNormals,-v", invertNormals, "invert normal orientations.");
   app.get_formatter()->column_width(40);
   CLI11_PARSE(app, argc, argv);
   // END parse command line using CLI ----------------------------------------------
@@ -411,22 +414,22 @@ int main( int argc, char** argv )
   Image2DC resultC (inputImage.domain());
 
   if(normalFileName != ""){
-    trace.info() << "Import normal file " << inputFileName << vectNormals.domain(); 
+    trace.info() << "Import normal file " << inputFileName << vectNormals.domain();
     if (useOrderedImportNormal)
     {
       importNormalsOrdDir(normalFileName, vectNormals,
                           inputImage.domain().upperBound()[0]+1,
-                          inputImage.domain().upperBound()[1]+1);
+                          inputImage.domain().upperBound()[1]+1, invertNormals);
     }
     else
     {
-      importNormals(normalFileName, vectNormals);
+      importNormals(normalFileName, vectNormals, invertNormals);
     }
     trace.info() << "[done]" << std::endl;
   }
   else
   {
-    computerBasicNormalsFromHeightField(inputImage, vectNormals);
+    computerBasicNormalsFromHeightField(inputImage, vectNormals, invertNormals);
   }
   if (hsvShading)
   {
