@@ -6,6 +6,10 @@
   - heightfield2shading: new option to add a matcap rendering (from normal
     direction interpreted as HSV vector)
     (Bertrand Kerautret [#399](https://github.com/DGtal-team/DGtalTools/pull/399))
+  - heightfield2shading: new option to generate a normal map.
+    (Bertrand Kerautret [#415](https://github.com/DGtal-team/DGtalTools/pull/415))
+  - mesh2heightfield: automatic object placement and improved usage.
+    (Bertrand Kerautret [#415](https://github.com/DGtal-team/DGtalTools/pull/415))
 
 - *build*
   - New cmake option (DGTAL_RANDOMIZED_BUILD_THRESHOLD) to set the
