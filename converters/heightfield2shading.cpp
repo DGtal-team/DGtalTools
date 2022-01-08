@@ -66,22 +66,34 @@ using namespace DGtal;
 
 @code
 
-Positionals:
-  1 TEXT:FILE REQUIRED                  input heightfield file (2D image).
-  2 TEXT                                output image.
+ Positionals:
+   1 TEXT:FILE REQUIRED                  mesh file (.off)
+   2 TEXT=result.pgm                     sequence of discrete point file (.sdp)
 
-Options:
- -h,--help                             Print this help message and exit
-  -i,--input TEXT:FILE                  input heightfield file (2D image).
-  -d,--domain UINT x 2                  specify the domain (required when normal are imported and if --inout is not given).
-  -o,--output TEXT                      output image.
-  --importNormal TEXT                   import normals from file.
-  --orderedNormalsImport                Use ordered normals.
-  --lightDir,--lDir,--ld FLOAT x 3      light source direction: lx ly lz.
-  --lightPos,--lPos,--lp FLOAT x 3      light source position: px py pz.
-  -s,--specularModel FLOAT x 3          use specular Nayar model with 3 param Kdiff, Kspec, sigma.
-  -r,--reflectanceMap TEXT:FILE         specify a image as reflectance map.
-  --hsvShading                          use shading with HSV shading (given from the normal vector)
+ Options:
+   -h,--help                             Print this help message and exit
+   -i,--input TEXT:FILE REQUIRED         mesh file (.off)
+   -o,--output TEXT=result.pgm           sequence of discrete point file (.sdp)
+   -s,--meshScale FLOAT                  change the default mesh scale (each vertex multiplied by the scale)
+   -a,--remeshMinArea FLOAT=0.01         ajust the remeshing min triangle are used to avoid empty areas
+   --heightFieldMaxScan INT=255          set the maximal scan deep.
+   -x,--centerX INT=0                    choose x center of the projected image.
+   -y,--centerY INT=0                    choose y center of the projected image.
+   -z,--centerZ INT=200                  choose z center of the projected image.
+   --nx FLOAT=0                          set the x component of the projection direction.
+   --ny FLOAT=0                          set the y component of the projection direction.
+   --nz FLOAT=1                          set the z component of the projection direction.
+   -v,--invertNormals                    invert normal vector of the mesh
+   --width FLOAT=500                     set the width of the area to be extracted as an height field image. (note that the resulting image width also depends of the scale parameter (option --meshScale))
+   --height FLOAT=500                    set the height of the area to extracted  as an height field image. (note that the resulting image height also depends of the scale parameter (option --meshScale))
+   --orientAutoFrontX                    automatically orients the camera in front according the x axis.
+   --orientAutoFrontY                    automatically orients the camera in front according the y axis.
+   --orientAutoFrontZ                    automatically orients the camera in front according the z axis.
+   --orientBack                          change the camera direction to back instead front as given in  orientAutoFront{X,Y,Z} options.
+   --exportNormals                       export mesh normal vectors (given in the image height field basis).
+   --backgroundNormalBack                set the normals of background in camera opposite direction (to obtain a black background in rendering).
+   --setBackgroundLastDepth              change the default background (black with the last filled intensity).
+
 
 @endcode
 
