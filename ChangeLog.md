@@ -1,7 +1,6 @@
 # DGtalTools 1.3 (beta)
 
 
-
 - *converters*
   - heightfield2shading: new option to add a matcap rendering (from normal
     direction interpreted as HSV vector)
