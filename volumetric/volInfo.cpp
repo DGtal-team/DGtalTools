@@ -13,7 +13,6 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  **/
-
 /**
  * @file volInfo.cpp
  * @author David Coeurjolly (\c david.coeurjolly@liris.cnrs.fr )
