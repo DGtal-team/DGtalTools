@@ -125,6 +125,7 @@ int main(int argc, char* const argv[]){
   bool profile {false};
   bool verbose  {false};
   bool visualize {false};
+  bool useInputImgToExp {false};
   
   app.description("Compute the thinning of a volume using the CriticalKernels framework\nBasic usage: criticalKernelsThinning3D --input <volFileName> --skel <ulti,end, 1isthmus, isthmus> --select [ -f <white,black> -m <minlevel> -M <maxlevel> -v ] [--persistence <value> ] --persistence <value> ] \n options for --skel {ulti end 1isthmus isthmus} \n options for --select = {dmax random first} \n Example: \n criticalKernelsThinning3D --input ${DGtal}/examples/samples/Al.100.vol --select dmax --skel 1isthmus --persistence 1 --visualize --verbose --exportImage ./Al100_dmax_1isthmus_p1.vol \n");
   app.add_option("-i,--input,1", inputFileName, "Input vol file." )
@@ -146,6 +147,7 @@ int main(int argc, char* const argv[]){
   app.add_option("--exportImage,-o",outputFilenameImg, "Export the resulting set of points to a image compatible with GenericWriter.");
   app.add_option("--exportSDP,-e",outputFilenameSDP, "Export the resulting set of points in a simple (sequence of discrete point (sdp))." );
   app.add_flag("--visualize,-t", visualize, "Visualize result in viewer");
+  app.add_flag("--useInputImgToExp,-k", useInputImgToExp, "Use input image type to export result (allowing to keep same domain (and same image spacing when using ITK)).");
     
   app.get_formatter()->column_width(40);
   CLI11_PARSE(app, argc, argv);
@@ -162,6 +164,7 @@ int main(int argc, char* const argv[]){
   trace.beginBlock("Reading input");
   using Domain = Z3i::Domain ;
   using Image = ImageSelector < Z3i::Domain, unsigned char>::Type ;
+  
   Image image = GenericReader<Image>::import(inputFileName);
   trace.endBlock();
 
@@ -268,9 +271,15 @@ int main(int argc, char* const argv[]){
       std::cout << "outputFilename" << outputFilenameImg << std::endl;
 
     unsigned int foreground_value = 255;
-    auto thin_image = ImageFromSet<Image>::create(thin_set, foreground_value);
-    thin_image >> outputFilenameImg;
-   }
+    auto thin_image = ImageFromSet<Image>::create(thin_set, foreground_value, false, useInputImgToExp);
+    if (useInputImgToExp){
+      for(auto p: image.domain()){image.setValue(p, 0);}
+      ImageFromSet<Image>::append(image, thin_set, foreground_value);
+      image >> outputFilenameImg;
+    }else{
+      thin_image >> outputFilenameImg;
+    }
+  }
 
   if(visualize)
   {
