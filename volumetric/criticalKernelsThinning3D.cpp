@@ -54,7 +54,7 @@
    -o,--exportImage TEXT                 Export the resulting set of points to a image compatible with GenericWriter.
    -e,--exportSDP TEXT                   Export the resulting set of points in a simple (sequence of discrete point (sdp)).
    -t,--visualize                        Visualize result in viewer
-
+   -k,--keepInputDomain                  Keep the resulting image domain equals to the input image (instead using the resulting bouding box set).
 
 
  @endcode
@@ -271,12 +271,12 @@ int main(int argc, char* const argv[]){
       std::cout << "outputFilename" << outputFilenameImg << std::endl;
 
     unsigned int foreground_value = 255;
-    auto thin_image = ImageFromSet<Image>::create(thin_set, foreground_value, false, useInputImgToExp);
     if (useInputImgToExp){
       for(auto p: image.domain()){image.setValue(p, 0);}
       ImageFromSet<Image>::append(image, thin_set, foreground_value);
       image >> outputFilenameImg;
     }else{
+      auto thin_image = ImageFromSet<Image>::create(thin_set, foreground_value, false, useInputImgToExp);
       thin_image >> outputFilenameImg;
     }
   }
