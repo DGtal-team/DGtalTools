@@ -146,7 +146,9 @@ int main(int argc, char* const argv[]){
   app.add_flag("--verbose,-v",verbose, "Verbose output");
   app.add_option("--exportImage,-o",outputFilenameImg, "Export the resulting set of points to a image compatible with GenericWriter.");
   app.add_option("--exportSDP,-e",outputFilenameSDP, "Export the resulting set of points in a simple (sequence of discrete point (sdp))." );
+#ifdef WITH_QGLVIEWER
   app.add_flag("--visualize,-t", visualize, "Visualize result in viewer");
+#endif
   app.add_flag("--useInputImgToExp,-k", useInputImgToExp, "Use input image type to export result (allowing to keep same domain (and same image spacing when using ITK)).");
     
   app.get_formatter()->column_width(40);
@@ -163,7 +165,7 @@ int main(int argc, char* const argv[]){
   }
   trace.beginBlock("Reading input");
   using Domain = Z3i::Domain ;
-  using Image = ImageSelector < Z3i::Domain, unsigned char>::Type ;
+  using Image = ImageSelector < Z3i::Domain, unsigned char, ITKIMAGEDATA_CONTAINER_I>::Type ;
   
   Image image = GenericReader<Image>::import(inputFileName);
   trace.endBlock();
@@ -280,7 +282,7 @@ int main(int argc, char* const argv[]){
       thin_image >> outputFilenameImg;
     }
   }
-
+#ifdef WITH_QGLVIEWER
   if(visualize)
   {
     int argc(1);
@@ -301,4 +303,6 @@ int main(int argc, char* const argv[]){
 
     app.exec();
   }
+#endif
+  
 }
