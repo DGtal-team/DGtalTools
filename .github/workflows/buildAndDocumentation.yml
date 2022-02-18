@@ -96,14 +96,16 @@ jobs:
 
 
 
- # Documentatin (build, check and deploy)
+ # Documentation (build, check and deploy)
   Documentation:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
 
     - name: Set up
-      run:  sudo apt-get install libboost-dev graphviz texlive doxygen  libqglviewer-dev-qt5 libeigen3-dev ninja-build libhdf5-serial-dev libboost-dev libcairo2-dev libgmp-dev libgraphicsmagick++1-dev libfftw3-dev
+      run: |
+         sudo apt-get update
+         sudo apt-get install libboost-dev graphviz texlive doxygen  libqglviewer-dev-qt5 libeigen3-dev ninja-build libhdf5-serial-dev libboost-dev libcairo2-dev libgmp-dev libgraphicsmagick++1-dev libfftw3-dev
 
     - name: DGtalBuild (linux)
       shell: bash
