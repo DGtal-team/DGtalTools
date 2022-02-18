@@ -75,8 +75,9 @@
 #include <iostream>
 #include <chrono>
 #include <unordered_map>
-
+#ifdef WITH_QGLVIEWER
 #include <DGtal/io/viewers/Viewer3D.h>
+#endif
 #include <DGtal/base/Common.h>
 #include <DGtal/helpers/StdDefs.h>
 #include <DGtal/io/readers/GenericReader.h>
