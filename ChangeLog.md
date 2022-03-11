@@ -21,7 +21,7 @@
 - *volumetric*
   - volSegment: adding new option to get long int images as output (for
     longvol exporting). (Bertrand Kerautret [#420](https://github.com/DGtal-team/DGtalTools/pull/420))
-  - volInfo: get information from a vol file. (David Coeurjolly, [#430](https://github.com/DGtal-team/DGtalTools/pull/430))
+  - volInfo: get information from a volumetric file. (David Coeurjolly, [#430](https://github.com/DGtal-team/DGtalTools/pull/430))
 
 # DGtalTools 1.2
 - *global*
