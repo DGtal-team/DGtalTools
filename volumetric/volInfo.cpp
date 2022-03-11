@@ -28,7 +28,6 @@
 #include <map>
 #include <DGtal/base/Common.h>
 #include <DGtal/io/readers/VolReader.h>
-#include <DGtal/io/writers/VolWriter.h>
 #include <DGtal/helpers/StdDefs.h>
 #include <DGtal/images/Image.h>
 #include <DGtal/images/ImageContainerBySTLVector.h>
