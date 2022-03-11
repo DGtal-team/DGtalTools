@@ -40,7 +40,7 @@ using namespace DGtal;
 using namespace Z3i;
 
 /**
- @page volSubSample volSubSample
+ @page volInfo volInfo
  
  @brief Get information from a vol file (size and values).
 
