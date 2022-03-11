@@ -60,14 +60,12 @@ using namespace Z3i;
  Positionals:
    1 TEXT:FILE REQUIRED                  Input vol file.
   
- Options:
-   -h,--help                             Print this help message and exit
-   -i,--input TEXT:FILE REQUIRED         Input vol file.
+
  
  @endcode
 
  @b Example: 
-You can apply several sub sampling:
+You can retrieve information from the vol file as:
  @code
  $ volInfo $DGtal/examples/samples/lobster.vol
  @endcode
