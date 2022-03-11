@@ -50,9 +50,6 @@ using namespace Z3i;
 
  @b Allowed @b options @b are : 
  @code
- Positionals:
-   1 TEXT:FILE REQUIRED                  Input vol file.
-  
  Options:
    -h,--help                             Print this help message and exit
    -i,--input TEXT:FILE REQUIRED         Input vol file.
