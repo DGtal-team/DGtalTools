@@ -106,7 +106,7 @@ int main(int argc, char**argv)
   trace.beginBlock("Loading file");
   typedef ImageContainerBySTLVector<Z3i::Domain, unsigned char>  MyImageC;
 
-  MyImageC  imageC = VolReader< MyImageC >::importVol ( inputFileName );
+  MyImageC  imageC = GenericReader<MyImageC>::import(inputFileName);
   
   trace.info()<<imageC<<std::endl;
   trace.info()<<"Scanning the values:"<<std::endl;
