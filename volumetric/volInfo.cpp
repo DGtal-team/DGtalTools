@@ -59,9 +59,6 @@ using namespace Z3i;
   
  Positionals:
    1 TEXT:FILE REQUIRED                  Input vol file.
-  
-
- 
  @endcode
 
  @b Example: 
