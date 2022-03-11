@@ -11,7 +11,7 @@
   - New cmake option (DGTAL_RANDOMIZED_BUILD_THRESHOLD) to set the
     (approximated) % of tools build
     (Bertrand Kerautret [#416](https://github.com/DGtal-team/DGtal/pull/416))
-       
+
 - *visualisation*
   - 3dImplicitSurfaceExtractorByThickening: adding OBJ export.
     (David Coeurjolly [#413](https://github.com/DGtal-team/DGtalTools/pull/413))
@@ -21,16 +21,16 @@
 - *volumetric*
   - volSegment: adding new option to get long int images as output (for
     longvol exporting). (Bertrand Kerautret [#420](https://github.com/DGtal-team/DGtalTools/pull/420))
-
+  - volInfo: get information from a volumetric file. (David Coeurjolly, [#430](https://github.com/DGtal-team/DGtalTools/pull/430))
 
 # DGtalTools 1.2
 - *global*
   - Fix itk2vol and fix ITK cmake configuaration that was making issues with the ITK image read.
     (Bertrand Kerautret [#393](https://github.com/DGtal-team/DGtalTools/pull/393))
   - Travis: Fix old default osx_image with xcode12.2 and remove non used boost
-    cmake references. (Bertrand Kerautret [#394](https://github.com/DGtal-team/DGtalTools/pull/394)) 
+    cmake references. (Bertrand Kerautret [#394](https://github.com/DGtal-team/DGtalTools/pull/394))
   - Uniform input/output option with previous use of CLI11 (issue #405).
-    (Bertrand Kerautret [#406](https://github.com/DGtal-team/DGtalTools/pull/406)) 
+    (Bertrand Kerautret [#406](https://github.com/DGtal-team/DGtalTools/pull/406))
   - Comply with cmake Policy CMP0115 "Source file extensions must be
      explicit". (Bertrand Kerautret and David Coeurjolly, [#407](https://github.com/DGtal-team/DGtalTools/pull/407))
 
