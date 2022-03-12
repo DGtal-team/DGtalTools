@@ -15,6 +15,7 @@ SET(DGTAL_TOOLS_SRC
   volTrValues
   volIntensityScale
   volFillInterior
+  volInfo
   volMask
 )
 
