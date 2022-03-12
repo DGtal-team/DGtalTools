@@ -54,7 +54,7 @@
    -o,--exportImage TEXT                 Export the resulting set of points to a image compatible with GenericWriter.
    -e,--exportSDP TEXT                   Export the resulting set of points in a simple (sequence of discrete point (sdp)).
    -t,--visualize                        Visualize result in viewer
-   -k,--keepInputDomain                  Keep the resulting image domain equals to the input image (instead using the resulting bouding box set).
+   -k,--keepInputDomain                  Keep the resulting image domain equal to the input image (instead using the resulting bouding box set).
 
 
  @endcode
