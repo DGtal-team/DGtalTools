@@ -1,7 +1,7 @@
 # DGtalTools 1.3 (beta)
 - *volumetric*
   - criticalKernelsThinning3D: new option to keep the resulting image
-  domain equals to the input image (instead using the resulting
+  domain equal to the input image (instead using the resulting
   bouding box set).
   (Bertrand Kerautret [#431](https://github.com/DGtal-team/DGtalTools/pull/431))
   
