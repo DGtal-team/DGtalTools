@@ -21,7 +21,7 @@
  *
  * @date 2015/04/08
  *
- * 
+ *
  *
  * This file is part of the DGtalTools.
  */
@@ -58,7 +58,7 @@ using namespace DGtal;
  @page mesh2heightfield mesh2heightfield
  @brief  Converts a mesh file into a projected 2D image given from a normal direction N and from a starting point P.
 
- The 3D mesh is discretized and scanned in the normal direction N, starting from P with a step 1. 
+ The 3D mesh is discretized and scanned in the normal direction N, starting from P with a step 1.
 
 
 @b Usage: mesh2heightfield [input] [output]
@@ -85,7 +85,7 @@ using namespace DGtal;
    --hsvShading                          use shading with HSV shading (given from the normal vector)
    --normalMap                           generates normal map.
    -v,--invertNormals                    invert normal orientations.
-  
+
 
 @endcode
 
@@ -123,28 +123,73 @@ getMainDirsCoVar(Mesh<Z3i::RealPoint>::Iterator begin, Mesh<Z3i::RealPoint>::Ite
   std::pair<DGtal::Z3i::RealPoint, DGtal::Z3i::RealPoint> res;
   Matrix3x3Point c ;
   unsigned int nb = 0;
-  for(auto it=begin; it != end; it++)
-    {
-      c[0] += ((*it)[0]*(*it)[0]);
-      c[1] += ((*it)[0]*(*it)[1]);
-      c[2] += ((*it)[0]*(*it)[2]);
-      
-      c[3] += ((*it)[1]*(*it)[0]);
-      c[4] += ((*it)[1]*(*it)[1]);
-      c[5] += ((*it)[1]*(*it)[2]);
-         
-      c[6] += ((*it)[2]*(*it)[0]);
-      c[7] += ((*it)[2]*(*it)[1]);
-      c[8] += ((*it)[2]*(*it)[2]);
+  //compute centroïd of point cloud
+  Z3i::RealPoint centroid;
+  int cp=0;
+  for(auto it=begin; it != end; it++){
+      Z3i::RealPoint pt=*it;
+      centroid[0] += pt[0];
+      centroid[1] += pt[1];
+      centroid[2] += pt[2];
+       ++cp;
+  }
+  centroid /=cp;
+  //compute matrix like PCL : https://pointclouds.org/documentation/moment__of__inertia__estimation_8hpp_source.html
+  for(auto it=begin; it != end; it++){
+
+      Z3i::RealPoint pt=*it;
+      pt[0] -= centroid[0];
+      pt[1] -= centroid[1];
+      pt[2] -= centroid[2];
+
+      trace.info()<<pt<< std::endl;
+      c[4] += pt[1] * pt[1];
+      c[5] += pt[1] * pt[2];
+      c[8] += pt[2] * pt[2];
+      pt *= pt[0];
+      c[0] += pt[0];
+      c[1] += pt[1];
+      c[2] += pt[2];
+
       nb++;
-    }
+
+  }
+  c[3] = c[1];
+  c[6] = c[2];
+  c[7] = c[5];
+  //normalize matrix
   c = c/nb;
   CoVarianceMat covar = getCoVarianceMatFrom(c);
   SimpleMatrix<double, 3, 3 > eVects;
   PointVector<3, double> eVals;
   DGtal::EigenDecomposition<3, double, CoVarianceMat>::getEigenDecomposition (covar, eVects, eVals);
-  res.first = eVects.column(0);
-  res.second = eVects.column(1);
+  unsigned int temp = 0;
+  unsigned int major_index = 0;
+  unsigned int middle_index = 1;
+  unsigned int minor_index = 2;
+  //reorder first and second axis according to their eigen value
+  if (eVals(major_index) < eVals(middle_index))
+  {
+     temp = major_index;
+     major_index = middle_index;
+     middle_index = temp;
+  }
+  if (eVals(major_index) < eVals(minor_index))
+  {
+    temp = major_index;
+    major_index = minor_index;
+    minor_index = temp;
+  }
+  if (eVals(middle_index) < eVals(minor_index))
+  {
+    temp = minor_index;
+    minor_index = middle_index;
+    middle_index = temp;
+  }
+
+  res.first = eVects.column(major_index);
+  res.second =  eVects.column(middle_index);
+
   return res;
 }
 
@@ -159,7 +204,7 @@ getNormal(const TPoint &vect, const TEmbeder &emb ){
   Z3i::RealPoint w = u.crossProduct(v); w /= w.norm();
   SimpleMatrix<double, 3, 3> t;
   t.setComponent(0,0, u[0]);  t.setComponent(0,1, v[0]); t.setComponent(0, 2, w[0]);
-  t.setComponent(1,0, u[1]);  t.setComponent(1,1, v[1]); t.setComponent(1, 2, w[1]);  
+  t.setComponent(1,0, u[1]);  t.setComponent(1,1, v[1]); t.setComponent(1, 2, w[1]);
   t.setComponent(2,0, u[2]);  t.setComponent(2,1, v[2]); t.setComponent(2, 2, w[2]);
   return ((t.inverse())*vect);
 }
@@ -169,7 +214,7 @@ getNormal(const TPoint &vect, const TEmbeder &emb ){
 
 template<typename TImage, typename TVectorField, typename TPoint>
 void
-fillPointArea(TImage &anImage, TVectorField &imageVectorField, 
+fillPointArea(TImage &anImage, TVectorField &imageVectorField,
               const TPoint aPoint, const unsigned int size, const unsigned int value, const Z3i::RealPoint &n){
   typename TImage::Domain aDom(aPoint-TPoint::diagonal(size), aPoint+TPoint::diagonal(size));
   for(typename TImage::Domain::ConstIterator it= aDom.begin(); it != aDom.end(); it++){
@@ -189,7 +234,7 @@ int main( int argc, char** argv )
   typedef ImageContainerBySTLVector < Z2i::Domain, unsigned char> Image2D;
   typedef DGtal::ConstImageAdapter<Image3D, Z2i::Domain, DGtal::functors::Point2DEmbedderIn3D<DGtal::Z3i::Domain>,
                                    Image3D::Value,  DGtal::functors::Identity >  ImageAdapterExtractor;
-  
+
 
 // parse command line using CLI ----------------------------------------------
   CLI::App app;
@@ -212,21 +257,21 @@ int main( int argc, char** argv )
   int centerX {0};
   int centerY {0};
   int centerZ {200};
-  
-  
+
+
   double nx{0};
   double ny{0};
   double nz{1};
   DGtal::Z3i::RealPoint secDir; //orientation to be used when flag orientAuto is used
   unsigned int minDiagVolSize {400}; //min size used to automatically resize mesh if included in unit box.
-  app.description("Convert a mesh file into a projected 2D image given from a normal direction N and from a starting point P. The 3D mesh discretized and scanned in the normal direction N, starting from P with a step 1.\n   Example:\n mesh2heightfield -i ${DGtal}/examples/samples/tref.off  heighfield.pgm  \n");  
+  app.description("Convert a mesh file into a projected 2D image given from a normal direction N and from a starting point P. The 3D mesh discretized and scanned in the normal direction N, starting from P with a step 1.\n   Example:\n mesh2heightfield -i ${DGtal}/examples/samples/tref.off  heighfield.pgm  \n");
   app.add_option("-i,--input,1", inputFileName, "mesh file (.off)" )
     ->required()
     ->check(CLI::ExistingFile);
   app.add_option("-o,--output,2", outputFileName, "sequence of discrete point file (.sdp) ", true );
   app.add_option("--meshScale,-s", meshScale, "change the default mesh scale (each vertex multiplied by the scale) ");
   app.add_option("--remeshMinArea,-a", triangleAreaUnit, "ajust the remeshing min triangle are used to avoid empty areas", true);
-  
+
   app.add_option("--heightFieldMaxScan", maxScan, "set the maximal scan deep.", true );
   app.add_option("-x,--centerX",
                               centerX, "choose x center of the projected image.", true);
@@ -250,13 +295,13 @@ int main( int argc, char** argv )
   app.add_flag("--exportNormals", exportNormals, "export mesh normal vectors (given in the image height field basis).");
   app.add_flag("--backgroundNormalBack", backgroundNormalBack, "set the normals of background in camera opposite direction (to obtain a black background in rendering).");
   app.add_flag("--setBackgroundLastDepth", setBackgroundLastDepth, "change the default background (black with the last filled intensity).");
-  
+
   app.get_formatter()->column_width(40);
   CLI11_PARSE(app, argc, argv);
   // END parse command line using CLI ----------------------------------------------
 
   orientAuto = optNx->count() == 0 && optNy->count() == 0 && optNy->count() == 0;
- 
+
   trace.info() << "Reading input file " << inputFileName ;
   Mesh<Z3i::RealPoint> inputMesh(true);
   inputMesh << inputFileName;
@@ -266,11 +311,11 @@ int main( int argc, char** argv )
     meshScale = minDiagVolSize/diagDist;
     inputMesh.changeScale(meshScale);
   }
-  
+
   triangleAreaUnit *= meshScale;
   // get vertex
   inputMesh.vertexBegin();
-   
+
   inputMesh.quadToTriangularFaces();
   trace.info() << " [done] " << std::endl ;
   int maxArea = triangleAreaUnit+1.0 ;
@@ -282,21 +327,21 @@ int main( int argc, char** argv )
     }
 
   std::pair<Z3i::RealPoint, Z3i::RealPoint> bb = inputMesh.getBoundingBox();
-  Image3D::Domain meshDomain( bb.first-Z3i::Point::diagonal(1), 
+  Image3D::Domain meshDomain( bb.first-Z3i::Point::diagonal(1),
                               bb.second+Z3i::Point::diagonal(1));
-  
+
   //  vol image filled from the mesh vertex.
   Image3D meshVolImage(meshDomain);
   VectorFieldImage3D meshNormalImage(meshDomain);
   Z3i::RealPoint z(0.0,0.0,0.0);
-  for(Image3D::Domain::ConstIterator it = meshVolImage.domain().begin(); 
+  for(Image3D::Domain::ConstIterator it = meshVolImage.domain().begin();
       it != meshVolImage.domain().end(); it++)
     {
       meshVolImage.setValue(*it, 0);
       meshNormalImage.setValue(*it, z);
     }
 
-  // Filling mesh faces in volume. 
+  // Filling mesh faces in volume.
   for(unsigned int i =0; i< inputMesh.nbFaces(); i++)
     {
       trace.progressBar(i, inputMesh.nbFaces());
@@ -306,41 +351,41 @@ int main( int argc, char** argv )
           Z3i::RealPoint p1 = inputMesh.getVertex(aFace[0]);
           Z3i::RealPoint p2 = inputMesh.getVertex(aFace[1]);
           Z3i::RealPoint p3 = inputMesh.getVertex(aFace[2]);
-          Z3i::RealPoint n = (p2-p1).crossProduct(p3-p1); 
+          Z3i::RealPoint n = (p2-p1).crossProduct(p3-p1);
           n /= invertNormal? -n.norm():  n.norm();
           Z3i::RealPoint c = (p1+p2+p3)/3.0;
-          fillPointArea(meshVolImage, meshNormalImage, p1, 1, 1, n);          
-          fillPointArea(meshVolImage, meshNormalImage, p2, 1, 1, n);          
-          fillPointArea(meshVolImage, meshNormalImage, p3, 1, 1, n);          
-          fillPointArea(meshVolImage, meshNormalImage, c, 1, 1, n);          
+          fillPointArea(meshVolImage, meshNormalImage, p1, 1, 1, n);
+          fillPointArea(meshVolImage, meshNormalImage, p2, 1, 1, n);
+          fillPointArea(meshVolImage, meshNormalImage, p3, 1, 1, n);
+          fillPointArea(meshVolImage, meshNormalImage, c, 1, 1, n);
         }
     }
-    
+
 
   if(orientAutoFrontX || orientAutoFrontY || orientAutoFrontZ)
     {
       Z3i::Point ptL = meshVolImage.domain().lowerBound();
-      Z3i::Point ptU = meshVolImage.domain().upperBound();     
+      Z3i::Point ptU = meshVolImage.domain().upperBound();
       Z3i::Point ptC = (ptL+ptU)/2;
       centerX=ptC[0]; centerY=ptC[1]; centerZ=ptC[2];
       nx=0; ny=0; nz=0;
-    }  
+    }
 
   if(orientAutoFrontX)
     {
-      nx=(orientBack?-1.0:1.0); 
+      nx=(orientBack?-1.0:1.0);
       maxScan = meshVolImage.domain().upperBound()[0]- meshVolImage.domain().lowerBound()[0];
       centerX = centerX + (orientBack? maxScan/2: -maxScan/2) ;
     }
   if(orientAutoFrontY)
     {
-      ny=(orientBack?-1.0:1.0); 
+      ny=(orientBack?-1.0:1.0);
       maxScan = meshVolImage.domain().upperBound()[1]- meshVolImage.domain().lowerBound()[1];
       centerY = centerY + (orientBack? maxScan/2: -maxScan/2);
     }
   if(orientAutoFrontZ)
     {
-      nz=(orientBack?-1.0:1.0); 
+      nz=(orientBack?-1.0:1.0);
       maxScan = meshVolImage.domain().upperBound()[2]-meshVolImage.domain().lowerBound()[2];
       centerZ = centerZ + (orientBack? maxScan/2: -maxScan/2);
     }
@@ -364,33 +409,33 @@ int main( int argc, char** argv )
     centerX=ptC[0]-(double)maxScan*nx/2;
     centerY=ptC[1]-(double)maxScan*ny/2;
     centerZ=ptC[2]-(double)maxScan*nz/2;
-    
+
 
   }
-  functors::Rescaling<unsigned int, Image2D::Value> scaleFctDepth(0, maxScan, 0, 255);  
+  functors::Rescaling<unsigned int, Image2D::Value> scaleFctDepth(0, maxScan, 0, 255);
   if(maxScan > std::numeric_limits<Image2D::Value>::max())
     {
-      trace.info()<< "Max depth value outside image intensity range: " << maxScan 
-                  << " (use a rescaling functor which implies a loss of precision)"  << std::endl; 
-    }  
-  trace.info() << "Processing image to output file " << outputFileName; 
-    
-  Image2D::Domain aDomain2D(DGtal::Z2i::Point(0,0), 
+      trace.info()<< "Max depth value outside image intensity range: " << maxScan
+                  << " (use a rescaling functor which implies a loss of precision)"  << std::endl;
+    }
+  trace.info() << "Processing image to output file " << outputFileName;
+
+  Image2D::Domain aDomain2D(DGtal::Z2i::Point(0,0),
                             DGtal::Z2i::Point(widthImageScan, heightImageScan));
   Z3i::Point ptCenter (centerX, centerY, centerZ);
-  
+
   Z3i::RealPoint normalDir (nx, ny, nz);
   Image2D resultingImage(aDomain2D);
   VectorFieldImage2D resultingVectorField(aDomain2D);
-  
-  
-  for(Image2D::Domain::ConstIterator it = resultingImage.domain().begin(); 
+
+
+  for(Image2D::Domain::ConstIterator it = resultingImage.domain().begin();
       it != resultingImage.domain().end(); it++){
     resultingImage.setValue(*it, 0);
     resultingVectorField.setValue(*it, z);
   }
   DGtal::functors::Identity idV;
-  
+
   unsigned int maxDepthFound = 0;
   Z3i::Point c (ptCenter-normalDir, DGtal::functors::Round<>());
   DGtal::functors::Point2DEmbedderIn3D<DGtal::Z3i::Domain >  embedder(meshVolImage.domain(),
@@ -410,12 +455,12 @@ int main( int argc, char** argv )
       embedder.shiftOriginPoint(normalDir);
       trace.progressBar(k, maxScan);
       ImageAdapterExtractor extractedImage(meshVolImage, aDomain2D, embedder, idV);
-      for(Image2D::Domain::ConstIterator it = extractedImage.domain().begin(); 
+      for(Image2D::Domain::ConstIterator it = extractedImage.domain().begin();
           it != extractedImage.domain().end(); it++)
         {
           if(resultingImage(*it)== 0 &&  extractedImage(*it)!=0)
             {
-              
+
               if (!firstFound) {
                 firstFound = true;
               }
@@ -430,36 +475,36 @@ int main( int argc, char** argv )
   }
   if (setBackgroundLastDepth)
     {
-      for(Image2D::Domain::ConstIterator it = resultingImage.domain().begin(); 
+      for(Image2D::Domain::ConstIterator it = resultingImage.domain().begin();
           it != resultingImage.domain().end(); it++){
         if( resultingImage(*it)== 0 )
           {
             resultingImage.setValue(*it, scaleFctDepth(maxScan-maxDepthFound));
           }
       }
-    } 
+    }
   bool inverBgNormal = backgroundNormalBack;
-  for(Image2D::Domain::ConstIterator it = resultingImage.domain().begin(); 
+  for(Image2D::Domain::ConstIterator it = resultingImage.domain().begin();
       it != resultingImage.domain().end(); it++){
-    if(resultingVectorField(*it)==Z3i::RealPoint(0.0, 0.0, 0.0))      
+    if(resultingVectorField(*it)==Z3i::RealPoint(0.0, 0.0, 0.0))
       {
-        resultingVectorField.setValue(*it,Z3i::RealPoint(0, 0, inverBgNormal?-1: 1));         
+        resultingVectorField.setValue(*it,Z3i::RealPoint(0, 0, inverBgNormal?-1: 1));
       }
   }
   resultingImage >> outputFileName;
-  if(exportNormals){ 
+  if(exportNormals){
     std::stringstream ss;
     ss << outputFileName << ".normals";
     std::ofstream outN;
     outN.open(ss.str().c_str(), std::ofstream::out);
-    for(Image2D::Domain::ConstIterator it = resultingImage.domain().begin(); 
+    for(Image2D::Domain::ConstIterator it = resultingImage.domain().begin();
         it != resultingImage.domain().end(); it++){
       outN << (*it)[0] << " " << (*it)[1] << " " <<  0 << std::endl;
       outN <<(*it)[0]+ resultingVectorField(*it)[0] << " "
-           <<(*it)[1]+resultingVectorField(*it)[1] << " " 
+           <<(*it)[1]+resultingVectorField(*it)[1] << " "
            << resultingVectorField(*it)[2];
       outN << std::endl;
     }
   }
-  return EXIT_SUCCESS;;  
+  return EXIT_SUCCESS;;
 }
