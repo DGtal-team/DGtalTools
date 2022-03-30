@@ -1,7 +1,10 @@
 # DGtalTools 1.3 (beta)
-
-
-
+- *volumetric*
+  - criticalKernelsThinning3D: new option to keep the resulting image
+  domain equal to the input image (instead using the resulting
+  bouding box set).
+  (Bertrand Kerautret [#431](https://github.com/DGtal-team/DGtalTools/pull/431))
+  
 - *converters*
   - heightfield2shading: new option to add a matcap rendering (from normal
     direction interpreted as HSV vector)
