@@ -8,7 +8,7 @@
   - heightfield2shading: new option to generate a normal map.
     (Bertrand Kerautret [#415](https://github.com/DGtal-team/DGtalTools/pull/415))
   - mesh2heightfield: automatic object placement and improved usage.
-    (Bertrand Kerautret [#415](https://github.com/DGtal-team/DGtalTools/pull/415))
+    (Bertrand Kerautret & Florian Delconte [#429](https://github.com/DGtal-team/DGtalTools/pull/429))
 
 - *build*
   - New cmake option (DGTAL_RANDOMIZED_BUILD_THRESHOLD) to set the
