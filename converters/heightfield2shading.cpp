@@ -66,22 +66,34 @@ using namespace DGtal;
 
 @code
 
-Positionals:
-  1 TEXT:FILE REQUIRED                  input heightfield file (2D image).
-  2 TEXT                                output image.
+ Positionals:
+   1 TEXT:FILE REQUIRED                  mesh file (.off)
+   2 TEXT=result.pgm                     sequence of discrete point file (.sdp)
 
-Options:
- -h,--help                             Print this help message and exit
-  -i,--input TEXT:FILE                  input heightfield file (2D image).
-  -d,--domain UINT x 2                  specify the domain (required when normal are imported and if --inout is not given).
-  -o,--output TEXT                      output image.
-  --importNormal TEXT                   import normals from file.
-  --orderedNormalsImport                Use ordered normals.
-  --lightDir,--lDir,--ld FLOAT x 3      light source direction: lx ly lz.
-  --lightPos,--lPos,--lp FLOAT x 3      light source position: px py pz.
-  -s,--specularModel FLOAT x 3          use specular Nayar model with 3 param Kdiff, Kspec, sigma.
-  -r,--reflectanceMap TEXT:FILE         specify a image as reflectance map.
-  --hsvShading                          use shading with HSV shading (given from the normal vector)
+ Options:
+   -h,--help                             Print this help message and exit
+   -i,--input TEXT:FILE REQUIRED         mesh file (.off)
+   -o,--output TEXT=result.pgm           sequence of discrete point file (.sdp)
+   -s,--meshScale FLOAT                  change the default mesh scale (each vertex multiplied by the scale)
+   -a,--remeshMinArea FLOAT=0.01         ajust the remeshing min triangle are used to avoid empty areas
+   --heightFieldMaxScan INT=255          set the maximal scan deep.
+   -x,--centerX INT=0                    choose x center of the projected image.
+   -y,--centerY INT=0                    choose y center of the projected image.
+   -z,--centerZ INT=200                  choose z center of the projected image.
+   --nx FLOAT=0                          set the x component of the projection direction.
+   --ny FLOAT=0                          set the y component of the projection direction.
+   --nz FLOAT=1                          set the z component of the projection direction.
+   -v,--invertNormals                    invert normal vector of the mesh
+   --width FLOAT=500                     set the width of the area to be extracted as an height field image. (note that the resulting image width also depends of the scale parameter (option --meshScale))
+   --height FLOAT=500                    set the height of the area to extracted  as an height field image. (note that the resulting image height also depends of the scale parameter (option --meshScale))
+   --orientAutoFrontX                    automatically orients the camera in front according the x axis.
+   --orientAutoFrontY                    automatically orients the camera in front according the y axis.
+   --orientAutoFrontZ                    automatically orients the camera in front according the z axis.
+   --orientBack                          change the camera direction to back instead front as given in  orientAutoFront{X,Y,Z} options.
+   --exportNormals                       export mesh normal vectors (given in the image height field basis).
+   --backgroundNormalBack                set the normals of background in camera opposite direction (to obtain a black background in rendering).
+   --setBackgroundLastDepth              change the default background (black with the last filled intensity).
+
 
 @endcode
 
@@ -106,7 +118,8 @@ You will obtain such image:
 
 template<typename TImage, typename TImageVector>
 void 
-computerBasicNormalsFromHeightField(const TImage &anHeightMap, TImageVector &vectorField)
+computerBasicNormalsFromHeightField(const TImage &anHeightMap, TImageVector &vectorField,
+                                    bool invertN = false)
 {
   for(typename TImage::Domain::ConstIterator it = anHeightMap.domain().begin(); 
       it != anHeightMap.domain().end(); it++){
@@ -116,7 +129,7 @@ computerBasicNormalsFromHeightField(const TImage &anHeightMap, TImageVector &vec
       double dy = (anHeightMap(*it-Z2i::Point(0,1))-anHeightMap(*it+Z2i::Point(0,1)))/2.0;
       Z3i::RealPoint n (dx, dy, 1);
       n /= n.norm();
-      vectorField.setValue(*it,n);
+      vectorField.setValue(*it,invertN? -n : n);
     }
   }
 }
@@ -125,7 +138,8 @@ computerBasicNormalsFromHeightField(const TImage &anHeightMap, TImageVector &vec
 
 template<typename TImageVector>
 void 
-importNormals(std::string file, TImageVector &vectorField)
+importNormals(std::string file, TImageVector &vectorField,
+              bool invertN = false)
 {
   std::vector<Z3i::RealPoint> vp = PointListReader<Z3i::RealPoint>::getPointsFromFile(file);
   trace.info() << "import done: " << vp.size() <<  std::endl;
@@ -133,7 +147,7 @@ importNormals(std::string file, TImageVector &vectorField)
         Z3i::RealPoint p = vp.at(i);
         Z3i::RealPoint q = vp.at(i+1);
         Z3i::RealPoint n = (q-p)/(p-q).norm();
-        vectorField.setValue(Z2i::Point(p[0], p[1]),n);
+        vectorField.setValue(Z2i::Point(p[0], p[1]),invertN? -n : n);
   }
   trace.info() <<endl;
 }
@@ -142,14 +156,14 @@ importNormals(std::string file, TImageVector &vectorField)
 template<typename TImageVector>
 void 
 importNormalsOrdDir(std::string file, TImageVector &vectorField,
-                    unsigned int width, unsigned int height)
+                    unsigned int width, unsigned int height, bool invertN = false)
 {
   std::vector<Z3i::RealPoint> vp = PointListReader<Z3i::RealPoint>::getPointsFromFile(file);
 
   for(unsigned int i = 0; i< vp.size()-1; i++){
     Z2i::Point p ( i-(width*floor((i/width))), i/width);
     Z3i::RealPoint n = vp[i];
-    vectorField.setValue(p,n);
+    vectorField.setValue(p,invertN? -n : n);
   }
   trace.info() <<endl;
 }
@@ -315,9 +329,11 @@ int main( int argc, char** argv )
   bool usingAllDirectionLightSource = false;
   bool useOrderedImportNormal = false;
   bool hsvShading = false;
+  bool normalMap = false;
+  bool invertNormals = false;
   std::vector<double> specularModel;
   std::string reflectanceMap;
-  std::vector<double> lDir;
+  std::vector<double> lDir = {0, 0, 1};
   std::vector<double> lPos;
   std::vector<unsigned int> domain;  
   
@@ -339,7 +355,8 @@ int main( int argc, char** argv )
   app.add_option("-r,--reflectanceMap",reflectanceMap, "specify a image as reflectance map.")
     ->check(CLI::ExistingFile);
   app.add_flag("--hsvShading", hsvShading, "use shading with HSV shading (given from the normal vector)");
-  
+  app.add_flag("--normalMap", normalMap, "generates normal map.");
+  app.add_flag("--invertNormals,-v", invertNormals, "invert normal orientations.");
   app.get_formatter()->column_width(40);
   CLI11_PARSE(app, argc, argv);
   // END parse command line using CLI ----------------------------------------------
@@ -363,7 +380,7 @@ int main( int argc, char** argv )
       pz = lPos[2];  
       usingAllDirectionLightSource = true;
     }
-  else if (reflectanceMap == "" && ! hsvShading)
+  else if (reflectanceMap == "" && ! hsvShading && !normalMap)
     {
       trace.error() << "You need to specify either the light source direction or position (if you use a all directions model)." << std::endl;
       exit(0);
@@ -409,18 +426,22 @@ int main( int argc, char** argv )
   Image2DC resultC (inputImage.domain());
 
   if(normalFileName != ""){
-    trace.info() << "Import normal file " << inputFileName << vectNormals.domain() ; 
-    if (useOrderedImportNormal){
+    trace.info() << "Import normal file " << inputFileName << vectNormals.domain();
+    if (useOrderedImportNormal)
+    {
       importNormalsOrdDir(normalFileName, vectNormals,
                           inputImage.domain().upperBound()[0]+1,
-                          inputImage.domain().upperBound()[1]+1);
+                          inputImage.domain().upperBound()[1]+1, invertNormals);
     }
-    else {
-      importNormals(normalFileName, vectNormals);
+    else
+    {
+      importNormals(normalFileName, vectNormals, invertNormals);
     }
     trace.info() << "[done]" << std::endl;
-  }else{
-    computerBasicNormalsFromHeightField(inputImage, vectNormals);
+  }
+  else
+  {
+    computerBasicNormalsFromHeightField(inputImage, vectNormals, invertNormals);
   }
   if (hsvShading)
   {
@@ -436,15 +457,26 @@ int main( int argc, char** argv )
     }
     IdColor id;
     PPMWriter<Image2DC, IdColor  >::exportPPM(outputFileName, resultC, id);
-  }else if(reflectanceMap != "")
+  }
+  else if (normalMap)
+  {
+    DGtal::functors::Rescaling<double, unsigned int> rgRescale (-1.0, 1.0, 0, 255);
+    DGtal::functors::Rescaling<double, unsigned int> bRescale (0.0, -1.0, 128, 255);
+    for(typename Image2D::Domain::ConstIterator it = inputImage.domain().begin();
+        it != inputImage.domain().end(); it++){
+        auto n = vectNormals(*it);
+        DGtal::Color c (rgRescale(n[0]), rgRescale(n[1]), bRescale(n[2]) );
+        resultC.setValue(*it, c.getRGB());
+    }
+    IdColor id;
+    PPMWriter<Image2DC, IdColor  >::exportPPM(outputFileName, resultC, id);
+  }
+  else if(reflectanceMap != "")
     {
       ImageMapReflectance<Image2D, Z3i::RealPoint> lMap(reflectanceMap);
       for(typename Image2D::Domain::ConstIterator it = inputImage.domain().begin(); 
           it != inputImage.domain().end(); it++){
-        if(reflectanceMap != "")
-          {
-            result.setValue(*it, lMap(vectNormals(*it)));           
-          }       
+            result.setValue(*it, lMap(vectNormals(*it)));
       }        
       IdColor id;
       PPMWriter<Image2D, IdColor  >::exportPPM(outputFileName, result, id);

@@ -40,6 +40,11 @@
 #include <DGtal/base/BasicFunctors.h>
 #include "DGtal/math/linalg/SimpleMatrix.h"
 
+#include <DGtal/math/linalg/SimpleMatrix.h>
+#include <DGtal/math/linalg/EigenDecomposition.h>
+
+
+
 #include "CLI11.hpp"
 
 
@@ -62,45 +67,86 @@ using namespace DGtal;
 
 @code
 
-ositionals:
-  1 TEXT:FILE REQUIRED                  mesh file (.off)
-  2 TEXT=result.pgm                     sequence of discrete point file (.sdp) 
+ Positionals:
+   1 TEXT:FILE                           input heightfield file (2D image).
+   2 TEXT                                output image.
 
-Options:
-  -h,--help                             Print this help message and exit
-  -i,--input TEXT:FILE REQUIRED         mesh file (.off)
-  -o,--output TEXT=result.pgm           sequence of discrete point file (.sdp) 
-  -s,--meshScale FLOAT                  change the default mesh scale (each vertex multiplied by the scale) 
-  --heightFieldMaxScan INT=255          set the maximal scan deep.
-  -x,--centerX INT=0                    choose x center of the projected image.
-  -y,--centerY INT=0                    choose y center of the projected image.
-  -z,--centerZ INT=1                    choose z center of the projected image.
-  --nx FLOAT=0                          set the x component of the projection direction.
-  --ny FLOAT=0                          set the y component of the projection direction.
-  --nz FLOAT=1                          set the z component of the projection direction.
-  --width UINT=100                      set the width of the area to be extracted as an height field image.
-  --height UINT=100                     set the height of the area to extracted  as an height field image.
-  --orientAutoFrontX                    automatically orients the camera in front according the x axis.
-  --orientAutoFrontY                    automatically orients the camera in front according the y axis.
-  --orientAutoFrontZ                    automatically orients the camera in front according the z axis.
-  --orientBack                          change the camera direction to back instead front as given in  orientAutoFront{X,Y,Z} options.
-  --exportNormals                       export mesh normal vectors (given in the image height field basis).
-  --backgroundNormalBack                set the normals of background in camera opposite direction (to obtain a black background in rendering).
-  --setBackgroundLastDepth              change the default background (black with the last filled intensity).
+ Options:
+   -h,--help                             Print this help message and exit
+   -i,--input TEXT:FILE                  input heightfield file (2D image).
+   -d,--domain UINT x 2                  specify the domain (required when normal are imported and if --inout is not given).
+   -o,--output TEXT                      output image.
+   --importNormal TEXT                   import normals from file.
+   --orderedNormalsImport                Use ordered normals.
+   --lightDir,--lDir,--ld FLOAT x 3      light source direction: lx ly lz.
+   --lightPos,--lPos,--lp FLOAT x 3      light source position: px py pz.
+   -s,--specularModel FLOAT x 3          use specular Nayar model with 3 param Kdiff, Kspec, sigma.
+   -r,--reflectanceMap TEXT:FILE         specify a image as reflectance map.
+   --hsvShading                          use shading with HSV shading (given from the normal vector)
+   --normalMap                           generates normal map.
+   -v,--invertNormals                    invert normal orientations.
+  
 
 @endcode
 
 @b Example:
 @code
-  $ mesh2heightfield -i ${DGtal}/examples/samples/tref.off --orientAutoFrontZ --width 25 --height 25 -o heighfield.pgm -s 10  
+  $ mesh2heightfield -i ${DGtal}/examples/samples/tref.off  heighfield.pgm
 
 @endcode
 You will obtain such image:
 @image html  resMesh2heightfield.png "Resulting heightfield."
 @see mesh2heightfield.cpp
 
-*/
+ */
+typedef PointVector<9, double> Matrix3x3Point;
+typedef SimpleMatrix<double, 3, 3 > CoVarianceMat;
 
+/**
+ * Order natural (book reading from upper left to lower right)
+ **/
+static CoVarianceMat
+getCoVarianceMatFrom(const Matrix3x3Point &aMatrixPt){
+  CoVarianceMat res;
+  for(unsigned int i = 0; i<3; i++){
+    for(unsigned int j = 0; j<3; j++){
+      res.setComponent(i, j, aMatrixPt[j+i*3] );
+    }
+  }
+  return res;
+}
+
+
+std::pair<DGtal::Z3i::RealPoint, DGtal::Z3i::RealPoint>
+getMainDirsCoVar(Mesh<Z3i::RealPoint>::Iterator begin, Mesh<Z3i::RealPoint>::Iterator end )
+{
+  std::pair<DGtal::Z3i::RealPoint, DGtal::Z3i::RealPoint> res;
+  Matrix3x3Point c ;
+  unsigned int nb = 0;
+  for(auto it=begin; it != end; it++)
+    {
+      c[0] += ((*it)[0]*(*it)[0]);
+      c[1] += ((*it)[0]*(*it)[1]);
+      c[2] += ((*it)[0]*(*it)[2]);
+      
+      c[3] += ((*it)[1]*(*it)[0]);
+      c[4] += ((*it)[1]*(*it)[1]);
+      c[5] += ((*it)[1]*(*it)[2]);
+         
+      c[6] += ((*it)[2]*(*it)[0]);
+      c[7] += ((*it)[2]*(*it)[1]);
+      c[8] += ((*it)[2]*(*it)[2]);
+      nb++;
+    }
+  c = c/nb;
+  CoVarianceMat covar = getCoVarianceMatFrom(c);
+  SimpleMatrix<double, 3, 3 > eVects;
+  PointVector<3, double> eVals;
+  DGtal::EigenDecomposition<3, double, CoVarianceMat>::getEigenDecomposition (covar, eVects, eVals);
+  res.first = eVects.column(0);
+  res.second = eVects.column(1);
+  return res;
+}
 
 template<typename TPoint, typename TEmbeder>
 TPoint
@@ -114,8 +160,7 @@ getNormal(const TPoint &vect, const TEmbeder &emb ){
   SimpleMatrix<double, 3, 3> t;
   t.setComponent(0,0, u[0]);  t.setComponent(0,1, v[0]); t.setComponent(0, 2, w[0]);
   t.setComponent(1,0, u[1]);  t.setComponent(1,1, v[1]); t.setComponent(1, 2, w[1]);  
-  t.setComponent(2,0, u[2]);  t.setComponent(2,1, v[2]); t.setComponent(2, 2, w[2]);  
-
+  t.setComponent(2,0, u[2]);  t.setComponent(2,1, v[2]); t.setComponent(2, 2, w[2]);
   return ((t.inverse())*vect);
 }
 
@@ -151,12 +196,14 @@ int main( int argc, char** argv )
   std::string inputFileName;
   std::string outputFileName {"result.pgm"};
   double meshScale = 1.0;
-  double triangleAreaUnit = 0.5;
-  unsigned int widthImageScan = {100};
-  unsigned int heightImageScan = {100};
+  double triangleAreaUnit = 0.01;
+  double widthImageScan = {500};
+  double heightImageScan = {500};
   bool orientAutoFrontX = false;
   bool orientAutoFrontY = false;
   bool orientAutoFrontZ = false;
+  bool orientAuto = true;
+  bool invertNormal = false;
   bool orientBack = false;
   bool exportNormals = false;
   bool setBackgroundLastDepth = false;
@@ -164,28 +211,38 @@ int main( int argc, char** argv )
   int maxScan {255};
   int centerX {0};
   int centerY {0};
-  int centerZ {1};
+  int centerZ {200};
+  
   
   double nx{0};
   double ny{0};
   double nz{1};
-
-  
-  app.description("Convert a mesh file into a projected 2D image given from a normal direction N and from a starting point P. The 3D mesh discretized and scanned in the normal direction N, starting from P with a step 1.\n   Example:\n mesh2heightfield ${DGtal}/examples/samples/tref.off heighMap.pgm --orientAutoFrontZ --width 25 --height 25  -s 10  \n");  
+  DGtal::Z3i::RealPoint secDir; //orientation to be used when flag orientAuto is used
+  unsigned int minDiagVolSize {400}; //min size used to automatically resize mesh if included in unit box.
+  app.description("Convert a mesh file into a projected 2D image given from a normal direction N and from a starting point P. The 3D mesh discretized and scanned in the normal direction N, starting from P with a step 1.\n   Example:\n mesh2heightfield -i ${DGtal}/examples/samples/tref.off  heighfield.pgm  \n");  
   app.add_option("-i,--input,1", inputFileName, "mesh file (.off)" )
     ->required()
     ->check(CLI::ExistingFile);
   app.add_option("-o,--output,2", outputFileName, "sequence of discrete point file (.sdp) ", true );
   app.add_option("--meshScale,-s", meshScale, "change the default mesh scale (each vertex multiplied by the scale) ");
+  app.add_option("--remeshMinArea,-a", triangleAreaUnit, "ajust the remeshing min triangle are used to avoid empty areas", true);
+  
   app.add_option("--heightFieldMaxScan", maxScan, "set the maximal scan deep.", true );
-  app.add_option("-x,--centerX",centerX, "choose x center of the projected image.", true);
-  app.add_option("-y,--centerY",centerY, "choose y center of the projected image.", true);
-  app.add_option("-z,--centerZ",centerZ, "choose z center of the projected image.", true);
-  app.add_option("--nx", nx, "set the x component of the projection direction.", true);
-  app.add_option("--ny", ny, "set the y component of the projection direction.", true);
-  app.add_option("--nz", nz, "set the z component of the projection direction.", true);
-  app.add_option("--width", widthImageScan, "set the width of the area to be extracted as an height field image.", true );
-  app.add_option("--height", heightImageScan, "set the height of the area to extracted  as an height field image.", true );
+  app.add_option("-x,--centerX",
+                              centerX, "choose x center of the projected image.", true);
+  app.add_option("-y,--centerY",
+                              centerY, "choose y center of the projected image.", true);
+  app.add_option("-z,--centerZ",
+                              centerZ, "choose z center of the projected image.", true);
+  auto optNx = app.add_option("--nx",
+                              nx, "set the x component of the projection direction.", true);
+  auto optNy = app.add_option("--ny",
+                              ny, "set the y component of the projection direction.", true);
+  auto optNz = app.add_option("--nz",
+                              nz, "set the z component of the projection direction.", true);
+  app.add_flag("--invertNormals,-v", invertNormal, "invert normal vector of the mesh");
+  app.add_option("--width", widthImageScan, "set the width of the area to be extracted as an height field image. (note that the resulting image width also depends of the scale parameter (option --meshScale))", true );
+  app.add_option("--height", heightImageScan, "set the height of the area to extracted  as an height field image. (note that the resulting image height also depends of the scale parameter (option --meshScale))", true );
   app.add_flag("--orientAutoFrontX", orientAutoFrontX,"automatically orients the camera in front according the x axis." );
   app.add_flag("--orientAutoFrontY", orientAutoFrontY,"automatically orients the camera in front according the y axis." );
   app.add_flag("--orientAutoFrontZ", orientAutoFrontZ,"automatically orients the camera in front according the z axis." );
@@ -198,29 +255,26 @@ int main( int argc, char** argv )
   CLI11_PARSE(app, argc, argv);
   // END parse command line using CLI ----------------------------------------------
 
-  widthImageScan *= meshScale;
-  heightImageScan *= meshScale;
-  maxScan *= meshScale;  
-  centerX *= meshScale;
-  centerY *= meshScale;
-  centerZ *= meshScale;
-  
-  
-  trace.info() << "Reading input file " << inputFileName ; 
+  orientAuto = optNx->count() == 0 && optNy->count() == 0 && optNy->count() == 0;
+ 
+  trace.info() << "Reading input file " << inputFileName ;
   Mesh<Z3i::RealPoint> inputMesh(true);
-      
-  DGtal::MeshReader<Z3i::RealPoint>::importOFFFile(inputFileName, inputMesh);
+  inputMesh << inputFileName;
   std::pair<Z3i::RealPoint, Z3i::RealPoint> b = inputMesh.getBoundingBox();
   double diagDist = (b.first-b.second).norm();
-  if(diagDist<2.0*sqrt(2.0)){
-    inputMesh.changeScale(2.0*sqrt(2.0)/diagDist);  
+  if(diagDist<minDiagVolSize){
+    meshScale = minDiagVolSize/diagDist;
+    inputMesh.changeScale(meshScale);
   }
- 
+  
+  triangleAreaUnit *= meshScale;
+  // get vertex
+  inputMesh.vertexBegin();
+   
   inputMesh.quadToTriangularFaces();
-  inputMesh.changeScale(meshScale);  
-  trace.info() << " [done] " << std::endl ; 
-  double maxArea = triangleAreaUnit+1.0 ;
-  while(maxArea> triangleAreaUnit)
+  trace.info() << " [done] " << std::endl ;
+  int maxArea = triangleAreaUnit+1.0 ;
+  while (maxArea> triangleAreaUnit)
     {
       trace.info()<< "Iterating mesh subdivision ... "<< maxArea;
       maxArea = inputMesh.subDivideTriangularFaces(triangleAreaUnit);
@@ -253,7 +307,7 @@ int main( int argc, char** argv )
           Z3i::RealPoint p2 = inputMesh.getVertex(aFace[1]);
           Z3i::RealPoint p3 = inputMesh.getVertex(aFace[2]);
           Z3i::RealPoint n = (p2-p1).crossProduct(p3-p1); 
-          n /= n.norm();
+          n /= invertNormal? -n.norm():  n.norm();
           Z3i::RealPoint c = (p1+p2+p3)/3.0;
           fillPointArea(meshVolImage, meshNormalImage, p1, 1, 1, n);          
           fillPointArea(meshVolImage, meshNormalImage, p2, 1, 1, n);          
@@ -290,7 +344,29 @@ int main( int argc, char** argv )
       maxScan = meshVolImage.domain().upperBound()[2]-meshVolImage.domain().lowerBound()[2];
       centerZ = centerZ + (orientBack? maxScan/2: -maxScan/2);
     }
-  
+  if (orientAuto)
+  {
+    Z3i::Point ptL = meshVolImage.domain().lowerBound();
+    Z3i::Point ptU = meshVolImage.domain().upperBound();
+    Z3i::Point ptC = (ptL+ptU)/2;
+    int maxScanZ = meshVolImage.domain().upperBound()[2]-meshVolImage.domain().lowerBound()[2];
+    int maxScanY = meshVolImage.domain().upperBound()[1]-meshVolImage.domain().lowerBound()[1];
+    int maxScanX = meshVolImage.domain().upperBound()[0]-meshVolImage.domain().lowerBound()[0];
+    maxScan = std::max(std::max(maxScanX, maxScanY), maxScanZ);
+    trace.info() << "Automatic orientation on volume of bounds: " << ptL << " " << ptU << std::endl;
+    trace.info() << "Computing main dir...";
+    auto dir = getMainDirsCoVar(inputMesh.vertexBegin(), inputMesh.vertexEnd());
+    trace.info() << "[done]"<<std::endl;
+    nx = dir.first[0];
+    ny = dir.first[1];
+    nz = dir.first[2];
+    secDir = dir.second;
+    centerX=ptC[0]-(double)maxScan*nx/2;
+    centerY=ptC[1]-(double)maxScan*ny/2;
+    centerZ=ptC[2]-(double)maxScan*nz/2;
+    
+
+  }
   functors::Rescaling<unsigned int, Image2D::Value> scaleFctDepth(0, maxScan, 0, 255);  
   if(maxScan > std::numeric_limits<Image2D::Value>::max())
     {
@@ -302,6 +378,7 @@ int main( int argc, char** argv )
   Image2D::Domain aDomain2D(DGtal::Z2i::Point(0,0), 
                             DGtal::Z2i::Point(widthImageScan, heightImageScan));
   Z3i::Point ptCenter (centerX, centerY, centerZ);
+  
   Z3i::RealPoint normalDir (nx, ny, nz);
   Image2D resultingImage(aDomain2D);
   VectorFieldImage2D resultingVectorField(aDomain2D);
@@ -315,26 +392,42 @@ int main( int argc, char** argv )
   DGtal::functors::Identity idV;
   
   unsigned int maxDepthFound = 0;
-  for(unsigned int k=0; k < maxScan; k++)
-    {
+  Z3i::Point c (ptCenter-normalDir, DGtal::functors::Round<>());
+  DGtal::functors::Point2DEmbedderIn3D<DGtal::Z3i::Domain >  embedder(meshVolImage.domain(),
+                                                                      c,
+                                                                      normalDir,
+                                                                      widthImageScan);
+  if (orientAuto){
+   embedder =  DGtal::functors::Point2DEmbedderIn3D<DGtal::Z3i::Domain >(meshVolImage.domain(),
+                                                                        c,
+                                                                        normalDir,
+                                                                        secDir,
+                                                                        widthImageScan);
+  }
+  int k = 0;
+  bool firstFound = false;
+  while (k < maxScan || !firstFound){
+      embedder.shiftOriginPoint(normalDir);
       trace.progressBar(k, maxScan);
-      Z3i::Point c (ptCenter+normalDir*k, DGtal::functors::Round<>());
-      DGtal::functors::Point2DEmbedderIn3D<DGtal::Z3i::Domain >  embedder(meshVolImage.domain(), 
-                                                                          c,
-                                                                          normalDir,
-                                                                          widthImageScan);
       ImageAdapterExtractor extractedImage(meshVolImage, aDomain2D, embedder, idV);
       for(Image2D::Domain::ConstIterator it = extractedImage.domain().begin(); 
           it != extractedImage.domain().end(); it++)
         {
           if(resultingImage(*it)== 0 &&  extractedImage(*it)!=0)
             {
+              
+              if (!firstFound) {
+                firstFound = true;
+              }
               maxDepthFound = k;
               resultingImage.setValue(*it, scaleFctDepth(maxScan-k));
               resultingVectorField.setValue(*it, getNormal(meshNormalImage(embedder(*it)), embedder));
             }
-        }    
+        }
+    if (firstFound){
+      k++;
     }
+  }
   if (setBackgroundLastDepth)
     {
       for(Image2D::Domain::ConstIterator it = resultingImage.domain().begin(); 
