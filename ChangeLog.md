@@ -112,6 +112,8 @@
   - volAddBorder: Add an option that sets zero value to domain boundary voxels without
     changing the domain extent (Bertrand Kertautret
     [#371](https://github.com/DGtal-team/DGtalTools/pull/371))
+  - volAddBorder: Fix VTKIMAGEDATA_CONTAINER_I (Phuc Ngo)
+    [#435](https://github.com/DGtal-team/DGtalTools/pull/435))  
   - Fix a wrong error message that appears when using the tool (wrong IO error)
     (Bertrand Kerautret
     [#368](https://github.com/DGtal-team/DGtalTools/pull/368))
