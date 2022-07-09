@@ -107,7 +107,7 @@ int main( int argc, char** argv )
   DGtal::int64_t rescaleInputMin {0};
   DGtal::int64_t rescaleInputMax {255};
   int userStartSlice {0};
-  int userEndSlice;
+  int userEndSlice {0};
   unsigned int sliceOrientation {2};
   
 

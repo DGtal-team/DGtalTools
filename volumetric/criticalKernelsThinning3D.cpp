@@ -166,10 +166,11 @@ int main(int argc, char* const argv[]){
   }
   trace.beginBlock("Reading input");
   using Domain = Z3i::Domain ;
+
 #ifdef WITH_ITK
-    using Image = ImageSelector < Z3i::Domain, unsigned char, ITKIMAGEDATA_CONTAINER_I>::Type ;
+  using Image = ImageSelector < Z3i::Domain, unsigned char, ITKIMAGEDATA_CONTAINER_I>::Type ;
 #else
-using Image = ImageSelector < Z3i::Domain, unsigned char>::Type ;
+  using Image = ImageSelector < Z3i::Domain, unsigned char>::Type ;
 #endif
 
   
