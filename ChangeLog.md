@@ -22,7 +22,7 @@
     (David Coeurjolly [#413](https://github.com/DGtal-team/DGtalTools/pull/413))
   - 3dVolViewer: adding new option to interprate intensity as transparency.
     (Bertrand Kerautret [#425](https://github.com/DGtal-team/DGtalTools/pull/425))
-  - 3dCompSurfelData: fix --noWindows options (issue [#427](https://github.com/DGtal-team/DGtalTools/issues/427). 
+  - 3dCompSurfelData: fix --noWindows option (issue [#427](https://github.com/DGtal-team/DGtalTools/issues/427). 
     (Bertrand Kerautret and Kacper Pluta  [#440](https://github.com/DGtal-team/DGtalTools/pull/440))
     
 - *volumetric*
