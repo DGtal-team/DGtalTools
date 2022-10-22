@@ -192,7 +192,7 @@ int main( int argc, char** argv )
   app.add_flag("-a,--drawSurfelAssociations", drawSurfelAssociations, "Draw the surfel association.");
   app.add_option("-o,--fileMeasureOutput",fileMeasureOutput,  "specify the output file to store (append) the error stats else the result is given to std output. ");
   
-  app.add_flag("-n,--noWindows","Don't display Viewer windows." );
+  app.add_flag("-n,--noWindows", noWindows, "Don't display Viewer windows." );
     
   app.add_option("-d,--doSnapShotAndExit", snapShotName, "save display snapshot into file. Notes that  the camera setting is set by default according the last saved configuration (use SHIFT+Key_M to save current camera setting in the Viewer3D).");
   auto maxValSpe = app.add_option("--fixMaxColorValue", maxVal, "fix the maximal color value for the scale error display (else the scale is set from the maximal value)");
