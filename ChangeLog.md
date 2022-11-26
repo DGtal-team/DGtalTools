@@ -1,17 +1,23 @@
 # DGtalTools 1.3 (beta)
+
 - *volumetric*
   - criticalKernelsThinning3D: new option to keep the resulting image
   domain equal to the input image (instead using the resulting
   bouding box set).
   (Bertrand Kerautret [#431](https://github.com/DGtal-team/DGtalTools/pull/431))
   
+
 - *converters*
   - heightfield2shading: new option to add a matcap rendering (from normal
     direction interpreted as HSV vector)
     (Bertrand Kerautret [#399](https://github.com/DGtal-team/DGtalTools/pull/399))
+  - heightfield2shading: new option to generate a normal map.
+    (Bertrand Kerautret [#415](https://github.com/DGtal-team/DGtalTools/pull/415))
+  - mesh2heightfield: automatic object placement and improved usage.
+    (Bertrand Kerautret & Florian Delconte [#429](https://github.com/DGtal-team/DGtalTools/pull/429))
   - vol2slice: fix infinite slices extraction.
     (Bertrand Kerautret [#439](https://github.com/DGtal-team/DGtalTools/pull/439))
-    
+ 
 - *build*
   - New cmake option (DGTAL_RANDOMIZED_BUILD_THRESHOLD) to set the
     (approximated) % of tools build
