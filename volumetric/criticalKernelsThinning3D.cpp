@@ -280,16 +280,7 @@ int main(int argc, char* const argv[]){
     }
   }
 
-  if (outputFilenameImg != "")
-  {
-    if(verbose)
-      std::cout << "outputFilename" << outputFilenameImg << std::endl;
-
-    unsigned int foreground_value = 255;
-    auto thin_image = ImageFromSet<Image>::create(thin_set, foreground_value);
-    thin_image >> outputFilenameImg;
-   }
-
+ 
   //-------------- export OBJ -------------------------------------------
   if ( outputFilenameInputOBJ != "" )
     {
@@ -340,7 +331,13 @@ int main(int argc, char* const argv[]){
       board.saveOBJ( outputFilenameOBJ );
     }
 
- if (useInputImgToExp){
+if (outputFilenameImg != "")
+  {
+    if(verbose)
+      std::cout << "outputFilename" << outputFilenameImg << std::endl;
+
+    unsigned int foreground_value = 255;
+    if (useInputImgToExp){
       for(auto p: image.domain()){image.setValue(p, 0);}
       ImageFromSet<Image>::append(image, thin_set, foreground_value);
       image >> outputFilenameImg;
@@ -348,7 +345,7 @@ int main(int argc, char* const argv[]){
       auto thin_image = ImageFromSet<Image>::create(thin_set, foreground_value, false, useInputImgToExp);
       thin_image >> outputFilenameImg;
     }
-  }   
+  }
 #ifdef WITH_QGLVIEWER
 if(visualize)
   {
