@@ -1,13 +1,10 @@
 # DGtalTools 1.3 (beta)
 
-- *volumetric*
-  - criticalKernelsThinning3D: new option to keep the resulting image
-  domain equal to the input image (instead using the resulting
-  bouding box set).
-  (Bertrand Kerautret [#431](https://github.com/DGtal-team/DGtalTools/pull/431))
- - criticalKernelsThinning3d: it can now export OBJ files for input surface and
-    output skeletons
-    (Jacques-Olivier Lachaud [#414](https://github.com/DGtal-team/DGtalTools/pull/414))  
+- *build*
+  - New cmake option (DGTAL_RANDOMIZED_BUILD_THRESHOLD) to set the
+    (approximated) % of tools build
+    (Bertrand Kerautret [#416](https://github.com/DGtal-team/DGtal/pull/416))
+
 
 - *converters*
   - heightfield2shading: new option to add a matcap rendering (from normal
@@ -18,12 +15,11 @@
   - mesh2heightfield: automatic object placement and improved usage.
     (Bertrand Kerautret & Florian Delconte [#429](https://github.com/DGtal-team/DGtalTools/pull/429))
   - vol2slice: fix infinite slices extraction.
-    (Bertrand Kerautret [#439](https://github.com/DGtal-team/DGtalTools/pull/439))
- 
-- *build*
-  - New cmake option (DGTAL_RANDOMIZED_BUILD_THRESHOLD) to set the
-    (approximated) % of tools build
-    (Bertrand Kerautret [#416](https://github.com/DGtal-team/DGtal/pull/416))
+    (Bertrand Kerautret [#439](https://github.com/DGtal-team/DGtalTools/pull/439)) 
+
+- *generatos*
+  - 2dSimplePolygonDigitizer: new tool compute the Gauss Digitization of a simple closed polyline.
+    (Phuc Ngo [#398](https://github.com/DGtal-team/DGtalTools/pull/398)) 
 
 - *visualisation*
   - 3dImplicitSurfaceExtractorByThickening: adding OBJ export.
@@ -37,7 +33,11 @@
   - volSegment: adding new option to get long int images as output (for
     longvol exporting). (Bertrand Kerautret [#420](https://github.com/DGtal-team/DGtalTools/pull/420))
   - volInfo: get information from a volumetric file. (David Coeurjolly, [#430](https://github.com/DGtal-team/DGtalTools/pull/430))
-
+  - criticalKernelsThinning3D: new option to keep the resulting image
+    domain equal to the input image (instead using the resulting bouding box set).
+    (Bertrand Kerautret [#431](https://github.com/DGtal-team/DGtalTools/pull/431))
+ - criticalKernelsThinning3d: it can now export OBJ files for input surface and
+   output skeletons (Jacques-Olivier Lachaud [#414](https://github.com/DGtal-team/DGtalTools/pull/414))  
 
 # DGtalTools 1.2
 - *global*
