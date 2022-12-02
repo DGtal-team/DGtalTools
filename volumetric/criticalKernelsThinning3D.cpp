@@ -349,7 +349,8 @@ int main(int argc, char* const argv[]){
       thin_image >> outputFilenameImg;
     }
   }   
-#ifdef WITH_QGLVIEWER if(visualize)
+#ifdef WITH_QGLVIEWER
+if(visualize)
   {
     int argc(1);
     char** argv(nullptr);
