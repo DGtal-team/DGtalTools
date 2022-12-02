@@ -5,7 +5,9 @@
   domain equal to the input image (instead using the resulting
   bouding box set).
   (Bertrand Kerautret [#431](https://github.com/DGtal-team/DGtalTools/pull/431))
-  
+ - criticalKernelsThinning3d: it can now export OBJ files for input surface and
+    output skeletons
+    (Jacques-Olivier Lachaud [#414](https://github.com/DGtal-team/DGtalTools/pull/414))  
 
 - *converters*
   - heightfield2shading: new option to add a matcap rendering (from normal
@@ -35,6 +37,7 @@
   - volSegment: adding new option to get long int images as output (for
     longvol exporting). (Bertrand Kerautret [#420](https://github.com/DGtal-team/DGtalTools/pull/420))
   - volInfo: get information from a volumetric file. (David Coeurjolly, [#430](https://github.com/DGtal-team/DGtalTools/pull/430))
+
 
 # DGtalTools 1.2
 - *global*
