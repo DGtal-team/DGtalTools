@@ -113,7 +113,7 @@ int main( int argc, char** argv )
     app.add_option("-i,--input,1", inputFileName, "Input filename (freeman chain of sdp)." )
     ->required()
     ->check(CLI::ExistingFile);
-    app.add_option("-o,--output", outputFileName, "Output filename", true);
+    app.add_option("-o,--output,2", outputFileName, "Output filename", true);
     
     app.get_formatter()->column_width(40);
     CLI11_PARSE(app, argc, argv);
