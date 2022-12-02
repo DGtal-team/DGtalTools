@@ -1,20 +1,42 @@
-# DGtalTools 1.3(beta)
-
+# DGtalTools 1.3 (beta)
 
 - *volumetric*
-  - criticalKernelsThinning3d: it can now export OBJ files for input surface and
+  - criticalKernelsThinning3D: new option to keep the resulting image
+  domain equal to the input image (instead using the resulting
+  bouding box set).
+  (Bertrand Kerautret [#431](https://github.com/DGtal-team/DGtalTools/pull/431))
+ - criticalKernelsThinning3d: it can now export OBJ files for input surface and
     output skeletons
-    (Jacques-Olivier Lachaud [#414](https://github.com/DGtal-team/DGtalTools/pull/414))
+    (Jacques-Olivier Lachaud [#414](https://github.com/DGtal-team/DGtalTools/pull/414))  
+
+- *converters*
+  - heightfield2shading: new option to add a matcap rendering (from normal
+    direction interpreted as HSV vector)
+    (Bertrand Kerautret [#399](https://github.com/DGtal-team/DGtalTools/pull/399))
+  - heightfield2shading: new option to generate a normal map.
+    (Bertrand Kerautret [#415](https://github.com/DGtal-team/DGtalTools/pull/415))
+  - mesh2heightfield: automatic object placement and improved usage.
+    (Bertrand Kerautret & Florian Delconte [#429](https://github.com/DGtal-team/DGtalTools/pull/429))
+  - vol2slice: fix infinite slices extraction.
+    (Bertrand Kerautret [#439](https://github.com/DGtal-team/DGtalTools/pull/439))
+ 
 - *build*
   - New cmake option (DGTAL_RANDOMIZED_BUILD_THRESHOLD) to set the
     (approximated) % of tools build
     (Bertrand Kerautret [#416](https://github.com/DGtal-team/DGtal/pull/416))
-       
+
 - *visualisation*
   - 3dImplicitSurfaceExtractorByThickening: adding OBJ export.
     (David Coeurjolly [#413](https://github.com/DGtal-team/DGtalTools/pull/413))
   - 3dVolViewer: adding new option to interprate intensity as transparency.
     (Bertrand Kerautret [#425](https://github.com/DGtal-team/DGtalTools/pull/425))
+  - 3dCompSurfelData: fix --noWindows option (issue [#427](https://github.com/DGtal-team/DGtalTools/issues/427). 
+    (Bertrand Kerautret and Kacper Pluta  [#440](https://github.com/DGtal-team/DGtalTools/pull/440))
+    
+- *volumetric*
+  - volSegment: adding new option to get long int images as output (for
+    longvol exporting). (Bertrand Kerautret [#420](https://github.com/DGtal-team/DGtalTools/pull/420))
+  - volInfo: get information from a volumetric file. (David Coeurjolly, [#430](https://github.com/DGtal-team/DGtalTools/pull/430))
 
 
 # DGtalTools 1.2
@@ -22,9 +44,9 @@
   - Fix itk2vol and fix ITK cmake configuaration that was making issues with the ITK image read.
     (Bertrand Kerautret [#393](https://github.com/DGtal-team/DGtalTools/pull/393))
   - Travis: Fix old default osx_image with xcode12.2 and remove non used boost
-    cmake references. (Bertrand Kerautret [#394](https://github.com/DGtal-team/DGtalTools/pull/394)) 
+    cmake references. (Bertrand Kerautret [#394](https://github.com/DGtal-team/DGtalTools/pull/394))
   - Uniform input/output option with previous use of CLI11 (issue #405).
-    (Bertrand Kerautret [#406](https://github.com/DGtal-team/DGtalTools/pull/406)) 
+    (Bertrand Kerautret [#406](https://github.com/DGtal-team/DGtalTools/pull/406))
   - Comply with cmake Policy CMP0115 "Source file extensions must be
      explicit". (Bertrand Kerautret and David Coeurjolly, [#407](https://github.com/DGtal-team/DGtalTools/pull/407))
 
@@ -101,6 +123,8 @@
   - volAddBorder: Add an option that sets zero value to domain boundary voxels without
     changing the domain extent (Bertrand Kertautret
     [#371](https://github.com/DGtal-team/DGtalTools/pull/371))
+  - volAddBorder: Fix VTKIMAGEDATA_CONTAINER_I (Phuc Ngo)
+    [#435](https://github.com/DGtal-team/DGtalTools/pull/435))  
   - Fix a wrong error message that appears when using the tool (wrong IO error)
     (Bertrand Kerautret
     [#368](https://github.com/DGtal-team/DGtalTools/pull/368))

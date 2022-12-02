@@ -54,8 +54,9 @@
    -o,--exportImage TEXT                 Export the resulting set of points to a image compatible with GenericWriter.
    -e,--exportSDP TEXT                   Export the resulting set of points in a simple (sequence of discrete point (sdp)).
    -t,--visualize                        Visualize result in viewer
-
-
+   -k,--keepInputDomain                  Keep the resulting image domain equal to the input image (instead using the resulting bouding box set).
+   -O,--exportOBJ TEXT                   Export the resulting set of points in an OBJ file.
+   -I,--exportInputOBJ TEXT              Export the input set of points in an OBJ file.
 
  @endcode
 
@@ -75,8 +76,9 @@
 #include <iostream>
 #include <chrono>
 #include <unordered_map>
-
+#ifdef WITH_QGLVIEWER
 #include <DGtal/io/viewers/Viewer3D.h>
+#endif
 #include <DGtal/base/Common.h>
 #include <DGtal/helpers/StdDefs.h>
 #include <DGtal/io/Color.h>
@@ -128,6 +130,7 @@ int main(int argc, char* const argv[]){
   bool profile {false};
   bool verbose  {false};
   bool visualize {false};
+  bool useInputImgToExp {false};
   
   app.description("Compute the thinning of a volume using the CriticalKernels framework\nBasic usage: criticalKernelsThinning3D --input <volFileName> --skel <ulti,end, 1isthmus, isthmus> --select [ -f <white,black> -m <minlevel> -M <maxlevel> -v ] [--persistence <value> ] --persistence <value> ] \n options for --skel {ulti end 1isthmus isthmus} \n options for --select = {dmax random first} \n Example: \n criticalKernelsThinning3D --input ${DGtal}/examples/samples/Al.100.vol --select dmax --skel 1isthmus --persistence 1 --visualize --verbose --exportImage ./Al100_dmax_1isthmus_p1.vol \n");
   app.add_option("-i,--input,1", inputFileName, "Input vol file." )
@@ -150,7 +153,10 @@ int main(int argc, char* const argv[]){
   app.add_option("--exportSDP,-e",outputFilenameSDP, "Export the resulting set of points in a simple (sequence of discrete point (sdp))." );
   app.add_option("--exportOBJ,-O",outputFilenameOBJ, "Export the resulting set of points in an OBJ file." );
   app.add_option("--exportInputOBJ,-I",outputFilenameInputOBJ, "Export the input set of points in an OBJ file." );
+#ifdef WITH_QGLVIEWER
   app.add_flag("--visualize,-t", visualize, "Visualize result in viewer");
+#endif
+  app.add_flag("--useInputImgToExp,-k", useInputImgToExp, "Use input image type to export result (allowing to keep same domain (and same image spacing when using ITK)).");
     
   app.get_formatter()->column_width(40);
   CLI11_PARSE(app, argc, argv);
@@ -166,7 +172,14 @@ int main(int argc, char* const argv[]){
   }
   trace.beginBlock("Reading input");
   using Domain = Z3i::Domain ;
+
+#ifdef WITH_ITK
+  using Image = ImageSelector < Z3i::Domain, unsigned char, ITKIMAGEDATA_CONTAINER_I>::Type ;
+#else
   using Image = ImageSelector < Z3i::Domain, unsigned char>::Type ;
+#endif
+
+  
   Image image = GenericReader<Image>::import(inputFileName);
   trace.endBlock();
 
@@ -327,7 +340,16 @@ int main(int argc, char* const argv[]){
       board.saveOBJ( outputFilenameOBJ );
     }
 
-  if(visualize)
+ if (useInputImgToExp){
+      for(auto p: image.domain()){image.setValue(p, 0);}
+      ImageFromSet<Image>::append(image, thin_set, foreground_value);
+      image >> outputFilenameImg;
+    }else{
+      auto thin_image = ImageFromSet<Image>::create(thin_set, foreground_value, false, useInputImgToExp);
+      thin_image >> outputFilenameImg;
+    }
+  }   
+#ifdef WITH_QGLVIEWER if(visualize)
   {
     int argc(1);
     char** argv(nullptr);
@@ -347,4 +369,6 @@ int main(int argc, char* const argv[]){
 
     app.exec();
   }
+#endif
+  
 }

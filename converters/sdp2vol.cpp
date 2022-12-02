@@ -129,7 +129,7 @@ int main( int argc, char** argv )
   if(domainCoords.size() != 6 )
   {
     unsigned int marge = 1;
-    for(unsigned int i=0; i< 4; i++)
+    for(unsigned int i=0; i< 3; i++)
     {
       BBCompPoints cmp_points(i);
       ptUpper[i] = (*(std::max_element(vectPoints.begin(), vectPoints.end(), cmp_points)))[i]+marge;

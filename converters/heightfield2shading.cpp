@@ -66,19 +66,34 @@ using namespace DGtal;
 
 @code
 
-Positionals:
-  1 TEXT:FILE REQUIRED                  input heightfield file (2D image).
-  2 TEXT                                output image.
+ Positionals:
+   1 TEXT:FILE REQUIRED                  mesh file (.off)
+   2 TEXT=result.pgm                     sequence of discrete point file (.sdp)
 
-Options:
-  -h,--help                             Print this help message and exit
-  -i,--input TEXT:FILE REQUIRED         input heightfield file (2D image).
-  -o,--output TEXT                      output image.
-  --importNormal TEXT                   import normals from file.
-  --lightDir,--lDir,--ld FLOAT x 3      light source direction: lx ly lz.
-  --lightPos,--lPos,--lp FLOAT x 3      light source position: px py pz.
-  -s,--specularModel FLOAT x 3          use specular Nayar model with 3 param Kdiff, Kspec, sigma.
-  -r,--reflectanceMap TEXT:FILE         specify a image as reflectance map.
+ Options:
+   -h,--help                             Print this help message and exit
+   -i,--input TEXT:FILE REQUIRED         mesh file (.off)
+   -o,--output TEXT=result.pgm           sequence of discrete point file (.sdp)
+   -s,--meshScale FLOAT                  change the default mesh scale (each vertex multiplied by the scale)
+   -a,--remeshMinArea FLOAT=0.01         ajust the remeshing min triangle are used to avoid empty areas
+   --heightFieldMaxScan INT=255          set the maximal scan deep.
+   -x,--centerX INT=0                    choose x center of the projected image.
+   -y,--centerY INT=0                    choose y center of the projected image.
+   -z,--centerZ INT=200                  choose z center of the projected image.
+   --nx FLOAT=0                          set the x component of the projection direction.
+   --ny FLOAT=0                          set the y component of the projection direction.
+   --nz FLOAT=1                          set the z component of the projection direction.
+   -v,--invertNormals                    invert normal vector of the mesh
+   --width FLOAT=500                     set the width of the area to be extracted as an height field image. (note that the resulting image width also depends of the scale parameter (option --meshScale))
+   --height FLOAT=500                    set the height of the area to extracted  as an height field image. (note that the resulting image height also depends of the scale parameter (option --meshScale))
+   --orientAutoFrontX                    automatically orients the camera in front according the x axis.
+   --orientAutoFrontY                    automatically orients the camera in front according the y axis.
+   --orientAutoFrontZ                    automatically orients the camera in front according the z axis.
+   --orientBack                          change the camera direction to back instead front as given in  orientAutoFront{X,Y,Z} options.
+   --exportNormals                       export mesh normal vectors (given in the image height field basis).
+   --backgroundNormalBack                set the normals of background in camera opposite direction (to obtain a black background in rendering).
+   --setBackgroundLastDepth              change the default background (black with the last filled intensity).
+
 
 @endcode
 
@@ -88,6 +103,13 @@ Options:
 @endcode
 You will obtain such image:
 @image html  resHeightfield2shading.png "Resulting image with a 90° ccw rotation"
+
+@b Other example:
+@code
+  $ heightfield2shading   ${DGtal}/examples/samples/bunnyHeightField.pgm  shading.ppm  --importNormal ${DGtal}/examples/samples/bunnyHeightField_normals.sdp --hsvShading
+@endcode
+You will obtain such image:
+@image html  resHueHeightfield2shading.png "Resulting image with a 90° ccw rotation (and conversion to png)"
 @see heightfield2shading.cpp
 
 */
@@ -96,7 +118,8 @@ You will obtain such image:
 
 template<typename TImage, typename TImageVector>
 void 
-computerBasicNormalsFromHeightField(const TImage &anHeightMap, TImageVector &vectorField)
+computerBasicNormalsFromHeightField(const TImage &anHeightMap, TImageVector &vectorField,
+                                    bool invertN = false)
 {
   for(typename TImage::Domain::ConstIterator it = anHeightMap.domain().begin(); 
       it != anHeightMap.domain().end(); it++){
@@ -106,7 +129,7 @@ computerBasicNormalsFromHeightField(const TImage &anHeightMap, TImageVector &vec
       double dy = (anHeightMap(*it-Z2i::Point(0,1))-anHeightMap(*it+Z2i::Point(0,1)))/2.0;
       Z3i::RealPoint n (dx, dy, 1);
       n /= n.norm();
-      vectorField.setValue(*it,n);
+      vectorField.setValue(*it,invertN? -n : n);
     }
   }
 }
@@ -115,16 +138,36 @@ computerBasicNormalsFromHeightField(const TImage &anHeightMap, TImageVector &vec
 
 template<typename TImageVector>
 void 
-importNormals(std::string file, TImageVector &vectorField)
+importNormals(std::string file, TImageVector &vectorField,
+              bool invertN = false)
 {
   std::vector<Z3i::RealPoint> vp = PointListReader<Z3i::RealPoint>::getPointsFromFile(file);
-   for(unsigned int i = 0; i< vp.size(); i=i+2){
+  trace.info() << "import done: " << vp.size() <<  std::endl;
+  for(unsigned int i = 0; i< vp.size()-1; i=i+2){
         Z3i::RealPoint p = vp.at(i);
         Z3i::RealPoint q = vp.at(i+1);
         Z3i::RealPoint n = (q-p)/(p-q).norm();
-        vectorField.setValue(Z2i::Point(p[0], p[1]),n);
-   }
+        vectorField.setValue(Z2i::Point(p[0], p[1]),invertN? -n : n);
+  }
+  trace.info() <<endl;
 }
+
+
+template<typename TImageVector>
+void 
+importNormalsOrdDir(std::string file, TImageVector &vectorField,
+                    unsigned int width, unsigned int height, bool invertN = false)
+{
+  std::vector<Z3i::RealPoint> vp = PointListReader<Z3i::RealPoint>::getPointsFromFile(file);
+
+  for(unsigned int i = 0; i< vp.size()-1; i++){
+    Z2i::Point p ( i-(width*floor((i/width))), i/width);
+    Z3i::RealPoint n = vp[i];
+    vectorField.setValue(p,invertN? -n : n);
+  }
+  trace.info() <<endl;
+}
+
 
 // Basic Lambertian reflectance model only based on light source direction. 
 template<typename TImage2D, typename TPoint3D >
@@ -251,6 +294,7 @@ struct ImageMapReflectance{
 };
 
 
+
 struct IdColor{
   Color operator()( const unsigned int & aValue ) const{
     return DGtal::Color(aValue);
@@ -259,11 +303,19 @@ struct IdColor{
 
 
 
+DGtal::Color
+colorFromHSB(double h, double saturation, double value){
+  double r, g, b;
+  DGtal::Color::HSVtoRGB(r, g, b, h,saturation, value);
+  return DGtal::Color(r*255.0,g*255.0,b*255.0);
+  
+}
+
+
 int main( int argc, char** argv )
 {
-  //  typedef ImageContainerBySTLVector < Z2i::Domain, unsigned int> Image2D;
+  typedef ImageContainerBySTLVector < Z2i::Domain, unsigned int> Image2DC;
   typedef ImageSelector < Z2i::Domain, unsigned char>::Type Image2D;
-  //typedef ImageContainerBySTLVector < Z2i::Domain, char> Image2DChar;
   typedef ImageContainerBySTLVector < Z2i::Domain, Z3i::RealPoint> Image2DNormals;
 
 
@@ -275,19 +327,25 @@ int main( int argc, char** argv )
   std::string normalFileName {""};
   double lx, ly, lz, px, py, pz;
   bool usingAllDirectionLightSource = false;
+  bool useOrderedImportNormal = false;
+  bool hsvShading = false;
+  bool normalMap = false;
+  bool invertNormals = false;
   std::vector<double> specularModel;
   std::string reflectanceMap;
-  std::vector<double> lDir;
+  std::vector<double> lDir = {0, 0, 1};
   std::vector<double> lPos;
+  std::vector<unsigned int> domain;  
   
-  
-  app.description("Render a 2D heightfield image into a shading image. You can choose between lambertian model (diffuse reflectance) and specular model (Nayar reflectance model). You can also choose between a single directional light source (using --lightDir option) or use light source which emits in all direction (by specifying the light source position with --lightPos} option). Another rendering mode is given from a bitmap reflectance map which represents the rendering for a normal vector value (mapped according the x/y coordinates).\nExample:\n   ${DGtal}/examples/samples/bunnyHeightField.pgm  shading.pgm --lPos 10.0  -120.0 550.0 --importNormal ${DGtal}/examples/samples/bunnyHeightField_normals.sdp -s 1.0 0.2 0.8 \n");
-  app.add_option("-i,--input,1", inputFileName, "input heightfield file (2D image).")
-     ->check(CLI::ExistingFile)
-     ->required();
+  app.description("Render a 2D heightfield image into a shading image. You can choose between lambertian model (diffuse reflectance) and specular model (Nayar reflectance model). You can also choose between a single directional light source (using --lightDir option) or use light source which emits in all direction (by specifying the light source position with --lightPos} option). Another rendering mode is given from a bitmap reflectance map which represents the rendering for a normal vector value (mapped according the x/y coordinates).\nExample:\n heightfield2shading   ${DGtal}/examples/samples/bunnyHeightField.pgm  shading.pgm --lPos 10.0  -120.0 550.0 --importNormal ${DGtal}/examples/samples/bunnyHeightField_normals.sdp -s 1.0 0.2 0.8 \n"
+    "Other example: heightfield2shading   ${DGtal}/examples/samples/bunnyHeightField.pgm  shading.ppm  --importNormal ${DGtal}/examples/samples/bunnyHeightField_normals.sdp --hsvShading\n");
+  auto opt1 = app.add_option("-i,--input,1", inputFileName, "input heightfield file (2D image).")
+    ->check(CLI::ExistingFile);
+  auto domOpt =  app.add_option("--domain,-d", domain , "specify the domain (required when normal are imported and if --inout is not given).")
+    -> expected(2);
   app.add_option("-o,--output,2", outputFileName,"output image.");
-  app.add_option("--importNormal", normalFileName, "import normals from file.");
-  
+  auto impNOpt = app.add_option("--importNormal", normalFileName, "import normals from file.");
+  app.add_flag("--orderedNormalsImport",useOrderedImportNormal, "Use ordered normals." );
   app.add_option("--lightDir,--lDir,--ld", lDir, "light source direction: lx ly lz.")
     ->expected(3);
   app.add_option("--lightPos,--lPos,--lp", lPos, "light source position: px py pz.")
@@ -296,12 +354,17 @@ int main( int argc, char** argv )
     ->expected(3);
   app.add_option("-r,--reflectanceMap",reflectanceMap, "specify a image as reflectance map.")
     ->check(CLI::ExistingFile);
-   
-  
+  app.add_flag("--hsvShading", hsvShading, "use shading with HSV shading (given from the normal vector)");
+  app.add_flag("--normalMap", normalMap, "generates normal map.");
+  app.add_flag("--invertNormals,-v", invertNormals, "invert normal orientations.");
   app.get_formatter()->column_width(40);
   CLI11_PARSE(app, argc, argv);
   // END parse command line using CLI ----------------------------------------------
 
+  if(! *opt1 && !(*domOpt && *impNOpt ) ){
+    trace.error() << "You need either set input file (--input) or use a domain (--domain) with the --importNormal option." << std::endl;
+    exit(0);
+  }
 
   
   if(lDir.size() == 3)
@@ -317,7 +380,7 @@ int main( int argc, char** argv )
       pz = lPos[2];  
       usingAllDirectionLightSource = true;
     }
-  else if (reflectanceMap == "")
+  else if (reflectanceMap == "" && ! hsvShading && !normalMap)
     {
       trace.error() << "You need to specify either the light source direction or position (if you use a all directions model)." << std::endl;
       exit(0);
@@ -347,24 +410,73 @@ int main( int argc, char** argv )
   }
 
   
-  trace.info() << "Reading input file " << inputFileName ; 
-  Image2D inputImage = DGtal::GenericReader<Image2D>::import(inputFileName);  
+  Image2D inputImage(Z2i::Domain(Z2i::Point(0,0), Z2i::Point(0,0) ));
+  if (inputFileName != "") {
+    trace.info() << "Reading input file " << inputFileName ; 
+    inputImage = DGtal::GenericReader<Image2D>::import(inputFileName);
+    trace.info() << "[done]" << std::endl;
+  }
+  else {
+    inputImage = Image2D(Z2i::Domain(Z2i::Domain(Z2i::Point(0,0),
+                                                 Z2i::Point(domain[0],domain[1]) )));
+  }
+  
   Image2DNormals vectNormals (inputImage.domain());
   Image2D result (inputImage.domain());
+  Image2DC resultC (inputImage.domain());
+
   if(normalFileName != ""){
-    importNormals(normalFileName, vectNormals);
-  }else{
-    computerBasicNormalsFromHeightField(inputImage, vectNormals);
+    trace.info() << "Import normal file " << inputFileName << vectNormals.domain();
+    if (useOrderedImportNormal)
+    {
+      importNormalsOrdDir(normalFileName, vectNormals,
+                          inputImage.domain().upperBound()[0]+1,
+                          inputImage.domain().upperBound()[1]+1, invertNormals);
+    }
+    else
+    {
+      importNormals(normalFileName, vectNormals, invertNormals);
+    }
+    trace.info() << "[done]" << std::endl;
   }
-  if(reflectanceMap != "")
+  else
+  {
+    computerBasicNormalsFromHeightField(inputImage, vectNormals, invertNormals);
+  }
+  if (hsvShading)
+  {
+    for(typename Image2D::Domain::ConstIterator it = inputImage.domain().begin();
+        it != inputImage.domain().end(); it++){
+      auto n = vectNormals(*it);
+      double sat = 1.0*( sin(acos(Z3i::RealPoint(0.0,0.0,1.0).dot(n))));
+      double value = 1.0;
+      double hue = ((int)(((2.0*M_PI+atan2(Z3i::RealPoint(0.0,1.0,0.0).dot(n),
+                     Z3i::RealPoint(1.0,0.0,0.0).dot(n)))/(2.0*M_PI))*360.0+100))%360;
+      DGtal::uint32_t colCode = colorFromHSB(hue, sat, value).getRGB();
+      resultC.setValue(*it, colCode);
+    }
+    IdColor id;
+    PPMWriter<Image2DC, IdColor  >::exportPPM(outputFileName, resultC, id);
+  }
+  else if (normalMap)
+  {
+    DGtal::functors::Rescaling<double, unsigned int> rgRescale (-1.0, 1.0, 0, 255);
+    DGtal::functors::Rescaling<double, unsigned int> bRescale (0.0, -1.0, 128, 255);
+    for(typename Image2D::Domain::ConstIterator it = inputImage.domain().begin();
+        it != inputImage.domain().end(); it++){
+        auto n = vectNormals(*it);
+        DGtal::Color c (rgRescale(n[0]), rgRescale(n[1]), bRescale(n[2]) );
+        resultC.setValue(*it, c.getRGB());
+    }
+    IdColor id;
+    PPMWriter<Image2DC, IdColor  >::exportPPM(outputFileName, resultC, id);
+  }
+  else if(reflectanceMap != "")
     {
       ImageMapReflectance<Image2D, Z3i::RealPoint> lMap(reflectanceMap);
       for(typename Image2D::Domain::ConstIterator it = inputImage.domain().begin(); 
           it != inputImage.domain().end(); it++){
-        if(reflectanceMap != "")
-          {
-            result.setValue(*it, lMap(vectNormals(*it)));           
-          }       
+            result.setValue(*it, lMap(vectNormals(*it)));
       }        
       IdColor id;
       PPMWriter<Image2D, IdColor  >::exportPPM(outputFileName, result, id);

@@ -36,6 +36,7 @@
 #include "DGtal/images/ImageContainerBySTLVector.h"
 #include "DGtal/io/readers/GenericReader.h"
 #include "DGtal/io/writers/GenericWriter.h"
+
 #include "DGtal/images/IntervalForegroundPredicate.h"
 #include <DGtal/topology/SetOfSurfels.h>
 #include "DGtal/topology/DigitalSurface.h"
@@ -68,6 +69,7 @@ using namespace DGtal;
    -h,--help                             Print this help message and exit.
    -i,--input TEXT:FILE REQUIRED         volumetric input file (.vol, .pgm, .pgm3d, .longvol)
    -o,--output TEXT=result.vol           volumetric output file (.vol, .pgm, .pgm3d, .longvol)
+   --outputTypeUInt                      to specify the output image type (unsigned int) instead using the default unsigned char. If this flag is selected you have to check the output file format type (longvol, or an ITK image type if the DGtal WITH_ITK option is selected).
    --labelBackground                     option to define a label to regions associated to object background.
    -m,--thresholdMin INT=0               min threshold (if not given the max threshold is computed with Otsu algorithm).
    -M,--thresholdMax INT=255             max threshold
@@ -101,6 +103,11 @@ and display them with @ref Doc3DSDPViewer :
  */
 
 typedef ImageContainerBySTLVector < Z3i::Domain, unsigned char > Image3D;
+typedef ImageContainerBySTLVector < Z3i::Domain, DGtal::uint64_t > Image3DI;
+
+typedef Z3i::KSpace::SurfelSet SurfelSet;
+typedef SetOfSurfels< Z3i::KSpace, SurfelSet > MySetOfSurfels;
+
 
 std::vector<unsigned int> getHistoFromImage(const Image3D &image){
   const Image3D::Domain &imgDom = image.domain();
@@ -150,11 +157,73 @@ getOtsuThreshold(const Image3D &image){
 }
 
 
+template<typename TImageOutput>
+void
+applySegmentation(TImageOutput &imageResuSegmentation,  const Image3D &inputImage, CLI::Option *labelOpt, int maxTh, int minTh) {
+  functors::IntervalForegroundPredicate<Image3D> simplePredicate ( inputImage, minTh, maxTh );
+  SurfelAdjacency< Z3i::KSpace::dimension > SAdj ( true );
+  Z3i::KSpace K;
+  bool space_ok = K.init( inputImage.domain().lowerBound(), inputImage.domain().upperBound(), false );
+  if(!space_ok){
+    trace.error() << "problem initializing 3d space" << endl;
+  }
+  
+  std::vector< std::vector<Z3i::SCell > > vectConnectedSCell;
+  Surfaces<Z3i::KSpace>::extractAllConnectedSCell(vectConnectedSCell,K, SAdj, simplePredicate, false);
+  trace.progressBar(0, vectConnectedSCell.size());
+  for(unsigned int i = 0; i<vectConnectedSCell.size(); i++)
+  {
+    trace.progressBar(i, vectConnectedSCell.size());
+    MySetOfSurfels  aSet(K, SAdj);
+    Z3i::Point lowerPoint, upperPoint;
+    Z3i::Point p1;
+    Z3i::Point p2;
+    for(std::vector<Z3i::SCell>::const_iterator it= vectConnectedSCell.at(i).begin(); it != vectConnectedSCell.at(i).end(); ++it)
+    {
+      aSet.surfelSet().insert(aSet.surfelSet().begin(),  *it);
+      unsigned int orth_dir = K.sOrthDir( *it );
+      p1 =  K.sCoords( K.sIncident( *it, orth_dir, true ) );
+      p2 =  K.sCoords( K.sIncident( *it, orth_dir, false ) );
+      if(p1[0] < lowerPoint[0]) lowerPoint[0]= p1[0];
+      if(p1[1] < lowerPoint[1]) lowerPoint[1]= p1[1];
+      if(p1[2] < lowerPoint[2]) lowerPoint[2]= p1[2];
+      
+      if(p1[0] > upperPoint[0]) upperPoint[0]= p1[0];
+      if(p1[1] > upperPoint[1]) upperPoint[1]= p1[1];
+      if(p1[2] > upperPoint[2]) upperPoint[2]= p1[2];
+      
+      if(p2[0] < lowerPoint[0]) lowerPoint[0]= p2[0];
+      if(p2[1] < lowerPoint[1]) lowerPoint[1]= p2[1];
+      if(p2[2] < lowerPoint[2]) lowerPoint[2]= p2[2];
+      
+      if(p2[0] > upperPoint[0]) upperPoint[0]= p2[0];
+      if(p2[1] > upperPoint[1]) upperPoint[1]= p2[1];
+      if(p2[2] > upperPoint[2]) upperPoint[2]= p2[2];
+      
+    }
+    
+    Z3i::KSpace kRestr ;
+    kRestr.init( lowerPoint, upperPoint, false );
+    if(simplePredicate(p2)){
+      DGtal::Surfaces<Z3i::KSpace>::uFillInterior( kRestr,  aSet.surfelPredicate(),
+                                                  imageResuSegmentation,
+                                                  i, false, false);
+    }else if (labelOpt->count() > 0){
+      DGtal::Surfaces<Z3i::KSpace>::uFillExterior( kRestr,  aSet.surfelPredicate(),
+                                                  imageResuSegmentation,
+                                                  i+1, false, false);
+    }
+  }
+  trace.progressBar(vectConnectedSCell.size(), vectConnectedSCell.size());
+  trace.info() << std::endl;
+}
+
+
+
+
 
 int main( int argc, char** argv )
 {
-  typedef Z3i::KSpace::SurfelSet SurfelSet;
-  typedef SetOfSurfels< Z3i::KSpace, SurfelSet > MySetOfSurfels;
   
   // parse command line using CLI ----------------------------------------------
   CLI::App app;
@@ -163,12 +232,16 @@ int main( int argc, char** argv )
   bool labelBackground {false};
   int minTh {0};
   int maxTh {255};
-  
+  bool outputTypeInt {false};
+
   app.description("Segment volumetric file from a simple threshold which can be set automatically from the otsu estimation.\n The segmentation result is given by an integer label given in the resulting image. Example:\n volSegment ${DGtal}/examples/samples/lobster.vol segmentation.vol \n");
   app.add_option("-i,--input,1", inputFileName, "volumetric input file (.vol, .pgm, .pgm3d, .longvol)." )
   ->required()
   ->check(CLI::ExistingFile);
   app.add_option("-o,--output,2", outputFileName, "volumetric output file (.vol, .pgm, .pgm3d, .longvol)", true);
+
+  app.add_flag("--outputTypeUInt", outputTypeInt, "to specify the output image type (unsigned int) instead using the default unsigned char. If this flag is selected you have to check the output file format type (longvol, or an ITK image type if the DGtal WITH_ITK option is selected).");
+
   auto labelOpt = app.add_flag("--labelBackground",labelBackground, "option to define a label to regions associated to object background.");
   app.add_option("-m,--thresholdMin",minTh, "min threshold (if not given the max threshold is computed with Otsu algorithm).", true );
   auto maxThOpt = app.add_option("-M,--thresholdMax", maxTh, "max threshold", true );
@@ -180,9 +253,8 @@ int main( int argc, char** argv )
 
   trace.info() << "Reading input file " << inputFileName ;
   Image3D inputImage = DGtal::GenericReader<Image3D>::import(inputFileName);
-  Image3D imageResuSegmentation(inputImage.domain());
+  trace.info() << " [done] " << std::endl ;
   
-  trace.info() << " [done] " << std::endl ; 
   std::ofstream outStream;
   outStream.open(outputFileName.c_str());
   if(maxThOpt->count()==0){
@@ -191,63 +263,18 @@ int main( int argc, char** argv )
   }
   trace.info() << "Processing image to output file " << outputFileName << std::endl;
 
-  functors::IntervalForegroundPredicate<Image3D> simplePredicate ( inputImage, minTh, maxTh );
-  SurfelAdjacency< Z3i::KSpace::dimension > SAdj ( true );
-  Z3i::KSpace K;
-  bool space_ok = K.init( inputImage.domain().lowerBound(), inputImage.domain().upperBound(), false );
-  if(!space_ok){
-     trace.error() << "problem initializing 3d space" << endl;
+  
+  if (outputTypeInt)
+  {
+    Image3DI imageResuSegmentation(inputImage.domain());
+    applySegmentation(imageResuSegmentation, inputImage, labelOpt, maxTh, minTh);
+    GenericWriter<Image3DI>::exportFile(outputFileName, imageResuSegmentation);
+    
+  }else{
+    Image3D imageResuSegmentation(inputImage.domain());
+    applySegmentation(imageResuSegmentation, inputImage, labelOpt, maxTh, minTh);
+    GenericWriter<Image3D>::exportFile(outputFileName, imageResuSegmentation);
   }
-
-  std::vector< std::vector<Z3i::SCell > > vectConnectedSCell;
-  Surfaces<Z3i::KSpace>::extractAllConnectedSCell(vectConnectedSCell,K, SAdj, simplePredicate, false);
-  trace.progressBar(0, vectConnectedSCell.size());
-  for(unsigned int i = 0; i<vectConnectedSCell.size(); i++)
-    {
-      trace.progressBar(i, vectConnectedSCell.size());
-      MySetOfSurfels  aSet(K, SAdj);
-      Z3i::Point lowerPoint, upperPoint;
-      Z3i::Point p1;
-      Z3i::Point p2;
-      for(std::vector<Z3i::SCell>::const_iterator it= vectConnectedSCell.at(i).begin(); it != vectConnectedSCell.at(i).end(); ++it)
-        {
-          aSet.surfelSet().insert(aSet.surfelSet().begin(),  *it);
-          unsigned int orth_dir = K.sOrthDir( *it );                                                     
-          p1 =  K.sCoords( K.sIncident( *it, orth_dir, true ) );               
-          p2 =  K.sCoords( K.sIncident( *it, orth_dir, false ) );
-          if(p1[0] < lowerPoint[0]) lowerPoint[0]= p1[0];
-          if(p1[1] < lowerPoint[1]) lowerPoint[1]= p1[1];
-          if(p1[2] < lowerPoint[2]) lowerPoint[2]= p1[2];
-
-          if(p1[0] > upperPoint[0]) upperPoint[0]= p1[0];
-          if(p1[1] > upperPoint[1]) upperPoint[1]= p1[1];
-          if(p1[2] > upperPoint[2]) upperPoint[2]= p1[2];
-
-          if(p2[0] < lowerPoint[0]) lowerPoint[0]= p2[0];
-          if(p2[1] < lowerPoint[1]) lowerPoint[1]= p2[1];
-          if(p2[2] < lowerPoint[2]) lowerPoint[2]= p2[2];
-
-          if(p2[0] > upperPoint[0]) upperPoint[0]= p2[0];
-          if(p2[1] > upperPoint[1]) upperPoint[1]= p2[1];
-          if(p2[2] > upperPoint[2]) upperPoint[2]= p2[2];
-          
-        }    
-       
-       Z3i::KSpace kRestr ;
-       kRestr.init( lowerPoint, upperPoint, false );
-       if(simplePredicate(p2)){
-         DGtal::Surfaces<Z3i::KSpace>::uFillInterior( kRestr,  aSet.surfelPredicate(), 
-                                                      imageResuSegmentation,
-                                                      i, false, false);
-       }else if (labelOpt->count() > 0){
-         DGtal::Surfaces<Z3i::KSpace>::uFillExterior( kRestr,  aSet.surfelPredicate(), 
-                                                      imageResuSegmentation,
-                                                      i+1, false, false);
-       }
-    }
-  trace.progressBar(vectConnectedSCell.size(), vectConnectedSCell.size());
-  trace.info() << std::endl;
-  GenericWriter<Image3D>::exportFile(outputFileName, imageResuSegmentation);
   return 0;
 }
 
