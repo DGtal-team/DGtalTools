@@ -1,10 +1,9 @@
-# DGtalTools 1.3 (beta)
+# DGtalTools 1.3
 
 - *build*
   - New cmake option (DGTAL_RANDOMIZED_BUILD_THRESHOLD) to set the
     (approximated) % of tools build
     (Bertrand Kerautret [#416](https://github.com/DGtal-team/DGtal/pull/416))
-
 
 - *converters*
   - heightfield2shading: new option to add a matcap rendering (from normal
@@ -17,7 +16,7 @@
   - vol2slice: fix infinite slices extraction.
     (Bertrand Kerautret [#439](https://github.com/DGtal-team/DGtalTools/pull/439)) 
 
-- *generatos*
+- *generators*
   - 2dSimplePolygonDigitizer: new tool compute the Gauss Digitization of a simple closed polyline.
     (Phuc Ngo [#398](https://github.com/DGtal-team/DGtalTools/pull/398)) 
 
@@ -36,8 +35,8 @@
   - criticalKernelsThinning3D: new option to keep the resulting image
     domain equal to the input image (instead using the resulting bouding box set).
     (Bertrand Kerautret [#431](https://github.com/DGtal-team/DGtalTools/pull/431))
- - criticalKernelsThinning3d: it can now export OBJ files for input surface and
-   output skeletons (Jacques-Olivier Lachaud [#414](https://github.com/DGtal-team/DGtalTools/pull/414))  
+  - criticalKernelsThinning3d: it can now export OBJ files for input surface and
+    output skeletons (Jacques-Olivier Lachaud [#414](https://github.com/DGtal-team/DGtalTools/pull/414))  
 
 # DGtalTools 1.2
 - *global*
