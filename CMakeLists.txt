@@ -1,11 +1,10 @@
-
 #David Coeurjolly <david.coeurjolly@liris.cnrs.fr>
 # -----------------------------------------------------------------------------
 # Project definition
 # -----------------------------------------------------------------------------
 PROJECT(DGtalTools)
 
-cmake_minimum_required (VERSION 3.1)
+cmake_minimum_required (VERSION 3.11)
 cmake_policy(SET CMP0057 NEW) # the new interpretation of IN_LIST is by default not set (at least until  3.21.1).
 
 SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake")
@@ -60,8 +59,8 @@ include_directories( "${PROJECT_SOURCE_DIR}/ext/" )
 # -----------------------------------------------------------------------------
 SET(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
 SET(DGtalTools_VERSION_MAJOR 1)
-SET(DGtalTools_VERSION_MINOR 3)
-#SET(DGtalTools_VERSION_PATCH 0)
+SET(DGtalTools_VERSION_MINOR 4)
+#SET(DGtalTools_VERSION_PATCH beta)
 SET(DGTALTOOLS_VERSION "${DGtalTools_VERSION_MAJOR}.${DGtalTools_VERSION_MINOR}.${DGtalTools_VERSION_PATCH}")
 SET(PROJECT_VERSION "${DGtalTools_VERSION_MAJOR}.${DGtalTools_VERSION_MINOR}.${DGtalTools_VERSION_PATCH}")
 SET(VERSION ${DGtalTools_VERSION_MAJOR}.${DGtalTools_VERSION_MINOR}.${DGtalTools_VERSION_PATCH})
