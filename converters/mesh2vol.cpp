@@ -88,7 +88,7 @@ void voxelizeAndExport(const std::string& inputFilename,
   trace.beginBlock("Preparing the mesh");
   trace.info() << "Reading input file: " << inputFilename;
   Mesh<PointR3> inputMesh;
-  MeshReader<PointR3>::importOFFFile(inputFilename.c_str(), inputMesh);
+  inputMesh << inputFilename.c_str();
   trace.info() << " [done]" << std::endl;
   const std::pair<PointR3, PointR3> bbox = inputMesh.getBoundingBox();
   trace.info()<< "Mesh bounding box: "<<bbox.first <<" "<<bbox.second<<std::endl;
