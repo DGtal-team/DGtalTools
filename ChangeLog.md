@@ -1,6 +1,8 @@
 # DGtalTools 1.4 (beta)
 
-
+- *volumetric*
+    - volReSample: fix the impossibility to export to vol when ITK is activated
+      (Bertrand Kerautret [#445](https://github.com/DGtal-team/DGtalTools/pull/445))
 
 # DGtalTools 1.3
 
