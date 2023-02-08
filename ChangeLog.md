@@ -1,5 +1,9 @@
 # DGtalTools 1.4 (beta)
 
+- *visualisation*
+  - meshViewer: new option to change the default background color and some fix 
+    and simplications of the option --doSnapShotAndExit. 
+    (Bertrand Kerautret [#448](https://github.com/DGtal-team/DGtalTools/pull/448))
 
 
 # DGtalTools 1.3
