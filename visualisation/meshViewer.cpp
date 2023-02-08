@@ -110,10 +110,9 @@ protected:
     Viewer3D<>::init();
     Viewer3D<>::setKeyDescription ( Qt::Key_I, "Display mesh informations about #faces, #vertices" );
     Viewer3D<>::setGLDoubleRenderingMode(false);
-    if(mySaveSnap){
-      QObject::connect(this, SIGNAL(drawFinished(bool)), this, SLOT(saveSnapshot(bool)));
-    }
+   
   }
+  
   virtual void keyPressEvent(QKeyEvent *e){
     bool handled = false;
     if( e->key() == Qt::Key_I)
@@ -139,7 +138,6 @@ protected:
 public: 
   std::string myInfoDisplay = "No information loaded...";
   bool myIsDisplayingInfoMode = false;
-  bool mySaveSnap = false;
   DGtal::Z3i::RealPoint centerMesh;
 };
 
@@ -254,7 +252,6 @@ int main( int argc, char** argv )
   
   QApplication application(argc,argv);
   CustomViewer3D viewer;
-  viewer.mySaveSnap = snapshotFile != "";
   if(snapshotFile != "")
   {
     viewer.setSnapshotFileName(QString(snapshotFile.c_str()));
@@ -360,23 +357,9 @@ int main( int argc, char** argv )
   viewer  << CustomViewer3D::updateDisplay;
   if(snapshotFile != "" )
   {
-    // Appy cleaning just save the last snap
-    if(!viewer.restoreStateFromFile())
-    {
-      viewer.update();
-    }
-    std::string extension = snapshotFile.substr(snapshotFile.find_last_of(".") + 1);
-    std::string basename = snapshotFile.substr(0, snapshotFile.find_last_of("."));
-    for(int i=0; i< viewer.snapshotCounter()-1; i++){
-      std::stringstream s;
-      s << basename << "-"<< setfill('0') << setw(4)<<  i << "." << extension;
-      trace.info() << "erase temp file: " << s.str() << std::endl;
-      remove(s.str().c_str());
-    }
-    
-    std::stringstream s;
-    s << basename << "-"<< setfill('0') << setw(4)<<  viewer.snapshotCounter()-1 << "." << extension;
-    rename(s.str().c_str(), snapshotFile.c_str());
+    // Recover mesh position
+    viewer.restoreStateFromFile();
+    viewer.saveSnapshot(QString(snapshotFile.c_str()), true);
     return 0;
   }
   
