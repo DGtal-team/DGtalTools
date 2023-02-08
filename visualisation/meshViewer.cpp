@@ -184,6 +184,7 @@ int main( int argc, char** argv )
   bool invertNormal {false};
   bool drawVertex {false};
   bool useLastCamSet {false};
+  bool fixLightToScene {false};
   float ambiantLight {0.0};
   
   
@@ -215,6 +216,7 @@ int main( int argc, char** argv )
     ->expected(3);
   app.add_option("--doSnapShotAndExit,-d", snapshotFile, "save display snapshot into file. Notes that the camera setting is set by default according the last saved configuration (use SHIFT+Key_M to save current camera setting in the Viewer3D). If the camera setting was not saved it will use the default camera setting.");
   app.add_flag("--useLastCameraSetting,-c", useLastCamSet, "use the last camera setting of the user (i.e if a .qglviewer.xml file is present in the current directory)");
+  app.add_flag("--fixLightToScene,-l", fixLightToScene, "Fix light source to scence instead to camera");
   app.add_flag("--invertNormal,-n", invertNormal, "invert face normal vectors.");
   app.add_flag("--drawVertex,-v", drawVertex, "draw the vertex of the mesh");
   
@@ -371,9 +373,17 @@ int main( int argc, char** argv )
   ss << "# faces: " << std::fixed << nbFaces << "    #vertex: " <<  nbVertex ;
   viewer.myInfoDisplay = ss.str();
   viewer  << CustomViewer3D::updateDisplay;
-  if (useLastCamSet) {
+  if (fixLightToScene)
+  {
+        viewer.setLightModeFixToCamera(false, false);
+  }
+
+  if (useLastCamSet)
+  {
       viewer.restoreStateFromFile();
-  }else{
+  }
+  else
+  {
       // useful in non interactive case in order to retain the default camera settings (that are not saved in case of process kill).
       viewer.saveStateToFile();
   }
@@ -384,6 +394,5 @@ int main( int argc, char** argv )
     viewer.saveSnapshot(QString(snapshotFile.c_str()), true);
     return 0;
   }
-
   return application.exec();
 }
