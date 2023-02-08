@@ -183,6 +183,7 @@ int main( int argc, char** argv )
   double ballRadius {0.5};
   bool invertNormal {false};
   bool drawVertex {false};
+  bool useLastCamSet {false};
   float ambiantLight {0.0};
   
   
@@ -213,6 +214,7 @@ int main( int argc, char** argv )
   app.add_option("--customBGColor,-b", customBGColor, "set the R, G, B, A components of the colors of  the sdp view")
     ->expected(3);
   app.add_option("--doSnapShotAndExit,-d", snapshotFile, "save display snapshot into file. Notes that the camera setting is set by default according the last saved configuration (use SHIFT+Key_M to save current camera setting in the Viewer3D). If the camera setting was not saved it will use the default camera setting.");
+  app.add_flag("--useLastCameraSetting,-c", useLastCamSet, "use the last camera setting of the user (i.e if a .qglviewer.xml file is present in the current directory)");
   app.add_flag("--invertNormal,-n", invertNormal, "invert face normal vectors.");
   app.add_flag("--drawVertex,-v", drawVertex, "draw the vertex of the mesh");
   
@@ -369,6 +371,9 @@ int main( int argc, char** argv )
   ss << "# faces: " << std::fixed << nbFaces << "    #vertex: " <<  nbVertex ;
   viewer.myInfoDisplay = ss.str();
   viewer  << CustomViewer3D::updateDisplay;
+  if (useLastCamSet) {
+      viewer.restoreStateFromFile();
+  }
   if(snapshotFile != "" )
   {
     // Recover mesh position
