@@ -381,6 +381,7 @@ int main( int argc, char** argv )
     viewer.saveSnapshot(QString(snapshotFile.c_str()), true);
     return 0;
   }
-  
+  // useful in non interactive case in order to retain the default camera settings (that are not saved in case of process kill).
+  viewer.saveStateToFile();
   return application.exec();
 }
