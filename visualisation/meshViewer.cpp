@@ -136,6 +136,12 @@ protected:
   };
   
 public: 
+  void changeDefaultBGColor(const DGtal::Color &col)
+    {
+         myDefaultBackgroundColor = col;
+         Viewer3D<>::update();
+         Viewer3D<>::draw();
+      }
   std::string myInfoDisplay = "No information loaded...";
   bool myIsDisplayingInfoMode = false;
   DGtal::Z3i::RealPoint centerMesh;
@@ -168,6 +174,7 @@ int main( int argc, char** argv )
   std::vector<unsigned int > customColorMesh;
   std::vector<unsigned int > customColorSDP;
   std::vector<unsigned int > customLineColor;
+  std::vector<unsigned int > customBGColor;
   std::vector<unsigned int > vectFieldIndices = {0,1,2,3,4,5};
   std::string displayVectorField;
   
@@ -203,6 +210,8 @@ int main( int argc, char** argv )
   app.add_option("--SDPradius", ballRadius, "change the ball radius to display a set of discrete points (used with displaySDP option)", true);
   app.add_option("--displaySDP,-s", filenameSDP,  "add the display of a set of discrete points as ball of radius 0.5.");
   app.add_option("--addAmbientLight,-A", ambiantLight, "add an ambient light for better display (between 0 and 1)." );
+  app.add_option("--customBGColor,-b", customBGColor, "set the R, G, B, A components of the colors of  the sdp view")
+    ->expected(3);
   app.add_option("--doSnapShotAndExit,-d", snapshotFile, "save display snapshot into file. Notes that the camera setting is set by default according the last saved configuration (use SHIFT+Key_M to save current camera setting in the Viewer3D). If the camera setting was not saved it will use the default camera setting.");
   app.add_flag("--invertNormal,-n", invertNormal, "invert face normal vectors.");
   app.add_flag("--drawVertex,-v", drawVertex, "draw the vertex of the mesh");
@@ -252,6 +261,7 @@ int main( int argc, char** argv )
   
   QApplication application(argc,argv);
   CustomViewer3D viewer;
+  
   if(snapshotFile != "")
   {
     viewer.setSnapshotFileName(QString(snapshotFile.c_str()));
@@ -263,7 +273,11 @@ int main( int argc, char** argv )
   viewer.show();
   viewer.myGLLineMinWidth = lineWidth;
   viewer.setGLScale(sx, sy, sz);
-  
+  if (customBGColor.size() != 0){
+        viewer.changeDefaultBGColor(DGtal::Color(customBGColor[0],
+                                                 customBGColor[1],
+                                                 customBGColor[2], 255));
+  }
   if(ambiantLight != 0.0)
   {
     GLfloat lightAmbientCoeffs [4] = {ambiantLight,ambiantLight, ambiantLight, 1.0f};
