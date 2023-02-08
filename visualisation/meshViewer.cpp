@@ -74,10 +74,12 @@ using namespace DGtal;
  --SDPradius FLOAT=0.5                 change the ball radius to display a set of discrete points (used with displaySDP option)
  -s,--displaySDP TEXT                  add the display of a set of discrete points as ball of radius 0.5.
  -A,--addAmbientLight FLOAT            add an ambient light for better display (between 0 and 1).
- -d,--doSnapShotAndExit TEXT           save display snapshot into file. Notes that the camera setting is set by default according the last saved configuration (use SHIFT+Key_M to save current camera setting in the Viewer3D). If the camera setting was not saved it will use the default camera setting.
+ -b,--customBGColor UINT x 3           set the R, G, B, A components of the colors of  the sdp view
+ -d,--doSnapShotAndExit TEXT           save display snapshot into file. Notes that the camera                                             setting is set by default according the last saved                                                 configuration (use SHIFT+Key_M to save current camera                                              setting in the Viewer3D). If the camera setting was not                                            saved it will use the default camera setting.
+ -c,--useLastCameraSetting             use the last camera setting of the user (i.e if a                                                  .qglviewer.xml file is present in the current directory)
+ -l,--fixLightToScene                  Fix light source to scence instead to camera
  -n,--invertNormal                     invert face normal vectors.
  -v,--drawVertex                       draw the vertex of the mesh
- 
  
  @endcode
  
