@@ -237,24 +237,11 @@ int main( int argc, char** argv )
   
   if( customColorMesh.size() != 0 )
   {
-    if(customColorMesh.size()!=4 && customColorMesh.size()!=8 )
+    if(customColorMesh.size()<4 )
     {
       trace.error() << "colors specification should contain R,G,B and Alpha values"<< std::endl;
     }
-    if( customColorMesh.size() >= 4)
-    {
-      meshColorR = customColorMesh[0];
-      meshColorG = customColorMesh[1];
-      meshColorB = customColorMesh[2];
-      meshColorA = customColorMesh[3];
-    }
-    if(customColorMesh.size() == 8)
-    {
-      meshColorRLine = customColorMesh[4];
-      meshColorGLine = customColorMesh[5];
-      meshColorBLine = customColorMesh[6];
-      meshColorALine = customColorMesh[7];
-    }
+      
   }
   
   if(customColorSDP.size() == 4)
@@ -296,6 +283,16 @@ int main( int argc, char** argv )
   {
     Mesh<DGtal::Z3i::RealPoint> aMesh(customColorMesh.size() != 4 && customColorMesh.size() != 8);
     aMesh << inputFileNames[i];
+      // for obj mesh by default the mesh color face are not necessary uniform.
+      if (aMesh.isStoringFaceColors() && customColorMesh.size() >= 4 ){
+          if ( i*8 < customColorMesh.size() ) {meshColorR = customColorMesh[i*8];}
+          if ( i*8+1< customColorMesh.size() ) {meshColorG = customColorMesh[i*8+1];}
+          if ( i*8+2 < customColorMesh.size() ) {meshColorB = customColorMesh[i*8+2];}
+          if ( i*8+3 < customColorMesh.size() ) {meshColorA = customColorMesh[i*8+3];}
+          for (unsigned int j = 0; j < aMesh.nbFaces(); j++){
+              aMesh.setFaceColor(j, Color(meshColorR, meshColorG, meshColorB, meshColorA));
+          }
+      }
     vectMesh.push_back(aMesh);
   }
   DGtal::Z3i::RealPoint centerMeshes;
@@ -333,10 +330,21 @@ int main( int argc, char** argv )
     }
   }
   
-  viewer << CustomColors3D(Color(meshColorRLine, meshColorGLine, meshColorBLine, meshColorALine),
-                           Color(meshColorR, meshColorG, meshColorB, meshColorA));
-  for(unsigned int i=0; i<vectMesh.size(); i++){
-    viewer << vectMesh[i];
+   for(unsigned int i=0; i<vectMesh.size(); i++){
+       if ( i*8 < customColorMesh.size() ) {meshColorR = customColorMesh[i*8];}
+       if ( i*8+1< customColorMesh.size() ) {meshColorG = customColorMesh[i*8+1];}
+       if ( i*8+2 < customColorMesh.size() ) {meshColorB = customColorMesh[i*8+2];}
+       if ( i*8+3 < customColorMesh.size() ) {meshColorA = customColorMesh[i*8+3];}
+       if ( i*8+4 < customColorMesh.size() ) {meshColorALine = customColorMesh[i*8+4];}
+       if ( i*8+5< customColorMesh.size() ) {meshColorBLine = customColorMesh[i*8+5];}
+       if ( i*8+6 < customColorMesh.size() ) {meshColorRLine = customColorMesh[i*8+6];}
+       if ( i*8+7 < customColorMesh.size() ) {meshColorALine = customColorMesh[i*8+7];}
+
+       viewer << CustomColors3D(Color(meshColorRLine, meshColorGLine, meshColorBLine,
+                                      meshColorALine),
+                                Color(meshColorR, meshColorG, meshColorB, meshColorA));
+
+      viewer << vectMesh[i];
   }
   
   if(drawVertex){

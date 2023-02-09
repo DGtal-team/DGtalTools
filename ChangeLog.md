@@ -3,8 +3,10 @@
 - *visualisation*
   - meshViewer: new options to change the default background color, to
     load camera settings at startup and to change at startup the light
-    source mode attached or not to the camera. It also includes some
-    fix and simplications of the option --doSnapShotAndExit.
+    source mode attached or not to the camera. It includes a fix of
+    the -customColorMesh for obj mesh and add new possibilities to
+    custom the color of each mesh given as input. It also includes a
+    fix and some simplications of the option --doSnapShotAndExit.
     (Bertrand Kerautret
     [#448](https://github.com/DGtal-team/DGtalTools/pull/448))
 
