@@ -410,6 +410,7 @@ int main( int argc, char** argv )
     viewer.saveSnapshot(QString(snapshotFile.c_str()), true);
     return 0;
   }
- 
+  trace.info() << "[display ready]"<< std::endl;
+
   return application.exec();
 }
