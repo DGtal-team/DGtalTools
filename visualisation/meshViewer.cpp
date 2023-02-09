@@ -221,7 +221,7 @@ int main( int argc, char** argv )
   app.add_flag("--fixLightToScene,-l", fixLightToScene, "Fix light source to scence instead to camera");
   app.add_flag("--invertNormal,-n", invertNormal, "invert face normal vectors.");
   app.add_flag("--drawVertex,-v", drawVertex, "draw the vertex of the mesh");
-  
+
   
   app.get_formatter()->column_width(40);
   CLI11_PARSE(app, argc, argv);
@@ -396,6 +396,13 @@ int main( int argc, char** argv )
       // useful in non interactive case in order to retain the default camera settings (that are not saved in case of process kill).
       viewer.saveStateToFile();
   }
+  // First display transparency improve
+  viewer.sortTriangleFromCamera();
+  viewer.sortQuadFromCamera();
+  viewer.sortSurfelFromCamera();
+  viewer.sortPolygonFromCamera();
+  viewer  << CustomViewer3D::updateDisplay;
+  
   if(snapshotFile != "" )
   {
     // Recover mesh position
@@ -403,5 +410,6 @@ int main( int argc, char** argv )
     viewer.saveSnapshot(QString(snapshotFile.c_str()), true);
     return 0;
   }
+ 
   return application.exec();
 }
