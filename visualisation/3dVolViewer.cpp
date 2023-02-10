@@ -77,7 +77,8 @@ using namespace Z3i;
    --colorMesh UINT ...                  set the color of Mesh (given from displayMesh option) : r g b a
    -d,--doSnapShotAndExit                save display snapshot into file. Notes that the camera setting is set by default according the last saved configuration (use SHIFT+Key_M to save current camera setting in the Viewer3D). If the camera setting was not saved it will use the default camera setting.
    -t,--transparency UINT=255            change the defaukt transparency
-   
+   --useLastCameraSetting                use the last camera setting of the user (i.e if a    .qglviewer.xml file is present in the current directory)
+
  
  @endcode
  
@@ -215,6 +216,7 @@ int main( int argc, char** argv )
   bool interactiveDisplayVoxCoords {false};
   bool transIntensity {false};
   bool transIntensitySq {false};
+  bool useLastCamSet {false};
 
   app.add_option("-i,--input,1", inputFileName, "vol file (.vol, .longvol .p3d, .pgm3d and if WITH_ITK is selected: dicom, dcm, mha, mhd). For longvol, dicom, dcm, mha or mhd formats, the input values are linearly scaled between 0 and 255." )
   ->required()
@@ -235,9 +237,9 @@ int main( int argc, char** argv )
   app.add_option("--transparency,-t", transparency, "change the defaukt transparency", true);
   app.add_flag("--transIntensity",transIntensity , "Used vocel intensity to define transparency valeue");
   app.add_flag("--transIntensitySq",transIntensitySq , "Used squared vocel intensity to define transparency valeue");
-
   app.add_flag("--interactiveDisplayVoxCoords,-c", interactiveDisplayVoxCoords, " by using this option the coordinates can be displayed after selection (shift+left click on voxel).");
-  app.get_formatter()->column_width(40);
+ app.add_flag("--useLastCameraSetting", useLastCamSet, "use the last camera setting of the user (i.e if a .qglviewer.xml file is present in the current directory)");
+    app.get_formatter()->column_width(40);
   CLI11_PARSE(app, argc, argv);
   // END parse command line using CLI ----------------------------------------------
   
@@ -344,5 +346,17 @@ int main( int argc, char** argv )
     rename(s.str().c_str(), snapShotFile.c_str());
     return 0;
   }
+    
+  if (useLastCamSet)
+  {
+        viewer.restoreStateFromFile();
+  }
+  // First display transparency improve
+  viewer.sortTriangleFromCamera();
+  viewer.sortQuadFromCamera();
+  viewer.sortSurfelFromCamera();
+  viewer.sortPolygonFromCamera();
+  viewer  << Viewer::updateDisplay;
+  trace.info() << "[display ready]"<< std::endl;
   return application.exec();
 }
