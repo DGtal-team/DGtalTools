@@ -265,7 +265,7 @@ int main( int argc, char** argv )
   viewer.show();
   viewer.myGLLineMinWidth = lineWidth;
   viewer.setGLScale(sx, sy, sz);
-  if (customBGColor.size() != 0){
+  if (customBGColor.size() == 3){
         viewer.changeDefaultBGColor(DGtal::Color(customBGColor[0],
                                                  customBGColor[1],
                                                  customBGColor[2], 255));
