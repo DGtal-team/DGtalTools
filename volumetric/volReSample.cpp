@@ -135,13 +135,22 @@ int main( int argc, char** argv )
   const functors::Identity aFunctor{};
   SamplerImageAdapter sampledImage ( input3dImage, reSampler.getSubSampledDomain(), reSampler, aFunctor );
 #ifdef WITH_ITK
-  ITKWriter<SamplerImageAdapter>::exportITK(outputFileName, sampledImage,
-                                            Z3i::RealPoint(aGridSizeReSample[0],
-                                                           aGridSizeReSample[1],
-                                                           aGridSizeReSample[2]));
+    const std::string ext = outputFileName.substr( outputFileName.find_last_of(".") + 1 );
+    if (std::find(ITK_IO_IMAGE_EXT.begin(),
+                  ITK_IO_IMAGE_EXT.end(), ext) != ITK_IO_IMAGE_EXT.end() )
+    {
+        ITKWriter<SamplerImageAdapter>::exportITK(outputFileName, sampledImage,
+                                                  Z3i::RealPoint(aGridSizeReSample[0],
+                                                                 aGridSizeReSample[1],
+                                                                 aGridSizeReSample[2]));
+    }
+    else
+    {
+        GenericWriter<SamplerImageAdapter>::exportFile(outputFileName, sampledImage);
+    }
+
 #else
   GenericWriter<SamplerImageAdapter>::exportFile(outputFileName, sampledImage);
-
 #endif
   
   return 0;
