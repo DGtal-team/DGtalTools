@@ -11,6 +11,16 @@
     Kerautret
     [#448](https://github.com/DGtal-team/DGtalTools/pull/448))
 
+- *volumetric*
+    - volReSample: fix the impossibility to export to vol when ITK is activated
+      (Bertrand Kerautret [#445](https://github.com/DGtal-team/DGtalTools/pull/445))
+
+- *converters*
+   - mesh2vol: small fix to read generic mesh. 
+     (Bertrand Kerautret [#444](https://github.com/DGtal-team/DGtal/pull/444))
+ 
+
+
 
 # DGtalTools 1.3
 
