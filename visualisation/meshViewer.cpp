@@ -74,7 +74,7 @@ using namespace DGtal;
  --SDPradius FLOAT=0.5                 change the ball radius to display a set of discrete points (used with displaySDP option)
  -s,--displaySDP TEXT                  add the display of a set of discrete points as ball of radius 0.5.
  -A,--addAmbientLight FLOAT            add an ambient light for better display (between 0 and 1).
- -b,--customBGColor UINT x 3           set the R, G, B, A components of the colors of  the sdp view
+ -b,--customBGColor UINT x 3           set the R, G, B components of the colors of the background color.
  -d,--doSnapShotAndExit TEXT           save display snapshot into file. Notes that the camera                                             setting is set by default according the last saved                                                 configuration (use SHIFT+Key_M to save current camera                                              setting in the Viewer3D). If the camera setting was not                                            saved it will use the default camera setting.
  -c,--useLastCameraSetting             use the last camera setting of the user (i.e if a                                                  .qglviewer.xml file is present in the current directory)
  -l,--fixLightToScene                  Fix light source to scence instead to camera
@@ -214,7 +214,7 @@ int main( int argc, char** argv )
   app.add_option("--SDPradius", ballRadius, "change the ball radius to display a set of discrete points (used with displaySDP option)", true);
   app.add_option("--displaySDP,-s", filenameSDP,  "add the display of a set of discrete points as ball of radius 0.5.");
   app.add_option("--addAmbientLight,-A", ambiantLight, "add an ambient light for better display (between 0 and 1)." );
-  app.add_option("--customBGColor,-b", customBGColor, "set the R, G, B, A components of the colors of  the sdp view")
+  app.add_option("--customBGColor,-b", customBGColor, "set the R, G, B components of the colors of the background color.")
     ->expected(3);
   app.add_option("--doSnapShotAndExit,-d", snapshotFile, "save display snapshot into file. Notes that the camera setting is set by default according the last saved configuration (use SHIFT+Key_M to save current camera setting in the Viewer3D). If the camera setting was not saved it will use the default camera setting.");
   app.add_flag("--useLastCameraSetting,-c", useLastCamSet, "use the last camera setting of the user (i.e if a .qglviewer.xml file is present in the current directory)");
