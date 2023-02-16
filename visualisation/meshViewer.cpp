@@ -74,10 +74,12 @@ using namespace DGtal;
  --SDPradius FLOAT=0.5                 change the ball radius to display a set of discrete points (used with displaySDP option)
  -s,--displaySDP TEXT                  add the display of a set of discrete points as ball of radius 0.5.
  -A,--addAmbientLight FLOAT            add an ambient light for better display (between 0 and 1).
- -d,--doSnapShotAndExit TEXT           save display snapshot into file. Notes that the camera setting is set by default according the last saved configuration (use SHIFT+Key_M to save current camera setting in the Viewer3D). If the camera setting was not saved it will use the default camera setting.
+ -b,--customBGColor UINT x 3           set the R, G, B components of the colors of the background color.
+ -d,--doSnapShotAndExit TEXT           save display snapshot into file. Notes that the camera                                             setting is set by default according the last saved                                                 configuration (use SHIFT+Key_M to save current camera                                              setting in the Viewer3D). If the camera setting was not                                            saved it will use the default camera setting.
+ -c,--useLastCameraSetting             use the last camera setting of the user (i.e if a                                                  .qglviewer.xml file is present in the current directory)
+ -l,--fixLightToScene                  Fix light source to scence instead to camera
  -n,--invertNormal                     invert face normal vectors.
  -v,--drawVertex                       draw the vertex of the mesh
- 
  
  @endcode
  
@@ -110,10 +112,9 @@ protected:
     Viewer3D<>::init();
     Viewer3D<>::setKeyDescription ( Qt::Key_I, "Display mesh informations about #faces, #vertices" );
     Viewer3D<>::setGLDoubleRenderingMode(false);
-    if(mySaveSnap){
-      QObject::connect(this, SIGNAL(drawFinished(bool)), this, SLOT(saveSnapshot(bool)));
-    }
+   
   }
+  
   virtual void keyPressEvent(QKeyEvent *e){
     bool handled = false;
     if( e->key() == Qt::Key_I)
@@ -137,9 +138,14 @@ protected:
   };
   
 public: 
+  void changeDefaultBGColor(const DGtal::Color &col)
+    {
+         myDefaultBackgroundColor = col;
+         Viewer3D<>::update();
+         Viewer3D<>::draw();
+      }
   std::string myInfoDisplay = "No information loaded...";
   bool myIsDisplayingInfoMode = false;
-  bool mySaveSnap = false;
   DGtal::Z3i::RealPoint centerMesh;
 };
 
@@ -170,6 +176,7 @@ int main( int argc, char** argv )
   std::vector<unsigned int > customColorMesh;
   std::vector<unsigned int > customColorSDP;
   std::vector<unsigned int > customLineColor;
+  std::vector<unsigned int > customBGColor;
   std::vector<unsigned int > vectFieldIndices = {0,1,2,3,4,5};
   std::string displayVectorField;
   
@@ -178,6 +185,8 @@ int main( int argc, char** argv )
   double ballRadius {0.5};
   bool invertNormal {false};
   bool drawVertex {false};
+  bool useLastCamSet {false};
+  bool fixLightToScene {false};
   float ambiantLight {0.0};
   
   
@@ -205,10 +214,14 @@ int main( int argc, char** argv )
   app.add_option("--SDPradius", ballRadius, "change the ball radius to display a set of discrete points (used with displaySDP option)", true);
   app.add_option("--displaySDP,-s", filenameSDP,  "add the display of a set of discrete points as ball of radius 0.5.");
   app.add_option("--addAmbientLight,-A", ambiantLight, "add an ambient light for better display (between 0 and 1)." );
+  app.add_option("--customBGColor,-b", customBGColor, "set the R, G, B components of the colors of the background color.")
+    ->expected(3);
   app.add_option("--doSnapShotAndExit,-d", snapshotFile, "save display snapshot into file. Notes that the camera setting is set by default according the last saved configuration (use SHIFT+Key_M to save current camera setting in the Viewer3D). If the camera setting was not saved it will use the default camera setting.");
+  app.add_flag("--useLastCameraSetting,-c", useLastCamSet, "use the last camera setting of the user (i.e if a .qglviewer.xml file is present in the current directory)");
+  app.add_flag("--fixLightToScene,-l", fixLightToScene, "Fix light source to scence instead to camera");
   app.add_flag("--invertNormal,-n", invertNormal, "invert face normal vectors.");
   app.add_flag("--drawVertex,-v", drawVertex, "draw the vertex of the mesh");
-  
+
   
   app.get_formatter()->column_width(40);
   CLI11_PARSE(app, argc, argv);
@@ -224,24 +237,11 @@ int main( int argc, char** argv )
   
   if( customColorMesh.size() != 0 )
   {
-    if(customColorMesh.size()!=4 && customColorMesh.size()!=8 )
+    if(customColorMesh.size()<4 )
     {
       trace.error() << "colors specification should contain R,G,B and Alpha values"<< std::endl;
     }
-    if( customColorMesh.size() >= 4)
-    {
-      meshColorR = customColorMesh[0];
-      meshColorG = customColorMesh[1];
-      meshColorB = customColorMesh[2];
-      meshColorA = customColorMesh[3];
-    }
-    if(customColorMesh.size() == 8)
-    {
-      meshColorRLine = customColorMesh[4];
-      meshColorGLine = customColorMesh[5];
-      meshColorBLine = customColorMesh[6];
-      meshColorALine = customColorMesh[7];
-    }
+      
   }
   
   if(customColorSDP.size() == 4)
@@ -254,7 +254,6 @@ int main( int argc, char** argv )
   
   QApplication application(argc,argv);
   CustomViewer3D viewer;
-  viewer.mySaveSnap = snapshotFile != "";
   if(snapshotFile != "")
   {
     viewer.setSnapshotFileName(QString(snapshotFile.c_str()));
@@ -266,7 +265,11 @@ int main( int argc, char** argv )
   viewer.show();
   viewer.myGLLineMinWidth = lineWidth;
   viewer.setGLScale(sx, sy, sz);
-  
+  if (customBGColor.size() == 3){
+        viewer.changeDefaultBGColor(DGtal::Color(customBGColor[0],
+                                                 customBGColor[1],
+                                                 customBGColor[2], 255));
+  }
   if(ambiantLight != 0.0)
   {
     GLfloat lightAmbientCoeffs [4] = {ambiantLight,ambiantLight, ambiantLight, 1.0f};
@@ -280,6 +283,16 @@ int main( int argc, char** argv )
   {
     Mesh<DGtal::Z3i::RealPoint> aMesh(customColorMesh.size() != 4 && customColorMesh.size() != 8);
     aMesh << inputFileNames[i];
+      // for obj mesh by default the mesh color face are not necessary uniform.
+      if (aMesh.isStoringFaceColors() && customColorMesh.size() >= 4 ){
+          if ( i*8 < customColorMesh.size() ) {meshColorR = customColorMesh[i*8];}
+          if ( i*8+1< customColorMesh.size() ) {meshColorG = customColorMesh[i*8+1];}
+          if ( i*8+2 < customColorMesh.size() ) {meshColorB = customColorMesh[i*8+2];}
+          if ( i*8+3 < customColorMesh.size() ) {meshColorA = customColorMesh[i*8+3];}
+          for (unsigned int j = 0; j < aMesh.nbFaces(); j++){
+              aMesh.setFaceColor(j, Color(meshColorR, meshColorG, meshColorB, meshColorA));
+          }
+      }
     vectMesh.push_back(aMesh);
   }
   DGtal::Z3i::RealPoint centerMeshes;
@@ -317,10 +330,21 @@ int main( int argc, char** argv )
     }
   }
   
-  viewer << CustomColors3D(Color(meshColorRLine, meshColorGLine, meshColorBLine, meshColorALine),
-                           Color(meshColorR, meshColorG, meshColorB, meshColorA));
-  for(unsigned int i=0; i<vectMesh.size(); i++){
-    viewer << vectMesh[i];
+   for(unsigned int i=0; i<vectMesh.size(); i++){
+       if ( i*8 < customColorMesh.size() ) {meshColorR = customColorMesh[i*8];}
+       if ( i*8+1< customColorMesh.size() ) {meshColorG = customColorMesh[i*8+1];}
+       if ( i*8+2 < customColorMesh.size() ) {meshColorB = customColorMesh[i*8+2];}
+       if ( i*8+3 < customColorMesh.size() ) {meshColorA = customColorMesh[i*8+3];}
+       if ( i*8+4 < customColorMesh.size() ) {meshColorALine = customColorMesh[i*8+4];}
+       if ( i*8+5< customColorMesh.size() ) {meshColorBLine = customColorMesh[i*8+5];}
+       if ( i*8+6 < customColorMesh.size() ) {meshColorRLine = customColorMesh[i*8+6];}
+       if ( i*8+7 < customColorMesh.size() ) {meshColorALine = customColorMesh[i*8+7];}
+
+       viewer << CustomColors3D(Color(meshColorRLine, meshColorGLine, meshColorBLine,
+                                      meshColorALine),
+                                Color(meshColorR, meshColorG, meshColorB, meshColorA));
+
+      viewer << vectMesh[i];
   }
   
   if(drawVertex){
@@ -358,27 +382,35 @@ int main( int argc, char** argv )
   ss << "# faces: " << std::fixed << nbFaces << "    #vertex: " <<  nbVertex ;
   viewer.myInfoDisplay = ss.str();
   viewer  << CustomViewer3D::updateDisplay;
+  if (fixLightToScene)
+  {
+      viewer.setLightModeFixToCamera(false, false);
+  }
+
+  if (useLastCamSet)
+  {
+      viewer.restoreStateFromFile();
+  }
+  else
+  {
+      // useful in non interactive case in order to retain the default camera settings (that are not saved in case of process kill).
+      viewer.saveStateToFile();
+  }
+  // First display transparency improve
+  viewer.sortTriangleFromCamera();
+  viewer.sortQuadFromCamera();
+  viewer.sortSurfelFromCamera();
+  viewer.sortPolygonFromCamera();
+  viewer  << CustomViewer3D::updateDisplay;
+  
   if(snapshotFile != "" )
   {
-    // Appy cleaning just save the last snap
-    if(!viewer.restoreStateFromFile())
-    {
-      viewer.update();
-    }
-    std::string extension = snapshotFile.substr(snapshotFile.find_last_of(".") + 1);
-    std::string basename = snapshotFile.substr(0, snapshotFile.find_last_of("."));
-    for(int i=0; i< viewer.snapshotCounter()-1; i++){
-      std::stringstream s;
-      s << basename << "-"<< setfill('0') << setw(4)<<  i << "." << extension;
-      trace.info() << "erase temp file: " << s.str() << std::endl;
-      remove(s.str().c_str());
-    }
-    
-    std::stringstream s;
-    s << basename << "-"<< setfill('0') << setw(4)<<  viewer.snapshotCounter()-1 << "." << extension;
-    rename(s.str().c_str(), snapshotFile.c_str());
+    // Recover mesh position
+    viewer.restoreStateFromFile();
+    viewer.saveSnapshot(QString(snapshotFile.c_str()), true);
     return 0;
   }
-  
+  trace.info() << "[display ready]"<< std::endl;
+
   return application.exec();
 }

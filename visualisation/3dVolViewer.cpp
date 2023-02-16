@@ -77,7 +77,8 @@ using namespace Z3i;
    --colorMesh UINT ...                  set the color of Mesh (given from displayMesh option) : r g b a
    -d,--doSnapShotAndExit                save display snapshot into file. Notes that the camera setting is set by default according the last saved configuration (use SHIFT+Key_M to save current camera setting in the Viewer3D). If the camera setting was not saved it will use the default camera setting.
    -t,--transparency UINT=255            change the defaukt transparency
-   
+   --useLastCameraSetting                use the last camera setting of the user (i.e if a    .qglviewer.xml file is present in the current directory)
+
  
  @endcode
  
@@ -211,10 +212,13 @@ int main( int argc, char** argv )
   std::string displayMesh;
   std::string snapShotFile;
   std::vector<unsigned int> colorMesh;
+  std::vector<unsigned int > customBGColor;
+
   string inputType {""};
   bool interactiveDisplayVoxCoords {false};
   bool transIntensity {false};
   bool transIntensitySq {false};
+  bool useLastCamSet {false};
 
   app.add_option("-i,--input,1", inputFileName, "vol file (.vol, .longvol .p3d, .pgm3d and if WITH_ITK is selected: dicom, dcm, mha, mhd). For longvol, dicom, dcm, mha or mhd formats, the input values are linearly scaled between 0 and 255." )
   ->required()
@@ -231,13 +235,15 @@ int main( int argc, char** argv )
   app.add_option("--displayMesh", displayMesh, "display a Mesh given in OFF or OFS format.");
   app.add_option("--colorMesh", colorMesh, "set the color of Mesh (given from displayMesh option) : r g b a ")
    ->expected(4);
-  app.add_flag("--doSnapShotAndExit,-d",snapShotFile, "save display snapshot into file. Notes that the camera setting is set by default according the last saved configuration (use SHIFT+Key_M to save current camera setting in the Viewer3D). If the camera setting was not saved it will use the default camera setting." );
+    app.add_option("--doSnapShotAndExit,-d", snapShotFile, "save display snapshot into file. Notes that the camera setting is set by default according the last saved configuration (use SHIFT+Key_M to save current camera setting in the Viewer3D). If the camera setting was not saved it will use the default camera setting.");
+  app.add_option("--customBGColor,-b", customBGColor, "set the R, G, B, A components of the colors of  the sdp view")
+      ->expected(3);
   app.add_option("--transparency,-t", transparency, "change the defaukt transparency", true);
   app.add_flag("--transIntensity",transIntensity , "Used vocel intensity to define transparency valeue");
   app.add_flag("--transIntensitySq",transIntensitySq , "Used squared vocel intensity to define transparency valeue");
-
   app.add_flag("--interactiveDisplayVoxCoords,-c", interactiveDisplayVoxCoords, " by using this option the coordinates can be displayed after selection (shift+left click on voxel).");
-  app.get_formatter()->column_width(40);
+ app.add_flag("--useLastCameraSetting", useLastCamSet, "use the last camera setting of the user (i.e if a .qglviewer.xml file is present in the current directory)");
+    app.get_formatter()->column_width(40);
   CLI11_PARSE(app, argc, argv);
   // END parse command line using CLI ----------------------------------------------
   
@@ -264,7 +270,14 @@ int main( int argc, char** argv )
   Image3D_D  imageD = Image3D_D(d);
   Image3D_I  imageI = Image3D_I(d);
   Image  image = Image(d);
-
+  if (customBGColor.size() == 3)
+  {
+      viewer.myDefaultBackgroundColor = DGtal::Color(customBGColor[0],
+                                              customBGColor[1],
+                                              customBGColor[2], 255);
+      viewer.update();
+      viewer.draw();
+   }
   if(extension != "sdp")
   {
     unsigned int numDisplayed=0;
@@ -324,25 +337,24 @@ int main( int argc, char** argv )
   }
   
   viewer << Viewer3D<>::updateDisplay;
-  if(snapShotFile != "")
-  {
-    // Appy cleaning just save the last snap
-    if(!viewer.restoreStateFromFile())
+  if(snapShotFile != "" )
     {
-      viewer.update();
-    }
-    std::string extension = snapShotFile.substr(snapShotFile.find_last_of(".") + 1);
-    std::string basename = snapShotFile.substr(0, snapShotFile.find_last_of("."));
-    for(int i=0; i< viewer.snapshotCounter()-1; i++){
-      std::stringstream s;
-      s << basename << "-"<< setfill('0') << setw(4)<<  i << "." << extension;
-      trace.info() << "erase temp file: " << s.str() << std::endl;
-      remove(s.str().c_str());
-    }
-    std::stringstream s;
-    s << basename << "-"<< setfill('0') << setw(4)<<  viewer.snapshotCounter()-1 << "." << extension;
-    rename(s.str().c_str(), snapShotFile.c_str());
-    return 0;
+      // Recover mesh position
+      viewer.restoreStateFromFile();
+      viewer.saveSnapshot(QString(snapShotFile.c_str()), true);
+      return 0;
+   }
+    
+  if (useLastCamSet)
+  {
+        viewer.restoreStateFromFile();
   }
+  // First display transparency improve
+  viewer.sortTriangleFromCamera();
+  viewer.sortQuadFromCamera();
+  viewer.sortSurfelFromCamera();
+  viewer.sortPolygonFromCamera();
+  viewer  << Viewer::updateDisplay;
+  trace.info() << "[display ready]"<< std::endl;
   return application.exec();
 }

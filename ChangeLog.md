@@ -1,5 +1,15 @@
 # DGtalTools 1.4 (beta)
 
+- *visualisation*
+  - meshViewer: new options to change the default background color, to
+    load camera settings at startup, to change at startup the light
+    source mode attached or not to the camera and improve transparency
+    process at startup rendering. It includes a fix of the
+    -customColorMesh for obj mesh and add new possibilities to custom
+    the color of each mesh given as input. It also includes a fix and
+    some simplications of the option --doSnapShotAndExit.  (Bertrand
+    Kerautret
+    [#448](https://github.com/DGtal-team/DGtalTools/pull/448))
 
 - *volumetric*
     - volReSample: fix the impossibility to export to vol when ITK is activated
