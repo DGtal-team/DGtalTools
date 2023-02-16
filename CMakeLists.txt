@@ -27,9 +27,19 @@ message(STATUS "DGtal found.")
  # -----------------------------------------------------------------------------
  # CPP17
  # -----------------------------------------------------------------------------
+set(DGTALTOOLS_CMAKE_CXX_STANDARD_MIN_REQUIRED 17)
  if(NOT CMAKE_CXX_STANDARD)
-   set(CMAKE_CXX_STANDARD 17)
+   set(CMAKE_CXX_STANDARD ${DGTALTOOLS_CMAKE_CXX_STANDARD_MIN_REQUIRED})
  else()
+  # Throw if CMAKE_CXX_STANDARD is 98
+  if(${CMAKE_CXX_STANDARD} EQUAL 98)
+    message(FATAL_ERROR "CMAKE_CXX_STANDARD is set to ${CMAKE_CXX_STANDARD}, "
+      "but DGtalTools requires at least ${DGTALTOOLS_CMAKE_CXX_STANDARD_MIN_REQUIRED}.")
+  endif()
+endif()
+if(NOT CMAKE_CXX_STANDARD_REQUIRED)
+  set(CMAKE_CXX_STANDARD_REQUIRED ON)
+endif()
 
 
 
