@@ -80,7 +80,8 @@ template< unsigned int SEP >
 void voxelizeAndExport(const std::string& inputFilename,
                        const std::string& outputFilename,
                        const unsigned int resolution,
-                       const unsigned int margin)
+                       const unsigned int margin,
+                       const unsigned char fillVal)
 {
   using Domain   = Z3i::Domain;
   using PointR3  = Z3i::RealPoint;
@@ -130,7 +131,7 @@ void voxelizeAndExport(const std::string& inputFilename,
   trace.info()<<aDomain<<std::endl;
   ImageContainerBySTLVector<Domain, unsigned char> image(aDomain);
   for(auto p: mySet)
-    image.setValue(p, 128);
+    image.setValue(p, fillVal);
   image >> outputFilename.c_str();
   trace.endBlock();
 }
@@ -145,6 +146,7 @@ int main( int argc, char** argv )
    unsigned int margin  {0};
    unsigned int separation {6};
    unsigned int resolution {128};
+   unsigned char fillValue {128};
    bool unitScale {false};
    
    app.description("Convert a mesh file into a 26-separated or 6-separated volumetric voxelization in a given resolution grid. \n Example:\n mesh2vol ${DGtal}/examples/samples/tref.off output.vol --separation 26 --resolution 256 ");
@@ -155,6 +157,7 @@ int main( int argc, char** argv )
    app.add_option("-o,--output,2", outputFileName, "filename of ouput volumetric file (vol, pgm3d, ...).",true);
    app.add_option("-m,--margin", margin, "add volume margin around the mesh bounding box.");
    app.add_flag("-d,--objectDomainBB", unitScale, "use the digitization space defined from bounding box of input mesh. If seleted, the option --resolution will have no effect.");
+   app.add_option("-f,--fillValue", fillValue, "change the default value of filling value of the volumetric image.")
    app.add_option("-s,--separation", separation, "voxelization 6-separated or 26-separated.", true)
      -> check(CLI::IsMember({6, 26}));
    app.add_option("-r,--resolution", resolution,"digitization domain size (e.g. 128). The mesh will be scaled such that its bounding box maps to [0,resolution)^3.", true);
@@ -165,9 +168,9 @@ int main( int argc, char** argv )
   // END parse command line using CLI ----------------------------------------------    
        
   if (separation==6)
-       voxelizeAndExport<6>(inputFileName, outputFileName, unitScale ? 0 : resolution, margin);
+       voxelizeAndExport<6>(inputFileName, outputFileName, unitScale ? 0 : resolution, margin, fillValue);
   else
-    voxelizeAndExport<26>(inputFileName, outputFileName, unitScale ? 0 : resolution, margin);    
+    voxelizeAndExport<26>(inputFileName, outputFileName, unitScale ? 0 : resolution, margin, fillValue);    
  return EXIT_SUCCESS;
 }
 
