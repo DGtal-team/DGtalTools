@@ -18,7 +18,9 @@
 - *converters*
    - mesh2vol: small fix to read generic mesh. 
      (Bertrand Kerautret [#444](https://github.com/DGtal-team/DGtal/pull/444))
- 
+   - mesh2vol: use the digitization space defined from bounding box of input mesh. 
+     (Bertrand Kerautret [#450](https://github.com/DGtal-team/DGtal/pull/450))
+     
 
 
 
