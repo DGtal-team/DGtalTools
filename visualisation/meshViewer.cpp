@@ -67,6 +67,7 @@ using namespace DGtal;
  -z,--scaleZ FLOAT                     set the scale value in the z direction (default 1.0)
  --minLineWidth FLOAT=1.5              set the min line width of the mesh faces (default 1.5)
  --customColorMesh UINT ...            set the R, G, B, A components of the colors of the mesh faces and eventually the color R, G, B, A of the mesh edge lines (set by default to black).
+ --customAlphaMesh INT                 set the alpha components of the colors of the mesh faces.
  --customColorSDP UINT x 4             set the R, G, B, A components of the colors of  the sdp view
  -f,--displayVectorField TEXT          display a vector field from a simple sdp file (two points per line)
  --vectorFieldIndex UINT x 6           specify special indices for the two point coordinates (instead usinf the default indices: 0 1, 2, 3, 4, 5)
@@ -188,7 +189,7 @@ int main( int argc, char** argv )
   bool useLastCamSet {false};
   bool fixLightToScene {false};
   float ambiantLight {0.0};
-  
+  unsigned int customAlphaMesh {255};
   
   // parse command line using CLI ----------------------------------------------
   CLI::App app;
@@ -203,6 +204,7 @@ int main( int argc, char** argv )
   app.add_option("-z,--scaleZ", sz, "set the scale value in the z direction (default 1.0)");
   app.add_option("--minLineWidth", lineWidth, "set the min line width of the mesh faces (default 1.5)", true);
   app.add_option("--customColorMesh", customColorMesh, "set the R, G, B, A components of the colors of the mesh faces and eventually the color R, G, B, A of the mesh edge lines (set by default to black).");
+  app.add_option("--customAlphaMesh", customAlphaMesh, "set the alpha components of the colors of the mesh faces.");
   
   app.add_option("--customColorSDP", customColorSDP, "set the R, G, B, A components of the colors of  the sdp view")
   ->expected(4);
@@ -292,7 +294,14 @@ int main( int argc, char** argv )
           for (unsigned int j = 0; j < aMesh.nbFaces(); j++){
               aMesh.setFaceColor(j, Color(meshColorR, meshColorG, meshColorB, meshColorA));
           }
+      }else if (customAlphaMesh != 255) {
+          for (unsigned int j = 0; j < aMesh.nbFaces(); j++){
+	    auto c = aMesh.getFaceColor(j);
+            aMesh.setFaceColor(j, Color(c.red(), c.green(), c.blue(), customAlphaMesh));
+          }
+	
       }
+      
     vectMesh.push_back(aMesh);
   }
   DGtal::Z3i::RealPoint centerMeshes;
