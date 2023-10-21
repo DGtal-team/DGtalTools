@@ -102,8 +102,8 @@ jobs:
            cd DGtal
            mkdir buildDGtal
            cd buildDGtal
-           echo  cmake .. -DCMAKE_BUILD_TYPE=Release $CONFIG_WINDOWS -DBUILD_EXAMPLES=false -DBUILD_TESTING=false 
-           cmake .. -DCMAKE_BUILD_TYPE=Release $CONFIG_WINDOWS -DBUILD_EXAMPLES=false -DBUILD_TESTING=false  
+           echo  cmake .. -DCMAKE_BUILD_TYPE=$BUILD_TYPE $CONFIG_WINDOWS -DBUILD_EXAMPLES=false -DBUILD_TESTING=false 
+           cmake .. -DCMAKE_BUILD_TYPE=$BUILD_TYPE $CONFIG_WINDOWS -DBUILD_EXAMPLES=false -DBUILD_TESTING=false  
            cmake --build . --config Release --parallel 3
      - name: Configure CMake (linux)
        if: matrix.os == 'ubuntu-latest'
@@ -121,13 +121,13 @@ jobs:
        if: matrix.os == 'windows-latest'
        shell: bash
        working-directory: "${{runner.workspace}}/build"
-       run: cmake $GITHUB_WORKSPACE -DCMAKE_MODULE_PATH="D:/a/DGtalTools/build/DGtal/buildDGtal" -DDGtal_DIR="D:/a/DGtalTools/build/DGtal/buildDGtal"  -DCMAKE_BUILD_TYPE=Release -DDGTAL_RANDOMIZED_TESTING_WHITELIST="${{ steps.whitelist.outputs.WHITELIST }}"
+       run: cmake $GITHUB_WORKSPACE -DCMAKE_MODULE_PATH="D:/a/DGtalTools/build/DGtal/buildDGtal" -DDGtal_DIR="D:/a/DGtalTools/build/DGtal/buildDGtal"  -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DDGTAL_RANDOMIZED_TESTING_WHITELIST="${{ steps.whitelist.outputs.WHITELIST }}"
 
      - name: Build
        working-directory: ${{runner.workspace}}/build
        shell: bash
        # Execute the build.  You can specify a specific target with "--target <NAME>"
-       run: cmake --build . --config Release  
+       run: cmake --build . --config $BUILD_TYPE  
 
 
 
