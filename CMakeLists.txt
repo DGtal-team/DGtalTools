@@ -10,6 +10,9 @@ cmake_policy(SET CMP0057 NEW) # the new interpretation of IN_LIST is by default 
 SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake")
 SET(DGTALTOOLS_RANDOMIZED_BUILD_THRESHOLD "100" CACHE INTERNAL "Threshold for the random selection of tools to build.")
 SET(DGTALTOOLS_RANDOMIZED_BUILD_WHITELIST "" CACHE INTERNAL "List of whitelisted tools to build.")
+option(NO_ADD_STBIMAGE_IMPLEMENT "To avoid duplicated linking errors (like LNK2005 in MSVC)" OFF)
+
+
 
 # -----------------------------------------------------------------------------
 # DGtal dependencies
@@ -25,10 +28,22 @@ message(STATUS "DGtal found.")
 
 
  # -----------------------------------------------------------------------------
- # CPP11
+ # CPP17
  # -----------------------------------------------------------------------------
- set (CMAKE_CXX_STANDARD 11)
- set (CMAKE_CXX_STANDARD_REQUIRED TRUE)
+set(DGTALTOOLS_CMAKE_CXX_STANDARD_MIN_REQUIRED 17)
+ if(NOT CMAKE_CXX_STANDARD)
+   set(CMAKE_CXX_STANDARD ${DGTALTOOLS_CMAKE_CXX_STANDARD_MIN_REQUIRED})
+ else()
+  # Throw if CMAKE_CXX_STANDARD is 98
+  if(${CMAKE_CXX_STANDARD} EQUAL 98)
+    message(FATAL_ERROR "CMAKE_CXX_STANDARD is set to ${CMAKE_CXX_STANDARD}, "
+      "but DGtalTools requires at least ${DGTALTOOLS_CMAKE_CXX_STANDARD_MIN_REQUIRED}.")
+  endif()
+endif()
+if(NOT CMAKE_CXX_STANDARD_REQUIRED)
+  set(CMAKE_CXX_STANDARD_REQUIRED ON)
+endif()
+
 
 
 
@@ -51,8 +66,6 @@ endif (CMAKE_CXX_FLAGS MATCHES "-ftemplate-depth-[0-9]*")
 # CLI11
 # -----------------------------------------------------------------------------
 include_directories( "${PROJECT_SOURCE_DIR}/ext/" )
-
-
 
 # -----------------------------------------------------------------------------
 # Define variables and cmake parameters, and display some information

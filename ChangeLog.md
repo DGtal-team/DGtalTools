@@ -23,14 +23,15 @@
      
 
 
-
 # DGtalTools 1.3
 
 - *build*
   - New cmake option (DGTAL_RANDOMIZED_BUILD_THRESHOLD) to set the
     (approximated) % of tools build
-    (Bertrand Kerautret [#416](https://github.com/DGtal-team/DGtal/pull/416))
-
+    (Bertrand Kerautret [#416](https://github.com/DGtal-team/DGtalTools/pull/416))
+  - Following DGtal C++17 is now required. (David Coeurjolly and Bertrand Kerautret, 
+     [#449](https://github.com/DGtal-team/DGtal/pull/449))
+     
 - *converters*
   - heightfield2shading: new option to add a matcap rendering (from normal
     direction interpreted as HSV vector)
