@@ -1,4 +1,4 @@
-name: CI (linux/macOS)
+name: CI (linux/macOS/windows)
 
 on:
   push:
@@ -12,6 +12,7 @@ env:
   CONFIG_GLOBAL: 
   CONFIG_LINUX:  -DWITH_MAGICK=true -DWITH_GMP=true -DWITH_FFTW3=true -DWARNING_AS_ERROR=ON -DWITH_HDF5=true -DWITH_QGLVIEWER=true -DWITH_CAIRO=true  -DWITH_EIGEN=true -DDGTAL_ENABLE_FLOATING_POINT_EXCEPTIONS=true
   CONFIG_MAC:    -DWITH_EIGEN=true -DWITH_GMP=tue
+  CONFIG_WINDOWS: -DWITH_OPENMP=true -DENABLE_CONAN=true #-DWITH_FFTW3=true  #-DWITH_CAIRO=true #-DWITH_ITK=true  -DWITH_GMP=true
 
 
 jobs:
@@ -20,7 +21,7 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        os: [ubuntu-latest, macOS-latest]
+        os: [ubuntu-latest, macOS-latest,windows-latest]
 
     steps:
 
@@ -44,8 +45,27 @@ jobs:
        if: matrix.os == 'macOS-latest'
        run: brew install boost ninja eigen gmp
 
+     - name: Install conan
+       if: matrix.os == 'windows-latest'
+       id: conan
+       uses: turtlebrowser/get-conan@main
+       with:
+         version: 1.57.0
+
+     - name: Create conan default profile
+       if: matrix.os == 'windows-latest'
+       run: conan profile new default --detect
+
+     - uses: actions/cache@v3
+       if: matrix.os == 'windows-latest'
+       with:
+         path: ~/.conan
+         key: ${{ runner.os }}-conan-Release
+
+
      - name: Create Build Environment
        run: cmake -E make_directory ${{runner.workspace}}/build
+
 
      
      - name: DGtalBuild (linux)
@@ -73,7 +93,18 @@ jobs:
            echo  cmake .. $CONFIG_MAC -DBUILD_EXAMPLES=false -DBUILD_TESTING=false  -G Ninja
            cmake .. $CONFIG_MAC -DBUILD_EXAMPLES=false -DBUILD_TESTING=false  -G Ninja
            ninja
-
+     - name: DGtalBuild (windows)
+       if: matrix.os == 'windows-latest'
+       shell: bash
+       working-directory: ${{runner.workspace}}/build
+       run: |
+           git clone --depth 1 https://github.com/DGtal-team/DGtal.git
+           cd DGtal
+           mkdir buildDGtal
+           cd buildDGtal
+           echo  cmake .. -DCMAKE_BUILD_TYPE=$BUILD_TYPE $CONFIG_WINDOWS -DBUILD_EXAMPLES=false -DBUILD_TESTING=false 
+           cmake .. -DCMAKE_BUILD_TYPE=$BUILD_TYPE $CONFIG_WINDOWS -DBUILD_EXAMPLES=false -DBUILD_TESTING=false  
+           cmake --build . --config Release --parallel 3
      - name: Configure CMake (linux)
        if: matrix.os == 'ubuntu-latest'
        shell: bash
@@ -85,7 +116,13 @@ jobs:
        shell: bash
        working-directory: ${{runner.workspace}}/build
        run: cmake $GITHUB_WORKSPACE  -DDGtal_DIR=${{runner.workspace}}/build/DGtal/buildDGtal -DCMAKE_BUILD_TYPE=$BUILD_TYPE $CONFIG_GLOBAL -DDGTALTOOLS_RANDOMIZED_BUILD_THRESHOLD=25  -DDGTALTOOLS_RANDOMIZED_BUILD_WHITELIST="${{ steps.whitelisttools.outputs.WHITE_LIST_TOOLS }}" $CONFIG_MAC -G Ninja
-              
+
+     - name: Configure CMake (windows)
+       if: matrix.os == 'windows-latest'
+       shell: bash
+       working-directory: "${{runner.workspace}}/build"
+       run: cmake $GITHUB_WORKSPACE -DCMAKE_MODULE_PATH="D:/a/DGtalTools/build/DGtal/buildDGtal" -DDGtal_DIR="D:/a/DGtalTools/build/DGtal/buildDGtal"  -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DDGTAL_RANDOMIZED_TESTING_WHITELIST="${{ steps.whitelist.outputs.WHITELIST }}"
+
      - name: Build
        working-directory: ${{runner.workspace}}/build
        shell: bash

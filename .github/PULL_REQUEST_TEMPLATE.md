@@ -11,5 +11,5 @@
 - [ ] Check if it follows the tools structure described in [CONTRIBUTING.md](https://github.com/DGtal-team/DGtalTools/blob/master/CONTRIBUTING.md)
 - [ ] New entry in the [ChangeLog.md](https://github.com/DGtal-team/DGtalTools/blob/master/ChangeLog.md) added.
 - [ ] Update the readme with potentially a screenshot of the tools if it applies. 
-- [ ] No warning raised in Debug ```cmake``` mode (otherwise, Travis C.I. will fail).
-- [ ] All continuous integration tests pass (Github Actions & appveyor).
+- [ ] No warning raised in Debug ```cmake``` mode (otherwise, Github Actions C.I. will fail).
+- [ ] All continuous integration tests pass (Github Actions).
