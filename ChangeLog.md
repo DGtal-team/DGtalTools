@@ -10,7 +10,9 @@
     some simplications of the option --doSnapShotAndExit.  (Bertrand
     Kerautret
     [#448](https://github.com/DGtal-team/DGtalTools/pull/448))
-
+  - meshViewer: new option to set alpha channel of the mesh color.
+  (Bertrand  Kerautret
+    [#451](https://github.com/DGtal-team/DGtalTools/pull/451))
 - *volumetric*
     - volReSample: fix the impossibility to export to vol when ITK is activated
       (Bertrand Kerautret [#445](https://github.com/DGtal-team/DGtalTools/pull/445))
