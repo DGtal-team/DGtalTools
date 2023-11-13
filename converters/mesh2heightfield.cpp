@@ -309,7 +309,7 @@ int main( int argc, char** argv )
   double diagDist = (b.first-b.second).norm();
   if(diagDist<minDiagVolSize){
     meshScale = minDiagVolSize/diagDist;
-    inputMesh.changeScale(meshScale);
+    inputMesh.rescale(meshScale);
   }
 
   triangleAreaUnit *= meshScale;
