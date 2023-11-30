@@ -13,6 +13,13 @@
   - meshViewer: new option to set alpha channel of the mesh color.
   (Bertrand  Kerautret
     [#451](https://github.com/DGtal-team/DGtalTools/pull/451))
+  - 3dSDPViewer: new option to set alpha channel of the mesh color.
+  (Xun Gong
+    [#452](https://github.com/DGtal-team/DGtalTools/pull/452))
+  - meshViewer: Add colored SDP option in meshViewer when input texts is an alpha mesh and a colored SDP respectively.
+  (Xun Gong
+    [#452](https://github.com/DGtal-team/DGtalTools/pull/452))
+
 - *volumetric*
     - volReSample: fix the impossibility to export to vol when ITK is activated
       (Bertrand Kerautret [#445](https://github.com/DGtal-team/DGtalTools/pull/445))
