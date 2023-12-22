@@ -45,8 +45,23 @@ if (  WITH_VISU3D_QGLVIEWER )
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${Qt5Xml_EXECUTABLE_COMPILE_FLAGS}")
     DGtalTools_add_tool(sliceViewer ${ui_sliceViewer_FORMS_HEADERS})
   endif (WITH_QT4)
-
 endif (WITH_VISU3D_QGLVIEWER)
+
+
+
+if (  NOT(DISABLE_POLYSCOPE) )
+    SET(DGTAL_EXAMPLES_POLYSCOPE_SRC
+    volscope)
+
+  FOREACH(tool_file ${DGTAL_EXAMPLES_POLYSCOPE_SRC})
+    add_executable(${tool_file} ${tool_file}.cpp)
+    target_link_libraries (${tool_file} ${DGTAL_LIBRARIES} ${DGtalLibDependencies} ${DGtalToolsLibDependencies} polyscope)
+    install(TARGETS ${tool_file}
+        RUNTIME DESTINATION bin
+        LIBRARY DESTINATION lib
+        ARCHIVE DESTINATION lib)
+  endforeach (tool_file)
+endif ()
 
 
 

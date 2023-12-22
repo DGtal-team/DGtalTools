@@ -11,6 +11,7 @@ SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake")
 SET(DGTALTOOLS_RANDOMIZED_BUILD_THRESHOLD "100" CACHE INTERNAL "Threshold for the random selection of tools to build.")
 SET(DGTALTOOLS_RANDOMIZED_BUILD_WHITELIST "" CACHE INTERNAL "List of whitelisted tools to build.")
 option(NO_ADD_STBIMAGE_IMPLEMENT "To avoid duplicated linking errors (like LNK2005 in MSVC)" OFF)
+option(DISABLE_POLYSCOPE "Disable polyscope based tools" OFF)
 
 
 
@@ -104,6 +105,17 @@ message(STATUS "----------------------------------------------------------------
 if (  WITH_ITK )
     include(${ITK_USE_FILE})
 ENDIF( WITH_ITK )
+
+
+
+#-----------------------------------------------------------------------------
+# polyscope
+#-----------------------------------------------------------------------------
+if (NOT(DISABLE_POLYSCOPE))
+  include(CPM)
+  include(polyscope)
+endif()
+
 
 
 # -----------------------------------------------------------------------------
