@@ -112,8 +112,11 @@ ENDIF( WITH_ITK )
 # polyscope
 #-----------------------------------------------------------------------------
 if (NOT(DISABLE_POLYSCOPE))
+  message(STATUS "Enabling polyscope tools")
   include(CPM)
   include(polyscope)
+else()
+    message(STATUS "Disabling polyscope tools")
 endif()
 
 
