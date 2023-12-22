@@ -19,6 +19,8 @@
   - meshViewer: Add colored SDP option in meshViewer when input texts is an alpha mesh and a colored SDP respectively.
   (Xun Gong
     [#452](https://github.com/DGtal-team/DGtalTools/pull/452))
+  - volscope new vol visualization tool using polyscope (David Coeurjolly, 
+    [#455](https://github.com/DGtal-team/DGtalTools/pull/455))
 
 - *volumetric*
     - volReSample: fix the impossibility to export to vol when ITK is activated
