@@ -95,6 +95,7 @@ int main(int argc, char**argv)
   app.get_formatter()->column_width(40);
   CLI11_PARSE(app, argc, argv);
   
+  polyscope::options::programName = "volscope " + inputFileName +  " - (DGtalTools)";  
   polyscope::init();
   
   if(!volumetricMode)
