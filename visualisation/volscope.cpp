@@ -66,7 +66,7 @@ typedef Shortcuts<Z3i::KSpace> SH3;
  -i,--input TEXT:FILE REQUIRED         Input vol file.
  --volumetricMode                      Activate the volumetric mode instead of the isosurface visualization.
  --point-cloud-only                    In the volumetric mode, visualize the vol file as a point cloud instead of an hex mesh (default: false)
- --min INT                             For isosurface visualization and voxel filtering, specifies the threshold min (excluded) (default: 0).
+-m,  --min INT                             For isosurface visualization and voxel filtering, specifies the threshold min (excluded) (default: 0).
  --max INT                             For isosurface visualization and voxel filtering, specifies the threshold max (included) (default: 255).
  @endcode
 **/
