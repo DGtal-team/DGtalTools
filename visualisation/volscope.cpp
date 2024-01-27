@@ -87,7 +87,7 @@ int main(int argc, char**argv)
   app.add_flag("--point-cloud-only",pclOnly, "In the volumetric mode, visualize the vol file as a point cloud instead of an hex mesh (default: false)");
   
   int thresholdMin=0;
-  app.add_option("--min", thresholdMin, "For isosurface visualization and voxel filtering, specifies the threshold min (excluded) (default: 0).");
+  app.add_option("--min,--thresholdMin,-m", thresholdMin, "For isosurface visualization and voxel filtering, specifies the threshold min (excluded) (default: 0).");
   int thresholdMax=255;
   app.add_option("--max", thresholdMax, "For isosurface visualization and voxel filtering, specifies the threshold max (included) (default: 255).");
   
