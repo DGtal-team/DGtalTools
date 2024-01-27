@@ -53,7 +53,7 @@ if (  NOT(DISABLE_POLYSCOPE) )
     SET(DGTAL_EXAMPLES_POLYSCOPE_SRC
     volscope)
 
-  FOREACH(tool_file ${DGTAL_EXAMPLES_POLYSCOPE_SRC})
+  FOREACH(tool_file ${DGTALTOOLS_POLYSCOPE_SRC})
     add_executable(${tool_file} ${tool_file}.cpp)
     target_link_libraries (${tool_file} ${DGTAL_LIBRARIES} ${DGtalLibDependencies} ${DGtalToolsLibDependencies} polyscope)
     install(TARGETS ${tool_file}
