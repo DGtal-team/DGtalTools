@@ -89,7 +89,7 @@ int main(int argc, char**argv)
   int thresholdMin=0;
   app.add_option("--min,--thresholdMin,-m", thresholdMin, "For isosurface visualization and voxel filtering, specifies the threshold min (excluded) (default: 0).");
   int thresholdMax=255;
-  app.add_option("--max", thresholdMax, "For isosurface visualization and voxel filtering, specifies the threshold max (included) (default: 255).");
+  app.add_option("--max, --thresholdMax,-M", thresholdMax, "For isosurface visualization and voxel filtering, specifies the threshold max (included) (default: 255).");
   
   
   app.get_formatter()->column_width(40);
