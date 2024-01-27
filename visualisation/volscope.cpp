@@ -26,6 +26,7 @@
  *
  * This file is part of the DGtal library.
  */
+#define NO_ADD_STBIMAGE_IMPLEMENT //To avoid duplicated linking errors (like LNK2005 in MSVC)
 #include <vector>
 #include <array>
 
