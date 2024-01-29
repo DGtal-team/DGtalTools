@@ -197,6 +197,13 @@ Galleries
    <td align=center  ><a href="https://dgtal-team.github.io/doctools-nightly/CompSurfelData.html" > 3dCompSurfelData</a></td>
    <td  align="center" colspan="2"><a href="https://dgtal-team.github.io/doctools-nightly/Doc3dImplicitSurfaceExtractorByThickening.html" > 3dImplicitSurfaceExtractorByThickening</a> </td>
    </tr>
+<tr>
+       <td align="center" colspan="2"><img width=250 src="https://private-user-images.githubusercontent.com/700165/292447134-04037898-33e8-48f5-855c-d7432fe061e8.png?jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3MDYzOTA1NTUsIm5iZiI6MTcwNjM5MDI1NSwicGF0aCI6Ii83MDAxNjUvMjkyNDQ3MTM0LTA0MDM3ODk4LTMzZTgtNDhmNS04NTVjLWQ3NDMyZmUwNjFlOC5wbmc_WC1BbXotQWxnb3JpdGhtPUFXUzQtSE1BQy1TSEEyNTYmWC1BbXotQ3JlZGVudGlhbD1BS0lBVkNPRFlMU0E1M1BRSzRaQSUyRjIwMjQwMTI3JTJGdXMtZWFzdC0xJTJGczMlMkZhd3M0X3JlcXVlc3QmWC1BbXotRGF0ZT0yMDI0MDEyN1QyMTE3MzVaJlgtQW16LUV4cGlyZXM9MzAwJlgtQW16LVNpZ25hdHVyZT04ZmRhODA5YTg2ODQ4Mzg1YzBiZDNlYWRiYmY0NzYxNDYyMzRhNTlkMWM0NDY4MDM5MDBkYmQ3OGJmYzE1YzA3JlgtQW16LVNpZ25lZEhlYWRlcnM9aG9zdCZhY3Rvcl9pZD0wJmtleV9pZD0wJnJlcG9faWQ9MCJ9.LZ85J7dmRixTVIqho3NLnSQjllhEttiX7Z2yki3xNtk"</td>
+
+</tr>
+      <tr>
+      <td  align="center" colspan="2"> volscope </td>
+</tr>
    </table>
    </center>
 
