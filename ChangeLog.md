@@ -3,7 +3,7 @@
 - *build*
   - Remove STBimage preprocessor instruction used to fix MVSC that is 
     no more usefull since DGtal PR [175](https://github.com/DGtal-team/DGtal/pull/1715) 
-    (Bertrand Kerautret [#458](https://github.com/DGtal-team/DGtalTools/pull/458))
+    (Bertrand Kerautret [#459](https://github.com/DGtal-team/DGtalTools/pull/459))
 
 
 - *visualisation*
