@@ -1,5 +1,11 @@
 # DGtalTools 1.4 (beta)
 
+- *build*
+  - Remove STBimage preprocessor instruction used to fix MVSC that is 
+    no more usefull since DGtal PR [175](https://github.com/DGtal-team/DGtal/pull/1715) 
+    (Bertrand Kerautret [#458](https://github.com/DGtal-team/DGtalTools/pull/458))
+
+
 - *visualisation*
   - meshViewer: new options to change the default background color, to
     load camera settings at startup, to change at startup the light
