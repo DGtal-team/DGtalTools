@@ -27,6 +27,8 @@
     [#452](https://github.com/DGtal-team/DGtalTools/pull/452))
   - volscope new vol visualization tool using polyscope (David Coeurjolly, 
     [#455](https://github.com/DGtal-team/DGtalTools/pull/455))
+  - volscope documentation enhanced (David Coeurjolly, 
+    [#460](https://github.com/DGtal-team/DGtalTools/pull/460))
 
 - *volumetric*
     - volReSample: fix the impossibility to export to vol when ITK is activated
