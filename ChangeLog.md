@@ -31,6 +31,8 @@
 - *volumetric*
     - volReSample: fix the impossibility to export to vol when ITK is activated
       (Bertrand Kerautret [#445](https://github.com/DGtal-team/DGtalTools/pull/445))
+    - volFillInterior: add new option to set the filling value.  
+      (Bertrand Kerautret [#456](https://github.com/DGtal-team/DGtalTools/pull/456))
 
 - *converters*
    - mesh2vol: small fix to read generic mesh. 
