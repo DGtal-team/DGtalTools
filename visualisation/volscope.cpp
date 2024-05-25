@@ -70,6 +70,15 @@ typedef Shortcuts<Z3i::KSpace> SH3;
 -m,  --min INT                             For isosurface visualization and voxel filtering, specifies the threshold min (excluded) (default: 0).
  -M, --max INT                             For isosurface visualization and voxel filtering, specifies the threshold max (included) (default: 255).
  @endcode
+
+
+ @image html volscope-surface.png "Default visualization mode." width=50%
+
+ @image html volscope-volumetric.png "Volumetric visualization using polyscope slice planes."  width=50%
+
+
+
+
 **/
 
 int main(int argc, char**argv)
