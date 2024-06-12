@@ -11,6 +11,7 @@ SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake")
 SET(DGTALTOOLS_RANDOMIZED_BUILD_THRESHOLD "100" CACHE INTERNAL "Threshold for the random selection of tools to build.")
 SET(DGTALTOOLS_RANDOMIZED_BUILD_WHITELIST "" CACHE INTERNAL "List of whitelisted tools to build.")
 option(NO_ADD_STBIMAGE_IMPLEMENT "To avoid duplicated linking errors (like LNK2005 in MSVC)" OFF)
+option(DISABLE_POLYSCOPE "Disable polyscope based tools" OFF)
 
 
 
@@ -19,7 +20,7 @@ option(NO_ADD_STBIMAGE_IMPLEMENT "To avoid duplicated linking errors (like LNK20
 # -----------------------------------------------------------------------------
 message(STATUS "-------------------------------------------------------------------------------")
 message(STATUS "Checking if DGtal is installed:")
-FIND_PACKAGE(DGtal 1.3 REQUIRED)
+FIND_PACKAGE(DGtal 1.5 REQUIRED)
 INCLUDE_DIRECTORIES(${DGTAL_INCLUDE_DIRS})
 LINK_DIRECTORIES(${DGTAL_LIBRARY_DIRS})
 SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
@@ -72,8 +73,8 @@ include_directories( "${PROJECT_SOURCE_DIR}/ext/" )
 # -----------------------------------------------------------------------------
 SET(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
 SET(DGtalTools_VERSION_MAJOR 1)
-SET(DGtalTools_VERSION_MINOR 4)
-#SET(DGtalTools_VERSION_PATCH beta)
+SET(DGtalTools_VERSION_MINOR 5)
+SET(DGtalTools_VERSION_PATCH beta)
 SET(DGTALTOOLS_VERSION "${DGtalTools_VERSION_MAJOR}.${DGtalTools_VERSION_MINOR}.${DGtalTools_VERSION_PATCH}")
 SET(PROJECT_VERSION "${DGtalTools_VERSION_MAJOR}.${DGtalTools_VERSION_MINOR}.${DGtalTools_VERSION_PATCH}")
 SET(VERSION ${DGtalTools_VERSION_MAJOR}.${DGtalTools_VERSION_MINOR}.${DGtalTools_VERSION_PATCH})
@@ -104,6 +105,20 @@ message(STATUS "----------------------------------------------------------------
 if (  WITH_ITK )
     include(${ITK_USE_FILE})
 ENDIF( WITH_ITK )
+
+
+
+#-----------------------------------------------------------------------------
+# polyscope
+#-----------------------------------------------------------------------------
+if (NOT(DISABLE_POLYSCOPE))
+  message(STATUS "Enabling polyscope tools")
+  include(CPM)
+  include(polyscope)
+else()
+    message(STATUS "Disabling polyscope tools")
+endif()
+
 
 
 # -----------------------------------------------------------------------------

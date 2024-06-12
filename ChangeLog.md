@@ -1,4 +1,14 @@
-# DGtalTools 1.4 (beta)
+# DGtalTools 1.5 (beta)
+
+
+
+# DGtalTools 1.4 
+
+- *build*
+  - Remove STBimage preprocessor instruction used to fix MVSC that is 
+    no more usefull since DGtal PR [175](https://github.com/DGtal-team/DGtal/pull/1715) 
+    (Bertrand Kerautret [#459](https://github.com/DGtal-team/DGtalTools/pull/459))
+
 
 - *visualisation*
   - meshViewer: new options to change the default background color, to
@@ -13,9 +23,22 @@
   - meshViewer: new option to set alpha channel of the mesh color.
   (Bertrand  Kerautret
     [#451](https://github.com/DGtal-team/DGtalTools/pull/451))
+  - 3dSDPViewer: new option to set alpha channel of the mesh color.
+  (Xun Gong
+    [#452](https://github.com/DGtal-team/DGtalTools/pull/452))
+  - meshViewer: Add colored SDP option in meshViewer when input texts is an alpha mesh and a colored SDP respectively.
+  (Xun Gong
+    [#452](https://github.com/DGtal-team/DGtalTools/pull/452))
+  - volscope new vol visualization tool using polyscope (David Coeurjolly, 
+    [#455](https://github.com/DGtal-team/DGtalTools/pull/455))
+  - volscope documentation enhanced (David Coeurjolly, 
+    [#460](https://github.com/DGtal-team/DGtalTools/pull/460))
+
 - *volumetric*
     - volReSample: fix the impossibility to export to vol when ITK is activated
       (Bertrand Kerautret [#445](https://github.com/DGtal-team/DGtalTools/pull/445))
+    - volFillInterior: add new option to set the filling value.  
+      (Bertrand Kerautret [#456](https://github.com/DGtal-team/DGtalTools/pull/456))
 
 - *converters*
    - mesh2vol: small fix to read generic mesh. 
