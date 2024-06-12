@@ -164,10 +164,17 @@ jobs:
          cmake ..   -DDGtal_DIR=${{runner.workspace}}/DGtal/buildDGtal
          wget --no-check-certificate -O "${{runner.workspace}}/DGtalTools/build/DGtal-tagfile"  http://dgtal.org/doc/tags/DGtal-tagfile;
          make doc > buildDoc.log
-
+    - name: Preparing deploy
+      run: |
+        git clone --depth 2 https://github.com/DGtal-team/doctools-nightly.git
+        ls build/
+        pwd
+        du -hs build/html
+        cd build/html
+        cp -r *  ../../doctools-nightly/
     - name: Deploy to GitHub Pages
       uses: JamesIves/github-pages-deploy-action@v4
-      if: github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == true
+#      if: github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == true
       with:
         token: ${{ secrets.DGTALTOOLSDOC }}
         branch: master
