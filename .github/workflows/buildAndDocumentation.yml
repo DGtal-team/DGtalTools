@@ -166,7 +166,7 @@ jobs:
          make doc > buildDoc.log
 
     - name: Deploy to GitHub Pages
-      uses: JamesIves/github-pages-deploy-action@4.6.1
+      uses: JamesIves/github-pages-deploy-action@v4
       if: github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == true
       with:
         token: ${{ secrets.DGTALTOOLSDOC }}
