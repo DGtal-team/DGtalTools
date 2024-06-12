@@ -1,5 +1,8 @@
 # DGtalTools 1.5 (beta)
 
+- *build*
+  - Fix DGtalTools doc deployement.
+    (David Coeurjolly and Bertrand Kerautret [#454](https://github.com/DGtal-team/DGtalTools/pull/454))
 
 
 # DGtalTools 1.4 
