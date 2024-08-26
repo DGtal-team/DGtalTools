@@ -12,7 +12,7 @@ env:
   CONFIG_GLOBAL: 
   CONFIG_LINUX:  -DWITH_MAGICK=true -DWITH_GMP=true -DWITH_FFTW3=true -DWARNING_AS_ERROR=ON -DWITH_HDF5=true -DWITH_QGLVIEWER=true -DWITH_CAIRO=true  -DWITH_EIGEN=true -DDGTAL_ENABLE_FLOATING_POINT_EXCEPTIONS=true
   CONFIG_MAC:    -DWITH_EIGEN=true -DWITH_GMP=tue
-  CONFIG_WINDOWS: -DWITH_OPENMP=true -DENABLE_CONAN=true -DDISABLE_POLYSCOPE=ON #-DWITH_FFTW3=true  #-DWITH_CAIRO=true #-DWITH_ITK=true  -DWITH_GMP=true
+  CONFIG_WINDOWS: -DWITH_OPENMP=true -DDISABLE_POLYSCOPE=ON #-DWITH_FFTW3=true  #-DWITH_CAIRO=true #-DWITH_ITK=true  -DWITH_GMP=true
 
 
 jobs:
@@ -50,17 +50,18 @@ jobs:
        id: conan
        uses: turtlebrowser/get-conan@main
        with:
-         version: 1.57.0
+         version: 2.4.0
 
      - name: Create conan default profile
        if: matrix.os == 'windows-latest'
-       run: conan profile new default --detect
+       run: |
+           conan profile detect --force
 
-     - uses: actions/cache@v3
+     - uses: actions/cache@v4
        if: matrix.os == 'windows-latest'
        with:
-         path: ~/.conan
-         key: ${{ runner.os }}-conan-Release
+         path: ~/.conan2
+         key: ${{ runner.os }}-conan2-Release
 
 
      - name: Create Build Environment
@@ -100,10 +101,11 @@ jobs:
        run: |
            git clone --depth 1 https://github.com/DGtal-team/DGtal.git
            cd DGtal
+           conan install . --build=missing
            mkdir buildDGtal
            cd buildDGtal
-           echo  cmake .. -DCMAKE_BUILD_TYPE=$BUILD_TYPE $CONFIG_WINDOWS -DBUILD_EXAMPLES=false -DBUILD_TESTING=false 
-           cmake .. -DCMAKE_BUILD_TYPE=$BUILD_TYPE $CONFIG_WINDOWS -DBUILD_EXAMPLES=false -DBUILD_TESTING=false  
+           echo  cmake ..-DCMAKE_POLICY_DEFAULT_CMP0091=NEW  -DCMAKE_BUILD_TYPE=$BUILD_TYPE $CONFIG_WINDOWS -DCMAKE_TOOLCHAIN_FILE="conan_toolchain.cmake" -DBUILD_EXAMPLES=false -DBUILD_TESTING=false 
+           cmake .. -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_BUILD_TYPE=$BUILD_TYPE $CONFIG_WINDOWS -DCMAKE_TOOLCHAIN_FILE="conan_toolchain.cmake" -DBUILD_EXAMPLES=false -DBUILD_TESTING=false  
            cmake --build . --config Release --parallel 3
      - name: Configure CMake (linux)
        if: matrix.os == 'ubuntu-latest'
@@ -121,7 +123,9 @@ jobs:
        if: matrix.os == 'windows-latest'
        shell: bash
        working-directory: "${{runner.workspace}}/build"
-       run: cmake $GITHUB_WORKSPACE -DCMAKE_MODULE_PATH="D:/a/DGtalTools/build/DGtal/buildDGtal" -DDGtal_DIR="D:/a/DGtalTools/build/DGtal/buildDGtal"  -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DDGTAL_RANDOMIZED_TESTING_WHITELIST="${{ steps.whitelist.outputs.WHITELIST }}"
+       run: |
+           conan install $GITHUB_WORKSPACE --build=missing
+           cmake $GITHUB_WORKSPACE -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_MODULE_PATH="D:/a/DGtalTools/build/DGtal/buildDGtal" -DDGtal_DIR="D:/a/DGtalTools/build/DGtal/buildDGtal"  -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DDGTAL_RANDOMIZED_TESTING_WHITELIST="${{ steps.whitelist.outputs.WHITELIST }}"
 
      - name: Build
        working-directory: ${{runner.workspace}}/build
