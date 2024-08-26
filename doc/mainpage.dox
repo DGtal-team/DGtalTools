@@ -1,4 +1,3 @@
-
 /**
  * @mainpage DGtalTools - Digital Geometry Tools and Algorithms Library.
 
@@ -134,7 +133,7 @@ Actually the DGTal project is organized as follows:
   </table>
    </center>
 
-
+@defgroup convertertools Converter Tools
 
 
 

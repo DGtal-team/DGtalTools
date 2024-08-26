@@ -52,6 +52,7 @@ using namespace DGtal;
 
 
 /**
+ @ingroup convertertools
  @page freeman2img freeman2img
  @brief Transforms one or several freeman chains into a pgm file by filling their interior areas.
 

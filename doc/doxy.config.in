@@ -326,7 +326,7 @@ MARKDOWN_SUPPORT       = YES
 # Minimum value: 0, maximum value: 99, default value: 0.
 # This tag requires that the tag MARKDOWN_SUPPORT is set to YES.
 
-TOC_INCLUDE_HEADINGS   = 2
+TOC_INCLUDE_HEADINGS   = 0
 
 # When enabled doxygen tries to link words that correspond to documented
 # classes, or namespaces to their corresponding documentation. Such a link can
@@ -664,7 +664,7 @@ GENERATE_DEPRECATEDLIST= YES
 # sections, marked by \if <section_label> ... \endif and \cond <section_label>
 # ... \endcond blocks.
 
-ENABLED_SECTIONS       =
+ENABLED_SECTIONS       = YES
 
 # The MAX_INITIALIZER_LINES tag determines the maximum number of lines that the
 # initial value of a variable or macro / define can have for it to appear in the
@@ -1167,7 +1167,7 @@ HTML_STYLESHEET        =
 
 #HTML_EXTRA_STYLESHEET  = @top_srcdir@/doc/modern-doxygen-green.css
 GENERATE_TREEVIEW      = YES #NO #YES # required!
-DISABLE_INDEX          = NO
+DISABLE_INDEX          = YES
 FULL_SIDEBAR           = NO
 HTML_EXTRA_STYLESHEET  =      @top_srcdir@/doc/doxygen-awesome-css-main/doxygen-awesome.css 
 HTML_COLORSTYLE        = LIGHT # required with Doxygen >= 1.9.5
@@ -1453,7 +1453,7 @@ ECLIPSE_DOC_ID         = org.doxygen.Project
 # The default value is: NO.
 # This tag requires that the tag GENERATE_HTML is set to YES.
 
-DISABLE_INDEX          = NO
+DISABLE_INDEX          = YES
 
 # The GENERATE_TREEVIEW tag is used to specify whether a tree-like index
 # structure should be generated to display hierarchical information. If the tag
