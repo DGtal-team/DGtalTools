@@ -2,9 +2,9 @@
 # -----------------------------------------------------------------------------
 # Project definition
 # -----------------------------------------------------------------------------
+cmake_minimum_required (VERSION 3.20)
 PROJECT(DGtalTools)
 
-cmake_minimum_required (VERSION 3.11)
 cmake_policy(SET CMP0057 NEW) # the new interpretation of IN_LIST is by default not set (at least until  3.21.1).
 
 SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake")
@@ -20,7 +20,7 @@ option(DISABLE_POLYSCOPE "Disable polyscope based tools" OFF)
 # -----------------------------------------------------------------------------
 message(STATUS "-------------------------------------------------------------------------------")
 message(STATUS "Checking if DGtal is installed:")
-FIND_PACKAGE(DGtal 1.4 REQUIRED)
+FIND_PACKAGE(DGtal 2.0.0 REQUIRED)
 INCLUDE_DIRECTORIES(${DGTAL_INCLUDE_DIRS})
 LINK_DIRECTORIES(${DGTAL_LIBRARY_DIRS})
 SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
