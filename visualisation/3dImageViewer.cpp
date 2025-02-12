@@ -43,7 +43,7 @@
 #include "DGtal/io/Color.h"
 #include "DGtal/io/colormaps/GradientColorMap.h"
 #include "DGtal/io/readers/GenericReader.h"
-#ifdef WITH_ITK
+#ifdef DGTAL_WITH_ITK
 #include "DGtal/io/readers/DicomReader.h"
 #endif
 
@@ -74,12 +74,12 @@ using namespace Z3i;
    @code
 
    Positionals:
-     1 TEXT:FILE REQUIRED                  vol file (.vol, .longvol .p3d, .pgm3d and if WITH_ITK is selected: dicom, dcm, mha, mhd). For longvol, dicom, dcm, mha or mhd formats, the input values are linearly scaled between 0 and 255.
+     1 TEXT:FILE REQUIRED                  vol file (.vol, .longvol .p3d, .pgm3d and if DGTAL_WITH_ITK is selected: dicom, dcm, mha, mhd). For longvol, dicom, dcm, mha or mhd formats, the input values are linearly scaled between 0 and 255.
      s TEXT                                display a set of discrete points (.sdp)
 
    Options:
      -h,--help                             Print this help message and exit
-     -i,--input TEXT:FILE REQUIRED         vol file (.vol, .longvol .p3d, .pgm3d and if WITH_ITK is selected: dicom, dcm, mha, mhd). For longvol, dicom, dcm, mha or mhd formats, the input values are linearly scaled between 0 and 255.
+     -i,--input TEXT:FILE REQUIRED         vol file (.vol, .longvol .p3d, .pgm3d and if DGTAL_WITH_ITK is selected: dicom, dcm, mha, mhd). For longvol, dicom, dcm, mha or mhd formats, the input values are linearly scaled between 0 and 255.
      --grid                                draw slice images using grid mode.
      --intergrid                           draw slice images using inter grid mode.
      --emptyMode                           remove the default boundingbox display.
@@ -154,7 +154,7 @@ int main( int argc, char** argv )
   
   app.description("Displays volume file as a voxel set by using QGLviewer\n 3dImageViewer  $DGtal/examples/samples/lobster.vol --thresholdImage -m 180");
   
-  app.add_option("-i,--input,1", inputFileName, "vol file (.vol, .longvol .p3d, .pgm3d and if WITH_ITK is selected: dicom, dcm, mha, mhd). For longvol, dicom, dcm, mha or mhd formats, the input values are linearly scaled between 0 and 255." )
+  app.add_option("-i,--input,1", inputFileName, "vol file (.vol, .longvol .p3d, .pgm3d and if DGTAL_WITH_ITK is selected: dicom, dcm, mha, mhd). For longvol, dicom, dcm, mha or mhd formats, the input values are linearly scaled between 0 and 255." )
   ->required()
   ->check(CLI::ExistingFile);
   

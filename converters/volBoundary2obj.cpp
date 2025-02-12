@@ -45,7 +45,7 @@
 #include "DGtal/io/boards/Board3D.h"
 #include "DGtal/io/readers/PointListReader.h"
 #include "DGtal/io/readers/GenericReader.h"
-#ifdef WITH_ITK
+#ifdef DGTAL_WITH_ITK
 #include "DGtal/io/readers/DicomReader.h"
 #endif
 #include "DGtal/io/Color.h"
@@ -73,12 +73,12 @@ using namespace DGtal;
 
 
 Positionals:
-  1 TEXT:FILE REQUIRED                  vol file (.vol, .longvol .p3d, .pgm3d and if WITH_ITK is selected: dicom, dcm, mha, mhd). For longvol, dicom, dcm, mha or mhd formats, the input values are linearly scaled between 0 and 255.
+  1 TEXT:FILE REQUIRED                  vol file (.vol, .longvol .p3d, .pgm3d and if DGTAL_WITH_ITK is selected: dicom, dcm, mha, mhd). For longvol, dicom, dcm, mha or mhd formats, the input values are linearly scaled between 0 and 255.
   2 TEXT                                output file (.obj or .off).
 
 Options:
   -h,--help                             Print this help message and exit
-  -i,--input TEXT:FILE REQUIRED         vol file (.vol, .longvol .p3d, .pgm3d and if WITH_ITK is selected: dicom, dcm, mha, mhd). For longvol, dicom, dcm, mha or mhd formats, the input values are linearly scaled between 0 and 255.
+  -i,--input TEXT:FILE REQUIRED         vol file (.vol, .longvol .p3d, .pgm3d and if DGTAL_WITH_ITK is selected: dicom, dcm, mha, mhd). For longvol, dicom, dcm, mha or mhd formats, the input values are linearly scaled between 0 and 255.
   -o,--output TEXT                      output file (.obj or .off).
   -m,--thresholdMin INT=128             threshold min (excluded) to define binary shape.
   -M,--thresholdMax INT=255             threshold max (included) to define binary shape.
@@ -127,7 +127,7 @@ int main( int argc, char** argv )
  
   app.description("Export the boundary of a volume file to OBJ format. By default the resulting mesh is defined from the surfels of the surface elements, a triangulated (dual)");
   
-  app.add_option("-i,--input,1", inputFilename, "vol file (.vol, .longvol .p3d, .pgm3d and if WITH_ITK is selected: dicom, dcm, mha, mhd). For longvol, dicom, dcm, mha or mhd formats, the input values are linearly scaled between 0 and 255." )
+  app.add_option("-i,--input,1", inputFilename, "vol file (.vol, .longvol .p3d, .pgm3d and if DGTAL_WITH_ITK is selected: dicom, dcm, mha, mhd). For longvol, dicom, dcm, mha or mhd formats, the input values are linearly scaled between 0 and 255." )
     ->required()
     ->check(CLI::ExistingFile);
   app.add_option("--output,-o,2",outputFilename ,"output file (.obj or .off).");

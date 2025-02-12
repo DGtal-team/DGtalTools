@@ -41,7 +41,7 @@
 #include "DGtal/io/viewers/Viewer3D.h"
 #include "DGtal/io/readers/PointListReader.h"
 #include "DGtal/io/readers/GenericReader.h"
-#ifdef WITH_ITK
+#ifdef DGTAL_WITH_ITK
 #include "DGtal/io/readers/DicomReader.h"
 #endif
 #include "DGtal/io/Color.h"
@@ -69,11 +69,11 @@ using namespace DGtal;
  @code
  
  Positionals:
- 1 TEXT:FILE REQUIRED                  vol file (.vol, .longvol .p3d, .pgm3d and if WITH_ITK is selected: dicom, dcm, mha, mhd). For longvol, dicom, dcm, mha or mhd formats, the input values are linearly scaled between 0 and 255.
+ 1 TEXT:FILE REQUIRED                  vol file (.vol, .longvol .p3d, .pgm3d and if DGTAL_WITH_ITK is selected: dicom, dcm, mha, mhd). For longvol, dicom, dcm, mha or mhd formats, the input values are linearly scaled between 0 and 255.
  
  Options:
  -h,--help                             Print this help message and exit
- -i,--input TEXT:FILE REQUIRED         vol file (.vol, .longvol .p3d, .pgm3d and if WITH_ITK is selected: dicom, dcm, mha, mhd). For longvol, dicom, dcm, mha or mhd formats, the input values are linearly scaled between 0 and 255.
+ -i,--input TEXT:FILE REQUIRED         vol file (.vol, .longvol .p3d, .pgm3d and if DGTAL_WITH_ITK is selected: dicom, dcm, mha, mhd). For longvol, dicom, dcm, mha or mhd formats, the input values are linearly scaled between 0 and 255.
  -m,--thresholdMin INT=0               threshold min (excluded) to define binary shape.
  -M,--thresholdMax INT=255             threshold max (included) to define binary shape.
  --mode TEXT:{INNER,OUTER,BDRY}=INNER  set mode for display: INNER: inner voxels, OUTER: outer voxels, BDRY: surfels
@@ -120,13 +120,13 @@ int main( int argc, char** argv )
   int thresholdMax {255};
   std::string mode {"INNER"};
   
-  app.add_option("-i,--input,1", inputFileName, "vol file (.vol, .longvol .p3d, .pgm3d and if WITH_ITK is selected: dicom, dcm, mha, mhd). For longvol, dicom, dcm, mha or mhd formats, the input values are linearly scaled between 0 and 255." )
+  app.add_option("-i,--input,1", inputFileName, "vol file (.vol, .longvol .p3d, .pgm3d and if DGTAL_WITH_ITK is selected: dicom, dcm, mha, mhd). For longvol, dicom, dcm, mha or mhd formats, the input values are linearly scaled between 0 and 255." )
   ->required()
   ->check(CLI::ExistingFile);
   
   app.add_option("--thresholdMin,-m", thresholdMin, "threshold min (excluded) to define binary shape.", true);
   app.add_option("--thresholdMax,-M", thresholdMax, "threshold max (included) to define binary shape.", true);
-#ifdef WITH_ITK
+#ifdef DGTAL_WITH_ITK
   app.add_option("--dicomMin",dicomMin,"set minimum density threshold on Hounsfield scale", true );
   app.add_option("--dicomMax",dicomMin,"set maximum density threshold on Hounsfield scale", true );
 #endif
@@ -143,7 +143,7 @@ int main( int argc, char** argv )
   
   string extension = inputFileName.substr(inputFileName.find_last_of(".") + 1);
   if(extension!="vol" && extension != "p3d" && extension != "pgm3D" && extension != "pgm3d" && extension != "sdp" && extension != "pgm"
-#ifdef WITH_ITK
+#ifdef DGTAL_WITH_ITK
      && extension !="dcm"
 #endif
      ){
@@ -152,12 +152,12 @@ int main( int argc, char** argv )
   }
   
   if(extension=="vol" || extension=="pgm3d" || extension=="pgm3D"
-#ifdef WITH_ITK
+#ifdef DGTAL_WITH_ITK
      || extension =="dcm"
 #endif
      ){
     trace.beginBlock( "Loading image into memory." );
-#ifdef WITH_ITK
+#ifdef DGTAL_WITH_ITK
     typedef DGtal::functors::Rescaling<int ,unsigned char > RescalFCT;
     Image image = extension == "dcm" ? DicomReader< Image,  RescalFCT  >::importDicom( inputFileName,
                                                                                       RescalFCT(dicomMin,
