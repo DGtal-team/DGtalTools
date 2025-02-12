@@ -11,7 +11,7 @@ SET(DGTAL_TOOLS_SRC
   eulerCharacteristic
 )
 
-if (WITH_EIGEN)
+if (DGTAL_WITH_EIGEN)
     DGtalTools_add_tool(volSurfaceRegularization volSurfaceRegularization-details/surface_approx.cpp)
 endif()
 
