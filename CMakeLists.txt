@@ -31,7 +31,7 @@ message(STATUS "DGtal found.")
  # -----------------------------------------------------------------------------
  # CPP17
  # -----------------------------------------------------------------------------
-set(DGTALTOOLS_CMAKE_CXX_STANDARD_MIN_REQUIRED 17)
+set(DGTALTOOLS_CMAKE_CXX_STANDARD_MIN_REQUIRED 20)
  if(NOT CMAKE_CXX_STANDARD)
    set(CMAKE_CXX_STANDARD ${DGTALTOOLS_CMAKE_CXX_STANDARD_MIN_REQUIRED})
  else()
