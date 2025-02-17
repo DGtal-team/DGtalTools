@@ -58,7 +58,7 @@
 #include "DGtal/images/SimpleThresholdForegroundPredicate.h"
 #include "DGtal/io/readers/MPolynomialReader.h"
 #include "DGtal/io/colormaps/GradientColorMap.h"
-#ifdef WITH_VISU3D_QGLVIEWER
+#ifdef DGTAL_WITH_VISU3D_QGLVIEWER
 #include "DGtal/io/viewers/Viewer3D.h"
 #include "DGtal/io/Display3DFactory.h"
 #endif
@@ -460,7 +460,7 @@ void computeEstimation
       export_output.close();
       trace.endBlock();
     }
-#ifdef WITH_VISU3D_QGLVIEWER
+#ifdef DGTAL_WITH_VISU3D_QGLVIEWER
   if ( params.exportX != "None" )
     {
       typedef typename KSpace::Space Space;
@@ -748,7 +748,7 @@ int main( int argc, char** argv )
   app.add_option("--export,-x",allParams.exportX, "exports surfel normals which can be viewed with ImaGene tool 'viewSetOfSurfels' in file <basename>-cells-<gridstep>.txt, as specified by -o <basename>. Parameter <arg> is None|Normals|AngleDeviation. The color depends on the angle deviation in degree: 0 metallic blue, 5 light cyan, 10 light green, 15 light yellow, 20 yellow, 25 orange, 30 red, 35, dark red, 40- grey", true );
   app.add_flag("--normals,-n", allParams.normals, "outputs every surfel, its estimated normal, and the ground truth normal in file <basename>-normals-<gridstep>.txt, as specified by -o <basename>.");
   app.add_flag("--noff,-O", allParams.noff, "exports the digital surface with normals as NOFF file <basename>-noff-<gridstep>.off, as specified by -o <basename>..");
-#ifdef WITH_VISU3D_QGLVIEWER
+#ifdef DGTAL_WITH_VISU3D_QGLVIEWER
   app.add_option("--view,-V", allParams.view, "view the digital surface with normals.  Parameter <arg> is None|Normals|AngleDeviation. The color depends on the angle deviation in degree: 0 metallic blue, 5 light cyan, 10 light green, 15 light yellow, 20 yellow, 25 orange, 30 red, 35, dark red, 40- grey.");
 #endif
 

@@ -10,7 +10,7 @@ foreach (FILE ${DGTAL_TOOLS_SRC})
   DGtalTools_add_tool(${FILE})
 ENDFOREACH(FILE)
 
-if (  WITH_VISU3D_QGLVIEWER )
+if (  DGTAL_WITH_VISU3D_QGLVIEWER )
     set_property(SOURCE ui_sliceViewer.h PROPERTY SKIP_AUTOMOC ON)
     SET(DGTAL_EXAMPLES_QGL_SRC
     3dVolViewer
@@ -45,7 +45,7 @@ if (  WITH_VISU3D_QGLVIEWER )
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${Qt5Xml_EXECUTABLE_COMPILE_FLAGS}")
     DGtalTools_add_tool(sliceViewer ${ui_sliceViewer_FORMS_HEADERS})
   endif (WITH_QT4)
-endif (WITH_VISU3D_QGLVIEWER)
+endif (DGTAL_WITH_VISU3D_QGLVIEWER)
 
 
 

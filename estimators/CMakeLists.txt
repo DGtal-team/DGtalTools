@@ -15,14 +15,14 @@ if (DGTAL_WITH_EIGEN)
     DGtalTools_add_tool(volSurfaceRegularization volSurfaceRegularization-details/surface_approx.cpp)
 endif()
 
-if ( WITH_VISU3D_QGLVIEWER )
+if ( DGTAL_WITH_VISU3D_QGLVIEWER )
   SET(VISU3D_TESTS_SRC
       3dCurveTangentEstimator
   )
   FOREACH(FILE ${VISU3D_TESTS_SRC})
      DGtalTools_add_tool(${FILE})
   ENDFOREACH(FILE)
-endif ( WITH_VISU3D_QGLVIEWER )
+endif ( DGTAL_WITH_VISU3D_QGLVIEWER )
 
 if (  DGTAL_WITH_CGAL )
   SET(CGAL_TESTS_SRC

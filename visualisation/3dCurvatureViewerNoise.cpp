@@ -61,7 +61,7 @@
 #include "DGtal/io/boards/Board3D.h"
 #include "DGtal/io/colormaps/GradientColorMap.h"
 
-#ifdef WITH_VISU3D_QGLVIEWER
+#ifdef DGTAL_WITH_VISU3D_QGLVIEWER
 #include "DGtal/io/viewers/Viewer3D.h"
 #endif
 
@@ -217,7 +217,7 @@ int main( int argc, char** argv )
       exit(EXIT_FAILURE);
     }
 
-#ifndef WITH_VISU3D_QGLVIEWER
+#ifndef DGTAL_WITH_VISU3D_QGLVIEWER
   bool enable_visu = false;
 #else
   bool enable_visu = !exportOnly; ///<! Default QGLViewer viewer. Disabled if exportOnly is set.
@@ -227,7 +227,7 @@ int main( int argc, char** argv )
 
   if( !enable_visu && !enable_obj && !enable_dat )
     {
-#ifndef WITH_VISU3D_QGLVIEWER
+#ifndef DGTAL_WITH_VISU3D_QGLVIEWER
       trace.error() << "You should specify what you want to export with --export and/or --exportDat." << std::endl;
 #else
       trace.error() << "You should specify what you want to export with --export and/or --exportDat, or remove --exportOnly." << std::endl;
@@ -341,18 +341,18 @@ int main( int argc, char** argv )
       exit(2);
     }
 
-#ifdef WITH_VISU3D_QGLVIEWER
+#ifdef DGTAL_WITH_VISU3D_QGLVIEWER
   QApplication application( argc, argv );
   typedef Viewer3D<Z3i::Space, Z3i::KSpace> Viewer;
 #endif
   typedef Board3D<Z3i::Space, Z3i::KSpace> Board;
 
-#ifdef WITH_VISU3D_QGLVIEWER
+#ifdef DGTAL_WITH_VISU3D_QGLVIEWER
   Viewer viewer( K );
 #endif
   Board board( K );
 
-#ifdef WITH_VISU3D_QGLVIEWER
+#ifdef DGTAL_WITH_VISU3D_QGLVIEWER
   if( enable_visu )
     {
       viewer.show();
@@ -488,7 +488,7 @@ int main( int argc, char** argv )
       cmap_grad.addColor( Color( 255, 0, 0 ) );
       cmap_grad.addColor( Color( 255, 255, 10 ) );
 
-#ifdef WITH_VISU3D_QGLVIEWER
+#ifdef DGTAL_WITH_VISU3D_QGLVIEWER
       if( enable_visu )
         {
           viewer << SetMode3D((*abegin2).className(), "Basic" );
@@ -502,7 +502,7 @@ int main( int argc, char** argv )
 
       for ( unsigned int i = 0; i < results.size(); ++i )
         {
-#ifdef WITH_VISU3D_QGLVIEWER
+#ifdef DGTAL_WITH_VISU3D_QGLVIEWER
           if( enable_visu )
             {
               viewer << CustomColors3D( Color::Black, cmap_grad( results[ i ] ));
@@ -578,7 +578,7 @@ int main( int argc, char** argv )
 
       //Visualization + export
 
-#ifdef WITH_VISU3D_QGLVIEWER
+#ifdef DGTAL_WITH_VISU3D_QGLVIEWER
       if( enable_visu )
         {
           viewer << SetMode3D(K.uCell( K.sKCoords(*abegin2) ).className(), "Basic" );
@@ -601,7 +601,7 @@ int main( int argc, char** argv )
 
           Cell unsignedSurfel = K.uCell( K.sKCoords(*abegin2) );
 
-#ifdef WITH_VISU3D_QGLVIEWER
+#ifdef DGTAL_WITH_VISU3D_QGLVIEWER
           if( enable_visu )
             {
               viewer << CustomColors3D( DGtal::Color(255,255,255,255),
@@ -627,7 +627,7 @@ int main( int argc, char** argv )
 
           RealPoint center = embedder( outer );
 
-#ifdef WITH_VISU3D_QGLVIEWER
+#ifdef DGTAL_WITH_VISU3D_QGLVIEWER
           if( enable_visu )
             {
               if( mode.compare("prindir1") == 0 )
@@ -690,7 +690,7 @@ int main( int argc, char** argv )
     }
   trace.endBlock();
 
-#ifdef WITH_VISU3D_QGLVIEWER
+#ifdef DGTAL_WITH_VISU3D_QGLVIEWER
   if( enable_visu )
     {
       viewer << Viewer3D<>::updateDisplay;
@@ -707,7 +707,7 @@ int main( int argc, char** argv )
       outDat.close();
     }
 
-#ifdef WITH_VISU3D_QGLVIEWER
+#ifdef DGTAL_WITH_VISU3D_QGLVIEWER
   if( enable_visu )
     {
       return application.exec();
