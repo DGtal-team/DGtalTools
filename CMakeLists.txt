@@ -14,20 +14,6 @@ option(NO_ADD_STBIMAGE_IMPLEMENT "To avoid duplicated linking errors (like LNK20
 option(DISABLE_POLYSCOPE "Disable polyscope based tools" OFF)
 
 
-
-# -----------------------------------------------------------------------------
-# DGtal dependencies
-# -----------------------------------------------------------------------------
-message(STATUS "-------------------------------------------------------------------------------")
-message(STATUS "Checking if DGtal is installed:")
-FIND_PACKAGE(DGtal 2.0.0 REQUIRED)
-INCLUDE_DIRECTORIES(${DGTAL_INCLUDE_DIRS})
-LINK_DIRECTORIES(${DGTAL_LIBRARY_DIRS})
-SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
-message(STATUS "DGtal found.")
-
-
-
 # -----------------------------------------------------------------------------
 # CPP20
 # -----------------------------------------------------------------------------
@@ -46,6 +32,17 @@ if(NOT CMAKE_CXX_STANDARD_REQUIRED)
 endif()
 message(STATUS "C++ standard set to ${CMAKE_CXX_STANDARD}")
 
+
+# -----------------------------------------------------------------------------
+# DGtal dependencies
+# -----------------------------------------------------------------------------
+message(STATUS "-------------------------------------------------------------------------------")
+message(STATUS "Checking if DGtal is installed:")
+FIND_PACKAGE(DGtal 2.0.0 REQUIRED)
+INCLUDE_DIRECTORIES(${DGTAL_INCLUDE_DIRS})
+LINK_DIRECTORIES(${DGTAL_LIBRARY_DIRS})
+SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+message(STATUS "DGtal found.")
 
 
 # -------------------------------------------------------------------------
