@@ -7,7 +7,7 @@ PROJECT(DGtalTools)
 
 cmake_policy(SET CMP0057 NEW) # the new interpretation of IN_LIST is by default not set (at least until  3.21.1).
 
-SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake")
+LIST(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
 SET(DGTALTOOLS_RANDOMIZED_BUILD_THRESHOLD "100" CACHE INTERNAL "Threshold for the random selection of tools to build.")
 SET(DGTALTOOLS_RANDOMIZED_BUILD_WHITELIST "" CACHE INTERNAL "List of whitelisted tools to build.")
 option(NO_ADD_STBIMAGE_IMPLEMENT "To avoid duplicated linking errors (like LNK2005 in MSVC)" OFF)
