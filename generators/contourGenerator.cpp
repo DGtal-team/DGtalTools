@@ -340,7 +340,7 @@ generateContour(
     Surfaces<KSpace>::track2DBoundaryPoints( points, K, SAdj, dig, bel );
     // Create GridCurve
     GridCurve<KSpace> gridcurve;
-    gridcurve.initFromVector( points );
+    gridcurve.initFromPointsVector( points );
     // gridcurve contains the digital boundary to analyze.
     Range r = gridcurve.getPointsRange(); //building range
 

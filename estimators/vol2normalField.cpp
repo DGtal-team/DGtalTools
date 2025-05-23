@@ -31,6 +31,7 @@
 #include <iostream>
 #include <iterator>
 #include "DGtal/base/Common.h"
+
 #include "DGtal/topology/CanonicDigitalSurfaceEmbedder.h"
 #include "DGtal/topology/DigitalSurface.h"
 #include "DGtal/topology/DigitalSetBoundary.h"
@@ -52,11 +53,11 @@
 #include "DGtal/helpers/StdDefs.h"
 #include "DGtal/kernel/CanonicEmbedder.h"
 
-#include "DGtal/geometry/surfaces/estimation/CNormalVectorEstimator.h"
-#include "DGtal/geometry/surfaces/estimation/BasicConvolutionWeights.h"
-#include "DGtal/geometry/surfaces/estimation/LocalConvolutionNormalVectorEstimator.h"
 #include "DGtal/geometry/surfaces/estimation/DigitalSurfaceEmbedderWithNormalVectorEstimator.h"
 
+#include "DGtal/geometry/surfaces/estimation/LocalEstimatorFromSurfelFunctorAdapter.h"
+#include "DGtal/geometry/surfaces/estimation/estimationFunctors/ElementaryConvolutionNormalVectorEstimator.h"
+#include "DGtal/geometry/volumes/distance/LpMetric.h"
 #include "CLI11.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -189,20 +190,31 @@ int main ( int argc, char**argv )
     SurfaceEmbedder surfaceEmbedder ( digSurf );
 
     //Convolution kernel
-    deprecated::GaussianConvolutionWeights < MyDigitalSurface::Size > Gkernel ( sigma );
+    typedef typename MyDigitalSurface::Surfel Surfel;
+    typedef DGtal::functors::GaussianKernel GaussianFunctor;
+    typedef DGtal::functors::ElementaryConvolutionNormalVectorEstimator<Surfel, CanonicSCellEmbedder<KSpace>> Functor;
+    typedef LocalEstimatorFromSurfelFunctorAdapter<
+        MyDigitalSurfaceContainer, 
+        LpMetric<Z3i::Space>,
+        Functor, GaussianFunctor> MyGaussianEstimator;
 
     //Estimator definition
-    typedef deprecated::LocalConvolutionNormalVectorEstimator  < MyDigitalSurface,
-                                                     deprecated::GaussianConvolutionWeights< MyDigitalSurface::Size>  > MyGaussianEstimator;
-    BOOST_CONCEPT_ASSERT ( ( concepts::CNormalVectorEstimator< MyGaussianEstimator > ) );
-    MyGaussianEstimator myNormalEstimatorG ( digSurf, Gkernel );
+
+    GaussianFunctor Gkernel(sigma);
+    LpMetric<Z3i::Space> l1(1.0);
+    CanonicSCellEmbedder<KSpace> embedder(digSurf.container().space());
+    Functor estimator(embedder,  1.0);
+
+    MyGaussianEstimator myNormalEstimatorG;
+    myNormalEstimatorG.attach(digSurf);
+    myNormalEstimatorG.setParams(l1, estimator, Gkernel, neighborhood);
 
     // Embedder definition
     typedef DigitalSurfaceEmbedderWithNormalVectorEstimator<SurfaceEmbedder,MyGaussianEstimator> SurfaceEmbedderWithGaussianNormal;
     SurfaceEmbedderWithGaussianNormal mySurfelEmbedderG ( surfaceEmbedder, myNormalEstimatorG );
 
     // Compute normal vector field and displays it.
-    myNormalEstimatorG.init ( 1.0, neighborhood );
+    myNormalEstimatorG.init ( 1.0, digSurf.begin(), digSurf.end() );
 
     trace.info() << "Generating the NOFF surface "<< std::endl;
     ofstream out2 ( ( outputFileName + ".off" ).c_str() );
