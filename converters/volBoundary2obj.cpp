@@ -42,7 +42,6 @@
 #include "DGtal/topology/KhalimskySpaceND.h"
 #include "DGtal/topology/DigitalSurface.h"
 #include "DGtal/topology/SetOfSurfels.h"
-#include "DGtal/io/boards/Board3D.h"
 #include "DGtal/io/readers/PointListReader.h"
 #include "DGtal/io/readers/GenericReader.h"
 #ifdef DGTAL_WITH_ITK

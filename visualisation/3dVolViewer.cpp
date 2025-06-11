@@ -31,8 +31,7 @@
 #include "DGtal/base/BasicFunctors.h"
 #include "DGtal/helpers/StdDefs.h"
 #include "DGtal/io/readers/GenericReader.h"
-#include "DGtal/io/viewers/Viewer3D.h"
-#include "DGtal/io/DrawWithDisplay3DModifier.h"
+#include "DGtal/io/viewers/PolyscopeViewer.h"
 #include "DGtal/io/readers/PointListReader.h"
 #include "DGtal/io/readers/MeshReader.h"
 
@@ -100,97 +99,27 @@ using namespace Z3i;
  
  */
 
-
-template < typename Space = DGtal::Z3i::Space, typename KSpace = DGtal::Z3i::KSpace>
-struct ViewerSnap: DGtal::Viewer3D <Space, KSpace>
-{
-  
-  ViewerSnap(bool saveSnap): Viewer3D<Space, KSpace>(), mySaveSnap(saveSnap){
-  };
-  
-  virtual  void
-  init(){
-    DGtal::Viewer3D<>::init();
-    if(mySaveSnap){
-      QObject::connect(this, SIGNAL(drawFinished(bool)), this, SLOT(saveSnapshot(bool)));
-    }
-  };
-  bool mySaveSnap;
-};
-
-typedef ViewerSnap<> Viewer;
-
-
-
-// call back function to display voxel coordinates
-template<typename TImage>
-int
-displayCoordsCallBack( void* viewer, int name, void* data )
-{
-  TImage *image = (TImage *) data;
-  std::stringstream ss;
-  Z3i::Point p  =  DGtal::Linearizer<typename TImage::Domain>::getPoint(name, image->domain());
-  // Check needed since simetimes the point appears outside (only in non debug mode). 
-  if (image->domain().isInside(p)){
-    ss << "Selected intensity:  " << (*image)(p) << "p " << p[0] << " "<< p[1] << " " << p[2] ;
-    ((Viewer *) viewer)->displayMessage(QString(ss.str().c_str()), 100000);
-  }
-  return 0;
-}
-
+typedef PolyscopeViewer<> Viewer;
 
 template <typename TImage>
 void
-processDisplay(ViewerSnap<> &viewer,  TImage &image,
+processDisplay(PolyscopeViewer<> &viewer,  TImage &image,
                const typename TImage::Value &thresholdMin,
                const typename TImage::Value &thresholdMax,
-               unsigned int numDisplayedMax,
-               unsigned int transparency,
-               bool useTransIntensity=false,
-               bool interDisplay=false,
-               bool squaredTransp=false)
+               unsigned int numDisplayedMax)
 {
-  Domain domain = image.domain();
-  GradientColorMap<typename TImage::Value> gradient( thresholdMin, thresholdMax);
   unsigned int numDisplayed = 0;
-  gradient.addColor(Color::Blue);
-  gradient.addColor(Color::Green);
-  gradient.addColor(Color::Yellow);
-  gradient.addColor(Color::Red);
-  typename TImage::Value varInt = 0;
-  if (useTransIntensity){
-    varInt = thresholdMax-thresholdMin;
-  }
-  for(Domain::ConstIterator it = domain.begin(), itend=domain.end(); it!=itend; ++it){
-    double trInt = 1.0;
-    if (useTransIntensity){
-      trInt = ((float)(image( (*it) )-thresholdMin)/(float)varInt);
-    }
+  Domain domain = image.domain();
+  for(Domain::ConstIterator it = domain.begin(), itend=domain.end(); it!=itend; ++it) {
     typename TImage::Value val= image( (*it) );
     if(numDisplayed > numDisplayedMax)
       break;
     
-    Color c= gradient(val);
     if(val<=thresholdMax && val >=thresholdMin)
     {
-      
-      viewer <<  CustomColors3D(Color(c.red(), c.green(),c.blue(),
-                                      static_cast<unsigned int>(transparency*trInt*(squaredTransp? trInt : 1.0))),
-                                Color(c.red(), c.green(),c.blue(),
-                                      static_cast<unsigned int>(transparency*trInt*(squaredTransp? trInt: 1.0))));
-      if (interDisplay)
-      {
-        auto p = *it;
-        auto index = DGtal::Linearizer<typename TImage::Domain>::getIndex( p, domain);
-        viewer << SetName3D( index ) ;
-      }
-      viewer << *it;
+      viewer << WithQuantity(*it, "value", val);
       numDisplayed++;
     }
-  }
-  if (interDisplay){
-    viewer << SetSelectCallback3D(displayCoordsCallBack<TImage>,
-                                  &image );
   }
 }
 
@@ -247,14 +176,8 @@ int main( int argc, char** argv )
   CLI11_PARSE(app, argc, argv);
   // END parse command line using CLI ----------------------------------------------
   
-  QApplication application(argc,argv);
-  
-  Viewer viewer(snapShotFile != "");
-  if(snapShotFile != ""){
-    viewer.setSnapshotFileName(QString(snapShotFile.c_str()));
-  }
-  viewer.setWindowTitle("simple Volume Viewer");
-  viewer.show();
+  Viewer viewer;
+  viewer.allowReuseList = true;
   typedef ImageContainerBySTLVector < Z3i::Domain,  double > Image3D_D;
   typedef ImageContainerBySTLVector < Z3i::Domain,  int > Image3D_I;
   typedef ImageSelector<Domain, unsigned char>::Type Image;
@@ -270,14 +193,7 @@ int main( int argc, char** argv )
   Image3D_D  imageD = Image3D_D(d);
   Image3D_I  imageI = Image3D_I(d);
   Image  image = Image(d);
-  if (customBGColor.size() == 3)
-  {
-      viewer.myDefaultBackgroundColor = DGtal::Color(customBGColor[0],
-                                              customBGColor[1],
-                                              customBGColor[2], 255);
-      viewer.update();
-      viewer.draw();
-   }
+  
   if(extension != "sdp")
   {
     unsigned int numDisplayed=0;
@@ -288,23 +204,20 @@ int main( int argc, char** argv )
     imageD = DGtal::GenericReader<Image3D_D>::import(inputFileName);
     trace.info() << "[done]"<< std::endl;
     trace.info() << "Image loaded:  D "<<imageD<< std::endl;
-    processDisplay(viewer, imageD, thresholdMin, thresholdMax, numDisplayedMax, transparency,
-                   transIntensity||transIntensitySq, interactiveDisplayVoxCoords, transIntensitySq);
+    processDisplay(viewer, imageD, thresholdMin, thresholdMax, numDisplayedMax);
   }
   else if (inputType=="int")
   {
     imageI= DGtal::GenericReader<Image3D_I>::import(inputFileName);
     trace.info() << "Image loaded: "<<image<< std::endl;
-    processDisplay(viewer, imageI, (int)thresholdMin, (int)thresholdMax, numDisplayedMax, transparency,
-                   transIntensity||transIntensitySq, interactiveDisplayVoxCoords, transIntensitySq);
+    processDisplay(viewer, imageI, (int)thresholdMin, (int)thresholdMax, numDisplayedMax);
   } else {
     typedef DGtal::functors::Rescaling<DGtal::int64_t ,unsigned char > RescalFCT;
     image =  GenericReader< Image >::importWithValueFunctor( inputFileName,RescalFCT(rescaleInputMin,
                                                                                      rescaleInputMax,
                                                                                      0, 255) );
     trace.info() << "Image loaded: "<<image<< std::endl;
-    processDisplay(viewer, image, thresholdMin, thresholdMax, numDisplayedMax, transparency,
-                   transIntensity||transIntensitySq, interactiveDisplayVoxCoords, transIntensitySq);
+    processDisplay(viewer, image, thresholdMin, thresholdMax, numDisplayedMax);
   }
 #else
     typedef DGtal::functors::Rescaling<DGtal::int64_t ,unsigned char > RescalFCT;
@@ -312,8 +225,7 @@ int main( int argc, char** argv )
                                                                                      rescaleInputMax,
                                                                                      0, 255) );
     trace.info() << "Image loaded: "<<image<< std::endl;
-    processDisplay(viewer, image, thresholdMin, thresholdMax, numDisplayedMax, transparency,
-                   transIntensity||transIntensitySq, interactiveDisplayVoxCoords, transIntensitySq);
+    processDisplay(viewer, image, thresholdMin, thresholdMax, numDisplayedMax);
 #endif
   }
   else if(extension=="sdp")
@@ -323,38 +235,22 @@ int main( int argc, char** argv )
       viewer << Z3i::Point(vectVoxels.at(i), functors::Round<>());
     }
   }
+
   if(displayMesh != "")
   {
     if(colorMesh.size() != 0)
     {
       Color c(colorMesh[0], colorMesh[1], colorMesh[2], colorMesh[3]);
-      viewer.setFillColor(c);
+      viewer.drawColor(c);
     }
     
     DGtal::Mesh<Z3i::RealPoint> aMesh(colorMesh.size() == 0);
     MeshReader<Z3i::RealPoint>::importOFFFile(displayMesh, aMesh);
     viewer << aMesh;
   }
-  
-  viewer << Viewer3D<>::updateDisplay;
-  if(snapShotFile != "" )
-    {
-      // Recover mesh position
-      viewer.restoreStateFromFile();
-      viewer.saveSnapshot(QString(snapShotFile.c_str()), true);
-      return 0;
-   }
-    
-  if (useLastCamSet)
-  {
-        viewer.restoreStateFromFile();
-  }
+   
   // First display transparency improve
-  viewer.sortTriangleFromCamera();
-  viewer.sortQuadFromCamera();
-  viewer.sortSurfelFromCamera();
-  viewer.sortPolygonFromCamera();
-  viewer  << Viewer::updateDisplay;
   trace.info() << "[display ready]"<< std::endl;
-  return application.exec();
+  viewer.show();
+  return 0;
 }

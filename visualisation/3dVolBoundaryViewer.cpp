@@ -38,7 +38,7 @@
 #include "DGtal/topology/KhalimskySpaceND.h"
 #include "DGtal/topology/DigitalSurface.h"
 #include "DGtal/topology/SetOfSurfels.h"
-#include "DGtal/io/viewers/Viewer3D.h"
+#include "DGtal/io/viewers/PolyscopeViewer.h"
 #include "DGtal/io/readers/PointListReader.h"
 #include "DGtal/io/readers/GenericReader.h"
 #ifdef DGTAL_WITH_ITK
@@ -139,8 +139,6 @@ int main( int argc, char** argv )
   // END parse command line using CLI ----------------------------------------------
   
   
-  QApplication application(argc,argv);
-  
   string extension = inputFileName.substr(inputFileName.find_last_of(".") + 1);
   if(extension!="vol" && extension != "p3d" && extension != "pgm3D" && extension != "pgm3d" && extension != "sdp" && extension != "pgm"
 #ifdef DGTAL_WITH_ITK
@@ -209,13 +207,12 @@ int main( int argc, char** argv )
     
     //! [3dVolBoundaryViewer-ViewingSurface]
     trace.beginBlock( "Displaying everything. " );
-    Viewer3D<Space,KSpace> viewer(ks);
-    viewer.setWindowTitle("Simple boundary of volume Viewer");
-    viewer.show();
+    PolyscopeViewer<Space,KSpace> viewer(ks);
+    viewer.allowReuseList = true;
     typedef MyDigitalSurface::ConstIterator ConstIterator;
     if ( mode == "BDRY" )
     {
-      viewer << SetMode3D(ks.unsigns( *(digSurf.begin()) ).className(), "Basic");
+      viewer.drawAsSimplified();
       for ( ConstIterator it = digSurf.begin(), itE = digSurf.end(); it != itE; ++it )
         viewer << ks.unsigns( *it );
     }else if ( mode == "INNER" )
@@ -228,9 +225,8 @@ int main( int argc, char** argv )
       trace.error() << "Warning display mode (" << mode << ") not implemented." << std::endl;
       trace.error() << "The display will be empty." << std::endl;
     }
-    viewer << Viewer3D<>::updateDisplay;
     trace.endBlock();
-    return application.exec();
+    viewer.show();
   }
   return 0;
 }

@@ -29,8 +29,6 @@
 #include "DGtal/base/Common.h"
 #include "DGtal/helpers/StdDefs.h"
 #include "DGtal/io/readers/GenericReader.h"
-#include "DGtal/io/boards/Board3D.h"
-#include "DGtal/io/DrawWithDisplay3DModifier.h"
 #include "DGtal/io/readers/PointListReader.h"
 
 #include "DGtal/images/ImageSelector.h"
@@ -76,6 +74,47 @@ vol2obj.cpp
 */
 ///////////////////////////////////////////////////////////////////////////////
 
+using Vertices = std::vector<std::array<double, 3>>;
+using Faces = std::vector<std::array<size_t, 3>>;
+
+template<typename T>
+void pushCube(const T& center, Vertices& vertices, Faces& faces) {
+  constexpr static double size = 0.5;
+  constexpr static std::array<std::array<double, 3>, 8> coords {{
+    {-size, -size, -size}, 
+    { size, -size, -size}, 
+    { size,  size, -size}, 
+    {-size,  size, -size},
+    {-size, -size,  size}, 
+    { size, -size,  size}, 
+    { size,  size,  size}, 
+    {-size,  size,  size}
+  }};
+  constexpr static std::array<std::array<size_t, 3>, 12> indices {{
+    {0, 1, 3}, {1, 2, 3},  
+    {0, 1, 4}, {1, 5, 4}, 
+    {1, 2, 5}, {2, 6, 5}, 
+    {3, 7, 2}, {7, 6, 2},
+    {4, 5, 7}, {5, 6, 7},
+    {0, 4, 3}, {4, 7, 3}
+  }};
+
+  const double x = center[0];
+  const double y = center[1];
+  const double z = center[2];
+
+  const size_t startIndex = vertices.size() + 1;
+  for (size_t i = 0; i < coords.size(); ++i) {
+    vertices.push_back({x + coords[i][0], 
+                        y + coords[i][1], 
+                        z + coords[i][2]});
+  }
+  for (size_t i = 0; i < indices.size(); ++i) {
+    faces.push_back({startIndex + indices[i][0], 
+                     startIndex + indices[i][1], 
+                     startIndex + indices[i][2]});
+  }
+}
 
 int main( int argc, char** argv )
 {
@@ -104,9 +143,9 @@ int main( int argc, char** argv )
   app.get_formatter()->column_width(40);
   CLI11_PARSE(app, argc, argv);
   // END parse command line using CLI ----------------------------------------------
-
-
-  Board3D<> board;
+  
+  Vertices vertices;
+  Faces faces;
 
   typedef ImageSelector<Domain, unsigned char>::Type Image;
   string extension = inputFileName.substr(inputFileName.find_last_of(".") + 1);
@@ -122,7 +161,7 @@ int main( int argc, char** argv )
       for(Domain::ConstIterator it = domain.begin(), itend=domain.end(); it!=itend; ++it){
         unsigned char  val= image( (*it) );
         if(val<=thresholdMax && val >=thresholdMin){
-          board << *it;
+          pushCube(*it, vertices, faces);
         }
       }
     }
@@ -131,10 +170,24 @@ int main( int argc, char** argv )
       {
         vector<Z3i::Point> vectVoxels = PointListReader<Z3i::Point>::getPointsFromFile(inputFileName);
         for(unsigned int i=0;i< vectVoxels.size(); i++){
-          board << vectVoxels.at(i);
+          pushCube(vectVoxels.at(i), vertices, faces);
         }
       }
+  
+  // Export file
+  std::ofstream outFile(outputFileName);
+  if (!outFile) {
+    trace.error() << "Can not open file: '" << outputFileName << "'\n";
+    return EXIT_FAILURE;
+  }
 
-  board.saveOBJ(outputFileName);
+  outFile << "#This file was created by DGtalTools vol2obj object\n";
+  for (size_t i = 0; i < vertices.size(); ++i) {
+    outFile << "v " << vertices[i][0] << ' ' << vertices[i][1] << ' ' << vertices[i][2] << '\n';
+  }
+  for (size_t i = 0; i < faces.size(); ++i) {
+    outFile << "f " << faces[i][0] << ' ' << faces[i][1] << ' ' << faces[i][2] << '\n';
+  }
+
   return EXIT_SUCCESS;
 }

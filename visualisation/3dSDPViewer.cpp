@@ -30,8 +30,7 @@
 
 #include "DGtal/base/Common.h"
 #include "DGtal/helpers/StdDefs.h"
-#include "DGtal/io/viewers/Viewer3D.h"
-#include "DGtal/io/DrawWithDisplay3DModifier.h"
+#include "DGtal/io/viewers/PolyscopeViewer.h"
 #include "DGtal/io/readers/TableReader.h"
 #include "DGtal/io/readers/PointListReader.h"
 #include "DGtal/io/readers/MeshReader.h"
@@ -41,7 +40,6 @@
 #include "DGtal/io/Color.h"
 #include "DGtal/io/colormaps/HueShadeColorMap.h"
 #include "DGtal/io/readers/GenericReader.h"
-#include "DGtal/io/DrawWithDisplay3DModifier.h"
 
 #include "CLI11.hpp"
 
@@ -49,7 +47,7 @@ using namespace std;
 using namespace DGtal;
 using namespace Z3i;
 
-typedef Viewer3D<Z3i::Space, Z3i::KSpace> Viewer;
+typedef PolyscopeViewer<Z3i::Space, Z3i::KSpace> Viewer;
 
 /**
  @page Doc3DSDPViewer 3DSDPViewer
@@ -135,19 +133,6 @@ If you need to display an important number of points, you can use the primitive 
 
  */
 
-// call back function to display voxel coordinates
-int displayCoordsCallBack(void *viewer, int name, void *data)
-{
-  vector<Z3i::RealPoint> *vectVoxels = (vector<Z3i::RealPoint> *)data;
-  std::stringstream ss;
-  ss << "Selected voxel: (" << (*vectVoxels)[name][0] << ", ";
-  ss << (*vectVoxels)[name][1] << ", ";
-  ss << (*vectVoxels)[name][2] << ") ";
-  ((Viewer *)viewer)->displayMessage(QString(ss.str().c_str()), 100000);
-
-  return 0;
-}
-
 int main(int argc, char **argv)
 {
   // parse command line using CLI ----------------------------------------------
@@ -161,20 +146,16 @@ int main(int argc, char **argv)
   std::string meshName;
   std::string typePrimitive{"voxel"};
   std::string vectorsFileName;
-  std::vector<double> vectSphereRadius;
   std::vector<unsigned int> vectColMesh;
   std::vector<unsigned int> vectIndexColorImport{3, 4, 5};
   bool importColorLabels{false};
   bool noPointDisplay{false};
   bool drawLines{false};
-  bool sphereRadiusFromInput{true};
   bool importColors{false};
   bool interactiveDisplayVoxCoords{false};
   float sx{1.0};
   float sy{1.0};
   float sz{1.0};
-  unsigned int sphereResolution{30};
-  double sphereRadius{0.2};
   double lineSize{0.2};
   double filterValue{100.0};
   double constantNorm{0.0};
@@ -210,12 +191,9 @@ int main(int argc, char **argv)
   app.add_option("--scaleX,-x", sx, "set the scale value in the X direction", true);
   app.add_option("--scaleY,-y", sy, "set the scale value in the Y direction", true);
   app.add_option("--scaleZ,-z", sy, "set the scale value in the Z direction", true);
-  app.add_option("--sphereResolution", sphereResolution, "defines the sphere resolution (used when the primitive is set to the sphere).", true);
-  app.add_option("-s,--sphereRadius", sphereRadius, "defines the sphere radius (used when the primitive is set to the sphere).", true);
-  app.add_flag("--sphereRadiusFromInput", sphereRadiusFromInput, "takes, as sphere radius, the 4th field of the sdp input file.");
   app.add_option("--lineSize", lineSize, "defines the line size (used when the --drawLines or --drawVectors option is selected).", true);
   app.add_option("--primitive,-p", typePrimitive, "set the primitive to display the set of points.", true)
-      ->check(CLI::IsMember({"voxel", "glPoints", "sphere"}));
+      ->check(CLI::IsMember({"voxel", "sphere"}));
   app.add_option("--drawVectors,-v", vectorsFileName, "SDP vector file: draw a set of vectors from the given file (each vector are determined by two consecutive point given, each point represented by its coordinates on a single line.");
 
   app.add_option("--unitVector,-u", constantNorm, "specifies that the SDP vector file format (of --drawVectors option) should be interpreted as unit vectors (each vector position is be defined from the input point (with input order) with a constant norm defined by [arg]).", true);
@@ -236,18 +214,18 @@ int main(int argc, char **argv)
     pointColor.setRGBi(vectColorPt[0], vectColorPt[1], vectColorPt[2], vectColorPt[3]);
   }
 
-  QApplication application(argc, argv);
 
   bool useUnitVector = constantNorm != 0.0;
 
-  typedef Viewer3D<Z3i::Space, Z3i::KSpace> Viewer;
+  typedef PolyscopeViewer<Z3i::Space, Z3i::KSpace> Viewer;
   Z3i::KSpace K;
   Viewer viewer(K);
-  viewer.setWindowTitle("3dSPD Viewer");
-  viewer.show();
-  viewer.setGLScale(sx, sy, sz);
-  viewer.myGLLineMinWidth = lineSize;
-  viewer << CustomColors3D(pointColor, pointColor);
+  viewer << pointColor;
+  viewer.allowReuseList = true;
+  
+  if (typePrimitive == "sphere") {
+    viewer.drawAsBalls();
+  }
 
   // Get vector of colors if imported.
   std::vector<Color> vectColors;
@@ -272,59 +250,38 @@ int main(int argc, char **argv)
   }
   HueShadeColorMap<unsigned int> aColorMap(0, maxLabel);
 
-  if (sphereRadiusFromInput)
-  {
-    vectSphereRadius = TableReader<double>::getColumnElementsFromFile(inputFileName, 3);
-  }
-
   vector<Z3i::RealPoint> vectVoxels;
   vectVoxels = PointListReader<Z3i::RealPoint>::getPointsFromFile(inputFileName, vectIndexSDP);
 
   int name = 0;
   if (!noPointDisplay)
   {
-    if (typePrimitive == "glPoints")
-    {
-      viewer.setUseGLPointForBalls(true);
-    }
-
     int step = max(1, (int)(100 / filterValue));
     for (unsigned int i = 0; i < vectVoxels.size(); i = i + step)
     {
       if (importColors)
       {
         Color col = vectColors[i];
-        viewer.setFillColor(col);
+        viewer.drawColor(col);
       }
       else if (importColorLabels)
       {
         unsigned int index = vectColorLabels[i];
         Color col = aColorMap(index);
-        viewer.setFillColor(col);
+        viewer.drawColor(col);
       }
 
-      if (typePrimitive == "voxel")
-      {
-        if (interactiveDisplayVoxCoords)
-        {
-          viewer << SetName3D(name++);
-        }
-        viewer << Z3i::Point((int)vectVoxels.at(i)[0],
-                             (int)vectVoxels.at(i)[1],
-                             (int)vectVoxels.at(i)[2]);
-      }
-      else
-      {
-        viewer.addBall(vectVoxels.at(i), sphereRadius, sphereResolution);
-      }
+      viewer << Z3i::Point((int)vectVoxels.at(i)[0],
+                           (int)vectVoxels.at(i)[1],
+                           (int)vectVoxels.at(i)[2]);
     }
 
-    viewer << CustomColors3D(lineColor, lineColor);
+    viewer << lineColor;
     if (drawLines)
     {
       for (unsigned int i = 1; i < vectVoxels.size(); i++)
       {
-        viewer.addLine(vectVoxels.at(i - 1), vectVoxels.at(i), lineSize);
+        viewer.drawLine(vectVoxels.at(i - 1), vectVoxels.at(i));
       }
     }
 
@@ -338,29 +295,33 @@ int main(int argc, char **argv)
 
       double percentage = percentageFilterVect;
       int step = max(1, (int)(100 / percentage));
-
+      
+      // Splits vectors into their own line groups
+      viewer.endCurrentGroup();  
       if (useUnitVector)
       {
         for (unsigned int i = 0; i < std::min(vectVoxels.size(), vectorsPt.size()); i = i + 2 * step)
         {
-          viewer.addLine(vectVoxels.at(i), vectVoxels.at(i) + vectorsPt.at(i) * constantNorm, lineSize);
+          viewer.drawLine(vectVoxels.at(i), vectVoxels.at(i) + vectorsPt.at(i) * constantNorm);
         }
       }
       else
       {
         for (unsigned int i = 0; i < vectorsPt.size() - 1; i = i + 2 * step)
         {
-          viewer.addLine(vectorsPt.at(i), vectorsPt.at(i + 1), lineSize);
+          viewer.drawLine(vectorsPt.at(i), vectorsPt.at(i + 1));
         }
       }
     }
+
     if (meshName != "")
     {
       bool customColorMesh = vectColMesh.size() == 4;
       if (customColorMesh)
       {
-        viewer.setFillColor(DGtal::Color(vectColMesh[0], vectColMesh[1], vectColMesh[2], vectColMesh[3]));
+        viewer.drawColor(DGtal::Color(vectColMesh[0], vectColMesh[1], vectColMesh[2], vectColMesh[3]));
       }
+
       Mesh<Z3i::RealPoint> mesh(!customColorMesh);
       mesh << meshName;
       if (customAlphaMesh)
@@ -372,13 +333,9 @@ int main(int argc, char **argv)
         }
         viewer << mesh;
       }
-      if (interactiveDisplayVoxCoords)
-      {
-        viewer << SetSelectCallback3D(displayCoordsCallBack, &vectVoxels, 0, vectVoxels.size() - 1);
-      }
-
-      viewer << Viewer3D<>::updateDisplay;
-      return application.exec();
     }
+
+    viewer.show();
+    return 0;
   }
 }
