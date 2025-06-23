@@ -57,9 +57,8 @@
 #include "DGtal/images/SimpleThresholdForegroundPredicate.h"
 #include "DGtal/io/readers/MPolynomialReader.h"
 #include "DGtal/io/colormaps/GradientColorMap.h"
-#ifdef DGTAL_WITH_VISU3D_QGLVIEWER
-#include "DGtal/io/viewers/Viewer3D.h"
-#include "DGtal/io/Display3DFactory.h"
+#ifdef DGTAL_WITH_POLYSCOPE
+#include "DGtal/io/viewers/PolyscopeViewer.h"
 #endif
 
 using namespace std;
@@ -78,7 +77,7 @@ Computes a normal vector field over a digitized 3D implicit surface
 for several estimators (II|VCM|Trivial|True), specified with -e. You
 may add Kanungo noise with option -N. These estimators are compared
 with ground truth. You may then: 1) visualize the normals or the angle
-deviations with -V (if WITH_QGL_VIEWER is enabled), 2) outputs them as
+deviations with -V (if DGTAL_WITH_POLYSCOPE is enabled), 2) outputs them as
 a list of cells/estimations with -n, 3) outputs them as a ImaGene file
 with -O, 4) outputs them as a NOFF file with -O, 5) computes
 estimation statistics with option -S.
@@ -459,21 +458,20 @@ void computeEstimation
       export_output.close();
       trace.endBlock();
     }
-#ifdef DGTAL_WITH_VISU3D_QGLVIEWER
+#ifdef DGTAL_WITH_POLYSCOPE
   if ( params.exportX != "None" )
     {
       typedef typename KSpace::Space Space;
-      typedef Viewer3D<Space,KSpace> MyViewever3D;
-      typedef Display3DFactory<Space,KSpace> MyDisplay3DFactory;
+      typedef PolyscopeViewer<Space,KSpace> MyViewever3D;
       int argc = 1;
       char name[] = "Viewer";
       char* argv[ 1 ];
       argv[ 0 ] = name;
       Surfel s;
-      QApplication application( argc, argv );
       MyViewever3D viewer( K );
-      viewer.show();
-      viewer << SetMode3D( s.className(), "Basic" );
+      viewer.drawAsSimplified();
+      viewer.allowReuseList = true;
+
       trace.beginBlock( "Viewing surface." );
       bool adev =  params.view == "AngleDeviation";
 
@@ -487,12 +485,11 @@ void computeEstimation
           s = *it;
           Color c = grad( 0 );
           if ( adev ) c = grad( max( 0.0, min( angle_error, 40.0 ) ) );
-          viewer.setFillColor( c );
-          MyDisplay3DFactory::drawOrientedSurfelWithNormal( viewer, s, n_est, false );
+          viewer.drawColor( c );
+          viewer << WithQuantity(s, "normal", n_est);
         }
       trace.endBlock();
-      viewer << MyViewever3D::updateDisplay;
-      application.exec();
+      viewer.show();
     }
 #endif
 

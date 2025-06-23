@@ -21,7 +21,7 @@
  *
  * @date 2011/01/04
  *
- * An example file named qglViewer.
+ * An example file named 3dImageViewer.
  *
  * This file is part of the DGtal library.
  */
@@ -64,7 +64,7 @@ using namespace Z3i;
 /**
    @page Doc3dImageViewer 3dImageViewer
  
-   @brief Displays volume file as a voxel set by using QGLviewer.
+   @brief Displays volume file as a voxel set by using PolyscopeViewer.
 
    @b Usage:  3dImageViewer [OPTIONS] 1 [s]
 
@@ -151,7 +151,7 @@ int main( int argc, char** argv )
   unsigned char transp {255};
 
   
-  app.description("Displays volume file as a voxel set by using QGLviewer\n 3dImageViewer  $DGtal/examples/samples/lobster.vol --thresholdImage -m 180");
+  app.description("Displays volume file as a voxel set by using PolyscopeViewer\n 3dImageViewer  $DGtal/examples/samples/lobster.vol --thresholdImage -m 180");
   
   app.add_option("-i,--input,1", inputFileName, "vol file (.vol, .longvol .p3d, .pgm3d and if DGTAL_WITH_ITK is selected: dicom, dcm, mha, mhd). For longvol, dicom, dcm, mha or mhd formats, the input values are linearly scaled between 0 and 255." )
   ->required()

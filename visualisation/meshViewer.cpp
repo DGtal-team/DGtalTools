@@ -44,7 +44,7 @@ using namespace DGtal;
 /**
  @page meshViewer meshViewer
 
- @brief Displays OFF mesh file by using QGLviewer.
+ @brief Displays OFF mesh file by using PolyscopeViewer.
 
  @b Usage:   meshViewer [input]
 
@@ -73,7 +73,6 @@ using namespace DGtal;
  -A,--addAmbientLight FLOAT            add an ambient light for better display (between 0 and 1).
  -b,--customBGColor UINT x 3           set the R, G, B components of the colors of the background color.
  -d,--doSnapShotAndExit TEXT           save display snapshot into file. Notes that the camera                                             setting is set by default according the last saved                                                 configuration (use SHIFT+Key_M to save current camera                                              setting in the Viewer3D). If the camera setting was not                                            saved it will use the default camera setting.
- -c,--useLastCameraSetting             use the last camera setting of the user (i.e if a                                                  .qglviewer.xml file is present in the current directory)
  -l,--fixLightToScene                  Fix light source to scence instead to camera
  -n,--invertNormal                     invert face normal vectors.
  -v,--drawVertex                       draw the vertex of the mesh
@@ -132,15 +131,12 @@ int main(int argc, char **argv)
   double ballRadius{0.5};
   bool invertNormal{false};
   bool drawVertex{false};
-  bool useLastCamSet{false};
-  bool fixLightToScene{false};
-  float ambiantLight{0.0};
 
   // parse command line using CLI ----------------------------------------------
   CLI::App app;
   std::vector<std::string> inputFileNames;
   std::string outputFileName{"result.raw"};
-  app.description("Display OFF mesh file by using QGLviewer");
+  app.description("Display OFF mesh file by using PolyscopeViewers");
   app.add_option("-i,--input,1", inputFileNames, "inputFileNames.off files (.off), or OFS file (.ofs)")
       ->check(CLI::ExistingFile)
       ->required();
@@ -159,12 +155,6 @@ int main(int argc, char **argv)
       ->expected(4);
   app.add_option("--SDPradius", ballRadius, "change the ball radius to display a set of discrete points (used with displaySDP option)", true);
   app.add_option("--displaySDP,-s", filenameSDP, "add the display of a set of discrete points as ball of radius 0.5.");
-  app.add_option("--addAmbientLight,-A", ambiantLight, "add an ambient light for better display (between 0 and 1).");
-  app.add_option("--customBGColor,-b", customBGColor, "set the R, G, B components of the colors of the background color.")
-      ->expected(3);
-  app.add_option("--doSnapShotAndExit,-d", snapshotFile, "save display snapshot into file. Notes that the camera setting is set by default according the last saved configuration (use SHIFT+Key_M to save current camera setting in the Viewer3D). If the camera setting was not saved it will use the default camera setting.");
-  app.add_flag("--useLastCameraSetting,-c", useLastCamSet, "use the last camera setting of the user (i.e if a .qglviewer.xml file is present in the current directory)");
-  app.add_flag("--fixLightToScene,-l", fixLightToScene, "Fix light source to scence instead to camera");
   app.add_flag("--invertNormal,-n", invertNormal, "invert face normal vectors.");
   app.add_flag("--drawVertex,-v", drawVertex, "draw the vertex of the mesh");
 

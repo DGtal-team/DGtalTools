@@ -30,7 +30,7 @@
 /**
  @page Doc3dCurveViewer 3dCurveViewer
  
- @brief  Displays a 3D curve given as the input filename (with possibly projections and/or tangent information) by using QGLviewer.
+ @brief  Displays a 3D curve given as the input filename (with possibly projections and/or tangent information) by using PolyscopeViewer.
  
 
  @b Usage:  3dCurveViewer [options] input

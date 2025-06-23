@@ -49,7 +49,7 @@ using namespace Z3i;
 /**
  @page Doc3dVolViewer 3dVolViewer
  
- @brief Displays volume file as a voxel set by using QGLviewer.
+ @brief Displays volume file as a voxel set by using PolyscopeViewer.
  
  The mode  specifies if you wish to see surface elements (BDRY), the inner
  voxels (INNER) or the outer voxels (OUTER) that touch the boundary.
@@ -76,7 +76,6 @@ using namespace Z3i;
    --colorMesh UINT ...                  set the color of Mesh (given from displayMesh option) : r g b a
    -d,--doSnapShotAndExit                save display snapshot into file. Notes that the camera setting is set by default according the last saved configuration (use SHIFT+Key_M to save current camera setting in the Viewer3D). If the camera setting was not saved it will use the default camera setting.
    -t,--transparency UINT=255            change the defaukt transparency
-   --useLastCameraSetting                use the last camera setting of the user (i.e if a    .qglviewer.xml file is present in the current directory)
 
  
  @endcode
@@ -147,7 +146,6 @@ int main( int argc, char** argv )
   bool interactiveDisplayVoxCoords {false};
   bool transIntensity {false};
   bool transIntensitySq {false};
-  bool useLastCamSet {false};
 
   app.add_option("-i,--input,1", inputFileName, "vol file (.vol, .longvol .p3d, .pgm3d and if DGTAL_WITH_ITK is selected: dicom, dcm, mha, mhd). For longvol, dicom, dcm, mha or mhd formats, the input values are linearly scaled between 0 and 255." )
   ->required()
@@ -171,7 +169,6 @@ int main( int argc, char** argv )
   app.add_flag("--transIntensity",transIntensity , "Used vocel intensity to define transparency valeue");
   app.add_flag("--transIntensitySq",transIntensitySq , "Used squared vocel intensity to define transparency valeue");
   app.add_flag("--interactiveDisplayVoxCoords,-c", interactiveDisplayVoxCoords, " by using this option the coordinates can be displayed after selection (shift+left click on voxel).");
- app.add_flag("--useLastCameraSetting", useLastCamSet, "use the last camera setting of the user (i.e if a .qglviewer.xml file is present in the current directory)");
     app.get_formatter()->column_width(40);
   CLI11_PARSE(app, argc, argv);
   // END parse command line using CLI ----------------------------------------------

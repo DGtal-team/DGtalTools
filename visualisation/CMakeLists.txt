@@ -9,7 +9,7 @@ foreach (FILE ${DGTAL_TOOLS_SRC})
 ENDFOREACH(FILE)
 
 if (  DGTAL_WITH_POLYSCOPE_VIEWER )
-    SET(DGTAL_EXAMPLES_QGL_SRC
+    SET(DGTAL_EXAMPLES_POLYSCOPE_SRC
     3dVolViewer
     3dVolBoundaryViewer
     3dImageViewer
@@ -24,7 +24,7 @@ if (  DGTAL_WITH_POLYSCOPE_VIEWER )
     3dImplicitSurfaceExtractorBy4DExtension
     3dImplicitSurfaceExtractorByThickening )
 
-  FOREACH(FILE ${DGTAL_EXAMPLES_QGL_SRC})
+  FOREACH(FILE ${DGTAL_EXAMPLES_POLYSCOPE_SRC})
     DGtalTools_add_tool(${FILE})
   endforeach (FILE)
 

@@ -199,7 +199,7 @@ int main( int argc, char** argv )
   bool neededArgsGiven=true;
 
   
-    bool enable_visu = !exportOnly; ///<! Default QGLViewer viewer. Disabled if exportOnly is set.
+    bool enable_visu = !exportOnly; ///<! Default PolyscopeViewer viewer. Disabled if exportOnly is set.
     bool enable_dat = export_dat_filename != ""; ///<! Export to a .dat file.
 
     if( !enable_visu && !enable_dat )

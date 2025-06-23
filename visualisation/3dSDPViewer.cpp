@@ -52,7 +52,7 @@ typedef PolyscopeViewer<Z3i::Space, Z3i::KSpace> Viewer;
 /**
  @page Doc3DSDPViewer 3DSDPViewer
 
- @brief Displays a  sequence of 3d discrete points by using QGLviewer.
+ @brief Displays a  sequence of 3d discrete points by using PolyscopeViewer.
 
  @b Usage:  3dSDPViewer [OPTIONS] 1 [f] [lineSize] [filterVectors]
 
@@ -164,7 +164,7 @@ int main(int argc, char **argv)
 
   unsigned int colorLabelIndex = 3;
 
-  app.description("Display sequence of 3d discrete points by using QGLviewer.");
+  app.description("Display sequence of 3d discrete points by using PolyscopeViewer.");
   app.add_option("-i,--input,1", inputFileName, "input file: sdp (sequence of discrete points).")
       ->required()
       ->check(CLI::ExistingFile);

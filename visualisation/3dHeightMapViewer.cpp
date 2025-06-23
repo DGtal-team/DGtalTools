@@ -21,7 +21,7 @@
  *
  * @date 2014/06/2014
  *
- * An example file named qglViewer.
+ * An example file named 3dHeighMapViewer.
  *
  * This file is part of the DGtal library.
  */

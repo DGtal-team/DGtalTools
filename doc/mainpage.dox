@@ -94,14 +94,12 @@ Actually the DGTal project is organized as follows:
    <tr>
    <td><img height=150px src="res3dCurvatureViewerNoise.png"> </td>
    <td><img height=150px src="res3dVolViewer.png"></td>
-   <td><img height=150px src="resSliceViewer.png"></td>
 
    </tr>
       <tr>
            <td align = center>@ref Doc3DCurvatureViewerNoise </td>
            <td align = center>@ref Doc3dVolViewer </td>
-           <td align = center>@ref sliceViewer </td>
-</tr>
+   </tr>
 
 
    <tr bgcolor="#FAFFFA">

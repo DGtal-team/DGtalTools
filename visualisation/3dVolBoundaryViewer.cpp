@@ -57,7 +57,7 @@ using namespace DGtal;
 /**
  @page Doc3dVolBoundaryViewer 3dVolBoundaryViewer
  
- @brief  Display the boundary of a volume file by using QGLviewer.
+ @brief  Display the boundary of a volume file by using PolyscopeViewer.
  
  The mode  specifies if you wish to see surface elements (BDRY), the inner
  voxels (INNER) or the outer voxels (OUTER) that touch the boundary.
@@ -110,7 +110,7 @@ int main( int argc, char** argv )
   
   // parse command line using CLI ----------------------------------------------
   CLI::App app;
-  app.description("Display the boundary of a volume file by using QGLviewer. The mode specifies if you wish to see surface elements (BDRY), the inner voxels (INNER) or the outer voxels (OUTER) that touch the boundary. \n \t Example: 3dVolBoundaryViewer  $DGtal/examples/samples/lobster.vol -m 60");
+  app.description("Display the boundary of a volume file by using PolyscopeViewer. The mode specifies if you wish to see surface elements (BDRY), the inner voxels (INNER) or the outer voxels (OUTER) that touch the boundary. \n \t Example: 3dVolBoundaryViewer  $DGtal/examples/samples/lobster.vol -m 60");
   std::string inputFileName;
   DGtal::int64_t rescaleInputMin {0};
   DGtal::int64_t rescaleInputMax {255};

@@ -209,7 +209,7 @@ int main( int argc, char** argv )
       trace.error() << "The noise level should be in the interval: ]0, 1["<< std::endl;
       exit(EXIT_FAILURE);
     }
-  bool enable_visu = !exportOnly; ///<! Default QGLViewer viewer. Disabled if exportOnly is set.
+  bool enable_visu = !exportOnly; ///<! Default Polyscope Viewer. Disabled if exportOnly is set.
   bool enable_dat = export_dat_filename != ""; ///<! Export to a .dat file.
 
   if( !enable_visu && !enable_dat )
