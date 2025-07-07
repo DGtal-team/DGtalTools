@@ -154,10 +154,10 @@ int main( int argc, char** argv )
   app.add_option("--inputType", inputType, "to specify the input image type (int or double).")
     -> check(CLI::IsMember({"int", "double"}));
 #endif 
-  app.add_option("--thresholdMin,-m", thresholdMin, "threshold min (excluded) to define binary shape.", true);
-  app.add_option("--thresholdMax,-M", thresholdMax, "threshold max (included) to define binary shape.", true);
-  app.add_option("--rescaleInputMin", rescaleInputMin, "min value used to rescale the input intensity (to avoid basic cast into 8  bits image).", true);
-  app.add_option("--rescaleInputMax", rescaleInputMax, "max value used to rescale the input intensity (to avoid basic cast into 8  bits image).", true);
+  app.add_option("--thresholdMin,-m", thresholdMin, "threshold min (excluded) to define binary shape.");
+  app.add_option("--thresholdMax,-M", thresholdMax, "threshold max (included) to define binary shape.");
+  app.add_option("--rescaleInputMin", rescaleInputMin, "min value used to rescale the input intensity (to avoid basic cast into 8  bits image).");
+  app.add_option("--rescaleInputMax", rescaleInputMax, "max value used to rescale the input intensity (to avoid basic cast into 8  bits image).");
   app.add_option("--numMaxVoxel,-n", numDisplayedMax, "set the maximal voxel number to be displayed.");
   app.add_option("--displayMesh", displayMesh, "display a Mesh given in OFF or OFS format.");
   app.add_option("--colorMesh", colorMesh, "set the color of Mesh (given from displayMesh option) : r g b a ")
@@ -165,7 +165,7 @@ int main( int argc, char** argv )
     app.add_option("--doSnapShotAndExit,-d", snapShotFile, "save display snapshot into file. Notes that the camera setting is set by default according the last saved configuration (use SHIFT+Key_M to save current camera setting in the Viewer3D). If the camera setting was not saved it will use the default camera setting.");
   app.add_option("--customBGColor,-b", customBGColor, "set the R, G, B, A components of the colors of  the sdp view")
       ->expected(3);
-  app.add_option("--transparency,-t", transparency, "change the defaukt transparency", true);
+  app.add_option("--transparency,-t", transparency, "change the defaukt transparency");
   app.add_flag("--transIntensity",transIntensity , "Used vocel intensity to define transparency valeue");
   app.add_flag("--transIntensitySq",transIntensitySq , "Used squared vocel intensity to define transparency valeue");
   app.add_flag("--interactiveDisplayVoxCoords,-c", interactiveDisplayVoxCoords, " by using this option the coordinates can be displayed after selection (shift+left click on voxel).");

@@ -153,8 +153,8 @@ int main( int argc, char** argv )
   app.add_option("-i,--input,1", inputFileName, "input file: sdp (sequence of discrete points with attribute)" )
   ->required()
   ->check(CLI::ExistingFile);
-  app.add_option("--labelIndex", labelIndex , "set the index of the label.", true);
-  app.add_option("--SDPindex", vectSDPindex, "specify the sdp index.", true);
+  app.add_option("--labelIndex", labelIndex , "set the index of the label.");
+  app.add_option("--SDPindex", vectSDPindex, "specify the sdp index.");
   
   app.get_formatter()->column_width(40);
   CLI11_PARSE(app, argc, argv);
