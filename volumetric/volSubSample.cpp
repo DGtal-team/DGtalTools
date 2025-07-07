@@ -174,8 +174,8 @@ int main(int argc, char**argv)
   app.add_option("-i,--input,1", inputFileName, "Input vol file." )
   ->required()
   ->check(CLI::ExistingFile);
-  app.add_option("-o,--output,2", outputFileName, "Output filename.",true);
-  app.add_option("-f,--function", function, "Function used to the down-sampling: {none,max, min, mean}", true)
+  app.add_option("-o,--output,2", outputFileName, "Output filename.");
+  app.add_option("-f,--function", function, "Function used to the down-sampling: {none,max, min, mean}")
    -> check(CLI::IsMember({"mean", "none", "max", "min", "mean"}));
   
   app.get_formatter()->column_width(40);

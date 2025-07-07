@@ -126,8 +126,8 @@ int main( int argc, char** argv )
   app.add_option("-i,--input,1", inputFileName, "Input volumetric file (.vol, .pgm3d or p3d)" )
   ->required()
   ->check(CLI::ExistingFile);
-  app.add_option("--min,-m", min, "Minimum (excluded) value for threshold.", true);
-  app.add_option("--max,-M", max, "Maximum (included) value for threshold.", true);
+  app.add_option("--min,-m", min, "Minimum (excluded) value for threshold.");
+  app.add_option("--max,-M", max, "Maximum (included) value for threshold.");
   app.add_option("--exportSDP,-e",exportSDPName, "Export the resulting set of points in a simple (sequence of discrete point (sdp)).");
   app.add_option("--fixedPoints",vectFixedPoints, "defines the coordinates of points which should not be removed.");
   app.add_option("--fixedPointSDP,-s",fixedPointSDPName,  "use fixed points from a file.")

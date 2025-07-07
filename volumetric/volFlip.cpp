@@ -113,10 +113,10 @@ int main(int argc, char**argv)
   ->required()
   ->check(CLI::ExistingFile);
   
-  app.add_option("--imagePlane", vectImgPlane, "arg=  {0,1,2} x {0,1,2} defines the axis of the slice image which will be transformed (by default arg= 0 1  i.e. the slice image defined in the X,Y plane (Z=cst)", true)
+  app.add_option("--imagePlane", vectImgPlane, "arg=  {0,1,2} x {0,1,2} defines the axis of the slice image which will be transformed (by default arg= 0 1  i.e. the slice image defined in the X,Y plane (Z=cst)")
    ->expected(2);
-  app.add_option("--flipDimension",dimFlip,"specify which axis will be used to apply the flip.", true);
-  app.add_option("-o,--output, 2",outputFileName, "Output filename.", true );
+  app.add_option("--flipDimension",dimFlip,"specify which axis will be used to apply the flip.");
+  app.add_option("-o,--output, 2",outputFileName, "Output filename.");
 
  
   app.get_formatter()->column_width(40);
