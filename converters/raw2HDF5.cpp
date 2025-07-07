@@ -103,7 +103,7 @@ int main(int argc, char**argv)
   app.add_option("-i,--input,1", inputFileName, "Input raw file." )
     ->required()
     ->check(CLI::ExistingFile);
-   app.add_option("-o,--output,2",outputFileName,"Output hdf5 filename.", true);
+   app.add_option("-o,--output,2",outputFileName,"Output hdf5 filename.");
    app.add_option("--x,-x", x, "x extent." )
    ->required();
    app.add_option("--y,-y", y, "y extent." )

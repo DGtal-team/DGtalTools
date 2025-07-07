@@ -86,7 +86,7 @@ int main( int argc, char** argv )
    app.add_option("-i,--input", vectImage2DNames, "input 2D files (.pgm)")
      -> required();
    app.add_option("-o,--output", outputFileName, "volumetric file (.vol, .longvol .pgm3d)");
-   app.add_option("--sliceOrientation,-s", sliceOrientation, "specify the slice orientation for which the slice are defined (by default =2 (Z direction))", true)
+   app.add_option("--sliceOrientation,-s", sliceOrientation, "specify the slice orientation for which the slice are defined (by default =2 (Z direction))")
      -> check(CLI::IsMember({0, 1, 2}));
    
   

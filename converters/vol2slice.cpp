@@ -117,15 +117,15 @@ int main( int argc, char** argv )
     ->required()
     ->check(CLI::ExistingFile);
   
-  app.add_option("--output,-o,2",outputFileName ,"base_name.extension:  extracted 2D slice volumetric files (will result n files base_name_xxx.extension)", true);
-  app.add_option("--setFirstSlice,-f", userStartSlice, "Set the first slice index to be extracted.", true)
+  app.add_option("--output,-o,2",outputFileName ,"base_name.extension:  extracted 2D slice volumetric files (will result n files base_name_xxx.extension)");
+  app.add_option("--setFirstSlice,-f", userStartSlice, "Set the first slice index to be extracted.")
     -> check(CLI::Number);
   app.add_option("--setLastSlice,-l", userEndSlice, "Set the last slice index to be extracted (by default set to maximal value according to the given volume).")
     -> check(CLI::Number);
-  app.add_option("--sliceOrientation,-s", sliceOrientation, "specify the slice orientation for which the slice are defined (by default =2 (Z direction))", true)
+  app.add_option("--sliceOrientation,-s", sliceOrientation, "specify the slice orientation for which the slice are defined (by default =2 (Z direction))")
     -> check(CLI::IsMember({0, 1, 2}));
-  app.add_option("--rescaleInputMin", rescaleInputMin, "min value used to rescale the input intensity (to avoid basic cast into 8  bits image).", true);
-  app.add_option("--rescaleInputMax", rescaleInputMax, "max value used to rescale the input intensity (to avoid basic cast into 8  bits image).", true);
+  app.add_option("--rescaleInputMin", rescaleInputMin, "min value used to rescale the input intensity (to avoid basic cast into 8  bits image).");
+  app.add_option("--rescaleInputMax", rescaleInputMax, "max value used to rescale the input intensity (to avoid basic cast into 8  bits image).");
   app.get_formatter()->column_width(40);
 
   CLI11_PARSE(app, argc, argv);

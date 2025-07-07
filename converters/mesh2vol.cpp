@@ -154,14 +154,14 @@ int main( int argc, char** argv )
    app.add_option("-i,--input,1", inputFileName, "mesh file (.off)." )
      ->required()
      ->check(CLI::ExistingFile);
-   app.add_option("-o,--output,2", outputFileName, "filename of ouput volumetric file (vol, pgm3d, ...).",true);
+   app.add_option("-o,--output,2", outputFileName, "filename of ouput volumetric file (vol, pgm3d, ...).");
    app.add_option("-m,--margin", margin, "add volume margin around the mesh bounding box.");
    app.add_flag("-d,--objectDomainBB", unitScale, "use the digitization space defined from bounding box of input mesh. If seleted, the option --resolution will have no effect.");
    app.add_option("-f,--fillValue", fillValue, "change the default output  volumetric image value in [1...255].")
    ->expected(0, 255);
-   app.add_option("-s,--separation", separation, "voxelization 6-separated or 26-separated.", true)
+   app.add_option("-s,--separation", separation, "voxelization 6-separated or 26-separated.")
      -> check(CLI::IsMember({6, 26}));
-   app.add_option("-r,--resolution", resolution,"digitization domain size (e.g. 128). The mesh will be scaled such that its bounding box maps to [0,resolution)^3.", true);
+   app.add_option("-r,--resolution", resolution,"digitization domain size (e.g. 128). The mesh will be scaled such that its bounding box maps to [0,resolution)^3.");
    
    
   app.get_formatter()->column_width(40);

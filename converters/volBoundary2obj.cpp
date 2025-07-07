@@ -130,11 +130,11 @@ int main( int argc, char** argv )
     ->required()
     ->check(CLI::ExistingFile);
   app.add_option("--output,-o,2",outputFilename ,"output file (.obj or .off).");
-  app.add_option("--thresholdMin,-m", thresholdMin, "threshold min (excluded) to define binary shape.", true);
-  app.add_option("--thresholdMax,-M", thresholdMax, "threshold max (included) to define binary shape.", true);
-  app.add_option("--rescaleInputMin", rescaleInputMin, "min value used to rescale the input intensity (to avoid basic cast into 8  bits image).", true);
-  app.add_option("--rescaleInputMax", rescaleInputMax, "max value used to rescale the input intensity (to avoid basic cast into 8  bits image).", true);
-  app.add_option("--customDiffuse,-c", vectCol, "set the R, G, B, A components of the diffuse colors of the mesh faces.", true)
+  app.add_option("--thresholdMin,-m", thresholdMin, "threshold min (excluded) to define binary shape.");
+  app.add_option("--thresholdMax,-M", thresholdMax, "threshold max (included) to define binary shape.");
+  app.add_option("--rescaleInputMin", rescaleInputMin, "min value used to rescale the input intensity (to avoid basic cast into 8  bits image).");
+  app.add_option("--rescaleInputMax", rescaleInputMax, "max value used to rescale the input intensity (to avoid basic cast into 8  bits image).");
+  app.add_option("--customDiffuse,-c", vectCol, "set the R, G, B, A components of the diffuse colors of the mesh faces.")
     ->expected(4);
   app.add_flag("--triangulatedSurface,-t", triangulatedSurface, "save the dual triangulated surface instead instead the default digital surface.");
   app.get_formatter()->column_width(40);
