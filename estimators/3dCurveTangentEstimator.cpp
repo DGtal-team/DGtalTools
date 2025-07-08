@@ -749,26 +749,26 @@ int main(int argc, char **argv)
   ->required()
   ->check(CLI::ExistingFile);
 
-  app.add_option("--view,-V", viewFlag, "toggles display ON/OFF",true );
-  app.add_option("--box,-b", box, "specifies  the tightness of the bounding box around the curve with a given integer displacement <arg> to enlarge it (0 is tight)", true);
-  app.add_option("--viewBox,-v", viewBox, "displays the bounding box, <arg>=WIRED means that only edges are displayed, <arg>=COLORED adds colors for planes (XY is red, XZ green, YZ, blue).", true)
+  app.add_option("--view,-V", viewFlag, "toggles display ON/OFF");
+  app.add_option("--box,-b", box, "specifies  the tightness of the bounding box around the curve with a given integer displacement <arg> to enlarge it (0 is tight)");
+  app.add_option("--viewBox,-v", viewBox, "displays the bounding box, <arg>=WIRED means that only edges are displayed, <arg>=COLORED adds colors for planes (XY is red, XZ green, YZ, blue).")
    -> check(CLI::IsMember({"WIRED" , "COLORED"}));
-  app.add_option("--connectivity,-T",connectivity, "specifies whether it is a 6-connected curve or a 26-connected curve: arg=6 | 26.", true )
+  app.add_option("--connectivity,-T",connectivity, "specifies whether it is a 6-connected curve or a 26-connected curve: arg=6 | 26." )
    -> check(CLI::IsMember({"6", "26"}));
   app.add_flag("--curve3d,-C", curve3d, "displays the 3D curve" );
   app.add_flag("--curve2d,-c", curve2d, "displays the 2D projections of the 3D curve on the bounding box" );
   app.add_flag("--cover3d,-3", cover3d, "displays the 3D tangential cover of the curve");
   app.add_flag("--cover2d,-2", cover2d, "displays the 2D projections of the 3D tangential cover of the curve");
   app.add_flag("--tangent,-t", displayTangent, "displays the tangents to the curve.");
-  app.add_option("--nbColors,-n", nbColors, "sets the number of successive colors used for displaying 2d and 3d maximal segments (default is 3: red, green, blue)", true);
+  app.add_option("--nbColors,-n", nbColors, "sets the number of successive colors used for displaying 2d and 3d maximal segments (default is 3: red, green, blue)");
   
-  app.add_option("--big-radius,-R",bigRad, "the radius parameter R in the VCM estimator.",true);
-  app.add_option("--small-radius,-r",smallRad, "the radius parameter r in the VCM estimator.",true);
-  app.add_option("--method,-m", method, "the method of tangent computation: VCM (default), L-MST.", true)
+  app.add_option("--big-radius,-R",bigRad, "the radius parameter R in the VCM estimator.");
+  app.add_option("--small-radius,-r",smallRad, "the radius parameter r in the VCM estimator.");
+  app.add_option("--method,-m", method, "the method of tangent computation: VCM (default), L-MST.")
    -> check(CLI::IsMember({"VCM", "L-MST"}));
-  app.add_option("--axes,-a", axesFlag, "show main axes - prints list of axes for each point and color points color = (if X => 255, if Y => 255, if Z => 255)", true)
+  app.add_option("--axes,-a", axesFlag, "show main axes - prints list of axes for each point and color points color = (if X => 255, if Y => 255, if Z => 255)")
    -> check(CLI::IsMember({"ON","OFF"}));
-  app.add_option("--output,-o",outputFileName, "the basename of the output text file which will contain points and tangent vectors: (x y z tx ty tz) per line", true);
+  app.add_option("--output,-o",outputFileName, "the basename of the output text file which will contain points and tangent vectors: (x y z tx ty tz) per line");
  
   
   
