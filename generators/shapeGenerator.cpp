@@ -390,12 +390,12 @@ int main( int argc, char** argv )
   auto radiusOpt = app.add_option("--radius,-R", radius, "Radius of the shape" );
   auto axis1Opt = app.add_option("--axis1,-A", axis1, "Half big axis of the shape (ellipse)" );
   auto axis2Opt = app.add_option("--axis2,-a", axis2, "Half small axis of the shape (ellipse)" );
-  auto smallradiusOpt = app.add_option("--smallradius,-r", smallradius, "Small radius of the shape (default 5)", true);
-  auto varsmallradiusOpt = app.add_option("--varsmallradius,-v", varsmallradius, "Variable small radius of the shape (default 5)", true );
-  auto kOpt = app.add_option("-k", k, "Number of branches or corners the shape (default 3)", true );
-  auto phiOpt = app.add_option("--phi", phi, "Phase of the shape (in radian, default 0.0)", true );
-  auto widthOpt = app.add_option("--width,-w", width, "Width of the shape (default 10.0)", true );
-  auto powerOpt = app.add_option("--power,-p", power, "Power of the metric (default 2.0)", true );
+  auto smallradiusOpt = app.add_option("--smallradius,-r", smallradius, "Small radius of the shape (default 5)");
+  auto varsmallradiusOpt = app.add_option("--varsmallradius,-v", varsmallradius, "Variable small radius of the shape (default 5)" );
+  auto kOpt = app.add_option("-k", k, "Number of branches or corners the shape (default 3)" );
+  auto phiOpt = app.add_option("--phi", phi, "Phase of the shape (in radian, default 0.0)" );
+  auto widthOpt = app.add_option("--width,-w", width, "Width of the shape (default 10.0)" );
+  auto powerOpt = app.add_option("--power,-p", power, "Power of the metric (default 2.0)" );
   auto outputNameOpt = app.add_option("--output,-o", outputName, "Basename of the output file");
   auto signatureOpt = app.add_flag("--signature", "Display to the standard output the signature (normal, curvature) at each point of the specified shape contour (middle point of each contour linel)");
   app.add_option("--format,-f", outputFormat, "Output format:\n\t  Bitmap {pgm, raw}\n\t  Vector {svg} (+ {png,pdf} if libCairo installed) (default pgm)" );
