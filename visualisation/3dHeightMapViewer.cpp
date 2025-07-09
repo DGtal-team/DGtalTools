@@ -21,7 +21,7 @@
  *
  * @date 2014/06/2014
  *
- * An example file named qglViewer.
+ * An example file named 3dHeighMapViewer.
  *
  * This file is part of the DGtal library.
  */
@@ -34,9 +34,7 @@
 #include "DGtal/base/BasicFunctors.h"
 #include "DGtal/helpers/StdDefs.h"
 #include "DGtal/io/readers/GenericReader.h"
-#include "DGtal/io/viewers/Viewer3D.h"
-#include <DGtal/io/colormaps/GradientColorMap.h>
-#include <DGtal/io/colormaps/GrayscaleColorMap.h>
+#include "DGtal/io/viewers/PolyscopeViewer.h"
 #include <DGtal/images/ImageContainerBySTLVector.h>
 
 #include "DGtal/io/Color.h"
@@ -45,6 +43,7 @@
 #include <DGtal/kernel/BasicPointFunctors.h>
 #include <DGtal/topology/helpers/Surfaces.h>
 #include <DGtal/io/colormaps/GradientColorMap.h>
+#include <DGtal/io/colormaps/GrayscaleColorMap.h>
 
 using namespace std;
 using namespace DGtal;
@@ -94,88 +93,6 @@ using namespace Z3i;
  @ref 3dHeightMapViewer.cpp
 
  */
-
-template < typename Space = DGtal::Z3i::Space, typename KSpace = DGtal::Z3i::KSpace>
-struct Viewer3DImageSpec: public DGtal::Viewer3D <Space, KSpace>
-{
-  Viewer3DImageSpec(Z2i::RealPoint pup, Z2i::RealPoint plow): myZScale(1.0), myZposClipping(10.0),
-                                                              myPUpper(pup), myPLower(plow){
-    DGtal::Viewer3D<>::update();
-  };
-
-virtual  void
-init(){
-   DGtal::Viewer3D<>::init();
-   QGLViewer::setKeyDescription ( Qt::Key_Up, "Move Up the cutting plane in the Z axis direction." );
-   QGLViewer::setKeyDescription ( Qt::Key_Down, "Move Down the cutting plane in the Z axis direction." );
-   QGLViewer::setKeyDescription ( Qt::Key_Shift, "Change the cutting plane move with step 1 (5 by default)" );
-   QGLViewer::setKeyDescription ( Qt::Key_Plus, "Increase the openGL scale by 0.25 " );
-   QGLViewer::setKeyDescription ( Qt::Key_Minus, "Decrease the openGL scale by 0.25 " );
-};
-
-
-protected:
-  double myZScale;
-  double myZposClipping;
-  Z2i::RealPoint myPUpper, myPLower;
-
-  virtual void draw (  ){
-    DGtal::Viewer3D<>::draw();
-    glPushMatrix();
-    glMultMatrixd ( DGtal::Viewer3D<>::manipulatedFrame()->matrix() );
-    glPushMatrix();
-    glScalef(1.0, 1.0, myZScale);
-    glEnable( GL_LIGHTING );
-    glBegin( GL_QUADS );
-    glColor4ub( 50, 50, 240,  150 );
-    glNormal3f( 0, 0 , 1.0 );
-    glVertex3f( myPLower[0], myPLower[1] , myZposClipping );
-    glVertex3f( myPUpper[0], myPLower[1] , myZposClipping );
-    glVertex3f( myPUpper[0], myPUpper[1], myZposClipping );
-    glVertex3f( myPLower[0], myPUpper[1],  myZposClipping );
-    glEnd();
-    glPopMatrix();
-    glPopMatrix();
-  }
-  virtual void keyPressEvent ( QKeyEvent *e ){
-    bool handled = false;
-    if( e->key() == Qt::Key_Up){
-      if((e->modifiers() & Qt::MetaModifier)){
-        myZposClipping+=1;
-      }else{
-        myZposClipping+=5;
-      }
-
-      DGtal::Viewer3D<>::update();
-      handled=true;
-    }
-    if( e->key() == Qt::Key_Down){
-      if((e->modifiers() & Qt::MetaModifier)){
-        myZposClipping-=1;
-      }else{
-        myZposClipping-=5;
-      }
-
-      DGtal::Viewer3D<>::update();
-      handled=true;
-    }
-
-    if( e->key() == Qt::Key_Plus){
-      myZScale+=0.25;
-      DGtal::Viewer3D<Space, KSpace>::setGLScale(1.0, 1.0, myZScale);
-      DGtal::Viewer3D<Space, KSpace>::update();
-      handled=true;
-    }
-    if( e->key() == Qt::Key_Minus){
-      myZScale-=0.25;
-      DGtal::Viewer3D<Space, KSpace>::setGLScale(1.0, 1.0, myZScale);
-      DGtal::Viewer3D<>::update();
-      handled=true;
-    }
-    if ( !handled )
-      DGtal::Viewer3D<>::keyPressEvent ( e );
-  }
-};
 
 // Defining a Helper to get the 3D point functor from an 2DImage
 template<typename TImage2D, typename TPoint3D >
@@ -240,16 +157,13 @@ int main( int argc, char** argv )
     imageTexture =  GenericReader<Image2DCol>::import( colorTextureImage );
   }
 
-  QApplication application(argc,argv);
   Z2i::RealPoint plow (image.domain().lowerBound()[0]-0.5,
                        image.domain().lowerBound()[1]-0.5);
   
   Z2i::RealPoint pup (image.domain().upperBound()[0]+0.5,
                       image.domain().upperBound()[1]+0.5);
   
-  Viewer3DImageSpec<> viewer(plow, pup) ;
-  viewer.setWindowTitle("Height Map Viewer");
-  viewer.show();
+  PolyscopeViewer viewer;
 
 
   KSpace K;
@@ -261,7 +175,7 @@ int main( int argc, char** argv )
                                    Z3i::Point(image.domain().upperBound()[0], image.domain().upperBound()[1], maxHeight+1));
   trace.info() << "[done]"<< std::endl;
 
-  viewer << SetMode3D((*(boundVect.begin())).className(), "Basic" );
+  viewer.drawAsSimplified();
   GradientColorMap<Image2DG::Value,CMAP_JET>  gradientShade( 0, std::numeric_limits<Image2DG::Value>::max());
   GrayscaleColorMap<Image2DG::Value>  grayShade(0, std::numeric_limits<Image2DG::Value>::max());
 
@@ -271,16 +185,15 @@ int main( int argc, char** argv )
     Z3i::Point pt = K.sCoords(K.sDirectIncident( *it, 2 ));
     functors::Projector<SpaceND<2,int> > proj;
     Image2DG::Value val = image(proj(pt));
-    if(colorMap){
-      viewer.setFillColor(gradientShade(val));
-    }else if (colorTextureImage != "") {
-      viewer.setFillColor(Color(imageTexture(proj(pt))));
-    }else{
-      viewer.setFillColor(grayShade(val));
+
+    if(!colorMap && colorTextureImage != ""){
+      viewer << WithQuantity(*it, "color", Color(imageTexture(proj(pt))));
+    } else {
+      viewer << WithQuantity(*it, "value", val);
     }
-  viewer << *it;
+    viewer << *it;
   }
 
-  viewer << Viewer3D<>::updateDisplay;
-  return application.exec();
+  viewer.show();
+  return 0;
 }

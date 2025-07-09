@@ -29,13 +29,11 @@
 ///////////////////////////////////////////////////////////////////////////////
 #include <iostream>
 #include <queue>
-#include <QImageReader>
 
-#include "DGtal/io/viewers/Viewer3D.h"
-#include "DGtal/io/DrawWithDisplay3DModifier.h"
 #include "DGtal/io/Color.h"
 #include "DGtal/shapes/Shapes.h"
 #include "DGtal/helpers/StdDefs.h"
+#include "DGtal/io/viewers/PolyscopeViewer.h"
 #include "DGtal/io/readers/PointListReader.h"
 
 #include "DGtal/io/readers/GenericReader.h"
@@ -233,20 +231,14 @@ int main( int argc, char** argv )
   trace.info() << "Skeleton--> "<<S<<std::endl;
 
   // Display by using two different list to manage OpenGL transparency.
-  QApplication application(argc,argv);
-  Viewer3D<> viewer;
-  viewer.setWindowTitle("homotopicThinning3D");
-  viewer.show();
+  PolyscopeViewer<> viewer;
 
-  viewer << SetMode3D( shape_set.className(), "Paving" );
-  viewer << CustomColors3D(Color(25,25,255, 255), Color(25,25,255, 255));
+  viewer << Color(25,25,255, 255);
   viewer << S ;
-  viewer << CustomColors3D(Color(255,25,255, 255), Color(255,25,255, 255));
+  viewer << Color(255,25,255, 255);
   viewer << fixedSet;
-  viewer << SetMode3D( shape_set.className(), "PavingTransp" );
-  viewer << CustomColors3D(Color(250, 0,0, 25), Color(250, 0,0, 5));
+  viewer << Color(250, 0,0, 25);
   viewer << shape_set;
-  viewer<< Viewer3D<>::updateDisplay;
   
   if (exportSDPName != "")
     {
@@ -257,7 +249,8 @@ int main( int argc, char** argv )
           out << p[0] << " " << p[1] << " " << p[2] << std::endl;
         }
     }
-  return application.exec();
+  viewer.show();
+  return 0;
 
 }
 //                                                                           //

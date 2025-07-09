@@ -311,7 +311,7 @@ lengthEstimators( const std::string & /*name*/,
     Surfaces<KSpace>::track2DBoundaryPoints( points, K, SAdj, dig, bel );
     // Create GridCurve
     GridCurve<KSpace> gridcurve;
-    gridcurve.initFromVector( points );
+    gridcurve.initFromPointsVector( points );
     // Ranges
     ArrowsRange ra = gridcurve.getArrowsRange(); 
     PointsRange rp = gridcurve.getPointsRange(); 

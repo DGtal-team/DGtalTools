@@ -1172,11 +1172,11 @@ void missingParam( std::string param )
 
 int main( int argc, char** argv )
 {
-#ifndef WITH_CGAL
-#error You need to have activated CGAL (WITH_CGAL) to include this file.
+#ifndef DGTAL_WITH_CGAL
+#error You need to have activated CGAL (DGTAL_WITH_CGAL) to include this file.
 #endif
-#ifndef WITH_EIGEN
-#error You need to have activated EIGEN (WITH_EIGEN) to include this file.
+#ifndef DGTAL_WITH_EIGEN
+#error You need to have activated EIGEN (DGTAL_WITH_EIGEN) to include this file.
 #endif
   
   // parse command line ----------------------------------------------

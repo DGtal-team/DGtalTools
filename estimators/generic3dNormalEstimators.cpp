@@ -44,7 +44,6 @@
 #include "DGtal/topology/LightImplicitDigitalSurface.h"
 #include "DGtal/graph/DepthFirstVisitor.h"
 #include "DGtal/graph/GraphVisitorRange.h"
-#include "DGtal/geometry/surfaces/estimation/CNormalVectorEstimator.h"
 #include "DGtal/geometry/surfaces/estimation/VoronoiCovarianceMeasureOnDigitalSurface.h"
 #include "DGtal/geometry/surfaces/estimation/VCMDigitalSurfaceLocalEstimator.h"
 #include "DGtal/geometry/surfaces/estimation/TrueDigitalSurfaceLocalEstimator.h"
@@ -58,9 +57,8 @@
 #include "DGtal/images/SimpleThresholdForegroundPredicate.h"
 #include "DGtal/io/readers/MPolynomialReader.h"
 #include "DGtal/io/colormaps/GradientColorMap.h"
-#ifdef WITH_VISU3D_QGLVIEWER
-#include "DGtal/io/viewers/Viewer3D.h"
-#include "DGtal/io/Display3DFactory.h"
+#ifdef DGTAL_WITH_POLYSCOPE
+#include "DGtal/io/viewers/PolyscopeViewer.h"
 #endif
 
 using namespace std;
@@ -79,7 +77,7 @@ Computes a normal vector field over a digitized 3D implicit surface
 for several estimators (II|VCM|Trivial|True), specified with -e. You
 may add Kanungo noise with option -N. These estimators are compared
 with ground truth. You may then: 1) visualize the normals or the angle
-deviations with -V (if WITH_QGL_VIEWER is enabled), 2) outputs them as
+deviations with -V (if DGTAL_WITH_POLYSCOPE is enabled), 2) outputs them as
 a list of cells/estimations with -n, 3) outputs them as a ImaGene file
 with -O, 4) outputs them as a NOFF file with -O, 5) computes
 estimation statistics with option -S.
@@ -460,21 +458,20 @@ void computeEstimation
       export_output.close();
       trace.endBlock();
     }
-#ifdef WITH_VISU3D_QGLVIEWER
+#ifdef DGTAL_WITH_POLYSCOPE
   if ( params.exportX != "None" )
     {
       typedef typename KSpace::Space Space;
-      typedef Viewer3D<Space,KSpace> MyViewever3D;
-      typedef Display3DFactory<Space,KSpace> MyDisplay3DFactory;
+      typedef PolyscopeViewer<Space,KSpace> MyViewever3D;
       int argc = 1;
       char name[] = "Viewer";
       char* argv[ 1 ];
       argv[ 0 ] = name;
       Surfel s;
-      QApplication application( argc, argv );
       MyViewever3D viewer( K );
-      viewer.show();
-      viewer << SetMode3D( s.className(), "Basic" );
+      viewer.drawAsSimplified();
+      viewer.allowReuseList = true;
+
       trace.beginBlock( "Viewing surface." );
       bool adev =  params.view == "AngleDeviation";
 
@@ -488,12 +485,11 @@ void computeEstimation
           s = *it;
           Color c = grad( 0 );
           if ( adev ) c = grad( max( 0.0, min( angle_error, 40.0 ) ) );
-          viewer.setFillColor( c );
-          MyDisplay3DFactory::drawOrientedSurfelWithNormal( viewer, s, n_est, false );
+          viewer.drawColor( c );
+          viewer << WithQuantity(s, "normal", n_est);
         }
       trace.endBlock();
-      viewer << MyViewever3D::updateDisplay;
-      application.exec();
+      viewer.show();
     }
 #endif
 
@@ -748,7 +744,7 @@ int main( int argc, char** argv )
   app.add_option("--export,-x",allParams.exportX, "exports surfel normals which can be viewed with ImaGene tool 'viewSetOfSurfels' in file <basename>-cells-<gridstep>.txt, as specified by -o <basename>. Parameter <arg> is None|Normals|AngleDeviation. The color depends on the angle deviation in degree: 0 metallic blue, 5 light cyan, 10 light green, 15 light yellow, 20 yellow, 25 orange, 30 red, 35, dark red, 40- grey", true );
   app.add_flag("--normals,-n", allParams.normals, "outputs every surfel, its estimated normal, and the ground truth normal in file <basename>-normals-<gridstep>.txt, as specified by -o <basename>.");
   app.add_flag("--noff,-O", allParams.noff, "exports the digital surface with normals as NOFF file <basename>-noff-<gridstep>.off, as specified by -o <basename>..");
-#ifdef WITH_VISU3D_QGLVIEWER
+#ifdef DGTAL_WITH_VISU3D_QGLVIEWER
   app.add_option("--view,-V", allParams.view, "view the digital surface with normals.  Parameter <arg> is None|Normals|AngleDeviation. The color depends on the angle deviation in degree: 0 metallic blue, 5 light cyan, 10 light green, 15 light yellow, 20 yellow, 25 orange, 30 red, 35, dark red, 40- grey.");
 #endif
 

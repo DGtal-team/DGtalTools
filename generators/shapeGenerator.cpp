@@ -273,7 +273,7 @@ struct Exporter
 	    board.saveSVG((outputName+"."+outputFormat).c_str());
 	  }
 	else
-#ifdef WITH_CAIRO
+#ifdef DGTAL_WITH_CAIRO
 	  if (outputFormat == "pdf")
 	    {
 	      Board2D board;

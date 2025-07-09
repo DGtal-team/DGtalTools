@@ -1,6 +1,6 @@
 
 # These tools require Eigen (because DEC requires Eigen)
-if(WITH_EIGEN)
+if(DGTAL_WITH_EIGEN)
   SET(DGTAL_TOOLS_SRC
     at-u0-v1
     at-u2-v0
@@ -9,4 +9,4 @@ if(WITH_EIGEN)
   FOREACH(FILE ${DGTAL_TOOLS_SRC})
     DGtalTools_add_tool(${FILE})
   ENDFOREACH(FILE)
-endif(WITH_EIGEN)
+endif(DGTAL_WITH_EIGEN)
