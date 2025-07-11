@@ -10,6 +10,10 @@
 - *build*
   - Fix DGtalTools doc deployement.
     (David Coeurjolly and Bertrand Kerautret [#454](https://github.com/DGtal-team/DGtalTools/pull/454))
+    
+- *global*
+  - Continuous integration fix using new version on conan following DGtal changes.
+    (Bertrand Kerautret [#465](https://github.com/DGtal-team/DGtalTools/pull/465))
 
 
 # DGtalTools 1.4 
