@@ -12,7 +12,7 @@ env:
   CONFIG_GLOBAL: 
   CONFIG_LINUX:  -DWITH_MAGICK=true -DWITH_GMP=true -DDGTAL_WITH_FFTW3=true -DWARNING_AS_ERROR=ON -DDGTAL_WITH_HDF5=true -DWITH_QGLVIEWER=true -DDGTAL_WITH_CAIRO=true  -DDGTAL_WITH_EIGEN=true -DDGTAL_ENABLE_FLOATING_POINT_EXCEPTIONS=true
   CONFIG_MAC:    -DDGTAL_WITH_EIGEN=true -DWITH_GMP=tue
-  CONFIG_WINDOWS: -DDGTAL_WITH_OPENMP=true  -DENABLE_CONAN=true -DDISABLE_POLYSCOPE=ON 
+  CONFIG_WINDOWS: -DDGTAL_WITH_OPENMP=true  -DDISABLE_POLYSCOPE=ON 
 
 
 jobs:
@@ -104,7 +104,7 @@ jobs:
            conan install . --build=missing -s:a compiler.cppstd=20
            mkdir buildDGtal
            cd buildDGtal
-           echo  cmake ..-DCMAKE_POLICY_DEFAULT_CMP0091=NEW  -DCMAKE_BUILD_TYPE=$BUILD_TYPE $CONFIG_WINDOWS -DCMAKE_TOOLCHAIN_FILE="conan_toolchain.cmake" -DBUILD_EXAMPLES=false -DBUILD_TESTING=false 
+           echo  cmake .. -DCMAKE_POLICY_DEFAULT_CMP0091=NEW  -DCMAKE_BUILD_TYPE=$BUILD_TYPE $CONFIG_WINDOWS -DCMAKE_TOOLCHAIN_FILE="conan_toolchain.cmake" -DBUILD_EXAMPLES=false -DBUILD_TESTING=false 
            cmake .. -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_BUILD_TYPE=$BUILD_TYPE $CONFIG_WINDOWS -DCMAKE_TOOLCHAIN_FILE="conan_toolchain.cmake" -DBUILD_EXAMPLES=false -DBUILD_TESTING=false  
            cmake --build . --config Release --parallel 3
      - name: Configure CMake (linux)
@@ -124,8 +124,8 @@ jobs:
        shell: bash
        working-directory: "${{runner.workspace}}/build"
        run: |
-           conan install $GITHUB_WORKSPACE --build=missing
-           cmake $GITHUB_WORKSPACE -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_MODULE_PATH="D:/a/DGtalTools/build/DGtal/buildDGtal" -DDGtal_DIR="D:/a/DGtalTools/build/DGtal/buildDGtal"  -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DDGTAL_RANDOMIZED_TESTING_WHITELIST="${{ steps.whitelist.outputs.WHITELIST }}"
+           conan install $GITHUB_WORKSPACE --build=missing  -s:a compiler.cppstd=20
+           cmake $GITHUB_WORKSPACE -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_MODULE_PATH="D:/a/DGtalTools/build/DGtal/buildDGtal" -DDGtal_DIR="D:/a/DGtalTools/build/DGtal/buildDGtal" -DCMAKE_TOOLCHAIN_FILE="conan_toolchain.cmake" -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DDGTAL_RANDOMIZED_TESTING_WHITELIST="${{ steps.whitelist.outputs.WHITELIST }}"
 
      - name: Build
        working-directory: ${{runner.workspace}}/build
