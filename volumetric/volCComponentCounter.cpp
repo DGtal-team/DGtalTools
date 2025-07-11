@@ -160,7 +160,7 @@ int main( int argc, char** argv )
   app.add_option("-i,--input,1", inputFileName, "volume file (.vol)." )
   ->required()
   ->check(CLI::ExistingFile);
-  app.add_option("--connectivity,-c",connectivity,"object connectivity (6,18,26) (default: 6 ).", true)
+  app.add_option("--connectivity,-c",connectivity,"object connectivity (6,18,26) (default: 6 ).")
    -> check(CLI::IsMember({6, 18, 26}));
  
   app.get_formatter()->column_width(40);

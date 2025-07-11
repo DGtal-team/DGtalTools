@@ -279,11 +279,11 @@ int main(int argc, char**argv)
   app.add_option("-b,--volB,2", volBFilename, "Input filename of volume B (vol format, and other pgm3d can also be used).")
   ->required()
   ->check(CLI::ExistingFile);
-  app.add_option("--aMin",aMin, "min threshold for a voxel to be considered as belonging to the object of volume A. (default 0)",true);
-  app.add_option("--aMax",aMax, "max threshold for a voxel to be considered as belonging to the object of volume A. (default 128)",true);
+  app.add_option("--aMin",aMin, "min threshold for a voxel to be considered as belonging to the object of volume A. (default 0)");
+  app.add_option("--aMax",aMax, "max threshold for a voxel to be considered as belonging to the object of volume A. (default 128)");
 
-  app.add_option("--bMin",bMin, "min threshold for a voxel to be considered as belonging to the object of volume B. (default 0)",true);
-  app.add_option("--bMax",bMax, "max threshold for a voxel to be considered as belonging to the object of volume B. (default 128)",true);
+  app.add_option("--bMin",bMin, "min threshold for a voxel to be considered as belonging to the object of volume B. (default 0)");
+  app.add_option("--bMax",bMax, "max threshold for a voxel to be considered as belonging to the object of volume B. (default 128)");
 
   app.add_flag("--noDistanceComparisons", noDistanceComparisons, "to avoid to apply distance map computation if the distance comparaison are not needed.");
 

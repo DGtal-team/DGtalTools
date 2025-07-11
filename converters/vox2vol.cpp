@@ -135,7 +135,7 @@ int main(int argc, char**argv)
   app.add_option("-i,--input,1", inputFileName, "" )
     ->required()
     ->check(CLI::ExistingFile);
-  app.add_option("-o,--ouput,2", outputFileName, "", true );
+  app.add_option("-o,--ouput,2", outputFileName, "" );
    
   app.get_formatter()->column_width(40);
   CLI11_PARSE(app, argc, argv);

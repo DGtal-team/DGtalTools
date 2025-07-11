@@ -12,7 +12,7 @@ SET(DGTALTOOLS_RANDOMIZED_BUILD_THRESHOLD "100" CACHE INTERNAL "Threshold for th
 SET(DGTALTOOLS_RANDOMIZED_BUILD_WHITELIST "" CACHE INTERNAL "List of whitelisted tools to build.")
 option(NO_ADD_STBIMAGE_IMPLEMENT "To avoid duplicated linking errors (like LNK2005 in MSVC)" OFF)
 option(DISABLE_POLYSCOPE "Disable polyscope based tools" OFF)
-
+list(APPEND CMAKE_PREFIX_PATH "${DGtal_DIR}")
 
 # -----------------------------------------------------------------------------
 # CPP20

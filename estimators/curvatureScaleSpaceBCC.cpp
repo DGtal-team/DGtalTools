@@ -139,10 +139,10 @@ int main( int argc, char** argv )
   app.description("Generate the Curvature Scale Space image using a binomial convolver based estimator.\n Typical use example:\n \t curvatureScaleSpaceBCC <input filename>  <output filename>\n");
   app.add_option("-i,--input,1",fileName,"Input FreemanChain file name")->required()->check(CLI::ExistingFile);
   app.add_option("-o,--output,2",outputFileName,"Set the output name")->required();  
-  app.add_option("--gridStepInit", h_initial, "Grid step initial", true);
-  app.add_option("--gridStepIncrement", h_increment, "Grid step increment ",true);
-  app.add_option("--gridStepFinal", h_final, "Grid step final", true);
-  app.add_option("--curvatureCutOff,-c", curvatureCutOff, "set the curvature limits to better display", true);
+  app.add_option("--gridStepInit", h_initial, "Grid step initial");
+  app.add_option("--gridStepIncrement", h_increment, "Grid step increment ");
+  app.add_option("--gridStepFinal", h_final, "Grid step final");
+  app.add_option("--curvatureCutOff,-c", curvatureCutOff, "set the curvature limits to better display");
 
   app.get_formatter()->column_width(40);
     CLI11_PARSE(app, argc, argv);

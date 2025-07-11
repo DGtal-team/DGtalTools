@@ -104,8 +104,8 @@ int main(int argc, char**argv)
   app.add_option("-i,--input,1", inputFileName, "Input vol file." )
   ->required()
   ->check(CLI::ExistingFile);
-  app.add_option("-o,--output,2",outputFileName, "Output filename.", true);
-  app.add_option("-v,--fillValue,3", fillValue, "Set the filling value other than the default value of 128.", false);
+  app.add_option("-o,--output,2",outputFileName, "Output filename.");
+  app.add_option("-v,--fillValue,3", fillValue, "Set the filling value other than the default value of 128.");
 
   app.get_formatter()->column_width(40);
   CLI11_PARSE(app, argc, argv);

@@ -260,7 +260,7 @@ int main( int argc, char** argv )
     app.add_option("--column1,-c", column1, "Column of file 1" )->required();
     app.add_option("--column2,-C", column2, "Column of file 2" )->required();
     app.add_option("--output,-o,2", output_filename, "Output file")->required();
-    app.add_option("--monge,-m", isMongeMean, "Is from Monge mean computation (optional, default false)", true);
+    app.add_option("--monge,-m", isMongeMean, "Is from Monge mean computation (optional, default false)");
 
     app.get_formatter()->column_width(40);
     CLI11_PARSE(app, argc, argv);

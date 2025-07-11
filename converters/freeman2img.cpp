@@ -118,7 +118,7 @@ int main( int argc, char** argv )
     ->required()
     ->check(CLI::ExistingFile);
   app.add_option("-b,--border",border, "add a border in the resulting image (used only in the automatic mode i.e when --space is not used.");
-  app.add_option("-o,--output,2", outputFileName, "the output fileName", true);
+  app.add_option("-o,--output,2", outputFileName, "the output fileName");
   app.add_option("-s,--space", space, "Define the space from its bounding box (lower and upper coordinates) else the space is automatically defined from the freemanchain bounding boxes." )
     ->expected(4);
 

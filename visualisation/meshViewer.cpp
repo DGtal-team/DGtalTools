@@ -143,7 +143,7 @@ int main(int argc, char **argv)
   app.add_option("-x,--scaleX", sx, "set the scale value in the X direction (default 1.0)");
   app.add_option("-y,--scaleY", sy, "set the scale value in the y direction (default 1.0)");
   app.add_option("-z,--scaleZ", sz, "set the scale value in the z direction (default 1.0)");
-  app.add_option("--minLineWidth", lineWidth, "set the min line width of the mesh faces (default 1.5)", true);
+  app.add_option("--minLineWidth", lineWidth, "set the min line width of the mesh faces (default 1.5)");
   app.add_option("--customColorMesh", customColorMesh, "set the R, G, B, A components of the colors of the mesh faces and eventually the color R, G, B, A of the mesh edge lines (set by default to black).");
   app.add_option("--customAlphaMesh", customAlphaMesh, "set the alpha(A) components of the colors of the mesh faces (can be applied for each mesh).");
   app.add_option("--customColorSDP", customColorSDP, "set the R, G, B, A components of the colors of the sdp view")
@@ -153,7 +153,7 @@ int main(int argc, char **argv)
       ->expected(6);
   app.add_option("--customLineColor", customLineColor, "set the R, G, B components of the colors of the lines displayed from the --displayVectorField option (red by default).")
       ->expected(4);
-  app.add_option("--SDPradius", ballRadius, "change the ball radius to display a set of discrete points (used with displaySDP option)", true);
+  app.add_option("--SDPradius", ballRadius, "change the ball radius to display a set of discrete points (used with displaySDP option)");
   app.add_option("--displaySDP,-s", filenameSDP, "add the display of a set of discrete points as ball of radius 0.5.");
   app.add_flag("--invertNormal,-n", invertNormal, "invert face normal vectors.");
   app.add_flag("--drawVertex,-v", drawVertex, "draw the vertex of the mesh");

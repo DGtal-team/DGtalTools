@@ -128,9 +128,9 @@ int main( int argc, char** argv )
   app.add_option("-i,--input,1", inputFileName, "the volume file (.vol)." )
   ->required()
   ->check(CLI::ExistingFile);
-  app.add_option("--threshold,-t",threshold, "the value that defines the isosurface in the image (an integer between 0 and 255).", true);
-  app.add_option("--adjacency,-a",intAdjacency, "0: interior adjacency, 1: exterior adjacency", true);
-  app.add_option("-o,--output,2", outputFileName, "the output OFF file that represents the geometry of the isosurface", true );
+  app.add_option("--threshold,-t",threshold, "the value that defines the isosurface in the image (an integer between 0 and 255).");
+  app.add_option("--adjacency,-a",intAdjacency, "0: interior adjacency, 1: exterior adjacency");
+  app.add_option("-o,--output,2", outputFileName, "the output OFF file that represents the geometry of the isosurface");
   auto noiseOpt = app.add_option("--noise,-n", noise, "Kanungo noise level in ]0,1[. Note that only the largest connected component is considered and that no specific embedder is used.");
   
   app.get_formatter()->column_width(40);

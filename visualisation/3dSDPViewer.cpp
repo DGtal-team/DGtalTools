@@ -184,21 +184,21 @@ int main(int argc, char **argv)
       ->needs(importColOpt);
 
   app.add_flag("--importColorLabels", importColorLabels, "import color labels from the input file (label index  should be by default at index 3).");
-  app.add_option("--setColorLabelIndex", colorLabelIndex, "customize the index of the imported color labels in the source file (used by -importColorLabels).", true);
-  app.add_option("--filter,-f", filterValue, "filter input file in order to display only the [arg] percent of the input 3D points (uniformly selected).", true);
+  app.add_option("--setColorLabelIndex", colorLabelIndex, "customize the index of the imported color labels in the source file (used by -importColorLabels).");
+  app.add_option("--filter,-f", filterValue, "filter input file in order to display only the [arg] percent of the input 3D points (uniformly selected).");
   app.add_flag("--noPointDisplay", noPointDisplay, "usefull for instance to only display the lines between points.");
   app.add_flag("--drawLines", drawLines, "draw the line between discrete points.");
-  app.add_option("--scaleX,-x", sx, "set the scale value in the X direction", true);
-  app.add_option("--scaleY,-y", sy, "set the scale value in the Y direction", true);
-  app.add_option("--scaleZ,-z", sy, "set the scale value in the Z direction", true);
-  app.add_option("--lineSize", lineSize, "defines the line size (used when the --drawLines or --drawVectors option is selected).", true);
-  app.add_option("--primitive,-p", typePrimitive, "set the primitive to display the set of points.", true)
+  app.add_option("--scaleX,-x", sx, "set the scale value in the X direction");
+  app.add_option("--scaleY,-y", sy, "set the scale value in the Y direction");
+  app.add_option("--scaleZ,-z", sy, "set the scale value in the Z direction");
+  app.add_option("--lineSize", lineSize, "defines the line size (used when the --drawLines or --drawVectors option is selected).");
+  app.add_option("--primitive,-p", typePrimitive, "set the primitive to display the set of points.")
       ->check(CLI::IsMember({"voxel", "sphere"}));
   app.add_option("--drawVectors,-v", vectorsFileName, "SDP vector file: draw a set of vectors from the given file (each vector are determined by two consecutive point given, each point represented by its coordinates on a single line.");
 
-  app.add_option("--unitVector,-u", constantNorm, "specifies that the SDP vector file format (of --drawVectors option) should be interpreted as unit vectors (each vector position is be defined from the input point (with input order) with a constant norm defined by [arg]).", true);
+  app.add_option("--unitVector,-u", constantNorm, "specifies that the SDP vector file format (of --drawVectors option) should be interpreted as unit vectors (each vector position is be defined from the input point (with input order) with a constant norm defined by [arg]).");
 
-  app.add_option("--filterVectors", percentageFilterVect, "filters vector input file in order to display only the [arg] percent of the input vectors (uniformly selected, to be used with option --drawVectors else no effect). ", true);
+  app.add_option("--filterVectors", percentageFilterVect, "filters vector input file in order to display only the [arg] percent of the input vectors (uniformly selected, to be used with option --drawVectors else no effect). ");
   app.add_flag("--interactiveDisplayVoxCoords", interactiveDisplayVoxCoords, " by using this option the coordinates can be displayed after selection (shift+left click on voxel).");
 
   app.get_formatter()->column_width(40);

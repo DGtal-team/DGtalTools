@@ -115,11 +115,11 @@ int main(int argc, char**argv)
   app.add_option("-i,--input,1", inputFileName, "Input vol file." )
   ->required()
   ->check(CLI::ExistingFile);
-  app.add_option("--output,-o,2", outputFileName, "Output filename.", true);
+  app.add_option("--output,-o,2", outputFileName, "Output filename.");
 
-  app.add_option("--xMin",xMin, "x coordinate of lower point.", true);
-  app.add_option("--yMin",yMin, "y coordinate of lower point.", true);
-  app.add_option("--zMin",zMin, "z coordinate of lower point.", true);
+  app.add_option("--xMin",xMin, "x coordinate of lower point.");
+  app.add_option("--yMin",yMin, "y coordinate of lower point.");
+  app.add_option("--zMin",zMin, "z coordinate of lower point.");
 
   app.add_option("--xMax",xMax, "x coordinate of upper point.")
    ->required();

@@ -128,19 +128,19 @@ int main( int argc, char** argv )
     ->required()
     ->check(CLI::ExistingFile);
   app.add_option("-o,--output,2", outputFileName, "resulting image filename (in pgm or other).");
-  app.add_option("--thresholdMin,-m", thresholdMin, "threshold min (excluded) to define binary shape.", true);
-  app.add_option("--thresholdMax,-M", thresholdMax, "threshold max (included) to define binary shape.", true);
-  app.add_option("--rescaleInputMin", rescaleInputMin, "min value used to rescale the input intensity (to avoid basic cast into 8  bits image).", true);
-  app.add_option("--rescaleInputMax", rescaleInputMax, "max value used to rescale the input intensity (to avoid basic cast into 8  bits image).", true);
+  app.add_option("--thresholdMin,-m", thresholdMin, "threshold min (excluded) to define binary shape.");
+  app.add_option("--thresholdMax,-M", thresholdMax, "threshold max (included) to define binary shape.");
+  app.add_option("--rescaleInputMin", rescaleInputMin, "min value used to rescale the input intensity (to avoid basic cast into 8  bits image).");
+  app.add_option("--rescaleInputMax", rescaleInputMax, "max value used to rescale the input intensity (to avoid basic cast into 8  bits image).");
  
-  app.add_option("--nx",nx, "set the x component of the projection direction.", true);
-  app.add_option("--ny",ny, "set the y component of the projection direction.", true);
-  app.add_option("--nz",nz, "set the z component of the projection direction.", true);
-  app.add_option("--centerX,-x", centerX, "choose x center of the projected image.", true);
-  app.add_option("--centerY,-y", centerY, "choose y center of the projected image.", true);
-  app.add_option("--centerZ,-z", centerZ, "choose z center of the projected image.", true);
-  app.add_option("--width,-w", widthImageScan, "set the width of the resulting height Field image.", true);
-  app.add_option("--height", heightImageScan, "set the height of the resulting height Field image.", true);
+  app.add_option("--nx",nx, "set the x component of the projection direction.");
+  app.add_option("--ny",ny, "set the y component of the projection direction.");
+  app.add_option("--nz",nz, "set the z component of the projection direction.");
+  app.add_option("--centerX,-x", centerX, "choose x center of the projected image.");
+  app.add_option("--centerY,-y", centerY, "choose y center of the projected image.");
+  app.add_option("--centerZ,-z", centerZ, "choose z center of the projected image.");
+  app.add_option("--width,-w", widthImageScan, "set the width of the resulting height Field image.");
+  app.add_option("--height", heightImageScan, "set the height of the resulting height Field image.");
   app.add_option("--heightFieldMaxScan",maxScan, "set the maximal scan deep.");
   app.add_flag("--setBackgroundLastDepth", bgLastDepth,"change the default background (black with the last filled intensity).");
   

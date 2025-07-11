@@ -198,9 +198,9 @@ int main( int argc, char** argv )
   
   app.add_option("--mask,-a",maskFileName, "the mask image that represents the elements that are copied as output in the resulting image (by default set to 1 you can change this value by using --maskValue). ")
   ->check(CLI::ExistingFile);
-  app.add_option("-o,--output,2", outputFileName, "the output masked image.", true );
-  app.add_option("--offsetBorder,-f", offsetBorder, "add a border offset to the bounding box of the masked value domain.", true);
-  app.add_option("--maskValue,-m", maskValue, "the masking value.", true);
+  app.add_option("-o,--output,2", outputFileName, "the output masked image." );
+  app.add_option("--offsetBorder,-f", offsetBorder, "add a border offset to the bounding box of the masked value domain.");
+  app.add_option("--maskValue,-m", maskValue, "the masking value.");
   app.get_formatter()->column_width(40);
   CLI11_PARSE(app, argc, argv);
   // END parse command line using CLI ----------------------------------------------

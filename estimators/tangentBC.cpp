@@ -108,7 +108,7 @@ int main( int argc, char** argv )
 
   app.description("Estimates tangent using a binomial convolver.\n Typical use example:\n \t tangentBC [options] --input  <fileName>\n");
   auto filenameOpt = app.add_option("--input,-i,1",fileName,"input file name: FreemanChain (.fc) or a sequence of discrete points (.sdp).")->required()->check(CLI::ExistingFile);
-  app.add_option("--GridStep", h, "Grid step (default 1.0)", true);
+  app.add_option("--GridStep", h, "Grid step (default 1.0)");
    
   app.get_formatter()->column_width(40);
   CLI11_PARSE(app, argc, argv);

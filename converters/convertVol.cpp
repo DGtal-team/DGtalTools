@@ -87,7 +87,7 @@ int main( int argc, char** argv )
   app.add_option("-i,--input,1", inputFileName, "volumetric file (.pgm3d, .vol, .longvol)." )
     ->required()
     ->check(CLI::ExistingFile);
-  app.add_option("-o,--output,2", outputFileName, "volumetric file (.pgm3d, .vol, .longvol)", true);
+  app.add_option("-o,--output,2", outputFileName, "volumetric file (.pgm3d, .vol, .longvol)");
 
   app.get_formatter()->column_width(40);
   CLI11_PARSE(app, argc, argv);

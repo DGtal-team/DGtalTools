@@ -726,22 +726,22 @@ int main( int argc, char** argv )
   app.description(ss_descr.str());
   
   app.add_option("--polynomial,-p",allParams.polynomials, "the implicit polynomial whose zero-level defines the shape of interest.") ->required();
-  app.add_option("--noise,-N", allParams.noise,"the Kanungo noise level l=arg, with l^d the probability that a point at distance d is flipped inside/outside.", true );
-  app.add_option("--minAABB,-a", allParams.minAABB, "the min value of the AABB bounding box (domain)", true );
-  app.add_option("--maxAABB,-A", allParams.maxAABB, "the max value of the AABB bounding box (domain)", true );
-  app.add_option("--gridstep,-g", allParams.gridstep, "the gridstep that defines the digitization (often called h).", true);
-  app.add_option("--estimator,-e", allParams.estimator, "the chosen normal estimator: True | VCM | II | Trivial", true)
+  app.add_option("--noise,-N", allParams.noise,"the Kanungo noise level l=arg, with l^d the probability that a point at distance d is flipped inside/outside." );
+  app.add_option("--minAABB,-a", allParams.minAABB, "the min value of the AABB bounding box (domain)" );
+  app.add_option("--maxAABB,-A", allParams.maxAABB, "the max value of the AABB bounding box (domain)" );
+  app.add_option("--gridstep,-g", allParams.gridstep, "the gridstep that defines the digitization (often called h).");
+  app.add_option("--estimator,-e", allParams.estimator, "the chosen normal estimator: True | VCM | II | Trivial")
   -> check(CLI::IsMember({"True", "VCM", "II", "Trivial"}));
-  app.add_option("--R-radius,-R", allParams.R_radius, "the constant for parameter R in R(h)=R h^alpha (VCM).",true);
-  app.add_option("--r-radius,-r", allParams.r_radius, "the constant for parameter r in r(h)=r h^alpha (VCM,II,Trivial).", true);
-  app.add_option("--kernel,-k", allParams.kernel, "the function chi_r, either hat or ball.", true);
-  app.add_option("--alpha", allParams.alpha, "the parameter alpha in r(h)=r h^alpha (VCM).", true);
-  app.add_option("--trivial-radius,-t", allParams.trivial_radius, "the parameter t defining the radius for the Trivial estimator. Also used for reorienting the VCM.", true);
-  app.add_option("--embedding,-E",allParams.embedding, "the surfel -> point embedding for VCM estimator: 0: Pointels, 1: InnerSpel, 2: OuterSpel.", true);
-  app.add_option("--output,-o", allParams.output, "the output basename. All generated files will have the form <arg>-*, for instance <arg>-angle-deviation-<gridstep>.txt, <arg>-normals-<gridstep>.txt, <arg>-cells-<gridstep>.txt, <arg>-noff-<gridstep>.off.", true);
+  app.add_option("--R-radius,-R", allParams.R_radius, "the constant for parameter R in R(h)=R h^alpha (VCM).");
+  app.add_option("--r-radius,-r", allParams.r_radius, "the constant for parameter r in r(h)=r h^alpha (VCM,II,Trivial).");
+  app.add_option("--kernel,-k", allParams.kernel, "the function chi_r, either hat or ball.");
+  app.add_option("--alpha", allParams.alpha, "the parameter alpha in r(h)=r h^alpha (VCM).");
+  app.add_option("--trivial-radius,-t", allParams.trivial_radius, "the parameter t defining the radius for the Trivial estimator. Also used for reorienting the VCM.");
+  app.add_option("--embedding,-E",allParams.embedding, "the surfel -> point embedding for VCM estimator: 0: Pointels, 1: InnerSpel, 2: OuterSpel.");
+  app.add_option("--output,-o", allParams.output, "the output basename. All generated files will have the form <arg>-*, for instance <arg>-angle-deviation-<gridstep>.txt, <arg>-normals-<gridstep>.txt, <arg>-cells-<gridstep>.txt, <arg>-noff-<gridstep>.off.");
   app.add_flag("--angle-deviation-stats,-S", allParams.angle_deviation_stats, "computes angle deviation error and outputs them in file <basename>-angle-deviation-<gridstep>.txt, as specified by -o <basename>.");
 
-  app.add_option("--export,-x",allParams.exportX, "exports surfel normals which can be viewed with ImaGene tool 'viewSetOfSurfels' in file <basename>-cells-<gridstep>.txt, as specified by -o <basename>. Parameter <arg> is None|Normals|AngleDeviation. The color depends on the angle deviation in degree: 0 metallic blue, 5 light cyan, 10 light green, 15 light yellow, 20 yellow, 25 orange, 30 red, 35, dark red, 40- grey", true );
+  app.add_option("--export,-x",allParams.exportX, "exports surfel normals which can be viewed with ImaGene tool 'viewSetOfSurfels' in file <basename>-cells-<gridstep>.txt, as specified by -o <basename>. Parameter <arg> is None|Normals|AngleDeviation. The color depends on the angle deviation in degree: 0 metallic blue, 5 light cyan, 10 light green, 15 light yellow, 20 yellow, 25 orange, 30 red, 35, dark red, 40- grey" );
   app.add_flag("--normals,-n", allParams.normals, "outputs every surfel, its estimated normal, and the ground truth normal in file <basename>-normals-<gridstep>.txt, as specified by -o <basename>.");
   app.add_flag("--noff,-O", allParams.noff, "exports the digital surface with normals as NOFF file <basename>-noff-<gridstep>.off, as specified by -o <basename>..");
 #ifdef DGTAL_WITH_VISU3D_QGLVIEWER

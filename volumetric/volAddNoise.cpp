@@ -115,9 +115,9 @@ int main( int argc, char ** argv )
   app.add_option("-i,--input,1", inputFileName, "input image file name (any 3D image format accepted by DGtal::GenericReader)" )
   ->required()
   ->check(CLI::ExistingFile);
-  app.add_option("-o,--output,2", outputFileName, "output image file name (any 3D image format accepted by DGtal::GenericWriter)", true);
+  app.add_option("-o,--output,2", outputFileName, "output image file name (any 3D image format accepted by DGtal::GenericWriter)");
   
-  app.add_option("--noise,-n", noise, "Kanungo noise level in ]0,1[ (default 0.5)\n", true);
+  app.add_option("--noise,-n", noise, "Kanungo noise level in ]0,1[ (default 0.5)\n");
   app.add_flag("--max,-m", MaxFlag, "Extract only the largest 6-connected component.");
     
   app.get_formatter()->column_width(40);

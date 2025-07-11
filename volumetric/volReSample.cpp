@@ -116,7 +116,7 @@ int main( int argc, char** argv )
   app.add_option("-i,--input,1", inputFileName, "input volumetric file (.vol, .longvol, .pgm3d)." )
   ->required()
   ->check(CLI::ExistingFile);
-  app.add_option("-o,--output,2", outputFileName, "the new volumetric file (.vol, .longvol, .pgm3d).", true );
+  app.add_option("-o,--output,2", outputFileName, "the new volumetric file (.vol, .longvol, .pgm3d)." );
   app.add_option("-g,--gridSize", aGridSizeReSample, "size_x size_y size_z : the grid size of the re sampling ")
    ->expected(3);
   app.get_formatter()->column_width(40);

@@ -161,12 +161,12 @@ int main( int argc, char** argv )
   app.add_flag("--intergrid", grid , "draw slice images using inter grid mode.");
   app.add_flag("--emptyMode", emptyMode,"remove the default boundingbox display.");
   app.add_flag("--thresholdImage", thresholdImage,"threshold the image to define binary shape");
-  app.add_option("--thresholdMin", thresholdMin, "threshold min to define binary shape", true);
-  app.add_option("--thresholdMax", thresholdMax, "threshold maw to define binary shape", true);
+  app.add_option("--thresholdMin", thresholdMin, "threshold min to define binary shape");
+  app.add_option("--thresholdMax", thresholdMax, "threshold maw to define binary shape");
   app.add_option("--displaySDP,s",inputFileNameSDP, "display a set of discrete points (.sdp)" );
   app.add_option("--SDPindex", vectSDPIndex, "specify the sdp index.")
    ->expected(3);
-  app.add_option("--SDPball",ballRadius, "use balls to display a set of discrete points (if not set to 0 and used with displaySDP option).", true);
+  app.add_option("--SDPball",ballRadius, "use balls to display a set of discrete points (if not set to 0 and used with displaySDP option).");
   
   app.add_option("--displayMesh", inputFileNameMesh, "display a Mesh given in OFF or OFS format.");
   app.add_flag("--displayDigitalSurface",displayDigitalSurface, "display the digital surface instead of display all the set of voxels (used with thresholdImage or displaySDP options)" );
@@ -177,12 +177,12 @@ int main( int argc, char** argv )
   app.add_option("--colorMesh", colorMesh, "set the color of Mesh (given from displayMesh option) : r g b a ")
    ->expected(4);
 
-  app.add_option("--scaleX,-x", sx, "set the scale value in the X direction", true );
-  app.add_option("--scaleY,-y", sy, "set the scale value in the Y direction", true );
-  app.add_option("--scaleZ,-z", sy, "set the scale value in the Z direction", true );
-  app.add_option("--rescaleInputMin",rescaleInputMin, "min value used to rescale the input intensity (to avoid basic cast into 8  bits image).", true );
-  app.add_option("--rescaleInputMax",rescaleInputMax, "max value used to rescale the input intensity (to avoid basic cast into 8  bits image).", true );
-  app.add_option("--transparency,-t",transp, "change the default transparency", true );
+  app.add_option("--scaleX,-x", sx, "set the scale value in the X direction" );
+  app.add_option("--scaleY,-y", sy, "set the scale value in the Y direction" );
+  app.add_option("--scaleZ,-z", sy, "set the scale value in the Z direction" );
+  app.add_option("--rescaleInputMin",rescaleInputMin, "min value used to rescale the input intensity (to avoid basic cast into 8  bits image)." );
+  app.add_option("--rescaleInputMax",rescaleInputMax, "max value used to rescale the input intensity (to avoid basic cast into 8  bits image)." );
+  app.add_option("--transparency,-t",transp, "change the default transparency" );
 
   
   app.get_formatter()->column_width(40);

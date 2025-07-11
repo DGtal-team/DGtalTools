@@ -124,13 +124,13 @@ int main( int argc, char** argv )
   ->required()
   ->check(CLI::ExistingFile);
   
-  app.add_option("--thresholdMin,-m", thresholdMin, "threshold min (excluded) to define binary shape.", true);
-  app.add_option("--thresholdMax,-M", thresholdMax, "threshold max (included) to define binary shape.", true);
+  app.add_option("--thresholdMin,-m", thresholdMin, "threshold min (excluded) to define binary shape.");
+  app.add_option("--thresholdMax,-M", thresholdMax, "threshold max (included) to define binary shape.");
 #ifdef DGTAL_WITH_ITK
-  app.add_option("--dicomMin",dicomMin,"set minimum density threshold on Hounsfield scale", true );
-  app.add_option("--dicomMax",dicomMin,"set maximum density threshold on Hounsfield scale", true );
+  app.add_option("--dicomMin",dicomMin,"set minimum density threshold on Hounsfield scale" );
+  app.add_option("--dicomMax",dicomMin,"set maximum density threshold on Hounsfield scale" );
 #endif
-  app.add_option("--mode", mode,"set mode for display: INNER: inner voxels, OUTER: outer voxels, BDRY: surfels", true )
+  app.add_option("--mode", mode,"set mode for display: INNER: inner voxels, OUTER: outer voxels, BDRY: surfels" )
   -> check(CLI::IsMember({"INNER", "OUTER", "BDRY"}));
   
   

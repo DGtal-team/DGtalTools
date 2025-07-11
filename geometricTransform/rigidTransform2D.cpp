@@ -91,11 +91,11 @@ int main(int argc, char**argv)
   app.add_option("-i,--input,1",filename,"Input file.")->required()->check(CLI::ExistingFile);
   app.add_option("-o,--output,2",outputFileName,"Output file.")->required();
   app.add_option("-m,--model",model,"Transformation model: backward, forward.")->required();
-  app.add_option("-a,--angle",angle,"Rotation angle in radians (default 0)",true);
-  app.add_option("--ox",ox,"X coordinate of origin (default 0)",true);
-  app.add_option("--oy",oy,"Y coordinate of origin (default 0)",true);
-  app.add_option("--tx",tx,"X component of translation vector (default 0)",true);
-  app.add_option("--ty",ty,"Y component of translation vector (default 0)",true);
+  app.add_option("-a,--angle",angle,"Rotation angle in radians (default 0)");
+  app.add_option("--ox",ox,"X coordinate of origin (default 0)");
+  app.add_option("--oy",oy,"Y coordinate of origin (default 0)");
+  app.add_option("--tx",tx,"X component of translation vector (default 0)");
+  app.add_option("--ty",ty,"Y component of translation vector (default 0)");
   
   app.get_formatter()->column_width(40);
   CLI11_PARSE(app, argc, argv);

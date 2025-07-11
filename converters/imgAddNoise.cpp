@@ -104,8 +104,8 @@ int main( int argc, char** argv )
   app.add_option("-i,--input,1", inputFileName, "input image file name (any 2D image format accepted by DGtal::GenericReader)." )
     ->required()
     ->check(CLI::ExistingFile);
-  app.add_option("-o,--output,2", outputFileName, "output image file name (any 2D image format accepted by DGtal::GenericWriter)", true);
-  app.add_option("-n,--noise", noise, "Kanungo noise level in ]0,1[ (default 0.5)", true);
+  app.add_option("-o,--output,2", outputFileName, "output image file name (any 2D image format accepted by DGtal::GenericWriter)");
+  app.add_option("-n,--noise", noise, "Kanungo noise level in ]0,1[ (default 0.5)");
 
   app.get_formatter()->column_width(40);
   CLI11_PARSE(app, argc, argv);

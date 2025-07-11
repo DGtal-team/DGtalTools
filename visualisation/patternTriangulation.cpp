@@ -669,7 +669,7 @@ int main(int argc, char **argv)
   app.add_option("-b,--bparam",b,"pattern b parameter")
     ->required();
   app.add_option("-d,--delta",d,"number of repetitions");
-  app.add_option("--triangulation,-t",type,"output:\n\tClosest-point Delaunay triangulation {CDT}\n\tFarthest-point Delaunay triangulation {FDT}\n\tConvex hull {CH}", true);
+  app.add_option("--triangulation,-t",type,"output:\n\tClosest-point Delaunay triangulation {CDT}\n\tFarthest-point Delaunay triangulation {FDT}\n\tConvex hull {CH}");
   
 
   app.get_formatter()->column_width(40);

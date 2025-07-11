@@ -105,12 +105,12 @@ int main( int argc, char** argv )
   app.add_option("-i,--input,1", inputFilename,  "vol file (.vol, .longvol .p3d, .pgm3d and if DGTAL_WITH_ITK is selected: dicom, dcm, mha, mhd) or sdp (sequence of discrete points). For longvol, dicom, dcm, mha or mhd formats, the input values are linearly scaled between 0 and 255." )
     ->required()
     ->check(CLI::ExistingFile);
-  app.add_option("--output,-o,2", outputFilename, "sequence of discrete point file (.sdp)", true);
+  app.add_option("--output,-o,2", outputFilename, "sequence of discrete point file (.sdp)");
   app.add_flag("--exportImageValues,-e",exportImageValues, "option to export also the image value of the voxel in a fourth field.");
-  app.add_option("--thresholdMin,-m", thresholdMin, "threshold min (excluded) to define binary shape.", true);
-  app.add_option("--thresholdMax,-M", thresholdMax, "threshold max (included) to define binary shape.", true);
-  app.add_option("--rescaleInputMin", rescaleInputMin, "min value used to rescale the input intensity (to avoid basic cast into 8  bits image).", true);
-  app.add_option("--rescaleInputMax", rescaleInputMax, "max value used to rescale the input intensity (to avoid basic cast into 8  bits image).", true);
+  app.add_option("--thresholdMin,-m", thresholdMin, "threshold min (excluded) to define binary shape.");
+  app.add_option("--thresholdMax,-M", thresholdMax, "threshold max (included) to define binary shape.");
+  app.add_option("--rescaleInputMin", rescaleInputMin, "min value used to rescale the input intensity (to avoid basic cast into 8  bits image).");
+  app.add_option("--rescaleInputMax", rescaleInputMax, "max value used to rescale the input intensity (to avoid basic cast into 8  bits image).");
 
   app.get_formatter()->column_width(40);
   CLI11_PARSE(app, argc, argv);

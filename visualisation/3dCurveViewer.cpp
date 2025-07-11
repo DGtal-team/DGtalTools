@@ -381,15 +381,15 @@ int main(int argc, char **argv)
   app.add_option("-i,--input,1", inputFileName, "the name of the text file containing the list of 3D points (x y z per line)." )
   ->required()
   ->check(CLI::ExistingFile);
-  app.add_option("--box,-b",b, "specifies the the tightness of the bounding box around the curve with a given integer displacement <arg> to enlarge it (0 is tight)", true);
-  app.add_option("--viewBox,-v",viewBox, "displays the bounding box, <arg>=WIRED means that only edges are displayed, <arg>=COLORED adds colors for planes (XY is red, XZ green, YZ, blue).", true )
+  app.add_option("--box,-b",b, "specifies the the tightness of the bounding box around the curve with a given integer displacement <arg> to enlarge it (0 is tight)");
+  app.add_option("--viewBox,-v",viewBox, "displays the bounding box, <arg>=WIRED means that only edges are displayed, <arg>=COLORED adds colors for planes (XY is red, XZ green, YZ, blue)." )
    -> check(CLI::IsMember({"WIRED", "COLORED"}));
   
   app.add_flag("--curve3d,-C", curve3d, "displays the 3D curve.");
   app.add_flag("--curve2d,-c", curve2d, "displays the 2D projections of the 3D curve on the bounding box.");
   app.add_flag("--cover3d,-3", curve2d, "displays the 3D tangential cover of the curve.");
   app.add_flag("--cover2d,-2", cover2d, "displays the 2D projections of the 3D tangential cover of the curve" );
-  app.add_option("--nbColors,-n", nbColors, "sets the number of successive colors used for displaying 2d and 3d maximal segments (default is 3: red, green, blue)", true);
+  app.add_option("--nbColors,-n", nbColors, "sets the number of successive colors used for displaying 2d and 3d maximal segments (default is 3: red, green, blue)");
 
   app.add_flag("--tangent,-t", tangent, "displays the tangents to the curve" );
 
