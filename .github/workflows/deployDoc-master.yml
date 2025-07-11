@@ -1,0 +1,56 @@
+name: CI (linux/macOS/windows)
+
+on:
+  push:
+    branches: [ master ]
+
+
+jobs:
+ # Documentation (build, check and deploy)
+  Documentation:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up
+      run: |
+         sudo apt-get update
+         sudo apt-get install libboost-dev graphviz texlive doxygen   libeigen3-dev ninja-build libhdf5-serial-dev libboost-dev libcairo2-dev libgmp-dev libgraphicsmagick++1-dev libfftw3-dev xorg-dev  libglu1-mesa-dev freeglut3-dev
+
+    - name: DGtalBuild (linux)
+      shell: bash
+      working-directory: ${{runner.workspace}}
+      run: |
+         git clone --depth 1 https://github.com/DGtal-team/DGtal.git
+         cd DGtal
+         mkdir buildDGtal
+         cd buildDGtal
+         echo  cmake .. $CONFIG_LINUX -DBUILD_EXAMPLES=false -DBUILD_TESTING=false  -G Ninja
+         cmake .. $CONFIG_LINUX -DBUILD_EXAMPLES=false -DBUILD_TESTING=false  -G Ninja
+         ninja
+
+    - name: Building pages
+      working-directory: ${{runner.workspace}}/DGtalTools
+      run: |
+         mkdir build
+         cd build
+         cmake ..   -DDGtal_DIR=${{runner.workspace}}/DGtal/buildDGtal
+         wget --no-check-certificate -O "${{runner.workspace}}/DGtalTools/build/DGtal-tagfile"  http://dgtal.org/doc/tags/DGtal-tagfile;
+         make doc > buildDoc.log
+    - name: Preparing deploy
+      run: |
+        git clone --depth 2 https://github.com/DGtal-team/doctools-nightly.git
+        ls build/
+        pwd
+        du -hs build/html
+        cd build/html
+        cp -r *  ../../doctools-nightly/
+    - name: Deploy to GitHub Pages
+      uses: JamesIves/github-pages-deploy-action@v4
+      with:
+        token: ${{ secrets.DGTALTOOLSDOC }}
+        branch: master
+        repository-name: DGtal-team/doctools-nightly
+        folder: build/html
+        single-comit: true
+        clean: true
