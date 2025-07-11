@@ -101,7 +101,7 @@ jobs:
        run: |
            git clone --depth 1 https://github.com/DGtal-team/DGtal.git
            cd DGtal
-           conan install . --build=missing
+           conan install . --build=missing -s:a compiler.cppstd=20
            mkdir buildDGtal
            cd buildDGtal
            echo  cmake ..-DCMAKE_POLICY_DEFAULT_CMP0091=NEW  -DCMAKE_BUILD_TYPE=$BUILD_TYPE $CONFIG_WINDOWS -DCMAKE_TOOLCHAIN_FILE="conan_toolchain.cmake" -DBUILD_EXAMPLES=false -DBUILD_TESTING=false 
