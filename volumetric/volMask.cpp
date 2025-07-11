@@ -38,7 +38,7 @@
 
 #include "CLI11.hpp"
 
-#ifdef WITH_ITK
+#ifdef DGTAL_WITH_ITK
 #include "DGtal/io/readers/ITKReader.h"
 #include "DGtal/io/writers/ITKWriter.h"
 
@@ -90,7 +90,7 @@ using namespace DGtal;
 
 
 typedef ImageContainerBySTLVector < Z3i::Domain, unsigned char > Image3D;
-#ifdef WITH_ITK
+#ifdef DGTAL_WITH_ITK
 typedef ImageContainerBySTLVector < Z3i::Domain,  double > Image3D_D;
 typedef ImageContainerBySTLVector < Z3i::Domain,  int > Image3D_I;
 #endif
@@ -184,7 +184,7 @@ int main( int argc, char** argv )
   
   app.description("Outputs a new image from two input images, one representing the data, one representing the selection mask. The size of output image is the size of the bounding box of selected values, plus the chosen border offset. \n Typical use example:\n \t volMask  ${DGtal}/examples/samples/lobster.vol lobsMasked.vol -a ${DGtal}/examples/samples/lobster.vol  -m 100  \n");
   
-#ifdef WITH_ITK
+#ifdef DGTAL_WITH_ITK
   app.add_option("-i,--input,1", inputFileName, "an input 3D image vol (or ITK: .nii, mha, ... ) file." )
       ->required()
       ->check(CLI::ExistingFile);
@@ -211,7 +211,7 @@ int main( int argc, char** argv )
   Image3D maskImage = DGtal::GenericReader<Image3D>::import(maskFileName);
   trace.info() << "[done]"<< std::endl;
   trace.info() << "Reading input image...";
-#ifdef WITH_ITK
+#ifdef DGTAL_WITH_ITK
   if (inputType=="double")
   {
     Image3D_D inputImage = DGtal::GenericReader<Image3D_D>::import(inputFileName);

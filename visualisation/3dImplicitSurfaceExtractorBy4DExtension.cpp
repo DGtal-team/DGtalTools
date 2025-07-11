@@ -40,8 +40,7 @@
 #include "DGtal/helpers/StdDefs.h"
 #include "DGtal/math/MPolynomial.h"
 #include "DGtal/io/readers/MPolynomialReader.h"
-#include "DGtal/io/DrawWithDisplay3DModifier.h"
-#include "DGtal/io/viewers/Viewer3D.h"
+#include "DGtal/io/viewers/PolyscopeViewer.h"
 #include "DGtal/topology/KhalimskySpaceND.h"
 #include "DGtal/topology/CubicalComplex.h"
 #include "DGtal/topology/CubicalComplexFunctions.h"
@@ -687,17 +686,15 @@ int main( int argc, char** argv )
   trace.endBlock();
 
   //-------------- View surface -------------------------------------------
-  QApplication application(argc,argv);
   Point4 low4 = K4.lowerBound();
   Point4 up4  = K4.upperBound();
   KSpace3 K3;
   K3.init( Point3( low4[ 0 ], low4[ 1 ], low4[ 2 ] ),
            Point3( up4 [ 0 ], up4 [ 1 ], up4 [ 2 ] ), true );
-  Viewer3D<Space3,KSpace3> viewer( K3 );
-  viewer.setWindowTitle("Implicit surface viewer by 4d extension");
-  viewer.show();
+
+  PolyscopeViewer<Space3,KSpace3> viewer( K3 );
   viewer << mesh;
-  viewer.setLineColor( highlight ? Color::Red : Color( 120, 120, 120 ) );
+  viewer.drawColor( highlight ? Color::Red : Color( 120, 120, 120 ) );
   // Drawing lines
   for ( CellMapConstIterator it = complex4.begin( 1 ), itE = complex4.end( 1 ); it != itE; ++it )
     {
@@ -710,9 +707,9 @@ int main( int argc, char** argv )
       ASSERT( vertices.size() == 2 );
       RealPoint3 p1 = points[ indices[ vertices.front() ] ];
       RealPoint3 p2 = points[ indices[ vertices.back()  ] ];
-      viewer.addLine( p1, p2, 0.05 );
-    }
-  viewer << Viewer3D<Space3,KSpace3>::updateDisplay;
-  return application.exec();
+      viewer.drawLine( p1, p2 );
+    } 
+  viewer.show();
+  return 0;
 }
 ///////////////////////////////////////////////////////////////////////////////

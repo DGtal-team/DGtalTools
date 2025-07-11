@@ -28,13 +28,11 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #include <iostream>
-#include <QGLViewer/qglviewer.h>
 #include <stdio.h>
 
 #include "DGtal/base/Common.h"
 #include "DGtal/helpers/StdDefs.h"
-#include "DGtal/io/viewers/Viewer3D.h"
-#include "DGtal/io/DrawWithDisplay3DModifier.h"
+#include "DGtal/io/viewers/PolyscopeViewer.h"
 #include "DGtal/io/readers/PointListReader.h"
 #include "DGtal/io/readers/MeshReader.h"
 #include "DGtal/io/colormaps/GradientColorMap.h"
@@ -107,27 +105,6 @@ $ 3dDisplaySurfelData -i curvatureCat10R3.dat
 
  */
 
-
-
-template < typename Space = DGtal::Z3i::Space, typename KSpace = DGtal::Z3i::KSpace>
-struct ViewerSnap: DGtal::Viewer3D <Space, KSpace>
-{
-
-  ViewerSnap(const KSpace &KSEmb, bool saveSnap): Viewer3D<Space, KSpace>(KSEmb), mySaveSnap(saveSnap){
-  };
-
-  virtual  void
-  init(){
-    DGtal::Viewer3D<>::init();
-    if(mySaveSnap)
-    {
-      QObject::connect(this, SIGNAL(drawFinished(bool)), this, SLOT(saveSnapshot(bool)));
-    }
-  };
-  bool mySaveSnap;
-};
-
-
 template < typename Point>
 void
 getBoundingUpperAndLowerPoint(const std::vector<Point> &vectorPt, Point &ptLower, Point &ptUpper){
@@ -169,10 +146,6 @@ int main( int argc, char** argv )
   // parse command line using CLI ----------------------------------------------
   CLI::App app;
   std::string inputFileName;
-  std::string doSnapShotName;
-  bool noWindows {false};
-  double minScalarVal;
-  double maxScalarVal;
   unsigned int labelIndex;
   std::vector<unsigned int> vectSDPindex {0, 1, 2};
   
@@ -180,10 +153,6 @@ int main( int argc, char** argv )
   app.add_option("-i,--input,1", inputFileName, "input file: sdp (sequence of discrete points with attribute)" )
   ->required()
   ->check(CLI::ExistingFile);
-  app.add_flag("--noWindows,-n",noWindows, "Don't display Viewer windows.");
-  app.add_option("--doSnapShotAndExit,-d", doSnapShotName, "save display snapshot into file.");
-  auto fixMaxOption =  app.add_option("--fixMaxColorValue,-M", maxScalarVal, "fix manually the maximal color value for the scale error display (else the scale is set from the maximal value)");
-  auto fixMinOption =  app.add_option("--fixMinColorValue,-m", minScalarVal, "fix manually the maximal color value for the scale error display (else the scale is set from the minimal value)");
   app.add_option("--labelIndex", labelIndex , "set the index of the label.", true);
   app.add_option("--SDPindex", vectSDPindex, "specify the sdp index.", true);
   
@@ -203,7 +172,6 @@ int main( int argc, char** argv )
   K.init(Z3i::Point(2*ptLower[0]+1, 2*ptLower[1]+1, 2*ptLower[2]+1),
          Z3i::Point(2*ptUpper[0]+1, 2*ptUpper[1]+1, 2*ptUpper[2]+1), true);
 
-
   std::vector<Cell> vectSurfelsInput;
 
   // Construction of the set of surfels
@@ -219,91 +187,16 @@ int main( int argc, char** argv )
   //-------------------------
   // Displaying input with color given from scalar values
 
-  QApplication application(argc,argv);
-  typedef ViewerSnap<> Viewer;
+  typedef PolyscopeViewer<> Viewer;
 
-  Viewer viewer(K, doSnapShotName != "");
-  if(doSnapShotName != "")
-  {
-    viewer.setSnapshotFileName(QString(doSnapShotName.c_str()));
-  }
-  viewer.setWindowTitle("3dCompSurfel Viewer");
-  viewer.show();
-  viewer.restoreStateFromFile();
-  
-  if( fixMinOption->count() == 0 )
-  {
-    minScalarVal=surfelAndScalarInput.at(0)[3];
-  }
-  if( fixMaxOption->count() == 0 )
-  {
-    maxScalarVal=surfelAndScalarInput.at(0)[3];
-  }
-  
-  if( fixMinOption->count() == 0 || fixMaxOption->count() == 0)
-  {
-    for(unsigned int i=1; i <surfelAndScalarInput.size(); i++)
-    {
-      double scalVal = surfelAndScalarInput.at(i)[3];
-      if(scalVal < minScalarVal  && fixMinOption->count() == 0)
-      {
-        minScalarVal = scalVal;
-      }
-      if(scalVal > maxScalarVal && fixMaxOption->count() == 0)
-      {
-        maxScalarVal = scalVal;
-      }
-    }
-  }
-  
-  GradientColorMap<double> gradientColorMap( minScalarVal, maxScalarVal );
-  gradientColorMap.addColor( Color(255,0,0,100 ) );
-  gradientColorMap.addColor( Color(0,255,0,100 ) );
-  gradientColorMap.addColor( Color(0,0,255,100 ) );
+  Viewer viewer(K);
 
-  bool useGrad = minScalarVal!=maxScalarVal;
-
-  viewer << SetMode3D(vectSurfelsInput.at(0).className(), "Basic");
   for(unsigned int i=0; i <surfelAndScalarInput.size(); i++)
   {
     double valInput = surfelAndScalarInput.at(i)[3];
-    if(useGrad)
-    {
-      viewer.setFillColor(gradientColorMap(valInput));
-    }else
-    {
-      viewer.setFillColor(Color::White);
-    }
-    viewer << vectSurfelsInput.at(i);
+    viewer << WithQuantity(vectSurfelsInput.at(i), "value", valInput);
   }
 
-
-
-  viewer << Viewer::updateDisplay;
-  if(doSnapShotName != "")
-  {
-    // Appy cleaning just save the last snap
-    std::string name = doSnapShotName;
-    std::string extension = name.substr(name.find_last_of(".") + 1);
-    std::string basename = name.substr(0, name.find_last_of("."));
-    for(int i=0; i< viewer.snapshotCounter()-1; i++){
-      std::stringstream s;
-      s << basename << "-"<< setfill('0') << setw(4)<<  i << "." << extension;
-      trace.info() << "erase temp file: " << s.str() << std::endl;
-      remove(s.str().c_str());
-    }
-    std::stringstream s;
-    s << basename << "-"<< setfill('0') << setw(4)<<  viewer.snapshotCounter()-1 << "." << extension;
-    rename(s.str().c_str(), name.c_str());
-    return 0;
-  }
-
-  if(noWindows)
-  {
-    return 0;
-  }
-  else
-  {
-    return application.exec();
-  }
+  viewer.show();
+  return 0;
 }

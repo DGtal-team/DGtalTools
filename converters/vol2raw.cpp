@@ -54,12 +54,12 @@ using namespace Z3i;
 Usage: ./converters/vol2raw [OPTIONS] 1 [2]
 
 Positionals:
-  1 TEXT:FILE REQUIRED                  vol file (.vol, .longvol .p3d, .pgm3d and if WITH_ITK is selected: dicom, dcm, mha, mhd). For longvol, dicom, dcm, mha or mhd formats, the input values are linearly scaled between 0 and 255.
+  1 TEXT:FILE REQUIRED                  vol file (.vol, .longvol .p3d, .pgm3d and if DGTAL_WITH_ITK is selected: dicom, dcm, mha, mhd). For longvol, dicom, dcm, mha or mhd formats, the input values are linearly scaled between 0 and 255.
   2 TEXT                                output file (.raw).
 
 Options:
   -h,--help                             Print this help message and exit
-  -i,--input TEXT:FILE REQUIRED         vol file (.vol, .longvol .p3d, .pgm3d and if WITH_ITK is selected: dicom, dcm, mha, mhd). For longvol, dicom, dcm, mha or mhd formats, the input values are linearly scaled between 0 and 255.
+  -i,--input TEXT:FILE REQUIRED         vol file (.vol, .longvol .p3d, .pgm3d and if DGTAL_WITH_ITK is selected: dicom, dcm, mha, mhd). For longvol, dicom, dcm, mha or mhd formats, the input values are linearly scaled between 0 and 255.
   -o,--output TEXT                      output file (.raw).
   --rescaleInputMin INT=0               min value used to rescale the input intensity (to avoid basic cast into 8  bits image).
   --rescaleInputMax INT=255             max value used to rescale the input intensity (to avoid basic cast into 8  bits image).
@@ -101,7 +101,7 @@ int main(int argc, char**argv)
   DGtal::int64_t rescaleInputMax {255};
   
   app.description("Convert a vol to a 8-bit raw file.\n Example: vol2raw  ${DGtal}/examples/samples/lobster.vol res.raw \n");
-  app.add_option("-i,--input,1", inputFileName, "vol file (.vol, .longvol .p3d, .pgm3d and if WITH_ITK is selected: dicom, dcm, mha, mhd). For longvol, dicom, dcm, mha or mhd formats, the input values are linearly scaled between 0 and 255." )
+  app.add_option("-i,--input,1", inputFileName, "vol file (.vol, .longvol .p3d, .pgm3d and if DGTAL_WITH_ITK is selected: dicom, dcm, mha, mhd). For longvol, dicom, dcm, mha or mhd formats, the input values are linearly scaled between 0 and 255." )
     ->required()
     ->check(CLI::ExistingFile);
   app.add_option("--output,-o,2",outputFileName ,"output file (.raw).");

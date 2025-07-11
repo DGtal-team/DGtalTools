@@ -60,12 +60,12 @@ using namespace DGtal;
 Usage: ./converters/vol2slice [OPTIONS] 1 [2]
 
 Positionals:
-  1 TEXT:FILE REQUIRED                  vol file (.vol, .longvol .p3d, .pgm3d and if WITH_ITK is selected: dicom, dcm, mha, mhd). For longvol, dicom, dcm, mha                                         or mhd formats, the input values are linearly scaled between 0 and 255.
+  1 TEXT:FILE REQUIRED                  vol file (.vol, .longvol .p3d, .pgm3d and if DGTAL_WITH_ITK is selected: dicom, dcm, mha, mhd). For longvol, dicom, dcm, mha                                         or mhd formats, the input values are linearly scaled between 0 and 255.
   2 TEXT=result.pgm                     base_name.extension:  extracted 2D slice volumetric files (will result n files base_name_xxx.extension)
 
 Options:
   -h,--help                             Print this help message and exit
-  -i,--input TEXT:FILE REQUIRED         vol file (.vol, .longvol .p3d, .pgm3d and if WITH_ITK is selected: dicom, dcm, mha, mhd). For longvol, dicom, dcm, mha                                         or mhd formats, the input values are linearly scaled between 0 and 255.
+  -i,--input TEXT:FILE REQUIRED         vol file (.vol, .longvol .p3d, .pgm3d and if DGTAL_WITH_ITK is selected: dicom, dcm, mha, mhd). For longvol, dicom, dcm, mha                                         or mhd formats, the input values are linearly scaled between 0 and 255.
   -o,--output TEXT=result.pgm           base_name.extension:  extracted 2D slice volumetric files (will result n files base_name_xxx.extension)
   -f,--setFirstSlice INT:NUMBER=0       Set the first slice index to be extracted.
   -l,--setLastSlice INT:NUMBER          Set the last slice index to be extracted (by default set to maximal value according to the given volume).
@@ -113,7 +113,7 @@ int main( int argc, char** argv )
 
   app.description("Convert a volumetric file (.vol, .longvol, .pgm3d) into a set of 2D slice  images. \n Typical use: to extract all slices defined in Y plane (y=cst): \n vol2slice  image3d.vol slice.pgm -s 1  \n");
 
-  app.add_option("-i,--input,1", inputFileName, "vol file (.vol, .longvol .p3d, .pgm3d and if WITH_ITK is selected: dicom, dcm, mha, mhd). For longvol, dicom, dcm, mha or mhd formats, the input values are linearly scaled between 0 and 255.")
+  app.add_option("-i,--input,1", inputFileName, "vol file (.vol, .longvol .p3d, .pgm3d and if DGTAL_WITH_ITK is selected: dicom, dcm, mha, mhd). For longvol, dicom, dcm, mha or mhd formats, the input values are linearly scaled between 0 and 255.")
     ->required()
     ->check(CLI::ExistingFile);
   

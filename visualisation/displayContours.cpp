@@ -131,7 +131,7 @@ using namespace DGtal;
  $ img2freeman $DGtal/examples/samples/church.pgm  -R 0 20 255 -s 200  > church.fc
  @endcode
  
- Then, we display the set of contours with the background images (you need to have compiled DGTal with the options (-DWITH_MAGICK=true and -DWITH_CAIRO=true) :
+ Then, we display the set of contours with the background images (you need to have compiled DGTal with the options (-DWITH_MAGICK=true and -DDGTAL_WITH_CAIRO=true) :
  
  @code
  $  displayContours church.fc   --backgroundImage $DGtal/examples/samples/church.png --alphaBG 0.75 --outputFile church.pdf
@@ -470,7 +470,7 @@ int main( int argc, char** argv )
     {
       aBoard.saveSVG(outputFileName.c_str());
     }
-#ifdef WITH_CAIRO
+#ifdef DGTAL_WITH_CAIRO
     else
       if (extension=="eps")
       {

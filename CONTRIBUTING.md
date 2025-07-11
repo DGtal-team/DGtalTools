@@ -88,7 +88,7 @@ scripts. This script generates a new empty tool containing only these minimal fe
     ```c++
        std::stringstream ss; 
         ss << "Usage: " << argv[0] << " [options] input\n"
-                  << "Display a 3D curve given as the <input> filename (with possibly projections and/or tangent information) by using QGLviewer.\n"
+                  << "Display a 3D curve given as the <input> filename (with possibly projections and/or tangent information) by using PolyscopeViewer.\n"
                   << general_opt << "\n\n";
          ss << "Example:\n"
              << "3dCurveViewer -C -b 1 -3 -2 -c ${DGtal}/examples/samples/sinus.dat\n";	     

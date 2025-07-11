@@ -2,36 +2,22 @@
 # -----------------------------------------------------------------------------
 # Project definition
 # -----------------------------------------------------------------------------
+cmake_minimum_required (VERSION 3.20)
 PROJECT(DGtalTools)
 
-cmake_minimum_required (VERSION 3.11)
 cmake_policy(SET CMP0057 NEW) # the new interpretation of IN_LIST is by default not set (at least until  3.21.1).
 
-SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake")
+LIST(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
 SET(DGTALTOOLS_RANDOMIZED_BUILD_THRESHOLD "100" CACHE INTERNAL "Threshold for the random selection of tools to build.")
 SET(DGTALTOOLS_RANDOMIZED_BUILD_WHITELIST "" CACHE INTERNAL "List of whitelisted tools to build.")
 option(NO_ADD_STBIMAGE_IMPLEMENT "To avoid duplicated linking errors (like LNK2005 in MSVC)" OFF)
 option(DISABLE_POLYSCOPE "Disable polyscope based tools" OFF)
 
 
-
 # -----------------------------------------------------------------------------
-# DGtal dependencies
+# CPP20
 # -----------------------------------------------------------------------------
-message(STATUS "-------------------------------------------------------------------------------")
-message(STATUS "Checking if DGtal is installed:")
-FIND_PACKAGE(DGtal 1.4 REQUIRED)
-INCLUDE_DIRECTORIES(${DGTAL_INCLUDE_DIRS})
-LINK_DIRECTORIES(${DGTAL_LIBRARY_DIRS})
-SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
-message(STATUS "DGtal found.")
-
-
-
- # -----------------------------------------------------------------------------
- # CPP17
- # -----------------------------------------------------------------------------
-set(DGTALTOOLS_CMAKE_CXX_STANDARD_MIN_REQUIRED 17)
+set(DGTALTOOLS_CMAKE_CXX_STANDARD_MIN_REQUIRED 20)
  if(NOT CMAKE_CXX_STANDARD)
    set(CMAKE_CXX_STANDARD ${DGTALTOOLS_CMAKE_CXX_STANDARD_MIN_REQUIRED})
  else()
@@ -44,8 +30,19 @@ endif()
 if(NOT CMAKE_CXX_STANDARD_REQUIRED)
   set(CMAKE_CXX_STANDARD_REQUIRED ON)
 endif()
+message(STATUS "C++ standard set to ${CMAKE_CXX_STANDARD}")
 
 
+# -----------------------------------------------------------------------------
+# DGtal dependencies
+# -----------------------------------------------------------------------------
+message(STATUS "-------------------------------------------------------------------------------")
+message(STATUS "Checking if DGtal is installed:")
+FIND_PACKAGE(DGtal 2.0.0 REQUIRED)
+INCLUDE_DIRECTORIES(${DGTAL_INCLUDE_DIRS})
+LINK_DIRECTORIES(${DGTAL_LIBRARY_DIRS})
+SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+message(STATUS "DGtal found.")
 
 
 # -------------------------------------------------------------------------
@@ -102,9 +99,9 @@ message(STATUS "----------------------------------------------------------------
 #-----------------------------------------------------------------------------
 # ITK setting
 #-----------------------------------------------------------------------------
-if (  WITH_ITK )
+if (  DGTAL_WITH_ITK )
     include(${ITK_USE_FILE})
-ENDIF( WITH_ITK )
+ENDIF( DGTAL_WITH_ITK )
 
 
 

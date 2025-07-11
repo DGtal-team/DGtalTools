@@ -31,8 +31,7 @@
 #include <sstream>
 #include "DGtal/base/Common.h"
 
-#include "DGtal/io/Display3D.h"
-#include "DGtal/io/viewers/Viewer3D.h"
+#include "DGtal/io/viewers/PolyscopeViewer.h"
 #include "DGtal/io/readers/MeshReader.h"
 #include "DGtal/helpers/StdDefs.h"
 #include "DGtal/io/readers/PointListReader.h"
@@ -45,7 +44,7 @@ using namespace DGtal;
 /**
  @page meshViewer meshViewer
 
- @brief Displays OFF mesh file by using QGLviewer.
+ @brief Displays OFF mesh file by using PolyscopeViewer.
 
  @b Usage:   meshViewer [input]
 
@@ -74,7 +73,6 @@ using namespace DGtal;
  -A,--addAmbientLight FLOAT            add an ambient light for better display (between 0 and 1).
  -b,--customBGColor UINT x 3           set the R, G, B components of the colors of the background color.
  -d,--doSnapShotAndExit TEXT           save display snapshot into file. Notes that the camera                                             setting is set by default according the last saved                                                 configuration (use SHIFT+Key_M to save current camera                                              setting in the Viewer3D). If the camera setting was not                                            saved it will use the default camera setting.
- -c,--useLastCameraSetting             use the last camera setting of the user (i.e if a                                                  .qglviewer.xml file is present in the current directory)
  -l,--fixLightToScene                  Fix light source to scence instead to camera
  -n,--invertNormal                     invert face normal vectors.
  -v,--drawVertex                       draw the vertex of the mesh
@@ -96,54 +94,6 @@ using namespace DGtal;
  @ref meshViewer.cpp
 
  */
-
-/**
- * Custom Viewer3D to override KeyPressEvent method and handle new key display.
- * It also desactivate the double Rendering mode for more efficiency.
- **/
-class CustomViewer3D : public Viewer3D<>
-{
-protected:
-  virtual void init()
-  {
-    Viewer3D<>::init();
-    Viewer3D<>::setKeyDescription(Qt::Key_I, "Display mesh informations about #faces, #vertices");
-    Viewer3D<>::setGLDoubleRenderingMode(false);
-  }
-
-  virtual void keyPressEvent(QKeyEvent *e)
-  {
-    bool handled = false;
-    if (e->key() == Qt::Key_I)
-    {
-      handled = true;
-      myIsDisplayingInfoMode = !myIsDisplayingInfoMode;
-      stringstream ss;
-      qglviewer::Vec camPos = camera()->position();
-      DGtal::Z3i::RealPoint c(camPos[0], camPos[1], camPos[2]);
-      ss << myInfoDisplay << " distance to camera: " << (c - centerMesh).norm();
-      Viewer3D<>::displayMessage(QString(myIsDisplayingInfoMode ? ss.str().c_str() : " "), 1000000);
-
-      Viewer3D<>::update();
-    }
-
-    if (!handled)
-    {
-      Viewer3D<>::keyPressEvent(e);
-    }
-  };
-
-public:
-  void changeDefaultBGColor(const DGtal::Color &col)
-  {
-    myDefaultBackgroundColor = col;
-    Viewer3D<>::update();
-    Viewer3D<>::draw();
-  }
-  std::string myInfoDisplay = "No information loaded...";
-  bool myIsDisplayingInfoMode = false;
-  DGtal::Z3i::RealPoint centerMesh;
-};
 
 int main(int argc, char **argv)
 {
@@ -181,15 +131,12 @@ int main(int argc, char **argv)
   double ballRadius{0.5};
   bool invertNormal{false};
   bool drawVertex{false};
-  bool useLastCamSet{false};
-  bool fixLightToScene{false};
-  float ambiantLight{0.0};
 
   // parse command line using CLI ----------------------------------------------
   CLI::App app;
   std::vector<std::string> inputFileNames;
   std::string outputFileName{"result.raw"};
-  app.description("Display OFF mesh file by using QGLviewer");
+  app.description("Display OFF mesh file by using PolyscopeViewers");
   app.add_option("-i,--input,1", inputFileNames, "inputFileNames.off files (.off), or OFS file (.ofs)")
       ->check(CLI::ExistingFile)
       ->required();
@@ -208,12 +155,6 @@ int main(int argc, char **argv)
       ->expected(4);
   app.add_option("--SDPradius", ballRadius, "change the ball radius to display a set of discrete points (used with displaySDP option)", true);
   app.add_option("--displaySDP,-s", filenameSDP, "add the display of a set of discrete points as ball of radius 0.5.");
-  app.add_option("--addAmbientLight,-A", ambiantLight, "add an ambient light for better display (between 0 and 1).");
-  app.add_option("--customBGColor,-b", customBGColor, "set the R, G, B components of the colors of the background color.")
-      ->expected(3);
-  app.add_option("--doSnapShotAndExit,-d", snapshotFile, "save display snapshot into file. Notes that the camera setting is set by default according the last saved configuration (use SHIFT+Key_M to save current camera setting in the Viewer3D). If the camera setting was not saved it will use the default camera setting.");
-  app.add_flag("--useLastCameraSetting,-c", useLastCamSet, "use the last camera setting of the user (i.e if a .qglviewer.xml file is present in the current directory)");
-  app.add_flag("--fixLightToScene,-l", fixLightToScene, "Fix light source to scence instead to camera");
   app.add_flag("--invertNormal,-n", invertNormal, "invert face normal vectors.");
   app.add_flag("--drawVertex,-v", drawVertex, "draw the vertex of the mesh");
 
@@ -243,31 +184,8 @@ int main(int argc, char **argv)
     sdpColorA = customColorSDP[3];
   }
 
-  QApplication application(argc, argv);
-  CustomViewer3D viewer;
-  if (snapshotFile != "")
-  {
-    viewer.setSnapshotFileName(QString(snapshotFile.c_str()));
-  }
-
-  std::stringstream title;
-  title << "Simple Mesh Viewer: " << inputFileNames[0];
-  viewer.setWindowTitle(title.str().c_str());
-  viewer.show();
-  viewer.myGLLineMinWidth = lineWidth;
-  viewer.setGLScale(sx, sy, sz);
-  if (customBGColor.size() == 3)
-  {
-    viewer.changeDefaultBGColor(DGtal::Color(customBGColor[0],
-                                             customBGColor[1],
-                                             customBGColor[2], 255));
-  }
-  if (ambiantLight != 0.0)
-  {
-    GLfloat lightAmbientCoeffs[4] = {ambiantLight, ambiantLight, ambiantLight, 1.0f};
-    viewer.setGLLightAmbientCoefficients(lightAmbientCoeffs);
-  }
-
+  PolyscopeViewer viewer;
+  viewer.allowReuseList = true;
   trace.info() << "Importing mesh... ";
 
   std::vector<Mesh<DGtal::Z3i::RealPoint>> vectMesh;
@@ -310,16 +228,7 @@ int main(int argc, char **argv)
 
     vectMesh.push_back(aMesh);
   }
-  DGtal::Z3i::RealPoint centerMeshes;
-  unsigned int tot = 0;
-  for (const auto &m : vectMesh)
-  {
-    for (auto p = m.vertexBegin(); p != m.vertexEnd(); ++p)
-      centerMeshes += *p;
-    tot += m.nbVertex();
-  }
-  centerMeshes /= tot;
-  viewer.centerMesh = centerMeshes;
+  
   bool import = vectMesh.size() == inputFileNames.size();
   if (!import)
   {
@@ -334,25 +243,23 @@ int main(int argc, char **argv)
     {
       trace.info() << "New meshViewer" << std::endl;
       auto vOrigins = PointListReader<PointVector<1, DGtal::int32_t>>::getPolygonsFromFile(filenameSDP);
-      viewer << CustomColors3D(Color(sdpColorR, sdpColorG, sdpColorB, sdpColorA),
-                               Color(sdpColorR, sdpColorG, sdpColorB, sdpColorA));
+      viewer << Color(sdpColorR, sdpColorG, sdpColorB, sdpColorA);
       for (auto l : vOrigins)
       {
         DGtal::Z3i::Point pt(l[0][0], l[1][0], l[2][0]);
         DGtal::Color cl(l[3][0], l[4][0], l[5][0], sdpColorA);
-        viewer.setFillColor(cl);
-        viewer.addBall(pt, ballRadius);
+        viewer.drawColor(cl);
+        viewer.drawBall(pt);
       }
     }
     else
     {
       vector<Z3i::RealPoint> vectPoints;
       vectPoints = PointListReader<Z3i::RealPoint>::getPointsFromFile(filenameSDP);
-      viewer << CustomColors3D(Color(sdpColorR, sdpColorG, sdpColorB, sdpColorA),
-                               Color(sdpColorR, sdpColorG, sdpColorB, sdpColorA));
+      viewer << Color(sdpColorR, sdpColorG, sdpColorB, sdpColorA);
       for (unsigned int i = 0; i < vectPoints.size(); i++)
       {
-        viewer.addBall(vectPoints.at(i), ballRadius);
+        viewer.drawBall(vectPoints.at(i));
       }
     }
   }
@@ -399,10 +306,7 @@ int main(int argc, char **argv)
       meshColorALine = customColorMesh[i * 8 + 7];
     }
 
-    viewer << CustomColors3D(Color(meshColorRLine, meshColorGLine, meshColorBLine,
-                                   meshColorALine),
-                             Color(meshColorR, meshColorG, meshColorB, meshColorA));
-
+    viewer << Color(meshColorR, meshColorG, meshColorB, meshColorA);
     viewer << vectMesh[i];
   }
 
@@ -428,11 +332,10 @@ int main(int argc, char **argv)
     std::vector<unsigned int> vectFieldIndices2 = {vectFieldIndices[3], vectFieldIndices[4], vectFieldIndices[5]};
     std::vector<DGtal::Z3i::RealPoint> vectPt1 = PointListReader<DGtal::Z3i::RealPoint>::getPointsFromFile(displayVectorField, vectFieldIndices1);
     std::vector<DGtal::Z3i::RealPoint> vectPt2 = PointListReader<DGtal::Z3i::RealPoint>::getPointsFromFile(displayVectorField, vectFieldIndices2);
-    viewer.createNewLineList();
     for (unsigned int i = 0; i < vectPt1.size(); i++)
     {
-      viewer.setLineColor(vFieldLineColor);
-      viewer.addLine(vectPt1[i], vectPt2[i]);
+      viewer.drawColor(vFieldLineColor);
+      viewer.drawLine(vectPt1[i], vectPt2[i]);
     }
   }
   unsigned int nbVertex = 0;
@@ -444,37 +347,8 @@ int main(int argc, char **argv)
   }
   stringstream ss;
   ss << "# faces: " << std::fixed << nbFaces << "    #vertex: " << nbVertex;
-  viewer.myInfoDisplay = ss.str();
-  viewer << CustomViewer3D::updateDisplay;
-  if (fixLightToScene)
-  {
-    viewer.setLightModeFixToCamera(false, false);
-  }
+ trace.info() << "[display ready]" << std::endl;
 
-  if (useLastCamSet)
-  {
-    viewer.restoreStateFromFile();
-  }
-  else
-  {
-    // useful in non interactive case in order to retain the default camera settings (that are not saved in case of process kill).
-    viewer.saveStateToFile();
-  }
-  // First display transparency improve
-  viewer.sortTriangleFromCamera();
-  viewer.sortQuadFromCamera();
-  viewer.sortSurfelFromCamera();
-  viewer.sortPolygonFromCamera();
-  viewer << CustomViewer3D::updateDisplay;
-
-  if (snapshotFile != "")
-  {
-    // Recover mesh position
-    viewer.restoreStateFromFile();
-    viewer.saveSnapshot(QString(snapshotFile.c_str()), true);
-    return 0;
-  }
-  trace.info() << "[display ready]" << std::endl;
-
-  return application.exec();
+  viewer.show();
+  return 0;
 }

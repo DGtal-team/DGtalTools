@@ -58,12 +58,7 @@
 #include "DGtal/geometry/surfaces/estimation/IntegralInvariantCovarianceEstimator.h"
 
 // Drawing
-#include "DGtal/io/boards/Board3D.h"
-#include "DGtal/io/colormaps/GradientColorMap.h"
-
-#ifdef WITH_VISU3D_QGLVIEWER
-#include "DGtal/io/viewers/Viewer3D.h"
-#endif
+#include "DGtal/io/viewers/PolyscopeViewer.h"
 
 using namespace DGtal;
 using namespace functors;
@@ -95,11 +90,11 @@ using namespace functors;
  @code
 
  Positionals:
-   1 TEXT:FILE REQUIRED                  vol file (.vol, .longvol .p3d, .pgm3d and if WITH_ITK is selected: dicom, dcm, mha, mhd). For longvol, dicom, dcm, mha or mhd formats, the input values are linearly scaled between 0 and 255.
+   1 TEXT:FILE REQUIRED                  vol file (.vol, .longvol .p3d, .pgm3d and if DGTAL_WITH_ITK is selected: dicom, dcm, mha, mhd). For longvol, dicom, dcm, mha or mhd formats, the input values are linearly scaled between 0 and 255.
 
  Options:
    -h,--help                             Print this help message and exit
-   -i,--input TEXT:FILE REQUIRED         vol file (.vol, .longvol .p3d, .pgm3d and if WITH_ITK is selected: dicom, dcm, mha, mhd). For longvol, dicom, dcm, mha or mhd formats, the input values are linearly scaled between 0 and 255.
+   -i,--input TEXT:FILE REQUIRED         vol file (.vol, .longvol .p3d, .pgm3d and if DGTAL_WITH_ITK is selected: dicom, dcm, mha, mhd). For longvol, dicom, dcm, mha or mhd formats, the input values are linearly scaled between 0 and 255.
    -r,--radius FLOAT REQUIRED            Kernel radius for IntegralInvariant
    -k,--noise FLOAT=0.5                  Level of Kanungo noise ]0;1[
    -t,--threshold UINT=8                 Min size of SCell boundary of an object
@@ -173,7 +168,6 @@ int main( int argc, char** argv )
   int minImageThreshold {0};
   int maxImageThreshold {255};
   std::string mode {"mean"};
-  std::string export_obj_filename;
   std::string export_dat_filename;
   bool exportOnly {false};
   std::vector< double> vectScale;
@@ -184,7 +178,7 @@ int main( int argc, char** argv )
 
   
   
-  app.add_option("-i,--input,1", inputFileName, "vol file (.vol, .longvol .p3d, .pgm3d and if WITH_ITK is selected: dicom, dcm, mha, mhd). For longvol, dicom, dcm, mha or mhd formats, the input values are linearly scaled between 0 and 255." )
+  app.add_option("-i,--input,1", inputFileName, "vol file (.vol, .longvol .p3d, .pgm3d and if DGTAL_WITH_ITK is selected: dicom, dcm, mha, mhd). For longvol, dicom, dcm, mha or mhd formats, the input values are linearly scaled between 0 and 255." )
   ->required()
   ->check(CLI::ExistingFile);
   
@@ -196,7 +190,6 @@ int main( int argc, char** argv )
   app.add_option("--maxImageThreshold,-u",maxImageThreshold, "set the maximal image threshold to define the image object (object defined by the voxel with intensity belonging to ]minImageThreshold, maxImageThreshold] ).", true);
   app.add_option("--mode,-m", mode, "type of output : mean, gaussian, k1, k2, prindir1, prindir2 or normal(default mean)", true)
    -> check(CLI::IsMember({"mean","gaussian", "k1", "k2", "prindir1","prindir2", "normal" }));
-  app.add_option("--exportOBJ,-o", export_obj_filename, "Export the scene to specified OBJ/MTL filename (extensions added).");
   app.add_option("--exportDAT,-d",export_dat_filename, "Export resulting curvature (for mean, gaussian, k1 or k2 mode) in a simple data file each line representing a surfel."  );
   app.add_flag("--exportOnly", exportOnly, "Used to only export the result without the 3d Visualisation (usefull for scripts).");
   
@@ -216,37 +209,17 @@ int main( int argc, char** argv )
       trace.error() << "The noise level should be in the interval: ]0, 1["<< std::endl;
       exit(EXIT_FAILURE);
     }
-
-#ifndef WITH_VISU3D_QGLVIEWER
-  bool enable_visu = false;
-#else
-  bool enable_visu = !exportOnly; ///<! Default QGLViewer viewer. Disabled if exportOnly is set.
-#endif
-  bool enable_obj = export_obj_filename != ""; ///<! Export to a .obj file.
+  bool enable_visu = !exportOnly; ///<! Default Polyscope Viewer. Disabled if exportOnly is set.
   bool enable_dat = export_dat_filename != ""; ///<! Export to a .dat file.
 
-  if( !enable_visu && !enable_obj && !enable_dat )
+  if( !enable_visu && !enable_dat )
     {
-#ifndef WITH_VISU3D_QGLVIEWER
-      trace.error() << "You should specify what you want to export with --export and/or --exportDat." << std::endl;
-#else
       trace.error() << "You should specify what you want to export with --export and/or --exportDat, or remove --exportOnly." << std::endl;
-#endif
       neededArgsGiven = false;
     }
 
   double h = 1.0;
 
-  if( enable_obj )
-    {
-      if( export_obj_filename.find(".obj") == std::string::npos )
-        {
-          std::ostringstream oss;
-          oss << export_obj_filename << ".obj" << std::endl;
-          export_obj_filename = oss.str();
-        }
-    }
- 
   std::vector<  double > aGridSizeReSample;
   if( vectScale.size() == 3)
     {
@@ -341,23 +314,9 @@ int main( int argc, char** argv )
       exit(2);
     }
 
-#ifdef WITH_VISU3D_QGLVIEWER
-  QApplication application( argc, argv );
-  typedef Viewer3D<Z3i::Space, Z3i::KSpace> Viewer;
-#endif
-  typedef Board3D<Z3i::Space, Z3i::KSpace> Board;
-
-#ifdef WITH_VISU3D_QGLVIEWER
+  typedef PolyscopeViewer<Z3i::Space, Z3i::KSpace> Viewer;
   Viewer viewer( K );
-#endif
-  Board board( K );
-
-#ifdef WITH_VISU3D_QGLVIEWER
-  if( enable_visu )
-    {
-      viewer.show();
-    }
-#endif
+  viewer.allowReuseList = true;
 
   unsigned int i = 0;
   unsigned int max_size = 0;
@@ -482,38 +441,12 @@ int main( int argc, char** argv )
         }
       trace.info() << "Max value= "<<max<<"  min value= "<<min<<std::endl;
       ASSERT( min <= max );
-      typedef GradientColorMap< Quantity > Gradient;
-      Gradient cmap_grad( min, (max==min)? max+1: max );
-      cmap_grad.addColor( Color( 50, 50, 255 ) );
-      cmap_grad.addColor( Color( 255, 0, 0 ) );
-      cmap_grad.addColor( Color( 255, 255, 10 ) );
-
-#ifdef WITH_VISU3D_QGLVIEWER
-      if( enable_visu )
-        {
-          viewer << SetMode3D((*abegin2).className(), "Basic" );
-        }
-#endif
-      if( enable_obj )
-        {
-          board << SetMode3D((K.unsigns(*abegin2)).className(), "Basic" );
-        }
-
 
       for ( unsigned int i = 0; i < results.size(); ++i )
         {
-#ifdef WITH_VISU3D_QGLVIEWER
           if( enable_visu )
             {
-              viewer << CustomColors3D( Color::Black, cmap_grad( results[ i ] ));
-              viewer << *abegin2;
-            }
-#endif
-
-          if( enable_obj )
-            {
-              board << CustomColors3D( Color::Black, cmap_grad( results[ i ] ));
-              board      << K.unsigns(*abegin2);
+              viewer << WithQuantity(*abegin2, "curvature", results[i]);
             }
 
           if( enable_dat )
@@ -577,19 +510,6 @@ int main( int argc, char** argv )
         }
 
       //Visualization + export
-
-#ifdef WITH_VISU3D_QGLVIEWER
-      if( enable_visu )
-        {
-          viewer << SetMode3D(K.uCell( K.sKCoords(*abegin2) ).className(), "Basic" );
-        }
-#endif
-
-      if( enable_obj )
-        {
-          board << SetMode3D(K.uCell( K.sKCoords(*abegin2) ).className(), "Basic" );
-        }
-
       for ( unsigned int i = 0; i < results.size(); ++i )
         {
           DGtal::Dimension kDim = K.sOrthDir( *abegin2 );
@@ -601,20 +521,10 @@ int main( int argc, char** argv )
 
           Cell unsignedSurfel = K.uCell( K.sKCoords(*abegin2) );
 
-#ifdef WITH_VISU3D_QGLVIEWER
           if( enable_visu )
             {
-              viewer << CustomColors3D( DGtal::Color(255,255,255,255),
-                                        DGtal::Color(255,255,255,255))
+              viewer << DGtal::Color(255,255,255,255)
                      << unsignedSurfel;
-            }
-#endif
-
-          if( enable_obj )
-            {
-              board << CustomColors3D( DGtal::Color(255,255,255,255),
-                                       DGtal::Color(255,255,255,255))
-                    << unsignedSurfel;
             }
 
           if( enable_dat )
@@ -627,23 +537,22 @@ int main( int argc, char** argv )
 
           RealPoint center = embedder( outer );
 
-#ifdef WITH_VISU3D_QGLVIEWER
           if( enable_visu )
             {
               if( mode.compare("prindir1") == 0 )
                 {
-                  viewer.setLineColor( AXIS_COLOR_BLUE );
+                  viewer.drawColor( AXIS_COLOR_BLUE );
                 }
               else if( mode.compare("prindir2") == 0 )
                 {
-                  viewer.setLineColor( AXIS_COLOR_RED );
+                  viewer.drawColor( AXIS_COLOR_RED );
                 }
               else if( mode.compare("normal") == 0 )
                 {
-                  viewer.setLineColor( AXIS_COLOR_GREEN );
+                  viewer.drawColor( AXIS_COLOR_GREEN );
                 }
 
-              viewer.addLine (
+              viewer.drawLine (
                               RealPoint(
                                         center[0] -  0.5 * results[i][0],
                                         center[1] -  0.5 * results[i][1],
@@ -653,36 +562,7 @@ int main( int argc, char** argv )
                                         center[0] +  0.5 * results[i][0],
                                         center[1] +  0.5 * results[i][1],
                                         center[2] +  0.5 * results[i][2]
-                                        ),
-                              AXIS_LINESIZE );
-            }
-#endif
-
-          if( enable_obj )
-            {
-              if( mode.compare("prindir1") == 0 )
-                {
-                  board.setFillColor( AXIS_COLOR_BLUE );
-                }
-              else if( mode.compare("prindir2") == 0 )
-                {
-                  board.setFillColor( AXIS_COLOR_RED );
-                }
-              else if( mode.compare("normal") == 0 )
-                {
-                  board.setFillColor( AXIS_COLOR_GREEN );
-                }
-
-              board.addCylinder (
-                                 RealPoint(
-                                           center[0] -  0.5 * results[i][0],
-                                           center[1] -  0.5 * results[i][1],
-                                           center[2] -  0.5 * results[i][2]),
-                                 RealPoint(
-                                           center[0] +  0.5 * results[i][0],
-                                           center[1] +  0.5 * results[i][1],
-                                           center[2] +  0.5 * results[i][2]),
-                                 0.2 );
+                                        ));
             }
 
           ++abegin2;
@@ -690,29 +570,15 @@ int main( int argc, char** argv )
     }
   trace.endBlock();
 
-#ifdef WITH_VISU3D_QGLVIEWER
-  if( enable_visu )
-    {
-      viewer << Viewer3D<>::updateDisplay;
-    }
-#endif
-  if( enable_obj )
-    {
-      trace.info()<< "Exporting object: " << export_obj_filename << " ...";
-      board.saveOBJ(export_obj_filename,normalization);
-      trace.info() << "[done]" << std::endl;
-    }
   if( enable_dat )
     {
       outDat.close();
     }
 
-#ifdef WITH_VISU3D_QGLVIEWER
   if( enable_visu )
     {
-      return application.exec();
+      viewer.show();
     }
-#endif
 
   return 0;
 }

@@ -1,4 +1,10 @@
-# DGtalTools 1.5 (beta)
+# DGtalTools 2.0 
+
+- *build*
+  - Update from DGtal 2.0 (cmake and tools env variable) (Bastien Doignies, [#467](https://github.com/DGtal-team/DGtalTools/pull/467))
+
+
+# DGtalTools 1.5 
 
 - *build*
   - Fix DGtalTools doc deployement.

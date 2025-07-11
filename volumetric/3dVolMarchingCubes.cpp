@@ -33,7 +33,6 @@
 #include <boost/program_options/options_description.hpp>
 #include <boost/program_options/parsers.hpp>
 #include <boost/program_options/variables_map.hpp>
-#include <DGtal/kernel/sets/SetPredicate.h>
 #include <DGtal/io/readers/VolReader.h>
 #include <DGtal/images/ImageSelector.h>
 #include <DGtal/images/SimpleThresholdForegroundPredicate.h>
