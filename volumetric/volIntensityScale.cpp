@@ -116,11 +116,11 @@ int main(int argc, char**argv)
   ->required()
   ->check(CLI::ExistingFile);
   
-  app.add_option("-o,--output,2",outputFileName, "volumetric output file (.vol, .pgm, .pgm3d, .longvol) ", true);
-  app.add_option("-m,--inMin", inMin,  "the min value of the input image.", true);
-  app.add_option("-M,--inMax", inMax,  "the max value of the input image.", true);
-  app.add_option("--outMin", outMin,  "the min value of the output image.", true);
-  app.add_option("--outMax", outMax,  "the max value of the output image.", true);
+  app.add_option("-o,--output,2",outputFileName, "volumetric output file (.vol, .pgm, .pgm3d, .longvol) ");
+  app.add_option("-m,--inMin", inMin,  "the min value of the input image.");
+  app.add_option("-M,--inMax", inMax,  "the max value of the input image.");
+  app.add_option("--outMin", outMin,  "the min value of the output image.");
+  app.add_option("--outMax", outMax,  "the max value of the output image.");
   
   app.get_formatter()->column_width(40);
   CLI11_PARSE(app, argc, argv);

@@ -146,11 +146,11 @@ int main ( int argc, char**argv )
     app.description("Generates normal vector field from a vol file using DGtal library.\n Typical use example:\n \t vol2normalField[options] --input <volFileName> --o <outputFileName>\n");
     app.add_option("-i,--input,1",filename,"Input vol file.")->required()->check(CLI::ExistingFile);
     app.add_option("-o,--output,2",outputFileName,"Output file.")->required();
-    app.add_option("--level,-l",level,"Iso-level for the surface construction (default 0).",true);
-    app.add_option("--sigma,-s", sigma,"Sigma parameter of the Gaussian kernel (default 5.0).",true);
+    app.add_option("--level,-l",level,"Iso-level for the surface construction (default 0).");
+    app.add_option("--sigma,-s", sigma,"Sigma parameter of the Gaussian kernel (default 5.0).");
     auto expOpt = app.add_flag("--exportOriginAndExtremity", "exports the origin and extremity of the vector fields when exporting the vector field in TXT format (useful to be displayed in other viewer like meshViewer).");
-    app.add_option("--vectorsNorm,-N", normExport, "set the norm of the exported vectors in TXT format (when the extremity points are exported with --exportOriginAndExtremity). By using a negative value you will invert the direction of the vectors (default 1.0).",true); 
-    app.add_option("--neighborhood,-n", neighborhood,"Size of the neighborhood for the convolution (distance on surfel graph, default 10).",true);  
+    app.add_option("--vectorsNorm,-N", normExport, "set the norm of the exported vectors in TXT format (when the extremity points are exported with --exportOriginAndExtremity). By using a negative value you will invert the direction of the vectors (default 1.0)."); 
+    app.add_option("--neighborhood,-n", neighborhood,"Size of the neighborhood for the convolution (distance on surfel graph, default 10).");  
 
     app.get_formatter()->column_width(40);
     CLI11_PARSE(app, argc, argv);

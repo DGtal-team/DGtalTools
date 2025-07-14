@@ -115,7 +115,7 @@ int main( int argc, char** argv )
 
   app.description("Estimates curvature using length of most centered segment computers.\n Typical use example:\n \t curvatureMCMS [options] --input  <fileName>\n");
   app.add_option("-i,--input,1",fileName,"Input FreemanChain file name")->required()->check(CLI::ExistingFile);
-  app.add_option("--GridStep", h, "Grid step",true);
+  app.add_option("--GridStep", h, "Grid step");
   
   app.get_formatter()->column_width(40);
   CLI11_PARSE(app, argc, argv);

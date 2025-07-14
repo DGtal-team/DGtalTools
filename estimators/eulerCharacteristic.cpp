@@ -92,8 +92,8 @@ int main(int argc, char**argv)
 
   app.description("Computes the Euleur Characteristic of  a vol to a 8-bit raw file.\n Typical use example:\n \t eulerCharacteristic <volFileName> -m <minlevel> -M <maxlevel>\n");
   app.add_option("--input,-i,1", filename, "Input vol file." )->required()->check(CLI::ExistingFile);
-  app.add_option("--thresholdMin,-m", thresholdMin, "threshold min (excluded) to define binary shape (default 0)", true);
-  app.add_option("--thresholdMax,-M", thresholdMax, "threshold max (included) to define binary shape (default 255)", true);
+  app.add_option("--thresholdMin,-m", thresholdMin, "threshold min (excluded) to define binary shape (default 0)");
+  app.add_option("--thresholdMax,-M", thresholdMax, "threshold max (included) to define binary shape (default 255)");
   
   app.get_formatter()->column_width(40);
   CLI11_PARSE(app, argc, argv);

@@ -1203,15 +1203,15 @@ int main( int argc, char** argv )
   app.add_option("--output,-o", file_export, "Output file", true) ->required();
   
   app.add_option("--radius,-r", radius,"Kernel radius for IntegralInvariant") ->required();
-  app.add_option("--alpha",alpha, "Alpha parameter for Integral Invariant computation", true );
+  app.add_option("--alpha",alpha, "Alpha parameter for Integral Invariant computation" );
   app.add_option("--h", h, "Grid step") ->required();
-  app.add_option("--minAABB,-a", border_minV,  "Min value of the AABB bounding box (domain)", true);
-  app.add_option("--maxAABB,-A", border_maxV,  "Max value of the AABB bounding box (domain)", true);
-  app.add_option("--noise,-n", noiseLevel, "Level of noise to perturb the shape", true );
+  app.add_option("--minAABB,-a", border_minV,  "Min value of the AABB bounding box (domain)");
+  app.add_option("--maxAABB,-A", border_maxV,  "Max value of the AABB bounding box (domain)");
+  app.add_option("--noise,-n", noiseLevel, "Level of noise to perturb the shape" );
   
   app.add_flag("--lambda,-l", lambda_optimized, "Use the shape to get a better approximation of the surface (optional)");
-  app.add_option("--properties", properties, "the i-th property is disabled iff there is a 0 at position i", true);
-  app.add_option("--estimators,-e", options, "the i-th estimator is disabled iff there is a 0 at position i", true);
+  app.add_option("--properties", properties, "the i-th property is disabled iff there is a 0 at position i");
+  app.add_option("--estimators,-e", options, "the i-th estimator is disabled iff there is a 0 at position i");
   
   app.get_formatter()->column_width(40);
   CLI11_PARSE(app, argc, argv);

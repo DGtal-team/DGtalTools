@@ -133,15 +133,15 @@ int main(int argc, char* const argv[]){
   ->required()
   ->check(CLI::ExistingFile);
 
-  app.add_option("--skel,-s", sk_string,"Type of skeletonization. Options: 1isthmus, isthmus, end, ulti.", true )
+  app.add_option("--skel,-s", sk_string,"Type of skeletonization. Options: 1isthmus, isthmus, end, ulti." )
    -> check(CLI::IsMember({"ulti", "end","isthmus", "1isthmus"}));
-  app.add_option("--select,-c", select_string, "Select the ordering for skeletonization. Options: dmax, random, first", true)
+  app.add_option("--select,-c", select_string, "Select the ordering for skeletonization. Options: dmax, random, first")
    -> check(CLI::IsMember({"random", "dmax", "first"}));
-  app.add_option("--foreground,-f",foreground, "Foreground color in binary image", true )
+  app.add_option("--foreground,-f",foreground, "Foreground color in binary image" )
    -> check(CLI::IsMember({"white", "black"}));
-  app.add_option("--thresholdMin,-m", thresholdMin, "Threshold min (excluded) to define binary shape", true );
-  app.add_option("--thresholdMax,-M", thresholdMax, "Threshold max (included) to define binary shape", true );
-  app.add_option("--persistence,-p",persistence,"Persistence value, implies use of persistence algorithm if p>=1", true )
+  app.add_option("--thresholdMin,-m", thresholdMin, "Threshold min (excluded) to define binary shape" );
+  app.add_option("--thresholdMax,-M", thresholdMax, "Threshold max (included) to define binary shape" );
+  app.add_option("--persistence,-p",persistence,"Persistence value, implies use of persistence algorithm if p>=1" )
   ->check(CLI::PositiveNumber);
   app.add_flag("--profile", profile, "Profile algorithm");
   app.add_flag("--verbose,-v",verbose, "Verbose output");

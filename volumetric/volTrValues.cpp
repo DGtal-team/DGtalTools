@@ -109,7 +109,7 @@ int main(int argc, char**argv)
   ->required()
   ->check(CLI::ExistingFile);
   
-  app.add_option("--output,-o,2",outputFileName, "Output filename.", true);
+  app.add_option("--output,-o,2",outputFileName, "Output filename.");
   app.add_option("--inputVals,-s", inputVals, "specify the values which will be transformed with the output values (given with --outputVals).") ->required();
   app.add_option("--outputVals,-r", outputVals, "specify the values which will be transformed with the output values (given with --outputVals).") ->required();
   

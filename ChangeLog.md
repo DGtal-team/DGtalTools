@@ -2,6 +2,7 @@
 
 - *build*
   - Update from DGtal 2.0 (cmake and tools env variable) (Bastien Doignies, [#467](https://github.com/DGtal-team/DGtalTools/pull/467))
+  - Update CLI11 and cmake polyscope dependencies (Bertrand Kerautret [468](https://github.com/DGtal-team/DGtalTools/pull/468)) 
 
 
 # DGtalTools 1.5 

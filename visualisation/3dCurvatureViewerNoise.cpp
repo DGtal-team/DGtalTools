@@ -184,11 +184,11 @@ int main( int argc, char** argv )
   
   app.add_option("--radius,-r", re_convolution_kernel, "Kernel radius for IntegralInvariant" )
     ->required();
-  app.add_option("--noise,-k", noiseLevel, "Level of Kanungo noise ]0;1[", true);
-  app.add_option("--threshold,-t", threshold, "Min size of SCell boundary of an object", true);
-  app.add_option("--minImageThreshold,-l",minImageThreshold,  "set the minimal image threshold to define the image object (object defined by the voxel with intensity belonging to ]minImageThreshold, maxImageThreshold ] ).", true);
-  app.add_option("--maxImageThreshold,-u",maxImageThreshold, "set the maximal image threshold to define the image object (object defined by the voxel with intensity belonging to ]minImageThreshold, maxImageThreshold] ).", true);
-  app.add_option("--mode,-m", mode, "type of output : mean, gaussian, k1, k2, prindir1, prindir2 or normal(default mean)", true)
+  app.add_option("--noise,-k", noiseLevel, "Level of Kanungo noise ]0;1[");
+  app.add_option("--threshold,-t", threshold, "Min size of SCell boundary of an object");
+  app.add_option("--minImageThreshold,-l",minImageThreshold,  "set the minimal image threshold to define the image object (object defined by the voxel with intensity belonging to ]minImageThreshold, maxImageThreshold ] ).");
+  app.add_option("--maxImageThreshold,-u",maxImageThreshold, "set the maximal image threshold to define the image object (object defined by the voxel with intensity belonging to ]minImageThreshold, maxImageThreshold] ).");
+  app.add_option("--mode,-m", mode, "type of output : mean, gaussian, k1, k2, prindir1, prindir2 or normal(default mean)")
    -> check(CLI::IsMember({"mean","gaussian", "k1", "k2", "prindir1","prindir2", "normal" }));
   app.add_option("--exportDAT,-d",export_dat_filename, "Export resulting curvature (for mean, gaussian, k1 or k2 mode) in a simple data file each line representing a surfel."  );
   app.add_flag("--exportOnly", exportOnly, "Used to only export the result without the 3d Visualisation (usefull for scripts).");

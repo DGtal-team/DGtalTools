@@ -134,10 +134,10 @@ int main( int argc, char** argv )
     ->required()
     ->check(CLI::ExistingFile);
   app.add_option("--output,-o,2",outputFileName ,"output file (.obj or .off).");
-  app.add_option("--thresholdMin,-m", thresholdMin, "threshold min (excluded) to define binary shape.", true);
-  app.add_option("--thresholdMax,-M", thresholdMax, "threshold max (included) to define binary shape.", true);
-  app.add_option("--rescaleInputMin", rescaleInputMin, "min value used to rescale the input intensity (to avoid basic cast into 8  bits image).", true);
-  app.add_option("--rescaleInputMax", rescaleInputMax, "max value used to rescale the input intensity (to avoid basic cast into 8  bits image).", true);
+  app.add_option("--thresholdMin,-m", thresholdMin, "threshold min (excluded) to define binary shape.");
+  app.add_option("--thresholdMax,-M", thresholdMax, "threshold max (included) to define binary shape.");
+  app.add_option("--rescaleInputMin", rescaleInputMin, "min value used to rescale the input intensity (to avoid basic cast into 8  bits image).");
+  app.add_option("--rescaleInputMax", rescaleInputMax, "max value used to rescale the input intensity (to avoid basic cast into 8  bits image).");
 
 
   app.get_formatter()->column_width(40);

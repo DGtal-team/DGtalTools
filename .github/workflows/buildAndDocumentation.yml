@@ -12,7 +12,7 @@ env:
   CONFIG_GLOBAL: 
   CONFIG_LINUX:  -DWITH_MAGICK=true -DWITH_GMP=true -DDGTAL_WITH_FFTW3=true -DWARNING_AS_ERROR=ON -DDGTAL_WITH_HDF5=true -DWITH_QGLVIEWER=true -DDGTAL_WITH_CAIRO=true  -DDGTAL_WITH_EIGEN=true -DDGTAL_ENABLE_FLOATING_POINT_EXCEPTIONS=true
   CONFIG_MAC:    -DDGTAL_WITH_EIGEN=true -DWITH_GMP=tue
-  CONFIG_WINDOWS: -DDGTAL_WITH_OPENMP=true  -DENABLE_CONAN=true -DDISABLE_POLYSCOPE=ON 
+  CONFIG_WINDOWS: -DDGTAL_WITH_OPENMP=true  -DDISABLE_POLYSCOPE=ON 
 
 
 jobs:
@@ -101,10 +101,10 @@ jobs:
        run: |
            git clone --depth 1 https://github.com/DGtal-team/DGtal.git
            cd DGtal
-           conan install . --build=missing
+           conan install . --build=missing -s:a compiler.cppstd=20
            mkdir buildDGtal
            cd buildDGtal
-           echo  cmake ..-DCMAKE_POLICY_DEFAULT_CMP0091=NEW  -DCMAKE_BUILD_TYPE=$BUILD_TYPE $CONFIG_WINDOWS -DCMAKE_TOOLCHAIN_FILE="conan_toolchain.cmake" -DBUILD_EXAMPLES=false -DBUILD_TESTING=false 
+           echo  cmake .. -DCMAKE_POLICY_DEFAULT_CMP0091=NEW  -DCMAKE_BUILD_TYPE=$BUILD_TYPE $CONFIG_WINDOWS -DCMAKE_TOOLCHAIN_FILE="conan_toolchain.cmake" -DBUILD_EXAMPLES=false -DBUILD_TESTING=false 
            cmake .. -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_BUILD_TYPE=$BUILD_TYPE $CONFIG_WINDOWS -DCMAKE_TOOLCHAIN_FILE="conan_toolchain.cmake" -DBUILD_EXAMPLES=false -DBUILD_TESTING=false  
            cmake --build . --config Release --parallel 3
      - name: Configure CMake (linux)
@@ -124,8 +124,8 @@ jobs:
        shell: bash
        working-directory: "${{runner.workspace}}/build"
        run: |
-           conan install $GITHUB_WORKSPACE --build=missing
-           cmake $GITHUB_WORKSPACE -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_MODULE_PATH="D:/a/DGtalTools/build/DGtal/buildDGtal" -DDGtal_DIR="D:/a/DGtalTools/build/DGtal/buildDGtal"  -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DDGTAL_RANDOMIZED_TESTING_WHITELIST="${{ steps.whitelist.outputs.WHITELIST }}"
+           conan install $GITHUB_WORKSPACE --build=missing  -s:a compiler.cppstd=20
+           cmake $GITHUB_WORKSPACE -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_MODULE_PATH="D:/a/DGtalTools/build/DGtal/buildDGtal" -DDGtal_DIR="D:/a/DGtalTools/build/DGtal/buildDGtal" -DCMAKE_TOOLCHAIN_FILE="conan_toolchain.cmake" -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DDGTAL_RANDOMIZED_TESTING_WHITELIST="${{ steps.whitelist.outputs.WHITELIST }}"
 
      - name: Build
        working-directory: ${{runner.workspace}}/build
@@ -146,7 +146,7 @@ jobs:
     - name: Set up
       run: |
          sudo apt-get update
-         sudo apt-get install libboost-dev graphviz texlive doxygen  libqglviewer-dev-qt5 libeigen3-dev ninja-build libhdf5-serial-dev libboost-dev libcairo2-dev libgmp-dev libgraphicsmagick++1-dev libfftw3-dev xorg-dev  libglu1-mesa-dev freeglut3-dev
+         sudo apt-get install libboost-dev graphviz texlive doxygen   libeigen3-dev ninja-build libhdf5-serial-dev libboost-dev libcairo2-dev libgmp-dev libgraphicsmagick++1-dev libfftw3-dev xorg-dev  libglu1-mesa-dev freeglut3-dev
 
     - name: DGtalBuild (linux)
       shell: bash
@@ -168,21 +168,3 @@ jobs:
          cmake ..   -DDGtal_DIR=${{runner.workspace}}/DGtal/buildDGtal
          wget --no-check-certificate -O "${{runner.workspace}}/DGtalTools/build/DGtal-tagfile"  http://dgtal.org/doc/tags/DGtal-tagfile;
          make doc > buildDoc.log
-    - name: Preparing deploy
-      run: |
-        git clone --depth 2 https://github.com/DGtal-team/doctools-nightly.git
-        ls build/
-        pwd
-        du -hs build/html
-        cd build/html
-        cp -r *  ../../doctools-nightly/
-    - name: Deploy to GitHub Pages
-      uses: JamesIves/github-pages-deploy-action@v4
-#      if: github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == true
-      with:
-        token: ${{ secrets.DGTALTOOLSDOC }}
-        branch: master
-        repository-name: DGtal-team/doctools-nightly
-        folder: build/html
-        single-comit: true
-        clean: true

@@ -260,22 +260,22 @@ int main( int argc, char** argv )
   double ax {1}, ay {0}, az {0}; 
 
   app.description("Digitizes 3D parametric curves using DGtal library.\n Typical use example:\n \t 3dParametricCurveDigitizer [options] --curve <curve> --param1 <double> --param2 <double> --param3 <double> --tstart <double> --tend <double> --step <double> --output <basename>\n");
-  app.add_option("--param1",param1,"a radius or a scaling factor (default 0)",true);
-  app.add_option("--param2",param2,"a radius or a scaling factor (default 0)",true);
-  app.add_option("--param3",param3,"a radius or a scaling factor (default 0)",true);
+  app.add_option("--param1",param1,"a radius or a scaling factor (default 0)");
+  app.add_option("--param2",param2,"a radius or a scaling factor (default 0)");
+  app.add_option("--param3",param3,"a radius or a scaling factor (default 0)");
   auto tstartOpt = app.add_option("--tstart",tstart,"start time");
   auto tendOpt = app.add_option("--tend",tend,"end time");
   auto stepOpt = app.add_option("--step, -s",step,"step");
-  app.add_option("--knext, -k",knext,"K_NEXT value (default 5)",true);
+  app.add_option("--knext, -k",knext,"K_NEXT value (default 5)");
   auto listOpt = app.add_flag("--list,-l","List all available shapes");
   auto curveNameOpt = app.add_option("--curve,-c",curveName,"Shape name");
-  app.add_option("--angle,-a",angle,"Rotation angle in radians(default 0)",true);
-  app.add_option("--ox",ox,"X coordinate of origin (default 0)",true);
-  app.add_option("--oy",oy,"Y coordinate of origin (default 0)",true);
-  app.add_option("--oz",oz,"Z coordinate of origin (default 0)",true);
-  app.add_option("--ax",ax,"X component of rotation axis (default 1)",true);
-  app.add_option("--ay",ay,"Y component of rotation axis (default 0)",true);
-  app.add_option("--az",az,"Z component of rotation axis (default 0)",true);
+  app.add_option("--angle,-a",angle,"Rotation angle in radians(default 0)");
+  app.add_option("--ox",ox,"X coordinate of origin (default 0)");
+  app.add_option("--oy",oy,"Y coordinate of origin (default 0)");
+  app.add_option("--oz",oz,"Z coordinate of origin (default 0)");
+  app.add_option("--ax",ax,"X component of rotation axis (default 1)");
+  app.add_option("--ay",ay,"Y component of rotation axis (default 0)");
+  app.add_option("--az",az,"Z component of rotation axis (default 0)");
   auto outputNameOpt = app.add_option("--output,-o",outputName,"Basename of the output file");
 
   app.get_formatter()->column_width(40);
