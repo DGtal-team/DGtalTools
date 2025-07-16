@@ -15,7 +15,7 @@
  **/
 /**
  * @file 3dHeightMapViewer.cpp
- * @ingroup Examples
+ * @ingroup Visualisation
  * @author Bertrand Kerautret (\c kerautre@loria.fr )
  * LORIA (CNRS, UMR 7503), University of Nancy, France
  *
@@ -57,7 +57,8 @@ using namespace Z3i;
  @page Doc3dHeightMapViewer 3dHeightMapViewer
  
  @brief  Displays 2D image as heightmap by using QGLviewer.
-
+ @ingroup visualizationtools
+ 
  @b Usage:  3dImageViewer [options] input
  
 

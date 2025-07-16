@@ -15,7 +15,7 @@
  **/
 /**
  * @file meshViewer.cpp
- * @ingroup visualisation
+ * @ingroup Visualisation
  * @author Bertrand Kerautret (\c kerautre@loria.fr )
  * LORIA (CNRS, UMR 7503), University of Nancy, France
  *
@@ -45,7 +45,8 @@ using namespace DGtal;
  @page meshViewer meshViewer
 
  @brief Displays OFF mesh file by using PolyscopeViewer.
-
+ @ingroup visualizationtools
+ 
  @b Usage:   meshViewer [input]
 
  @b Allowed @b options @b are :

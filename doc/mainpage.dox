@@ -135,7 +135,7 @@ Actually the DGTal project is organized as follows:
 
 @defgroup convertertools Converter Tools
 @defgroup volumetrictools Volumetric Tools
-
+@defgroup visualizationtools Visualization Tools
 
 
 */

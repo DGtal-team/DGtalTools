@@ -15,7 +15,7 @@
  **/
 /**
  * @file 3dVolBoundaryViewer.cpp
- * @ingroup Tools
+ * @ingroup Visualisation
  * @author Jacques-Olivier Lachaud (\c jacques-olivier.lachaud@univ-savoie.fr )
  * Laboratory of Mathematics (CNRS, UMR 5127), University of Savoie, France
  *
@@ -58,6 +58,7 @@ using namespace DGtal;
  @page Doc3dVolBoundaryViewer 3dVolBoundaryViewer
  
  @brief  Display the boundary of a volume file by using PolyscopeViewer.
+ @ingroup visualizationtools
  
  The mode  specifies if you wish to see surface elements (BDRY), the inner
  voxels (INNER) or the outer voxels (OUTER) that touch the boundary.

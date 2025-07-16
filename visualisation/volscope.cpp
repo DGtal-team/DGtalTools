@@ -15,7 +15,7 @@
  **/
 /**
  * @file volscope.cpp
- * @ingroup visualization
+ * @ingroup Visualisation
  * @author David Coeurjolly (\c david.coeurjolly@cnrs.fr )
  * Laboratoire d'InfoRmatique en Image et Systèmes d'information - LIRIS (CNRS, UMR 5205), CNRS,
  * France
@@ -51,6 +51,7 @@ typedef Shortcuts<Z3i::KSpace> SH3;
  @page volscope volscope
  
  @brief Volumetric file visualization using polyscope
+ @ingroup visualizationtools
  
  @b Usage: volscope [options] --input  \<fileName\>
  

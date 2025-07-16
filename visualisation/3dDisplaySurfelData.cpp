@@ -17,7 +17,7 @@
  * @file 3dDisplaySurfelData.cpp
  * @author Bertrand Kerautret (\c kerautre@loria.fr )
  * LORIA (CNRS, UMR 7503), University of Nancy, France
- *
+ * @ingroup Visualisation
  * @date 2014/08/16
  *
  * Display surfel data from SDP file with color attributes given as scalar interpreted as color.
@@ -59,7 +59,8 @@ using namespace Z3i;
  @page Doc3dDisplaySurfelData 3dDisplaySurfelData
  
  @brief  Displays surfel data from SDP file with color attributes given as scalar interpreted as color. 
-
+ @ingroup visualizationtools
+ 
  @b Usage:   3dDisplaySurfelData [OPTIONS] 1 [fixMaxColorValue] [fixMinColorValue]
 
  
