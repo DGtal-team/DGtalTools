@@ -15,7 +15,7 @@
  **/
 /**
  * @file freeman2img.cpp
- * @ingroup Tools
+ * @ingroup Converters
  * @author Bertrand Kerautret (\c kerautre@loria.fr) and Jacques-Olivier Lachaud 
  * LORIA (CNRS, UMR 7503), University of Nancy, France 
  * (backport from ImaGene)

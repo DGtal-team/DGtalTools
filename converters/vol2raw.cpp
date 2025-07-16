@@ -16,6 +16,7 @@
 
 /**
  * @file vol2raw.cpp
+ * @ingroup Converters
  * @author David Coeurjolly (\c david.coeurjolly@liris.cnrs.fr )
  * Laboratoire d'InfoRmatique en Image et Systèmes d'information - LIRIS (CNRS, UMR 5205), CNRS, France
  *
@@ -44,10 +45,10 @@ using namespace Z3i;
 /**
  @page vol2raw vol2raw
  @brief Converts a vol to a 8-bit raw file.
+ @ingroup convertertools
+ @b Usage: vol2raw [input] [output]
 
-@b Usage: vol2raw [input] [output]
-
-@b Allowed @b options @b are:
+ @b Allowed @b options @b are:
 
 @code
 
