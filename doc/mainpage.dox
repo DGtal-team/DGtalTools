@@ -138,6 +138,6 @@ Actually the DGTal project is organized as follows:
 @defgroup visualizationtools Visualization Tools
 @defgroup imageprocessingtools Image Processing Tools
 @defgroup generatorstools Generator Tools
-
+@defgroup estimatortools Estimator Tools
 
 */

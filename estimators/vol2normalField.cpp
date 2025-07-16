@@ -16,6 +16,7 @@
 
 /**
  * @file vol2normalField.cpp
+ * @ingroup Estimators
  * @author David Coeurjolly (\c david.coeurjolly@liris.cnrs.fr )
  * Laboratoire d'InfoRmatique en Image et Systèmes d'information - LIRIS (CNRS, UMR 5205), CNRS, France
  * @author Jacques-Olivier Lachaud (\c jacques-olivier.lachaud@univ-savoie.fr )
@@ -70,7 +71,8 @@ using namespace Z3i;
  @page vol2normalField vol2normalField
  
  @brief Generates normal vector field from a vol file using DGtal library.
-
+ @ingroup estimatortools
+ 
  It will output the embedded vector field (Gaussian convolution on elementary normal vectors)
  an OFF file, and a TXT normal vector file (theta, phi in degree).
 

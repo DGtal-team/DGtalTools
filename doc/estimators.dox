@@ -13,10 +13,10 @@
 
 //----------------------------------------
 /*!
-@page estimators Estimators
+@page estimators Estimator Tools
 @writers Bertrand Kerautret
 
-@section estimators_Doc Estimators
+
 
   - @ref Doc2dLocalEstimators : compares local estimators on implicit shapes using DGtal Library.
   - @ref Doc3dCurveTangentEstimator : estimates the tangent vector to a set of 3D integer points.
