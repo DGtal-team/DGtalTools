@@ -12,7 +12,7 @@
 
 /*!
 @page moduleAT Image restoration and inpainting with Ambrosio-Tortorelli functional
-
+@ingroup imageprocessingtools
 @writers Marion Foare and Jacques-Olivier Lachaud
 
   Part of tool \ref imageProcessing.
