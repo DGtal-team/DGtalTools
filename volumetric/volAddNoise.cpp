@@ -75,7 +75,7 @@ using namespace DGtal;
  # Converting in sdp to display:
  $ vol2sdp  AlNoisy0.4.vol AlNoisy0.4.sdp
  # displaying sequence of points:
- $ 3dSDPViewer  tmp.sdp
+ $ 3dSDPViewer AlNoisy0.4.sdp
  @endcode
 
  You should obtain such a visualization:

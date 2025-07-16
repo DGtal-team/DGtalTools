@@ -206,7 +206,7 @@ int main(int argc, char **argv)
     
     stringstream s;
     s << "meshViewer - DGtalTools: ";
-    string name = inputFileNames[0].substr(inputFileNames[0].find_last_of("/")+1,inputFileNames[0].size()-1) ;
+    string name = inputFileNames[0].substr(inputFileNames[0].find_last_of("/")+1,inputFileNames[0].size()) ;
     s << " " <<  name << " (W key to display settings)";
     polyscope::options::programName = s.str();
     polyscope::options::buildGui=false;

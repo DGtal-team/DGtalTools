@@ -214,7 +214,11 @@ int main(int argc, char **argv)
   {
     pointColor.setRGBi(vectColorPt[0], vectColorPt[1], vectColorPt[2], vectColorPt[3]);
   }
-
+    stringstream s;
+    s << "3dSDPViewer - DGtalTools: ";
+    string bname = inputFileName.substr(inputFileName.find_last_of("/")+1,inputFileName.size()) ;
+    s << " " <<  bname ;
+    polyscope::options::programName = s.str();
 
   bool useUnitVector = constantNorm != 0.0;
 

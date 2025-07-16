@@ -122,7 +122,7 @@ int main( int argc, char** argv )
   
   std::vector<int> vectFixedPoints;
   
-  app.description("Applies an homotopic thinning of a 3d image file (vol,longvol,pgm3d...) with 3D viewer. \n Basic usage: \t homotopicThinning3d [options] --input <3dImageFileName>  {vol,longvol,pgm3d...}  \n Usage by forcing point to be left by the thinning: \n homotopicThinning3D --input ${DGtal}/examples/samples/Al.100.vol  --fixedPoints 56 35 5  56 61 5  57 91 38  58 8 38  45 50 97 \n");
+  app.description("Applies an homotopic thinning of a 3d image file (vol,longvol,pgm3d...) with 3D viewer. \n Basic usage: \t homotopicThinning3D [options] --input <3dImageFileName>  {vol,longvol,pgm3d...}  \n Usage by forcing point to be left by the thinning: \n homotopicThinning3D --input ${DGtal}/examples/samples/Al.100.vol  --fixedPoints 56 35 5  56 61 5  57 91 38  58 8 38  45 50 97 \n");
   app.add_option("-i,--input,1", inputFileName, "Input volumetric file (.vol, .pgm3d or p3d)" )
   ->required()
   ->check(CLI::ExistingFile);
@@ -231,7 +231,11 @@ int main( int argc, char** argv )
   trace.info() << "Skeleton--> "<<S<<std::endl;
 
   // Display by using two different list to manage OpenGL transparency.
-  PolyscopeViewer<> viewer;
+    polyscope::options::programName = "DGtalTools: homotopicThinning3D";
+
+    PolyscopeViewer<> viewer;
+
+    
 
   viewer << Color(25,25,255, 255);
   viewer << S ;

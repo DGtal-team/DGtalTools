@@ -291,6 +291,8 @@ int main(int argc, char* const argv[]){
 
   if(visualize)
   {
+     polyscope::options::programName = "DGtalTools: criticalKernelsThinning3D";
+
     PolyscopeViewer<> viewer( ks );
 
     viewer.drawColor(Color(255, 255, 255, 255));
