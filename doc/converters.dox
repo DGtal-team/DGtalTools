@@ -14,8 +14,6 @@
 @writers Bertrand Kerautret
 
 
-@section converters Converters
-
 
 Utilities to convert various simple file formats:
 
