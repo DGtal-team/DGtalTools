@@ -17,7 +17,7 @@
  * @file volIntensityScale.cpp
  * @author Bertrand Kerautret (\c kerautre@loria.fr )
  * LORIA (CNRS, UMR 7503), University of Nancy, France
- *
+ * @ingroup Volumetric 
  * @date 2015/01/12
  *
  * 
@@ -46,7 +46,7 @@ using namespace Z3i;
  @page volIntensityScale volIntensityScale
  
  @brief Applies a linear rescaling of the image intensity from an input intensity interval [InMin, InMax] into an output interval [OutMin, OutMax].
-
+ @ingroup volumetrictools
  @b Usage: 	  ./volumetric/volIntensityScale [OPTIONS] 1 (image files can be independently in vol, pgm3D, p3d format)
 
 

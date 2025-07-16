@@ -15,7 +15,7 @@
  **/
 /**
  * @file volAddNoise
- * @ingroup converters
+ * @ingroup Volumetric
  * @author David Coeurjolly (\c david.coeurjolly@liris.cnrs.fr)
  *
  * @date 2015/03/24
@@ -48,7 +48,7 @@ using namespace DGtal;
  @page volAddNoise volAddNoise
  @brief  Adds Kanungo noise to a binary object with 0 values as background
  points and values >0 for the foreground ones.
-
+ @ingroup volumetrictools
  @b Usage:  volumetric/volAddNoise [OPTIONS] 1 [2]
 
  @b Allowed @b options @b are:

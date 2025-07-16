@@ -16,7 +16,7 @@
 
 /**
  * @file volShapeMetrics.cpp
- *
+ * @ingroup Volumetric
  * @author Bertrand Kerautret (\c kerautre@loria.fr )
  * LORIA (CNRS, UMR 7503), University of Nancy, France
  *
@@ -50,7 +50,8 @@ using namespace Z3i;
  @page volShapeMetrics volShapeMetrics
  
  @brief Applies shape measures for comparing two volumetric images A and B (shape defined from thresholds).
-
+ @ingroup volumetrictools
+ 
  Usefull to determine classical statistics like false positive related stats.
  
 

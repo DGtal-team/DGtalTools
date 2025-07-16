@@ -15,7 +15,7 @@
  **/
 /**
  * @file volCComponentCounter.cpp
- * @ingroup tools
+ * @ingroup Volumetric
  * @author David Coeurjolly (\c david.coeurjolly@liris.cnrs.fr)
  * LIRIS (CNRS, UMR 5205), University de Lyon, France.
  *
@@ -48,7 +48,7 @@ using namespace Z3i;
  @page volCComponentCounter volCComponentCounter
  
  @brief Counts the number of connected component (same values) in a  volume (Vol) file image.
-
+ @ingroup volumetrictools
  @b Usage:   ./volumetric/volCComponentCounter [OPTIONS] 1
 
 

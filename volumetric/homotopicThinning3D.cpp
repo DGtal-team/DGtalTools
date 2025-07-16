@@ -18,7 +18,7 @@
  * @file homotopicThinning3D.cpp
  * @author Bertrand Kerautret (\c kerautre@loria.fr )
  * LORIA (CNRS, UMR 7503), University of Nancy, France
- *
+ * @ingroup Volumetric 
  * @date 2011/01/04
  *
  * Apply an the homotopic thinning from a volumetric volume file.
@@ -60,7 +60,7 @@ using namespace Z3i;
  @brief Applies an homotopic thinning of a 3d image file (vol,longvol,pgm3d...) with 3D viewer.
 
  @b Usage: homotopicThinning3d [options]  <3dImageFileName>  {vol,longvol,pgm3d...}
-
+ @ingroup volumetrictools
 
  @b Allowed @b options @b are : 
  @code
