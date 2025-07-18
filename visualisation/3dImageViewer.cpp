@@ -376,6 +376,10 @@ int main( int argc, char** argv )
   CLI11_PARSE(app, argc, argv);
   // END parse command line using CLI ----------------------------------------------
 
+    polyscope::options::programName = "3dImageViewer - (DGtalTools)";
+    polyscope::options::buildGui=false;
+    polyscope::options::groundPlaneMode = polyscope::GroundPlaneMode::None;
+    
     PolyscopeViewer<> viewer;
     refViewer = &viewer;
     
