@@ -130,6 +130,11 @@ typedef DGtal::ConstImageAdapter<Image3D, Image2D::Domain, DGtal::functors::Proj
                                 Image3D::Value,  DGtal::functors::Identity >  SliceImageAdapter;
 typedef DGtal::ConstImageAdapter<Image3D, DGtal::Z2i::Domain, DGtal::functors::SliceRotator2D< DGtal::Z3i::Domain >,
 Image3D::Value,  DGtal::functors::Identity >  MyRotatorSliceImageAdapter;
+DGtal::Z2i::Domain domain2DX();
+DGtal::Z2i::Domain domain2DY();
+DGtal::Z2i::Domain domain2DZ();
+
+const DGtal::functors::Identity identityFunctor{};
 
 static polyscope::SurfaceTextureScalarQuantity* texSliceX = nullptr;
 static polyscope::SurfaceTextureScalarQuantity* texSliceY = nullptr;
@@ -258,42 +263,24 @@ updateSlices(const MyRotatorSliceImageAdapter &sliceIm, string name, TypeSlice a
 }
 
 void callbackFaceID() {
-    srand((unsigned) time(NULL));
     ImGui::Begin("Editing tools");
-    ImGui::Text("Setting selection size:");
-    if (ImGui::Button("+X"))
-        {
-         
-        }
-    if (ImGui::SliderInt("slice x", &sliceXNum, image.domain().lowerBound()[0], image.domain().upperBound()[0], "size = %i")){
-        std::cout << "val "<<sliceXNum << std::endl;
-       
+    ImGui::Text("SliceC :");
+    if (ImGui::SliderInt("x axis", &sliceXNum, image.domain().lowerBound()[0], image.domain().upperBound()[0], "size = %i")){
         DGtal::functors::SliceRotator2D<DGtal::Z3i::Domain> aSliceFunctorX(0, image.domain(), sliceXNum, 2, 0 );
-                const DGtal::functors::Identity identityFunctor{};
-        DGtal::Z2i::Domain domain2DX(invFunctorX(image.domain().lowerBound()),
-                                     invFunctorX(image.domain().upperBound()));
-
         MyRotatorSliceImageAdapter sliceImageX( image, domain2DX, aSliceFunctorX, identityFunctor );
         updateSlices(sliceImageX, "slicex", TypeSlice::SliceX);
-   
-
     }
     if (ImGui::SliderInt("slice y", &sliceYNum, image.domain().lowerBound()[1], image.domain().upperBound()[1], "size = %i")){
         std::cout << "val "<<sliceYNum << std::endl;
         DGtal::functors::SliceRotator2D<DGtal::Z3i::Domain> aSliceFunctorY(1, image.domain(), sliceYNum, 2, 0 );
-        DGtal::Z2i::Domain domain2DY(invFunctorY(image.domain().lowerBound()),
-                                     invFunctorY(image.domain().upperBound()));
-        const DGtal::functors::Identity identityFunctor{};
+
         MyRotatorSliceImageAdapter sliceImageY( image, domain2DY, aSliceFunctorY, identityFunctor );
         updateSlices(sliceImageY, "slicey", TypeSlice::SliceY);
     }
     if (ImGui::SliderInt("slice z", &sliceZNum, image.domain().lowerBound()[2], image.domain().upperBound()[2], "size = %i")){
         std::cout << "val "<<sliceZNum << std::endl;
         DGtal::functors::SliceRotator2D<DGtal::Z3i::Domain> aSliceFunctorZ(2, image.domain(), sliceZNum, 0, 0 );
-        DGtal::Z2i::Domain domain2DZ(invFunctorZ(image.domain().lowerBound()),
-                                     invFunctorZ(image.domain().upperBound()));
-        const DGtal::functors::Identity identityFunctor{};
-        MyRotatorSliceImageAdapter sliceImageZ( image, domain2DZ, aSliceFunctorZ, identityFunctor );
+         MyRotatorSliceImageAdapter sliceImageZ( image, domain2DZ, aSliceFunctorZ, identityFunctor );
         updateSlices(sliceImageZ, "slicez", TypeSlice::SliceZ);
 
         
@@ -395,7 +382,13 @@ int main( int argc, char** argv )
                                                                                              0,
                                                                                              255));
   Domain domain = image.domain();
-
+  DGtal::Z2i::Domain domain2DX = DGtal::Z2i::Domain(invFunctorX(image.domain().lowerBound()),
+                                                    invFunctorX(image.domain().upperBound()));
+    DGtal::Z2i::Domain domain2DY = DGtal::Z2i::Domain(invFunctorY(image.domain().lowerBound()),
+                                                      invFunctorY(image.domain().upperBound()));
+    DGtal::Z2i::Domain domain2DZ = DGtal::Z2i::Domain(invFunctorZ(image.domain().lowerBound()),
+                                                      invFunctorZ(image.domain().upperBound()));
+    
   trace.info() << "Image loaded: "<<image<< std::endl;
   //viewer << image;
 
