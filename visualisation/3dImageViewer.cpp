@@ -148,7 +148,10 @@ static int sliceZNum = 0;
 static float rotX = 0.0;
 static float rotY = 0.0;
 static float rotZ = 0.0;
-
+static bool showText = true;
+static double startTime =  0.0;
+static std::string message = "Press W to display interface";
+static TypeSlice mainAxisKeySelect = SliceX;
 static polyscope::SurfaceTextureScalarQuantity* g_qScalarSliceX = nullptr;
 static polyscope::SurfaceTextureScalarQuantity* g_qScalarSliceY = nullptr;
 static polyscope::SurfaceTextureScalarQuantity* g_qScalarSliceZ = nullptr;
@@ -206,15 +209,18 @@ initSlices(const MyRotatorSliceImageAdapter &sliceIm, string name, TypeSlice aTy
     
     auto qParam = res->addParameterizationQuantity("param", param);
     std::vector<float> valuesTex;
-    for(unsigned int y =  0; y< dimY; y++){
-        for(unsigned int x =  0; x< dimX; x++){
+    for(unsigned int y =  0; y< dimY; y++)
+    {
+        for(unsigned int x =  0; x< dimX; x++)
+        {
             valuesTex.push_back(((float)sliceIm(Z2i::Point(x,y))));
         }
     }
     
     float minV = *std::min_element(valuesTex.begin(), valuesTex.end());
     float maxV = *std::max_element(valuesTex.begin(), valuesTex.end());
-    for (float& v : valuesTex) {
+    for (float& v : valuesTex)
+    {
         v = (v - minV) / (maxV - minV );
     }
     g_qScalar[aTypeSlice] = res->addTextureScalarQuantity("tScalar", *qParam, dimX, dimY,
@@ -236,80 +242,164 @@ updateSlices(const MyRotatorSliceImageAdapter &sliceIm, string name, TypeSlice a
     auto dimX = dim[0];
     auto dimY = dim[1];
     std::vector<float> valuesTex;
-    for(unsigned int y =  0; y< dimY; y++){
-        for(unsigned int x =  0; x< dimX; x++){
+    for(unsigned int y =  0; y< dimY; y++)
+    {
+        for(unsigned int x =  0; x< dimX; x++)
+        {
             valuesTex.push_back(((float)sliceIm(Z2i::Point(x,y))));
         }
     }
     
     float minV = *std::min_element(valuesTex.begin(), valuesTex.end());
     float maxV = *std::max_element(valuesTex.begin(), valuesTex.end());
-    for (float& v : valuesTex) {
+    for (float& v : valuesTex)
+    {
         v = (v - minV) / (maxV - minV );
     }
     g_qScalar[aTypeSlice] -> updateData(valuesTex);
-    auto nV =  getVertices(sliceIm, sliceIm.domain().lowerBound(), sliceIm.domain().upperBound(), func);
+    auto nV =  getVertices(sliceIm, sliceIm.domain().lowerBound(),
+                           sliceIm.domain().upperBound(), func);
     sm->updateVertexPositions(nV);
     
 }
 
 void callbackFaceID() {
     ImGuiIO& io = ImGui::GetIO();
+    auto iDom = image.domain();
+    bool needRedisSX = false;
+    bool needRedisSY = false;
+    bool needRedisSZ = false;
     
-    if (ImGui::IsKeyPressed(ImGuiKey_W)) {
+    if (ImGui::IsKeyPressed(ImGuiKey_W))
+    {
         show_ui = !show_ui;
     }
+    bool updateSlice = false;
+    if (ImGui::IsKeyPressed(ImGuiKey_X))
+    {
+        mainAxisKeySelect = TypeSlice::SliceX;
+        message = "Slice X selected";
+        startTime = ImGui::GetTime();
+        showText = true;
+    }
+    if (ImGui::IsKeyPressed(ImGuiKey_Y))
+    {
+        mainAxisKeySelect = TypeSlice::SliceY;
+        message = "Slice Y selected";
+        startTime = ImGui::GetTime();
+        showText = true;
+    }
+    if (ImGui::IsKeyPressed(ImGuiKey_Z))
+    {
+        mainAxisKeySelect = TypeSlice::SliceZ;
+        message = "Slice Z selected";
+        startTime = ImGui::GetTime();
+        showText = true;
+    }
+    
+    if (ImGui::IsKeyPressed(ImGuiKey_UpArrow))
+    {
+        if (mainAxisKeySelect == TypeSlice::SliceX)
+        {
+            if (!io.KeyShift)
+                sliceXNum++;
+            else
+                rotX += 0.01;
+            needRedisSX = true;
+        }
+        if (mainAxisKeySelect == TypeSlice::SliceY)
+        {
+            if (!io.KeyShift)
+                sliceYNum++;
+            else
+                rotY += 0.01;
+            needRedisSY = true;
+        }
+        if (mainAxisKeySelect == TypeSlice::SliceZ)
+        {
+            if (!io.KeyShift)
+                sliceZNum++;
+            else
+                rotZ += 0.01;
+            needRedisSZ = true;
+        }
+    }
+    if (ImGui::IsKeyPressed(ImGuiKey_DownArrow))
+    {
+        if (mainAxisKeySelect == TypeSlice::SliceX)
+        {
+            if (!io.KeyShift)
+                sliceXNum--;
+            else
+                rotX -= 0.01;
+            needRedisSX = true;
+        }
+        if (mainAxisKeySelect == TypeSlice::SliceY)
+        {
+            if (!io.KeyShift)
+                sliceYNum--;
+            else
+                rotY -= 0.01;
+            needRedisSY = true;
+        }
+        if (mainAxisKeySelect == TypeSlice::SliceZ)
+        {
+            if (!io.KeyShift)
+                sliceZNum--;
+            else
+                rotZ -= 0.01;
+            needRedisSZ = true;
+        }
+    }
+    
+    
     if (show_ui){
-        auto iDom = image.domain();
         float totalWidth = ImGui::GetContentRegionAvail().x;
         float sliderWidth = (totalWidth - ImGui::GetStyle().ItemSpacing.x) * 0.5f;
         ImGui::Begin("Editing tools");
         ImGui::Text("Slice X :");
         ImGui::PushItemWidth(sliderWidth);
-        if (ImGui::SliderInt("##x axis", &sliceXNum, iDom.lowerBound()[0], iDom.upperBound()[0], "slice X %i")){
-            DGtal::functors::SliceRotator2D<DGtal::Z3i::Domain> aSliceFunctorX(0, iDom, sliceXNum, 2, rotX, false);
-            MyRotatorSliceImageAdapter sliceImageX( image, domain2DX, aSliceFunctorX, identityFunctor );
-            updateSlices(sliceImageX, "slicex", TypeSlice::SliceX, aSliceFunctorX);
+        if (ImGui::SliderInt("##x axis", &sliceXNum, iDom.lowerBound()[0],
+                             iDom.upperBound()[0], "slice X %i"))
+        {
+            needRedisSX = true;
         }
         ImGui::SameLine();
-        if (ImGui::SliderFloat("##rotateX", &rotX, 0, 3.14, "angle = %f")){
-            DGtal::functors::SliceRotator2D<DGtal::Z3i::Domain> aSliceFunctorX(0, iDom, sliceXNum, 2, rotX, false );
-            MyRotatorSliceImageAdapter sliceImageX( image, domain2DX, aSliceFunctorX, identityFunctor );
-            updateSlices(sliceImageX, "slicex", TypeSlice::SliceX, aSliceFunctorX);
+        if (ImGui::SliderFloat("##rotateX", &rotX, 0, 3.14, "angle = %f"))
+        {
+            needRedisSX = true;
         }
         ImGui::PopItemWidth();
         ImGui::PushItemWidth(sliderWidth);
-
+        
         ImGui::Text("Slice Y :");
-        if (ImGui::SliderInt("##slice y", &sliceYNum, iDom.lowerBound()[1], iDom.upperBound()[1], "slice Y %i")){
-            DGtal::functors::SliceRotator2D<DGtal::Z3i::Domain> aSliceFunctorY(1, iDom, sliceYNum, 2, rotY, false );
-            MyRotatorSliceImageAdapter sliceImageY( image, domain2DY, aSliceFunctorY, identityFunctor );
-            updateSlices(sliceImageY, "slicey", TypeSlice::SliceY, aSliceFunctorY);
+        if (ImGui::SliderInt("##slice y", &sliceYNum, iDom.lowerBound()[1],
+                             iDom.upperBound()[1], "slice Y %i"))
+        {
+            needRedisSY = true;
         }
         ImGui::SameLine();
-        if (ImGui::SliderFloat("##rotateY", &rotY, 0, 3.14, "angle = %f")){
-            DGtal::functors::SliceRotator2D<DGtal::Z3i::Domain> aSliceFunctorY(1, iDom, sliceYNum, 2, rotY, false );
-            MyRotatorSliceImageAdapter sliceImageY( image, domain2DY, aSliceFunctorY, identityFunctor );
-            updateSlices(sliceImageY, "slicey", TypeSlice::SliceY, aSliceFunctorY);
+        if (ImGui::SliderFloat("##rotateY", &rotY, 0, 3.14, "angle = %f"))
+        {
+            needRedisSY = true;
         }
         ImGui::PopItemWidth();
         ImGui::PushItemWidth(sliderWidth);
         ImGui::Text("Slice Z :");
-        if (ImGui::SliderInt("##slice z", &sliceZNum, iDom.lowerBound()[2], iDom.upperBound()[2], "slice Z %i")){
-            DGtal::functors::SliceRotator2D<DGtal::Z3i::Domain> aSliceFunctorZ(2, iDom, sliceZNum, 0, rotZ, false );
-            MyRotatorSliceImageAdapter sliceImageZ( image, domain2DZ, aSliceFunctorZ, identityFunctor );
-            updateSlices(sliceImageZ, "slicez", TypeSlice::SliceZ, aSliceFunctorZ);
+        if (ImGui::SliderInt("##slice z", &sliceZNum, iDom.lowerBound()[2],
+                             iDom.upperBound()[2], "slice Z %i"))
+        {
+            needRedisSZ = true;
         }
         ImGui::SameLine();
-        if (ImGui::SliderFloat("##rotateZ", &rotZ, 0, 3.14, "angle = %f")){
-            DGtal::functors::SliceRotator2D<DGtal::Z3i::Domain> aSliceFunctorZ(2, iDom, sliceZNum, 0, rotZ, false );
-            MyRotatorSliceImageAdapter sliceImageZ( image, domain2DZ, aSliceFunctorZ, identityFunctor );
-            updateSlices(sliceImageZ, "slicez", TypeSlice::SliceZ, aSliceFunctorZ);
+        if (ImGui::SliderFloat("##rotateZ", &rotZ, 0, 3.14, "angle = %f"))
+        {
+            needRedisSZ = true;
         }
         ImGui::PopItemWidth();
         ImGui::Separator();
         ImGui::Text("Polyscope interface:");
-
+        
         if (ImGui::Button("show "))
         {
             polyscope::options::buildGui=true;
@@ -319,9 +409,42 @@ void callbackFaceID() {
         {
             polyscope::options::buildGui=false;
         }
-
-
+        ImGui::Separator();
+        ImGui::Text("Touches:");
+        ImGui::Text("X: select X slice plane");
+        ImGui::Text("Y: select Y slice plane");
+        ImGui::Text("Z: select Z slice plane");
+        ImGui::Text("UP/DOWN arrow : Move selected slice (+SHIFT to rotate)");
         ImGui::End();
+    }
+    if (needRedisSX)
+    {
+        DGtal::functors::SliceRotator2D<DGtal::Z3i::Domain> aSliceFunctorX(0, iDom, sliceXNum, 2, rotX, false );
+        MyRotatorSliceImageAdapter sliceImageX( image, domain2DX, aSliceFunctorX, identityFunctor );
+        updateSlices(sliceImageX, "slicex", TypeSlice::SliceX, aSliceFunctorX);
+    }
+    if (needRedisSY)
+    {
+        DGtal::functors::SliceRotator2D<DGtal::Z3i::Domain> aSliceFunctorY(1, iDom, sliceYNum, 2, rotY, false );
+        MyRotatorSliceImageAdapter sliceImageY( image, domain2DY, aSliceFunctorY, identityFunctor );
+        updateSlices(sliceImageY, "slicey", TypeSlice::SliceY, aSliceFunctorY);
+    }
+    if (needRedisSZ)
+    {
+        DGtal::functors::SliceRotator2D<DGtal::Z3i::Domain> aSliceFunctorZ(2, iDom, sliceZNum, 0, rotZ, false );
+        MyRotatorSliceImageAdapter sliceImageZ( image, domain2DZ, aSliceFunctorZ, identityFunctor );
+        updateSlices(sliceImageZ, "slicez", TypeSlice::SliceZ, aSliceFunctorZ);
+    }
+    if (showText)
+    {
+        ImVec2 pos(20, 20);
+        ImDrawList* drawList = ImGui::GetBackgroundDrawList();
+        drawList->AddText(pos, IM_COL32(25, 25, 255, 255), message.c_str());
+        if (ImGui::GetTime() - startTime > 10.0 )
+        {
+            showText = false;
+        }
+        
     }
 }
 
@@ -358,7 +481,7 @@ int main( int argc, char** argv )
     double ballRadius = {0.0};
     unsigned char transp {255};
     
-    
+   
     app.description("Displays volume file as a voxel set by using PolyscopeViewer\n 3dImageViewer  $DGtal/examples/samples/lobster.vol --thresholdImage -m 180");
     
     app.add_option("-i,--input,1", inputFileName, "vol file (.vol, .longvol .p3d, .pgm3d and if DGTAL_WITH_ITK is selected: dicom, dcm, mha, mhd). For longvol, dicom, dcm, mha or mhd formats, the input values are linearly scaled between 0 and 255." )
@@ -406,7 +529,7 @@ int main( int argc, char** argv )
     polyscope::view::setNavigateStyle(polyscope::NavigateStyle::Free);
     PolyscopeViewer<> viewer;
     string extension = inputFileName.substr(inputFileName.find_last_of(".") + 1);
-    
+    startTime =  ImGui::GetTime();
     invFunctorX.initRemoveOneDim(0);
     invFunctorY.initRemoveOneDim(1);
     invFunctorZ.initRemoveOneDim(2);
@@ -478,8 +601,10 @@ int main( int argc, char** argv )
     MyRotatorSliceImageAdapter sliceImageZ( image, domain2DZ, aSliceFunctorZ, identityFunctor );
     slicePlaneZ = initSlices(sliceImageZ, "slicez", TypeSlice::SliceZ, aSliceFunctorZ);
     
-    if(inputFileNameSDP != "" ){
-        if(colorSDP.size()==4){
+    if(inputFileNameSDP != "" )
+    {
+        if(colorSDP.size()==4)
+        {
             Color c(colorSDP[0], colorSDP[1], colorSDP[2], colorSDP[3]);
             viewer << c;
         }
