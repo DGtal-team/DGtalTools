@@ -403,7 +403,7 @@ int main( int argc, char** argv )
     polyscope::options::programName = s.str();
     polyscope::options::buildGui=false;
     polyscope::options::groundPlaneMode = polyscope::GroundPlaneMode::None;
-    polyscope::view::style = polyscope::ViewStyle::Free;
+    polyscope::view::setNavigateStyle(polyscope::NavigateStyle::Free);
     PolyscopeViewer<> viewer;
     string extension = inputFileName.substr(inputFileName.find_last_of(".") + 1);
     
