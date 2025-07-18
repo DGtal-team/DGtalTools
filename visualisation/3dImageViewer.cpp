@@ -118,12 +118,199 @@ using namespace Z3i;
 */
 
 
+
+
+enum TypeSlice {SliceX, SliceY, SliceZ};
+
+
+typedef DGtal::functors::Rescaling<DGtal::int64_t ,unsigned char > RescalFCT;
+typedef DGtal::ImageContainerBySTLVector<DGtal::Z3i::Domain,  unsigned char > Image3D;
+typedef DGtal::ImageContainerBySTLVector<DGtal::Z2i::Domain,  unsigned char > Image2D;
+typedef DGtal::ConstImageAdapter<Image3D, Image2D::Domain, DGtal::functors::Projector< DGtal::Z3i::Space>,
+                                Image3D::Value,  DGtal::functors::Identity >  SliceImageAdapter;
+typedef DGtal::ConstImageAdapter<Image3D, DGtal::Z2i::Domain, DGtal::functors::SliceRotator2D< DGtal::Z3i::Domain >,
+Image3D::Value,  DGtal::functors::Identity >  MyRotatorSliceImageAdapter;
+
+static polyscope::SurfaceTextureScalarQuantity* texSliceX = nullptr;
+static polyscope::SurfaceTextureScalarQuantity* texSliceY = nullptr;
+static polyscope::SurfaceTextureScalarQuantity* texSliceZ = nullptr;
+
+static int sliceXNum = 100;
+static int sliceYNum = 100;
+static int sliceZNum = 25;
+
+static PolyscopeViewer<> *refViewer;
+static polyscope::SurfaceTextureScalarQuantity* g_qScalarSliceX = nullptr;
+static polyscope::SurfaceTextureScalarQuantity* g_qScalarSliceY = nullptr;
+static polyscope::SurfaceTextureScalarQuantity* g_qScalarSliceZ = nullptr;
+
+static polyscope::SurfaceTextureScalarQuantity* g_qScalar[] = {g_qScalarSliceX, g_qScalarSliceY, g_qScalarSliceZ};
+Image3D image  = Image3D(DGtal::Z3i::Domain());
+DGtal::functors::Projector<DGtal::Z2i::Space>  invFunctorX;
+DGtal::functors::Projector<DGtal::Z2i::Space>  invFunctorY;
+DGtal::functors::Projector<DGtal::Z2i::Space>  invFunctorZ;
+
+
+polyscope::SurfaceMesh *slicePlaneX;
+polyscope::SurfaceMesh *slicePlaneY;
+polyscope::SurfaceMesh *slicePlaneZ;
+
+
+std::vector<glm::vec3>
+getVertices(TypeSlice aTypeSlice, const Z3i::Point &ptInf, const Z3i::Point &ptSup){
+    switch (aTypeSlice) {
+        case TypeSlice::SliceX:
+            return  {
+                {ptInf[0],    ptInf[1],   ptInf[2]   }, // bas-gauche
+                {ptInf[0],    ptSup[1],   ptInf[2]   }, // bas-droit
+                {ptInf[0],    ptSup[1],   ptSup[2]   }, // haut-droit
+                {ptInf[0],    ptInf[1],   ptSup[2]   }, // haut-gauche
+            };
+        case TypeSlice::SliceY:
+            return  {
+                {ptInf[0],    ptInf[1],   ptInf[2]   }, // bas-gauche
+                {ptSup[0],    ptInf[1],   ptInf[2]   }, // bas-droit
+                {ptSup[0],    ptInf[1],   ptSup[2]   }, // haut-droit
+                {ptInf[0],    ptInf[1],   ptSup[2]   }, // haut-gauche
+            };
+        case TypeSlice::SliceZ:
+            return  {
+                {ptInf[0],    ptInf[1],   ptInf[2]   }, // bas-gauche
+                {ptSup[0],    ptInf[1],   ptInf[2]   }, // bas-droit
+                {ptSup[0],    ptSup[1],   ptInf[2]   }, // haut-droit
+                {ptInf[0],    ptSup[1],   ptInf[2]   }, // haut-gauche
+            };
+    }
+    return  {
+        {ptInf[0],    ptInf[1],   ptInf[2]   }, // bas-gauche
+        {ptInf[0],    ptInf[1],   ptSup[2]   }, // bas-droit
+        {ptSup[0],    ptInf[1],   ptSup[2]   }, // haut-droit
+        {ptSup[0],    ptInf[1],   ptInf[2]   }, // haut-gauche
+    };
+            
+}
+
+
+polyscope::SurfaceMesh *
+initSlices(const MyRotatorSliceImageAdapter &sliceIm, string name, TypeSlice aTypeSlice) {
+    polyscope::SurfaceMesh * res;
+    auto ptInf = sliceIm.sourceDomainPoint(sliceIm.domain().lowerBound());
+    auto ptSup = sliceIm.sourceDomainPoint(sliceIm.domain().upperBound());
+    auto dim = sliceIm.domain().upperBound() - sliceIm.domain().lowerBound();
+    auto dimX = dim[0];
+    auto dimY = dim[1];
+    auto maxDim = max(dimX, dimY);
+    std::vector<glm::vec3> vertices = getVertices(aTypeSlice, ptInf, ptSup);
+    std::vector<std::vector<size_t>> faces = {{0, 1, 2, 3}};
+    res = polyscope::registerSurfaceMesh(name, vertices, faces);
+    std::vector<glm::vec2> param = {
+        {0.0f, 0.0f},
+        {1.0f, 0.0f},
+        {1.0f, 1.0f},
+        {0.0f, 1.0f}
+    };
+
+    auto qParam = res->addParameterizationQuantity("param", param);
+    std::vector<float> valuesTex;
+    for(unsigned int y =  0; y< dimY; y++){
+        for(unsigned int x =  0; x< dimX; x++){
+            valuesTex.push_back(((float)sliceIm(Z2i::Point(x,y))));
+        }
+    }
+     
+    float minV = *std::min_element(valuesTex.begin(), valuesTex.end());
+    float maxV = *std::max_element(valuesTex.begin(), valuesTex.end());
+    for (float& v : valuesTex) {
+        v = (v - minV) / (maxV - minV );
+    }
+    g_qScalar[aTypeSlice] = res->addTextureScalarQuantity("tScalar", *qParam, dimX, dimY,
+                                              valuesTex, polyscope::ImageOrigin::LowerLeft);
+    g_qScalar[aTypeSlice]->setFilterMode(polyscope::FilterMode::Nearest); // change filter for sampling
+    g_qScalar[aTypeSlice]->setEnabled(true);
+    return res;
+}
+
+
+
+void
+updateSlices(const MyRotatorSliceImageAdapter &sliceIm, string name, TypeSlice aTypeSlice) {
+    polyscope::SurfaceMesh * sm = polyscope::getSurfaceMesh(name);
+    auto ptInf = sliceIm.sourceDomainPoint(sliceIm.domain().lowerBound());
+    auto ptSup = sliceIm.sourceDomainPoint(sliceIm.domain().upperBound());
+    auto dim = sliceIm.domain().upperBound() - sliceIm.domain().lowerBound();
+    auto dimX = dim[0];
+    auto dimY = dim[1];
+    std::vector<float> valuesTex;
+    for(unsigned int y =  0; y< dimY; y++){
+        for(unsigned int x =  0; x< dimX; x++){
+            valuesTex.push_back(((float)sliceIm(Z2i::Point(x,y))));
+        }
+    }
+    
+    float minV = *std::min_element(valuesTex.begin(), valuesTex.end());
+    float maxV = *std::max_element(valuesTex.begin(), valuesTex.end());
+    for (float& v : valuesTex) {
+        v = (v - minV) / (maxV - minV );
+    }
+    g_qScalar[aTypeSlice] -> updateData(valuesTex);
+    sm->updateVertexPositions(getVertices(aTypeSlice, ptInf, ptSup));
+
+}
+
+void callbackFaceID() {
+    srand((unsigned) time(NULL));
+    ImGui::Begin("Editing tools");
+    ImGui::Text("Setting selection size:");
+    if (ImGui::Button("+X"))
+        {
+         
+        }
+    if (ImGui::SliderInt("slice x", &sliceXNum, image.domain().lowerBound()[0], image.domain().upperBound()[0], "size = %i")){
+        std::cout << "val "<<sliceXNum << std::endl;
+       
+        DGtal::functors::SliceRotator2D<DGtal::Z3i::Domain> aSliceFunctorX(0, image.domain(), sliceXNum, 2, 0 );
+                const DGtal::functors::Identity identityFunctor{};
+        DGtal::Z2i::Domain domain2DX(invFunctorX(image.domain().lowerBound()),
+                                     invFunctorX(image.domain().upperBound()));
+
+        MyRotatorSliceImageAdapter sliceImageX( image, domain2DX, aSliceFunctorX, identityFunctor );
+        updateSlices(sliceImageX, "slicex", TypeSlice::SliceX);
+   
+
+    }
+    if (ImGui::SliderInt("slice y", &sliceYNum, image.domain().lowerBound()[1], image.domain().upperBound()[1], "size = %i")){
+        std::cout << "val "<<sliceYNum << std::endl;
+        DGtal::functors::SliceRotator2D<DGtal::Z3i::Domain> aSliceFunctorY(1, image.domain(), sliceYNum, 2, 0 );
+        DGtal::Z2i::Domain domain2DY(invFunctorY(image.domain().lowerBound()),
+                                     invFunctorY(image.domain().upperBound()));
+        const DGtal::functors::Identity identityFunctor{};
+        MyRotatorSliceImageAdapter sliceImageY( image, domain2DY, aSliceFunctorY, identityFunctor );
+        updateSlices(sliceImageY, "slicey", TypeSlice::SliceY);
+    }
+    if (ImGui::SliderInt("slice z", &sliceZNum, image.domain().lowerBound()[2], image.domain().upperBound()[2], "size = %i")){
+        std::cout << "val "<<sliceZNum << std::endl;
+        DGtal::functors::SliceRotator2D<DGtal::Z3i::Domain> aSliceFunctorZ(2, image.domain(), sliceZNum, 0, 0 );
+        DGtal::Z2i::Domain domain2DZ(invFunctorZ(image.domain().lowerBound()),
+                                     invFunctorZ(image.domain().upperBound()));
+        const DGtal::functors::Identity identityFunctor{};
+        MyRotatorSliceImageAdapter sliceImageZ( image, domain2DZ, aSliceFunctorZ, identityFunctor );
+        updateSlices(sliceImageZ, "slicez", TypeSlice::SliceZ);
+
+        
+   
+
+    }
+
+    ImGui::End();
+}
+
+
+
 int main( int argc, char** argv )
 {
 
-  typedef DGtal::ImageContainerBySTLVector<DGtal::Z3i::Domain,  unsigned char > Image3D;
-  typedef DGtal::ImageContainerBySTLVector<DGtal::Z2i::Domain,  unsigned char > Image2D;
-
+ 
+    
   // parse command line using CLI ----------------------------------------------
   CLI::App app;
   std::string inputFileName;
@@ -189,22 +376,26 @@ int main( int argc, char** argv )
   CLI11_PARSE(app, argc, argv);
   // END parse command line using CLI ----------------------------------------------
 
-  
-  string extension = inputFileName.substr(inputFileName.find_last_of(".") + 1);
- 
-  PolyscopeViewer<> viewer;
+    PolyscopeViewer<> viewer;
+    refViewer = &viewer;
+    
+    string extension = inputFileName.substr(inputFileName.find_last_of(".") + 1);
+   
 
-  typedef DGtal::functors::Rescaling<DGtal::int64_t ,unsigned char > RescalFCT;
-  Image3D image =  GenericReader< Image3D >::importWithValueFunctor( inputFileName,RescalFCT(rescaleInputMin,
+    invFunctorX.initRemoveOneDim(0);
+    invFunctorY.initRemoveOneDim(1);
+    invFunctorZ.initRemoveOneDim(2);
+
+  image =  GenericReader< Image3D >::importWithValueFunctor( inputFileName,RescalFCT(rescaleInputMin,
                                                                                              rescaleInputMax,
                                                                                              0,
                                                                                              255));
   Domain domain = image.domain();
 
   trace.info() << "Image loaded: "<<image<< std::endl;
-  viewer << image;
-  
-  // Used to display 3D surface
+  //viewer << image;
+
+    // Used to display 3D surface
   Z3i::DigitalSet set3d(domain);
 
   if(thresholdImage){
@@ -225,7 +416,37 @@ int main( int argc, char** argv )
     }
     viewer.endCurrentGroup();
   }
+    
+    
+    
+  auto  myImageOrigin = image.domain().lowerBound();
+    
+ auto   mySliceXPos=myImageOrigin[0];
+ auto   mySliceYPos=myImageOrigin[1];
+ auto   mySliceZPos=myImageOrigin[2];
 
+   // Adding X slice in the viewer.
+    DGtal::Z2i::Domain domain2DX(invFunctorX(image.domain().lowerBound()),
+                     invFunctorX(image.domain().upperBound()));
+    DGtal::functors::SliceRotator2D<DGtal::Z3i::Domain> aSliceFunctorX(0, image.domain(), sliceXNum, 2, 0 );
+    const DGtal::functors::Identity identityFunctor{};
+    MyRotatorSliceImageAdapter sliceImageX( image, domain2DX, aSliceFunctorX, identityFunctor );
+    slicePlaneX = initSlices(sliceImageX, "slicex", TypeSlice::SliceX);
+
+    // Adding Y slice in the viewer.
+     DGtal::Z2i::Domain domain2DY(invFunctorY(image.domain().lowerBound()),
+                      invFunctorY(image.domain().upperBound()));
+     DGtal::functors::SliceRotator2D<DGtal::Z3i::Domain> aSliceFunctorY(1, image.domain(), sliceYNum, 0, 0 );
+     MyRotatorSliceImageAdapter sliceImageY( image, domain2DY, aSliceFunctorY, identityFunctor );
+     slicePlaneY = initSlices(sliceImageY, "slicey", TypeSlice::SliceY);
+   
+    // Adding Z slice in the viewer.
+     DGtal::Z2i::Domain domain2DZ(invFunctorZ(image.domain().lowerBound()),
+                      invFunctorZ(image.domain().upperBound()));
+     DGtal::functors::SliceRotator2D<DGtal::Z3i::Domain> aSliceFunctorZ(2, image.domain(), sliceZNum, 1, 0 );
+     MyRotatorSliceImageAdapter sliceImageZ( image, domain2DZ, aSliceFunctorZ, identityFunctor );
+     slicePlaneZ = initSlices(sliceImageZ, "slicez", TypeSlice::SliceZ);
+    
   if(inputFileNameSDP != "" ){
     if(colorSDP.size()==4){
       Color c(colorSDP[0], colorSDP[1], colorSDP[2], colorSDP[3]);
@@ -306,6 +527,8 @@ int main( int argc, char** argv )
   DGtal::Z3i::Point size = image.domain().upperBound() - image.domain().lowerBound();
   DGtal::Z3i::Point center = image.domain().lowerBound()+size/2;
   unsigned int maxDist = std::max(std::max(size[2], size[1]), size[0]);
+  polyscope::state::userCallback = callbackFaceID;
+
   viewer.show();
   return 0;
 }
