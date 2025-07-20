@@ -157,7 +157,9 @@ int main( int argc, char** argv )
     Image2DCol imageTexture(image.domain());
     int maxHeight = (int)(std::numeric_limits<Image2DG::Value>::max()*scale);
     trace.info()<< "Max height from scale:" << maxHeight << std::endl;
-    
+    GradientColorMap<Image2DG::Value,CMAP_JET>  gradientShade( 0, std::numeric_limits<Image2DG::Value>::max());
+    GrayscaleColorMap<Image2DG::Value>  grayShade(0, std::numeric_limits<Image2DG::Value>::max());
+
     if(colorTextureImage != ""){
         imageTexture =  GenericReader<Image2DCol>::import( colorTextureImage );
     }
@@ -223,12 +225,16 @@ int main( int argc, char** argv )
     for (unsigned int i = 0; i < viewmesh.nbFaces(); i++){
         auto b =  viewmesh.getFaceBarycenter(i);
         auto bp = Z2i::Point(b[0], b[1]);
+        auto val = image(bp);
         if (image.domain().isInside(bp)){
-            if (colorTextureImage == "")
-                viewmesh.setFaceColor(i, DGtal::Color(image(bp)));
-            else
+            if(colorMap){
+                viewmesh.setFaceColor(i,gradientShade(val));
+            }else if (colorTextureImage != "") {
                 viewmesh.setFaceColor(i, DGtal::Color(imageTexture(bp)));
-
+            }else{
+                viewmesh.setFaceColor(i, grayShade(val));
+            }
+                        
         }
     }
     viewer.drawColor(Color(150,0,0,254));
