@@ -99,6 +99,16 @@ using namespace Z3i;
  
  */
 
+
+static int posSliceZ = 0;
+static int maxPosSliceZ = 0;
+static Z2i::Point imagePtInf;
+static Z2i::Point imagePtSup;
+static float startTime = 0.0;
+static bool showText = true;
+static bool show_ui = false;
+static string message =  "Press W to display interface";
+
 // Defining a Helper to get the 3D point functor from an 2DImage
 template<typename TImage2D, typename TPoint3D >
 struct Image3DPredicatFrom2DImage{
@@ -120,6 +130,97 @@ struct Image3DPredicatFrom2DImage{
 
 
 
+polyscope::SurfaceMesh *
+initSlice(string name, const Z2i::Point &ptLow, const Z2i::Point &ptUp) {
+    polyscope::SurfaceMesh * res;
+    std::vector<glm::vec3> vertices = {{ptLow[0], ptLow[1], 0},
+        {ptUp[0], ptLow[1], 0},
+        {ptUp[0], ptUp[1], 0},
+        {ptLow[0], ptUp[1], 0}};
+    
+    std::vector<std::vector<size_t>> faces = {{0, 1, 2, 3}};
+    res = polyscope::registerSurfaceMesh(name, vertices, faces);
+    res->setSurfaceColor({0.2, 0.2, .9});
+    res->setTransparency(0.5);
+    return res;
+}
+void updateSlice(string name, const Z2i::Point &ptLow, const Z2i::Point &ptUp){
+    polyscope::SurfaceMesh * sm = polyscope::getSurfaceMesh(name);
+    std::vector<glm::vec3> vertices = {{ptLow[0], ptLow[1], posSliceZ},
+        {ptUp[0], ptLow[1], posSliceZ},
+        {ptUp[0], ptUp[1], posSliceZ},
+        {ptLow[0], ptUp[1], posSliceZ}};
+    sm->updateVertexPositions(vertices);
+    stringstream ss; ss << "Slice position: "; ss << posSliceZ;
+    message = ss.str();
+    startTime = ImGui::GetTime();
+    showText = true;
+    
+}
+
+
+void callbackFaceID() {
+    ImGuiIO& io = ImGui::GetIO();
+    if (ImGui::IsKeyPressed(ImGuiKey_W))
+    {
+        show_ui = !show_ui;
+    }
+    if (ImGui::IsKeyPressed(ImGuiKey_UpArrow))
+    {
+        posSliceZ++;
+        updateSlice("sliceplane", imagePtInf, imagePtSup);
+    }
+    if (ImGui::IsKeyPressed(ImGuiKey_DownArrow))
+    {
+        posSliceZ--;
+        updateSlice("sliceplane", imagePtInf, imagePtSup);
+    }
+    
+    
+    if (show_ui){
+        float totalWidth = ImGui::GetContentRegionAvail().x;
+        float sliderWidth = (totalWidth - ImGui::GetStyle().ItemSpacing.x) * 0.5f;
+        ImGui::Begin("Editing tools");
+        ImGui::Text("Slice positio, :");
+        ImGui::PushItemWidth(sliderWidth);
+        if (ImGui::SliderInt("##z axis", &posSliceZ, 0,
+                             maxPosSliceZ, "slice %i"))
+        {
+            updateSlice("sliceplane", imagePtInf, imagePtSup);
+        }
+        ImGui::SameLine();
+    
+        ImGui::PopItemWidth();
+        ImGui::Separator();
+        ImGui::Text("Polyscope interface:");
+
+        if (ImGui::Button("show "))
+        {
+            polyscope::options::buildGui=true;
+        }
+        ImGui::SameLine();
+        if (ImGui::Button("hide"))
+        {
+            polyscope::options::buildGui=false;
+        }
+        ImGui::Separator();
+        ImGui::Text("Keys:");
+            ImGui::Text("UP/DOWN arrow : Move slice");
+        ImGui::End();
+    }
+  
+    if (showText)
+    {
+        ImVec2 pos(20, 20);
+        ImDrawList* drawList = ImGui::GetBackgroundDrawList();
+        drawList->AddText(pos, IM_COL32(25, 25, 255, 255), message.c_str());
+        if (ImGui::GetTime() - startTime > 10.0 )
+        {
+            showText = false;
+        }
+
+    }
+}
 
 typedef ImageSelector < Domain, int>::Type Image;
 
@@ -164,15 +265,24 @@ int main( int argc, char** argv )
         imageTexture =  GenericReader<Image2DCol>::import( colorTextureImage );
     }
     
-    Z2i::RealPoint plow (image.domain().lowerBound()[0]-0.5,
-                         image.domain().lowerBound()[1]-0.5);
+    imagePtInf = Z2i::Point(image.domain().lowerBound()[0],
+                         image.domain().lowerBound()[1]);
     
-    Z2i::RealPoint pup (image.domain().upperBound()[0]+0.5,
-                        image.domain().upperBound()[1]+0.5);
+    imagePtSup = Z2i::Point(image.domain().upperBound()[0],
+                        image.domain().upperBound()[1]);
+    maxPosSliceZ = image.domain().upperBound()[1];
     
+    stringstream s;
+    s << "3dHeightMapViewer - DGtalTools: ";
+    string name = inputFileName.substr(inputFileName.find_last_of("/")+1,inputFileName.size()) ;
+    s << " " <<  name << " (W key to display settings)";
+    polyscope::options::programName = s.str();
+    polyscope::options::buildGui=false;
+    polyscope::options::groundPlaneMode = polyscope::GroundPlaneMode::None;
+    polyscope::view::setNavigateStyle(polyscope::NavigateStyle::Free);
     PolyscopeViewer viewer;
     bool intAdjacency = true;
-    
+    polyscope::SurfaceMesh *slicePlane;
     typedef SurfelAdjacency<KSpace::dimension> MySurfelAdjacency;
     typedef KSpace::SurfelSet SurfelSet;
     typedef SetOfSurfels< KSpace, SurfelSet > MySetOfSurfels;
@@ -237,9 +347,11 @@ int main( int argc, char** argv )
                         
         }
     }
+    slicePlane = initSlice("sliceplane", image.domain().lowerBound(), image.domain().upperBound());
+    
     viewer.drawColor(Color(150,0,0,254));
     viewer << viewmesh;
-    
+    polyscope::state::userCallback = callbackFaceID;
     viewer.show();
     return 0;
 }
