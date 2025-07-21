@@ -167,13 +167,17 @@ void callbackFaceID() {
     }
     if (ImGui::IsKeyPressed(ImGuiKey_UpArrow))
     {
-        posSliceZ++;
-        updateSlice("sliceplane", imagePtInf, imagePtSup);
+        if (posSliceZ <= maxPosSliceZ) {
+            posSliceZ++;
+            updateSlice("sliceplane", imagePtInf, imagePtSup);
+        }
     }
     if (ImGui::IsKeyPressed(ImGuiKey_DownArrow))
     {
-        posSliceZ--;
-        updateSlice("sliceplane", imagePtInf, imagePtSup);
+        if (posSliceZ > 0) {
+            posSliceZ--;
+            updateSlice("sliceplane", imagePtInf, imagePtSup);
+        }
     }
     
     
@@ -206,6 +210,8 @@ void callbackFaceID() {
         ImGui::Separator();
         ImGui::Text("Keys:");
             ImGui::Text("UP/DOWN arrow : Move slice");
+            ImGui::Text("W: Hide/Show this panel");
+
         ImGui::End();
     }
   
@@ -256,7 +262,7 @@ int main( int argc, char** argv )
     
     Image2DG image = GenericReader<Image2DG>::import( inputFileName );
     Image2DCol imageTexture(image.domain());
-    int maxHeight = (int)(std::numeric_limits<Image2DG::Value>::max()*scale);
+    Image2DG::Value  maxHeight =   *std::max_element(image.begin(), image.end()) * scale;
     trace.info()<< "Max height from scale:" << maxHeight << std::endl;
     GradientColorMap<Image2DG::Value,CMAP_JET>  gradientShade( 0, std::numeric_limits<Image2DG::Value>::max());
     GrayscaleColorMap<Image2DG::Value>  grayShade(0, std::numeric_limits<Image2DG::Value>::max());
@@ -270,12 +276,12 @@ int main( int argc, char** argv )
     
     imagePtSup = Z2i::Point(image.domain().upperBound()[0],
                         image.domain().upperBound()[1]);
-    maxPosSliceZ = image.domain().upperBound()[1];
+    maxPosSliceZ = maxHeight;
     
     stringstream s;
     s << "3dHeightMapViewer - DGtalTools: ";
     string name = inputFileName.substr(inputFileName.find_last_of("/")+1,inputFileName.size()) ;
-    s << " " <<  name << " (W key to display settings)";
+    s << " " <<  name ;
     polyscope::options::programName = s.str();
     polyscope::options::buildGui=false;
     polyscope::options::groundPlaneMode = polyscope::GroundPlaneMode::None;
