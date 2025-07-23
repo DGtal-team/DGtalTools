@@ -1169,7 +1169,8 @@ HTML_STYLESHEET        =
 GENERATE_TREEVIEW      = YES #NO #YES # required!
 DISABLE_INDEX          = YES
 FULL_SIDEBAR           = NO
-HTML_EXTRA_STYLESHEET  =      @top_srcdir@/doc/doxygen-awesome-css-main/doxygen-awesome.css 
+#HTML_EXTRA_STYLESHEET  =      @top_srcdir@/doc/doxygen-awesome-css-main/doxygen-awesome.css
+HTML_EXTRA_STYLESHEET  =      @top_srcdir@/doc/doxygen-awesome-css-main/doxygen-awesomeDGtalTools.css 
 HTML_COLORSTYLE        = LIGHT # required with Doxygen >= 1.9.5
 
 #@top_srcdir@/doc/modern-doxygen-blue.css \
