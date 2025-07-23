@@ -26,7 +26,7 @@ own source code (in complement of DGtal tutorial https://dgtal-team.github.io/do
 
 @section Organisation
 
-Actually the DGTal project is organized as follows:
+Actually the DGTalTools project is organized as follows:
 
  - [Converters](\ref converters)
 
