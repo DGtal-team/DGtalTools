@@ -16,6 +16,7 @@
 
 /**
  * @file eulerCharacteristic.cpp
+ * @ingroup Estimators
  * @author David Coeurjolly (\c david.coeurjolly@liris.cnrs.fr )
  * Laboratoire d'InfoRmatique en Image et Systèmes d'information - LIRIS (CNRS, UMR 5205), CNRS, France
  *
@@ -43,7 +44,8 @@ using namespace Z3i;
  @page eulerCharacteristic eulerCharacteristic
  
  @brief Computes the Euleur Characteristic of  a vol to a 8-bit raw file.
-
+ @ingroup estimatortools
+ 
  The vol file is first binarized using interval [m,M[ thresholds and
  the Eucler characteristic is given from the cubical complex.
 

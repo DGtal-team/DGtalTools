@@ -15,7 +15,7 @@
  **/
 /**
  * @file curvatureBC.cpp
- * @ingroup Tools
+ * @ingroup Estimators
  * @author Jacques-Olivier Lachaud (\c jacques-olivier.lachaud@univ-savoie.fr )
  * Laboratory of Mathematics (CNRS, UMR 5807), University of Savoie, France
  *
@@ -54,7 +54,8 @@ using namespace DGtal;
  @page tangentBC tangentBC
  
  @brief  Estimates tangent using a binomial convolver.
-
+ @ingroup estimatortools
+ 
  @b Usage:  tangentBC [options] --input  <fileName> 
 
 

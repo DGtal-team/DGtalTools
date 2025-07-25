@@ -15,7 +15,7 @@
  **/
 /**
  * @file 3dCurvatureViewer.cpp
- * @ingroup surfaceTools
+ * @ingroup Visualisation
  * @author Jérémy Levallois (\c jeremy.levallois@liris.cnrs.fr )
  * Laboratoire d'InfoRmatique en Image et Systèmes d'information - LIRIS (CNRS, UMR 5205), INSA-Lyon, France
  * LAboratoire de MAthématiques - LAMA (CNRS, UMR 5127), Université de Savoie, France
@@ -65,7 +65,8 @@ using namespace functors;
  @page Doc3DCurvatureViewer 3DCurvatureViewer
 
  @brief  Computes and visualizes mean or gaussian curvature of binary shapes.
-
+ @ingroup visualizationtools
+ 
   Vol file viewer, with curvature (mean or Gaussian, see parameters) information on surface.
   Blue color means lowest curvature
   Yellow color means highest curvature

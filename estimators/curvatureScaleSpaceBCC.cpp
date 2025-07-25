@@ -15,7 +15,7 @@
  **/
 /**
  * @file curvatureScaleSpace.cpp
- * @ingroup estimators
+ * @ingroup Estimators
  *
  * @author Bertrand Kerautret (\c kerautre@loria.fr )
  * LORIA (CNRS, UMR 7503), University of Nancy, France
@@ -66,7 +66,8 @@ using namespace DGtal;
  @page curvatureScaleSpaceBCC curvatureScaleSpaceBCC
  
  @brief Generate the Curvature Scale Space image using a binomial convolver based estimator.
-
+ @ingroup estimatortools
+ 
 The x axis is associated to the contour point and the y axis to the scale. The colors represent the curvature values included between the cutoff values (set to 10 by default).
 
  @b Usage:  curvatureScaleSpaceBCC --input <filename>  --output <filename> 

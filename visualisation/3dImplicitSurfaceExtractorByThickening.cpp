@@ -59,6 +59,7 @@ using namespace DGtal;
  @page  Doc3dImplicitSurfaceExtractorByThickening 3dImplicitSurfaceExtractorByThickening
  
  @brief Computes the zero level set of the given polynomial.
+ @ingroup visualizationtools
 
  @b Usage:  3dImplicitSurfaceExtractorByThickening [options] input
 

@@ -15,7 +15,7 @@
  **/
 /**
  * @file freeman2sdp.cpp
- * @ingroup Tools
+ * @ingroup Converters
  * @author Bertrand Kerautret (\c kerautre@loria.fr) and Jacques-Olivier Lachaud 
  * LORIA (CNRS, UMR 7503), University of Nancy, France 
  * (backport from ImaGene)
@@ -51,6 +51,7 @@
 using namespace DGtal;
 
 /**
+   @ingroup convertertools
    @page freeman2sdp freeman2sdp
    @brief Transform freeman chain into a Sequence of Discrete Points. Result is given to std output.
 

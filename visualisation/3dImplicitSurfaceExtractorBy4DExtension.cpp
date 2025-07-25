@@ -60,7 +60,8 @@ using namespace DGtal;
  @page Doc3dImplicitSurfaceExtractorBy4DExtension 3dImplicitSurfaceExtractorBy4DExtension
  
  @brief Computes the zero level set of the given polynomial.
-
+ @ingroup visualizationtools
+ 
  @b Usage:  3dImplicitSurfaceExtractorBy4DExtension [options] input
 
  @b Allowed @b options @b are :

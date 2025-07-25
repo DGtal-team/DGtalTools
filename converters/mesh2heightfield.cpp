@@ -15,7 +15,7 @@
  **/
 /**
  * @file mesh2heightfield.cpp
- * @ingroup converters
+ *  @ingroup Converters
  * @author Bertrand Kerautret (\c kerautre@loria.fr )
  * LORIA (CNRS, UMR 7503), University of Nancy, France
  *
@@ -57,7 +57,8 @@ using namespace DGtal;
 /**
  @page mesh2heightfield mesh2heightfield
  @brief  Converts a mesh file into a projected 2D image given from a normal direction N and from a starting point P.
-
+ @ingroup convertertools
+ 
  The 3D mesh is discretized and scanned in the normal direction N, starting from P with a step 1.
 
 

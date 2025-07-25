@@ -18,6 +18,7 @@
  * @author Bertrand Kerautret (\c kerautre@loria.fr )
  * LORIA (CNRS, UMR 7503), University of Nancy, France
  *
+ * @ingroup Visualisation
  * @date 2014/08/01
  *
  * A tool to compare generic surfel data informations given from two data files.
@@ -60,7 +61,7 @@ using namespace Z3i;
  @page CompSurfelData 3DCompSurfelData
 
  @brief  Computes generic scalar surfel data comparisons (squared error) (given from an input data file and from a reference one). 
- 
+ @ingroup visualizationtools 
 
  @b Usage: 3dCompSurfelData [input] [reference]
  

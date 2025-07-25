@@ -15,7 +15,7 @@
  **/
 /**
  * @file shapeGenerator.cpp
- * @ingroup Tools
+ * @ingroup Generators
  * @author David Coeurjolly (\c david.coeurjolly@liris.cnrs.fr)
  * LIRIS (CNRS, UMR 5205),
  *
@@ -56,7 +56,7 @@ using namespace DGtal;
 /**
  @page shapeGenerator shapeGenerator
  @brief  Generates shapes using DGtal library.
- 
+ @ingroup generatorstools  
 
 
  @b Usage:  shapeGenerator [options] --shape <shapeName> --output <outputBasename>

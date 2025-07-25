@@ -8,6 +8,7 @@
  * @file criticalKernelsThinning3D.cpp
  * @author Pablo Hernandez-Cerdan (\c pablo.hernandez.cerdan@outlook.com )
  * Institute of Fundamental Sciences, Massey University, New Zealand
+ * @ingroup Volumetric
  *
  * @date 2017/11/04
  *
@@ -22,7 +23,7 @@
  @brief Applies an criticalKernels thinning algorithm of a 3d image file (vol,longvol,pgm3d...) with 3D viewer.
 
  @b Usage: criticalKernelsThinning3D [options] --input <3dImageFileName>  {vol,longvol,pgm3d...}
-
+ @ingroup volumetrictools
 
  @b Allowed @b options @b are :
  @code
@@ -290,6 +291,8 @@ int main(int argc, char* const argv[]){
 
   if(visualize)
   {
+     polyscope::options::programName = "DGtalTools: criticalKernelsThinning3D";
+
     PolyscopeViewer<> viewer( ks );
 
     viewer.drawColor(Color(255, 255, 255, 255));

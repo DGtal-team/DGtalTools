@@ -15,7 +15,7 @@
  **/
 /**
  * @file heightfield2vol.cpp
- * @ingroup converters
+ *  @ingroup Converters
  * @author Bertrand Kerautret (\c kerautre@loria.fr )
  * LORIA (CNRS, UMR 7503), University of Nancy, France
  *
@@ -47,6 +47,8 @@ using namespace DGtal;
 /**
  @page heightfield2vol heightfield2vol
  @brief  Converts a 2D heightfield image into a volumetric file.
+ @ingroup convertertools
+
 
 @b Usage: heightfield2vol [OPTIONS] 1 [2]
 

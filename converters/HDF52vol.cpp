@@ -18,7 +18,7 @@
  * @file HDF52vol.cpp
  * @author Martial Tola (\c martial.tola@liris.cnrs.fr )
  * Laboratoire d'InfoRmatique en Image et Systèmes d'information - LIRIS (CNRS, UMR 5205), CNRS, France
- *
+ * @ingroup Converters
  * @date 2013/09/11
  *
  *
@@ -43,6 +43,9 @@ using namespace Z3i;
 
 /**
  @page HDF52vol HDF52vol
+ @ingroup convertertools
+
+
  @brief Converts a 3D 8-bit HDF5 file to vol.
 
 @b Usage: HDF52vol [input] [output]

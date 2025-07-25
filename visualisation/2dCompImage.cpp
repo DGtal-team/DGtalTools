@@ -16,7 +16,7 @@
 
 /**
  * @file
- * @ingroup visualisation
+ * @ingroup Visualisation
  * @author Bertrand Kerautret (\c kerautre@loria.fr )
  * LORIA (CNRS, UMR 7503), University of Lorraine, France
  *
@@ -60,7 +60,7 @@ typedef GradientColorMap<unsigned int, CMAP_JET, 1 > JetMap;
  @page Doc2dCompImage 2dCompImage
  
  @brief Compare images and displays differences (squared and absolute differences). 
-
+ @ingroup visualizationtools
 
  @b Usage:  2dCompImage <imageA>.pgm <imageB>.pgm --imageError <name>
 

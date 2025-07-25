@@ -15,7 +15,7 @@
  **/
 /**
  * @file 3dLocalEstimators.cpp
- * @ingroup Tools
+ * @ingroup Estimators
  * @author Jeremy Levallois (\c jeremy.levallois@liris.cnrs.fr )
  * Laboratoire d'InfoRmatique en Image et Systèmes d'information - LIRIS (CNRS, UMR 5205), Universite de Lyon, France
  * LAboratoire de MAthematiques - LAMA (CNRS, UMR 5807), Universite de Savoie, France
@@ -78,7 +78,8 @@ using namespace functors;
  @page Doc3dLocalEstimators 3dLocalEstimators
  
  @brief Compares local estimators on implicit shapes using DGtal library.
-
+ @ingroup estimatortools
+ 
  @b Usage:  3dLocalEstimators [options] --shape <shape> --h <h> --radius <radius> --estimators <binaryWord> --output <output>
 
     Below are the different available families of estimators:

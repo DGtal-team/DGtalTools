@@ -15,7 +15,7 @@
  **/
 /**
  * @file 3dCurvatureViewerNoise.cpp
- * @ingroup visualisation
+ * @ingroup Visualisation
  *
  * @author Jérémy Levallois (\c jeremy.levallois@liris.cnrs.fr )
  * Laboratoire d'InfoRmatique en Image et Systèmes d'information - LIRIS (CNRS, UMR 5205), INSA-Lyon, France
@@ -67,7 +67,8 @@ using namespace functors;
  @page Doc3DCurvatureViewerNoise 3DCurvatureViewerNoise
 
  @brief  Same as @ref Doc3DCurvatureViewer, but allows to add some noise to objects.
-
+ @ingroup visualizationtools
+ 
   Vol file viewer, with curvature (mean or Gaussian, see parameters) information on surface.
   Blue color means lowest curvature
   Yellow color means highest curvature
