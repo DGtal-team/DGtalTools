@@ -15,7 +15,7 @@
  **/
 /**
  * @file contourGenerator.cpp
- * @ingroup Tools
+ * @ingroup Generators
  * @author Jacques-Olivier Lachaud (\c jacques-olivier.lachaud@univ-savoie.fr )
  * Laboratory of Mathematics (CNRS, UMR 5807), University of Savoie, France
  * @author David Coeurjolly (\c david.coeurjolly@liris.cnrs.fr)
@@ -69,7 +69,8 @@ using namespace DGtal;
  @page contourGenerator contourGenerator
  
  @brief Generates multigrid contours of 2d digital shapes using DGtal library.
- 
+ @ingroup generatorstools 
+
  The associated geometric information like contour, curvature can also be displayed. 
 
  @b Usage: 	contourGenerator --shape <shapeName> [requiredParam] [otherOptions]

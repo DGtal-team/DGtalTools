@@ -15,7 +15,7 @@
  **/
 /**
  * @file 3dVolMarchingCubes.cpp
- * @ingroup volumetric
+ * @ingroup Volumetric
  * @author Jacques-Olivier Lachaud (\c jacques-olivier.lachaud@univ-savoie.fr )
  * Laboratory of Mathematics (CNRS, UMR 5127), University of Savoie, France
  *
@@ -58,7 +58,7 @@ using namespace Z3i;
 
 /**
  @page Doc3dVolMarchingCubes 3dVolMarchingCubes
- 
+ @ingroup volumetrictools
  @brief Outputs the isosurface of the input volume  as an OFF file
  
  @b Usage: 3dVolMarchingCubes [-i \<fileName.vol\>] [-t \<threshold\>] [-a \<adjacency\>] [-o \<output.off\>]

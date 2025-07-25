@@ -48,7 +48,8 @@ using namespace DGtal;
 /**
  @page vol2slice vol2slice
  @brief  Convert a volumetric file (.vol, .longvol, .pgm3d) into a set of 2D slice  images.
-
+ @ingroup convertertools
+ 
 @b Usage: vol2slice [input] [output]
 
 @b Allowed @b options @b are:

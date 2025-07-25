@@ -15,7 +15,7 @@
  **/
 /**
  * @file volSurfaceRegularization
- * @ingroup Tools
+ * @ingroup Estimators
  * @author David Coeurjolly (\c david.coeurjolly@liris.cnrs.fr )
  * @author Pierre Gueth (\c pierre.gueth@liris.cnrs.fr )
  * @author Jacques-Olivier Lachaud (\c jacques-olivier.lachaud@univ-smb.fr )
@@ -34,8 +34,9 @@
  @page volSurfaceRegularization volSurfaceRegularization
  
  @brief Regularize a cubical complex into a smooth quadrangulated complex.
+ @ingroup estimatortools
 
-This is done by minimizing a quadratic energy function as decribed in ??. The variational
+ This is done by minimizing a quadratic energy function as decribed in ??. The variational
  formulation regularizes the position while aligning the regularized quads with an 
  input normal vector field. In this tool, the input normal vector field can be either 
  specified in the CSV input file, or computed using Integral Invariant (and -r option).

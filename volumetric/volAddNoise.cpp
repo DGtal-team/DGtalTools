@@ -15,7 +15,7 @@
  **/
 /**
  * @file volAddNoise
- * @ingroup converters
+ * @ingroup Volumetric
  * @author David Coeurjolly (\c david.coeurjolly@liris.cnrs.fr)
  *
  * @date 2015/03/24
@@ -48,7 +48,7 @@ using namespace DGtal;
  @page volAddNoise volAddNoise
  @brief  Adds Kanungo noise to a binary object with 0 values as background
  points and values >0 for the foreground ones.
-
+ @ingroup volumetrictools
  @b Usage:  volumetric/volAddNoise [OPTIONS] 1 [2]
 
  @b Allowed @b options @b are:
@@ -75,7 +75,7 @@ using namespace DGtal;
  # Converting in sdp to display:
  $ vol2sdp  AlNoisy0.4.vol AlNoisy0.4.sdp
  # displaying sequence of points:
- $ 3dSDPViewer  tmp.sdp
+ $ 3dSDPViewer AlNoisy0.4.sdp
  @endcode
 
  You should obtain such a visualization:

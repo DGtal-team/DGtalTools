@@ -15,7 +15,7 @@
  **/
 /**
  * @file heightfield2shading.cpp
- * @ingroup converters
+ * @ingroup Converters
  * @author Bertrand Kerautret (\c kerautre@loria.fr )
  * LORIA (CNRS, UMR 7503), University of Nancy, France
  *
@@ -50,6 +50,9 @@ using namespace DGtal;
 
 /**
  @page heightfield2shading heightfield2shading
+ @ingroup convertertools
+
+
  @brief Renders a 2D heightfield image into a shading image. 
  
  You can choose between lambertian model (diffuse reflectance) and

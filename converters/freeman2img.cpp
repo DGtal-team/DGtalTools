@@ -15,7 +15,7 @@
  **/
 /**
  * @file freeman2img.cpp
- * @ingroup Tools
+ * @ingroup Converters
  * @author Bertrand Kerautret (\c kerautre@loria.fr) and Jacques-Olivier Lachaud 
  * LORIA (CNRS, UMR 7503), University of Nancy, France 
  * (backport from ImaGene)
@@ -52,6 +52,7 @@ using namespace DGtal;
 
 
 /**
+ @ingroup convertertools
  @page freeman2img freeman2img
  @brief Transforms one or several freeman chains into a pgm file by filling their interior areas.
 

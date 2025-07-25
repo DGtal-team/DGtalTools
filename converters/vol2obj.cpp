@@ -45,7 +45,7 @@ using namespace Z3i;
  @brief Converts any volumetric file to an OBJ one. Each grid point with value
 between
  [@a thresholdMin,@a thresholdMax] is exported as a unit cube.
-
+ @ingroup convertertools
 
 @b Usage: ./converters/vol2obj [OPTIONS] 1 [2]
 

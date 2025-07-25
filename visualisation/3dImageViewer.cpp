@@ -15,7 +15,7 @@
  **/
 /**
  * @file 3dImageViewer.cpp
- * @ingroup visualisation
+ * @ingroup Visualisation
  * @author Bertrand Kerautret (\c kerautre@loria.fr )
  * LORIA (CNRS, UMR 7503), University of Nancy, France
  *
@@ -65,7 +65,8 @@ using namespace Z3i;
    @page Doc3dImageViewer 3dImageViewer
  
    @brief Displays volume file as a voxel set by using PolyscopeViewer.
-
+   @ingroup visualizationtools
+ 
    @b Usage:  3dImageViewer [OPTIONS] 1 [s]
 
    @b Allowed @b options @b are :

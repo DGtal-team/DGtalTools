@@ -18,7 +18,7 @@
  * @file genericNormalEstimator.cpp
  * @author Jacques-Olivier Lachaud (\c jacques-olivier.lachaud@univ-savoie.fr )
  * Laboratory of Mathematics (CNRS, UMR 5127), University of Savoie, France
- *
+ * @ingroup Estimators
  * @date 2014/05/02
  *
  * Estimates the normal vector field of an implicitly defined shape
@@ -70,7 +70,8 @@ using namespace DGtal;
  @page generic3dNormalEstimators generic3dNormalEstimators
  
  @brief  computes a normal vector field over a digitized 3D implicit surface for several estimators.
-
+ @ingroup estimatortools
+ 
  @b Usage:  ./estimators/generic3dNormalEstimators -p <polynomial> [options]
 
 Computes a normal vector field over a digitized 3D implicit surface
