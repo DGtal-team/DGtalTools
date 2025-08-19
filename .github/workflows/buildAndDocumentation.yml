@@ -166,5 +166,4 @@ jobs:
          mkdir build
          cd build
          cmake ..   -DDGtal_DIR=${{runner.workspace}}/DGtal/buildDGtal
-         wget --no-check-certificate -O "${{runner.workspace}}/DGtalTools/build/DGtal-tagfile"  http://dgtal.org/doc/tags/DGtal-tagfile;
          make doc > buildDoc.log
