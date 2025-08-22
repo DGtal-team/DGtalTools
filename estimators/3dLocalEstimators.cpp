@@ -1201,7 +1201,7 @@ int main( int argc, char** argv )
   bool lambda_optimized {false};
 
   app.add_option("--shape,-s", poly_str, "Shape") ->required();
-  app.add_option("--output,-o", file_export, "Output file", true) ->required();
+  app.add_option("--output,-o", file_export, "Output file") ->required();
   
   app.add_option("--radius,-r", radius,"Kernel radius for IntegralInvariant") ->required();
   app.add_option("--alpha",alpha, "Alpha parameter for Integral Invariant computation" );
