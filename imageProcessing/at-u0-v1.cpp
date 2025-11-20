@@ -15,7 +15,7 @@
  **/
 /**
  * @file at-u0-v1.cpp
- * @ingroup Tools
+ * @ingroup ImageProcessing
  * @author Jacques-Olivier Lachaud (\c jacques-olivier.lachaud@univ-savoie.fr )
  * Laboratory of Mathematics (CNRS, UMR 5127), University of Savoie, France
  * @author Marion Foare (\c marion.foare@univ-savoie.fr )
@@ -49,7 +49,7 @@
 @page DocATu0v1 imageProcessing/at-u0-v1 
 
 @brief Computes a piecewise smooth approximation of a grey-level or color image, by optimizing the Ambrosio-Tortorelli functional (with u a 0-form and v a 1-form).
-
+@ingroup imageprocessingtools
 @writers Marion Foare, Jacques-Olivier Lachaud
 
 @b Usage: at-u0-v1 -i [input.pgm]

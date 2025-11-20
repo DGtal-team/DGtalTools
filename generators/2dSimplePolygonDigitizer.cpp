@@ -15,7 +15,7 @@
  **/
 /**
  * @file 2dSimplePolygonDigitizer.cpp
- * @ingroup Tools
+ * @ingroup Generators
  * @author Phuc Ngo (\c hoai-diem-phuc.ngo@loria.fr)
  * LORIA - Lorraine Univeristy , France
  *
@@ -52,6 +52,8 @@ using namespace DGtal;
 /**
  @page 2dSimplePolygonDigitizer 2dSimplePolygonDigitizer
  @brief Compute the Gauss Digitization of a simple closed polyline (no hole or self-intersection).
+ @ingroup generatorstools
+
  
  The digitizer compute the set of integer points inside the input polyline.
  

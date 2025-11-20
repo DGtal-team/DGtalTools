@@ -16,7 +16,7 @@
 
 /**
  * @file 3dCurveViewer.cpp
- * @ingroup visualisationTools
+ * @ingroup Visualisation
  * @author Jacques-Olivier Lachaud (\c jacques-olivier.lachaud@univ-savoie.fr )
  * Laboratory of Mathematics (CNRS, UMR 5127), University of Savoie, France
  *
@@ -31,7 +31,7 @@
  @page Doc3dCurveViewer 3dCurveViewer
  
  @brief  Displays a 3D curve given as the input filename (with possibly projections and/or tangent information) by using PolyscopeViewer.
- 
+ @ingroup visualizationtools 
 
  @b Usage:  3dCurveViewer [options] input
  

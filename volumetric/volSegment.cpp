@@ -15,7 +15,7 @@
  **/
 /**
  * @file volSegment.cpp
- * @ingroup volumetric
+ * @ingroup Volumetric
  * @author Bertrand Kerautret (\c kerautre@loria.fr )
  * LORIA (CNRS, UMR 7503), University of Nancy, France
  *
@@ -53,7 +53,7 @@ using namespace DGtal;
  @page volSegment volSegment
  
  @brief Segments volumetric file from a simple threshold which can be set automatically from the otsu estimation.
-
+ @ingroup volumetrictools
 
  @b Usage: volSegment [input] [output]
 

@@ -15,7 +15,7 @@
  **/
 /**
  * @file LengthEstimator.cpp
- * @ingroup Tools
+ * @ingroup Estimators
  * @author Tristan Roussillon (\c tristan.roussillon@liris.cnrs.fr ) 
  * @author David Coeurjolly (\c david.coeurjolly@liris.cnrs.fr ) 
  * Laboratoire d'InfoRmatique en Image et Systèmes d'information - LIRIS (CNRS, UMR 5205), CNRS,
@@ -75,7 +75,8 @@ using namespace DGtal;
  @page lengthEstimators lengthEstimators
  
  @brief Generates multigrid length estimations of paramteric shapes using DGtal library.
-
+ @ingroup estimatortools
+ 
 It will output length estimations (and timings) using several algorithms for decreasing grid steps.
 
 @b Usage: 	LengthEstimators [options] --shape <shapeName>

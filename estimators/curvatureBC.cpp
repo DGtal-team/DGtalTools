@@ -15,7 +15,7 @@
  **/
 /**
  * @file curvatureBC.cpp
- * @ingroup estimators
+ * @ingroup Estimators
  * @author Tristan Roussillon (\c tristan.roussillon@liris.cnrs.fr ) 
  * Laboratoire d'InfoRmatique en Image et Systèmes d'information - LIRIS (CNRS, UMR 5205), CNRS,
  * France
@@ -59,7 +59,8 @@ using namespace DGtal;
  @page curvatureBC curvatureBC
  
  @brief Estimatates curvature using a binomial convolver.
-
+ @ingroup estimatortools
+ 
  @b Usage: curvatureBC [options] --input  \<fileName\> 
 
 

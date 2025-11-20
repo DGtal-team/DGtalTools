@@ -18,7 +18,7 @@
  * @file volFillInterior.cpp
  * @author David Coeurjolly (\c david.coeurjolly@liris.cnrs.fr )
  * Laboratoire d'InfoRmatique en Image et Systèmes d'information - LIRIS (CNRS, UMR 5205), CNRS, France
- *
+ * @ingroup Volumetric 
  * @date 2018/09/01
  *
  *
@@ -31,7 +31,7 @@
  
  @brief  Fills the interior of a voxel shape. The process can be sketched as follows: First the volume is filled in a
  breath-first approach from the point (0,0,0) (supposed to be exterior) using 6-adjacency. Then the complement is returned.
- 
+  @ingroup volumetrictools
  @b Usage:  volFillInterior  \<volFileName\>  \<volOutputFileName\> (vol, longvol, p3d format)
  
  

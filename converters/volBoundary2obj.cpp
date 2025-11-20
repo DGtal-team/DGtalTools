@@ -15,7 +15,7 @@
  **/
 /**
  * @file volBoundary2obj.cpp
- * @ingroup Tools
+ * @ingroup Converters
  * @author Jacques-Olivier Lachaud (\c jacques-olivier.lachaud@univ-savoie.fr )
  * Laboratory of Mathematics (CNRS, UMR 5127), University of Savoie, France
  * @author David Coeurjolly (\c david.coeurjolly@liris.cnrs.fr )
@@ -63,6 +63,7 @@ using namespace DGtal;
 /**
  @page volBoundary2obj volBoundary2obj
  @brief Export the boundary of a volume file to OBJ format. By default the resulting mesh is defined from the surfels of the surface elements, a triangulated (dual)
+ @ingroup convertertools
  
  @b Usage: converters/volBoundary2obj [OPTIONS] 1 [2]
  

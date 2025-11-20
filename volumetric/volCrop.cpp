@@ -17,7 +17,7 @@
  **/
 /**
  * @file volCrop.cpp
- * @ingroup volumetric/voltools
+ * @ingroup Volumetric
  * @author Bertrand Kerautret (\c kerautre@loria.fr )
  * LORIA (CNRS, UMR 7503), University of Nancy, France
  *
@@ -46,7 +46,8 @@ using namespace Z3i;
  @page volCrop volCrop
  
  @brief  Crops a 3D vol image from domain coordinates.
-
+ @ingroup volumetrictools
+ 
  @b Usage: 	 volCrop --input \<volFileName\> --o \<volOutputFileName\> (both files can be independently in vol, pgm3D, p3d format)
 
 

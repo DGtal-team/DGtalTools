@@ -15,7 +15,7 @@
  **/
 /**
  * @file 3dParametricCurveDigitizer.cpp
- * @ingroup Tools
+ * @ingroup Generators
  * @author Kacper Pluta (\c kacper.pluta@esiee.fr)
  * Laboratoire d'Informatique Gaspard-Monge - LIGM, France
  *
@@ -57,7 +57,7 @@ using namespace DGtal;
 /**
  @page 3dParametricCurveDigitizer 3dParametricCurveDigitizer
  @brief  Digitizes 3D parametric curves using DGtal library.
- 
+ @ingroup generatorstools 
 
 
  @b Usage:  3dParametricCurveDigitizer [options] --curve <curve> --param1 <double> --param2 <double> --param3 <double> --tstart <double> --tend <double> --step <double> --output <basename>

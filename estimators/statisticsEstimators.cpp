@@ -15,7 +15,7 @@
  **/
 /**
  * @file statisticsEstimators.cpp
- * @ingroup Tools
+ * @ingroup Estimators
  * @author Jeremy Levallois (\c jeremy.levallois@liris.cnrs.fr)
  * Laboratoire d'InfoRmatique en Image et Systèmes d'information - LIRIS (CNRS, UMR 5205), CNRS,
  * France
@@ -49,7 +49,8 @@ using namespace DGtal;
  @page statisticsEstimators statisticsEstimators
  
  @brief   Computes satistics (L1, L2, Loo) from results of two estimators.
-
+ @ingroup estimatortools
+ 
  @b Usage: 	statisticsEstimators --file1 <file1> --column1 <column1> --file2 <file2> --column2 <column2> --output <output>
 
 

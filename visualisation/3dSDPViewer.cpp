@@ -17,7 +17,7 @@
  * @file 3dSDPViewer.cpp
  * @author Bertrand Kerautret (\c kerautre@loria.fr )
  * LORIA (CNRS, UMR 7503), University of Nancy, France
- *
+ * @ingroup Visualisation
  * @date 2014/04/01
  *
  * An simple viewer to display 3d SDP files (sequence of discrete points).
@@ -53,7 +53,8 @@ typedef PolyscopeViewer<Z3i::Space, Z3i::KSpace> Viewer;
  @page Doc3DSDPViewer 3DSDPViewer
 
  @brief Displays a  sequence of 3d discrete points by using PolyscopeViewer.
-
+ @ingroup visualizationtools
+ 
  @b Usage:  3dSDPViewer [OPTIONS] 1 [f] [lineSize] [filterVectors]
 
  @b Allowed @b options @b are :
@@ -213,7 +214,11 @@ int main(int argc, char **argv)
   {
     pointColor.setRGBi(vectColorPt[0], vectColorPt[1], vectColorPt[2], vectColorPt[3]);
   }
-
+    stringstream s;
+    s << "3dSDPViewer - DGtalTools: ";
+    string bname = inputFileName.substr(inputFileName.find_last_of("/")+1,inputFileName.size()) ;
+    s << " " <<  bname ;
+    polyscope::options::programName = s.str();
 
   bool useUnitVector = constantNorm != 0.0;
 

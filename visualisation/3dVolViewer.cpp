@@ -17,7 +17,7 @@
  * @file 3dVolViewer.cpp
  * @author Bertrand Kerautret (\c kerautre@loria.fr )
  * LORIA (CNRS, UMR 7503), University of Lorraine, France
- *
+ * @ingroup Visualisation
  * @date 2011/01/04
  *
  *
@@ -50,6 +50,7 @@ using namespace Z3i;
  @page Doc3dVolViewer 3dVolViewer
  
  @brief Displays volume file as a voxel set by using PolyscopeViewer.
+ @ingroup visualizationtools
  
  The mode  specifies if you wish to see surface elements (BDRY), the inner
  voxels (INNER) or the outer voxels (OUTER) that touch the boundary.
