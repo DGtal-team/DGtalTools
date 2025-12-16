@@ -16,7 +16,7 @@
 
 /**
  * @file
- * @ingroup volumetric
+ * @ingroup Volumetric
  * @author Bertrand Kerautret (\c bertrand.kerautret@univ-lyon2.fr )
  * @author Jonas Lamy (\c jonas.lamy@univ-lyon2.fr )
  *
@@ -53,6 +53,7 @@ using namespace DGtal;
  @page volMask volMask
  
  @brief  Extracts a new image from the a mask image that represents the regions of the image which are selected and copied in the resulting image. Elements outside the regions defined by the mask are set to 0.
+ @ingroup volumetrictools
  
  @b Usage:   volMask [input]
  

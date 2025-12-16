@@ -16,6 +16,7 @@
 
 /**
  * @file raw2HDF5.cpp
+ * @ingroup Converters
  * @author Martial Tola (\c martial.tola@liris.cnrs.fr )
  * Laboratoire d'InfoRmatique en Image et Systèmes d'information - LIRIS (CNRS, UMR 5205), CNRS, France
  *
@@ -45,7 +46,8 @@ using namespace Z3i;
 /**
  @page raw2HDF5 raw2HDF5
  @brief  Converts a 3D 8-bit raw file to HDF5.
-
+ @ingroup convertertools
+ 
 @b Usage: raw2HDF5 [input] [output]
 
 @b Allowed @b options @b are:

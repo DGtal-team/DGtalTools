@@ -16,7 +16,7 @@
 
 /**
  * @file 3dCurveTangentEstimator.cpp
- * @ingroup visualisationTools
+ * @ingroup Estimators
  * @author Jacques-Olivier Lachaud (\c jacques-olivier.lachaud@univ-savoie.fr )
  * Laboratory of Mathematics (CNRS, UMR 5127), University of Savoie, France
  * @author Kacper Pluta (\c kacper.pluta@esiee.fr )
@@ -76,8 +76,10 @@ using namespace std;
 /**
  @page Doc3dCurveTangentEstimator 3dCurveTangentEstimator
  
- @brief This program estimates the tangent vector to a set of 3D integer points, which are supposed to approximate a 3D curve.
+ @brief This program estimates the tangent vector to a set of 3D integer points, which are supposed to approximate a 3D curv.e
+ @ingroup estimatortools
 
+ 
  @b Usage: ./estimators/3dCurveTangentEstimator [options] --input <filename>
 
 

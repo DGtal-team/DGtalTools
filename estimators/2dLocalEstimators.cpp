@@ -15,7 +15,7 @@
  **/
 /**
  * @file 2dLocalEstimators.cpp
- * @ingroup Tools
+ * @ingroup Estimator
  * @author Jacques-Olivier Lachaud (\c jacques-olivier.lachaud@univ-savoie.fr )
  * Laboratory of Mathematics (CNRS, UMR 5807), University of Savoie, France
  * @author David Coeurjolly (\c david.coeurjolly@liris.cnrs.fr)
@@ -90,6 +90,7 @@ using namespace DGtal;
  @page Doc2dLocalEstimators 2dLocalEstimators
  
  @brief Compares local estimators on implicit shapes using DGtal library.
+ @ingroup estimatortools
 
  @b Usage: 	2dlocalEstimators --output <output> --shape <shapeName> [required parameters] --estimators <binaryWord> --properties <binaryWord>
 

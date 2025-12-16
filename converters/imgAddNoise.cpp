@@ -15,7 +15,7 @@
  **/
 /**
  * @file imgAddNoise
- * @ingroup converters
+ *  @ingroup Converters
  * @author David Coeurjolly (\c david.coeurjolly@liris.cnrs.fr)
  *
  * @date 2015/03/24
@@ -47,7 +47,7 @@ using namespace DGtal;
 /**
  @page imgAddNoise imgAddNoise
  @brief  Adds noise (Kanungo's) to a binary 2D object.
-
+ @ingroup convertertools
 @b Usage: imgAddNoise [input] [output]
 
 @b Allowed @b options @b are:

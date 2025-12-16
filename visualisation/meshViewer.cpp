@@ -15,7 +15,7 @@
  **/
 /**
  * @file meshViewer.cpp
- * @ingroup visualisation
+ * @ingroup Visualisation
  * @author Bertrand Kerautret (\c kerautre@loria.fr )
  * LORIA (CNRS, UMR 7503), University of Nancy, France
  *
@@ -45,7 +45,8 @@ using namespace DGtal;
  @page meshViewer meshViewer
 
  @brief Displays OFF mesh file by using PolyscopeViewer.
-
+ @ingroup visualizationtools
+ 
  @b Usage:   meshViewer [input]
 
  @b Allowed @b options @b are :
@@ -94,6 +95,25 @@ using namespace DGtal;
  @ref meshViewer.cpp
 
  */
+
+
+
+// Variable globale pour activer/désactiver l'UI
+bool show_ui = false;
+
+void myCallback() {
+    ImGuiIO& io = ImGui::GetIO();
+
+    
+    // Si la touche W est enfoncée ce frame
+    if (ImGui::IsKeyPressed(ImGuiKey_W)) {
+        show_ui = !show_ui;
+        polyscope::options::buildGui = show_ui;
+    }
+
+  
+}
+
 
 int main(int argc, char **argv)
 {
@@ -183,9 +203,20 @@ int main(int argc, char **argv)
     sdpColorB = customColorSDP[2];
     sdpColorA = customColorSDP[3];
   }
+    
+    stringstream s;
+    s << "meshViewer - DGtalTools: ";
+    string name = inputFileNames[0].substr(inputFileNames[0].find_last_of("/")+1,inputFileNames[0].size()) ;
+    s << " " <<  name << " (W key to display settings)";
+    polyscope::options::programName = s.str();
+    polyscope::options::buildGui=false;
+    polyscope::options::groundPlaneMode = polyscope::GroundPlaneMode::None;
+ 
+    // Masquer le sol aussi
 
-  PolyscopeViewer viewer;
-  viewer.allowReuseList = true;
+    PolyscopeViewer viewer;
+
+    viewer.allowReuseList = true;
   trace.info() << "Importing mesh... ";
 
   std::vector<Mesh<DGtal::Z3i::RealPoint>> vectMesh;
@@ -348,6 +379,7 @@ int main(int argc, char **argv)
   stringstream ss;
   ss << "# faces: " << std::fixed << nbFaces << "    #vertex: " << nbVertex;
  trace.info() << "[display ready]" << std::endl;
+  polyscope::state::userCallback = myCallback;
 
   viewer.show();
   return 0;

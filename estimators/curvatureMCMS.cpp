@@ -15,7 +15,7 @@
  **/
 /**
  * @file curvatureMCMS.cpp
- * @ingroup estimators
+ * @ingroup Estimators
  * @author Tristan Roussillon (\c tristan.roussillon@liris.cnrs.fr ) 
  * Laboratoire d'InfoRmatique en Image et Systèmes d'information - LIRIS (CNRS, UMR 5205), CNRS,
  * France
@@ -62,7 +62,8 @@ using namespace std;
  @page curvatureMCMS curvatureMCMS
  
  @brief Estimates curvature using length of most centered segment computers.
-
+ @ingroup estimatortools
+ 
  @b Usage:  curvatureMCMS [options] --input  <fileName> 
 
 

@@ -15,8 +15,7 @@
  **/
 /**
  * @file mesh2vol.cpp
- * @ingroup converters
- *
+ * @ingroup Converters 
  * @date 2018/01/11
  *
  *
@@ -47,7 +46,8 @@ using namespace DGtal;
 /**
  @page mesh2vol
  @brief Convert a mesh file into a 26-separated or 6-separated voxelization in a given resolution grid.
-
+ @ingroup convertertools
+ 
 @b Usage: mesh2vol [input]
 
 @b Allowed @b options @b are:

@@ -16,7 +16,6 @@
 @page visualization Visualization
 @writers Bertrand Kerautret
 
-@section visualization_Doc Visualization
 
   - @ref volscope : a new generic VOL file viewer using polyscope.
   - @ref Doc2dCompImage : compare images and displays differences (squared and absolute differences). 

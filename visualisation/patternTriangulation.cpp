@@ -16,7 +16,7 @@
 
 /**
  * @file patternTriangulation.cpp
- * @ingroup visualisationTools
+ * @ingroup Visualisation
  * @author Tristan Roussillon (\c tristan.roussillon@liris.cnrs.fr )
  * Laboratoire d'InfoRmatique en Image et Systèmes d'information - LIRIS (CNRS, UMR 5205), CNRS, France
  *
@@ -64,7 +64,8 @@ using namespace std;
  @page patternTriangulation patternTriangulation
  
  @brief Draws the Delaunay triangulation of a pattern using DGtal library.
-
+ @ingroup visualizationtools
+ 
  @b Usage:   	patternTriangulation -a 5 -b 8 
 
  @b Allowed @b options @b are :

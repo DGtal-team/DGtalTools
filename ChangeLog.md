@@ -1,3 +1,8 @@
+# DGtalTools 2.1.beta
+
+- *build*
+  - Update CLI11 for 3dLocalEstimators (David Coeurjolly [473](https://github.com/DGtal-team/DGtalTools/pull/473)) 
+
 # DGtalTools 2.0 
 
 - *build*

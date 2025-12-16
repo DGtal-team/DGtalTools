@@ -15,7 +15,7 @@
  **/
 /**
  * @file itk2vol.cpp
- * @ingroup converters
+ * @ingroup Converters
  * @author Bertrand Kerautret (\c kerautre@loria.fr )
  * LORIA (CNRS, UMR 7503), University of Nancy, France
  *
@@ -44,7 +44,7 @@ using namespace DGtal;
 /**
  @page itk2vol itk2vol
  @brief  Converts itk file into a volumetric file (.vol, .pgm3d).
-
+ @ingroup convertertools
 @b Usage: itk2vol [input] [output]
 
 @b Allowed @b options @b are:

@@ -15,7 +15,7 @@
  **/
 /**
  * @file sdp2vol.cpp
- * @ingroup converters
+ * @ingroup Converters
  * @author Bertrand Kerautret (\c kerautre@loria.fr )
  * LORIA (CNRS, UMR 7503), University of Nancy, France
  *
@@ -42,8 +42,8 @@ using namespace DGtal;
 /**
  @page sdp2vol sdp2vol
  @brief  Converts digital set of points into a volumic file.
-
-@b Usage: sdp2vol [input] [output]
+ @ingroup convertertools
+ @b Usage: sdp2vol [input] [output]
 
 @b Allowed @b options @b are:
 

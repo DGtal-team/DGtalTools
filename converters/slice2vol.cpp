@@ -15,7 +15,7 @@
  **/
 /**
  * @file slice2vol.cpp
- * @ingroup surfaceTools
+ * @ingroup Converters
  * @author Bertrand Kerautret (\c kerautre@loria.fr )
  * LORIA (CNRS, UMR 7503), University of Nancy, France
  *
@@ -45,7 +45,7 @@ using namespace DGtal;
 /**
  @page slice2vol slice2vol
  @brief  Converts set of 2D images into volumetric file  (pgm3d, vol, longvol).
-
+ @ingroup convertertools
 @b Usage: slice2vol [input] [output]
 
 @b Allowed @b options @b are:

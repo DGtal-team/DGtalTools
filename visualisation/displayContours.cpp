@@ -15,7 +15,7 @@
  **/
 /**
  * @file displayContours.cpp
- * @ingroup visualization
+ * @ingroup Visualisation
  * @author Bertrand Kerautret (\c kerautre@loria.fr)
  * LORIA (CNRS, UMR 7503), University of Nancy, France
  *
@@ -76,7 +76,7 @@ using namespace DGtal;
  @page displayContours displayContours
  
  @brief Displays discrete contours.
- 
+ @ingroup visualizationtools 
  
  @b Usage:   	 displayContours [options] -i  <fileName>
  

@@ -6,25 +6,19 @@
  * @date 2016/05/09
  *
  * Documentation file for converters
- *
  * This file is part of the DGtal library.
  */
-
-
 //----------------------------------------
 /*!
 @page converters Converters 
 @writers Bertrand Kerautret
 
-@section converters Converters
 
 
 Utilities to convert various simple file formats:
 
 
   - @ref convertVol : a simple generic volume image converters (can process actually pgm3d, vol, longvol, raw (for writing)).
-
-
   - @ref dicom2vol : converts dicom file into a volumetric file (.vol, .longvol .pgm3d).
   - @ref freeman2img : transforms one or several freeman chains into a pgm file by filling their interior areas.
   - @ref freeman2sdp : transforms Freeman chain into a Sequence of Discrete Points.

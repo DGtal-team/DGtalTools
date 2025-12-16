@@ -19,7 +19,7 @@
  *
  * @author Bertrand Kerautret (\c kerautre@loria.fr )
  * LORIA (CNRS, UMR 7503), University of Nancy, France
- *
+ * @ingroup Volumetric 
  * @date 2013/07/20
  *
  * This file is part of the DGtal library.
@@ -30,7 +30,7 @@
  @page volImageMetrics volImageMetrics
  
  @brief  Applies basic image measures (RMSE, PSNR) between two volumetric images A and B.
-
+ @ingroup volumetrictools
  @b Usage:  volImageMetrics --volA \<volAFilename\> --volB \<volBFilename\> 
 
 

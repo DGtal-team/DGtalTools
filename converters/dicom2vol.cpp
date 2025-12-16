@@ -15,7 +15,7 @@
  **/
 /**
  * @file dicom2vol.cpp
- * @ingroup conerters
+ * @ingroup Converters
  * @author Bertrand Kerautret (\c kerautre@loria.fr )
  * LORIA (CNRS, UMR 7503), University of Nancy, France
  *
@@ -46,6 +46,9 @@ using namespace DGtal;
 
 /**
  @page dicom2vol dicom2vol
+ @ingroup convertertools
+
+
  @brief Converts dicom file into a volumetric file (.vol, .longvol .pgm3d).
 
 @b Usage: dicom2vol [input] [output]
