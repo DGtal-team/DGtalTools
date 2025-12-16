@@ -277,15 +277,16 @@ int main( int argc, char** argv )
     imagePtSup = Z2i::Point(image.domain().upperBound()[0],
                         image.domain().upperBound()[1]);
     maxPosSliceZ = maxHeight;
-    
+
     stringstream s;
     s << "3dHeightMapViewer - DGtalTools: ";
     string name = inputFileName.substr(inputFileName.find_last_of("/")+1,inputFileName.size()) ;
-    s << " " <<  name ;
+    s << " " <<  name << " (W key to display settings)";
     polyscope::options::programName = s.str();
     polyscope::options::buildGui=false;
     polyscope::options::groundPlaneMode = polyscope::GroundPlaneMode::None;
     polyscope::view::setNavigateStyle(polyscope::NavigateStyle::Free);
+
     PolyscopeViewer viewer;
     bool intAdjacency = true;
     polyscope::SurfaceMesh *slicePlane;
