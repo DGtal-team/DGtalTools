@@ -7,7 +7,7 @@ set(CMAKE_CXX_FLAGS_DEBUG "-w")
 
 CPMAddPackage(
   NAME polyscope
-  VERSION 1.2.0
+  VERSION 2.4.0
   GITHUB_REPOSITORY "nmwsharp/polyscope"
 )
 
