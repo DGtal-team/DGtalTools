@@ -38,7 +38,7 @@ message(STATUS "C++ standard set to ${CMAKE_CXX_STANDARD}")
 # -----------------------------------------------------------------------------
 message(STATUS "-------------------------------------------------------------------------------")
 message(STATUS "Checking if DGtal is installed:")
-FIND_PACKAGE(DGtal 2.0.0 REQUIRED)
+FIND_PACKAGE(DGtal 2.1.0 REQUIRED)
 INCLUDE_DIRECTORIES(${DGTAL_INCLUDE_DIRS})
 LINK_DIRECTORIES(${DGTAL_LIBRARY_DIRS})
 SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
