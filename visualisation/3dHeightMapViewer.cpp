@@ -63,6 +63,7 @@ using namespace Z3i;
  
  @brief  Displays 2D image as heightmap by using QGLviewer.
  @ingroup visualizationtools
+ 
  @b Usage:  3dImageViewer [options] input
  
  
