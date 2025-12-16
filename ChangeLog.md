@@ -1,4 +1,4 @@
-# DGtalTools 2.1.beta
+# DGtalTools 2.1
 
 - *build*
   - Update CLI11 for 3dLocalEstimators (David Coeurjolly [473](https://github.com/DGtal-team/DGtalTools/pull/473)) 
@@ -9,6 +9,7 @@
   - Update from DGtal 2.0 (cmake and tools env variable) (Bastien Doignies, [#467](https://github.com/DGtal-team/DGtalTools/pull/467))
   - Update CLI11 and cmake polyscope dependencies (Bertrand Kerautret [468](https://github.com/DGtal-team/DGtalTools/pull/468)) 
   - update 3dHeightMapViewer with polyscope use. (Bertrand Kerautret [471](https://github.com/DGtal-team/DGtalTools/pull/471)) 
+  - update 3DdImageViewer with polyscope use. (Bertrand Kerautret [470](https://github.com/DGtal-team/DGtalTools/pull/470)
 
 # DGtalTools 1.5 
 
