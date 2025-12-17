@@ -10,7 +10,7 @@ env:
   # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
   BUILD_TYPE:   Release
   CONFIG_GLOBAL: 
-  CONFIG_LINUX:  -DWITH_MAGICK=true -DWITH_GMP=true -DDGTAL_WITH_FFTW3=true -DWARNING_AS_ERROR=ON -DDGTAL_WITH_HDF5=true -DWITH_QGLVIEWER=true -DDGTAL_WITH_CAIRO=true  -DDGTAL_WITH_EIGEN=true -DDGTAL_ENABLE_FLOATING_POINT_EXCEPTIONS=true
+  CONFIG_LINUX:  -DWITH_MAGICK=true -DWITH_GMP=true -DDGTAL_WITH_FFTW3=true -DWARNING_AS_ERROR=ON -DDGTAL_WITH_HDF5=true  -DDGTAL_WITH_CAIRO=true  -DDGTAL_WITH_EIGEN=true -DDGTAL_ENABLE_FLOATING_POINT_EXCEPTIONS=true 
   CONFIG_MAC:    -DDGTAL_WITH_EIGEN=true -DWITH_GMP=tue
   CONFIG_WINDOWS: -DDGTAL_WITH_OPENMP=true  -DDISABLE_POLYSCOPE=ON 
 
@@ -33,7 +33,7 @@ jobs:
        if: matrix.os == 'ubuntu-latest'
        run: | 
            sudo apt-get update
-           sudo apt-get install zsh libqglviewer-dev-qt5 libboost-dev libeigen3-dev ninja-build libhdf5-serial-dev libboost-dev libcairo2-dev libgmp-dev libgraphicsmagick++1-dev libfftw3-dev xorg-dev  libglu1-mesa-dev freeglut3-dev mesa-common-dev
+           sudo apt-get install zsh  libboost-dev libeigen3-dev ninja-build libhdf5-serial-dev libboost-dev libcairo2-dev libgmp-dev libgraphicsmagick++1-dev libfftw3-dev xorg-dev  libglu1-mesa-dev freeglut3-dev mesa-common-dev
 
      - name: Get white list tools
        run : |
@@ -104,8 +104,8 @@ jobs:
            conan install . --build=missing -s:a compiler.cppstd=20
            mkdir buildDGtal
            cd buildDGtal
-           echo  cmake .. -DCMAKE_POLICY_DEFAULT_CMP0091=NEW  -DCMAKE_BUILD_TYPE=$BUILD_TYPE $CONFIG_WINDOWS -DCMAKE_TOOLCHAIN_FILE="conan_toolchain.cmake" -DBUILD_EXAMPLES=false -DBUILD_TESTING=false 
-           cmake .. -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_BUILD_TYPE=$BUILD_TYPE $CONFIG_WINDOWS -DCMAKE_TOOLCHAIN_FILE="conan_toolchain.cmake" -DBUILD_EXAMPLES=false -DBUILD_TESTING=false  
+           echo  cmake .. -DCMAKE_POLICY_DEFAULT_CMP0091=NEW  -DCMAKE_BUILD_TYPE=$BUILD_TYPE $CONFIG_WINDOWS -DCMAKE_TOOLCHAIN_FILE="conan_toolchain.cmake" -DBUILD_EXAMPLES=false -DBUILD_TESTING=false -DDGTAL_WITH_POLYSCOPE_VIEWER=true
+           cmake .. -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_BUILD_TYPE=$BUILD_TYPE $CONFIG_WINDOWS -DCMAKE_TOOLCHAIN_FILE="conan_toolchain.cmake" -DBUILD_EXAMPLES=false -DBUILD_TESTING=false -DDGTAL_WITH_POLYSCOPE_VIEWER=true
            cmake --build . --config Release --parallel 3
      - name: Configure CMake (linux)
        if: matrix.os == 'ubuntu-latest'
