@@ -88,17 +88,18 @@ Actually the DGTalTools project is organized as follows:
 
 
    <tr bgcolor="#FAFFFA">
-    <td align = center colspan="3" vertical-align=middle> Example of tools of section @ref visualization_Doc : </td>
+    <td align="center" colspan="3" vertical-align=middle> Example of tools of section @ref visualization_Doc : </td>
    </tr>
    <tr>
-   <td><img height=150px src="res3dCurvatureViewerNoise.png"> </td>
-   <td><img height=150px src="res3dVolViewer.png"></td>
-
+   <td align="center"><img height=150px src="res3dCurvatureViewerNoise.png"> </td>
+   <td align="center"><img height=150px src="res3dVolViewer.png"></td>
+   <td align="center"><img height=150px src="res3dImageViewer.png"></td>
    </tr>
       <tr>
-           <td align = center>@ref Doc3DCurvatureViewerNoise </td>
-           <td align = center>@ref Doc3dVolViewer </td>
-   </tr>
+           <td align="center">@ref Doc3DCurvatureViewerNoise </td>
+           <td align="center">@ref Doc3dVolViewer </td>
+           <td align="center">@ref Doc3dImageViewer_sec</td>
+
 
 
    <tr bgcolor="#FAFFFA">
