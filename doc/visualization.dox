@@ -17,54 +17,54 @@
 @writers Bertrand Kerautret
 
 
-  - @ref volscope : a new generic VOL file viewer using polyscope.
-  - @ref Doc2dCompImage : compare images and displays differences (squared and absolute differences). 
-  - @ref CompSurfelData : computes generic scalar surfel data comparisons (squared error) ( given from an input data file and from a reference one). 
-  - @ref Doc3DCurvatureViewer :  permits to compute and visualize mean or gaussian curvature of binary shapes.
-  - @ref Doc3DCurvatureViewerNoise :  same as @ref Doc3DCurvatureViewer, but allows to add some noise to objects. 
-  - @ref Doc3dCurveViewer : displays a 3D curve given as the input filename (with possibly projections and/or tangent information) by using PolyscopeViewer.
-  - @ref Doc3dDisplaySurfelData : displays surfel data from SDP file with color attributes given as scalar interpreted as color. 
-  - @ref Doc3dHeightMapViewer : displays 2D image as heightmap by using PolyscopeViewer.
-  - @ref Doc3dImageViewer : displays volume file as a voxel set by using PolyscopeViewer.
-  - @ref Doc3dImplicitSurfaceExtractorBy4DExtension : computes the zero level set of the given polynomial.
-  - @ref Doc3dImplicitSurfaceExtractorByThickening : computes the zero level set of the given polynomial.
-  - @ref Doc3DSDPViewer : displays sequence of 3d discrete points by using PolyscopeViewer.
-  - @ref Doc3dVolBoundaryViewer : displays the boundary of a volume file by using PolyscopeViewer. 
-  - @ref Doc3dVolViewer : displays volume file as a voxel set by using PolyscopeViewer.
-  - @ref displayContours : displays discrete contours.
-  - @ref meshViewer : displays OFF mesh file by using PolyscopeViewer.
-  - @ref patternTriangulation : draws the Delaunay triangulation of a pattern using DGtal library.
+  - @ref DocVolscope_sec : a new generic VOL file viewer using polyscope.
+  - @ref Doc2dCompImage_sec : compare images and displays differences (squared and absolute differences). 
+  - @ref Doc3DCompSurfelData_sec : computes generic scalar surfel data comparisons (squared error) ( given from an input data file and from a reference one). 
+  - @ref Doc3DCurvatureViewer_sec :  permits to compute and visualize mean or gaussian curvature of binary shapes.
+  - @ref Doc3DCurvatureViewerNoise_sec :  same as @ref Doc3DCurvatureViewer, but allows to add some noise to objects. 
+  - @ref Doc3dCurveViewer_sec : displays a 3D curve given as the input filename (with possibly projections and/or tangent information) by using PolyscopeViewer.
+  - @ref Doc3dDisplaySurfelData_sec : displays surfel data from SDP file with color attributes given as scalar interpreted as color. 
+  - @ref Doc3dHeightMapViewer_sec : displays 2D image as heightmap by using PolyscopeViewer.
+  - @ref Doc3dImageViewer_sec : displays volume file as a voxel set by using PolyscopeViewer.
+  - @ref Doc3dImplicitSurfaceExtractorBy4DExtension_sec : computes the zero level set of the given polynomial.
+  - @ref Doc3dImplicitSurfaceExtractorByThickening_sec : computes the zero level set of the given polynomial.
+  - @ref Doc3DSDPViewer_sec : displays sequence of 3d discrete points by using PolyscopeViewer.
+  - @ref Doc3dVolBoundaryViewer_sec : displays the boundary of a volume file by using PolyscopeViewer. 
+  - @ref Doc3dVolViewer_sec : displays volume file as a voxel set by using PolyscopeViewer.
+  - @ref displayContours_sec : displays discrete contours.
+  - @ref meshViewer_sec : displays OFF mesh file by using PolyscopeViewer.
+  - @ref patternTriangulation_sec : draws the Delaunay triangulation of a pattern using DGtal library.
 
 
 
 <center>
 <table>
   <tr>
-        <td> <img height=200px src="res3dCurvatureViewer.png"> </td>
-        <td><img height=200px src="res3dCurvatureViewerNoise.png"></td>
-        <td><img height=200px src="res3dHeightMapViewer.png"></td>        
-        <td><img height=200px src="res3dImageViewer.png"></td>        
+        <td align = center> <img height=200px src="res3dCurvatureViewer.png"> </td>
+        <td align = center><img height=200px src="res3dCurvatureViewerNoise.png"></td>
+        <td align = center><img height=200px src="res3dHeightMapViewer.png"></td>
 </tr>
 <tr>
-        <td align = center>@ref Doc3DCurvatureViewer </td>
-        <td align = center>@ref Doc3DCurvatureViewerNoise </td>   
-        <td align = center>@ref Doc3dHeightMapViewer</td>
-        <td align = center>@ref Doc3dImageViewer</td>
+        <td align = center>@ref  Doc3DCurvatureViewer_sec </td>
+        <td align = center>@ref Doc3DCurvatureViewerNoise_sec </td>
+        <td align = center>@ref Doc3dHeightMapViewer_sec</td>
+
 </tr>
-  <tr>
-        <td> <img height=200px src="res3dImplicitSurfaceExtractorByThickening.png"> </td>
-        <td><img height=200px src="res3dVolViewer.png"></td>
-        <td><img height=200px src="resDisplayContours.png"></td>        
+
+<tr>
+<td><img height=200px src="res3dImageViewer.png"></td>
+<td><img height=200px src="res3dVolViewer.png"></td>
+<td><img height=200px src="res3dImplicitSurfaceExtractorByThickening.png"></td>
 </tr>
 <tr>
-        <td align = center>@ref Doc3dImplicitSurfaceExtractorByThickening </td>
-        <td align = center>@ref Doc3dVolViewer </td>   
-        <td align = center>@ref displayContours</td>
+<td align = center>@ref Doc3dImageViewer_sec</td>
+<td align = center>@ref Doc3dVolViewer_sec</td>
+<td align = center>@ref Doc3dImplicitSurfaceExtractorByThickening_sec</td>
 </tr>
-
-
 </table>
 </center>
 
 
-*/
+
+
+**/

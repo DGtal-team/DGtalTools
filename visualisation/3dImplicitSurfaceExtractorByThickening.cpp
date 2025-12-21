@@ -30,6 +30,7 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 #include <iostream>
+#include <sstream>
 #include <map>
 #include "CLI11.hpp"
 
@@ -57,7 +58,7 @@ using namespace DGtal;
 
 /**
  @page  Doc3dImplicitSurfaceExtractorByThickening 3dImplicitSurfaceExtractorByThickening
- 
+ @section  Doc3dImplicitSurfaceExtractorByThickening_sec 3dImplicitSurfaceExtractorByThickening
  @brief Computes the zero level set of the given polynomial.
  @ingroup visualizationtools
 
@@ -498,8 +499,15 @@ int main( int argc, char** argv )
   trace.endBlock();
 
    //-------------- View surface -------------------------------------------
+  stringstream s;
+  s << "3dImplicitSurfaceExtractorByThickening - DGtalTools";
+  
+  polyscope::options::programName = s.str();
+  polyscope::view::setNavigateStyle(polyscope::NavigateStyle::Free);
+
   PolyscopeViewer<Space3,KSpace3> viewer( K3 );
   viewer << mesh;
+
   // Display lines that are not in the mesh.
   for ( CellMapConstIterator it = complex3.begin( 1 ), itE = complex3.end( 1 ); it != itE; ++it )
     {

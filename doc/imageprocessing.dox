@@ -18,14 +18,14 @@
 
 @section imageprocessing_Modules Modules of package image processing
 
- - \ref moduleAT (Marion Foare, Jacques-Olivier Lachaud)
+ - \ref moduleAT_sec (Marion Foare, Jacques-Olivier Lachaud)
 
 
 @section imageprocessing_Doc Image restoration
 
-  - @ref DocATu2v0 : Computes a piecewise smooth approximation of an image, by optimizing the Ambrosio-Tortorelli functional (with u a 2-form and v a 0-form).
-  - @ref DocATVu2v0 : Computes a piecewise smooth approximation of an image, by optimizing a variant of the Ambrosio-Tortorelli functional (with u a 2-form and v a 0-form), which uses the Laplacian of v instead of its gradient for length approximation.
-  - @ref DocATu0v1 : Computes a piecewise smooth approximation of an image, by optimizing the Ambrosio-Tortorelli functional (with u a 0-form and v a 1-form).
+  - @ref DocATu2v0_sec : Computes a piecewise smooth approximation of an image, by optimizing the Ambrosio-Tortorelli functional (with u a 2-form and v a 0-form).
+  - @ref DocATVu2v0_sec : Computes a piecewise smooth approximation of an image, by optimizing a variant of the Ambrosio-Tortorelli functional (with u a 2-form and v a 0-form), which uses the Laplacian of v instead of its gradient for length approximation.
+  - @ref DocATu0v1_sec : Computes a piecewise smooth approximation of an image, by optimizing the Ambrosio-Tortorelli functional (with u a 0-form and v a 1-form).
 
 
 <center>

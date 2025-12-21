@@ -26,6 +26,7 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 #include <iostream>
+#include <sstream>
 
 #include "DGtal/base/Common.h"
 #include "DGtal/base/BasicFunctors.h"
@@ -48,6 +49,7 @@ using namespace Z3i;
 
 /**
  @page Doc3dVolViewer 3dVolViewer
+ @section Doc3dVolViewer_sec 3dVolViewer
  
  @brief Displays volume file as a voxel set by using PolyscopeViewer.
  @ingroup visualizationtools
@@ -125,6 +127,23 @@ processDisplay(PolyscopeViewer<> &viewer,  TImage &image,
 
 
 
+// Variable globale pour activer/désactiver l'UI
+bool show_ui = false;
+
+void myCallback() {
+    ImGuiIO& io = ImGui::GetIO();
+
+    
+    // Si la touche W est enfoncée ce frame
+    if (ImGui::IsKeyPressed(ImGuiKey_W)) {
+        show_ui = !show_ui;
+        polyscope::options::buildGui = show_ui;
+    }
+
+  
+}
+
+
 
 int main( int argc, char** argv )
 {
@@ -173,9 +192,18 @@ int main( int argc, char** argv )
     app.get_formatter()->column_width(40);
   CLI11_PARSE(app, argc, argv);
   // END parse command line using CLI ----------------------------------------------
-  
+  stringstream s;
+  s << "3dVolViewer - DGtalTools: ";
+  string name = inputFileName.substr(inputFileName.find_last_of("/")+1,inputFileName.size()) ;
+  s << " " <<  name << " (W key to display settings)";
+  polyscope::options::programName = s.str();
+  polyscope::options::buildGui=false;
+  polyscope::options::groundPlaneMode = polyscope::GroundPlaneMode::None;
+  polyscope::view::setNavigateStyle(polyscope::NavigateStyle::Free);
+ 
   Viewer viewer;
   viewer.allowReuseList = true;
+ 
   typedef ImageContainerBySTLVector < Z3i::Domain,  double > Image3D_D;
   typedef ImageContainerBySTLVector < Z3i::Domain,  int > Image3D_I;
   typedef ImageSelector<Domain, unsigned char>::Type Image;
@@ -249,6 +277,7 @@ int main( int argc, char** argv )
    
   // First display transparency improve
   trace.info() << "[display ready]"<< std::endl;
+  polyscope::state::userCallback = myCallback;
   viewer.show();
   return 0;
 }

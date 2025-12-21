@@ -74,7 +74,7 @@ using namespace DGtal;
 
 /**
  @page displayContours displayContours
- 
+ @section displayContours_sec displayContours
  @brief Displays discrete contours.
  @ingroup visualizationtools 
  

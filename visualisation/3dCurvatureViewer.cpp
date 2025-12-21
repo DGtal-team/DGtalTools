@@ -28,6 +28,7 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 #include <iostream>
+#include <sstream>
 #include "DGtal/base/Common.h"
 #include <cstring>
 
@@ -63,6 +64,7 @@ using namespace functors;
 
 /**
  @page Doc3DCurvatureViewer 3DCurvatureViewer
+ @section Doc3DCurvatureViewer_sec 3DCurvatureViewer
 
  @brief  Computes and visualizes mean or gaussian curvature of binary shapes.
  @ingroup visualizationtools
@@ -142,6 +144,16 @@ const Color  AXIS_COLOR_BLUE( 20, 20, 200, 255 );
 const double AXIS_LINESIZE = 0.05;
 ///////////////////////////////////////////////////////////////////////////////
 
+// used to enable/disable the polyscope UI
+bool show_ui = false;
+void myCallback() {
+    ImGuiIO& io = ImGui::GetIO();
+    if (ImGui::IsKeyPressed(ImGuiKey_W)) {
+        show_ui = !show_ui;
+        polyscope::options::buildGui = show_ui;
+    }
+}
+
 /**
  * Missing parameter error message.
  *
@@ -170,7 +182,7 @@ int main( int argc, char** argv )
   std::vector< double> vectScale;
   bool normalization {false};
   
-  app.description("Visualisation of 3d curvature from .vol file using curvature from Integral Invarian\nBasic usage:\n \t3dCurvatureViewerNoise file.vol --radius 5 --mode mean  \n Below are the different available modes: \n\t - \"mean\" for the mean curvature \n \t - \"mean\" for the mean curvature\n\t - \"gaussian\" for the Gaussian curvature\n\t - \"k1\" for the first principal curvature\n\t - \"k2\" for the second principal curvature\n\t - \"prindir1\" for the first principal curvature direction\n\t - \"prindir2\" for the second principal curvature direction\n\t - \"normal\" for the normal vector");
+  app.description("Visualisation of 3d curvature from .vol file using curvature from Integral Invarian\nBasic usage:\n \t3dCurvatureViewer file.vol --radius 5 --mode mean  \n Below are the different available modes: \n\t - \"mean\" for the mean curvature \n \t - \"mean\" for the mean curvature\n\t - \"gaussian\" for the Gaussian curvature\n\t - \"k1\" for the first principal curvature\n\t - \"k2\" for the second principal curvature\n\t - \"prindir1\" for the first principal curvature direction\n\t - \"prindir2\" for the second principal curvature direction\n\t - \"normal\" for the normal vector\n Example: 3dCurvatureViewer --radius 20 --mode mean  ${DGtal}/examples/samples/lobster.vol -l 110 ");
 
    
    
@@ -298,10 +310,18 @@ int main( int argc, char** argv )
       trace.info()<<std::endl;
       exit(2);
     }
-
+  std::stringstream s;
+  s << "3dCurvatureViewer - DGtalTools: ";
+  std::string name = inputFileName.substr(inputFileName.find_last_of("/")+1,inputFileName.size()) ;
+  s << " " <<  name <<  " (W key to display settings)" ;
+  polyscope::options::programName = s.str();
+  polyscope::options::buildGui=false;
+  polyscope::options::groundPlaneMode = polyscope::GroundPlaneMode::None;
+  
   typedef PolyscopeViewer<Z3i::Space, Z3i::KSpace> Viewer;
   Viewer viewer( K );
   viewer.allowReuseList = true;
+  polyscope::state::userCallback = myCallback;
 
   for( unsigned int i = 0; i<vectConnectedSCell.size(); ++i )
     {

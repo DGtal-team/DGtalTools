@@ -28,6 +28,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #include <iostream>
+#include <sstream>
 #include <stdio.h>
 
 #include "DGtal/base/Common.h"
@@ -57,6 +58,7 @@ using namespace Z3i;
 
 /**
  @page Doc3dDisplaySurfelData 3dDisplaySurfelData
+ @section Doc3dDisplaySurfelData_sec 3dDisplaySurfelData
  
  @brief  Displays surfel data from SDP file with color attributes given as scalar interpreted as color. 
  @ingroup visualizationtools
@@ -123,17 +125,17 @@ getBoundingUpperAndLowerPoint(const std::vector<Point> &vectorPt, Point &ptLower
    {
       ptLower[2] =vectorPt.at(i)[2];
     }
-   if(vectorPt.at(i)[0] < ptLower[0])
+   if(vectorPt.at(i)[0] > ptUpper[0])
    {
-      ptLower[0] = vectorPt.at(i)[0];
+      ptUpper[0] = vectorPt.at(i)[0];
    }
-   if(vectorPt.at(i)[1] < ptLower[1])
+   if(vectorPt.at(i)[1] > ptUpper[1])
    {
-     ptLower[1] = vectorPt.at(i)[1];
+     ptUpper[1] = vectorPt.at(i)[1];
     }
-   if(vectorPt.at(i)[2] < ptLower[2])
+   if(vectorPt.at(i)[2] > ptUpper[2])
    {
-      ptLower[2] =vectorPt.at(i)[2];
+      ptUpper[2] =vectorPt.at(i)[2];
     }
   }
 }
@@ -148,7 +150,7 @@ int main( int argc, char** argv )
   CLI::App app;
   std::string inputFileName;
   unsigned int labelIndex;
-  std::vector<unsigned int> vectSDPindex {0, 1, 2};
+  std::vector<unsigned int> vectSDPindex {0, 1, 2, 3};
   
   app.description("Display surfel data from SDP file with color attributes given as scalar interpreted as color. \n Example of use: \n First you have to generate a file containing a set of surfels with, for instance, their associated curvature values: \n 3dCurvatureViewer -i $DGtal/examples/samples/cat10.vol -r 3 --exportOnly -d curvatureCat10R3.dat \n Then, we can use this tool to display the set of surfel with their associated values: 3dDisplaySurfelData -i curvatureCat10R3.dat");
   app.add_option("-i,--input,1", inputFileName, "input file: sdp (sequence of discrete points with attribute)" )
@@ -187,6 +189,12 @@ int main( int argc, char** argv )
 
   //-------------------------
   // Displaying input with color given from scalar values
+
+  stringstream s;
+  s << "3dDisplaySurfelData - DGtalTools";
+  
+  polyscope::options::programName = s.str();
+  polyscope::view::setNavigateStyle(polyscope::NavigateStyle::Free);
 
   typedef PolyscopeViewer<> Viewer;
 

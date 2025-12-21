@@ -43,6 +43,7 @@ using namespace DGtal;
 
 /**
  @page meshViewer meshViewer
+ @section meshViewer_sec meshViewer
 
  @brief Displays OFF mesh file by using PolyscopeViewer.
  @ingroup visualizationtools
@@ -378,7 +379,7 @@ int main(int argc, char **argv)
   }
   stringstream ss;
   ss << "# faces: " << std::fixed << nbFaces << "    #vertex: " << nbVertex;
- trace.info() << "[display ready]" << std::endl;
+  trace.info() << "[display ready]" << std::endl;
   polyscope::state::userCallback = myCallback;
 
   viewer.show();

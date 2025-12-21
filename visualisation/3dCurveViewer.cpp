@@ -29,6 +29,7 @@
 
 /**
  @page Doc3dCurveViewer 3dCurveViewer
+ @section Doc3dCurveViewer_sec 3dCurveViewer
  
  @brief  Displays a 3D curve given as the input filename (with possibly projections and/or tangent information) by using PolyscopeViewer.
  @ingroup visualizationtools 
@@ -76,6 +77,7 @@
 
 
 #include <iostream>
+#include <sstream>
 #include <iterator>
 #include <cstdio>
 #include <cmath>
@@ -415,6 +417,11 @@ int main(int argc, char **argv)
   inputStream.close();
 
   // start viewer
+  stringstream s;
+  s << "3dCurveViewer - DGtalTools";
+  polyscope::options::programName = s.str();
+  polyscope::view::setNavigateStyle(polyscope::NavigateStyle::Free);
+
   PolyscopeViewer<> viewer;
   trace.beginBlock ( "Tool 3dCurveViewer" );
 

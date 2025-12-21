@@ -25,6 +25,8 @@ own source code (in complement of DGtal tutorial https://dgtal-team.github.io/do
 More Information
 ----------------
 * Related DGtalTools-contrib: https://github.com/DGtal-team/DGtalTools-contrib
+* Release 2.1 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.17953751.svg)](https://doi.org/10.5281/zenodo.17953751)
+* Release 2.0 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.17953693.svg)](https://doi.org/10.5281/zenodo.17953693)
 * Release 1.4 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.11577409.svg)](https://doi.org/10.5281/zenodo.11577409)
 * Release 1.3 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.7395984.svg)](https://doi.org/10.5281/zenodo.7395984)
 * Release 1.2 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.4893597.svg)](https://doi.org/10.5281/zenodo.4893597)
@@ -90,7 +92,7 @@ Galleries
    <td> <img height=150 src="https://cloud.githubusercontent.com/assets/772865/6914104/6d25be78-d787-11e4-9433-2a834fc4a0af.png"> </td>
    </tr>
    <tr>
-   <td align=center > <a href="https://dgtal-team.github.io/doctools-nightly/vol2heightfield.html">vol2heightmap</a></td>
+   <td align=center > <a href="https://dgtal-team.github.io/doctools-nightly/group__convertertools.html">vol2heightmap</a></td>
    <td align=center ><a href="https://dgtal-team.github.io/doctools-nightly/heightfield2vol.html">heightfield2vol</a></td>
    <td align=center ><a href="https://dgtal-team.github.io/doctools-nightly/imgAddNoise.html">imgAddNoise</a></td> 
    <td align=center ><a href="https://dgtal-team.github.io/doctools-nightly/volAddNoise.html">volAddNoise</a></td>

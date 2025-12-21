@@ -31,6 +31,7 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 #include <iostream>
+#include <sstream>
 #include <map>
 #include "CLI11.hpp"
 
@@ -58,7 +59,7 @@ using namespace DGtal;
 
 /**
  @page Doc3dImplicitSurfaceExtractorBy4DExtension 3dImplicitSurfaceExtractorBy4DExtension
- 
+ @section Doc3dImplicitSurfaceExtractorBy4DExtension_sec 3dImplicitSurfaceExtractorBy4DExtension
  @brief Computes the zero level set of the given polynomial.
  @ingroup visualizationtools
  
@@ -692,6 +693,11 @@ int main( int argc, char** argv )
   KSpace3 K3;
   K3.init( Point3( low4[ 0 ], low4[ 1 ], low4[ 2 ] ),
            Point3( up4 [ 0 ], up4 [ 1 ], up4 [ 2 ] ), true );
+  stringstream s;
+  s << "3dImplicitSurfaceExtractorBy4DExtension - DGtalTools";
+  
+  polyscope::options::programName = s.str();
+  polyscope::view::setNavigateStyle(polyscope::NavigateStyle::Free);
 
   PolyscopeViewer<Space3,KSpace3> viewer( K3 );
   viewer << mesh;
