@@ -56,7 +56,7 @@ using namespace Z3i;
 
 /**
  @page homotopicThinning3D homotopicThinning3D
- 
+ @section homotopicThinning3D_sec homotopicThinning3D 
  @brief Applies an homotopic thinning of a 3d image file (vol,longvol,pgm3d...) with 3D viewer.
 
  @b Usage: homotopicThinning3d [options]  <3dImageFileName>  {vol,longvol,pgm3d...}
@@ -231,9 +231,10 @@ int main( int argc, char** argv )
   trace.info() << "Skeleton--> "<<S<<std::endl;
 
   // Display by using two different list to manage OpenGL transparency.
-    polyscope::options::programName = "DGtalTools: homotopicThinning3D";
-
-    PolyscopeViewer<> viewer;
+  polyscope::options::programName = "DGtalTools: homotopicThinning3D";
+  polyscope::view::setNavigateStyle(polyscope::NavigateStyle::Free);
+    
+  PolyscopeViewer<> viewer;
 
     
 

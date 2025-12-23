@@ -44,7 +44,7 @@ using namespace Z3i;
 
 /**
  @page volCrop volCrop
- 
+ @section volCrop_sec volCrop 
  @brief  Crops a 3D vol image from domain coordinates.
  @ingroup volumetrictools
  
@@ -73,7 +73,7 @@ using namespace Z3i;
 
  @code
 $ volCrop --xMin 50 --yMin 50 --zMin 10 --xMax 150 --yMax 150 --zMax 50 -i ${DGtal}/examples/samples/lobster.vol -o croppedLobster.vol 
-$ 3dImageViewer -i croppedLobster.vol
+$ ./visualisation/3dVolViewer croppedLobster.vol -m 60
  @endcode
 
 

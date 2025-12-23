@@ -131,6 +131,24 @@ If you need to display an important number of points, you can use the primitive 
 
  */
 
+// Variable globale pour activer/désactiver l'UI
+bool show_ui = false;
+
+void myCallback() {
+    ImGuiIO& io = ImGui::GetIO();
+
+    
+    // Si la touche W est enfoncée ce frame
+    if (ImGui::IsKeyPressed(ImGuiKey_W)) {
+        show_ui = !show_ui;
+        polyscope::options::buildGui = show_ui;
+    }
+
+  
+}
+
+
+
 int main(int argc, char **argv)
 {
   // parse command line using CLI ----------------------------------------------
@@ -216,7 +234,11 @@ int main(int argc, char **argv)
     polyscope::options::programName = s.str();
 
   bool useUnitVector = constantNorm != 0.0;
-
+  polyscope::view::setNavigateStyle(polyscope::NavigateStyle::Free);
+  polyscope::options::groundPlaneMode = polyscope::GroundPlaneMode::None;
+  polyscope::options::buildGui=false;
+  
+  
   typedef PolyscopeViewer<Z3i::Space, Z3i::KSpace> Viewer;
   Z3i::KSpace K;
   Viewer viewer(K);
@@ -261,19 +283,19 @@ int main(int argc, char **argv)
     {
       if (importColors)
       {
-        Color col = vectColors[i];
-        viewer.drawColor(col);
+        pointColor = vectColors[i];
+
       }
       else if (importColorLabels)
       {
         unsigned int index = vectColorLabels[i];
-        Color col = aColorMap(index);
-        viewer.drawColor(col);
-      }
-
-      viewer << Z3i::Point((int)vectVoxels.at(i)[0],
-                           (int)vectVoxels.at(i)[1],
-                           (int)vectVoxels.at(i)[2]);
+        pointColor = aColorMap(index);
+      }      
+      viewer << WithQuantity(Z3i::Point((int)vectVoxels.at(i)[0],
+					(int)vectVoxels.at(i)[1],
+					(int)vectVoxels.at(i)[2]), "label", pointColor);
+      
+      
     }
 
     viewer << lineColor;
@@ -334,7 +356,7 @@ int main(int argc, char **argv)
         viewer << mesh;
       }
     }
-
+    polyscope::state::userCallback = myCallback;
     viewer.show();
     return 0;
   }

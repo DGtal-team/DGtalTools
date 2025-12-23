@@ -41,7 +41,7 @@ using namespace Z3i;
 
 /**
  @page volInfo volInfo
- 
+ @section volInfo_sec volInfo 
  @brief Get information from a vol file (size and values).
  @ingroup volumetrictools
 

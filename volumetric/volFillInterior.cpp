@@ -28,7 +28,7 @@
 
 /**
  @page volFillInterior volFillInterior
- 
+ @section volFillInterior_sec volFillInterior 
  @brief  Fills the interior of a voxel shape. The process can be sketched as follows: First the volume is filled in a
  breath-first approach from the point (0,0,0) (supposed to be exterior) using 6-adjacency. Then the complement is returned.
   @ingroup volumetrictools

@@ -46,6 +46,7 @@ using namespace Z3i;
 
 /**
  @page volCComponentCounter volCComponentCounter
+ @section volCComponentCounter_sec volCComponentCounter
  
  @brief Counts the number of connected component (same values) in a  volume (Vol) file image.
  @ingroup volumetrictools

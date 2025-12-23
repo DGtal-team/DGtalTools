@@ -44,7 +44,7 @@ using namespace Z3i;
 
 /**
  @page volFlip volFlip
- 
+ @section volFlip_sec volFlip 
  @brief  Flips 2D slice image of an 3D vol image (mirror transformation).
  @ingroup volumetrictools
  @b Usage:  volFlip  \<volFileName\> --imagePlane 0 1 --flipDimension 0  \<volOutputFileName\> (vol, longvol, p3d format)

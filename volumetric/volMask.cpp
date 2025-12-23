@@ -51,7 +51,7 @@ using namespace DGtal;
 
 /**
  @page volMask volMask
- 
+ @section volMask_sec volMask 
  @brief  Extracts a new image from the a mask image that represents the regions of the image which are selected and copied in the resulting image. Elements outside the regions defined by the mask are set to 0.
  @ingroup volumetrictools
  
