@@ -63,13 +63,13 @@ Utilities to convert various simple file formats:
         <td> <img height=200px src="resVol2heightfield.png"> </td>
         <td><img height=200px src="resVol2sdp.png"></td>
         <td><img height=200px src="resVol2slice.png"></td>
-        <td><img height=200px src="resVolAddnoise.png"></td>
+        <td><img height=200px src="resVolBoundary2obj.png"></td>
 </tr>
 <tr>
         <td align = center>@ref vol2heightfield_sec </td>
         <td align = center>@ref vol2sdp_sec </td>
         <td align = center>@ref vol2slice_sec</td>
-        <td align = center>@ref volAddNoise_sec</td>
+        <td align = center>@ref volBoundary2obj_sec</td>
 </tr>
 
 

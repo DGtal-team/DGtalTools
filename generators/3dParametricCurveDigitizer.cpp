@@ -55,8 +55,8 @@ using namespace DGtal;
 
 
 /**
- @page Doc3dParametricCurveDigitizer Doc3dParametricCurveDigitizer
- @section Doc3dParametricCurveDigitizer_sec Doc3dParametricCurveDigitizer
+ @page Doc3dParametricCurveDigitizer 3dParametricCurveDigitizer
+ @section Doc3dParametricCurveDigitizer_sec 3dParametricCurveDigitizer
  @brief  Digitizes 3D parametric curves using DGtal library.
  @ingroup generatorstools 
 

@@ -52,9 +52,9 @@ Actually the DGTalTools project is organized as follows:
         <td align="center"><img height=150px src="resVolAddnoise.png"></td>
     </tr>
     <tr>
-           <td align = center>@ref vol2sdp </td>
-           <td align = center>@ref mesh2heightfield </td>
-           <td align = center>@ref volAddNoise</td>
+           <td align = center>@ref vol2sdp_sec </td>
+           <td align = center>@ref mesh2heightfield_sec </td>
+           <td align = center>@ref volAddNoise_sec</td>
    </tr>
 
     <tr bgcolor="#FAFFFA">
@@ -66,9 +66,9 @@ Actually the DGTalTools project is organized as follows:
            <td align="center"><img height=150px src="resGeneric3dNormalEstimatorsII.png"></td>
    </tr>
       <tr>
-           <td align = center>@ref Doc3dCurveTangentEstimator </td>
-           <td align = center>@ref Doc2dLocalEstimators </td>
-           <td align = center>@ref generic3dNormalEstimators</td>
+           <td align = center>@ref Doc3dCurveTangentEstimator_sec </td>
+           <td align = center>@ref Doc2dLocalEstimators_sec </td>
+           <td align = center>@ref generic3dNormalEstimators_sec</td>
    </tr>
 
 
@@ -82,8 +82,8 @@ Actually the DGTalTools project is organized as follows:
            <td align="center"><img height=150px src="resShapeGenerator.png"></td>
    </tr>
       <tr>
-           <td align = center colspan="2"> @ref  contourGenerator </td>
-           <td align = center> @ref shapeGenerator </td>
+           <td align = center colspan="2"> @ref  contourGenerator_sec </td>
+           <td align = center> @ref shapeGenerator_sec </td>
    </tr>
 
 
@@ -96,8 +96,8 @@ Actually the DGTalTools project is organized as follows:
    <td align="center"><img height=150px src="res3dImageViewer.png"></td>
    </tr>
       <tr>
-           <td align="center">@ref Doc3DCurvatureViewerNoise </td>
-           <td align="center">@ref Doc3dVolViewer </td>
+           <td align="center">@ref Doc3DCurvatureViewerNoise_sec </td>
+           <td align="center">@ref Doc3dVolViewer_sec </td>
            <td align="center">@ref Doc3dImageViewer_sec</td>
 
 
@@ -112,9 +112,9 @@ Actually the DGTalTools project is organized as follows:
 
    </tr>
       <tr>
-           <td align = center>@ref Doc3dVolMarchingCubes </td>
-           <td align = center>@ref homotopicThinning3D </td>
-           <td align = center>@ref volReSample </td>
+           <td align = center>@ref Doc3dVolMarchingCubes_sec </td>
+           <td align = center>@ref homotopicThinning3D_sec </td>
+           <td align = center>@ref volReSample_sec </td>
 </tr>
 
 <tr bgcolor="#FAFFFA">
