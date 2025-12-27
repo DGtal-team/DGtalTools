@@ -91,9 +91,9 @@ Galleries
    <td> <img height=150 src="https://dgtal-team.github.io/doctools-nightly/resImgAddNoise.png"> </td>'
    </tr>
    <tr>
-   <td align=center > <a href="https://dgtal-team.github.io/doctools-nightly/group__convertertools.html">vol2heighfield</a></td>
-   <td align=center ><a href="https://dgtal-team.github.io/doctools-nightly/heightfield2vol.html">heightfield2vol</a></td>
-   <td align=center ><a href="https://dgtal-team.github.io/doctools-nightly/imgAddNoise.html">imgAddNoise</a></td> 
+   <td align=center > <a href="https://dgtal-team.github.io/doctools-nightly/resVol2heightfield.png">vol2heighfield</a></td>
+   <td align=center ><a href="https://dgtal-team.github.io/doctools-nightly/resHeightfield2vol.png">heightfield2vol</a></td>
+   <td align=center ><a href="https://dgtal-team.github.io/doctools-nightly/resImgAddNoise.png">imgAddNoise</a></td> 
 
    </tr>
    <tr>
