@@ -41,9 +41,9 @@
         <td><table> <tr><td><img height=50px src="resCurvatureBCcontour.png"></td><td><img height=200px src="resCurvatureBCcurvature.png"></td></tr></table></td>
 </tr>
 <tr>
-        <td align="center">@ref Doc2dLocalEstimators </td>
+        <td align="center">@ref Doc2dLocalEstimators_sec </td>
         <td align="center">@ref Doc3dCurveTangentEstimator_sec </td>
-        <td align="center">@ref curvatureBC</td>
+        <td align="center">@ref curvatureBC_sec</td>
 </tr>
   <tr>
         <td> <img height=200px src="resVol2normalField.png"> </td>
@@ -52,8 +52,8 @@
 </tr>
 <tr>
         <td align = center>@ref vol2normalField_sec </td>
-        <td align = center>@ref generic3dNormalEstimators </td>
-        <td align = center>@ref curvatureScaleSpaceBCC</td>
+        <td align = center>@ref generic3dNormalEstimators_sec </td>
+        <td align = center>@ref curvatureScaleSpaceBCC_sec</td>
 </tr>
 
 

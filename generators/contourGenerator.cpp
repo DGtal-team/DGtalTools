@@ -67,6 +67,7 @@ using namespace DGtal;
 /**
  *
  @page contourGenerator contourGenerator
+ @section contourGenerator_sec contourGenerator
  
  @brief Generates multigrid contours of 2d digital shapes using DGtal library.
  @ingroup generatorstools 

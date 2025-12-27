@@ -50,7 +50,8 @@ using namespace DGtal;
 
 
 /**
- @page 2dSimplePolygonDigitizer 2dSimplePolygonDigitizer
+ @page Doc2dSimplePolygonDigitizer Doc2dSimplePolygonDigitizer
+ @section Doc2dSimplePolygonDigitizer_sec Doc2dSimplePolygonDigitizer
  @brief Compute the Gauss Digitization of a simple closed polyline (no hole or self-intersection).
  @ingroup generatorstools
 

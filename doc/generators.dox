@@ -21,9 +21,10 @@
 
 Utilities to generate various contours/shapes:
 
-  - @ref contourGenerator :  generates multigrid contours of 2d digital shapes using DGtal library.
-  - @ref shapeGenerator : generates shapes using DGtal library.
-
+  - @ref contourGenerator_sec :  generates multigrid contours of 2d digital shapes using DGtal library.
+  - @ref shapeGenerator_sec : generates shapes using DGtal library.
+  - @ref Doc3dParametricCurveDigitizer_sec : Digitizes 3D parametric curves using DGtal library.
+  - @ref Doc2dSimplePolygonDigitizer_sec : Computes the set of integer points inside the input polyline.      
   
 
 
@@ -35,8 +36,8 @@ Utilities to generate various contours/shapes:
         <td><img height=200px src="resShapeGenerator.png"></td>
   </tr>
   <tr>
-  <td align=center>@ref contourGenerator</td>
-  <td align=center>@ref shapeGenerator </td>
+  <td align=center>@ref contourGenerator_sec</td>
+  <td align=center>@ref shapeGenerator_sec </td>
   </tr>
 
 

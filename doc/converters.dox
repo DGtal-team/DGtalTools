@@ -54,10 +54,10 @@ Utilities to convert various simple file formats:
         <td><img height=200px src="resMesh2heightfield.png"></td>
 </tr>
 <tr>
-        <td align = center>@ref heightfield2shading </td>
-        <td align = center>@ref heightfield2vol </td>
-        <td align = center>@ref imgAddNoise</td>
-        <td align = center>@ref mesh2heightfield</td>
+        <td align = center>@ref heightfield2shading_sec </td>
+        <td align = center>@ref heightfield2vol_sec </td>
+        <td align = center>@ref imgAddNoise_sec</td>
+        <td align = center>@ref mesh2heightfield_sec</td>
 </tr>
   <tr>
         <td> <img height=200px src="resVol2heightfield.png"> </td>
@@ -66,10 +66,10 @@ Utilities to convert various simple file formats:
         <td><img height=200px src="resVolAddnoise.png"></td>
 </tr>
 <tr>
-        <td align = center>@ref vol2heightfield </td>
-        <td align = center>@ref vol2sdp </td>
-        <td align = center>@ref vol2slice</td>
-        <td align = center>@ref volAddNoise</td>
+        <td align = center>@ref vol2heightfield_sec </td>
+        <td align = center>@ref vol2sdp_sec </td>
+        <td align = center>@ref vol2slice_sec</td>
+        <td align = center>@ref volAddNoise_sec</td>
 </tr>
 
 
