@@ -1,5 +1,7 @@
 # DGtalTools 2.2 (beta)
 
+- *global*
+  - Following the new display introduced from polyscope viewer, the illustrations of tools in the documentations was obsolete. It also add some fix when reproducing examples. Some links were also broken from the new organization. (Bertrand Kerautret [476](https://github.com/DGtal-team/DGtalTools/pull/476)) 
 
 
 
