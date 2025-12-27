@@ -47,9 +47,9 @@ Actually the DGTalTools project is organized as follows:
     <td align = center colspan="3" vertical-align=middle> Example of tools of section  @ref converters : </td>
     </tr>
     <tr>
-    <td> <img height=150px src="resVol2sdp.png"> </td>
-        <td><img height=150px src="resMesh2heightfield.png"></td>
-        <td><img height=150px src="resVolAddnoise.png"></td>
+    <td align="center"> <img height=150px src="resVol2sdp.png"> </td>
+        <td align="center" ><img height=150px src="resMesh2heightfield.png"></td>
+        <td align="center"><img height=150px src="resVolAddnoise.png"></td>
     </tr>
     <tr>
            <td align = center>@ref vol2sdp </td>
@@ -61,9 +61,9 @@ Actually the DGTalTools project is organized as follows:
    <td align = center colspan="3" vertical-align=middle> Example of tools of section @ref estimators_Doc : </td>
    </tr>
    <tr>
-   <td>    <img height=150px src="res3dCurveTangentEstimator.png"> </td>
-           <td><img height=150px src="res2dLocalEstimators.png"></td>
-           <td><img height=150px src="resGeneric3dNormalEstimatorsII.png"></td>
+   <td align="center">    <img height=150px src="res3dCurveTangentEstimator.png"> </td>
+           <td align="center"><img height=150px src="res2dLocalEstimators.png"></td>
+           <td align="center"><img height=150px src="resGeneric3dNormalEstimatorsII.png"></td>
    </tr>
       <tr>
            <td align = center>@ref Doc3dCurveTangentEstimator </td>
@@ -77,9 +77,9 @@ Actually the DGTalTools project is organized as follows:
     <td align = center colspan="3" vertical-align=middle> Example of tools of section @ref generators : </td>
    </tr>
    <tr>
-   <td center colspan="2">
+   <td align="center" colspan="2">
            <img height=150px src="resContourGenerator.png"> </td>
-           <td><img height=150px src="resShapeGenerator.png"></td>
+           <td align="center"><img height=150px src="resShapeGenerator.png"></td>
    </tr>
       <tr>
            <td align = center colspan="2"> @ref  contourGenerator </td>
@@ -106,9 +106,9 @@ Actually the DGTalTools project is organized as follows:
     <td align = center colspan="3" vertical-align=middle> Example of tools of section @ref volumetric_Doc : </td>
    </tr>
    <tr>
-   <td><img height=150px src="res3dVolMarchingCubes2.png"> </td>
-   <td><img height=150px src="resHomotopicThinning3D.png"></td>
-   <td><img height=150px src="resVolReSample.png"></td>
+   <td align="center"><img height=150px src="res3dVolMarchingCubes2.png"> </td>
+   <td align="center"><img height=150px src="resHomotopicThinning3D.png"></td>
+   <td align="center"><img height=150px src="resVolReSample.png"></td>
 
    </tr>
       <tr>
@@ -121,16 +121,12 @@ Actually the DGTalTools project is organized as follows:
     <td align = center colspan="3" vertical-align=middle> Example of tools of @ref imageProcessing : </td>
    </tr>
    <tr>
-   <td><img height=150px src="barbara-cropped-b01.png"> </td>
-   <td><img height=150px src="barbara-cropped-b01-l0.0054088-a1.0-u0-v1-u.png"></td>
-   <td></td>
+   <td align="center" colspan="3" vertical-align=middle><img height=150px src="barbara-cropped-b01-l0.0054088-a1.0-u0-v1-u.png"></td>
    </tr>
       <tr>
-           <td align = center>Input image </td>
-           <td align = center>@ref DocATu2v0, @ref DocATu0v1 </td>
-           <td align = center> </td>
-      </tr>
+           <td align = center colspan="3" vertical-align=middle>@ref DocATu2v0, @ref DocATu0v1 </td>
 
+      </tr>
   </table>
    </center>
 

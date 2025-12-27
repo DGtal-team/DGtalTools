@@ -69,6 +69,7 @@ using namespace Z3i;
 
 /**
  @page vol2normalField vol2normalField
+ @section vol2normalField_sec vol2normalField
  
  @brief Generates normal vector field from a vol file using DGtal library.
  @ingroup estimatortools

@@ -57,6 +57,7 @@ using namespace DGtal;
 
 /**
  @page curvatureBC curvatureBC
+ @section curvatureBC_sec curvatureBC
  
  @brief Estimatates curvature using a binomial convolver.
  @ingroup estimatortools

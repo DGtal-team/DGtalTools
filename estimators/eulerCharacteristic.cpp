@@ -42,6 +42,7 @@ using namespace Z3i;
 
 /**
  @page eulerCharacteristic eulerCharacteristic
+ @section eulerCharacteristic_sec eulerCharacteristic
  
  @brief Computes the Euleur Characteristic of  a vol to a 8-bit raw file.
  @ingroup estimatortools

@@ -47,6 +47,7 @@ using namespace DGtal;
 
 /**
  @page statisticsEstimators statisticsEstimators
+ @section statisticsEstimators_sec statisticsEstimators
  
  @brief   Computes satistics (L1, L2, Loo) from results of two estimators.
  @ingroup estimatortools

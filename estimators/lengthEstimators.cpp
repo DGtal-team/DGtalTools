@@ -73,6 +73,7 @@ using namespace DGtal;
 
 /**
  @page lengthEstimators lengthEstimators
+ @section lengthEstimators_sec lengthEstimators
  
  @brief Generates multigrid length estimations of paramteric shapes using DGtal library.
  @ingroup estimatortools

@@ -75,6 +75,7 @@ using namespace std;
 
 /**
  @page Doc3dCurveTangentEstimator 3dCurveTangentEstimator
+ @section Doc3dCurveTangentEstimator_sec 3dCurveTangentEstimator
  
  @brief This program estimates the tangent vector to a set of 3D integer points, which are supposed to approximate a 3D curv.e
  @ingroup estimatortools
@@ -825,6 +826,9 @@ int main(int argc, char **argv)
   lowerBound -= Point::diagonal( box );
   upperBound += Point::diagonal( box + 1 );
   K3 ks; ks.init( lowerBound, upperBound, true );
+
+  polyscope::options::programName = "3dCurveTangentEstimator - DGtalTools";  
+  polyscope::view::setNavigateStyle(polyscope::NavigateStyle::Free); 
   PolyscopeViewer<Z3,K3> viewer( ks );
   viewer.allowReuseList = true;
   trace.beginBlock ( "Tool 3dCurveTangentEstimator" );
@@ -864,7 +868,10 @@ int main(int argc, char **argv)
       viewer.drawColor( Color ( 255, 0, 0, 255 ) );
       viewer.drawLine( p + 2.0 * tangent, p - 2.0 * tangent);
       viewer.drawColor( Color ( 100, 100, 140, 255 ) );
-      viewer.drawBall( p );
+      auto p1 = p+1.0;
+      auto p0 = p-1.0;
+      viewer.draw(p);
+
     }
   }
   
