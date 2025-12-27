@@ -41,6 +41,8 @@ using namespace DGtal;
 
 /**
  @page sdp2vol sdp2vol
+ @section sdp2vol_sec sdp2vol
+
  @brief  Converts digital set of points into a volumic file.
  @ingroup convertertools
  @b Usage: sdp2vol [input] [output]

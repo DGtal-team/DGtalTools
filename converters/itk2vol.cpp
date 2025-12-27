@@ -43,6 +43,7 @@ using namespace DGtal;
 
 /**
  @page itk2vol itk2vol
+ @section itk2vol_sec itk2vol
  @brief  Converts itk file into a volumetric file (.vol, .pgm3d).
  @ingroup convertertools
 @b Usage: itk2vol [input] [output]

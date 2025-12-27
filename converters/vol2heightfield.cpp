@@ -46,6 +46,7 @@ using namespace DGtal;
 
 /**
  @page vol2heightfield vol2heightfield
+ @section vol2heightfield_sec vol2heightfield
  @brief  Converts volumetric  file into a projected 2D image given from a normal direction N and from a starting point P.
  @ingroup convertertools
  The 3D volume is scanned in this normal direction N starting from P with a step 1. If the intensity of the 3d point is inside the given thresholds its 2D gray values are set to the current scan number.

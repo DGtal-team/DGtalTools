@@ -43,6 +43,7 @@ using namespace Z3i;
 
 /**
  @page HDF52vol HDF52vol
+ @section HDF52vol_sec HDF52vol
  @ingroup convertertools
 
 

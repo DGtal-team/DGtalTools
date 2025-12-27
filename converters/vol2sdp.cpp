@@ -44,6 +44,7 @@ using namespace DGtal;
 
 /**
    @page vol2sdp vol2sdp
+   @section vol2sdp_sec vol2sdp
    @brief  Extracts digital points from 3d vol files.
    @ingroup convertertools
    @b Usage: vol2sdp [input] [output]

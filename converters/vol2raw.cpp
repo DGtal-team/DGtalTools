@@ -44,6 +44,8 @@ using namespace Z3i;
 
 /**
  @page vol2raw vol2raw
+ @section vol2raw_sec vol2raw
+
  @brief Converts a vol to a 8-bit raw file.
  @ingroup convertertools
  @b Usage: vol2raw [input] [output]

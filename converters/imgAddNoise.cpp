@@ -46,6 +46,8 @@ using namespace DGtal;
 
 /**
  @page imgAddNoise imgAddNoise
+ @section imgAddNoise_sec imgAddNoise
+
  @brief  Adds noise (Kanungo's) to a binary 2D object.
  @ingroup convertertools
 @b Usage: imgAddNoise [input] [output]

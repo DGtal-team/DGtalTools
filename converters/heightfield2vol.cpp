@@ -46,6 +46,8 @@ using namespace DGtal;
 
 /**
  @page heightfield2vol heightfield2vol
+ @section heightfield2vol_sec heightfield2vol
+
  @brief  Converts a 2D heightfield image into a volumetric file.
  @ingroup convertertools
 
