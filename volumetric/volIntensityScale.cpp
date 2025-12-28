@@ -43,8 +43,8 @@ using namespace Z3i;
 
 
 /**
+
  @page volIntensityScale volIntensityScale
- @section volIntensityScale_sec volIntensityScale 
  @brief Applies a linear rescaling of the image intensity from an input intensity interval [InMin, InMax] into an output interval [OutMin, OutMax].
  @ingroup volumetrictools
  @b Usage: 	  ./volumetric/volIntensityScale [OPTIONS] 1 (image files can be independently in vol, pgm3D, p3d format)

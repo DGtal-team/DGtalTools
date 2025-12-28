@@ -18,12 +18,13 @@
  */
 
 /**
+
  @page criticalKernelsThinning3D criticalKernelsThinning3D
- @section criticalKernelsThinning3D_sec criticalKernelsThinning3D
  @brief Applies an criticalKernels thinning algorithm of a 3d image file (vol,longvol,pgm3d...) with 3D viewer.
+ @ingroup volumetrictools
 
  @b Usage: criticalKernelsThinning3D [options] --input <3dImageFileName>  {vol,longvol,pgm3d...}
- @ingroup volumetrictools
+
 
  @b Allowed @b options @b are :
  @code

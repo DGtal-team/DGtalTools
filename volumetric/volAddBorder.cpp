@@ -39,8 +39,8 @@ using namespace DGtal;
 using namespace Z3i;
 
 /**
+
  @page volAddBorder volAddBorder
- @section volAddBorder_sec volAddBorder
  
  @brief Adds a border of one voxel with value 0 around a vol file.
 

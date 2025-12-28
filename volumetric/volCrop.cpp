@@ -43,8 +43,8 @@ using namespace DGtal;
 using namespace Z3i;
 
 /**
+
  @page volCrop volCrop
- @section volCrop_sec volCrop 
  @brief  Crops a 3D vol image from domain coordinates.
  @ingroup volumetrictools
  

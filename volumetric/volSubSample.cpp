@@ -43,8 +43,8 @@ using namespace Z3i;
 
 
 /**
+
  @page volSubSample volSubSample
- @section volSubSample_sec volSubSample
  
  @brief Brutally sub samples a vol file (division by 2 in each direction).
  @ingroup volumetrictools

@@ -44,8 +44,8 @@ using namespace DGtal;
 
 
 /**
+
  @page volReSample volReSample
- @section volReSample_sec volReSample 
  @brief Re samples a 3D volumetric image (.vol, .longvol, .pgm3d)  with a given grid size.
  @ingroup volumetrictools
  @b Usage: v ./volumetric/volReSample [OPTIONS] 1 [2]

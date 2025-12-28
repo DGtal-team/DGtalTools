@@ -45,8 +45,8 @@ using namespace DGtal;
 
 
 /**
+
  @page volAddNoise volAddNoise
- @section volAddNoise_sec volAddNoise
  @brief  Adds Kanungo noise to a binary object with 0 values as background
  points and values >0 for the foreground ones.
  @ingroup volumetrictools

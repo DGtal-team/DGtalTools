@@ -58,8 +58,6 @@ using namespace Z3i;
 
 /**
  @page Doc3dVolMarchingCubes 3dVolMarchingCubes
- @section Doc3dVolMarchingCubes_sec 3dVolMarchingCubes
-
  @ingroup volumetrictools
  @brief Outputs the isosurface of the input volume  as an OFF file
  

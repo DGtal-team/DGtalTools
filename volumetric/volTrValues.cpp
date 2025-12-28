@@ -43,8 +43,8 @@ using namespace Z3i;
 
  
 /**
+
  @page volTrValues volTrValues
- @section volTrValues_sec volTrValues 
  @brief  Applies basic vol image transform from the input values to output values.
  @ingroup volumetrictools
  
