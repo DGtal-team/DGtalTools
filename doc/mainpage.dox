@@ -127,10 +127,12 @@ Actually the DGTalTools project is organized as follows:
     <td align = center colspan="3" vertical-align=middle> Example of tools of @ref imageProcessing : </td>
    </tr>
    <tr>
-   <td align="center" colspan="3" vertical-align=middle><img height=150px src="barbara-cropped-b01-l0.0054088-a1.0-u0-v1-u.png"></td>
+   <td align="center" colspan="3" vertical-align=middle>
+       <img height=150px src="barbara-cropped-b01-l0.0054088-a1.0-u0-v1-u.png">
+   </td>
    </tr>
       <tr>
-           <td align = center colspan="3" vertical-align=middle>@ref DocATu2v0, @ref DocATu0v1 </td>
+           <td align = center colspan="3" vertical-align=middle> <a href="group__imageprocessingtools.html#DocATu2v0">DocATu2v0</a>,  <a href="group__imageprocessingtools.html#DocATu0v1">DocATu0v1</a> </td>
 
       </tr>
   </table>

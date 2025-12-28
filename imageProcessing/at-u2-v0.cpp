@@ -49,7 +49,7 @@
 
 /**
 @page DocATu2v0 imageProcessing/at-u2-v0 
-@section DocATu2v0_sec imageProcessing/at-u2-v0 
+
 
 @brief Computes a piecewise smooth approximation of a grey-level or color image, by optimizing the Ambrosio-Tortorelli functional (with u a 2-form and v a 0-form).
 @ingroup imageprocessingtools
