@@ -155,7 +155,7 @@ Galleries
    <td> grid size = 1</td> <td> grid size= 0.1</td> <td> grid size = 0.01</td>
    </tr>
    <tr>
-   <td colspan="3" align=center> <a href="https://dgtal-team.github.io/doctools-nightly/shapeGenerator.html">shapeGenerator</a>  
+   <td colspan="3" align=center> <a href="https://dgtal-team.github.io/doctools-nightly/group__generatorstools.html#shapeGenerator_sec">shapeGenerator</a>  
    </tr>
    </table>
    </center>
