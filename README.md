@@ -164,10 +164,10 @@ Galleries
    <center>
    <table>
    <tr>
-   <td><img height=130 src="https://dgtal-team.github.io/doctools-nightly/res3dCurvatureViewerNoise.png"></td>
-   <td><img height=130 src="https://dgtal-team.github.io/doctools-nightly/res3dCurveViewer.png"></td>
-   <td><img height=130 src="https://dgtal-team.github.io/doctools-nightly/res3dImageViewer.png" ></td>
-   <td><img height=130 src="https://dgtal-team.github.io/doctools-nightly/res3dVolViewer.png"></td>
+   <td><img height=130 src="doc/images/res3dCurvatureViewerNoise.png"></td>
+   <td><img height=130 src="doc/images/res3dCurveViewer.png"></td>
+   <td><img height=130 src="doc/images/res3dImageViewer.png" ></td>
+   <td><img height=130 src="doc/images/res3dVolViewer.png"></td>
    </tr>
    <tr>
    <td align=center > <a href="https://dgtal-team.github.io/doctools-nightly/group__visualizationtools.html#Doc3DCurvatureViewer_sec" > 3dCurvatureViewer</a></td>
@@ -176,9 +176,9 @@ Galleries
    <td align=center > <a href="https://dgtal-team.github.io/doctools-nightly/group__visualizationtools.html#Doc3dVolViewer_sec" > 3dVolViewer</a></td>
    </tr>
    <tr>
-   <td><img height=130 src="https://dgtal-team.github.io/doctools-nightly/resDisplayContours.png"></td>
-   <td><img height=130 src="https://dgtal-team.github.io/doctools-nightly/resMeshViewer.png"></td>
-   <td><img width=300 src="https://dgtal-team.github.io/doctools-nightly/res3DSDPViewer.png"> </td>
+   <td><img height=130 src="doc/images/resDisplayContours.png"></td>
+   <td><img height=130 src="doc/images/resMeshViewer.png"></td>
+   <td><img width=300 src="doc/images/res3DSDPViewer.png"> </td>
    <td><img  width=300 src=""></td>
    </tr>
    <tr>
@@ -188,22 +188,21 @@ Galleries
 
    </tr>
    <tr>
-   <td><img  width=300 src="https://dgtal-team.github.io/doctools-nightly/res3dHeightMapViewer.png" </td>
-   <td><img width=300 src="https://dgtal-team.github.io/doctools-nightly/res3dCompSurfelData.png" </td>
-   <td align="center" colspan="2"><img width=250 src="https://dgtal-team.github.io/doctools-nightly/res3dImplicitSurfaceExtractorByThickening.png"</td>
+   <td><img  width=300 src="doc/images//res3dHeightMapViewer.png" </td>
+   <td><img width=300 src="doc/images//res3dCompSurfelData.png" </td>
+   <td align="center" colspan="2"><img width=250 src="doc/images//res3dImplicitSurfaceExtractorByThickening.png"</td>
    </tr>
 
 <tr>
-   <td align=center ><a href="https://dgtal-team.github.io/doctools-nightly/group__visualizationtools.html#Doc3dHeightMapViewer" > 3dHeightMapViewer</a></td>
-   <td align=center  ><a href="https://dgtal-team.github.io/doctools-nightly/group__visualizationtools.html#3DCompSurfelData" > 3dCompSurfelData</a></td>
-   <td  align="center" colspan="2"><a href="https://dgtal-team.github.io/doctools-nightly/group__visualizationtools.html#Doc3dImplicitSurfaceExtractorByThickening" > 3dImplicitSurfaceExtractorByThickening</a> </td>
+   <td align=center ><a href="https://dgtal-team.github.io/doctools-nightly/group__visualizationtools.html#Doc3dHeightMapViewer_sec" > 3dHeightMapViewer</a></td>
+   <td align=center  ><a href="https://dgtal-team.github.io/doctools-nightly/group__visualizationtools.html#Doc3DCompSurfelData_sec" > 3dCompSurfelData</a></td>
+   <td  align="center" colspan="2"><a href="https://dgtal-team.github.io/doctools-nightly/group__visualizationtools.html#Doc3dImplicitSurfaceExtractorByThickening_sec" > 3dImplicitSurfaceExtractorByThickening</a> </td>
    </tr>
 <tr>
        <td align="center" colspan="2"><img width=250 src="doc/images/volscope-surface.png"</td>
-
 </tr>
       <tr>
-      <td  align="center" colspan="2"><a href="https://dgtal-team.github.io/doctools-nightly/group__visualizationtools.html#DocVolscope">volScope</a>  </td>
+      <td  align="center" colspan="2"><a href="https://dgtal-team.github.io/doctools-nightly/group__visualizationtools.html#DocVolscope_sec">volScope</a>  </td>
 </tr>
    </table>
    </center>
