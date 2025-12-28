@@ -17,23 +17,23 @@
 @writers Bertrand Kerautret
 
 
-  - @ref DocVolscope_sec : a new generic VOL file viewer using polyscope.
-  - @ref Doc2dCompImage_sec : compare images and displays differences (squared and absolute differences). 
-  - @ref Doc3DCompSurfelData_sec : computes generic scalar surfel data comparisons (squared error) ( given from an input data file and from a reference one). 
-  - @ref Doc3DCurvatureViewer_sec :  permits to compute and visualize mean or gaussian curvature of binary shapes.
-  - @ref Doc3DCurvatureViewerNoise_sec :  same as @ref Doc3DCurvatureViewer, but allows to add some noise to objects. 
-  - @ref Doc3dCurveViewer_sec : displays a 3D curve given as the input filename (with possibly projections and/or tangent information) by using PolyscopeViewer.
-  - @ref Doc3dDisplaySurfelData_sec : displays surfel data from SDP file with color attributes given as scalar interpreted as color. 
-  - @ref Doc3dHeightMapViewer_sec : displays 2D image as heightmap by using PolyscopeViewer.
-  - @ref Doc3dImageViewer_sec : displays volume file as a voxel set by using PolyscopeViewer.
-  - @ref Doc3dImplicitSurfaceExtractorBy4DExtension_sec : computes the zero level set of the given polynomial.
-  - @ref Doc3dImplicitSurfaceExtractorByThickening_sec : computes the zero level set of the given polynomial.
-  - @ref Doc3DSDPViewer_sec : displays sequence of 3d discrete points by using PolyscopeViewer.
-  - @ref Doc3dVolBoundaryViewer_sec : displays the boundary of a volume file by using PolyscopeViewer. 
-  - @ref Doc3dVolViewer_sec : displays volume file as a voxel set by using PolyscopeViewer.
-  - @ref displayContours_sec : displays discrete contours.
-  - @ref meshViewer_sec : displays OFF mesh file by using PolyscopeViewer.
-  - @ref patternTriangulation_sec : draws the Delaunay triangulation of a pattern using DGtal library.
+  - <a href="group__visualizationtools.html#DocVolscope">volscope</a> : a new generic VOL file viewer using polyscope.
+  - <a href="group__visualizationtools.html#Doc2dCompImage">2dCompImage</a> : compare images and displays differences (squared and absolute differences). 
+  - <a href="group__visualizationtools.html#Doc3dCompSurfelData">3dCompSurfelData</a> : computes generic scalar surfel data comparisons (squared error) ( given from an input data file and from a reference one). 
+  - <a href="group__visualizationtools.html#Doc3dCurvatureViewer">3dCurvatureViewer</a> :  permits to compute and visualize mean or gaussian curvature of binary shapes.
+  - <a href="group__visualizationtools.html#Doc3dCurvatureViewerNoise">3dCurvatureViewerNoise</a> :  same as <a href="group__visualizationtools.html#Doc3DCurvatureViewer"> 3dCurvatureViewer</a>, but allows to add some noise to objects. 
+  - <a href="group__visualizationtools.html#Doc3dCurveViewer">3dCurveViewer</a> : displays a 3D curve given as the input filename (with possibly projections and/or tangent information) by using PolyscopeViewer.
+  - <a href="group__visualizationtools.html#Doc3dDisplaySurfelData">3dDisplaySurfelData</a> : displays surfel data from SDP file with color attributes given as scalar interpreted as color. 
+  - <a href="group__visualizationtools.html#Doc3dHeightMapViewer">3dHeightMapViewer</a> : displays 2D image as heightmap by using PolyscopeViewer.
+  - <a href="group__visualizationtools.html#Doc3dImageViewer">3dImageViewer</a> : displays volume file as a voxel set by using PolyscopeViewer.
+  - <a href="group__visualizationtools.html#Doc3dImplicitSurfaceExtractorBy4DExtension">3dImplicitSurfaceExtractorBy4DExtension</a> : computes the zero level set of the given polynomial.
+  - <a href="group__visualizationtools.html#Doc3dImplicitSurfaceExtractorByThickening">3dImplicitSurfaceExtractorByThickening</a> : computes the zero level set of the given polynomial.
+  - <a href="group__visualizationtools.html#Doc3dSDPViewer">3dSDPViewer</a> : displays sequence of 3d discrete points by using PolyscopeViewer.
+  - <a href="group__visualizationtools.html#Doc3dVolBoundaryViewer">3dVolBoundaryViewer</a> : displays the boundary of a volume file by using PolyscopeViewer. 
+  - <a href="group__visualizationtools.html#Doc3dVolViewer">3dVolViewer</a> : displays volume file as a voxel set by using PolyscopeViewer.
+  - <a href="group__visualizationtools.html#displayContours">displayContours</a> : displays discrete contours.
+  - <a href="group__visualizationtools.html#meshViewer">meshViewer</a> : displays OFF mesh file by using PolyscopeViewer.
+  - <a href="group__visualizationtools.html#patternTriangulation">patternTriangulation</a> : draws the Delaunay triangulation of a pattern using DGtal library.
 
 
 
@@ -45,9 +45,9 @@
         <td align="center"><img height=200px src="res3dHeightMapViewer.png"></td>
 </tr>
 <tr>
-        <td align="center">@ref  Doc3DCurvatureViewer_sec </td>
-        <td align="center">@ref Doc3DCurvatureViewerNoise_sec </td>
-        <td align="center">@ref Doc3dHeightMapViewer_sec</td>
+        <td align="center"><a href="group__visualizationtools.html#Doc3dCurvatureViewer">  3dCurvatureViewer</a> </td>
+        <td align="center"><a href="group__visualizationtools.html#Doc3dCurvatureViewerNoise"> 3dCurvatureViewerNoise</a> </td>
+        <td align="center"><a href="group__visualizationtools.html#Doc3dHeightMapViewer"> 3dHeightMapViewer</a></td>
 
 </tr>
 
@@ -57,9 +57,9 @@
 <td align="center"><img height=200px src="res3dImplicitSurfaceExtractorByThickening.png"></td>
 </tr>
 <tr>
-<td align="center">@ref Doc3dImageViewer_sec</td>
-<td align="center">@ref Doc3dVolViewer_sec</td>
-<td align="center">@ref Doc3dImplicitSurfaceExtractorByThickening_sec</td>
+<td align="center"><a href="group__visualizationtools.html#Doc3dImageViewer"> 3dImageViewer</a></td>
+<td align="center"><a href="group__visualizationtools.html#Doc3dVolViewer"> 3dVolViewer</a></td>
+<td align="center"><a href="group__visualizationtools.html#Doc3dImplicitSurfaceExtractorByThickening"> 3dImplicitSurfaceExtractorByThickening</a></td>
 </tr>
 </table>
 </center>

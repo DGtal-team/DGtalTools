@@ -49,7 +49,7 @@ using namespace Z3i;
 
 /**
  @page Doc3dVolViewer 3dVolViewer
- @section Doc3dVolViewer_sec 3dVolViewer
+
  
  @brief Displays volume file as a voxel set by using PolyscopeViewer.
  @ingroup visualizationtools

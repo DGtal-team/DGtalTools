@@ -58,7 +58,7 @@ using namespace Z3i;
 
 /**
  @page Doc3dDisplaySurfelData 3dDisplaySurfelData
- @section Doc3dDisplaySurfelData_sec 3dDisplaySurfelData
+
  
  @brief  Displays surfel data from SDP file with color attributes given as scalar interpreted as color. 
  @ingroup visualizationtools

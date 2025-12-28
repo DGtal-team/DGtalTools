@@ -58,7 +58,7 @@ typedef GradientColorMap<unsigned int, CMAP_JET, 1 > JetMap;
 
 /**
  @page 2dCompImage 2dCompImage
- @section Doc2dCompImage_sec 2dCompImage
+ 
  @brief Compare images and displays differences (squared and absolute differences). 
  @ingroup visualizationtools
 

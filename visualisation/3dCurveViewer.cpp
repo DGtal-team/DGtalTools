@@ -29,7 +29,7 @@
 
 /**
  @page Doc3dCurveViewer 3dCurveViewer
- @section Doc3dCurveViewer_sec 3dCurveViewer
+ 
  
  @brief  Displays a 3D curve given as the input filename (with possibly projections and/or tangent information) by using PolyscopeViewer.
  @ingroup visualizationtools 

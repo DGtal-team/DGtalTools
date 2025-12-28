@@ -50,8 +50,8 @@ using namespace Z3i;
 typedef PolyscopeViewer<Z3i::Space, Z3i::KSpace> Viewer;
 
 /**
- @page Doc3DSDPViewer 3DSDPViewer
- @section Doc3DSDPViewer_sec 3DSDPViewer
+ @page Doc3dSDPViewer 3dSDPViewer
+ 
  @brief Displays a  sequence of 3d discrete points by using PolyscopeViewer.
  @ingroup visualizationtools
  

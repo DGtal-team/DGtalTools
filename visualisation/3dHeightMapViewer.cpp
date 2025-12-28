@@ -60,7 +60,7 @@ using namespace Z3i;
 
 /**
  @page Doc3dHeightMapViewer 3dHeightMapViewer
- @section Doc3dHeightMapViewer_sec 3dHeightMapViewer 
+ 
  @brief  Displays 2D image as heightmap by using QGLviewer.
  @ingroup visualizationtools
  

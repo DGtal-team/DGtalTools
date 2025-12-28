@@ -62,7 +62,7 @@ using namespace std;
 
 /**
  @page patternTriangulation patternTriangulation
- @section patternTriangulation_sec patternTriangulation 
+
  @brief Draws the Delaunay triangulation of a pattern using DGtal library.
  @ingroup visualizationtools
  

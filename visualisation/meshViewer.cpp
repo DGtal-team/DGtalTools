@@ -43,7 +43,7 @@ using namespace DGtal;
 
 /**
  @page meshViewer meshViewer
- @section meshViewer_sec meshViewer
+
 
  @brief Displays OFF mesh file by using PolyscopeViewer.
  @ingroup visualizationtools

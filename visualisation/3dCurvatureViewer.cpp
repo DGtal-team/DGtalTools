@@ -63,8 +63,8 @@ using namespace DGtal;
 using namespace functors;
 
 /**
- @page Doc3DCurvatureViewer 3DCurvatureViewer
- @section Doc3DCurvatureViewer_sec 3DCurvatureViewer
+ @page Doc3dCurvatureViewer 3dCurvatureViewer
+ 
 
  @brief  Computes and visualizes mean or gaussian curvature of binary shapes.
  @ingroup visualizationtools

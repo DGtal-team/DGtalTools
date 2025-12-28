@@ -56,7 +56,7 @@ using namespace DGtal;
 
 /**
  @page Doc3dVolBoundaryViewer 3dVolBoundaryViewer
- @section Doc3dVolBoundaryViewer_sec 3dVolBoundaryViewer
+ 
  
  @brief  Display the boundary of a volume file by using PolyscopeViewer.
  @ingroup visualizationtools

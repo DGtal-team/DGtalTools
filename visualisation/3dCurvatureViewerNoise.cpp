@@ -65,8 +65,8 @@ using namespace DGtal;
 using namespace functors;
 
 /**
- @page Doc3DCurvatureViewerNoise 3DCurvatureViewerNoise
- @section Doc3DCurvatureViewerNoise_sec 3DCurvatureViewerNoise
+ @page Doc3dCurvatureViewerNoise 3dCurvatureViewerNoise
+ 
  @brief  Same as @ref Doc3DCurvatureViewer, but allows to add some noise to objects.
  @ingroup visualizationtools
  

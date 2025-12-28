@@ -59,7 +59,7 @@ using namespace DGtal;
 
 /**
  @page Doc3dImplicitSurfaceExtractorBy4DExtension 3dImplicitSurfaceExtractorBy4DExtension
- @section Doc3dImplicitSurfaceExtractorBy4DExtension_sec 3dImplicitSurfaceExtractorBy4DExtension
+ 
  @brief Computes the zero level set of the given polynomial.
  @ingroup visualizationtools
  

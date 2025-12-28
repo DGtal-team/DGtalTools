@@ -50,7 +50,7 @@ typedef Shortcuts<Z3i::KSpace> SH3;
 /**
 
  @page DocVolscope volscope
- @section DocVolscope_sec volscope
+
  
  @ingroup visualizationtools
  

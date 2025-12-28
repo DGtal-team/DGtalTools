@@ -59,8 +59,8 @@ using namespace Z3i;
 
 
 /**
- @page 3DCompSurfelData 3DCompSurfelData
- @section Doc3DCompSurfelData_sec 3DCompSurfelData
+ @page Doc3dCompSurfelData 3dCompSurfelData
+
  @brief  Computes generic scalar surfel data comparisons (squared error) (given from an input data file and from a reference one). 
  @ingroup visualizationtools 
 
