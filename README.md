@@ -88,25 +88,25 @@ Galleries
    <tr>
    <td> <img height=150 src="https://dgtal-team.github.io/doctools-nightly/resVol2heightfield.png"> </td>
    <td> <img height=150 src="https://dgtal-team.github.io/doctools-nightly/resHeightfield2vol.png"> </td>
-   <td> <img height=150 src="https://dgtal-team.github.io/doctools-nightly/resImgAddNoise.png"> </td>'
+   <td> <img height=150 src="https://dgtal-team.github.io/doctools-nightly/resImgAddNoise.png"> </td>
    </tr>
    <tr>
    <td align=center > <a href="https://dgtal-team.github.io/doctools-nightly/group__convertertools.html#vol2heightfield_sec">vol2heighfield</a></td>
-   <td align=center ><a href="https://dgtal-team.github.io/doctools-nightly/group__convertertools.html#heightfield2vol">heightfield2vol</a></td>
-   <td align=center ><a href="https://dgtal-team.github.io/doctools-nightly/group__convertertools.html#imgAddNoise">imgAddNoise</a></td> 
+   <td align=center ><a href="https://dgtal-team.github.io/doctools-nightly/group__convertertools.html#heightfield2vol_sec">heightfield2vol</a></td>
+   <td align=center ><a href="https://dgtal-team.github.io/doctools-nightly/group__convertertools.html#imgAddNoise_sec">imgAddNoise</a></td> 
 
    </tr>
    <tr>
-   <td> <img height=150 src="https://cloud.githubusercontent.com/assets/772865/7106643/c09cb8d4-e148-11e4-8653-2d5bac5dc3c5.png"> 
-   <td align=center> <img height=150 src="https://cloud.githubusercontent.com/assets/772865/10265156/64aaad64-6a24-11e5-9773-628c661fa76c.png"> </td>
-   <td> <img height=150 src="https://cloud.githubusercontent.com/assets/772865/15342501/d80656d6-1c95-11e6-8461-2ec25ba5a864.png"></td>
-   <td> <img height=150 src="https://cloud.githubusercontent.com/assets/772865/15342675/b17e505c-1c97-11e6-85c3-663550b3b39a.png"></td>
+   <td> <img height=150 src="https://dgtal-team.github.io/doctools-nightly/resMesh2heightfield.png"> 
+   <td align=center> <img height=150 src="https://dgtal-team.github.io/doctools-nightly/resHeightfield2shading.png"> </td>
+   <td> <img height=150 src="https://dgtal-team.github.io/doctools-nightly/resVol2sdp.png"></td>
+   <td> <img height=150 src="https://dgtal-team.github.io/doctools-nightly/resVol2slice.png"></td>
    </tr>
    <tr>
-   <td align=center ><a href="https://dgtal-team.github.io/doctools-nightly/group__convertertools.html#mesh2heightfield"> mesh2heightfield</a></td>
-   <td align=center ><a href="https://dgtal-team.github.io/doctools-nightly/group__convertertools.html#heightfield2shading"> heightfield2shading</a></td>
-   <td align=center ><a href="https://dgtal-team.github.io/doctools-nightly/group__convertertools.html#vol2sdp"> vol2sdp</a></td>
-   <td align=center ><a href="https://dgtal-team.github.io/doctools-nightly/group__convertertools.html#vol2slice"> vol2slice</a></td>
+   <td align=center ><a href="https://dgtal-team.github.io/doctools-nightly/group__convertertools.html#mesh2heightfield_sec"> mesh2heightfield</a></td>
+   <td align=center ><a href="https://dgtal-team.github.io/doctools-nightly/group__convertertools.html#heightfield2shading_sec"> heightfield2shading</a></td>
+   <td align=center ><a href="https://dgtal-team.github.io/doctools-nightly/group__convertertools.html#vol2sdp_sec"> vol2sdp</a></td>
+   <td align=center ><a href="https://dgtal-team.github.io/doctools-nightly/group__convertertools.html#vol2slice_sec"> vol2slice</a></td>
    </tr>
    <tr>
    </table>
