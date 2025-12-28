@@ -116,7 +116,7 @@ Galleries
    <center>
    <table>
    <tr>
-   <td colspan="3"><img height=130 src="https://dgtal-team.github.io/doctools-nightly/resCurvatureScaleSpaceBCC.png"></td>
+   <td  align="center" colspan="3"><img height=130 src="doc/images/resCurvatureScaleSpaceBCC.png"></td>
    </tr>
    <tr>
    <td colspan="3" align=center >Illustration of <a href="https://dgtal-team.github.io/doctools-nightly/group__estimatortools.html#curvatureScaleSpaceBCC_sec"> curvatureScaleSpaceBCC</a> </td>
@@ -179,13 +179,15 @@ Galleries
    <td><img height=130 src="doc/images/resDisplayContours.png"></td>
    <td><img height=130 src="doc/images/resMeshViewer.png"></td>
    <td><img width=300 src="doc/images/res3DSDPViewer.png"> </td>
-   <td><img  width=300 src=""></td>
-   </tr>
+   <td align="center" colspan="2"><img width=250 src="doc/images/volscope-surface.png"</td>
+
+
+</tr>
    <tr>
    <td align=center > <a href="https://dgtal-team.github.io/doctools-nightly/group__visualizationtools.html#displayContours"> displayContours</a></td>
    <td align=center > <a href="https://dgtal-team.github.io/doctools-nightly/group__visualizationtools.html#meshViewer"> meshViewer</a></td>
    <td align=center > <a href="https://dgtal-team.github.io/doctools-nightly/group__visualizationtools.html#Doc3DSDPViewer"> 3dSDPViewer</a></td>
-
+   <td  align="center" colspan="2"><a href="https://dgtal-team.github.io/doctools-nightly/group__visualizationtools.html#DocVolscope_sec">volScope</a>  </td>
    </tr>
    <tr>
    <td><img  width=300 src="doc/images//res3dHeightMapViewer.png" </td>
@@ -199,10 +201,9 @@ Galleries
    <td  align="center" colspan="2"><a href="https://dgtal-team.github.io/doctools-nightly/group__visualizationtools.html#Doc3dImplicitSurfaceExtractorByThickening_sec" > 3dImplicitSurfaceExtractorByThickening</a> </td>
    </tr>
 <tr>
-       <td align="center" colspan="2"><img width=250 src="doc/images/volscope-surface.png"</td>
 </tr>
       <tr>
-      <td  align="center" colspan="2"><a href="https://dgtal-team.github.io/doctools-nightly/group__visualizationtools.html#DocVolscope_sec">volScope</a>  </td>
+
 </tr>
    </table>
    </center>
@@ -215,31 +216,30 @@ Galleries
    <center>
    <table>
    <tr>
-   <td> <img width=300 src="https://cloud.githubusercontent.com/assets/772865/15342874/d79fc22e-1c98-11e6-922b-48f27f5cf586.png"> </td>
-   <td> <img width=300 src="https://cloud.githubusercontent.com/assets/772865/15342814/828267ec-1c98-11e6-9080-a210bdd42b35.png"> </td>
-   <td> <img width=300 src="https://cloud.githubusercontent.com/assets/772865/15342834/a6736bb0-1c98-11e6-9a42-9dc5a198800f.png"> </td>
+   <td> <img width=300 src="doc/images/res3dVolMarchingCubes2.png"> </td>
+   <td> <img width=300 src="doc/images/resHomotopicThinning3D.png"> </td>
+   <td> <img width=300 src="doc/images/resVolSubSample.png"> </td>
    </tr>
    <tr>
-   <td align=center  ><a href="https://dgtal-team.github.io/doctools-nightly/Doc3dVolMarchingCubes.html"> 3dVolMarchingCubes </a> </td>
-   <td align=center  ><a href="https://dgtal-team.github.io/doctools-nightly/homotopicThinning3D.html"> homotopicThinning3D </a> </td>
-   <td align=center  ><a href="https://dgtal-team.github.io/doctools-nightly/volSubSample.html"> volSubSample </a> </td>
+   <td align="center"><a href="https://dgtal-team.github.io/doctools-nightly/group__volumetrictools.html#Doc3dVolMarchingCubes_sec"> 3dVolMarchingCubes </a> </td>
+   <td align="center"><a href="https://dgtal-team.github.io/doctools-nightly/group__volumetrictools.html#homotopicThinning3D_sec"> homotopicThinning3D </a> </td>
+   <td align="center"><a href="https://dgtal-team.github.io/doctools-nightly/group__volumetrictools.html#volSubSample_sec"> volSubSample </a> </td>
    </tr>
    <tr>
-   <td align=center > <img width=300 src="https://cloud.githubusercontent.com/assets/772865/15342933/2da32a80-1c99-11e6-9600-16a68f145bdd.png"> </td>
-   <td align=center > <img width=300 src="https://cloud.githubusercontent.com/assets/772865/15342979/8e2d2d4c-1c99-11e6-88b4-5835adb04eff.png"> </td>
-   <td align=center > <img width=300 src="https://cloud.githubusercontent.com/assets/772865/15343002/b2fdf4c6-1c99-11e6-986b-9f56299b4a16.png"> </td>
+   <td align=center > <img width=300 src="doc/images/resVolReSample.png"> </td>
+   <td align=center > <img width=300 src="doc/images/resVolTrValues.png"> </td>
+   <td align=center > <img width=300 src="doc/images/resVolSubSample.png"> </td>
    </tr>
    <tr>
-   <td align=center ><a href="https://dgtal-team.github.io/doctools-nightly/volReSample.html"> volReSample </a> </td>
-   <td align=center ><a href="https://dgtal-team.github.io/doctools-nightly/volTrValues.html"> volTrValues </a> </td>
-   <td align=center ><a href="https://dgtal-team.github.io/doctools-nightly/volSegment.html"> volSegment </a> </td>
+   <td align=center ><a href="https://dgtal-team.github.io/doctools-nightly/group__volumetrictools.html#volReSample_sec"> volReSample </a> </td>
+   <td align=center ><a href="https://dgtal-team.github.io/doctools-nightly/group__volumetrictools.html#volTrValues_sec"> volTrValues </a> </td>
+   <td align=center ><a href="https://dgtal-team.github.io/doctools-nightly/group__volumetrictools.html#volSegment_sec"> volSegment </a> </td>
    </tr>
    <tr>
-   <td align=center > <img width=300 src="https://raw.github.com/phcerdan/DGtalTools/thin_criticalkernel/doc/images/resCriticalKernelsThinning3D_select-first_skel-1isthmus_persistence-1.png"> </td>
+   <td align=center > <img width=300 src="doc/images/resCriticalKernelsThinning3D_select-dmax_skel-1isthmus_persistence-1.png"> </td>
    </tr>
    <tr>
-   <!-- <td align=center  ><a href="https://raw.github.com/DGtal&#45;team/DGtalTools/master/doc/images/resCriticalKernelsThinning3D_select&#45;first_skel&#45;1isthmus_persistence&#45;1.png"> criticalKernelsThinning3D </a> </td> -->
-   <td align=center  ><a href="https://dgtal-team.github.io/doctools-nightly/criticalKernelsThinning3D.html"> criticalKernelsThinning3D </a> </td>
+   <td align=center  ><a href="https://dgtal-team.github.io/doctools-nightly/group__volumetrictools.html#criticalKernelsThinning3D_sec"> criticalKernelsThinning3D </a> </td>
    </tr>
    </table>
    </center>
