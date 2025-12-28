@@ -91,9 +91,9 @@ Galleries
    <td> <img height=150 src="https://dgtal-team.github.io/doctools-nightly/resImgAddNoise.png"> </td>'
    </tr>
    <tr>
-   <td align=center > <a href="https://dgtal-team.github.io/doctools-nightly/resVol2heightfield.png">vol2heighfield</a></td>
-   <td align=center ><a href="https://dgtal-team.github.io/doctools-nightly/resHeightfield2vol.png">heightfield2vol</a></td>
-   <td align=center ><a href="https://dgtal-team.github.io/doctools-nightly/resImgAddNoise.png">imgAddNoise</a></td> 
+   <td align=center > <a href="https://dgtal-team.github.io/doctools-nightly/group__convertertools.html#vol2heightfield_sec">vol2heighfield</a></td>
+   <td align=center ><a href="https://dgtal-team.github.io/doctools-nightly/group__convertertools.html#heightfield2vol">heightfield2vol</a></td>
+   <td align=center ><a href="https://dgtal-team.github.io/doctools-nightly/group__convertertools.html#imgAddNoise">imgAddNoise</a></td> 
 
    </tr>
    <tr>
@@ -103,10 +103,10 @@ Galleries
    <td> <img height=150 src="https://cloud.githubusercontent.com/assets/772865/15342675/b17e505c-1c97-11e6-85c3-663550b3b39a.png"></td>
    </tr>
    <tr>
-   <td align=center ><a href="https://dgtal-team.github.io/doctools-nightly/mesh2heightfield.html"> mesh2heightfield</a></td>
-   <td align=center ><a href="https://dgtal-team.github.io/doctools-nightly/heightfield2shading.html"> heightfield2shading</a></td>
-   <td align=center ><a href="https://dgtal-team.github.io/doctools-nightly/vol2sdp.html"> vol2sdp</a></td>
-   <td align=center ><a href="https://dgtal-team.github.io/doctools-nightly/vol2slice.html"> vol2slice</a></td>
+   <td align=center ><a href="https://dgtal-team.github.io/doctools-nightly/group__convertertools.html#mesh2heightfield"> mesh2heightfield</a></td>
+   <td align=center ><a href="https://dgtal-team.github.io/doctools-nightly/group__convertertools.html#heightfield2shading"> heightfield2shading</a></td>
+   <td align=center ><a href="https://dgtal-team.github.io/doctools-nightly/group__convertertools.html#vol2sdp"> vol2sdp</a></td>
+   <td align=center ><a href="https://dgtal-team.github.io/doctools-nightly/group__convertertools.html#vol2slice"> vol2slice</a></td>
    </tr>
    <tr>
    </table>

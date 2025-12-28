@@ -36,9 +36,11 @@
 <center>
 <table>
   <tr>
-        <td> <img height=200px src="res2dLocalEstimators.png"> </td>
-        <td><img height=200px src="res3dCurveTangentEstimator.png"></td>
-        <td><table> <tr><td><img height=50px src="resCurvatureBCcontour.png"></td><td><img height=200px src="resCurvatureBCcurvature.png"></td></tr></table></td>
+        <td align="center"> <img height=200px src="res2dLocalEstimators.png"> </td>
+        <td align="center"><img height=200px src="res3dCurveTangentEstimator.png"></td>
+        <td><table> <tr>
+        <td align="center"><img height=50px src="resCurvatureBCcontour.png"></td><td><img height=200px src="resCurvatureBCcurvature.png"></td>
+        </tr></table></td>
 </tr>
 <tr>
         <td align="center">@ref Doc2dLocalEstimators_sec </td>
@@ -46,14 +48,14 @@
         <td align="center">@ref curvatureBC_sec</td>
 </tr>
   <tr>
-        <td> <img height=200px src="resVol2normalField.png"> </td>
-        <td><img height=200px src="resGeneric3dNormalEstimatorsVCM.png"></td>
-        <td><img height=100px src="resCurvatureScaleSpaceBCC.png"></td>
+        <td align="center"> <img height=200px src="resVol2normalField.png"> </td>
+        <td align="center"><img height=200px src="resGeneric3dNormalEstimatorsVCM.png"></td>
+        <td align="center"><img height=100px src="resCurvatureScaleSpaceBCC.png"></td>
 </tr>
 <tr>
-        <td align = center>@ref vol2normalField_sec </td>
-        <td align = center>@ref generic3dNormalEstimators_sec </td>
-        <td align = center>@ref curvatureScaleSpaceBCC_sec</td>
+        <td align="center">@ref vol2normalField_sec </td>
+        <td align="center">@ref generic3dNormalEstimators_sec </td>
+        <td align="center">@ref curvatureScaleSpaceBCC_sec</td>
 </tr>
 
 

@@ -32,12 +32,12 @@ Utilities to generate various contours/shapes:
 <table>
 
   <tr>
-        <td><img height=200px src="resContourGenerator.png"></td>
-        <td><img height=200px src="resShapeGenerator.png"></td>
+        <td align="center"><img height=200px src="resContourGenerator.png"></td>
+        <td align="center"><img height=200px src="resShapeGenerator.png"></td>
   </tr>
   <tr>
-  <td align=center>@ref contourGenerator_sec</td>
-  <td align=center>@ref shapeGenerator_sec </td>
+  <td align="center">@ref contourGenerator_sec</td>
+  <td align="center">@ref shapeGenerator_sec </td>
   </tr>
 
 

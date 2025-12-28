@@ -40,26 +40,26 @@
 <center>
 <table>
   <tr>
-        <td align = center> <img height=200px src="res3dCurvatureViewer.png"> </td>
-        <td align = center><img height=200px src="res3dCurvatureViewerNoise.png"></td>
-        <td align = center><img height=200px src="res3dHeightMapViewer.png"></td>
+        <td align="center"> <img height=200px src="res3dCurvatureViewer.png"> </td>
+        <td align="center"><img height=200px src="res3dCurvatureViewerNoise.png"></td>
+        <td align="center"><img height=200px src="res3dHeightMapViewer.png"></td>
 </tr>
 <tr>
-        <td align = center>@ref  Doc3DCurvatureViewer_sec </td>
-        <td align = center>@ref Doc3DCurvatureViewerNoise_sec </td>
-        <td align = center>@ref Doc3dHeightMapViewer_sec</td>
+        <td align="center">@ref  Doc3DCurvatureViewer_sec </td>
+        <td align="center">@ref Doc3DCurvatureViewerNoise_sec </td>
+        <td align="center">@ref Doc3dHeightMapViewer_sec</td>
 
 </tr>
 
 <tr>
-<td><img height=200px src="res3dImageViewer.png"></td>
-<td><img height=200px src="res3dVolViewer.png"></td>
-<td><img height=200px src="res3dImplicitSurfaceExtractorByThickening.png"></td>
+<td align="center"><img height=200px src="res3dImageViewer.png"></td>
+<td align="center"><img height=200px src="res3dVolViewer.png"></td>
+<td align="center"><img height=200px src="res3dImplicitSurfaceExtractorByThickening.png"></td>
 </tr>
 <tr>
-<td align = center>@ref Doc3dImageViewer_sec</td>
-<td align = center>@ref Doc3dVolViewer_sec</td>
-<td align = center>@ref Doc3dImplicitSurfaceExtractorByThickening_sec</td>
+<td align="center">@ref Doc3dImageViewer_sec</td>
+<td align="center">@ref Doc3dVolViewer_sec</td>
+<td align="center">@ref Doc3dImplicitSurfaceExtractorByThickening_sec</td>
 </tr>
 </table>
 </center>
