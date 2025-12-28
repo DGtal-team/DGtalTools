@@ -43,7 +43,6 @@ using namespace DGtal;
 
 /**
  @page ofs2off ofs2off
- @section ofs2off_sec ofs2off
  @brief  Convert OFS file into OFF mesh format.
  @ingroup convertertools
    

@@ -43,7 +43,6 @@ using namespace Z3i;
 
 /**
  @page vol2vox vol2vox
- @section vol2vox_sec vol2vox
  @brief  Converts a vol file to a MagicaVoxel VOX file (https://ephtracy.github.io).
  @ingroup convertertools
 

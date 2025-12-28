@@ -32,7 +32,7 @@
 
 /**
  @page volSurfaceRegularization volSurfaceRegularization
- @section volSurfaceRegularization_sec volSurfaceRegularization
+
  
  @brief Regularize a cubical complex into a smooth quadrangulated complex.
  @ingroup estimatortools

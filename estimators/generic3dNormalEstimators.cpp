@@ -70,7 +70,7 @@ using namespace DGtal;
 
 /**
  @page generic3dNormalEstimators generic3dNormalEstimators
- @section generic3dNormalEstimators_sec generic3dNormalEstimators
+
  
  @brief  computes a normal vector field over a digitized 3D implicit surface for several estimators.
  @ingroup estimatortools

@@ -45,7 +45,6 @@ using namespace Z3i;
 
 /**
  @page raw2HDF5 raw2HDF5
- @section raw2HDF5_sec raw2HDF5
  @brief  Converts a 3D 8-bit raw file to HDF5.
  @ingroup convertertools
  

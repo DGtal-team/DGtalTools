@@ -43,7 +43,6 @@ using namespace Z3i;
 
 /**
  @page longvol2vol longvol2vol
- @section longvol2vol_sec longvol2vol
  @brief  Converts a longvol (long int) to a vol file (unsigned char).
  @ingroup convertertools
  

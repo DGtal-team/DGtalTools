@@ -42,7 +42,6 @@ using namespace Z3i;
 
 /**
  @page vol2obj vol2obj
- @section vol2obj_sec vol2obj
 
  @brief Converts any volumetric file to an OBJ one. Each grid point with value
 between

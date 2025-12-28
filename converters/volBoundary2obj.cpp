@@ -62,7 +62,6 @@ using namespace DGtal;
 
 /**
  @page volBoundary2obj volBoundary2obj
- @section volBoundary2obj_sec volBoundary2obj
  
  @brief Export the boundary of a volume file to OBJ format. By default the resulting mesh is defined from the surfels of the surface elements, a triangulated (dual)
  @ingroup convertertools

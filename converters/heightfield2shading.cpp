@@ -50,7 +50,6 @@ using namespace DGtal;
 
 /**
  @page heightfield2shading heightfield2shading
- @section heightfield2shading_sec heightfield2shading
  @ingroup convertertools
 
 

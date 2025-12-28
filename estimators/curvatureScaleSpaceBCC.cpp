@@ -64,7 +64,7 @@ using namespace DGtal;
 
 /**
  @page curvatureScaleSpaceBCC curvatureScaleSpaceBCC
- @section curvatureScaleSpaceBCC_sec curvatureScaleSpaceBCC
+
  
  @brief Generate the Curvature Scale Space image using a binomial convolver based estimator.
  @ingroup estimatortools

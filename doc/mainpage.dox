@@ -49,15 +49,16 @@ Actually the DGTalTools project is organized as follows:
     <tr>
     <td align="center"> <img height=150px src="resVol2sdp.png"> </td>
         <td align="center" ><img height=150px src="resMesh2heightfield.png"></td>
-        <td align="center"><img height=150px src="resVolAddnoise.png"></td>
+        <td align="center"><img height=150px src="resHeightfield2shading.png"></td>
     </tr>
     <tr>
-           <td align = center>@ref vol2sdp_sec </td>
-           <td align = center>@ref mesh2heightfield_sec </td>
-           <td align = center>@ref volAddNoise_sec</td>
+           <td align = center><a href="group__convertertools.html#vol2sdp">vol2sdp</a> </td>
+           <td align = center><a href="group__convertertools.html#mesh2heightfield">mesh2heightfield</a> </td>
+           <td align = center><a href="group__convertertools.html#heightfield2shading">heightfield2shading</a></td>
    </tr>
-
-    <tr bgcolor="#FAFFFA">
+    </table>
+    <table>
+<tr bgcolor="#FAFFFA">
    <td align = center colspan="3" vertical-align=middle> Example of tools of section @ref estimators_Doc : </td>
    </tr>
    <tr>
@@ -66,13 +67,14 @@ Actually the DGTalTools project is organized as follows:
            <td align="center"><img height=150px src="resGeneric3dNormalEstimatorsII.png"></td>
    </tr>
       <tr>
-           <td align = center>@ref Doc3dCurveTangentEstimator_sec </td>
-           <td align = center>@ref Doc2dLocalEstimators_sec </td>
-           <td align = center>@ref generic3dNormalEstimators_sec</td>
+           <td align = center><a href="group__estimatortools.html#Doc3dCurveTangentEstimator"> 3dCurveTangentEstimator</a> </td>
+           <td align = center><a href="group__estimatortools.html#Doc2dLocalEstimators"> 2dLocalEstimators</a> </td>
+           <td align = center><a href="group__estimatortools.html#generic3dNormalEstimators"> generic3dNormalEstimators</a></td>
    </tr>
 
+</table>
 
-
+<table>
    <tr bgcolor="#FAFFFA">
     <td align = center colspan="3" vertical-align=middle> Example of tools of section @ref generators : </td>
    </tr>
@@ -86,7 +88,9 @@ Actually the DGTalTools project is organized as follows:
            <td align = center> @ref shapeGenerator_sec </td>
    </tr>
 
+</table>
 
+<table>
    <tr bgcolor="#FAFFFA">
     <td align="center" colspan="3" vertical-align=middle> Example of tools of section @ref visualization_Doc : </td>
    </tr>
@@ -99,9 +103,9 @@ Actually the DGTalTools project is organized as follows:
            <td align="center">@ref Doc3DCurvatureViewerNoise_sec </td>
            <td align="center">@ref Doc3dVolViewer_sec </td>
            <td align="center">@ref Doc3dImageViewer_sec</td>
+</table>
 
-
-
+<table>
    <tr bgcolor="#FAFFFA">
     <td align = center colspan="3" vertical-align=middle> Example of tools of section @ref volumetric_Doc : </td>
    </tr>
@@ -112,10 +116,12 @@ Actually the DGTalTools project is organized as follows:
 
    </tr>
       <tr>
-           <td align = center>@ref Doc3dVolMarchingCubes_sec </td>
-           <td align = center>@ref homotopicThinning3D_sec </td>
-           <td align = center>@ref volReSample_sec </td>
+           <td align = center><a href="group__volumetrictools.html#Doc3dVolMarchingCubes">Doc3dVolMarchingCubes</a> </td>
+           <td align = center><a href="group__volumetrictools.html#homotopicThinning3D">homotopicThinning3D</a> </td>
+           <td align = center><a href="group__volumetrictools.html#volReSample">volReSample</a> </td>
 </tr>
+</table>
+<table>
 
 <tr bgcolor="#FAFFFA">
     <td align = center colspan="3" vertical-align=middle> Example of tools of @ref imageProcessing : </td>

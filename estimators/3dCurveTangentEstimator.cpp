@@ -75,7 +75,7 @@ using namespace std;
 
 /**
  @page Doc3dCurveTangentEstimator 3dCurveTangentEstimator
- @section Doc3dCurveTangentEstimator_sec 3dCurveTangentEstimator
+
  
  @brief This program estimates the tangent vector to a set of 3D integer points, which are supposed to approximate a 3D curv.e
  @ingroup estimatortools

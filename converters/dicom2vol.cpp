@@ -46,7 +46,6 @@ using namespace DGtal;
 
 /**
  @page dicom2vol dicom2vol
- @section dicom2vol_sec dicom2vol
  @ingroup convertertools
 
 

@@ -76,7 +76,6 @@ using namespace functors;
 
 /**
  @page Doc3dLocalEstimators 3dLocalEstimators
- @section Doc3dLocalEstimators_sec 3dLocalEstimators
  
  @brief Compares local estimators on implicit shapes using DGtal library.
  @ingroup estimatortools

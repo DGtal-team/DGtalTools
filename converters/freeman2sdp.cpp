@@ -51,9 +51,8 @@
 using namespace DGtal;
 
 /**
-   @ingroup convertertools
    @page freeman2sdp freeman2sdp
-   @section freeman2sdp_sec freeman2sdp
+   @ingroup convertertools
    @brief Transform freeman chain into a Sequence of Discrete Points. Result is given to std output.
 
    @b Usage: freeman2sdp [input] > output.sdp
