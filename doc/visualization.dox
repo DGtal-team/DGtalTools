@@ -17,7 +17,8 @@
 @writers Bertrand Kerautret
 
 
-  - <a href="group__visualizationtools.html#DocVolscope">volscope</a> : a new generic VOL file viewer using polyscope.
+
+
   - <a href="group__visualizationtools.html#Doc2dCompImage">2dCompImage</a> : compare images and displays differences (squared and absolute differences). 
   - <a href="group__visualizationtools.html#Doc3dCompSurfelData">3dCompSurfelData</a> : computes generic scalar surfel data comparisons (squared error) ( given from an input data file and from a reference one). 
   - <a href="group__visualizationtools.html#Doc3dCurvatureViewer">3dCurvatureViewer</a> :  permits to compute and visualize mean or gaussian curvature of binary shapes.
@@ -34,7 +35,8 @@
   - <a href="group__visualizationtools.html#displayContours">displayContours</a> : displays discrete contours.
   - <a href="group__visualizationtools.html#meshViewer">meshViewer</a> : displays OFF mesh file by using PolyscopeViewer.
   - <a href="group__visualizationtools.html#patternTriangulation">patternTriangulation</a> : draws the Delaunay triangulation of a pattern using DGtal library.
-
+  - <a href="group__visualizationtools.html#DocVolscope">volscope</a> : a new generic VOL file viewer using polyscope.
+  
 
 
 <center>

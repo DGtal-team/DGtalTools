@@ -23,9 +23,9 @@
 
 @section imageprocessing_Doc Image restoration
 
-  - <a href="group__imageprocessingtools.html#DocATu2v0">DocATu2v0</a> : Computes a piecewise smooth approximation of an image, by optimizing the Ambrosio-Tortorelli functional (with u a 2-form and v a 0-form).
-  - <a href="group__imageprocessingtools.html#DocATVu2v0">DocATVu2v0</a> : Computes a piecewise smooth approximation of an image, by optimizing a variant of the Ambrosio-Tortorelli functional (with u a 2-form and v a 0-form), which uses the Laplacian of v instead of its gradient for length approximation.
-  - <a href="group__imageprocessingtools.html#DocATu0v1">DocATu0v1</a> : Computes a piecewise smooth approximation of an image, by optimizing the Ambrosio-Tortorelli functional (with u a 0-form and v a 1-form).
+  - <a href="group__imageprocessingtools.html#DocATu2v0">atu2v0</a> : Computes a piecewise smooth approximation of an image, by optimizing the Ambrosio-Tortorelli functional (with u a 2-form and v a 0-form).
+  - <a href="group__imageprocessingtools.html#DocATVu2v0">atVu2v0</a> : Computes a piecewise smooth approximation of an image, by optimizing a variant of the Ambrosio-Tortorelli functional (with u a 2-form and v a 0-form), which uses the Laplacian of v instead of its gradient for length approximation.
+  - <a href="group__imageprocessingtools.html#DocATu0v1">atu0v1</a> : Computes a piecewise smooth approximation of an image, by optimizing the Ambrosio-Tortorelli functional (with u a 0-form and v a 1-form).
 
 
 <center>
