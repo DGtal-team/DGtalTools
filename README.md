@@ -92,10 +92,10 @@ Galleries
    <td> <img height=150 src="doc/images/resVol2slice.png"></td>
    </tr>
    <tr>
-   <td align=center > <a href="https://dgtal-team.github.io/doctools-nightly/group__convertertools.html#vol2heightfield_sec">vol2heighfield</a></td>
-   <td align=center ><a href="https://dgtal-team.github.io/doctools-nightly/group__convertertools.html#heightfield2vol_sec">heightfield2vol</a></td>
-   <td align=center ><a href="https://dgtal-team.github.io/doctools-nightly/group__convertertools.html#imgAddNoise_sec">imgAddNoise</a></td> 
-   <td align=center ><a href="https://dgtal-team.github.io/doctools-nightly/group__convertertools.html#vol2slice_sec">vol2slice</a></td>
+   <td align=center > <a href="https://dgtal-team.github.io/doctools-nightly/group__convertertools.html#vol2heightfield">vol2heighfield</a></td>
+   <td align=center ><a href="https://dgtal-team.github.io/doctools-nightly/group__convertertools.html#heightfield2vol">heightfield2vol</a></td>
+   <td align=center ><a href="https://dgtal-team.github.io/doctools-nightly/group__convertertools.html#imgAddNoise">imgAddNoise</a></td> 
+   <td align=center ><a href="https://dgtal-team.github.io/doctools-nightly/group__convertertools.html#vol2slice">vol2slice</a></td>
    </tr>
    <tr>
    <td> <img height=150 src="doc/images/resMesh2heightfield.png"> 
@@ -103,9 +103,9 @@ Galleries
    <td> <img height=150 src="doc/images/resVol2sdp.png"></td>
    </tr>
    <tr>
-   <td align=center ><a href="https://dgtal-team.github.io/doctools-nightly/group__convertertools.html#mesh2heightfield_sec"> mesh2heightfield</a></td>
-   <td align=center ><a href="https://dgtal-team.github.io/doctools-nightly/group__convertertools.html#heightfield2shading_sec"> heightfield2shading</a></td>
-   <td align=center ><a href="https://dgtal-team.github.io/doctools-nightly/group__convertertools.html#vol2sdp_sec"> vol2sdp</a></td>
+   <td align=center ><a href="https://dgtal-team.github.io/doctools-nightly/group__convertertools.html#mesh2heightfield"> mesh2heightfield</a></td>
+   <td align=center ><a href="https://dgtal-team.github.io/doctools-nightly/group__convertertools.html#heightfield2shading"> heightfield2shading</a></td>
+   <td align=center ><a href="https://dgtal-team.github.io/doctools-nightly/group__convertertools.html#vol2sdp"> vol2sdp</a></td>
    </tr>
    <tr>
    </table>
@@ -119,7 +119,7 @@ Galleries
    <td  align="center" colspan="3"><img height=130 src="doc/images/resCurvatureScaleSpaceBCC.png"></td>
    </tr>
    <tr>
-   <td colspan="3" align=center >Illustration of <a href="https://dgtal-team.github.io/doctools-nightly/group__estimatortools.html#curvatureScaleSpaceBCC_sec"> curvatureScaleSpaceBCC</a> </td>
+   <td colspan="3" align=center >Illustration of <a href="https://dgtal-team.github.io/doctools-nightly/group__estimatortools.html#curvatureScaleSpaceBCC"> curvatureScaleSpaceBCC</a> </td>
    </tr>
    <tr>
    <td align=center ><img height=200 src="doc/images/resGeneric3dNormalEstimatorsVCM.png"> </td>
@@ -127,8 +127,8 @@ Galleries
    <td align=center> <img height=200 src="doc/images/res2dLocalEstimators.png"> </td>
    </tr>
    <tr>
-   <td colspan="2"> Illustration of <a href="https://https://dgtal-team.github.io/doctools-nightly/group__estimatortools.html#generic3dNormalEstimators_sec">generic3dNormalEstimators</a> on VCM estimator applied on smooth and noisy shapes.</td>
-   <td> <a align=center href="https://dgtal-team.github.io/doctools-nightly/group__estimatortools.html#Doc2dLocalEstimators_sec"> 2dLocalEstimators </a> </td>
+   <td colspan="2"> Illustration of <a href="https://https://dgtal-team.github.io/doctools-nightly/group__estimatortools.html#generic3dNormalEstimators">generic3dNormalEstimators</a> on VCM estimator applied on smooth and noisy shapes.</td>
+   <td> <a align=center href="https://dgtal-team.github.io/doctools-nightly/group__estimatortools.html#Doc2dLocalEstimators"> 2dLocalEstimators </a> </td>
    </tr>
    <tr> 
    <td> <img height=200 src="doc/images/res3dCurveTangentEstimator.png"></td>
@@ -136,9 +136,9 @@ Galleries
    <td> <img height=200 src="doc/images/resLengthEstimators.png"></td>
    </tr>
    <tr> 
-   <td align=center > <a href="https://dgtal-team.github.io/doctools-nightly/group__estimatortools.html#Doc3dCurveTangentEstimator_sec"> 3dCurveTangentEstimator</a> </td>
-   <td align=center > <a href="https://dgtal-team.github.io/doctools-nightly/group__estimatortools.html#vol2normalField_sec"> vol2normalField</a> </td>
-   <td align=center > <a href="https://dgtal-team.github.io/doctools-nightly/group__estimatortools.html#lengthEstimators_sec"> lengthEstimators</a> </td>
+   <td align=center > <a href="https://dgtal-team.github.io/doctools-nightly/group__estimatortools.html#Doc3dCurveTangentEstimator"> 3dCurveTangentEstimator</a> </td>
+   <td align=center > <a href="https://dgtal-team.github.io/doctools-nightly/group__estimatortools.html#vol2normalField"> vol2normalField</a> </td>
+   <td align=center > <a href="https://dgtal-team.github.io/doctools-nightly/group__estimatortools.html#lengthEstimators"> lengthEstimators</a> </td>
    </tr>
    </table>
    </center>
@@ -155,7 +155,7 @@ Galleries
    <td> grid size = 1</td> <td> grid size= 0.1</td> <td> grid size = 0.01</td>
    </tr>
    <tr>
-   <td colspan="3" align=center> <a href="https://dgtal-team.github.io/doctools-nightly/group__generatorstools.html#shapeGenerator_sec">shapeGenerator</a>  
+   <td colspan="3" align=center> <a href="https://dgtal-team.github.io/doctools-nightly/group__generatorstools.html#shapeGenerator">shapeGenerator</a>  
    </tr>
    </table>
    </center>
@@ -170,10 +170,10 @@ Galleries
    <td><img height=130 src="doc/images/res3dVolViewer.png"></td>
    </tr>
    <tr>
-   <td align=center > <a href="https://dgtal-team.github.io/doctools-nightly/group__visualizationtools.html#Doc3DCurvatureViewer_sec" > 3dCurvatureViewer</a></td>
-   <td align=center > <a href="https://dgtal-team.github.io/doctools-nightly/group__visualizationtools.html#Doc3dCurveViewer_sec" > 3dCurveViewer</a> </td>
-   <td align=center > <a href="https://dgtal-team.github.io/doctools-nightly/group__visualizationtools.html#Doc3dImageViewer_sec" > 3dImageViewer</a></td>
-   <td align=center > <a href="https://dgtal-team.github.io/doctools-nightly/group__visualizationtools.html#Doc3dVolViewer_sec" > 3dVolViewer</a></td>
+   <td align=center > <a href="https://dgtal-team.github.io/doctools-nightly/group__visualizationtools.html#Doc3DCurvatureViewer" > 3dCurvatureViewer</a></td>
+   <td align=center > <a href="https://dgtal-team.github.io/doctools-nightly/group__visualizationtools.html#Doc3dCurveViewer" > 3dCurveViewer</a> </td>
+   <td align=center > <a href="https://dgtal-team.github.io/doctools-nightly/group__visualizationtools.html#Doc3dImageViewer" > 3dImageViewer</a></td>
+   <td align=center > <a href="https://dgtal-team.github.io/doctools-nightly/group__visualizationtools.html#Doc3dVolViewer" > 3dVolViewer</a></td>
    </tr>
    <tr>
    <td><img height=130 src="doc/images/resDisplayContours.png"></td>
@@ -196,9 +196,9 @@ Galleries
    </tr>
 
 <tr>
-   <td align=center ><a href="https://dgtal-team.github.io/doctools-nightly/group__visualizationtools.html#Doc3dHeightMapViewer_sec" > 3dHeightMapViewer</a></td>
-   <td align=center  ><a href="https://dgtal-team.github.io/doctools-nightly/group__visualizationtools.html#Doc3DCompSurfelData_sec" > 3dCompSurfelData</a></td>
-   <td  align="center" colspan="2"><a href="https://dgtal-team.github.io/doctools-nightly/group__visualizationtools.html#Doc3dImplicitSurfaceExtractorByThickening_sec" > 3dImplicitSurfaceExtractorByThickening</a> </td>
+   <td align=center ><a href="https://dgtal-team.github.io/doctools-nightly/group__visualizationtools.html#Doc3dHeightMapViewer" > 3dHeightMapViewer</a></td>
+   <td align=center  ><a href="https://dgtal-team.github.io/doctools-nightly/group__visualizationtools.html#Doc3DCompSurfelData" > 3dCompSurfelData</a></td>
+   <td  align="center" colspan="2"><a href="https://dgtal-team.github.io/doctools-nightly/group__visualizationtools.html#Doc3dImplicitSurfaceExtractorByThickening" > 3dImplicitSurfaceExtractorByThickening</a> </td>
    </tr>
 <tr>
 </tr>
@@ -221,19 +221,19 @@ Galleries
    <td> <img width=300 src="doc/images/resVolSubSample.png"> </td>
    </tr>
    <tr>
-   <td align="center"><a href="https://dgtal-team.github.io/doctools-nightly/group__volumetrictools.html#Doc3dVolMarchingCubes_sec"> 3dVolMarchingCubes </a> </td>
-   <td align="center"><a href="https://dgtal-team.github.io/doctools-nightly/group__volumetrictools.html#homotopicThinning3D_sec"> homotopicThinning3D </a> </td>
-   <td align="center"><a href="https://dgtal-team.github.io/doctools-nightly/group__volumetrictools.html#volSubSample_sec"> volSubSample </a> </td>
+   <td align="center"><a href="https://dgtal-team.github.io/doctools-nightly/group__volumetrictools.html#Doc3dVolMarchingCubes"> 3dVolMarchingCubes </a> </td>
+   <td align="center"><a href="https://dgtal-team.github.io/doctools-nightly/group__volumetrictools.html#homotopicThinning3D"> homotopicThinning3D </a> </td>
+   <td align="center"><a href="https://dgtal-team.github.io/doctools-nightly/group__volumetrictools.html#volSubSample"> volSubSample </a> </td>
    </tr>
    <tr>
    <td align=center > <img width=300 src="doc/images/resVolReSample.png"> </td>
    <td align=center > <img width=300 src="doc/images/resVolTrValues.png"> </td>
-   <td align=center > <img width=300 src="doc/images/resVolSubSample.png"> </td>
+   <td align=center > <img width=300 src="doc/images/resVolSegment.png"> </td>
    </tr>
    <tr>
-   <td align=center ><a href="https://dgtal-team.github.io/doctools-nightly/group__volumetrictools.html#volReSample_sec"> volReSample </a> </td>
-   <td align=center ><a href="https://dgtal-team.github.io/doctools-nightly/group__volumetrictools.html#volTrValues_sec"> volTrValues </a> </td>
-   <td align=center ><a href="https://dgtal-team.github.io/doctools-nightly/group__volumetrictools.html#volSegment_sec"> volSegment </a> </td>
+   <td align=center ><a href="https://dgtal-team.github.io/doctools-nightly/group__volumetrictools.html#volReSample"> volReSample </a> </td>
+   <td align=center ><a href="https://dgtal-team.github.io/doctools-nightly/group__volumetrictools.html#volTrValues"> volTrValues </a> </td>
+   <td align=center ><a href="https://dgtal-team.github.io/doctools-nightly/group__volumetrictools.html#volSegment"> volSegment </a> </td>
    </tr>
    <tr>
    <td align=center > <img width=300 src="doc/images/resCriticalKernelsThinning3D_select-dmax_skel-1isthmus_persistence-1.png"> </td>
