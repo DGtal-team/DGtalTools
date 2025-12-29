@@ -27,8 +27,8 @@
 
 
 /**
+
  @page volImageMetrics volImageMetrics
- 
  @brief  Applies basic image measures (RMSE, PSNR) between two volumetric images A and B.
  @ingroup volumetrictools
  @b Usage:  volImageMetrics --volA \<volAFilename\> --volB \<volBFilename\> 

@@ -24,9 +24,10 @@ user to show how to include the DGtal library framework directly in their
 own source code (in complement of DGtal tutorial https://dgtal-team.github.io/doc-nightly/packageTutorials.html).
 
 
-@section Organisation
+@section OrgSection Organisation 
 
-Actually the DGTalTools project is organized as follows:
+
+The DGTalTools project is structured around the following categories:
 
  - [Converters](\ref converters)
 
@@ -34,12 +35,19 @@ Actually the DGTalTools project is organized as follows:
 
  - [Generators](\ref generators)
 
- - [Visualization](\ref visualization)
+ - [Visualization](\ref visualization_Doc)
 
  - [Volumetric](\ref volumetric_Doc)
 
  - [Image Processing](\ref imageprocessing_Doc)
 
+
+@section ExampleTools Tool Preview
+
+
+The images below provide an overview of representative tools available in each category.
+
+    
 
    <center>
     <table>
@@ -47,91 +55,102 @@ Actually the DGTalTools project is organized as follows:
     <td align = center colspan="3" vertical-align=middle> Example of tools of section  @ref converters : </td>
     </tr>
     <tr>
-    <td> <img height=150px src="resVol2sdp.png"> </td>
-        <td><img height=150px src="resMesh2heightfield.png"></td>
-        <td><img height=150px src="resVolAddnoise.png"></td>
+    <td align="center"> <img height=150px src="resVol2sdp.png"> </td>
+        <td align="center" ><img height=150px src="resMesh2heightfield.png"></td>
+        <td align="center"><img height=150px src="resHeightfield2shading.png"></td>
     </tr>
     <tr>
-           <td align = center>@ref vol2sdp </td>
-           <td align = center>@ref mesh2heightfield </td>
-           <td align = center>@ref volAddNoise</td>
+           <td align = center><a href="group__convertertools.html#vol2sdp">vol2sdp</a> </td>
+           <td align = center><a href="group__convertertools.html#mesh2heightfield">mesh2heightfield</a> </td>
+           <td align = center><a href="group__convertertools.html#heightfield2shading">heightfield2shading</a></td>
    </tr>
-
-    <tr bgcolor="#FAFFFA">
+    </table>
+    <table>
+<tr bgcolor="#FAFFFA">
    <td align = center colspan="3" vertical-align=middle> Example of tools of section @ref estimators_Doc : </td>
    </tr>
    <tr>
-   <td>    <img height=150px src="res3dCurveTangentEstimator.png"> </td>
-           <td><img height=150px src="res2dLocalEstimators.png"></td>
-           <td><img height=150px src="resGeneric3dNormalEstimatorsII.png"></td>
+   <td align="center">    <img height=150px src="res3dCurveTangentEstimator.png"> </td>
+           <td align="center"><img height=150px src="res2dLocalEstimators.png"></td>
+           <td align="center"><img height=150px src="resGeneric3dNormalEstimatorsII.png"></td>
    </tr>
       <tr>
-           <td align = center>@ref Doc3dCurveTangentEstimator </td>
-           <td align = center>@ref Doc2dLocalEstimators </td>
-           <td align = center>@ref generic3dNormalEstimators</td>
+           <td align = center><a href="group__estimatortools.html#Doc3dCurveTangentEstimator"> 3dCurveTangentEstimator</a> </td>
+           <td align = center><a href="group__estimatortools.html#Doc2dLocalEstimators"> 2dLocalEstimators</a> </td>
+           <td align = center><a href="group__estimatortools.html#generic3dNormalEstimators"> generic3dNormalEstimators</a></td>
    </tr>
 
+</table>
 
-
+<table>
    <tr bgcolor="#FAFFFA">
     <td align = center colspan="3" vertical-align=middle> Example of tools of section @ref generators : </td>
    </tr>
    <tr>
-   <td center colspan="2">
+   <td align="center" colspan="2">
            <img height=150px src="resContourGenerator.png"> </td>
-           <td><img height=150px src="resShapeGenerator.png"></td>
+           <td align="center"><img height=150px src="resShapeGenerator.png"></td>
    </tr>
       <tr>
-           <td align = center colspan="2"> @ref  contourGenerator </td>
-           <td align = center> @ref shapeGenerator </td>
+           <td align = center colspan="2"> <a href="group__generatorstools.html#contourGenerator">  contourGenerator </a> </td>
+           <td align = center> <a href="group__generatorstools.html#shapeGenerator"> shapeGenerator </a> </td>
    </tr>
 
+</table>
 
+<table>
    <tr bgcolor="#FAFFFA">
-    <td align = center colspan="3" vertical-align=middle> Example of tools of section @ref visualization_Doc : </td>
+    <td align="center" colspan="3" vertical-align=middle> Example of tools of section @ref visualization_Doc : </td>
    </tr>
    <tr>
-   <td><img height=150px src="res3dCurvatureViewerNoise.png"> </td>
-   <td><img height=150px src="res3dVolViewer.png"></td>
-
+   <td align="center"><img height=150px src="res3dCurvatureViewerNoise.png"> </td>
+   <td align="center"><img height=150px src="res3dVolViewer.png"></td>
+   <td align="center"><img height=150px src="res3dImageViewer.png"></td>
    </tr>
       <tr>
-           <td align = center>@ref Doc3DCurvatureViewerNoise </td>
-           <td align = center>@ref Doc3dVolViewer </td>
-   </tr>
+           <td align="center"><a href="group__visualizationtools.html#Doc3dCurvatureViewerNoise">3dCurvatureViewerNoise</a>  </td>
+           <td align="center"><a href="group__visualizationtools.html#Doc3dVolViewer">3dVolViewer</a>  </td>
+           <td align="center"><a href="group__visualizationtools.html#Doc3dImageViewer">3dImageViewer</a> </td>
+</table>
 
-
+<table>
    <tr bgcolor="#FAFFFA">
     <td align = center colspan="3" vertical-align=middle> Example of tools of section @ref volumetric_Doc : </td>
    </tr>
    <tr>
-   <td><img height=150px src="res3dVolMarchingCubes2.png"> </td>
-   <td><img height=150px src="resHomotopicThinning3D.png"></td>
-   <td><img height=150px src="resVolReSample.png"></td>
+   <td align="center"><img height=150px src="res3dVolMarchingCubes2.png"> </td>
+   <td align="center"><img height=150px src="resHomotopicThinning3D.png"></td>
+   <td align="center"><img height=150px src="resVolReSample.png"></td>
 
    </tr>
       <tr>
-           <td align = center>@ref Doc3dVolMarchingCubes </td>
-           <td align = center>@ref homotopicThinning3D </td>
-           <td align = center>@ref volReSample </td>
+           <td align = center><a href="group__volumetrictools.html#Doc3dVolMarchingCubes">Doc3dVolMarchingCubes</a> </td>
+           <td align = center><a href="group__volumetrictools.html#homotopicThinning3D">homotopicThinning3D</a> </td>
+           <td align = center><a href="group__volumetrictools.html#volReSample">volReSample</a> </td>
 </tr>
+</table>
+<table>
 
 <tr bgcolor="#FAFFFA">
-    <td align = center colspan="3" vertical-align=middle> Example of tools of @ref imageProcessing : </td>
+    <td align = center colspan="2" vertical-align=middle> Example of tools of @ref imageProcessing : </td>
    </tr>
    <tr>
-   <td><img height=150px src="barbara-cropped-b01.png"> </td>
-   <td><img height=150px src="barbara-cropped-b01-l0.0054088-a1.0-u0-v1-u.png"></td>
-   <td></td>
+   <td align="center" vertical-align=middle>
+   <img height=150px src="barbara-cropped-b01.png">  
+   </td>
+<td align="center"  vertical-align=middle>
+<img height=150px src="barbara-cropped-b01-l0.0054088-a1.0-u0-v1-u.png">
+   </td>
    </tr>
       <tr>
-           <td align = center>Input image </td>
-           <td align = center>@ref DocATu2v0, @ref DocATu0v1 </td>
-           <td align = center> </td>
-      </tr>
+        <td align = center colspan="2" vertical-align=middle>
+        <a href="group__imageprocessingtools.html#DocATu2v0">atu2v0</a>,
+        <a href="group__imageprocessingtools.html#DocATu0v1">atu0v1</a> </td>
 
+      </tr>
   </table>
    </center>
+
 
 @defgroup convertertools Converter Tools
 @defgroup volumetrictools Volumetric Tools
@@ -139,5 +158,8 @@ Actually the DGTalTools project is organized as follows:
 @defgroup imageprocessingtools Image Processing Tools
 @defgroup generatorstools Generator Tools
 @defgroup estimatortools Estimator Tools
+
+
+
 
 */

@@ -60,6 +60,7 @@ using namespace std;
 
 /**
  @page curvatureMCMS curvatureMCMS
+
  
  @brief Estimates curvature using length of most centered segment computers.
  @ingroup estimatortools

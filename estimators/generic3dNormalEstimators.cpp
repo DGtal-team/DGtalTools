@@ -57,9 +57,11 @@
 #include "DGtal/images/SimpleThresholdForegroundPredicate.h"
 #include "DGtal/io/readers/MPolynomialReader.h"
 #include "DGtal/io/colormaps/GradientColorMap.h"
-#ifdef DGTAL_WITH_POLYSCOPE
+#ifdef DGTAL_WITH_POLYSCOPE_VIEWER
+    // Polyscope disponible
 #include "DGtal/io/viewers/PolyscopeViewer.h"
 #endif
+
 
 using namespace std;
 using namespace DGtal;
@@ -68,6 +70,7 @@ using namespace DGtal;
 
 /**
  @page generic3dNormalEstimators generic3dNormalEstimators
+
  
  @brief  computes a normal vector field over a digitized 3D implicit surface for several estimators.
  @ingroup estimatortools
@@ -78,7 +81,7 @@ Computes a normal vector field over a digitized 3D implicit surface
 for several estimators (II|VCM|Trivial|True), specified with -e. You
 may add Kanungo noise with option -N. These estimators are compared
 with ground truth. You may then: 1) visualize the normals or the angle
-deviations with -V (if DGTAL_WITH_POLYSCOPE is enabled), 2) outputs them as
+deviations with -V (if DGTAL_WITH_POLYSCOPE_VIEWER  is enabled), 2) outputs them as
 a list of cells/estimations with -n, 3) outputs them as a ImaGene file
 with -O, 4) outputs them as a NOFF file with -O, 5) computes
 estimation statistics with option -S.
@@ -141,47 +144,53 @@ estimation statistics with option -S.
  You can estimate the normal vectors and compare the error with the true normals (option  -V AngleDeviation):
   @code
  # apply the Integral Invariant estimator  (options  -e II  -r 8 ):
- $ generic3dNormalEstimators -p "10000-(x^2+y^2+z^2+1000*(x^2+y^2)*(x^2+z^2)*(y^2+z^2))" -a -10 -A 10 -e II  -r 8  -V AngleDeviation -g 0.05 
+ $ generic3dNormalEstimators -p "10000-(x^2+y^2+z^2+1000*(x^2+y^2)*(x^2+z^2)*(y^2+z^2))" -a -10 -A 10 -e II  -r 8  -V AngleDeviation -g 0.05  
  # apply the Voronoi Covariance Measure based estimator  (options  -e VCM  -r 8 ): 
  $ generic3dNormalEstimators -p "10000-(x^2+y^2+z^2+1000*(x^2+y^2)*(x^2+z^2)*(y^2+z^2))"  -a -10 -A 10 -e VCM   -R 20 -r 8 -V AngleDeviation -g 0.05 
- # to display source digital surface  :  visualize the normals and tape Key E to export surface (in  exportedMesh.off) 
- $ generic3dNormalEstimators -p "10000-(x^2+y^2+z^2+1000*(x^2+y^2)*(x^2+z^2)*(y^2+z^2))"  -a -10 -A 10 -e VCM   -R 20 -r 8 -V Normals -g 0.05 
- # visualize generated file:
- $ meshViewer -i  exportedMesh.off
 
   @endcode
   You should obtain such a result:
   |type                   |  visualization                                 | 
   | :----:                | :-------------:                                |
-  | digital surface       | ![ ](resGeneric3dNormalEstimatorsDiscrete.png) |
+  | digital surface       | ![ ](resGeneric3dNormalEstimatorsDiscrete.png ) |
   |  VCM angle-deviation  | ![ ](resGeneric3dNormalEstimatorsVCM.png)      |
   | II angle-deviation    | ![ ](resGeneric3dNormalEstimatorsII.png)       |
 
 
 
 
- - @b Example @b of @b normal @b visualization with noise add:
- This tool allows to add some noise on initial shape (option -N) and it is also possiblt to  visualize the source shape by using the resulting normals:
+ - @b Example @b of @b normal @b comparisons visualization with noise add:
+ This tool allows to add some noise on initial shape (option -N) before estimating and comparing the normals:
  @code 
  # apply the Integral Invariant estimator  (options  -e II  -r 6 ): 
-  generic3dNormalEstimators -p "100-(x^2*y^2*z^2+4*x^2+4*y^2+3*z^2)"  -a -10 -A 10 -e II  -r 6 -V Normals -g 0.1 -N 0.3
+  generic3dNormalEstimators -p "100-(x^2*y^2*z^2+4*x^2+4*y^2+3*z^2)"  -a -10 -A 10 -e II  -r 6 -V AngleDeviation -g 0.1 -N 0.3 
  # apply the Voronoi Covariance Measure based estimator  (options  -e VCM  -r 8 ):  
-   generic3dNormalEstimators -p "100-(x^2*y^2*z^2+4*x^2+4*y^2+3*z^2)"  -a -10 -A 10 -e VCM   -R 10 -r 5 -V Normals -g 0.1 -N 0.3
- # apply the true normals:
- ./estimators/generic3dNormalEstimators -p "100-(x^2*y^2*z^2+4*x^2+4*y^2+3*z^2)"  -a -10 -A 10 -e True  -V Normals -g 0.1 -N 0.3
- # to display source digital surface  :  tape Key E on previous displays to export surface (in  exportedMesh.off) 
- # visualize generated file:
- $ meshViewer -i  exportedMesh.off
+  generic3dNormalEstimators -p "100-(x^2*y^2*z^2+4*x^2+4*y^2+3*z^2)"  -a -10 -A 10 -e VCM   -R 10 -r 5 -V AngleDeviation -g 0.1 -N 0.3 
 
- @endcode 
+@endcode 
 
+ 
  You should obtain such a result:
   |type                   |  visualization                                 | 
   | :----:                | :-------------:                                |
   | digital surface       | ![ ](resGeneric3dNormalEstimatorsNoiseDiscrete.png) |
   |  VCM estimator  | ![ ](resGeneric3dNormalEstimatorsNoiseVCM.png)      |
   | II estimator    | ![ ](resGeneric3dNormalEstimatorsNoiseII.png)       |
-  | True Normals    | ![ ](resGeneric3dNormalEstimatorsNoiseTrue.png)       |
+
+
+
+ It is also possible to visualize the resulting normals:
+@code
+ # display the II normals:
+  generic3dNormalEstimators  -p "100-(x^2*y^2*z^2+4*x^2+4*y^2+3*z^2)"  -a -10 -A 10 -e II  -r 8  -V Normals -g 0.3   
+@endcode
+  You should obtain such a result:
+  |type                   |  visualization                                 | 
+  | :----:                | :-------------:                                |
+  | II estimator    | ![ ](resGeneric3dNormalVisuEstimatorsNoiseII.png)       |
+
+
+
 
 
 
@@ -459,8 +468,9 @@ void computeEstimation
       export_output.close();
       trace.endBlock();
     }
-#ifdef DGTAL_WITH_POLYSCOPE
-  if ( params.exportX != "None" )
+
+#ifdef DGTAL_WITH_POLYSCOPE_VIEWER 
+  if ( params.view != "None" )
     {
       typedef typename KSpace::Space Space;
       typedef PolyscopeViewer<Space,KSpace> MyViewever3D;
@@ -469,6 +479,7 @@ void computeEstimation
       char* argv[ 1 ];
       argv[ 0 ] = name;
       Surfel s;
+      polyscope::options::programName = "generic3dNormalEstimators - DGtalTools ";
       MyViewever3D viewer( K );
       viewer.drawAsSimplified();
       viewer.allowReuseList = true;
@@ -487,10 +498,18 @@ void computeEstimation
           Color c = grad( 0 );
           if ( adev ) c = grad( max( 0.0, min( angle_error, 40.0 ) ) );
           viewer.drawColor( c );
-          viewer << WithQuantity(s, "normal", n_est);
-        }
+	  if ( params.view == "Normals" )
+	  {
+	    viewer << WithQuantity(s, "normal", n_est);
+	  }
+	  else if  ( params.view == "AngleDeviation" )
+	  {
+	    viewer << WithQuantity(s, "angle deviation", angle_error);
+	  }
+	}
       trace.endBlock();
       viewer.show();
+ 
     }
 #endif
 
@@ -745,7 +764,7 @@ int main( int argc, char** argv )
   app.add_option("--export,-x",allParams.exportX, "exports surfel normals which can be viewed with ImaGene tool 'viewSetOfSurfels' in file <basename>-cells-<gridstep>.txt, as specified by -o <basename>. Parameter <arg> is None|Normals|AngleDeviation. The color depends on the angle deviation in degree: 0 metallic blue, 5 light cyan, 10 light green, 15 light yellow, 20 yellow, 25 orange, 30 red, 35, dark red, 40- grey" );
   app.add_flag("--normals,-n", allParams.normals, "outputs every surfel, its estimated normal, and the ground truth normal in file <basename>-normals-<gridstep>.txt, as specified by -o <basename>.");
   app.add_flag("--noff,-O", allParams.noff, "exports the digital surface with normals as NOFF file <basename>-noff-<gridstep>.off, as specified by -o <basename>..");
-#ifdef DGTAL_WITH_VISU3D_QGLVIEWER
+#ifdef DGTAL_WITH_POLYSCOPE_VIEWER 
   app.add_option("--view,-V", allParams.view, "view the digital surface with normals.  Parameter <arg> is None|Normals|AngleDeviation. The color depends on the angle deviation in degree: 0 metallic blue, 5 light cyan, 10 light green, 15 light yellow, 20 yellow, 25 orange, 30 red, 35, dark red, 40- grey.");
 #endif
 

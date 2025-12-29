@@ -241,11 +241,11 @@ TAB_SIZE               = 8
 # commands \{ and \} for these it is advised to use the version @{ and @} or use
 # a double escape (\\{ and \\})
 
--ALIASES                = "definition=\par Definition:\n" \
-                         "advanced=\par Advanced:\n" \
-                         "writers=\par Author(s) of this documentation:\n" \
-                         "managers=\par Package managers:\n"
-
+ALIASES = "definition=@par Definition:^^ " \
+          "advanced=@par Advanced: ^^ " \
+          "writers=@par Author(s) of this documentation: ^^ " \
+          "managers=@par Package managers:^^"
+          
 
 # This tag can be used to specify a number of word-keyword mappings (TCL only).
 # A mapping has the form "name=value". For example adding "class=itcl::class"
@@ -696,7 +696,7 @@ SHOW_FILES             = NO
 # Folder Tree View (if specified).
 # The default value is: YES.
 
-SHOW_NAMESPACES        = YES
+SHOW_NAMESPACES        = NO
 
 # The FILE_VERSION_FILTER tag can be used to specify a program or script that
 # doxygen should invoke to get the current version for each file (typically from
@@ -2532,3 +2532,7 @@ GENERATE_LEGEND        = YES
 # This tag requires that the tag HAVE_DOT is set to YES.
 
 DOT_CLEANUP            = YES
+
+# Important to remove the TOC appearing once clicked on DGTalTools
+SHOW_PAGE_TOC = NO
+LAYOUT_FILE = @top_srcdir@/doc/DoxygenLayout.xml

@@ -43,6 +43,7 @@ using namespace Z3i;
 
 
 /**
+
  @page volSubSample volSubSample
  
  @brief Brutally sub samples a vol file (division by 2 in each direction).

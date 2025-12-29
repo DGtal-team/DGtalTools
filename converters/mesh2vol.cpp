@@ -44,7 +44,7 @@ using namespace DGtal;
 
 
 /**
- @page mesh2vol
+ @page mesh2vol mesh2vol
  @brief Convert a mesh file into a 26-separated or 6-separated voxelization in a given resolution grid.
  @ingroup convertertools
  

@@ -39,6 +39,7 @@
 using namespace DGtal;
 /**
  @page img2freeman img2freeman
+
  @brief Extracts Freeman chains from thresholded image.
  @ingroup convertertools
  @b Usage: img2freeman [input] [output]

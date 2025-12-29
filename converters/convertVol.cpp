@@ -42,6 +42,7 @@ using namespace DGtal;
 /**
  @ingroup convertertools
  @page convertVol convertVol
+
  @brief Converts volumetric file into volumetric file from different formats (pgm3d, vol, longvol). This tool can also be used to upgrade a Version-2 Vol or Longvol file to the new (compressed) Version-3.
 
 @b Usage: convertVol [input] [output]

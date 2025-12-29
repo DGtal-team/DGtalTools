@@ -28,7 +28,7 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 #include <iostream>
-
+#include <sstream>
 #include "DGtal/base/Common.h"
 #include "DGtal/base/BasicFunctors.h"
 #include "DGtal/kernel/SpaceND.h"
@@ -56,6 +56,7 @@ using namespace DGtal;
 
 /**
  @page Doc3dVolBoundaryViewer 3dVolBoundaryViewer
+ 
  
  @brief  Display the boundary of a volume file by using PolyscopeViewer.
  @ingroup visualizationtools
@@ -208,6 +209,14 @@ int main( int argc, char** argv )
     
     //! [3dVolBoundaryViewer-ViewingSurface]
     trace.beginBlock( "Displaying everything. " );
+    stringstream s;
+    s << "3dVolBoundaryViewer - DGtalTools: ";
+    string name = inputFileName.substr(inputFileName.find_last_of("/")+1,inputFileName.size()) ;
+    s << " " <<  name ;
+    polyscope::options::programName = s.str();
+    polyscope::options::groundPlaneMode = polyscope::GroundPlaneMode::None;
+    polyscope::view::setNavigateStyle(polyscope::NavigateStyle::Free);
+
     PolyscopeViewer<Space,KSpace> viewer(ks);
     viewer.allowReuseList = true;
     typedef MyDigitalSurface::ConstIterator ConstIterator;

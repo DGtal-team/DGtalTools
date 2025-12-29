@@ -97,7 +97,7 @@ using namespace Z3i;
  You should obtain such a result:
  @image html res3dVolMarchingCubes.png "Resulting visualization."
  
- You can test on other samples like http://www.tc18.org/code_data_set/3D_greyscale/bonsai.vol.bz2
+ You can test on other samples like https://tc18.org/DataSets/3D_greyscale/bonsai.vol.bz2
  @code
  $ 3dVolMarchingCubes -i bonsai.vol  -t 80
  @endcode

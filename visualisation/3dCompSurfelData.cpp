@@ -24,11 +24,12 @@
  * A tool to compare generic surfel data informations given from two data files.
  *
  * This file is part of the DGtal library.
- */
+ **/
 
 ///////////////////////////////////////////////////////////////////////////////
 
 #include <iostream>
+#include <sstream>
 #include <stdio.h>
 
 #include "DGtal/base/Common.h"
@@ -58,7 +59,7 @@ using namespace Z3i;
 
 
 /**
- @page CompSurfelData 3DCompSurfelData
+ @page Doc3dCompSurfelData 3dCompSurfelData
 
  @brief  Computes generic scalar surfel data comparisons (squared error) (given from an input data file and from a reference one). 
  @ingroup visualizationtools 
@@ -110,8 +111,8 @@ using namespace Z3i;
 
  @see
  @ref 3dCompSurfelData.cpp
- @ref 3dCurvatureViewer 
- */
+ @ref Doc3dCurvatureViewer 
+**/
 
 template < typename Point>
 void
@@ -126,14 +127,14 @@ getBoundingUpperAndLowerPoint(const std::vector<Point> &vectorPt, Point &ptLower
    if(vectorPt.at(i)[2] < ptLower[2]){
       ptLower[2] =vectorPt.at(i)[2];
     }
-   if(vectorPt.at(i)[0] < ptLower[0]){
-      ptLower[0] = vectorPt.at(i)[0];
+   if(vectorPt.at(i)[0] > ptUpper[0]){
+      ptUpper[0] = vectorPt.at(i)[0];
    }
-   if(vectorPt.at(i)[1] < ptLower[1]){
-     ptLower[1] = vectorPt.at(i)[1];
+   if(vectorPt.at(i)[1] > ptUpper[1]){
+     ptUpper[1] = vectorPt.at(i)[1];
     }
-   if(vectorPt.at(i)[2] < ptLower[2]){
-      ptLower[2] =vectorPt.at(i)[2];
+   if(vectorPt.at(i)[2] > ptUpper[2]){
+      ptUpper[2] =vectorPt.at(i)[2];
     }
   }
 }
@@ -213,8 +214,8 @@ int main( int argc, char** argv )
   getBoundingUpperAndLowerPoint(surfelAndScalarReference,  ptLower, ptUpper);
   getBoundingUpperAndLowerPoint(surfelAndScalarInput,  ptLower, ptUpper);
 
-  K.init(Z3i::Point(2*ptLower[0]+1, 2*ptLower[1]+1, 2*ptLower[2]+1),
-         Z3i::Point(2*ptUpper[0]+1, 2*ptUpper[1]+1, 2*ptUpper[2]+1), true);
+  K.init(Z3i::Point(2*(ptLower[0]-1)+1, 2*(ptLower[1]-1)+1, 2*(ptLower[2]-1)+1),
+         Z3i::Point(2*(ptUpper[0]+1)+1, 2*(ptUpper[1]+1)+1, 2*(ptUpper[2]+1)+1), true);
 
 
   std::vector<Cell> vectSurfelsReference;
@@ -271,6 +272,12 @@ int main( int argc, char** argv )
 
   //-------------------------
   // Displaying input with error and computing statistics
+  stringstream s;
+  s << "3dCompSurfelData - DGtalTools: ";
+  string name = inputFileName.substr(inputFileName.find_last_of("/")+1,inputFileName.size()) ;
+  s << " " <<  name << " (W key to display settings)";
+  polyscope::options::programName = s.str();
+  polyscope::view::setNavigateStyle(polyscope::NavigateStyle::Free);
 
 
   typedef PolyscopeViewer<> Viewer;

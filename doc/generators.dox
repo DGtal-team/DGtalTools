@@ -20,10 +20,11 @@
 
 
 Utilities to generate various contours/shapes:
-
-  - @ref contourGenerator :  generates multigrid contours of 2d digital shapes using DGtal library.
-  - @ref shapeGenerator : generates shapes using DGtal library.
-
+             
+  - <a href="group__generatorstools.html#contourGenerator"> contourGenerator </a> :  generates multigrid contours of 2d digital shapes using DGtal library.
+  - <a href="group__generatorstools.html#shapeGenerator"> shapeGenerator </a> : generates shapes using DGtal library.
+  - <a href="group__generatorstools.html#Doc3dParametricCurveDigitizer"> 3dParametricCurveDigitizer </a> : Digitizes 3D parametric curves using DGtal library.
+  - <a href="group__generatorstools.html#Doc2dSimplePolygonDigitizer"> 2dSimplePolygonDigitizer </a> : Computes the set of integer points inside the input polyline.      
   
 
 
@@ -31,12 +32,12 @@ Utilities to generate various contours/shapes:
 <table>
 
   <tr>
-        <td><img height=200px src="resContourGenerator.png"></td>
-        <td><img height=200px src="resShapeGenerator.png"></td>
+        <td align="center"><img height=200px src="resContourGenerator.png"></td>
+        <td align="center"><img height=200px src="resShapeGenerator.png"></td>
   </tr>
   <tr>
-  <td align=center>@ref contourGenerator</td>
-  <td align=center>@ref shapeGenerator </td>
+  <td align="center"><a href="group__generatorstools.html#contourGenerator">contourGenerator</a></td>
+  <td align="center"><a href="group__generatorstools.html#shapeGenerator">shapeGenerator</a> </td>
   </tr>
 
 

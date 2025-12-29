@@ -50,8 +50,8 @@ using namespace Z3i;
 typedef PolyscopeViewer<Z3i::Space, Z3i::KSpace> Viewer;
 
 /**
- @page Doc3DSDPViewer 3DSDPViewer
-
+ @page Doc3dSDPViewer 3dSDPViewer
+ 
  @brief Displays a  sequence of 3d discrete points by using PolyscopeViewer.
  @ingroup visualizationtools
  
@@ -84,16 +84,13 @@ typedef PolyscopeViewer<Z3i::Space, Z3i::KSpace> Viewer;
    -x,--scaleX FLOAT=1                   set the scale value in the X direction
    -y,--scaleY FLOAT=1                   set the scale value in the Y direction
    -z,--scaleZ FLOAT=1                   set the scale value in the Z direction
-   --sphereResolution UINT=30            defines the sphere resolution (used when the primitive is set to the sphere).
-   -s,--sphereRadius FLOAT=0.2           defines the sphere radius (used when the primitive is set to the sphere).
-   --sphereRadiusFromInput               takes, as sphere radius, the 4th field of the sdp input file.
    --lineSize FLOAT=0.2                  defines the line size (used when the --drawLines or --drawVectors option is selected).
    -p,--primitive TEXT:{voxel,glPoints,sphere}=voxel
                                          set the primitive to display the set of points.
    -v,--drawVectors TEXT                 SDP vector file: draw a set of vectors from the given file (each vector are determined by two consecutive point given, each point represented by its coordinates on a single line.
    -u,--unitVector FLOAT=0               specifies that the SDP vector file format (of --drawVectors option) should be interpreted as unit vectors (each vector position is be defined from the input point (with input order) with a constant norm defined by [arg]).
    --filterVectors FLOAT=100             filters vector input file in order to display only the [arg] percent of the input vectors (uniformly selected, to be used with option --drawVectors else no effect).
-   --interactiveDisplayVoxCoords          by using this option the coordinates can be displayed after selection (shift+left click on voxel).
+
 
 @endcode
 
@@ -102,7 +99,7 @@ typedef PolyscopeViewer<Z3i::Space, Z3i::KSpace> Viewer;
 
  You can display a set of 3D points with sphere primitive and lines:
  @code
- $  3DSDPViewer  $DGtal/tests/samples/sinus3D.dat -p sphere -s 0.3 --drawLines --lineSize 5
+ $  3DSDPViewer  $DGtal/tests/samples/sinus3D.dat -p sphere  --drawLines --lineSize 5
  @endcode
 
  You should obtain such a result:
@@ -112,18 +109,18 @@ typedef PolyscopeViewer<Z3i::Space, Z3i::KSpace> Viewer;
 
 @b Example @b with @b interactive @b selection :
 
-This tool can be useful to recover coordinates from a set of voxels. To do it, you have to add the option allowing to activate the interactive selection (with --interactiveDisplayVoxCoords), for instance if you apply:
+This tool can be useful to recover the index of selected voxel:
 @code
-$ 3dSDPViewer  $DGtal/tests/samples/sinus3D.dat  --interactiveDisplayVoxCoords
+$ 3dSDPViewer  $DGtal/tests/samples/sinus3D.dat  
 
 @endcode
-you should be able to select a voxel by using the SHIFT key and by clicking on a voxel:
+By clicking on a voxel:
   @image html res3DSDPViewerInteractive.png " "
 
 
 @b Visualization @b of @b large @b  point @b set
 
-If you need to display an important number of points, you can use the primitive @e glPoints instead @e voxel or @e sphere (-p glPoints). You will obtain such type of a visualization:
+If you need to display an important number of points, you can use the primitive @e sphere instead @e voxel. You will obtain such type of a visualization:
 
   @image html res3DSDPViewerGLPoints.png " "
 
@@ -133,6 +130,24 @@ If you need to display an important number of points, you can use the primitive 
  @ref 3DSDPViewer.cpp
 
  */
+
+// Variable globale pour activer/désactiver l'UI
+bool show_ui = false;
+
+void myCallback() {
+    ImGuiIO& io = ImGui::GetIO();
+
+    
+    // Si la touche W est enfoncée ce frame
+    if (ImGui::IsKeyPressed(ImGuiKey_W)) {
+        show_ui = !show_ui;
+        polyscope::options::buildGui = show_ui;
+    }
+
+  
+}
+
+
 
 int main(int argc, char **argv)
 {
@@ -153,7 +168,7 @@ int main(int argc, char **argv)
   bool noPointDisplay{false};
   bool drawLines{false};
   bool importColors{false};
-  bool interactiveDisplayVoxCoords{false};
+  
   float sx{1.0};
   float sy{1.0};
   float sz{1.0};
@@ -196,11 +211,9 @@ int main(int argc, char **argv)
   app.add_option("--primitive,-p", typePrimitive, "set the primitive to display the set of points.")
       ->check(CLI::IsMember({"voxel", "sphere"}));
   app.add_option("--drawVectors,-v", vectorsFileName, "SDP vector file: draw a set of vectors from the given file (each vector are determined by two consecutive point given, each point represented by its coordinates on a single line.");
-
   app.add_option("--unitVector,-u", constantNorm, "specifies that the SDP vector file format (of --drawVectors option) should be interpreted as unit vectors (each vector position is be defined from the input point (with input order) with a constant norm defined by [arg]).");
-
   app.add_option("--filterVectors", percentageFilterVect, "filters vector input file in order to display only the [arg] percent of the input vectors (uniformly selected, to be used with option --drawVectors else no effect). ");
-  app.add_flag("--interactiveDisplayVoxCoords", interactiveDisplayVoxCoords, " by using this option the coordinates can be displayed after selection (shift+left click on voxel).");
+
 
   app.get_formatter()->column_width(40);
   CLI11_PARSE(app, argc, argv);
@@ -221,7 +234,11 @@ int main(int argc, char **argv)
     polyscope::options::programName = s.str();
 
   bool useUnitVector = constantNorm != 0.0;
-
+  polyscope::view::setNavigateStyle(polyscope::NavigateStyle::Free);
+  polyscope::options::groundPlaneMode = polyscope::GroundPlaneMode::None;
+  polyscope::options::buildGui=false;
+  
+  
   typedef PolyscopeViewer<Z3i::Space, Z3i::KSpace> Viewer;
   Z3i::KSpace K;
   Viewer viewer(K);
@@ -266,19 +283,19 @@ int main(int argc, char **argv)
     {
       if (importColors)
       {
-        Color col = vectColors[i];
-        viewer.drawColor(col);
+        pointColor = vectColors[i];
+
       }
       else if (importColorLabels)
       {
         unsigned int index = vectColorLabels[i];
-        Color col = aColorMap(index);
-        viewer.drawColor(col);
-      }
-
-      viewer << Z3i::Point((int)vectVoxels.at(i)[0],
-                           (int)vectVoxels.at(i)[1],
-                           (int)vectVoxels.at(i)[2]);
+        pointColor = aColorMap(index);
+      }      
+      viewer << WithQuantity(Z3i::Point((int)vectVoxels.at(i)[0],
+					(int)vectVoxels.at(i)[1],
+					(int)vectVoxels.at(i)[2]), "label", pointColor);
+      
+      
     }
 
     viewer << lineColor;
@@ -339,7 +356,7 @@ int main(int argc, char **argv)
         viewer << mesh;
       }
     }
-
+    polyscope::state::userCallback = myCallback;
     viewer.show();
     return 0;
   }

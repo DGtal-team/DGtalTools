@@ -40,8 +40,8 @@ using namespace DGtal;
 using namespace Z3i;
 
 /**
+
  @page volInfo volInfo
- 
  @brief Get information from a vol file (size and values).
  @ingroup volumetrictools
 

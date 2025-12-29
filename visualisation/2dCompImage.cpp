@@ -25,7 +25,7 @@
  * Source file of the tool 2dCompImage
  *
  * This file is part of the DGtal library/DGtalTools Project.
- */
+ **/
 
 ///////////////////////////////////////////////////////////////////////////////
 #include "DGtal/base/Common.h"
@@ -57,7 +57,7 @@ typedef GradientColorMap<unsigned int, CMAP_JET, 1 > JetMap;
 
 
 /**
- @page Doc2dCompImage 2dCompImage
+ @page 2dCompImage 2dCompImage
  
  @brief Compare images and displays differences (squared and absolute differences). 
  @ingroup visualizationtools
@@ -95,7 +95,7 @@ You should obtain such a visualisation:
  @ref 2dCompImage.cpp
 
 
- */
+**/
 
 
 

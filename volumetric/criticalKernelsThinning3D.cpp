@@ -18,12 +18,13 @@
  */
 
 /**
- @page criticalKernelsThinning3D criticalKernelsThinning3D
 
+ @page criticalKernelsThinning3D criticalKernelsThinning3D
  @brief Applies an criticalKernels thinning algorithm of a 3d image file (vol,longvol,pgm3d...) with 3D viewer.
+ @ingroup volumetrictools
 
  @b Usage: criticalKernelsThinning3D [options] --input <3dImageFileName>  {vol,longvol,pgm3d...}
- @ingroup volumetrictools
+
 
  @b Allowed @b options @b are :
  @code
@@ -291,8 +292,8 @@ int main(int argc, char* const argv[]){
 
   if(visualize)
   {
-     polyscope::options::programName = "DGtalTools: criticalKernelsThinning3D";
-
+    polyscope::options::programName = "DGtalTools: criticalKernelsThinning3D";
+    polyscope::view::setNavigateStyle(polyscope::NavigateStyle::Free);
     PolyscopeViewer<> viewer( ks );
 
     viewer.drawColor(Color(255, 255, 255, 255));

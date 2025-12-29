@@ -87,8 +87,7 @@ using namespace DGtal;
 
 
 /**
- @page Doc2dLocalEstimators 2dLocalEstimators
- 
+ @page Doc2dLocalEstimators 2dLocalEstimators 
  @brief Compares local estimators on implicit shapes using DGtal library.
  @ingroup estimatortools
 

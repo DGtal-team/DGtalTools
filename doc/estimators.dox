@@ -17,43 +17,45 @@
 @writers Bertrand Kerautret
 
 
-
-  - @ref Doc2dLocalEstimators : compares local estimators on implicit shapes using DGtal Library.
-  - @ref Doc3dCurveTangentEstimator : estimates the tangent vector to a set of 3D integer points.
-  - @ref Doc3dLocalEstimators : compares local estimators on implicit shapes using DGtal library.
-  - @ref curvatureBC : estimates curvature using a binomial convolver.
-  - @ref curvatureMCMS : estimates curvature using length of most centered segment computers.
-  - @ref curvatureScaleSpaceBCC : generates the Curvature Scale Space image using a binomial convolver based estimator.
-  - @ref eulerCharacteristic : computes the Euleur Characteristic of  a vol to a 8-bit raw file.
-  - @ref generic3dNormalEstimators : computes a normal vector field over a digitized 3D implicit surface for several estimators.
-  - @ref lengthEstimators : generates multigrid length estimations of paramteric shapes using DGtal library.
-  - @ref statisticsEstimators : computes satistics (L1, L2, Loo) from results of two estimators.
-  - @ref tangentBC : estimates tangent using a binomial convolver.
-  - @ref vol2normalField : generates normal vector field from a vol file using DGtal library.
-  - @ref volSurfaceRegularization : regularizes a digital surface into a smooth cubical complex.
+                   
+  - <a href="group__estimatortools.html#Doc2dLocalEstimators">2dLocalEstimators</a> : compares local estimators on implicit shapes using DGtal Library.
+  - <a href="group__estimatortools.html#Doc3dCurveTangentEstimator">3dCurveTangentEstimator</a> : estimates the tangent vector to a set of 3D integer points.
+  - <a href="group__estimatortools.html#Doc3dLocalEstimators">3dLocalEstimators</a> : compares local estimators on implicit shapes using DGtal library.
+  - <a href="group__estimatortools.html#curvatureBC">curvatureBC</a> : estimates curvature using a binomial convolver.
+  - <a href="group__estimatortools.html#curvatureMCMS">curvatureMCMS</a> : estimates curvature using length of most centered segment computers.
+  - <a href="group__estimatortools.html#curvatureScaleSpaceBCC">curvatureScaleSpaceBCC</a> : generates the Curvature Scale Space image using a binomial convolver based estimator.
+  - <a href="group__estimatortools.html#eulerCharacteristic">eulerCharacteristic</a> : computes the Euleur Characteristic of  a vol to a 8-bit raw file.
+  - <a href="group__estimatortools.html#generic3dNormalEstimators">generic3dNormalEstimators</a> : computes a normal vector field over a digitized 3D implicit surface for several estimators.
+  - <a href="group__estimatortools.html#lengthEstimators">lengthEstimators</a> : generates multigrid length estimations of paramteric shapes using DGtal library.
+  - <a href="group__estimatortools.html#statisticsEstimators">statisticsEstimators</a> : computes satistics (L1, L2, Loo) from results of two estimators.
+  - <a href="group__estimatortools.html#tangentBC">tangentBC</a> : estimates tangent using a binomial convolver.
+  - <a href="group__estimatortools.html#vol2normalField">vol2normalField</a> : generates normal vector field from a vol file using DGtal library.
+  - <a href="group__estimatortools.html#volSurfaceRegularization">volSurfaceRegularization</a> : regularizes a digital surface into a smooth cubical complex.
 
 
 <center>
 <table>
   <tr>
-        <td> <img height=200px src="res2dLocalEstimators.png"> </td>
-        <td><img height=200px src="res3dCurveTangentEstimator.png"></td>
-        <td><table> <tr><td><img height=50px src="resCurvatureBCcontour.png"></td><td><img height=200px src="resCurvatureBCcurvature.png"></td></tr></table></td>
+        <td align="center"> <img height=200px src="res2dLocalEstimators.png"> </td>
+        <td align="center"><img height=200px src="res3dCurveTangentEstimator.png"></td>
+        <td><table> <tr>
+        <td align="center"><img height=50px src="resCurvatureBCcontour.png"></td><td><img height=200px src="resCurvatureBCcurvature.png"></td>
+        </tr></table></td>
 </tr>
 <tr>
-        <td align = center>@ref Doc2dLocalEstimators </td>
-        <td align = center>@ref Doc3dCurveTangentEstimator </td>
-        <td align = center>@ref curvatureBC</td>
+        <td align="center"><a href="group__estimatortools.html#Doc2dLocalEstimators">2dLocalEstimators</a> </td>
+        <td align="center"><a href="group__estimatortools.html#Doc3dCurveTangentEstimator">3dCurveTangentEstimator</a> </td>
+        <td align="center"><a href="group__estimatortools.html#curvatureBC">curvatureBC</a></td>
 </tr>
   <tr>
-        <td> <img height=200px src="resVol2normalField.png"> </td>
-        <td><img height=200px src="resGeneric3dNormalEstimatorsVCM.png"></td>
-        <td><img height=100px src="resCurvatureScaleSpaceBCC.png"></td>
+        <td align="center"> <img height=200px src="resVol2normalField.png"> </td>
+        <td align="center"><img height=200px src="resGeneric3dNormalEstimatorsVCM.png"></td>
+        <td align="center"><img height=100px src="resCurvatureScaleSpaceBCC.png"></td>
 </tr>
 <tr>
-        <td align = center>@ref vol2normalField </td>
-        <td align = center>@ref generic3dNormalEstimators </td>
-        <td align = center>@ref curvatureScaleSpaceBCC</td>
+        <td align="center"><a href="group__estimatortools.html#vol2normalField">vol2normalField</a> </td>
+        <td align="center"><a href="group__estimatortools.html#generic3dNormalEstimators">generic3dNormalEstimators</a> </td>
+        <td align="center"><a href="group__estimatortools.html#curvatureScaleSpaceBCC">curvatureScaleSpaceBCC</a></td>
 </tr>
 
 

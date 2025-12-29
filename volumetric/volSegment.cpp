@@ -50,6 +50,7 @@ using namespace DGtal;
 
 
 /**
+
  @page volSegment volSegment
  
  @brief Segments volumetric file from a simple threshold which can be set automatically from the otsu estimation.

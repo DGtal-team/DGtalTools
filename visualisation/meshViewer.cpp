@@ -44,6 +44,7 @@ using namespace DGtal;
 /**
  @page meshViewer meshViewer
 
+
  @brief Displays OFF mesh file by using PolyscopeViewer.
  @ingroup visualizationtools
  
@@ -203,20 +204,21 @@ int main(int argc, char **argv)
     sdpColorB = customColorSDP[2];
     sdpColorA = customColorSDP[3];
   }
-    
-    stringstream s;
-    s << "meshViewer - DGtalTools: ";
-    string name = inputFileNames[0].substr(inputFileNames[0].find_last_of("/")+1,inputFileNames[0].size()) ;
-    s << " " <<  name << " (W key to display settings)";
-    polyscope::options::programName = s.str();
-    polyscope::options::buildGui=false;
-    polyscope::options::groundPlaneMode = polyscope::GroundPlaneMode::None;
- 
-    // Masquer le sol aussi
 
-    PolyscopeViewer viewer;
 
-    viewer.allowReuseList = true;
+  stringstream s;
+  s << "meshViewer - DGtalTools: ";
+  string name = inputFileNames[0].substr(inputFileNames[0].find_last_of("/")+1,inputFileNames[0].size()) ;
+  s << " " <<  name << " (W key to display settings)";
+  polyscope::options::programName = s.str();
+  polyscope::options::buildGui=false;
+  polyscope::options::groundPlaneMode = polyscope::GroundPlaneMode::None;
+  polyscope::view::setNavigateStyle(polyscope::NavigateStyle::Free); 
+
+  // Masquer le sol aussi
+  PolyscopeViewer viewer;
+
+  viewer.allowReuseList = true;
   trace.info() << "Importing mesh... ";
 
   std::vector<Mesh<DGtal::Z3i::RealPoint>> vectMesh;
@@ -378,7 +380,7 @@ int main(int argc, char **argv)
   }
   stringstream ss;
   ss << "# faces: " << std::fixed << nbFaces << "    #vertex: " << nbVertex;
- trace.info() << "[display ready]" << std::endl;
+  trace.info() << "[display ready]" << std::endl;
   polyscope::state::userCallback = myCallback;
 
   viewer.show();

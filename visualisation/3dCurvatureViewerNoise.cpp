@@ -28,6 +28,7 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 #include <iostream>
+#include <sstream>
 #include "DGtal/base/Common.h"
 #include <cstring>
 
@@ -64,15 +65,14 @@ using namespace DGtal;
 using namespace functors;
 
 /**
- @page Doc3DCurvatureViewerNoise 3DCurvatureViewerNoise
-
+ @page Doc3dCurvatureViewerNoise 3dCurvatureViewerNoise
+ 
  @brief  Same as @ref Doc3DCurvatureViewer, but allows to add some noise to objects.
  @ingroup visualizationtools
  
   Vol file viewer, with curvature (mean or Gaussian, see parameters) information on surface.
-  Blue color means lowest curvature
-  Yellow color means highest curvature
-  Red means the in-between
+  Curvature values are displayed using a colormap (Viridis by default).
+  The colormap and scale can be changed in the Polyscope interface (press W).
 
   Uses IntegralInvariantCurvatureEstimation
   @see related article:
@@ -107,7 +107,6 @@ using namespace functors;
    -d,--exportDAT TEXT                   Export resulting curvature (for mean, gaussian, k1 or k2 mode) in a simple data file each line representing a surfel.
    --exportOnly                          Used to only export the result without the 3d Visualisation (usefull for scripts).
    -s,--imageScale FLOAT x 3             scaleX, scaleY, scaleZ: re sample the source image according with a grid of size 1.0/scale (usefull to compute curvature on image defined on anisotropic grid). Set by default to 1.0 for the three axis.
-   -n,--normalization BOOLEAN            When exporting to OBJ, performs a normalization so that the geometry fits in [-1/2,1/2]^3
 
  
  @endcode
@@ -135,7 +134,7 @@ $ 3dCurvatureViewerNoise $DGtal/examples/samples/Al.100.vol -r 15 -m mean -k 0.5
 
  @see
  @ref 3dCurvatureViewerNoise.cpp,
- @ref Doc3DCurvatureViewer
+ @ref Doc3dCurvatureViewer
  */
 
 
@@ -145,6 +144,17 @@ const Color  AXIS_COLOR_BLUE( 20, 20, 200, 255 );
 const double AXIS_LINESIZE = 0.05;
 
 ///////////////////////////////////////////////////////////////////////////////
+
+// used to enable/disable the polyscope UI
+bool show_ui = false;
+void myCallback() {
+    ImGuiIO& io = ImGui::GetIO();
+    if (ImGui::IsKeyPressed(ImGuiKey_W)) {
+        show_ui = !show_ui;
+        polyscope::options::buildGui = show_ui;
+    }
+}
+
 
 /**
  * Missing parameter error message.
@@ -172,10 +182,10 @@ int main( int argc, char** argv )
   std::string export_dat_filename;
   bool exportOnly {false};
   std::vector< double> vectScale;
-  bool normalization {false};
+  
 
   
-  app.description("Visualisation of 3d curvature from .vol file using curvature from Integral Invariant\nBasic usage:\n \t3dCurvatureViewerNoise file.vol --radius 5 --mode mean --noise 0.5 \n Below are the different available modes: \n\t - \"mean\" for the mean curvature \n \t - \"mean\" for the mean curvature\n\t - \"gaussian\" for the Gaussian curvature\n\t - \"k1\" for the first principal curvature\n\t - \"k2\" for the second principal curvature\n\t - \"prindir1\" for the first principal curvature direction\n\t - \"prindir2\" for the second principal curvature direction\n\t - \"normal\" for the normal vector");
+  app.description("Visualisation of 3d curvature from .vol file using curvature from Integral Invariant\nBasic usage:\n \t3dCurvatureViewerNoise file.vol --radius 5 --mode mean --noise 0.5 \n Below are the different available modes: \n\t - \"mean\" for the mean curvature \n \t - \"mean\" for the mean curvature\n\t - \"gaussian\" for the Gaussian curvature\n\t - \"k1\" for the first principal curvature\n\t - \"k2\" for the second principal curvature\n\t - \"prindir1\" for the first principal curvature direction\n\t - \"prindir2\" for the second principal curvature direction\n\t - \"normal\" for the normal vector\n Example:  3dCurvatureViewerNoise $DGtal/examples/samples/Al.100.vol -r 15 -m mean -k 0.5");
 
   
   
@@ -197,8 +207,6 @@ int main( int argc, char** argv )
   app.add_option("--imageScale,-s", vectScale,  "scaleX, scaleY, scaleZ: re sample the source image according with a grid of size 1.0/scale (usefull to compute curvature on image defined on anisotropic grid). Set by default to 1.0 for the three axis.")
    ->expected(3);
  
-  app.add_option("--normalization,-n",normalization, "When exporting to OBJ, performs a normalization so that the geometry fits in [-1/2,1/2]^3") ;
-  
   app.get_formatter()->column_width(40);
   CLI11_PARSE(app, argc, argv);
   // END parse command line using CLI ----------------------------------------------
@@ -314,10 +322,18 @@ int main( int argc, char** argv )
       trace.info()<<std::endl;
       exit(2);
     }
-
+  std::stringstream s;
+  s << "3dCurvatureViewerNoise - DGtalTools: ";
+  std::string name = inputFileName.substr(inputFileName.find_last_of("/")+1,inputFileName.size()) ;
+  s << " " <<  name <<  " (W key to display settings)" ;
+  polyscope::options::programName = s.str();
+  polyscope::options::buildGui=false;
+  polyscope::options::groundPlaneMode = polyscope::GroundPlaneMode::None;
+  
   typedef PolyscopeViewer<Z3i::Space, Z3i::KSpace> Viewer;
   Viewer viewer( K );
   viewer.allowReuseList = true;
+  polyscope::state::userCallback = myCallback;
 
   unsigned int i = 0;
   unsigned int max_size = 0;

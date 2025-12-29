@@ -48,10 +48,13 @@ typedef Shortcuts<Z3i::KSpace> SH3;
 
 
 /**
- @page volscope volscope
+
+ @page DocVolscope volscope
+
+ 
+ @ingroup visualizationtools
  
  @brief Volumetric file visualization using polyscope
- @ingroup visualizationtools
  
  @b Usage: volscope [options] --input  \<fileName\>
  

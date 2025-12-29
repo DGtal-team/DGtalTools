@@ -56,6 +56,7 @@ using namespace DGtal;
 
 /**
  @page mesh2heightfield mesh2heightfield
+
  @brief  Converts a mesh file into a projected 2D image given from a normal direction N and from a starting point P.
  @ingroup convertertools
  

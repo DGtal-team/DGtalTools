@@ -52,6 +52,7 @@ using namespace DGtal;
 
 /**
  @page tangentBC tangentBC
+
  
  @brief  Estimates tangent using a binomial convolver.
  @ingroup estimatortools

@@ -1,7 +1,9 @@
 /**
  * @file volumetric.dox
- * @author Bertrand Kerautret
- * LORIA (CNRS, UMR 7503), University of Lorraine, France
+
+* @author Bertrand Kerautret
+
+* LORIA (CNRS, UMR 7503), University of Lorraine, France
  *
  * @date 2016/05/12
  *
@@ -13,28 +15,29 @@
 //----------------------------------------
 /*!
 @page volumetric_Doc Volumetric
+
 @writers Bertrand Kerautret
 
 
 
-  - @ref criticalKernelsThinning3D :  applies an criticalKernels thinning algorithm of a 3d image file (vol,longvol,pgm3d...) with 3D viewer.
-  - @ref 3dVolMarchingCubes : outputs the isosurface of the input volume  as an OFF file.
-  - @ref homotopicThinning3D : applies an homotopic thinning of a 3d image file (vol,longvol,pgm3d...) with 3D viewer.
-  - @ref volAddBorder : adds a border of one voxel with value 0 around a vol file.
-  - @ref volAddNoise : adds Kanungo noise to a binary object with 0 values as background points and values >0 for the foreground ones.
-  - @ref volCComponentCounter : counts the number of connected component (same values) in a  volume (Vol) file image.
-  - @ref volCrop : crops a 3D vol image from domain coordinates.
-  - @ref volFillInterior : fills the interior of a voxel set.
-  - @ref volFlip : flips 2D slice image of an 3D vol image (mirror transformation).
-  - @ref volImageMetrics : applies basic image measures (RMSE, PSNR) between two volumetric images A and B.
-  - @ref volIntensityScale : applies a linear rescaling of the image intensity.
-  - @ref volMask : extracts a new image from the a mask image.
-  - @ref volReSample :  re samples a 3D volumetric image (.vol, .longvol, .pgm3d)  with a given grid size.
-  - @ref volSegment : segments volumetric file from a simple threshold.
-  - @ref volShapeMetrics : applies shape measures to compare two volumetric images A and B (shape defined from thresholds).
-  - @ref volSubSample : brutally sub samples a vol file (division by 2 in each direction).
-  - @ref volTrValues : applies basic vol image transform from the input values to output values.
-  - @ref volInfo : to get information (domain size, value distributions) from a VOL file.
+  - <a href="group__volumetrictools.html#criticalKernelsThinning3D">criticalKernelsThinning3D</a> :  applies an criticalKernels thinning algorithm of a 3d image file (vol,longvol,pgm3d...) with 3D viewer.
+  - <a href="group__volumetrictools.html#Doc3dVolMarchingCubes">3dVolMarchingCubes</a> : outputs the isosurface of the input volume  as an OFF file.
+  - <a href="group__volumetrictools.html#homotopicThinning3D">homotopicThinning3D</a>  : applies an homotopic thinning of a 3d image file (vol,longvol,pgm3d...) with 3D viewer.
+  - <a href="group__volumetrictools.html#volAddBorder">volAddBorder</a>  : adds a border of one voxel with value 0 around a vol file.
+  - <a href="group__volumetrictools.html#volAddNoise">volAddNoise</a>  : adds Kanungo noise to a binary object with 0 values as background points and values >0 for the foreground ones.
+  - <a href="group__volumetrictools.html#volCComponentCounter">volCComponentCounter</a>  : counts the number of connected component (same values) in a  volume (Vol) file image.
+  - <a href="group__volumetrictools.html#volCrop">volCrop</a>  : crops a 3D vol image from domain coordinates.
+  - <a href="group__volumetrictools.html#volFillInterior">volFillInterior</a>  : fills the interior of a voxel set.
+  - <a href="group__volumetrictools.html#volFlip">volFlip</a>  : flips 2D slice image of an 3D vol image (mirror transformation).
+  - <a href="group__volumetrictools.html#volImageMetrics">volImageMetrics</a>  : applies basic image measures (RMSE, PSNR) between two volumetric images A and B.
+  - <a href="group__volumetrictools.html#volIntensityScale">volIntensityScale</a>  : applies a linear rescaling of the image intensity.
+  - <a href="group__volumetrictools.html#volMask">volMask</a>  : extracts a new image from the a mask image.
+  - <a href="group__volumetrictools.html#volReSample">volReSample</a>  :  re samples a 3D volumetric image (.vol, .longvol, .pgm3d)  with a given grid size.
+  - <a href="group__volumetrictools.html#volSegment">volSegment</a>  : segments volumetric file from a simple threshold.
+  - <a href="group__volumetrictools.html#volShapeMetrics">volShapeMetrics</a>  : applies shape measures to compare two volumetric images A and B (shape defined from thresholds).
+  - <a href="group__volumetrictools.html#volSubSample">volSubSample</a>  : brutally sub samples a vol file (division by 2 in each direction).
+  - <a href="group__volumetrictools.html#volTrValues">volTrValues</a>  : applies basic vol image transform from the input values to output values.
+  - <a href="group__volumetrictools.html#volInfo">volInfo</a>  : to get information (domain size, value distributions) from a VOL file.
 
 
 
@@ -47,21 +50,21 @@
         <td><img height=200px src="resVolReSample.png"></td>
 </tr>
 <tr>
-        <td align = center>@ref Doc3dVolMarchingCubes </td>
-        <td align = center>@ref homotopicThinning3D </td>
-        <td align = center>@ref volReSample</td>
+        <td align = center><a href="group__volumetrictools.html#Doc3dVolMarchingCubes"> 3dVolMarchingCubes</a> </td>
+        <td align = center><a href="group__volumetrictools.html#homotopicThinning3D"> homotopicThinning3D</a> </td>
+        <td align = center><a href="group__volumetrictools.html#volReSample"> volReSample</a></td>
 
 </tr>
 
 <tr>
 <td><img height=200px src="resVolTrValues.png"></td>
 <td><img height=200px src="resVolSegment.png"></td>
-<td><img height=200px src="resVolSubSample.png"></td>
+<td><img height=200px src="resVolCrop.png"></td>
 </tr>
 <tr>
-<td align = center>@ref volTrValues</td>
-<td align = center>@ref volSegment</td>
-<td align = center>@ref volSubSample</td>
+<td align = center><a href="group__volumetrictools.html#volTrValues"> volTrValues</a></td>
+<td align = center><a href="group__volumetrictools.html#volSegment"> volSegment</a></td>
+<td align = center><a href="group__volumetrictools.html#volCrop"> volCrop</a></td>
 </tr>
 </table>
 </center>

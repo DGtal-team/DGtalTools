@@ -47,6 +47,7 @@ using namespace Z3i;
 
 
 /**
+
  @page volShapeMetrics volShapeMetrics
  
  @brief Applies shape measures for comparing two volumetric images A and B (shape defined from thresholds).
