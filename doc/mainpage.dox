@@ -24,7 +24,7 @@ user to show how to include the DGtal library framework directly in their
 own source code (in complement of DGtal tutorial https://dgtal-team.github.io/doc-nightly/packageTutorials.html).
 
 
-@section Organisation
+@section Org Organisation 
 
 Actually the DGTalTools project is organized as follows:
 
@@ -132,11 +132,12 @@ Actually the DGTalTools project is organized as follows:
    </td>
    </tr>
       <tr>
-           <td align = center colspan="3" vertical-align=middle> <a href="group__imageprocessingtools.html#DocATu2v0">DocATu2v0</a>,  <a href="group__imageprocessingtools.html#DocATu0v1">DocATu0v1</a> </td>
+           <td align = center colspan="3" vertical-align=middle> <a href="group__imageprocessingtools.html#DocATu2v0">atu2v0</a>,  <a href="group__imageprocessingtools.html#DocATu0v1">atu0v1</a> </td>
 
       </tr>
   </table>
    </center>
+
 
 @defgroup convertertools Converter Tools
 @defgroup volumetrictools Volumetric Tools
@@ -144,5 +145,8 @@ Actually the DGTalTools project is organized as follows:
 @defgroup imageprocessingtools Image Processing Tools
 @defgroup generatorstools Generator Tools
 @defgroup estimatortools Estimator Tools
+
+
+
 
 */
