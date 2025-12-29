@@ -70,9 +70,8 @@ using namespace functors;
  @ingroup visualizationtools
  
   Vol file viewer, with curvature (mean or Gaussian, see parameters) information on surface.
-  Blue color means lowest curvature
-  Yellow color means highest curvature
-  Red means the in-between
+  Curvature values are displayed using a colormap (Viridis by default).
+  The colormap and scale can be changed in the Polyscope interface (press W).
 
   Uses IntegralInvariantCurvatureEstimation
   @see related article:
@@ -107,7 +106,7 @@ using namespace functors;
    -d,--exportDAT TEXT                   Export resulting curvature (for mean, gaussian, k1 or k2 mode) in a simple data file each line representing a surfel.
    --exportOnly                          Used to only export the result without the 3d Visualisation (usefull for scripts).
    -s,--imageScale FLOAT x 3             scaleX, scaleY, scaleZ: re sample the source image according with a grid of size 1.0/scale (usefull to compute curvature on image defined on anisotropic grid). Set by default to 1.0 for the three axis.
-   -n,--normalization BOOLEAN            When exporting to OBJ, performs a normalization so that the geometry fits in [-1/2,1/2]^3
+
    
  @endcode
 
@@ -135,7 +134,7 @@ using namespace functors;
 
  @see
  @ref 3dCurvatureViewer.cpp,
- @ref Doc3DCurvatureViewerNoise
+ @ref Doc3dCurvatureViewerNoise
  */
 
 const Color  AXIS_COLOR_RED( 200, 20, 20, 255 );
@@ -180,9 +179,9 @@ int main( int argc, char** argv )
   std::string export_dat_filename;
   bool exportOnly {false};
   std::vector< double> vectScale;
-  bool normalization {false};
   
-  app.description("Visualisation of 3d curvature from .vol file using curvature from Integral Invarian\nBasic usage:\n \t3dCurvatureViewer file.vol --radius 5 --mode mean  \n Below are the different available modes: \n\t - \"mean\" for the mean curvature \n \t - \"mean\" for the mean curvature\n\t - \"gaussian\" for the Gaussian curvature\n\t - \"k1\" for the first principal curvature\n\t - \"k2\" for the second principal curvature\n\t - \"prindir1\" for the first principal curvature direction\n\t - \"prindir2\" for the second principal curvature direction\n\t - \"normal\" for the normal vector\n Example: 3dCurvatureViewer --radius 20 --mode mean  ${DGtal}/examples/samples/lobster.vol -l 110 ");
+  
+  app.description("Visualisation of 3d curvature from .vol file using curvature from Integral Invarian\nBasic usage:\n \t3dCurvatureViewer file.vol --radius 5 --mode mean  \n Below are the different available modes: \n\t - \"mean\" for the mean curvature \n \t - \"mean\" for the mean curvature\n\t - \"gaussian\" for the Gaussian curvature\n\t - \"k1\" for the first principal curvature\n\t - \"k2\" for the second principal curvature\n\t - \"prindir1\" for the first principal curvature direction\n\t - \"prindir2\" for the second principal curvature direction\n\t - \"normal\" for the normal vector\n Example: 3dCurvatureViewer --radius 20 --mode mean ${DGtal}/examples/samples/lobster.vol -l 110 ");
 
    
    
@@ -202,8 +201,6 @@ int main( int argc, char** argv )
    
    app.add_option("--imageScale,-s", vectScale,  "scaleX, scaleY, scaleZ: re sample the source image according with a grid of size 1.0/scale (usefull to compute curvature on image defined on anisotropic grid). Set by default to 1.0 for the three axis.")
     ->expected(3);
-  
-   app.add_option("--normalization,-n",normalization, "When exporting to OBJ, performs a normalization so that the geometry fits in [-1/2,1/2]^3") ;
    
    app.get_formatter()->column_width(40);
    CLI11_PARSE(app, argc, argv);

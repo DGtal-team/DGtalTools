@@ -111,7 +111,7 @@ using namespace Z3i;
 
  @see
  @ref 3dCompSurfelData.cpp
- @ref 3dCurvatureViewer 
+ @ref Doc3dCurvatureViewer 
 **/
 
 template < typename Point>
