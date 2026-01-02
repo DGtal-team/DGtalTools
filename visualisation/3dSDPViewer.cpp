@@ -79,7 +79,7 @@ typedef PolyscopeViewer<Z3i::Space, Z3i::KSpace> Viewer;
    --importColorLabels                   import color labels from the input file (label index  should be by default at index 3).
    --setColorLabelIndex UINT=3           customize the index of the imported color labels in the source file (used by -importColorLabels).
    -f,--filter FLOAT=100                 filter input file in order to display only the [arg] percent of the input 3D points (uniformly selected).
-   --noPointDisplay                      usefull for instance to only display the lines between points.
+   --noPointDisplay                      useful for instance to only display the lines between points.
    --drawLines                           draw the line between discrete points.
    -x,--scaleX FLOAT=1                   set the scale value in the X direction
    -y,--scaleY FLOAT=1                   set the scale value in the Y direction
@@ -202,7 +202,7 @@ int main(int argc, char **argv)
   app.add_flag("--importColorLabels", importColorLabels, "import color labels from the input file (label index  should be by default at index 3).");
   app.add_option("--setColorLabelIndex", colorLabelIndex, "customize the index of the imported color labels in the source file (used by -importColorLabels).");
   app.add_option("--filter,-f", filterValue, "filter input file in order to display only the [arg] percent of the input 3D points (uniformly selected).");
-  app.add_flag("--noPointDisplay", noPointDisplay, "usefull for instance to only display the lines between points.");
+  app.add_flag("--noPointDisplay", noPointDisplay, "useful for instance to only display the lines between points.");
   app.add_flag("--drawLines", drawLines, "draw the line between discrete points.");
   app.add_option("--scaleX,-x", sx, "set the scale value in the X direction");
   app.add_option("--scaleY,-y", sy, "set the scale value in the Y direction");

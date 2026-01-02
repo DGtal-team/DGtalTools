@@ -104,8 +104,8 @@ using namespace functors;
                                          type of output : mean, gaussian, k1, k2, prindir1, prindir2 or normal(default mean)
    -o,--exportOBJ TEXT                   Export the scene to specified OBJ/MTL filename (extensions added).
    -d,--exportDAT TEXT                   Export resulting curvature (for mean, gaussian, k1 or k2 mode) in a simple data file each line representing a surfel.
-   --exportOnly                          Used to only export the result without the 3d Visualisation (usefull for scripts).
-   -s,--imageScale FLOAT x 3             scaleX, scaleY, scaleZ: re sample the source image according with a grid of size 1.0/scale (usefull to compute curvature on image defined on anisotropic grid). Set by default to 1.0 for the three axis.
+   --exportOnly                          Used to only export the result without the 3d Visualisation (useful for scripts).
+   -s,--imageScale FLOAT x 3             scaleX, scaleY, scaleZ: re sample the source image according with a grid of size 1.0/scale (useful to compute curvature on image defined on anisotropic grid). Set by default to 1.0 for the three axis.
 
    
  @endcode
@@ -181,7 +181,7 @@ int main( int argc, char** argv )
   std::vector< double> vectScale;
   
   
-  app.description("Visualisation of 3d curvature from .vol file using curvature from Integral Invarian\nBasic usage:\n \t3dCurvatureViewer file.vol --radius 5 --mode mean  \n Below are the different available modes: \n\t - \"mean\" for the mean curvature \n \t - \"mean\" for the mean curvature\n\t - \"gaussian\" for the Gaussian curvature\n\t - \"k1\" for the first principal curvature\n\t - \"k2\" for the second principal curvature\n\t - \"prindir1\" for the first principal curvature direction\n\t - \"prindir2\" for the second principal curvature direction\n\t - \"normal\" for the normal vector\n Example: 3dCurvatureViewer --radius 20 --mode mean ${DGtal}/examples/samples/lobster.vol -l 110 ");
+  app.description("Visualisation of 3d curvature from .vol file using curvature from Integral Invariant\nBasic usage:\n \t3dCurvatureViewer file.vol --radius 5 --mode mean  \n Below are the different available modes: \n\t - \"mean\" for the mean curvature \n \t - \"mean\" for the mean curvature\n\t - \"gaussian\" for the Gaussian curvature\n\t - \"k1\" for the first principal curvature\n\t - \"k2\" for the second principal curvature\n\t - \"prindir1\" for the first principal curvature direction\n\t - \"prindir2\" for the second principal curvature direction\n\t - \"normal\" for the normal vector\n Example: 3dCurvatureViewer --radius 20 --mode mean ${DGtal}/examples/samples/lobster.vol -l 110 ");
 
    
    
@@ -197,9 +197,9 @@ int main( int argc, char** argv )
    app.add_option("--mode,-m", mode, "type of output : mean, gaussian, k1, k2, prindir1, prindir2 or normal(default mean)")
     -> check(CLI::IsMember({"mean","gaussian", "k1", "k2", "prindir1","prindir2", "normal" }));
    app.add_option("--exportDAT,-d",export_dat_filename, "Export resulting curvature (for mean, gaussian, k1 or k2 mode) in a simple data file each line representing a surfel."  );
-   app.add_flag("--exportOnly", exportOnly, "Used to only export the result without the 3d Visualisation (usefull for scripts).");
+   app.add_flag("--exportOnly", exportOnly, "Used to only export the result without the 3d Visualisation (useful for scripts).");
    
-   app.add_option("--imageScale,-s", vectScale,  "scaleX, scaleY, scaleZ: re sample the source image according with a grid of size 1.0/scale (usefull to compute curvature on image defined on anisotropic grid). Set by default to 1.0 for the three axis.")
+   app.add_option("--imageScale,-s", vectScale,  "scaleX, scaleY, scaleZ: re sample the source image according with a grid of size 1.0/scale (useful to compute curvature on image defined on anisotropic grid). Set by default to 1.0 for the three axis.")
     ->expected(3);
    
    app.get_formatter()->column_width(40);
