@@ -2,7 +2,9 @@
 
 - *global*
   - Following the new display introduced from polyscope viewer, the illustrations of tools in the documentations was obsolete. It also add some fix when reproducing examples. Some links were also broken from the new organization. (Bertrand Kerautret [476](https://github.com/DGtal-team/DGtalTools/pull/476)) 
-
+  
+  - Default branch set to main instead old master.
+   (Bertrand Kerautret [477](https://github.com/DGtal-team/DGtalTools/pull/477)) 
 
 
 # DGtalTools 2.1

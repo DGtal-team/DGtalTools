@@ -2,7 +2,7 @@ name: CI (linux/macOS/windows)
 
 on:
   push:
-    branches: [ master ]
+    branches: [ main ]
 
 
 jobs:
@@ -48,7 +48,7 @@ jobs:
       uses: JamesIves/github-pages-deploy-action@v4
       with:
         token: ${{ secrets.DGTALTOOLSDOC }}
-        branch: master
+        branch: main
         repository-name: DGtal-team/doctools-nightly
         folder: build/html
         single-comit: true
