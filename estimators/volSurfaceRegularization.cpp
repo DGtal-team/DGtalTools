@@ -37,7 +37,7 @@
  @brief Regularize a cubical complex into a smooth quadrangulated complex.
  @ingroup estimatortools
 
- This is done by minimizing a quadratic energy function as decribed in ??. The variational
+ This is done by minimizing a quadratic energy function as described in ??. The variational
  formulation regularizes the position while aligning the regularized quads with an 
  input normal vector field. In this tool, the input normal vector field can be either 
  specified in the CSV input file, or computed using Integral Invariant (and -r option).

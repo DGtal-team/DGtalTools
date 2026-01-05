@@ -270,7 +270,7 @@ int main(int argc, char**argv)
   bool displayTFstats {false};
   bool exportSDP {false};
   
-  app.description("Apply shape measures for comparing two volumetric images A and B (shape defined from thresholds).\n It can compute: \n  - voxel count from voxel partition (number of voxel from (B-A), (A-B) ...): usefull to determine classical statistics like false positive related stats.\n - euclidean distance between two volumetric images A and B\n Basic usage: \t volShapeMetrics --volA <volAFilename> --volB <volBFilename>\nTypical use :\n  volShapeMetrics -a imageA.vol --aMin 128 --aMax 255 -b imageB.vol --bMin 128 --bMax 255 --distancesFromBnotInAOnly \n");
+  app.description("Apply shape measures for comparing two volumetric images A and B (shape defined from thresholds).\n It can compute: \n  - voxel count from voxel partition (number of voxel from (B-A), (A-B) ...): useful to determine classical statistics like false positive related stats.\n - euclidean distance between two volumetric images A and B\n Basic usage: \t volShapeMetrics --volA <volAFilename> --volB <volBFilename>\nTypical use :\n  volShapeMetrics -a imageA.vol --aMin 128 --aMax 255 -b imageB.vol --bMin 128 --bMax 255 --distancesFromBnotInAOnly \n");
   
   
   
