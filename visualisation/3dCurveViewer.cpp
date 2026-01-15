@@ -47,7 +47,7 @@
  Options:
    -h,--help                             Print this help message and exit
    -i,--input TEXT:FILE REQUIRED         the name of the text file containing the list of 3D points (x y z per line).
-   -b,--box INT=0                        specifies the the tightness of the bounding box around the curve with a given integer displacement <arg> to enlarge it (0 is tight)
+   -b,--box INT=0                        specifies the tightness of the bounding box around the curve with a given integer displacement <arg> to enlarge it (0 is tight)
    -v,--viewBox TEXT:{WIRED,COLORED}=WIRED
                                          displays the bounding box, <arg>=WIRED means that only edges are displayed, <arg>=COLORED adds colors for planes (XY is red, XZ green, YZ, blue).
    -C,--curve3d                          displays the 3D curve.
@@ -383,7 +383,7 @@ int main(int argc, char **argv)
   app.add_option("-i,--input,1", inputFileName, "the name of the text file containing the list of 3D points (x y z per line)." )
   ->required()
   ->check(CLI::ExistingFile);
-  app.add_option("--box,-b",b, "specifies the the tightness of the bounding box around the curve with a given integer displacement <arg> to enlarge it (0 is tight)");
+  app.add_option("--box,-b",b, "specifies the tightness of the bounding box around the curve with a given integer displacement <arg> to enlarge it (0 is tight)");
   app.add_option("--viewBox,-v",viewBox, "displays the bounding box, <arg>=WIRED means that only edges are displayed, <arg>=COLORED adds colors for planes (XY is red, XZ green, YZ, blue)." )
    -> check(CLI::IsMember({"WIRED", "COLORED"}));
   
