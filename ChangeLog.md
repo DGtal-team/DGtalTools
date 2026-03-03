@@ -7,7 +7,7 @@
    (Bertrand Kerautret [477](https://github.com/DGtal-team/DGtalTools/pull/477)) 
 
 - *volumetric*
-  - volSubSample: domains are shown before performing the subsampling (David Coeurjolly [481](https://github.com/DGtal-team/DGtalTools/pull/481)
+  - volSubSample: domains are shown before performing the subsampling and bugfix for the lowerbound (David Coeurjolly [481](https://github.com/DGtal-team/DGtalTools/pull/481)
 
 # DGtalTools 2.1
 
