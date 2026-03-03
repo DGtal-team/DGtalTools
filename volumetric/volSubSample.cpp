@@ -189,8 +189,7 @@ int main(int argc, char**argv)
   typedef ImageContainerBySTLVector<Z3i::Domain, unsigned char>  MyImageC;
   
   MyImageC  imageC = VolReader< MyImageC >::importVol ( inputFileName );
-  MyImageC  outputImage( Z3i::Domain( imageC.domain().lowerBound(),
-                                     imageC.domain().lowerBound() + (imageC.domain().upperBound()-imageC.domain().lowerBound())/Vector().diagonal(2)));
+  MyImageC  outputImage( Z3i::Domain( imageC.domain().lowerBound() / 2, imageC.domain().upperBound() / 2));
   trace.info()<<"Input vol: "<<imageC<<std::endl;
   trace.info()<<"Output vol: "<<outputImage<<std::endl;
   trace.endBlock();
