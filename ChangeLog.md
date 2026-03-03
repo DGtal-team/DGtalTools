@@ -6,6 +6,8 @@
   - Default branch set to main instead old master.
    (Bertrand Kerautret [477](https://github.com/DGtal-team/DGtalTools/pull/477)) 
 
+- *volumetric*
+  - volSubSample: domains are shown before performing the subsampling (David Coeurjolly [xxx](https://github.com/DGtal-team/DGtalTools/pull/477)
 
 # DGtalTools 2.1
 
