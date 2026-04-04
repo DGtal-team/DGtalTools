@@ -33,13 +33,13 @@ if (  DGTAL_WITH_POLYSCOPE_VIEWER )
 endif (  DGTAL_WITH_POLYSCOPE_VIEWER )
 
 
-if (  NOT(DISABLE_POLYSCOPE) )
+if (  DGTAL_WITH_POLYSCOPE_VIEWER )
     SET(DGTALTOOLS_POLYSCOPE_SRC
     volscope)
 
   FOREACH(tool_file ${DGTALTOOLS_POLYSCOPE_SRC})
     add_executable(${tool_file} ${tool_file}.cpp)
-    target_link_libraries (${tool_file} ${DGTAL_LIBRARIES} ${DGtalLibDependencies} ${DGtalToolsLibDependencies} polyscope)
+    target_link_libraries (${tool_file} ${DGtalToolsLibDependencies} DGtal::DGtal)
     install(TARGETS ${tool_file}
         RUNTIME DESTINATION bin
         LIBRARY DESTINATION lib
