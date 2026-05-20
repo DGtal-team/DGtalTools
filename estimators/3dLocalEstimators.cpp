@@ -15,7 +15,7 @@
  **/
 /**
  * @file 3dLocalEstimators.cpp
- * @ingroup Tools
+ * @ingroup Estimators
  * @author Jeremy Levallois (\c jeremy.levallois@liris.cnrs.fr )
  * Laboratoire d'InfoRmatique en Image et Systèmes d'information - LIRIS (CNRS, UMR 5205), Universite de Lyon, France
  * LAboratoire de MAthematiques - LAMA (CNRS, UMR 5807), Universite de Savoie, France
@@ -78,7 +78,8 @@ using namespace functors;
  @page Doc3dLocalEstimators 3dLocalEstimators
  
  @brief Compares local estimators on implicit shapes using DGtal library.
-
+ @ingroup estimatortools
+ 
  @b Usage:  3dLocalEstimators [options] --shape <shape> --h <h> --radius <radius> --estimators <binaryWord> --output <output>
 
     Below are the different available families of estimators:
@@ -1172,11 +1173,11 @@ void missingParam( std::string param )
 
 int main( int argc, char** argv )
 {
-#ifndef WITH_CGAL
-#error You need to have activated CGAL (WITH_CGAL) to include this file.
+#ifndef DGTAL_WITH_CGAL
+#error You need to have activated CGAL (DGTAL_WITH_CGAL) to include this file.
 #endif
-#ifndef WITH_EIGEN
-#error You need to have activated EIGEN (WITH_EIGEN) to include this file.
+#ifndef DGTAL_WITH_EIGEN
+#error You need to have activated EIGEN (DGTAL_WITH_EIGEN) to include this file.
 #endif
   
   // parse command line ----------------------------------------------
@@ -1200,18 +1201,18 @@ int main( int argc, char** argv )
   bool lambda_optimized {false};
 
   app.add_option("--shape,-s", poly_str, "Shape") ->required();
-  app.add_option("--output,-o", file_export, "Output file", true) ->required();
+  app.add_option("--output,-o", file_export, "Output file") ->required();
   
   app.add_option("--radius,-r", radius,"Kernel radius for IntegralInvariant") ->required();
-  app.add_option("--alpha",alpha, "Alpha parameter for Integral Invariant computation", true );
+  app.add_option("--alpha",alpha, "Alpha parameter for Integral Invariant computation" );
   app.add_option("--h", h, "Grid step") ->required();
-  app.add_option("--minAABB,-a", border_minV,  "Min value of the AABB bounding box (domain)", true);
-  app.add_option("--maxAABB,-A", border_maxV,  "Max value of the AABB bounding box (domain)", true);
-  app.add_option("--noise,-n", noiseLevel, "Level of noise to perturb the shape", true );
+  app.add_option("--minAABB,-a", border_minV,  "Min value of the AABB bounding box (domain)");
+  app.add_option("--maxAABB,-A", border_maxV,  "Max value of the AABB bounding box (domain)");
+  app.add_option("--noise,-n", noiseLevel, "Level of noise to perturb the shape" );
   
   app.add_flag("--lambda,-l", lambda_optimized, "Use the shape to get a better approximation of the surface (optional)");
-  app.add_option("--properties", properties, "the i-th property is disabled iff there is a 0 at position i", true);
-  app.add_option("--estimators,-e", options, "the i-th estimator is disabled iff there is a 0 at position i", true);
+  app.add_option("--properties", properties, "the i-th property is disabled iff there is a 0 at position i");
+  app.add_option("--estimators,-e", options, "the i-th estimator is disabled iff there is a 0 at position i");
   
   app.get_formatter()->column_width(40);
   CLI11_PARSE(app, argc, argv);

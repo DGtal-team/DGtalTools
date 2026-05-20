@@ -30,6 +30,7 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 #include <iostream>
+#include <sstream>
 #include <map>
 #include "CLI11.hpp"
 
@@ -38,8 +39,7 @@
 #include "DGtal/helpers/StdDefs.h"
 #include "DGtal/math/MPolynomial.h"
 #include "DGtal/io/readers/MPolynomialReader.h"
-#include "DGtal/io/DrawWithDisplay3DModifier.h"
-#include "DGtal/io/viewers/Viewer3D.h"
+#include "DGtal/io/viewers/PolyscopeViewer.h"
 #include "DGtal/topology/KhalimskySpaceND.h"
 #include "DGtal/topology/CubicalComplex.h"
 #include "DGtal/topology/CubicalComplexFunctions.h"
@@ -60,6 +60,7 @@ using namespace DGtal;
  @page  Doc3dImplicitSurfaceExtractorByThickening 3dImplicitSurfaceExtractorByThickening
  
  @brief Computes the zero level set of the given polynomial.
+ @ingroup visualizationtools
 
  @b Usage:  3dImplicitSurfaceExtractorByThickening [options] input
 
@@ -79,13 +80,14 @@ using namespace DGtal;
    -P,--project TEXT:{No,Newton}=Newton  defines the projection: either No or Newton.
    -e,--epsilon FLOAT=1e-06              the maximum precision relative to the implicit surface in the Newton approximation of F=0.
    -n,--max_iter UINT=500                the maximum number of iteration in the Newton approximation of F=0.
+   -o,--obj TEXT                         OBJ export filename.
    -v,--view TEXT:{Singular,Normal,Hide}=Normal
                                          specifies if the surface is viewed as is (Normal) or if places close to singularities are highlighted (Singular), or if unsure places should not be displayed (Hide).
  @endcode
  
  @b Example: 
  @code
- 3dImplicitSurfaceExtractorByThickening -p "x^2-y*z^2" -g 0.1 -a -2 -A 2 -v Singular
+ 3dImplicitSurfaceExtractorByThickening "x^2-y*z^2" -g 0.1 -a -2 -A 2 -v Singular
  @endcode
 
 
@@ -104,8 +106,8 @@ using namespace DGtal;
 
 Some other examples (more difficult):
 @code 
-3dImplicitSurfaceExtractorByThickening -a -2 -A 2 -p "((y^2+z^2-1)^2-(x^2+y^2-1)^3)*(y*(x-1)^2-z*(x+1))^2" -g 0.025 -e 1e-6 -n 50000 -v Singular -t 0.5 -P Newton
-3dImplicitSurfaceExtractorByThickening -a -2 -A 2 -p "(x^5-4*z^3*y^2)*((x+y)^2-(z-x)^3)" -g 0.025 -e 1e-6 -n 50000 -v Singular -t 0.05 -P Newton
+3dImplicitSurfaceExtractorByThickening -a -2 -A 2  "((y^2+z^2-1)^2-(x^2+y^2-1)^3)*(y*(x-1)^2-z*(x+1))^2" -g 0.025 -e 1e-6 -n 50000 -v Singular -t 0.5 -P Newton
+3dImplicitSurfaceExtractorByThickening -a -2 -A 2  "(x^5-4*z^3*y^2)*((x+y)^2-(z-x)^3)" -g 0.025 -e 1e-6 -n 50000 -v Singular -t 0.05 -P Newton
  
  @endcode
  @see
@@ -303,19 +305,19 @@ int main( int argc, char** argv )
   double epsilon {1e-6};
   unsigned int max_iter {500};
   std::string view {"Normal"};
-
+  
   app.description( "Computes the zero level set of the given polynomial. Usage:  3dImplicitSurfaceExtractorByThickening -p <polynomial> [options]\n Example:\n 3dImplicitSurfaceExtractorByThickening -p \"x^2-y*z^2\" -g 0.1 -a -2 -A 2 -v Singular\n - whitney  : x^2-y*z^2 \n - 4lines   : x*y*(y-x)*(y-z*x) \n - cone     : z^2-x^2-y^2 \n - simonU   : x^2-z*y^2+x^4+y^4 \n - cayley3  : 4*(x^2 + y^2 + z^2) + 16*x*y*z - 1 \n - crixxi   : -0.9*(y^2+z^2-1)^2-(x^2+y^2-1)^3 \n Some other examples (more difficult): \n 3dImplicitSurfaceExtractorByThickening -a -2 -A 2 -p \"((y^2+z^2-1)^2-(x^2+y^2-1)^3)*(y*(x-1)^2-z*(x+1))^2\" -g 0.025 -e 1e-6 -n 50000 -v Singular -t 0.5 -P Newton \n 3dImplicitSurfaceExtractorByThickening -a -2 -A 2 -p \"(x^5-4*z^3*y^2)*((x+y)^2-(z-x)^3)\" -g 0.025 -e 1e-6 -n 50000 -v Singular -t 0.05 -P Newton ");
   app.add_option("-p,--polynomial,1", poly_str, "the implicit polynomial whose zero-level defines the shape of interest." )
   ->required();
-  app.add_option("--minAABB,-a",min_x, "the min value of the AABB bounding box (domain)" , true);
-  app.add_option("--maxAABB,-A",max_x, "the max value of the AABB bounding box (domain)" , true);
-  app.add_option("--gridstep,-g", h, "the gridstep that defines the digitization (often called h).", true);
-  app.add_option("--thickness,-t",t, "the thickening parameter for the implicit surface." , true);
-  app.add_option("--project,-P", project, "defines the projection: either No or Newton.", true)
+  app.add_option("--minAABB,-a",min_x, "the min value of the AABB bounding box (domain)");
+  app.add_option("--maxAABB,-A",max_x, "the max value of the AABB bounding box (domain)" );
+  app.add_option("--gridstep,-g", h, "the gridstep that defines the digitization (often called h).");
+  app.add_option("--thickness,-t",t, "the thickening parameter for the implicit surface." );
+  app.add_option("--project,-P", project, "defines the projection: either No or Newton.")
    -> check(CLI::IsMember({"No", "Newton"}));
-  app.add_option("--epsilon,-e", epsilon, "the maximum precision relative to the implicit surface in the Newton approximation of F=0.", true);
-  app.add_option("--max_iter,-n", max_iter, "the maximum number of iteration in the Newton approximation of F=0.", true );
-  app.add_option("--view,-v", view, "specifies if the surface is viewed as is (Normal) or if places close to singularities are highlighted (Singular), or if unsure places should not be displayed (Hide).",true )
+  app.add_option("--epsilon,-e", epsilon, "the maximum precision relative to the implicit surface in the Newton approximation of F=0.");
+  app.add_option("--max_iter,-n", max_iter, "the maximum number of iteration in the Newton approximation of F=0." );
+  app.add_option("--view,-v", view, "specifies if the surface is viewed as is (Normal) or if places close to singularities are highlighted (Singular), or if unsure places should not be displayed (Hide).")
    -> check(CLI::IsMember({"Singular", "Normal", "Hide"}));
   
   app.get_formatter()->column_width(40);
@@ -496,12 +498,16 @@ int main( int argc, char** argv )
      }
   trace.endBlock();
 
-  //-------------- View surface -------------------------------------------
-  QApplication application(argc,argv);
-  Viewer3D<Space3,KSpace3> viewer( K3 );
-  viewer.setWindowTitle("Implicit surface viewer by thickening");
-  viewer.show();
+   //-------------- View surface -------------------------------------------
+  stringstream s;
+  s << "3dImplicitSurfaceExtractorByThickening - DGtalTools";
+  
+  polyscope::options::programName = s.str();
+  polyscope::view::setNavigateStyle(polyscope::NavigateStyle::Free);
+
+  PolyscopeViewer<Space3,KSpace3> viewer( K3 );
   viewer << mesh;
+
   // Display lines that are not in the mesh.
   for ( CellMapConstIterator it = complex3.begin( 1 ), itE = complex3.end( 1 ); it != itE; ++it )
     {
@@ -519,10 +525,10 @@ int main( int argc, char** argv )
       Color color = highlight
         ? ( fixed ? Color::White : Color(128,255,128) )
         : Color::White;
-      viewer.setLineColor( color );
-      viewer.addLine( points[ indices[ v0 ] ], points[ indices[ v1 ] ], h/2.0 );
+      viewer.drawColor( color );
+      viewer.drawLine( points[ indices[ v0 ] ], points[ indices[ v1 ] ]);
     }
-  viewer << Viewer3D<Space3,KSpace3>::updateDisplay;
-  return application.exec();
+  viewer.show();
+  return 0;
 }
 ///////////////////////////////////////////////////////////////////////////////

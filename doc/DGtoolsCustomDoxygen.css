@@ -1454,6 +1454,9 @@ tr.heading h2 {
 	top: 50%;
 	margin-top: -11px;
 }
+#nav-tree {
+  min-width: 200px;
+}
 
 @media print
 {

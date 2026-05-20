@@ -15,7 +15,7 @@
  **/
 /**
  * @file volCComponentCounter.cpp
- * @ingroup tools
+ * @ingroup Volumetric
  * @author David Coeurjolly (\c david.coeurjolly@liris.cnrs.fr)
  * LIRIS (CNRS, UMR 5205), University de Lyon, France.
  *
@@ -45,10 +45,11 @@ using namespace Z3i;
 
 
 /**
+
  @page volCComponentCounter volCComponentCounter
  
  @brief Counts the number of connected component (same values) in a  volume (Vol) file image.
-
+ @ingroup volumetrictools
  @b Usage:   ./volumetric/volCComponentCounter [OPTIONS] 1
 
 
@@ -68,7 +69,7 @@ using namespace Z3i;
  @b Example: 
 
  @code
- $ volCComponentCounter -i $DGtal/examples/samples/Al.100.vol 
+ $ volCComponentCounter $DGtal/examples/samples/Al.100.vol
  @endcode
 
 
@@ -156,11 +157,11 @@ int main( int argc, char** argv )
   std::string inputFileName;
   unsigned int connectivity {6};
   
-  app.description("Count the number of connected component (same values) in a  volume (Vol) file image\n\n Example : \n \t volCComponentCounter -i $DGtal/examples/samples/Al.100.vol\n");
+  app.description("Count the number of connected component (same values) in a volume (Vol) file image\n\n Example : \n \t volCComponentCounter $DGtal/examples/samples/Al.100.vol\n");
   app.add_option("-i,--input,1", inputFileName, "volume file (.vol)." )
   ->required()
   ->check(CLI::ExistingFile);
-  app.add_option("--connectivity,-c",connectivity,"object connectivity (6,18,26) (default: 6 ).", true)
+  app.add_option("--connectivity,-c",connectivity,"object connectivity (6,18,26) (default: 6 ).")
    -> check(CLI::IsMember({6, 18, 26}));
  
   app.get_formatter()->column_width(40);

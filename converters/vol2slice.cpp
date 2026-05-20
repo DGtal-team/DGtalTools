@@ -47,8 +47,10 @@ using namespace DGtal;
 
 /**
  @page vol2slice vol2slice
- @brief  Convert a volumetric file (.vol, .longvol, .pgm3d) into a set of 2D slice  images.
 
+ @brief  Convert a volumetric file (.vol, .longvol, .pgm3d) into a set of 2D slice  images.
+ @ingroup convertertools
+ 
 @b Usage: vol2slice [input] [output]
 
 @b Allowed @b options @b are:
@@ -60,12 +62,12 @@ using namespace DGtal;
 Usage: ./converters/vol2slice [OPTIONS] 1 [2]
 
 Positionals:
-  1 TEXT:FILE REQUIRED                  vol file (.vol, .longvol .p3d, .pgm3d and if WITH_ITK is selected: dicom, dcm, mha, mhd). For longvol, dicom, dcm, mha                                         or mhd formats, the input values are linearly scaled between 0 and 255.
+  1 TEXT:FILE REQUIRED                  vol file (.vol, .longvol .p3d, .pgm3d and if DGTAL_WITH_ITK is selected: dicom, dcm, mha, mhd). For longvol, dicom, dcm, mha                                         or mhd formats, the input values are linearly scaled between 0 and 255.
   2 TEXT=result.pgm                     base_name.extension:  extracted 2D slice volumetric files (will result n files base_name_xxx.extension)
 
 Options:
   -h,--help                             Print this help message and exit
-  -i,--input TEXT:FILE REQUIRED         vol file (.vol, .longvol .p3d, .pgm3d and if WITH_ITK is selected: dicom, dcm, mha, mhd). For longvol, dicom, dcm, mha                                         or mhd formats, the input values are linearly scaled between 0 and 255.
+  -i,--input TEXT:FILE REQUIRED         vol file (.vol, .longvol .p3d, .pgm3d and if DGTAL_WITH_ITK is selected: dicom, dcm, mha, mhd). For longvol, dicom, dcm, mha                                         or mhd formats, the input values are linearly scaled between 0 and 255.
   -o,--output TEXT=result.pgm           base_name.extension:  extracted 2D slice volumetric files (will result n files base_name_xxx.extension)
   -f,--setFirstSlice INT:NUMBER=0       Set the first slice index to be extracted.
   -l,--setLastSlice INT:NUMBER          Set the last slice index to be extracted (by default set to maximal value according to the given volume).
@@ -80,7 +82,7 @@ Options:
 @b Example:
 @code 
    # Export Z slice images (-s 2): 
-   $ vol2slice -i ${DGtal}/examples/samples/lobster.vol -o slice.pgm  -f 10 -l 15 -s 2
+   $ vol2slice ${DGtal}/examples/samples/lobster.vol slice.pgm  -f 10 -l 15 -s 2
 @endcode
 
 You should obtain such a visualization:
@@ -107,25 +109,25 @@ int main( int argc, char** argv )
   DGtal::int64_t rescaleInputMin {0};
   DGtal::int64_t rescaleInputMax {255};
   int userStartSlice {0};
-  int userEndSlice;
+  int userEndSlice {0};
   unsigned int sliceOrientation {2};
   
 
-  app.description("Convert a volumetric file (.vol, .longvol, .pgm3d) into a set of 2D slice  images. \n Typical use: to extract all slices defined in Y plane (y=cst): \n vol2slice -i image3d.vol -s 1  -o slice.pgm \n");
+  app.description("Convert a volumetric file (.vol, .longvol, .pgm3d) into a set of 2D slice  images. \n Typical use: to extract all slices defined in Y plane (y=cst): \n vol2slice  image3d.vol slice.pgm -s 1  \n");
 
-  app.add_option("-i,--input,1", inputFileName, "vol file (.vol, .longvol .p3d, .pgm3d and if WITH_ITK is selected: dicom, dcm, mha, mhd). For longvol, dicom, dcm, mha or mhd formats, the input values are linearly scaled between 0 and 255.")
+  app.add_option("-i,--input,1", inputFileName, "vol file (.vol, .longvol .p3d, .pgm3d and if DGTAL_WITH_ITK is selected: dicom, dcm, mha, mhd). For longvol, dicom, dcm, mha or mhd formats, the input values are linearly scaled between 0 and 255.")
     ->required()
     ->check(CLI::ExistingFile);
   
-  app.add_option("--output,-o,2",outputFileName ,"base_name.extension:  extracted 2D slice volumetric files (will result n files base_name_xxx.extension)", true);
-  app.add_option("--setFirstSlice,-f", userStartSlice, "Set the first slice index to be extracted.", true)
+  app.add_option("--output,-o,2",outputFileName ,"base_name.extension:  extracted 2D slice volumetric files (will result n files base_name_xxx.extension)");
+  app.add_option("--setFirstSlice,-f", userStartSlice, "Set the first slice index to be extracted.")
     -> check(CLI::Number);
   app.add_option("--setLastSlice,-l", userEndSlice, "Set the last slice index to be extracted (by default set to maximal value according to the given volume).")
     -> check(CLI::Number);
-  app.add_option("--sliceOrientation,-s", sliceOrientation, "specify the slice orientation for which the slice are defined (by default =2 (Z direction))", true)
+  app.add_option("--sliceOrientation,-s", sliceOrientation, "specify the slice orientation for which the slice are defined (by default =2 (Z direction))")
     -> check(CLI::IsMember({0, 1, 2}));
-  app.add_option("--rescaleInputMin", rescaleInputMin, "min value used to rescale the input intensity (to avoid basic cast into 8  bits image).", true);
-  app.add_option("--rescaleInputMax", rescaleInputMax, "max value used to rescale the input intensity (to avoid basic cast into 8  bits image).", true);
+  app.add_option("--rescaleInputMin", rescaleInputMin, "min value used to rescale the input intensity (to avoid basic cast into 8  bits image).");
+  app.add_option("--rescaleInputMax", rescaleInputMax, "max value used to rescale the input intensity (to avoid basic cast into 8  bits image).");
   app.get_formatter()->column_width(40);
 
   CLI11_PARSE(app, argc, argv);
@@ -154,7 +156,7 @@ int main( int argc, char** argv )
 
   //Processing each slice
 #pragma omp parallel for schedule(dynamic)
-   for( unsigned int i=startSlice; i <= endSlice; i++){
+   for( int i = startSlice; i <= endSlice; i++){
     trace.info() << "Exporting slice image "<< i ;
     DGtal::functors::Projector<DGtal::Z2i::Space>  invFunctor; invFunctor.initRemoveOneDim(sliceOrientation);
     DGtal::Z2i::Domain domain2D(invFunctor(input3dImage.domain().lowerBound()),

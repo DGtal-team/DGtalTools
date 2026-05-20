@@ -15,7 +15,7 @@
  **/
 /**
  * @file slice2vol.cpp
- * @ingroup surfaceTools
+ * @ingroup Converters
  * @author Bertrand Kerautret (\c kerautre@loria.fr )
  * LORIA (CNRS, UMR 7503), University of Nancy, France
  *
@@ -45,7 +45,7 @@ using namespace DGtal;
 /**
  @page slice2vol slice2vol
  @brief  Converts set of 2D images into volumetric file  (pgm3d, vol, longvol).
-
+ @ingroup convertertools
 @b Usage: slice2vol [input] [output]
 
 @b Allowed @b options @b are:
@@ -86,7 +86,7 @@ int main( int argc, char** argv )
    app.add_option("-i,--input", vectImage2DNames, "input 2D files (.pgm)")
      -> required();
    app.add_option("-o,--output", outputFileName, "volumetric file (.vol, .longvol .pgm3d)");
-   app.add_option("--sliceOrientation,-s", sliceOrientation, "specify the slice orientation for which the slice are defined (by default =2 (Z direction))", true)
+   app.add_option("--sliceOrientation,-s", sliceOrientation, "specify the slice orientation for which the slice are defined (by default =2 (Z direction))")
      -> check(CLI::IsMember({0, 1, 2}));
    
   

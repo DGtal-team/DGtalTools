@@ -15,7 +15,7 @@
  **/
 /**
  * @file 3dVolMarchingCubes.cpp
- * @ingroup volumetric
+ * @ingroup Volumetric
  * @author Jacques-Olivier Lachaud (\c jacques-olivier.lachaud@univ-savoie.fr )
  * Laboratory of Mathematics (CNRS, UMR 5127), University of Savoie, France
  *
@@ -33,7 +33,6 @@
 #include <boost/program_options/options_description.hpp>
 #include <boost/program_options/parsers.hpp>
 #include <boost/program_options/variables_map.hpp>
-#include <DGtal/kernel/sets/SetPredicate.h>
 #include <DGtal/io/readers/VolReader.h>
 #include <DGtal/images/ImageSelector.h>
 #include <DGtal/images/SimpleThresholdForegroundPredicate.h>
@@ -59,7 +58,7 @@ using namespace Z3i;
 
 /**
  @page Doc3dVolMarchingCubes 3dVolMarchingCubes
- 
+ @ingroup volumetrictools
  @brief Outputs the isosurface of the input volume  as an OFF file
  
  @b Usage: 3dVolMarchingCubes [-i \<fileName.vol\>] [-t \<threshold\>] [-a \<adjacency\>] [-o \<output.off\>]
@@ -89,7 +88,7 @@ using namespace Z3i;
  @b Example:
  
  @code
- $ 3dVolMarchingCubes -i $DGtal/examples/samples/lobster.vol -t 30
+ $ 3dVolMarchingCubes $DGtal/examples/samples/lobster.vol -t 30
  # we invert the default normol orientation to improve display (-n option):
  $ meshViewer -i marching-cubes.off -n
  @endcode
@@ -98,7 +97,7 @@ using namespace Z3i;
  You should obtain such a result:
  @image html res3dVolMarchingCubes.png "Resulting visualization."
  
- You can test on other samples like http://www.tc18.org/code_data_set/3D_greyscale/bonsai.vol.bz2
+ You can test on other samples like https://tc18.org/DataSets/3D_greyscale/bonsai.vol.bz2
  @code
  $ 3dVolMarchingCubes -i bonsai.vol  -t 80
  @endcode
@@ -129,9 +128,9 @@ int main( int argc, char** argv )
   app.add_option("-i,--input,1", inputFileName, "the volume file (.vol)." )
   ->required()
   ->check(CLI::ExistingFile);
-  app.add_option("--threshold,-t",threshold, "the value that defines the isosurface in the image (an integer between 0 and 255).", true);
-  app.add_option("--adjacency,-a",intAdjacency, "0: interior adjacency, 1: exterior adjacency", true);
-  app.add_option("-o,--output,2", outputFileName, "the output OFF file that represents the geometry of the isosurface", true );
+  app.add_option("--threshold,-t",threshold, "the value that defines the isosurface in the image (an integer between 0 and 255).");
+  app.add_option("--adjacency,-a",intAdjacency, "0: interior adjacency, 1: exterior adjacency");
+  app.add_option("-o,--output,2", outputFileName, "the output OFF file that represents the geometry of the isosurface");
   auto noiseOpt = app.add_option("--noise,-n", noise, "Kanungo noise level in ]0,1[. Note that only the largest connected component is considered and that no specific embedder is used.");
   
   app.get_formatter()->column_width(40);

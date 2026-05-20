@@ -1,4 +1,147 @@
+# DGtalTools 2.2 (beta)
+
+- *global*
+  - Following the new display introduced from polyscope viewer, the illustrations of tools in the documentations was obsolete. It also add some fix when reproducing examples. Some links were also broken from the new organization. (Bertrand Kerautret [476](https://github.com/DGtal-team/DGtalTools/pull/476)) 
+  
+  - Default branch set to main instead old master.
+   (Bertrand Kerautret [477](https://github.com/DGtal-team/DGtalTools/pull/477)) 
+
+- *volumetric*
+  - volSubSample: domains are shown before performing the subsampling and bugfix for the lowerbound (David Coeurjolly [481](https://github.com/DGtal-team/DGtalTools/pull/481)
+
+# DGtalTools 2.1
+
+- *build*
+  - Update CLI11 for 3dLocalEstimators (David Coeurjolly [473](https://github.com/DGtal-team/DGtalTools/pull/473)) 
+
+# DGtalTools 2.0 
+
+- *build*
+  - Update from DGtal 2.0 (cmake and tools env variable) (Bastien Doignies, [#467](https://github.com/DGtal-team/DGtalTools/pull/467))
+  - Update CLI11 and cmake polyscope dependencies (Bertrand Kerautret [468](https://github.com/DGtal-team/DGtalTools/pull/468)) 
+  - update 3dHeightMapViewer with polyscope use. (Bertrand Kerautret [471](https://github.com/DGtal-team/DGtalTools/pull/471)) 
+  - update 3DdImageViewer with polyscope use. (Bertrand Kerautret [470](https://github.com/DGtal-team/DGtalTools/pull/470)
+
+# DGtalTools 1.5 
+
+- *build*
+  - Fix DGtalTools doc deployement.
+    (David Coeurjolly and Bertrand Kerautret [#454](https://github.com/DGtal-team/DGtalTools/pull/454))
+    
+- *global*
+  - Continuous integration fix using new version on conan following DGtal changes.
+    (Bertrand Kerautret [#465](https://github.com/DGtal-team/DGtalTools/pull/465))
+
+
+# DGtalTools 1.4 
+
+- *build*
+  - Remove STBimage preprocessor instruction used to fix MVSC that is 
+    no more usefull since DGtal PR [175](https://github.com/DGtal-team/DGtal/pull/1715) 
+    (Bertrand Kerautret [#459](https://github.com/DGtal-team/DGtalTools/pull/459))
+
+
+- *visualisation*
+  - meshViewer: new options to change the default background color, to
+    load camera settings at startup, to change at startup the light
+    source mode attached or not to the camera and improve transparency
+    process at startup rendering. It includes a fix of the
+    -customColorMesh for obj mesh and add new possibilities to custom
+    the color of each mesh given as input. It also includes a fix and
+    some simplications of the option --doSnapShotAndExit.  (Bertrand
+    Kerautret
+    [#448](https://github.com/DGtal-team/DGtalTools/pull/448))
+  - meshViewer: new option to set alpha channel of the mesh color.
+  (Bertrand  Kerautret
+    [#451](https://github.com/DGtal-team/DGtalTools/pull/451))
+  - 3dSDPViewer: new option to set alpha channel of the mesh color.
+  (Xun Gong
+    [#452](https://github.com/DGtal-team/DGtalTools/pull/452))
+  - meshViewer: Add colored SDP option in meshViewer when input texts is an alpha mesh and a colored SDP respectively.
+  (Xun Gong
+    [#452](https://github.com/DGtal-team/DGtalTools/pull/452))
+  - volscope new vol visualization tool using polyscope (David Coeurjolly, 
+    [#455](https://github.com/DGtal-team/DGtalTools/pull/455))
+  - volscope documentation enhanced (David Coeurjolly, 
+    [#460](https://github.com/DGtal-team/DGtalTools/pull/460))
+
+- *volumetric*
+    - volReSample: fix the impossibility to export to vol when ITK is activated
+      (Bertrand Kerautret [#445](https://github.com/DGtal-team/DGtalTools/pull/445))
+    - volFillInterior: add new option to set the filling value.  
+      (Bertrand Kerautret [#456](https://github.com/DGtal-team/DGtalTools/pull/456))
+
+- *converters*
+   - mesh2vol: small fix to read generic mesh. 
+     (Bertrand Kerautret [#444](https://github.com/DGtal-team/DGtal/pull/444))
+   - mesh2vol: use the digitization space defined from bounding box of input mesh. 
+     (Bertrand Kerautret [#450](https://github.com/DGtal-team/DGtal/pull/450))
+     
+
+
+# DGtalTools 1.3
+
+- *build*
+  - New cmake option (DGTAL_RANDOMIZED_BUILD_THRESHOLD) to set the
+    (approximated) % of tools build
+    (Bertrand Kerautret [#416](https://github.com/DGtal-team/DGtalTools/pull/416))
+  - Following DGtal C++17 is now required. (David Coeurjolly and Bertrand Kerautret, 
+     [#449](https://github.com/DGtal-team/DGtal/pull/449))
+     
+- *converters*
+  - heightfield2shading: new option to add a matcap rendering (from normal
+    direction interpreted as HSV vector)
+    (Bertrand Kerautret [#399](https://github.com/DGtal-team/DGtalTools/pull/399))
+  - heightfield2shading: new option to generate a normal map.
+    (Bertrand Kerautret [#415](https://github.com/DGtal-team/DGtalTools/pull/415))
+  - mesh2heightfield: automatic object placement and improved usage.
+    (Bertrand Kerautret & Florian Delconte [#429](https://github.com/DGtal-team/DGtalTools/pull/429))
+  - vol2slice: fix infinite slices extraction.
+    (Bertrand Kerautret [#439](https://github.com/DGtal-team/DGtalTools/pull/439)) 
+
+- *generators*
+  - 2dSimplePolygonDigitizer: new tool compute the Gauss Digitization of a simple closed polyline.
+    (Phuc Ngo [#398](https://github.com/DGtal-team/DGtalTools/pull/398)) 
+
+- *visualisation*
+  - 3dImplicitSurfaceExtractorByThickening: adding OBJ export.
+    (David Coeurjolly [#413](https://github.com/DGtal-team/DGtalTools/pull/413))
+  - 3dVolViewer: adding new option to interprate intensity as transparency.
+    (Bertrand Kerautret [#425](https://github.com/DGtal-team/DGtalTools/pull/425))
+  - 3dCompSurfelData: fix --noWindows option (issue [#427](https://github.com/DGtal-team/DGtalTools/issues/427). 
+    (Bertrand Kerautret and Kacper Pluta  [#440](https://github.com/DGtal-team/DGtalTools/pull/440))
+    
+- *volumetric*
+  - volSegment: adding new option to get long int images as output (for
+    longvol exporting). (Bertrand Kerautret [#420](https://github.com/DGtal-team/DGtalTools/pull/420))
+  - volInfo: get information from a volumetric file. (David Coeurjolly, [#430](https://github.com/DGtal-team/DGtalTools/pull/430))
+  - criticalKernelsThinning3D: new option to keep the resulting image
+    domain equal to the input image (instead using the resulting bouding box set).
+    (Bertrand Kerautret [#431](https://github.com/DGtal-team/DGtalTools/pull/431))
+  - criticalKernelsThinning3d: it can now export OBJ files for input surface and
+    output skeletons (Jacques-Olivier Lachaud [#414](https://github.com/DGtal-team/DGtalTools/pull/414))  
+
 # DGtalTools 1.2
+- *global*
+  - Fix itk2vol and fix ITK cmake configuaration that was making issues with the ITK image read.
+    (Bertrand Kerautret [#393](https://github.com/DGtal-team/DGtalTools/pull/393))
+  - Travis: Fix old default osx_image with xcode12.2 and remove non used boost
+    cmake references. (Bertrand Kerautret [#394](https://github.com/DGtal-team/DGtalTools/pull/394))
+  - Uniform input/output option with previous use of CLI11 (issue #405).
+    (Bertrand Kerautret [#406](https://github.com/DGtal-team/DGtalTools/pull/406))
+  - Comply with cmake Policy CMP0115 "Source file extensions must be
+     explicit". (Bertrand Kerautret and David Coeurjolly, [#407](https://github.com/DGtal-team/DGtalTools/pull/407))
+
+- *visualisation*
+  - 3dVolViewer: improvement of the possibility to read input image of type double (with ITK).
+    New possibility to select the voxel in order to display image intensity.    
+    (Bertrand Kerautret [#402](https://github.com/DGtal-team/DGtalTools/pull/402))
+  - 3dVolBoundaryViewer: fix compilation issue (related to CLI11 change) when ITK is activated.
+    (Bertrand Kerautret [#395](https://github.com/DGtal-team/DGtalTools/pull/395))
+
+- *volumetric*
+  - volReSample: it can now export image including ITK image spacing.
+    (Bertrand Kerautret [#404](https://github.com/DGtal-team/DGtalTools/pull/404))
 
 
 
@@ -62,6 +205,8 @@
   - volAddBorder: Add an option that sets zero value to domain boundary voxels without
     changing the domain extent (Bertrand Kertautret
     [#371](https://github.com/DGtal-team/DGtalTools/pull/371))
+  - volAddBorder: Fix VTKIMAGEDATA_CONTAINER_I (Phuc Ngo)
+    [#435](https://github.com/DGtal-team/DGtalTools/pull/435))  
   - Fix a wrong error message that appears when using the tool (wrong IO error)
     (Bertrand Kerautret
     [#368](https://github.com/DGtal-team/DGtalTools/pull/368))

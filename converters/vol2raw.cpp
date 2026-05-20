@@ -16,6 +16,7 @@
 
 /**
  * @file vol2raw.cpp
+ * @ingroup Converters
  * @author David Coeurjolly (\c david.coeurjolly@liris.cnrs.fr )
  * Laboratoire d'InfoRmatique en Image et Systèmes d'information - LIRIS (CNRS, UMR 5205), CNRS, France
  *
@@ -43,23 +44,24 @@ using namespace Z3i;
 
 /**
  @page vol2raw vol2raw
+
  @brief Converts a vol to a 8-bit raw file.
+ @ingroup convertertools
+ @b Usage: vol2raw [input] [output]
 
-@b Usage: vol2raw [input] [output]
-
-@b Allowed @b options @b are:
+ @b Allowed @b options @b are:
 
 @code
 
 Usage: ./converters/vol2raw [OPTIONS] 1 [2]
 
 Positionals:
-  1 TEXT:FILE REQUIRED                  vol file (.vol, .longvol .p3d, .pgm3d and if WITH_ITK is selected: dicom, dcm, mha, mhd). For longvol, dicom, dcm, mha or mhd formats, the input values are linearly scaled between 0 and 255.
+  1 TEXT:FILE REQUIRED                  vol file (.vol, .longvol .p3d, .pgm3d and if DGTAL_WITH_ITK is selected: dicom, dcm, mha, mhd). For longvol, dicom, dcm, mha or mhd formats, the input values are linearly scaled between 0 and 255.
   2 TEXT                                output file (.raw).
 
 Options:
   -h,--help                             Print this help message and exit
-  -i,--input TEXT:FILE REQUIRED         vol file (.vol, .longvol .p3d, .pgm3d and if WITH_ITK is selected: dicom, dcm, mha, mhd). For longvol, dicom, dcm, mha or mhd formats, the input values are linearly scaled between 0 and 255.
+  -i,--input TEXT:FILE REQUIRED         vol file (.vol, .longvol .p3d, .pgm3d and if DGTAL_WITH_ITK is selected: dicom, dcm, mha, mhd). For longvol, dicom, dcm, mha or mhd formats, the input values are linearly scaled between 0 and 255.
   -o,--output TEXT                      output file (.raw).
   --rescaleInputMin INT=0               min value used to rescale the input intensity (to avoid basic cast into 8  bits image).
   --rescaleInputMax INT=255             max value used to rescale the input intensity (to avoid basic cast into 8  bits image).
@@ -101,12 +103,12 @@ int main(int argc, char**argv)
   DGtal::int64_t rescaleInputMax {255};
   
   app.description("Convert a vol to a 8-bit raw file.\n Example: vol2raw  ${DGtal}/examples/samples/lobster.vol res.raw \n");
-  app.add_option("-i,--input,1", inputFileName, "vol file (.vol, .longvol .p3d, .pgm3d and if WITH_ITK is selected: dicom, dcm, mha, mhd). For longvol, dicom, dcm, mha or mhd formats, the input values are linearly scaled between 0 and 255." )
+  app.add_option("-i,--input,1", inputFileName, "vol file (.vol, .longvol .p3d, .pgm3d and if DGTAL_WITH_ITK is selected: dicom, dcm, mha, mhd). For longvol, dicom, dcm, mha or mhd formats, the input values are linearly scaled between 0 and 255." )
     ->required()
     ->check(CLI::ExistingFile);
   app.add_option("--output,-o,2",outputFileName ,"output file (.raw).");
-  app.add_option("--rescaleInputMin", rescaleInputMin, "min value used to rescale the input intensity (to avoid basic cast into 8  bits image).", true);
-  app.add_option("--rescaleInputMax", rescaleInputMax, "max value used to rescale the input intensity (to avoid basic cast into 8  bits image).", true);
+  app.add_option("--rescaleInputMin", rescaleInputMin, "min value used to rescale the input intensity (to avoid basic cast into 8  bits image).");
+  app.add_option("--rescaleInputMax", rescaleInputMax, "max value used to rescale the input intensity (to avoid basic cast into 8  bits image).");
  
   
   app.get_formatter()->column_width(40);

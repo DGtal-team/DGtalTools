@@ -19,7 +19,7 @@
  *
  * @author Bertrand Kerautret (\c kerautre@loria.fr )
  * LORIA (CNRS, UMR 7503), University of Nancy, France
- *
+ * @ingroup Volumetric 
  * @date 2013/07/20
  *
  * This file is part of the DGtal library.
@@ -27,10 +27,10 @@
 
 
 /**
- @page volImageMetrics volImageMetrics
- 
- @brief  Applies basic image measures (RMSE, PSNR) between two volumetric images A and B.
 
+ @page volImageMetrics volImageMetrics
+ @brief  Applies basic image measures (RMSE, PSNR) between two volumetric images A and B.
+ @ingroup volumetrictools
  @b Usage:  volImageMetrics --volA \<volAFilename\> --volB \<volBFilename\> 
 
 
@@ -54,7 +54,7 @@
  # generating another input vol file using tutorial example (eroded.vol):
  $DGtal/build/examples/tutorial-examples/FMMErosion
  # compare the two images:
- $ volImageMetrics -a eroded.vol -b $DGtal/examples/samples/cat10.vol 
+ $ volImageMetrics eroded.vol $DGtal/examples/samples/cat10.vol 
  @endcode
 
 

@@ -15,7 +15,7 @@
  **/
 /**
  * @file atv-u2-v0.cpp
- * @ingroup Tools
+ * @ingroup ImageProcessing
  * @author Jacques-Olivier Lachaud (\c jacques-olivier.lachaud@univ-savoie.fr )
  * Laboratory of Mathematics (CNRS, UMR 5127), University of Savoie, France
  * @author Marion Foare (\c marion.foare@univ-savoie.fr )
@@ -49,6 +49,7 @@
 @page DocATVu2v0 imageProcessing/atv-u2-v0 
 
 @brief Computes a piecewise smooth approximation of a grey-level or color image, by optimizing a variant of the Ambrosio-Tortorelli functional (with u a 2-form and v a 0-form).
+@ingroup imageprocessingtools
 
 @writers Jacques-Olivier Lachaud
 
@@ -263,25 +264,25 @@ app.add_option("-i,--input,1", f1, "the input image PPM filename." )
     ->required()
     ->check(CLI::ExistingFile);
 app.add_option("--inpainting-mask,-m", inpainting_mask, "the input inpainting mask filename." );
-app.add_option("--output,-o", f2, "the output image basename.", true);
+app.add_option("--output,-o", f2, "the output image basename.");
 auto lambdaOpt = app.add_option("--lambda,-l",l, "the parameter lambda.");
 app.add_flag("--metric-average,-M",metric, "use metric average to smooth L1-metric." );
 
-app.add_option("--lambda-1,-1",l1, "the initial parameter lambda (l1).", true);
-app.add_option("--lambda-2,-2",l2, "the final parameter lambda (l2).", true );
-app.add_option("--lambda-ratio,-q",lr,  "the division ratio for lambda from l1 to l2.", true);
-app.add_option("--alpha,-a",a, "the parameter alpha.", true);
+app.add_option("--lambda-1,-1",l1, "the initial parameter lambda (l1).");
+app.add_option("--lambda-2,-2",l2, "the final parameter lambda (l2)." );
+app.add_option("--lambda-ratio,-q",lr,  "the division ratio for lambda from l1 to l2.");
+app.add_option("--alpha,-a",a, "the parameter alpha.");
 auto epsOpt = app.add_option("--epsilon,-e", "the initial and final parameter epsilon of AT functional at the same time.");
 
-app.add_option("--epsilon-1",e1, "the initial parameter epsilon.", true);
-app.add_option("--epsilon-2",e2, "the final parameter epsilon.", true);
-app.add_option("--epsilon-r",er,  "sets the ratio between two consecutive epsilon values of AT functional.", true);
+app.add_option("--epsilon-1",e1, "the initial parameter epsilon.");
+app.add_option("--epsilon-2",e2, "the final parameter epsilon.");
+app.add_option("--epsilon-r",er,  "sets the ratio between two consecutive epsilon values of AT functional.");
 
-app.add_option("--nbiter,-n",nbiter, "the maximum number of iterations.", true );
+app.add_option("--nbiter,-n",nbiter, "the maximum number of iterations." );
 auto snrOpt = app.add_option("--image-snr", isnr, "the input image without deterioration if you wish to compute the SNR.");
-app.add_option("--pixel-size,-p", pix_sz, "the pixel size for outputing images (useful when one wants to see the discontinuities v on top of u).", true);
-app.add_option("--color-v,-c",scv, "the color chosen for displaying the singularities v (e.g. red is 0xff0000).", true );
-app.add_option("--verbose,-v", verb, "the verbose level (0: silent, 1: less silent, etc).", true );
+app.add_option("--pixel-size,-p", pix_sz, "the pixel size for outputing images (useful when one wants to see the discontinuities v on top of u).");
+app.add_option("--color-v,-c",scv, "the color chosen for displaying the singularities v (e.g. red is 0xff0000)." );
+app.add_option("--verbose,-v", verb, "the verbose level (0: silent, 1: less silent, etc)." );
 
 app.get_formatter()->column_width(40);
 CLI11_PARSE(app, argc, argv);

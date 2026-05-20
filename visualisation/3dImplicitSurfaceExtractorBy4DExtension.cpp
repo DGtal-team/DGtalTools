@@ -31,6 +31,7 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 #include <iostream>
+#include <sstream>
 #include <map>
 #include "CLI11.hpp"
 
@@ -40,8 +41,7 @@
 #include "DGtal/helpers/StdDefs.h"
 #include "DGtal/math/MPolynomial.h"
 #include "DGtal/io/readers/MPolynomialReader.h"
-#include "DGtal/io/DrawWithDisplay3DModifier.h"
-#include "DGtal/io/viewers/Viewer3D.h"
+#include "DGtal/io/viewers/PolyscopeViewer.h"
 #include "DGtal/topology/KhalimskySpaceND.h"
 #include "DGtal/topology/CubicalComplex.h"
 #include "DGtal/topology/CubicalComplexFunctions.h"
@@ -61,7 +61,8 @@ using namespace DGtal;
  @page Doc3dImplicitSurfaceExtractorBy4DExtension 3dImplicitSurfaceExtractorBy4DExtension
  
  @brief Computes the zero level set of the given polynomial.
-
+ @ingroup visualizationtools
+ 
  @b Usage:  3dImplicitSurfaceExtractorBy4DExtension [options] input
 
  @b Allowed @b options @b are :
@@ -510,15 +511,15 @@ int main( int argc, char** argv )
     app.description( "Computes the zero level set of the given polynomial. Usage:  3dImplicitSurfaceExtractorBy4DExtension -p <polynomial> [options]\n Example:\n 3dImplicitSurfaceExtractorBy4DExtension  -p \"-0.9*(y^2+z^2-1)^2-(x^2+y^2-1)^3\" -g 0.06125 -a -2 -A 2 -v Singular -t 0.02 \n - whitney  : x^2-y*z^2 \n - 4lines   : x*y*(y-x)*(y-z*x) \n - cone     : z^2-x^2-y^2 \n - simonU   : x^2-z*y^2+x^4+y^4 \n - cayley3  : 4*(x^2 + y^2 + z^2) + 16*x*y*z - 1 \n - crixxi   : -0.9*(y^2+z^2-1)^2-(x^2+y^2-1)^3 \n Some other examples (more difficult): \n 3dImplicitSurfaceExtractorBy4DExtension -a -2 -A 2 -p \"((y^2+z^2-1)^2-(x^2+y^2-1)^3)*(y*(x-1)^2-z*(x+1))^2\" -g 0.025 -e 1e-6 -n 50000 -v Singular -t 0.5 -P Newton \n 3dImplicitSurfaceExtractorBy4DExtension -a -2 -A 2 -p \"(x^5-4*z^3*y^2)*((x+y)^2-(z-x)^3)\" -g 0.025 -e 1e-6 -n 50000 -v Singular -t 0.05 -P Newton ");
   app.add_option("-p,--polynomial,1", poly_str, "the implicit polynomial whose zero-level defines the shape of interest." )
   ->required();
-  app.add_option("--minAABB,-a",min_x, "the min value of the AABB bounding box (domain)" , true);
-  app.add_option("--maxAABB,-A",max_x, "the max value of the AABB bounding box (domain)" , true);
-  app.add_option("--gridstep,-g", h, "the gridstep that defines the digitization in the 4th dimension (small is generally a good idea, default is 1e-6). ", true);
-  app.add_option("--timestep,-t",t, "the thickening parameter for the implicit surface." , true);
-  app.add_option("--project,-P", project, "defines the projection: either No or Newton.", true)
+  app.add_option("--minAABB,-a",min_x, "the min value of the AABB bounding box (domain)" );
+  app.add_option("--maxAABB,-A",max_x, "the max value of the AABB bounding box (domain)" );
+  app.add_option("--gridstep,-g", h, "the gridstep that defines the digitization in the 4th dimension (small is generally a good idea, default is 1e-6). ");
+  app.add_option("--timestep,-t",t, "the thickening parameter for the implicit surface." );
+  app.add_option("--project,-P", project, "defines the projection: either No or Newton.")
    -> check(CLI::IsMember({"No", "Newton"}));
-  app.add_option("--epsilon,-e", epsilon, "the maximum precision relative to the implicit surface in the Newton approximation of F=0.", true);
-  app.add_option("--max_iter,-n", max_iter, "the maximum number of iteration in the Newton approximation of F=0.", true );
-  app.add_option("--view,-v", view, "specifies if the surface is viewed as is (Normal) or if places close to singularities are highlighted (Singular), or if unsure places should not be displayed (Hide).",true )
+  app.add_option("--epsilon,-e", epsilon, "the maximum precision relative to the implicit surface in the Newton approximation of F=0.");
+  app.add_option("--max_iter,-n", max_iter, "the maximum number of iteration in the Newton approximation of F=0.");
+  app.add_option("--view,-v", view, "specifies if the surface is viewed as is (Normal) or if places close to singularities are highlighted (Singular), or if unsure places should not be displayed (Hide).")
    -> check(CLI::IsMember({"Singular", "Normal", "Hide"}));
   
   app.get_formatter()->column_width(40);
@@ -687,17 +688,20 @@ int main( int argc, char** argv )
   trace.endBlock();
 
   //-------------- View surface -------------------------------------------
-  QApplication application(argc,argv);
   Point4 low4 = K4.lowerBound();
   Point4 up4  = K4.upperBound();
   KSpace3 K3;
   K3.init( Point3( low4[ 0 ], low4[ 1 ], low4[ 2 ] ),
            Point3( up4 [ 0 ], up4 [ 1 ], up4 [ 2 ] ), true );
-  Viewer3D<Space3,KSpace3> viewer( K3 );
-  viewer.setWindowTitle("Implicit surface viewer by 4d extension");
-  viewer.show();
+  stringstream s;
+  s << "3dImplicitSurfaceExtractorBy4DExtension - DGtalTools";
+  
+  polyscope::options::programName = s.str();
+  polyscope::view::setNavigateStyle(polyscope::NavigateStyle::Free);
+
+  PolyscopeViewer<Space3,KSpace3> viewer( K3 );
   viewer << mesh;
-  viewer.setLineColor( highlight ? Color::Red : Color( 120, 120, 120 ) );
+  viewer.drawColor( highlight ? Color::Red : Color( 120, 120, 120 ) );
   // Drawing lines
   for ( CellMapConstIterator it = complex4.begin( 1 ), itE = complex4.end( 1 ); it != itE; ++it )
     {
@@ -710,9 +714,9 @@ int main( int argc, char** argv )
       ASSERT( vertices.size() == 2 );
       RealPoint3 p1 = points[ indices[ vertices.front() ] ];
       RealPoint3 p2 = points[ indices[ vertices.back()  ] ];
-      viewer.addLine( p1, p2, 0.05 );
-    }
-  viewer << Viewer3D<Space3,KSpace3>::updateDisplay;
-  return application.exec();
+      viewer.drawLine( p1, p2 );
+    } 
+  viewer.show();
+  return 0;
 }
 ///////////////////////////////////////////////////////////////////////////////

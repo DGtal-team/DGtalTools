@@ -16,7 +16,7 @@
 
 /**
  * @file
- * @ingroup volumetric
+ * @ingroup Volumetric
  * @author Bertrand Kerautret (\c bertrand.kerautret@univ-lyon2.fr )
  * @author Jonas Lamy (\c jonas.lamy@univ-lyon2.fr )
  *
@@ -38,7 +38,7 @@
 
 #include "CLI11.hpp"
 
-#ifdef WITH_ITK
+#ifdef DGTAL_WITH_ITK
 #include "DGtal/io/readers/ITKReader.h"
 #include "DGtal/io/writers/ITKWriter.h"
 
@@ -50,9 +50,10 @@ using namespace DGtal;
 ///////////////////////////////////////////////////////////////////////////////
 
 /**
+
  @page volMask volMask
- 
  @brief  Extracts a new image from the a mask image that represents the regions of the image which are selected and copied in the resulting image. Elements outside the regions defined by the mask are set to 0.
+ @ingroup volumetrictools
  
  @b Usage:   volMask [input]
  
@@ -76,7 +77,7 @@ using namespace DGtal;
  @b Example:
  
  @code
- volMask -i ${DGtal}/examples/samples/lobster.vol  -a ${DGtal}/examples/samples/lobster.vol -o lobsMasked.vol -m 100
+ volMask  ${DGtal}/examples/samples/lobster.vol lobsMasked.vol  -a ${DGtal}/examples/samples/lobster.vol   -m 100
  @endcode
  
  @image html resvolMask.png "Example of result. "
@@ -90,7 +91,7 @@ using namespace DGtal;
 
 
 typedef ImageContainerBySTLVector < Z3i::Domain, unsigned char > Image3D;
-#ifdef WITH_ITK
+#ifdef DGTAL_WITH_ITK
 typedef ImageContainerBySTLVector < Z3i::Domain,  double > Image3D_D;
 typedef ImageContainerBySTLVector < Z3i::Domain,  int > Image3D_I;
 #endif
@@ -182,9 +183,9 @@ int main( int argc, char** argv )
   unsigned int offsetBorder {0};
   int maskValue {1};
   
-  app.description("Outputs a new image from two input images, one representing the data, one representing the selection mask. The size of output image is the size of the bounding box of selected values, plus the chosen border offset. \n Typical use example:\n \t volMask -i ${DGtal}/examples/samples/lobster.vol  -a ${DGtal}/examples/samples/lobster.vol -o lobsMasked.vol -m 100  \n");
+  app.description("Outputs a new image from two input images, one representing the data, one representing the selection mask. The size of output image is the size of the bounding box of selected values, plus the chosen border offset. \n Typical use example:\n \t volMask  ${DGtal}/examples/samples/lobster.vol lobsMasked.vol -a ${DGtal}/examples/samples/lobster.vol  -m 100  \n");
   
-#ifdef WITH_ITK
+#ifdef DGTAL_WITH_ITK
   app.add_option("-i,--input,1", inputFileName, "an input 3D image vol (or ITK: .nii, mha, ... ) file." )
       ->required()
       ->check(CLI::ExistingFile);
@@ -198,9 +199,9 @@ int main( int argc, char** argv )
   
   app.add_option("--mask,-a",maskFileName, "the mask image that represents the elements that are copied as output in the resulting image (by default set to 1 you can change this value by using --maskValue). ")
   ->check(CLI::ExistingFile);
-  app.add_option("-o,--output,2", outputFileName, "the output masked image.", true );
-  app.add_option("--offsetBorder,-f", offsetBorder, "add a border offset to the bounding box of the masked value domain.", true);
-  app.add_option("--maskValue,-m", maskValue, "the masking value.", true);
+  app.add_option("-o,--output,2", outputFileName, "the output masked image." );
+  app.add_option("--offsetBorder,-f", offsetBorder, "add a border offset to the bounding box of the masked value domain.");
+  app.add_option("--maskValue,-m", maskValue, "the masking value.");
   app.get_formatter()->column_width(40);
   CLI11_PARSE(app, argc, argv);
   // END parse command line using CLI ----------------------------------------------
@@ -211,7 +212,7 @@ int main( int argc, char** argv )
   Image3D maskImage = DGtal::GenericReader<Image3D>::import(maskFileName);
   trace.info() << "[done]"<< std::endl;
   trace.info() << "Reading input image...";
-#ifdef WITH_ITK
+#ifdef DGTAL_WITH_ITK
   if (inputType=="double")
   {
     Image3D_D inputImage = DGtal::GenericReader<Image3D_D>::import(inputFileName);

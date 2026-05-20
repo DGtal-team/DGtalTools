@@ -18,7 +18,7 @@
  * @file homotopicThinning3D.cpp
  * @author Bertrand Kerautret (\c kerautre@loria.fr )
  * LORIA (CNRS, UMR 7503), University of Nancy, France
- *
+ * @ingroup Volumetric 
  * @date 2011/01/04
  *
  * Apply an the homotopic thinning from a volumetric volume file.
@@ -29,13 +29,11 @@
 ///////////////////////////////////////////////////////////////////////////////
 #include <iostream>
 #include <queue>
-#include <QImageReader>
 
-#include "DGtal/io/viewers/Viewer3D.h"
-#include "DGtal/io/DrawWithDisplay3DModifier.h"
 #include "DGtal/io/Color.h"
 #include "DGtal/shapes/Shapes.h"
 #include "DGtal/helpers/StdDefs.h"
+#include "DGtal/io/viewers/PolyscopeViewer.h"
 #include "DGtal/io/readers/PointListReader.h"
 
 #include "DGtal/io/readers/GenericReader.h"
@@ -57,12 +55,12 @@ using namespace Z3i;
 ///////////////////////////////////////////////////////////////////////////////
 
 /**
+
  @page homotopicThinning3D homotopicThinning3D
- 
  @brief Applies an homotopic thinning of a 3d image file (vol,longvol,pgm3d...) with 3D viewer.
 
- @b Usage: homotopicThinning3d [options] --input <3dImageFileName>  {vol,longvol,pgm3d...}
-
+ @b Usage: homotopicThinning3d [options]  <3dImageFileName>  {vol,longvol,pgm3d...}
+ @ingroup volumetrictools
 
  @b Allowed @b options @b are : 
  @code
@@ -87,7 +85,7 @@ using namespace Z3i;
  Usage by forcing point to be left by the thinning: 
  
 @code
- $  homotopicThinning3D --input ${DGtal}/examples/samples/Al.100.vol  --fixedPoints 56 35 5  56 61 5  57 91 38  58 8 38  45 50 97 
+ $  homotopicThinning3D  ${DGtal}/examples/samples/Al.100.vol  --fixedPoints 56 35 5  56 61 5  57 91 38  58 8 38  45 50 97
  @endcode
 
 
@@ -124,12 +122,12 @@ int main( int argc, char** argv )
   
   std::vector<int> vectFixedPoints;
   
-  app.description("Applies an homotopic thinning of a 3d image file (vol,longvol,pgm3d...) with 3D viewer. \n Basic usage: \t homotopicThinning3d [options] --input <3dImageFileName>  {vol,longvol,pgm3d...}  \n Usage by forcing point to be left by the thinning: \n homotopicThinning3D --input ${DGtal}/examples/samples/Al.100.vol  --fixedPoints 56 35 5  56 61 5  57 91 38  58 8 38  45 50 97 \n");
+  app.description("Applies an homotopic thinning of a 3d image file (vol,longvol,pgm3d...) with 3D viewer. \n Basic usage: \t homotopicThinning3D [options] --input <3dImageFileName>  {vol,longvol,pgm3d...}  \n Usage by forcing point to be left by the thinning: \n homotopicThinning3D --input ${DGtal}/examples/samples/Al.100.vol  --fixedPoints 56 35 5  56 61 5  57 91 38  58 8 38  45 50 97 \n");
   app.add_option("-i,--input,1", inputFileName, "Input volumetric file (.vol, .pgm3d or p3d)" )
   ->required()
   ->check(CLI::ExistingFile);
-  app.add_option("--min,-m", min, "Minimum (excluded) value for threshold.", true);
-  app.add_option("--max,-M", max, "Maximum (included) value for threshold.", true);
+  app.add_option("--min,-m", min, "Minimum (excluded) value for threshold.");
+  app.add_option("--max,-M", max, "Maximum (included) value for threshold.");
   app.add_option("--exportSDP,-e",exportSDPName, "Export the resulting set of points in a simple (sequence of discrete point (sdp)).");
   app.add_option("--fixedPoints",vectFixedPoints, "defines the coordinates of points which should not be removed.");
   app.add_option("--fixedPointSDP,-s",fixedPointSDPName,  "use fixed points from a file.")
@@ -233,20 +231,19 @@ int main( int argc, char** argv )
   trace.info() << "Skeleton--> "<<S<<std::endl;
 
   // Display by using two different list to manage OpenGL transparency.
-  QApplication application(argc,argv);
-  Viewer3D<> viewer;
-  viewer.setWindowTitle("homotopicThinning3D");
-  viewer.show();
+  polyscope::options::programName = "DGtalTools: homotopicThinning3D";
+  polyscope::view::setNavigateStyle(polyscope::NavigateStyle::Free);
+    
+  PolyscopeViewer<> viewer;
 
-  viewer << SetMode3D( shape_set.className(), "Paving" );
-  viewer << CustomColors3D(Color(25,25,255, 255), Color(25,25,255, 255));
+    
+
+  viewer << Color(25,25,255, 255);
   viewer << S ;
-  viewer << CustomColors3D(Color(255,25,255, 255), Color(255,25,255, 255));
+  viewer << Color(255,25,255, 255);
   viewer << fixedSet;
-  viewer << SetMode3D( shape_set.className(), "PavingTransp" );
-  viewer << CustomColors3D(Color(250, 0,0, 25), Color(250, 0,0, 5));
+  viewer << Color(250, 0,0, 25);
   viewer << shape_set;
-  viewer<< Viewer3D<>::updateDisplay;
   
   if (exportSDPName != "")
     {
@@ -257,7 +254,8 @@ int main( int argc, char** argv )
           out << p[0] << " " << p[1] << " " << p[2] << std::endl;
         }
     }
-  return application.exec();
+  viewer.show();
+  return 0;
 
 }
 //                                                                           //

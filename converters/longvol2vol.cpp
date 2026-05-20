@@ -16,6 +16,7 @@
 
 /**
  * @file longvol2vol.cpp
+ *  @ingroup Converters
  * @author David Coeurjolly (\c david.coeurjolly@liris.cnrs.fr )
  * Laboratoire d'InfoRmatique en Image et Systèmes d'information - LIRIS (CNRS, UMR 5205), CNRS, France
  *
@@ -43,7 +44,8 @@ using namespace Z3i;
 /**
  @page longvol2vol longvol2vol
  @brief  Converts a longvol (long int) to a vol file (unsigned char).
-
+ @ingroup convertertools
+ 
 @b Usage: longvol2vol [input] [output]
 
 @b Allowed @b options @b are:
@@ -65,7 +67,7 @@ Options:
 
 @b Example:
 @code
-  $ longvol2vol -i ${DGtal}/tests/samples/test.longvol -o out.vol 
+  $ longvol2vol ${DGtal}/tests/samples/test.longvol out.vol 
 @endcode
 
 @see longvol2vol.cpp

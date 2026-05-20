@@ -16,6 +16,7 @@
 
 /**
  * @file vol2vox.cpp
+ * @ingroup Converters
  * @author David Coeurjolly (\c david.coeurjolly@liris.cnrs.fr )
  * Laboratoire d'InfoRmatique en Image et Systèmes d'information - LIRIS (CNRS, UMR 5205), CNRS, France
  *
@@ -41,9 +42,9 @@ using namespace Z3i;
 
 
 /**
- @page vol2vox
+ @page vol2vox vol2vox
  @brief  Converts a vol file to a MagicaVoxel VOX file (https://ephtracy.github.io).
-
+ @ingroup convertertools
 
  @b Usage: vo2vox -i [input] -o [output]
 
@@ -52,7 +53,8 @@ using namespace Z3i;
  @code
 
 Positionals:
-  2 TEXT=result.vox                     Output filename.
+ 1 TEXT:FILE REQUIRED                  Input vol file.
+ 2 TEXT=result.vox                     Output filename.
 
 Options:
   -h,--help                             Print this help message and exit
@@ -62,7 +64,7 @@ Options:
 
  @b Example:
  @code
- $ vol2vox -i ${DGtal}/examples/samples/Al.100.vol -o Al.100.vox
+ $ vol2vox ${DGtal}/examples/samples/Al.100.vol Al.100.vox
 
  @endcode
  */
@@ -101,10 +103,10 @@ int main(int argc, char**argv)
    std::string inputFileName;
    std::string outputFileName{"result.vox"};
   app.description("Convert a vol (up to [0,126]^3) to a vox.\n The current exporter does not support custom colormaps, only the voxel values are exported \n Example: vol2vox  -i ${DGtal}/examples/samples/Al.100.vol -o Al.100.vox");
-  app.add_option("-i,--input", inputFileName, "Input vol file.")
+  app.add_option("-i,--input,1", inputFileName, "Input vol file.")
     ->required()
     ->check(CLI::ExistingFile);
-  app.add_option("-o,--output,2", outputFileName, "Output filename.", true);
+  app.add_option("-o,--output,2", outputFileName, "Output filename.");
   app.get_formatter()->column_width(40);
   CLI11_PARSE(app, argc, argv);
 

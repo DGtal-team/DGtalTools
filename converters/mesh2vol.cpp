@@ -15,8 +15,7 @@
  **/
 /**
  * @file mesh2vol.cpp
- * @ingroup converters
- *
+ * @ingroup Converters 
  * @date 2018/01/11
  *
  *
@@ -45,15 +44,16 @@ using namespace DGtal;
 
 
 /**
- @page mesh2vol
+ @page mesh2vol mesh2vol
  @brief Convert a mesh file into a 26-separated or 6-separated voxelization in a given resolution grid.
-
+ @ingroup convertertools
+ 
 @b Usage: mesh2vol [input]
 
 @b Allowed @b options @b are:
 
 @code
-ositionals:
+positionals:
   1 TEXT:FILE REQUIRED                  mesh file (.off).
   2 TEXT=result.vol                     filename of ouput volumetric file (vol, pgm3d, ...).
 
@@ -62,7 +62,9 @@ Options:
   -i,--input TEXT:FILE REQUIRED         mesh file (.off).
   -o,--output TEXT=result.vol           filename of ouput volumetric file (vol, pgm3d, ...).
   -m,--margin UINT                      add volume margin around the mesh bounding box.
+  -d,--objectDomainBB                   use the digitization space defined from bounding box of input mesh. If seleted, the option --resolution will have no effect.
   -s,--separation UINT:{6,26}=6         voxelization 6-separated or 26-separated.
+  -f,--fillValue                                        change the default output  volumetric image value in [1...255].
   -r,--resolution UINT=128              digitization domain size (e.g. 128). The mesh will be scaled such that its bounding box maps to [0,resolution)^3.
 @endcode
 
@@ -79,7 +81,8 @@ template< unsigned int SEP >
 void voxelizeAndExport(const std::string& inputFilename,
                        const std::string& outputFilename,
                        const unsigned int resolution,
-                       const unsigned int margin)
+                       const unsigned int margin,
+                       const unsigned char fillVal)
 {
   using Domain   = Z3i::Domain;
   using PointR3  = Z3i::RealPoint;
@@ -88,27 +91,33 @@ void voxelizeAndExport(const std::string& inputFilename,
   trace.beginBlock("Preparing the mesh");
   trace.info() << "Reading input file: " << inputFilename;
   Mesh<PointR3> inputMesh;
-  MeshReader<PointR3>::importOFFFile(inputFilename.c_str(), inputMesh);
+  inputMesh << inputFilename.c_str();
   trace.info() << " [done]" << std::endl;
   const std::pair<PointR3, PointR3> bbox = inputMesh.getBoundingBox();
   trace.info()<< "Mesh bounding box: "<<bbox.first <<" "<<bbox.second<<std::endl;
 
   const double smax = (bbox.second - bbox.first).max();
-  const double factor = resolution / smax;
-  const PointR3 translate = -bbox.first;
-  trace.info() << "Scale = "<<factor<<" translate = "<<translate<<std::endl;
-  for(auto it = inputMesh.vertexBegin(), itend = inputMesh.vertexEnd();
-      it != itend; ++it)
+  if (resolution != 0)
   {
-    //scale + translation
-    *it += translate;
-    *it *= factor;
+    const double factor = resolution / smax;
+    const PointR3 translate = -bbox.first;
+    trace.info() << "Scale = "<<factor<<" translate = "<<translate<<std::endl;
+    for(auto it = inputMesh.vertexBegin(), itend = inputMesh.vertexEnd();
+        it != itend; ++it)
+    {
+      //scale + translation
+      *it += translate;
+      *it *= factor;
+    }
+    trace.endBlock();
   }
-  trace.endBlock();
-  
   trace.beginBlock("Voxelization");
   trace.info() << "Voxelization " << SEP << "-separated ; " << resolution << "^3 ";
   Domain aDomain(PointZ3().diagonal(-margin), PointZ3().diagonal(resolution+margin));
+  if (resolution == 0)
+  {
+    aDomain = Domain(bbox.first, bbox.second);
+  }
   
   //Digitization step
   Z3i::DigitalSet mySet(aDomain);
@@ -122,7 +131,7 @@ void voxelizeAndExport(const std::string& inputFilename,
   trace.info()<<aDomain<<std::endl;
   ImageContainerBySTLVector<Domain, unsigned char> image(aDomain);
   for(auto p: mySet)
-    image.setValue(p, 128);
+    image.setValue(p, fillVal);
   image >> outputFilename.c_str();
   trace.endBlock();
 }
@@ -137,27 +146,32 @@ int main( int argc, char** argv )
    unsigned int margin  {0};
    unsigned int separation {6};
    unsigned int resolution {128};
- 
-   app.description("Convert a mesh file into a 26-separated or 6-separated volumetric voxelization in a given resolution grid. \n Example:\n mesh2vol -i ${DGtal}/examples/samples/tref.off -o output.vol --separation 26 --resolution 256 ");
+   unsigned char fillValue {128};
+   bool unitScale {false};
+   
+   app.description("Convert a mesh file into a 26-separated or 6-separated volumetric voxelization in a given resolution grid. \n Example:\n mesh2vol ${DGtal}/examples/samples/tref.off output.vol --separation 26 --resolution 256 ");
    
    app.add_option("-i,--input,1", inputFileName, "mesh file (.off)." )
      ->required()
      ->check(CLI::ExistingFile);
-   app.add_option("-o,--output,2", outputFileName, "filename of ouput volumetric file (vol, pgm3d, ...).",true);
+   app.add_option("-o,--output,2", outputFileName, "filename of ouput volumetric file (vol, pgm3d, ...).");
    app.add_option("-m,--margin", margin, "add volume margin around the mesh bounding box.");
-   app.add_option("-s,--separation", separation, "voxelization 6-separated or 26-separated.", true)
+   app.add_flag("-d,--objectDomainBB", unitScale, "use the digitization space defined from bounding box of input mesh. If seleted, the option --resolution will have no effect.");
+   app.add_option("-f,--fillValue", fillValue, "change the default output  volumetric image value in [1...255].")
+   ->expected(0, 255);
+   app.add_option("-s,--separation", separation, "voxelization 6-separated or 26-separated.")
      -> check(CLI::IsMember({6, 26}));
-   app.add_option("-r,--resolution", resolution,"digitization domain size (e.g. 128). The mesh will be scaled such that its bounding box maps to [0,resolution)^3.", true);
+   app.add_option("-r,--resolution", resolution,"digitization domain size (e.g. 128). The mesh will be scaled such that its bounding box maps to [0,resolution)^3.");
    
    
   app.get_formatter()->column_width(40);
   CLI11_PARSE(app, argc, argv);
   // END parse command line using CLI ----------------------------------------------    
- 
+       
   if (separation==6)
-    voxelizeAndExport<6>(inputFileName, outputFileName, resolution, margin);
+       voxelizeAndExport<6>(inputFileName, outputFileName, unitScale ? 0 : resolution, margin, fillValue);
   else
-    voxelizeAndExport<26>(inputFileName, outputFileName, resolution, margin);    
+    voxelizeAndExport<26>(inputFileName, outputFileName, unitScale ? 0 : resolution, margin, fillValue);    
  return EXIT_SUCCESS;
 }
 

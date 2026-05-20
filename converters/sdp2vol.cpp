@@ -15,7 +15,7 @@
  **/
 /**
  * @file sdp2vol.cpp
- * @ingroup converters
+ * @ingroup Converters
  * @author Bertrand Kerautret (\c kerautre@loria.fr )
  * LORIA (CNRS, UMR 7503), University of Nancy, France
  *
@@ -41,9 +41,10 @@ using namespace DGtal;
 
 /**
  @page sdp2vol sdp2vol
- @brief  Converts digital set of points into a volumic file.
 
-@b Usage: sdp2vol [input] [output]
+ @brief  Converts digital set of points into a volumic file.
+ @ingroup convertertools
+ @b Usage: sdp2vol [input] [output]
 
 @b Allowed @b options @b are:
 
@@ -65,7 +66,7 @@ Options:
 
 @b Example:
 @code
-  $ sdp2vol -i volumePoints.sdp -o volume.vol -d 0 0 0 10 10 10
+  $ sdp2vol volumePoints.sdp volume.vol -d 0 0 0 10 10 10
 @endcode
 
 @see sdp2vol.cpp
@@ -92,7 +93,7 @@ int main( int argc, char** argv )
    bool invertY {false};
    std::vector<int> domainCoords;
 
-   app.description("Convert digital set of points into a volumic file.\n Example:\n sdp2vol -i volumePoints.sdp -o volume.vol -d 0 0 0 10 10 10 \n");
+   app.description("Convert digital set of points into a volumic file.\n Example:\n sdp2vol volumePoints.sdp volume.vol -d 0 0 0 10 10 10 \n");
    app.add_option("-i,--input,1", inputSDP, "Sequence of 3d Discrete points (.sdp)." )
     ->required()
     ->check(CLI::ExistingFile);
@@ -129,7 +130,7 @@ int main( int argc, char** argv )
   if(domainCoords.size() != 6 )
   {
     unsigned int marge = 1;
-    for(unsigned int i=0; i< 4; i++)
+    for(unsigned int i=0; i< 3; i++)
     {
       BBCompPoints cmp_points(i);
       ptUpper[i] = (*(std::max_element(vectPoints.begin(), vectPoints.end(), cmp_points)))[i]+marge;

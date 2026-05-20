@@ -15,7 +15,7 @@
  **/
 /**
  * @file curvatureBC.cpp
- * @ingroup Tools
+ * @ingroup Estimators
  * @author Jacques-Olivier Lachaud (\c jacques-olivier.lachaud@univ-savoie.fr )
  * Laboratory of Mathematics (CNRS, UMR 5807), University of Savoie, France
  *
@@ -52,9 +52,11 @@ using namespace DGtal;
 
 /**
  @page tangentBC tangentBC
+
  
  @brief  Estimates tangent using a binomial convolver.
-
+ @ingroup estimatortools
+ 
  @b Usage:  tangentBC [options] --input  <fileName> 
 
 
@@ -76,12 +78,12 @@ using namespace DGtal;
 
 We consider as input shape the freeman chain of the DGtal/examples/sample directory. The contour can be displayed with @ref displayContours : 
  @code
-$  displayContours -i $DGtal/examples/samples/contourS.fc -o contourS.png  --drawPointOfIndex 0
+$  displayContours $DGtal/examples/samples/contourS.fc  contourS.png  --drawPointOfIndex 0
  @endcode
 
 The tangents can be computed as follows:
 @code 
-$ tangentBC -i $DGtal/examples/samples/contourS.fc  > tangentsBC.dat
+$ tangentBC $DGtal/examples/samples/contourS.fc  > tangentsBC.dat
 $ gnuplot 
 gnuplot> plot [] [-1.2:1.2]'tangentsBC.dat' using 1:3  w lines title "tangents with Binomial Convolution estimator"
 @endcode
@@ -108,7 +110,7 @@ int main( int argc, char** argv )
 
   app.description("Estimates tangent using a binomial convolver.\n Typical use example:\n \t tangentBC [options] --input  <fileName>\n");
   auto filenameOpt = app.add_option("--input,-i,1",fileName,"input file name: FreemanChain (.fc) or a sequence of discrete points (.sdp).")->required()->check(CLI::ExistingFile);
-  app.add_option("--GridStep", h, "Grid step (default 1.0)", true);
+  app.add_option("--GridStep", h, "Grid step (default 1.0)");
    
   app.get_formatter()->column_width(40);
   CLI11_PARSE(app, argc, argv);

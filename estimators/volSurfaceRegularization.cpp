@@ -15,7 +15,7 @@
  **/
 /**
  * @file volSurfaceRegularization
- * @ingroup Tools
+ * @ingroup Estimators
  * @author David Coeurjolly (\c david.coeurjolly@liris.cnrs.fr )
  * @author Pierre Gueth (\c pierre.gueth@liris.cnrs.fr )
  * @author Jacques-Olivier Lachaud (\c jacques-olivier.lachaud@univ-smb.fr )
@@ -32,10 +32,12 @@
 
 /**
  @page volSurfaceRegularization volSurfaceRegularization
+
  
  @brief Regularize a cubical complex into a smooth quadrangulated complex.
+ @ingroup estimatortools
 
-This is done by minimizing a quadratic energy function as decribed in ??. The variational
+ This is done by minimizing a quadratic energy function as described in ??. The variational
  formulation regularizes the position while aligning the regularized quads with an 
  input normal vector field. In this tool, the input normal vector field can be either 
  specified in the CSV input file, or computed using Integral Invariant (and -r option).
@@ -139,16 +141,16 @@ int main(int argc, char* argv[])
   app.add_option("--image-filename,-i,1",options.image_filename, "input vol filename for image shape (object voxels have values > 0) or input cvs filename for surfels and normals") -> required();
   app.add_option("--regularized-obj-filename,-o,1", options.regularized_obj_filename, "output regularized obj") -> required();
   app.add_option("--cubical-obj-filename,-n", options.cubical_obj_filename, "output cubical obj");
-  app.add_option("--shape-noise,-k", options.noise_level,"noise shape parameter", true );
+  app.add_option("--shape-noise,-k", options.noise_level,"noise shape parameter" );
   auto groupNormEst = app.add_option_group("Normal field estimator options");
-  groupNormEst->add_option("--normal-radius,-r", options.normal_radius, "radius of normal estimator", true);
+  groupNormEst->add_option("--normal-radius,-r", options.normal_radius, "radius of normal estimator");
 
   auto groupApprox = app.add_option_group("Surface approximation options");
-  groupApprox->add_option("--regularization-position,-p", options.regularization_position, "vertex position regularization coeff", true );
-  groupApprox->add_option("--regularization-center,-c",options.regularization_center, "face center regularization coeff", true);
-  groupApprox->add_option("--align,-a", options.align, "normal alignment coeff", true);
-  groupApprox->add_option("--fairness,-f",options.fairness,"face fairness coeff" ,true);
-  groupApprox->add_option("--barycenter,-b", options.barycenter, "barycenter fairness coeff", true);
+  groupApprox->add_option("--regularization-position,-p", options.regularization_position, "vertex position regularization coeff" );
+  groupApprox->add_option("--regularization-center,-c",options.regularization_center, "face center regularization coeff");
+  groupApprox->add_option("--align,-a", options.align, "normal alignment coeff");
+  groupApprox->add_option("--fairness,-f",options.fairness,"face fairness coeff");
+  groupApprox->add_option("--barycenter,-b", options.barycenter, "barycenter fairness coeff");
 
   app.get_formatter()->column_width(40);
   CLI11_PARSE(app, argc, argv);

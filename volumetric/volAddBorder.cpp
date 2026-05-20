@@ -18,7 +18,7 @@
  * @file voAddBorder.cpp
  * @author David Coeurjolly (\c david.coeurjolly@liris.cnrs.fr )
  * Laboratoire d'InfoRmatique en Image et Systèmes d'information - LIRIS (CNRS, UMR 5205), CNRS, France
- *
+ * @ingroup Volumetric
  * @date 2012/05/01
  *
  * This file is part of the DGtal library.
@@ -39,12 +39,13 @@ using namespace DGtal;
 using namespace Z3i;
 
 /**
+
  @page volAddBorder volAddBorder
  
  @brief Adds a border of one voxel with value 0 around a vol file.
 
- @b Usage: 	volAddBorder --input \<volFileName\> --o \<volOutputFileName\> 
-
+ @b Usage: 	volAddBorder \<volFileName\> \<volOutputFileName\> 
+ @ingroup volumetrictools
 
  @b Allowed @b options @b are : 
  @code

@@ -15,7 +15,7 @@
  **/
 /**
  * @file dicom2vol.cpp
- * @ingroup conerters
+ * @ingroup Converters
  * @author Bertrand Kerautret (\c kerautre@loria.fr )
  * LORIA (CNRS, UMR 7503), University of Nancy, France
  *
@@ -46,6 +46,9 @@ using namespace DGtal;
 
 /**
  @page dicom2vol dicom2vol
+ @ingroup convertertools
+
+
  @brief Converts dicom file into a volumetric file (.vol, .longvol .pgm3d).
 
 @b Usage: dicom2vol [input] [output]
@@ -55,6 +58,7 @@ using namespace DGtal;
 @code
 Positionals:
   1 TEXT:FILE REQUIRED                  dicom image  (.dcm).
+  2 TEXT:FILE                           volumetric file (.vol, .longvol .pgm3d, .raw).
 
 Options:
   -h,--help                             Print this help message and exit
@@ -86,11 +90,11 @@ int main( int argc, char** argv )
    DGtal::int64_t dicomMin {-1000};
    DGtal::int64_t dicomMax {3000};
 
-   app.description("Convert dicom file into a volumetric file (.vol, .longvol .pgm3d).\n Example:\n dicom2vol -i ${DGtal}/tests/samples/dicomSample/1629.dcm --dicomMin 0 --dicomMax 300 -o sample.vol.");
+   app.description("Convert dicom file into a volumetric file (.vol, .longvol .pgm3d).\n Example:\n dicom2vol  ${DGtal}/tests/samples/dicomSample/1629.dcm sample.vol --dicomMin 0 --dicomMax 300.");
    app.add_option("-i,--input,1", inputFileName, "dicom image  (.dcm)." )
     ->required()
     ->check(CLI::ExistingFile);
-   app.add_option("-o,--output,2", outputFileName, "volumetric file (.vol, .longvol .pgm3d, .raw)", true);
+   app.add_option("-o,--output,2", outputFileName, "volumetric file (.vol, .longvol .pgm3d, .raw)");
    app.add_option("--dicomMin",dicomMin,"set minimum density threshold on Hounsfield scale" );
    app.add_option("--dicomMax",dicomMax,"set maximum density threshold on Hounsfield scale" );
 

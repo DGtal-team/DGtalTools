@@ -16,7 +16,7 @@
 
 /**
  * @file volShapeMetrics.cpp
- *
+ * @ingroup Volumetric
  * @author Bertrand Kerautret (\c kerautre@loria.fr )
  * LORIA (CNRS, UMR 7503), University of Nancy, France
  *
@@ -47,10 +47,12 @@ using namespace Z3i;
 
 
 /**
+
  @page volShapeMetrics volShapeMetrics
  
  @brief Applies shape measures for comparing two volumetric images A and B (shape defined from thresholds).
-
+ @ingroup volumetrictools
+ 
  Usefull to determine classical statistics like false positive related stats.
  
 
@@ -268,7 +270,7 @@ int main(int argc, char**argv)
   bool displayTFstats {false};
   bool exportSDP {false};
   
-  app.description("Apply shape measures for comparing two volumetric images A and B (shape defined from thresholds).\n It can compute: \n  - voxel count from voxel partition (number of voxel from (B-A), (A-B) ...): usefull to determine classical statistics like false positive related stats.\n - euclidean distance between two volumetric images A and B\n Basic usage: \t volShapeMetrics --volA <volAFilename> --volB <volBFilename>\nTypical use :\n  volShapeMetrics -a imageA.vol --aMin 128 --aMax 255 -b imageB.vol --bMin 128 --bMax 255 --distancesFromBnotInAOnly \n");
+  app.description("Apply shape measures for comparing two volumetric images A and B (shape defined from thresholds).\n It can compute: \n  - voxel count from voxel partition (number of voxel from (B-A), (A-B) ...): useful to determine classical statistics like false positive related stats.\n - euclidean distance between two volumetric images A and B\n Basic usage: \t volShapeMetrics --volA <volAFilename> --volB <volBFilename>\nTypical use :\n  volShapeMetrics -a imageA.vol --aMin 128 --aMax 255 -b imageB.vol --bMin 128 --bMax 255 --distancesFromBnotInAOnly \n");
   
   
   
@@ -279,11 +281,11 @@ int main(int argc, char**argv)
   app.add_option("-b,--volB,2", volBFilename, "Input filename of volume B (vol format, and other pgm3d can also be used).")
   ->required()
   ->check(CLI::ExistingFile);
-  app.add_option("--aMin",aMin, "min threshold for a voxel to be considered as belonging to the object of volume A. (default 0)",true);
-  app.add_option("--aMax",aMax, "max threshold for a voxel to be considered as belonging to the object of volume A. (default 128)",true);
+  app.add_option("--aMin",aMin, "min threshold for a voxel to be considered as belonging to the object of volume A. (default 0)");
+  app.add_option("--aMax",aMax, "max threshold for a voxel to be considered as belonging to the object of volume A. (default 128)");
 
-  app.add_option("--bMin",bMin, "min threshold for a voxel to be considered as belonging to the object of volume B. (default 0)",true);
-  app.add_option("--bMax",bMax, "max threshold for a voxel to be considered as belonging to the object of volume B. (default 128)",true);
+  app.add_option("--bMin",bMin, "min threshold for a voxel to be considered as belonging to the object of volume B. (default 0)");
+  app.add_option("--bMax",bMax, "max threshold for a voxel to be considered as belonging to the object of volume B. (default 128)");
 
   app.add_flag("--noDistanceComparisons", noDistanceComparisons, "to avoid to apply distance map computation if the distance comparaison are not needed.");
 

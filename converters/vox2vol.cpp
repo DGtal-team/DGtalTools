@@ -16,6 +16,7 @@
 
 /**
  * @file vox2vol.cpp
+ * @ingroup Converters
  * @author David Coeurjolly (\c david.coeurjolly@liris.cnrs.fr )
  * Laboratoire d'InfoRmatique en Image et Systèmes d'information - LIRIS (CNRS, UMR 5205), CNRS, France
  *
@@ -43,8 +44,9 @@ using namespace Z3i;
 
 
 /**
-   @page vox2vol
+   @page vox2vol vox2vol
    @brief  Converts a MagicaVoxel VOX file (https://ephtracy.github.io) to a vol file.
+   @ingroup convertertools
 
 
    @b Usage: vox2vol -i [input] -o [output]
@@ -65,7 +67,7 @@ using namespace Z3i;
 
    @b Example:
    @code
-   $ vox2vol -i Al.100.vox -o Al.100.vol
+   $ vox2vol  Al.100.vox Al.100.vol
 
    @endcode
 */
@@ -131,14 +133,11 @@ int main(int argc, char**argv)
   CLI::App app;
   std::string inputFileName;
   std::string outputFileName {"result.vol"};
-
-
-  app.description("Convert a vox file to a vol. Basic usage:\n vox2vol --input <volFileName> --o <volOutputFileName> ");
+  app.description("Convert a vox file to a vol. Basic usage:\n vox2vol  <volFileName> <volOutputFileName> ");
   app.add_option("-i,--input,1", inputFileName, "" )
     ->required()
     ->check(CLI::ExistingFile);
-  app.add_option("-o,--ouput,2", outputFileName, "", true );   
-
+  app.add_option("-o,--ouput,2", outputFileName, "" );
    
   app.get_formatter()->column_width(40);
   CLI11_PARSE(app, argc, argv);

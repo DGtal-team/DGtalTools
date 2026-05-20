@@ -16,7 +16,7 @@
 
 /**
  * @file
- * @ingroup visualisation
+ * @ingroup Visualisation
  * @author Bertrand Kerautret (\c kerautre@loria.fr )
  * LORIA (CNRS, UMR 7503), University of Lorraine, France
  *
@@ -25,7 +25,7 @@
  * Source file of the tool 2dCompImage
  *
  * This file is part of the DGtal library/DGtalTools Project.
- */
+ **/
 
 ///////////////////////////////////////////////////////////////////////////////
 #include "DGtal/base/Common.h"
@@ -57,12 +57,12 @@ typedef GradientColorMap<unsigned int, CMAP_JET, 1 > JetMap;
 
 
 /**
- @page Doc2dCompImage 2dCompImage
+ @page 2dCompImage 2dCompImage
  
  @brief Compare images and displays differences (squared and absolute differences). 
+ @ingroup visualizationtools
 
-
- @b Usage:  2dCompImage --imageA <imageA>.pgm --imageB <imageB>.pgm --imageError <name> 
+ @b Usage:  2dCompImage <imageA>.pgm <imageB>.pgm --imageError <name>
 
  @b Allowed @b options @b are :
  
@@ -85,7 +85,7 @@ typedef GradientColorMap<unsigned int, CMAP_JET, 1 > JetMap;
  @b Example: 
  Typical use example:
  @code
-       2dCompImage -a imageA.pgm -b imageB.pgm -e errorImage -S 100 
+       2dCompImage  imageA.pgm imageB.pgm -e errorImage -S 100
  @endcode
 
 You should obtain such a visualisation:
@@ -95,7 +95,7 @@ You should obtain such a visualisation:
  @ref 2dCompImage.cpp
 
 
- */
+**/
 
 
 
@@ -162,7 +162,7 @@ int main( int argc, char** argv )
   int maxValueMAE;
   int maxValueMSE;
   
-  app.description("Compare images and displays differences (squared and absolute differences).\n Typical use example:\n \t 2dCompImage -a imageA.pgm -b imageB.pgm -e errorImage -S 100 \n");
+  app.description("Compare images and displays differences (squared and absolute differences).\n Typical use example:\n \t 2dCompImage imageA.pgm imageB.pgm -e errorImage -S 100 \n");
   app.add_option("-a,--imageA,1", inputFileNameA, "Input filename of image A." )
   ->required()
   ->check(CLI::ExistingFile);

@@ -1,13 +1,36 @@
-
 #David Coeurjolly <david.coeurjolly@liris.cnrs.fr>
 # -----------------------------------------------------------------------------
 # Project definition
 # -----------------------------------------------------------------------------
+cmake_minimum_required (VERSION 3.20)
 PROJECT(DGtalTools)
 
 cmake_minimum_required (VERSION 3.11)
+cmake_policy(SET CMP0057 NEW) # the new interpretation of IN_LIST is by default not set (at least until  3.21.1).
 
-SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake")
+LIST(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
+SET(DGTALTOOLS_RANDOMIZED_BUILD_THRESHOLD "100" CACHE INTERNAL "Threshold for the random selection of tools to build.")
+SET(DGTALTOOLS_RANDOMIZED_BUILD_WHITELIST "" CACHE INTERNAL "List of whitelisted tools to build.")
+option(NO_ADD_STBIMAGE_IMPLEMENT "To avoid duplicated linking errors (like LNK2005 in MSVC)" OFF)
+list(APPEND CMAKE_PREFIX_PATH "${DGtal_DIR}")
+
+# -----------------------------------------------------------------------------
+# CPP20
+# -----------------------------------------------------------------------------
+set(DGTALTOOLS_CMAKE_CXX_STANDARD_MIN_REQUIRED 20)
+ if(NOT CMAKE_CXX_STANDARD)
+   set(CMAKE_CXX_STANDARD ${DGTALTOOLS_CMAKE_CXX_STANDARD_MIN_REQUIRED})
+ else()
+  # Throw if CMAKE_CXX_STANDARD is 98
+  if(${CMAKE_CXX_STANDARD} EQUAL 98)
+    message(FATAL_ERROR "CMAKE_CXX_STANDARD is set to ${CMAKE_CXX_STANDARD}, "
+      "but DGtalTools requires at least ${DGTALTOOLS_CMAKE_CXX_STANDARD_MIN_REQUIRED}.")
+  endif()
+endif()
+if(NOT CMAKE_CXX_STANDARD_REQUIRED)
+  set(CMAKE_CXX_STANDARD_REQUIRED ON)
+endif()
+message(STATUS "C++ standard set to ${CMAKE_CXX_STANDARD}")
 
 
 # -----------------------------------------------------------------------------
@@ -15,20 +38,11 @@ SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake")
 # -----------------------------------------------------------------------------
 message(STATUS "-------------------------------------------------------------------------------")
 message(STATUS "Checking if DGtal is installed:")
-FIND_PACKAGE(DGtal 1.0 REQUIRED)
+FIND_PACKAGE(DGtal 2.1.0 REQUIRED)
 INCLUDE_DIRECTORIES(${DGTAL_INCLUDE_DIRS})
 LINK_DIRECTORIES(${DGTAL_LIBRARY_DIRS})
 SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 message(STATUS "DGtal found.")
-
-
-
- # -----------------------------------------------------------------------------
- # CPP11
- # -----------------------------------------------------------------------------
- set (CMAKE_CXX_STANDARD 11)
- set (CMAKE_CXX_STANDARD_REQUIRED TRUE)
-
 
 
 # -------------------------------------------------------------------------
@@ -46,18 +60,18 @@ endif (CMAKE_CXX_FLAGS MATCHES "-ftemplate-depth-[0-9]*")
 
 
 
+# -----------------------------------------------------------------------------
 # CLI11
+# -----------------------------------------------------------------------------
 include_directories( "${PROJECT_SOURCE_DIR}/ext/" )
-
-
 
 # -----------------------------------------------------------------------------
 # Define variables and cmake parameters, and display some information
 # -----------------------------------------------------------------------------
 SET(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
-SET(DGtalTools_VERSION_MAJOR 1)
-SET(DGtalTools_VERSION_MINOR 2)
-SET(DGtalTools_VERSION_PATCH beta)
+SET(DGtalTools_VERSION_MAJOR 2)
+SET(DGtalTools_VERSION_MINOR 1)
+SET(DGtalTools_VERSION_PATCH 0)
 SET(DGTALTOOLS_VERSION "${DGtalTools_VERSION_MAJOR}.${DGtalTools_VERSION_MINOR}.${DGtalTools_VERSION_PATCH}")
 SET(PROJECT_VERSION "${DGtalTools_VERSION_MAJOR}.${DGtalTools_VERSION_MINOR}.${DGtalTools_VERSION_PATCH}")
 SET(VERSION ${DGtalTools_VERSION_MAJOR}.${DGtalTools_VERSION_MINOR}.${DGtalTools_VERSION_PATCH})
@@ -65,27 +79,29 @@ SET(VERSION ${DGtalTools_VERSION_MAJOR}.${DGtalTools_VERSION_MINOR}.${DGtalTools
 
 
 
-
  # -----------------------------------------------------------------------------
- # Looking for boost
+ # Randomized build.
  # -----------------------------------------------------------------------------
 
-set(Boost_USE_STATIC_LIBS   ON)
-set(Boost_USE_MULTITHREADED ON)
-set(Boost_USE_STATIC_RUNTIME OFF)
-set(Boost_FOUND FALSE)
-FIND_PACKAGE(Boost 1.50.0 REQUIRED)
-if ( Boost_FOUND )
-  ADD_DEFINITIONS(${BOOST_DEFINITIONS} -DBOOST_ALL_NO_LIB)
-  # SYSTEM to avoid warnings from boost.
-  include_directories(SYSTEM ${Boost_INCLUDE_DIRS} )
-  SET(DGtalToolsLibDependencies ${DGtalToolsLibDependencies}
-     ${Boost_LIBRAIRIES})
-   SET(DGtalLibInc ${Boost_INCLUDE_DIRS})
-endif( Boost_FOUND )
+message(STATUS "Randomized build")
+if (DGTALTOOLS_RANDOMIZED_BUILD_THRESHOLD EQUAL "100")
+   message(STATUS "All tools will be compiled (cmake variable DGTALTOOLS_RANDOMIZED_BUILD_THRESHOLD)")
+else()
+   message(STATUS "Only ~${DGTALTOOLS_RANDOMIZED_BUILD_THRESHOLD}% of the (randomly selected) tools will be  compiled.")
+   message(STATUS "  (you can adjust this with the cmake variable DGTALTOOLS_RANDOMIZED_BUILD_THRESHOLD)")
+   message(STATUS " Whitelist: ${DGTALTOOLS_RANDOMIZED_BUILD_WHITELIST}")
+   message(STATUS "  (you can adjust this with the cmake variable DGTALTOOLS_RANDOMIZED_BUILD_WHITELIST)")
+ endif()
+message(STATUS "-------------------------------------------------------------------------------")
 
 
 
+#-----------------------------------------------------------------------------
+# ITK setting
+#-----------------------------------------------------------------------------
+if (  DGTAL_WITH_ITK )
+    include(${ITK_USE_FILE})
+ENDIF( DGTAL_WITH_ITK )
 
 # -----------------------------------------------------------------------------
 # Documentation
@@ -97,7 +113,9 @@ INCLUDE(doxygen)
 INCLUDE(TargetDoxygenDoc OPTIONAL)
 message(STATUS "-------------------------------------------------------------------------------")
 
+
 #------Tools subdirectories ------
+include(cmake/AddToolsFunction.cmake)
 add_subdirectory(volumetric)
 add_subdirectory(generators)
 add_subdirectory(estimators)

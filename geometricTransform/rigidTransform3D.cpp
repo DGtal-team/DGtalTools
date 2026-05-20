@@ -89,20 +89,20 @@ int main(int argc, char**argv)
   double ax {1}, ay {0}, az {0};
   double tx {0}, ty {0}, tz {0};
 
-  app.description("Apply rigid transformation on a given volumic image.\n Typical use example:\n \t rigidTrans3D --input <RawFileName> --output <VolOutputFileName> --ox 1.0 --oy 1.0 --oz 1 -a 1.2 --ax 1 --ay 1 --az 0 --tx 1 --ty 0 --tz 0 --m <forward|backward>\n");
+  app.description("Apply rigid transformation on a given volumic image.\n Typical use example:\n \t rigidTrans3D  <RawFileName>  <VolOutputFileName> --ox 1.0 --oy 1.0 --oz 1 -a 1.2 --ax 1 --ay 1 --az 0 --tx 1 --ty 0 --tz 0 --m <forward|backward>\n");
   app.add_option("-i,--input,1",filename,"Input file.")->required()->check(CLI::ExistingFile);
   app.add_option("-o,--output,2",outputFileName,"Output file.")->required();
   app.add_option("-m,--model",model,"Transformation model: backward, forward.")->required();
-  app.add_option("-a,--angle",angle,"Rotation angle in radians (default 0)",true);
-  app.add_option("--ox",ox,"X coordinate of origin (default 0)",true);
-  app.add_option("--oy",oy,"Y coordinate of origin (default 0)",true);
-  app.add_option("--oz",oz,"Z coordinate of origin (default 0)",true);
-  app.add_option("--ax",ax,"X component of rotation axis (default 1)",true);
-  app.add_option("--ay",ay,"Y component of rotation axis (default 0)",true);
-  app.add_option("--az",az,"Z component of rotation axis (default 0)",true);
-  app.add_option("--tx",tx,"X component of translation vector (default 0)",true);
-  app.add_option("--ty",ty,"Y component of translation vector (default 0)",true);
-  app.add_option("--tz",tz,"Y component of translation vector (default 0)",true);
+  app.add_option("-a,--angle",angle,"Rotation angle in radians (default 0)");
+  app.add_option("--ox",ox,"X coordinate of origin (default 0)");
+  app.add_option("--oy",oy,"Y coordinate of origin (default 0)");
+  app.add_option("--oz",oz,"Z coordinate of origin (default 0)");
+  app.add_option("--ax",ax,"X component of rotation axis (default 1)");
+  app.add_option("--ay",ay,"Y component of rotation axis (default 0)");
+  app.add_option("--az",az,"Z component of rotation axis (default 0)");
+  app.add_option("--tx",tx,"X component of translation vector (default 0)");
+  app.add_option("--ty",ty,"Y component of translation vector (default 0)");
+  app.add_option("--tz",tz,"Y component of translation vector (default 0)");
 
   app.get_formatter()->column_width(40);
   CLI11_PARSE(app, argc, argv);

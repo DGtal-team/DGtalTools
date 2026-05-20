@@ -15,7 +15,7 @@
  **/
 /**
  * @file LengthEstimator.cpp
- * @ingroup Tools
+ * @ingroup Estimators
  * @author Tristan Roussillon (\c tristan.roussillon@liris.cnrs.fr ) 
  * @author David Coeurjolly (\c david.coeurjolly@liris.cnrs.fr ) 
  * Laboratoire d'InfoRmatique en Image et Systèmes d'information - LIRIS (CNRS, UMR 5205), CNRS,
@@ -73,9 +73,11 @@ using namespace DGtal;
 
 /**
  @page lengthEstimators lengthEstimators
- 
- @brief Generates multigrid length estimations of paramteric shapes using DGtal library.
 
+ 
+ @brief Generates multigrid length estimations of parametric shapes using DGtal library.
+ @ingroup estimatortools
+ 
 It will output length estimations (and timings) using several algorithms for decreasing grid steps.
 
 @b Usage: 	LengthEstimators [options] --shape <shapeName>
@@ -311,7 +313,7 @@ lengthEstimators( const std::string & /*name*/,
     Surfaces<KSpace>::track2DBoundaryPoints( points, K, SAdj, dig, bel );
     // Create GridCurve
     GridCurve<KSpace> gridcurve;
-    gridcurve.initFromVector( points );
+    gridcurve.initFromPointsVector( points );
     // Ranges
     ArrowsRange ra = gridcurve.getArrowsRange(); 
     PointsRange rp = gridcurve.getPointsRange(); 
@@ -408,14 +410,14 @@ int main( int argc, char** argv )
   auto radiusOpt = app.add_option("--radius,-R", radius, "Radius of the shape" );
   auto axis1Opt = app.add_option("--axis1,-A", axis1, "Half big axis of the shape (ellipse)" );
   auto axis2Opt = app.add_option("--axis2,-a", axis2, "Half small axis of the shape (ellipse)" );
-  auto smallradiusOpt = app.add_option("--smallradius,-r", smallradius, "Small radius of the shape (default 5)", true);
-  auto varsmallradiusOpt = app.add_option("--varsmallradius,-v", varsmallradius, "Variable small radius of the shape (default 5)", true );
-  auto kOpt = app.add_option("-k", k, "Number of branches or corners the shape (default 3)", true );
-  auto phiOpt = app.add_option("--phi", phi, "Phase of the shape (in radian, default 0.0)", true );
-  auto widthOpt = app.add_option("--width,-w", width, "Width of the shape (default 10.0)", true );
-  auto powerOpt = app.add_option("--power,-p", power, "Power of the metric (default 2.0)", true );
-  app.add_option("--hMin", hMin, "Minimum value for the grid step h (double, default 0.0001)", true );
-  app.add_option("--steps", nbSteps, "Number of multigrid steps between 1 and hMin (integer, default 32)", true );
+  auto smallradiusOpt = app.add_option("--smallradius,-r", smallradius, "Small radius of the shape (default 5)");
+  auto varsmallradiusOpt = app.add_option("--varsmallradius,-v", varsmallradius, "Variable small radius of the shape (default 5)" );
+  auto kOpt = app.add_option("-k", k, "Number of branches or corners the shape (default 3)" );
+  auto phiOpt = app.add_option("--phi", phi, "Phase of the shape (in radian, default 0.0)" );
+  auto widthOpt = app.add_option("--width,-w", width, "Width of the shape (default 10.0)" );
+  auto powerOpt = app.add_option("--power,-p", power, "Power of the metric (default 2.0)" );
+  app.add_option("--hMin", hMin, "Minimum value for the grid step h (double, default 0.0001)" );
+  app.add_option("--steps", nbSteps, "Number of multigrid steps between 1 and hMin (integer, default 32)" );
   
   app.get_formatter()->column_width(40);
   CLI11_PARSE(app, argc, argv);

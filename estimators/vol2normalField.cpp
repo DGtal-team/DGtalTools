@@ -16,6 +16,7 @@
 
 /**
  * @file vol2normalField.cpp
+ * @ingroup Estimators
  * @author David Coeurjolly (\c david.coeurjolly@liris.cnrs.fr )
  * Laboratoire d'InfoRmatique en Image et Systèmes d'information - LIRIS (CNRS, UMR 5205), CNRS, France
  * @author Jacques-Olivier Lachaud (\c jacques-olivier.lachaud@univ-savoie.fr )
@@ -31,6 +32,7 @@
 #include <iostream>
 #include <iterator>
 #include "DGtal/base/Common.h"
+
 #include "DGtal/topology/CanonicDigitalSurfaceEmbedder.h"
 #include "DGtal/topology/DigitalSurface.h"
 #include "DGtal/topology/DigitalSetBoundary.h"
@@ -52,11 +54,11 @@
 #include "DGtal/helpers/StdDefs.h"
 #include "DGtal/kernel/CanonicEmbedder.h"
 
-#include "DGtal/geometry/surfaces/estimation/CNormalVectorEstimator.h"
-#include "DGtal/geometry/surfaces/estimation/BasicConvolutionWeights.h"
-#include "DGtal/geometry/surfaces/estimation/LocalConvolutionNormalVectorEstimator.h"
 #include "DGtal/geometry/surfaces/estimation/DigitalSurfaceEmbedderWithNormalVectorEstimator.h"
 
+#include "DGtal/geometry/surfaces/estimation/LocalEstimatorFromSurfelFunctorAdapter.h"
+#include "DGtal/geometry/surfaces/estimation/estimationFunctors/ElementaryConvolutionNormalVectorEstimator.h"
+#include "DGtal/geometry/volumes/distance/LpMetric.h"
 #include "CLI11.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -67,9 +69,11 @@ using namespace Z3i;
 
 /**
  @page vol2normalField vol2normalField
+
  
  @brief Generates normal vector field from a vol file using DGtal library.
-
+ @ingroup estimatortools
+ 
  It will output the embedded vector field (Gaussian convolution on elementary normal vectors)
  an OFF file, and a TXT normal vector file (theta, phi in degree).
 
@@ -106,7 +110,7 @@ using namespace Z3i;
 
  You can use the too meshViewer to display the resulting vector field with the Iso-level surface:
 @code
-$ meshViewer -i lobTreshold40.off -f lobTreshold40.txt  --vectorFieldIndex 2 3 4 5 6 7  -n
+$ meshViewer lobTreshold40.off -f lobTreshold40.txt  --vectorFieldIndex 2 3 4 5 6 7  -n
 @endcode
 
  You should obtain such a result:
@@ -145,11 +149,11 @@ int main ( int argc, char**argv )
     app.description("Generates normal vector field from a vol file using DGtal library.\n Typical use example:\n \t vol2normalField[options] --input <volFileName> --o <outputFileName>\n");
     app.add_option("-i,--input,1",filename,"Input vol file.")->required()->check(CLI::ExistingFile);
     app.add_option("-o,--output,2",outputFileName,"Output file.")->required();
-    app.add_option("--level,-l",level,"Iso-level for the surface construction (default 0).",true);
-    app.add_option("--sigma,-s", sigma,"Sigma parameter of the Gaussian kernel (default 5.0).",true);
+    app.add_option("--level,-l",level,"Iso-level for the surface construction (default 0).");
+    app.add_option("--sigma,-s", sigma,"Sigma parameter of the Gaussian kernel (default 5.0).");
     auto expOpt = app.add_flag("--exportOriginAndExtremity", "exports the origin and extremity of the vector fields when exporting the vector field in TXT format (useful to be displayed in other viewer like meshViewer).");
-    app.add_option("--vectorsNorm,-N", normExport, "set the norm of the exported vectors in TXT format (when the extremity points are exported with --exportOriginAndExtremity). By using a negative value you will invert the direction of the vectors (default 1.0).",true); 
-    app.add_option("--neighborhood,-n", neighborhood,"Size of the neighborhood for the convolution (distance on surfel graph, default 10).",true);  
+    app.add_option("--vectorsNorm,-N", normExport, "set the norm of the exported vectors in TXT format (when the extremity points are exported with --exportOriginAndExtremity). By using a negative value you will invert the direction of the vectors (default 1.0)."); 
+    app.add_option("--neighborhood,-n", neighborhood,"Size of the neighborhood for the convolution (distance on surfel graph, default 10).");  
 
     app.get_formatter()->column_width(40);
     CLI11_PARSE(app, argc, argv);
@@ -189,20 +193,31 @@ int main ( int argc, char**argv )
     SurfaceEmbedder surfaceEmbedder ( digSurf );
 
     //Convolution kernel
-    deprecated::GaussianConvolutionWeights < MyDigitalSurface::Size > Gkernel ( sigma );
+    typedef typename MyDigitalSurface::Surfel Surfel;
+    typedef DGtal::functors::GaussianKernel GaussianFunctor;
+    typedef DGtal::functors::ElementaryConvolutionNormalVectorEstimator<Surfel, CanonicSCellEmbedder<KSpace>> Functor;
+    typedef LocalEstimatorFromSurfelFunctorAdapter<
+        MyDigitalSurfaceContainer, 
+        LpMetric<Z3i::Space>,
+        Functor, GaussianFunctor> MyGaussianEstimator;
 
     //Estimator definition
-    typedef deprecated::LocalConvolutionNormalVectorEstimator  < MyDigitalSurface,
-                                                     deprecated::GaussianConvolutionWeights< MyDigitalSurface::Size>  > MyGaussianEstimator;
-    BOOST_CONCEPT_ASSERT ( ( concepts::CNormalVectorEstimator< MyGaussianEstimator > ) );
-    MyGaussianEstimator myNormalEstimatorG ( digSurf, Gkernel );
+
+    GaussianFunctor Gkernel(sigma);
+    LpMetric<Z3i::Space> l1(1.0);
+    CanonicSCellEmbedder<KSpace> embedder(digSurf.container().space());
+    Functor estimator(embedder,  1.0);
+
+    MyGaussianEstimator myNormalEstimatorG;
+    myNormalEstimatorG.attach(digSurf);
+    myNormalEstimatorG.setParams(l1, estimator, Gkernel, neighborhood);
 
     // Embedder definition
     typedef DigitalSurfaceEmbedderWithNormalVectorEstimator<SurfaceEmbedder,MyGaussianEstimator> SurfaceEmbedderWithGaussianNormal;
     SurfaceEmbedderWithGaussianNormal mySurfelEmbedderG ( surfaceEmbedder, myNormalEstimatorG );
 
     // Compute normal vector field and displays it.
-    myNormalEstimatorG.init ( 1.0, neighborhood );
+    myNormalEstimatorG.init ( 1.0, digSurf.begin(), digSurf.end() );
 
     trace.info() << "Generating the NOFF surface "<< std::endl;
     ofstream out2 ( ( outputFileName + ".off" ).c_str() );

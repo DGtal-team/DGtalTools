@@ -15,7 +15,7 @@
  **/
 /**
  * @file curvatureMCMS.cpp
- * @ingroup estimators
+ * @ingroup Estimators
  * @author Tristan Roussillon (\c tristan.roussillon@liris.cnrs.fr ) 
  * Laboratoire d'InfoRmatique en Image et Systèmes d'information - LIRIS (CNRS, UMR 5205), CNRS,
  * France
@@ -60,14 +60,20 @@ using namespace std;
 
 /**
  @page curvatureMCMS curvatureMCMS
+
  
  @brief Estimates curvature using length of most centered segment computers.
-
+ @ingroup estimatortools
+ 
  @b Usage:  curvatureMCMS [options] --input  <fileName> 
 
 
  @b Allowed @b options @b are : 
  @code
+ Positionals:
+ 1 TEXT:FILE REQUIRED                  Input FreemanChain file name
+
+ Options:
   -h,--help                             Print this help message and exit
   -i,--input TEXT:FILE REQUIRED         Input FreemanChain file name
   --GridStep FLOAT=1                    Grid step
@@ -76,12 +82,12 @@ using namespace std;
  @b Example: 
 We consider as input shape the freeman chain of the DGtal/examples/sample directory. The contour can be displayed with @ref displayContours : 
  @code
-$  displayContours -i $DGtal/examples/samples/contourS.fc -o contourS.png  --drawPointOfIndex 0
+$  displayContours  $DGtal/examples/samples/contourS.fc  contourS.png  --drawPointOfIndex 0
  @endcode
 
 The curvature can be computed as follows:
 @code 
-$ curvatureMCMS -i $DGtal/examples/samples/contourS.fc  > curvatureMCMS.dat
+$ curvatureMCMS  $DGtal/examples/samples/contourS.fc  > curvatureMCMS.dat
 $ gnuplot 
 gnuplot> plot 'curvatureMCMS.dat' w lines title "curvature using length of most centered segment computers estimator"
 @endcode
@@ -155,8 +161,8 @@ int main( int argc, char** argv )
   double h {1.0};
 
   app.description("Estimates curvature using length of most centered segment computers.\n Typical use example:\n \t curvatureMCMS [options] --input  <fileName>\n");
-  app.add_option("-i,--input",fileName,"Input FreemanChain file name")->required()->check(CLI::ExistingFile);
-  app.add_option("--GridStep", h, "Grid step",true);
+  app.add_option("-i,--input, 1",fileName,"Input FreemanChain file name")->required()->check(CLI::ExistingFile);
+  app.add_option("--GridStep", h, "Grid step");
   
   app.get_formatter()->column_width(40);
   CLI11_PARSE(app, argc, argv);

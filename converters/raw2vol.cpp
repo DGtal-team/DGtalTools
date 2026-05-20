@@ -18,7 +18,7 @@
  * @file raw2vol.cpp
  * @author David Coeurjolly (\c david.coeurjolly@liris.cnrs.fr )
  * Laboratoire d'InfoRmatique en Image et Systèmes d'information - LIRIS (CNRS, UMR 5205), CNRS, France
- *
+ * @ingroup Converters
  * @date 2012/05/01
  *
  *
@@ -45,9 +45,10 @@ using namespace Z3i;
 
 /**
  @page raw2vol raw2vol
- @brief  Converts a  8-bit raw file to vol.
 
-@b Usage: raw2vol [input] [output]
+ @brief  Converts a  8-bit raw file to vol.
+ @ingroup convertertools
+ @b Usage: raw2vol [input] [output]
 
 @b Allowed @b options @b are:
 
@@ -56,6 +57,7 @@ Allowed options are: :
 
 Positionals:
   1 TEXT:FILE REQUIRED                  Input raw file.
+  2 TEXT:FILE REQUIRED                  Input raw file.
 
 Options:
   -h,--help                             Print this help message and exit
@@ -99,11 +101,11 @@ int main(int argc, char**argv)
    std::string inputFileName;
    std::string outputFileName {"result.vol"};
    unsigned int x, y, z;
-   app.description("Converts a  8-bit raw file to  vol.\n Basic example:\n \t raw2vol -x 128 -y 128 -z 128 --input <RawFileName> --output <VolOutputFileName>");
+   app.description("Converts a  8-bit raw file to  vol.\n Basic example:\n \t raw2vol <RawFileName>  <VolOutputFileName> -x 128 -y 128 -z 128");
    app.add_option("-i,--input,1", inputFileName, "Input raw file." )
     ->required()
     ->check(CLI::ExistingFile);
-   app.add_option("-o,--output,2",outputFileName,"Output vol filename.", true);
+   app.add_option("-o,--output,2",outputFileName,"Output vol filename.");
    app.add_option("--x,-x", x, "x extent." )
    ->required();
    app.add_option("--y,-y", y, "y extent." )

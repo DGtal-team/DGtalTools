@@ -1,3 +1,26 @@
+/**
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU Lesser General Public License as
+ *  published by the Free Software Foundation, either version 3 of the
+ *  License, or  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ **/
+/**
+ * @file img2freean
+ * @ingroup Converters
+ *
+ *
+ *
+ * This file is part of the DGtal library.
+ */
 #include "DGtal/io/colormaps/GrayscaleColorMap.h"
 #include "DGtal/io/readers/GenericReader.h"
 #include "DGtal/images/ImageContainerBySTLVector.h"
@@ -16,9 +39,10 @@
 using namespace DGtal;
 /**
  @page img2freeman img2freeman
- @brief Extracts Freeman chains from thresholded image.
 
-@b Usage: img2freeman [input] [output]
+ @brief Extracts Freeman chains from thresholded image.
+ @ingroup convertertools
+ @b Usage: img2freeman [input] [output]
 
 @b Allowed @b options @b are:
 
@@ -41,7 +65,7 @@ Options:
 
 @b Example:
 @code
-  $ img2freeman -i ${DGtal}/examples/samples/church.pgm > contours.fc  
+  $ img2freeman ${DGtal}/examples/samples/church.pgm > contours.fc
 
 @endcode
 You will obtain such results:
@@ -74,11 +98,7 @@ more contours.fc
 */
 
 
-
-
-
 typedef ImageSelector < Z2i::Domain, unsigned char>::Type Image;
-
 
 
 std::vector<unsigned int> getHistoFromImage(const Image &image){
@@ -89,8 +109,6 @@ std::vector<unsigned int> getHistoFromImage(const Image &image){
   }
   return vectHisto;
 }
-
-
 
 unsigned int 
 getOtsuThreshold(const Image &image){
@@ -272,10 +290,10 @@ int main( int argc, char** argv )
   }else{
     for(int i=0; minThreshold+i*increment< maxThreshold; i++){
       if(vectRangeMin.size()==3){
-	min = (int)(minThreshold+(i)*increment);
+        min = (int)(minThreshold+(i)*increment);
       }
       if(vectRangeMax.size()==3){
-	max = (int)(maxThreshold-(i)*increment);
+        max = (int)(maxThreshold-(i)*increment);
       }
       Binarizer b(min, max); 
       functors::PointFunctorPredicate<Image,Binarizer> predicate(image, b); 
@@ -286,15 +304,14 @@ int main( int argc, char** argv )
       Surfaces<Z2i::KSpace>::extractAllPointContours4C( vectContoursBdryPointels,
 							ks, predicate, sAdj );  
       if(select){
-	saveSelContoursAsFC(vectContoursBdryPointels,  minSize, selectCenter,  selectDistanceMax, sortCnt);
+          saveSelContoursAsFC(vectContoursBdryPointels,  minSize,
+                              selectCenter,  selectDistanceMax, sortCnt);
       }else{
-	saveAllContoursAsFc(vectContoursBdryPointels,  minSize, sortCnt); 
+          saveAllContoursAsFc(vectContoursBdryPointels,
+                              minSize, sortCnt);
       }
       trace.info() << " [done]" << std::endl;
     }
   }
-
-    
-  
 }
 

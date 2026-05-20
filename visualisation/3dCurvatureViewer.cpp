@@ -15,7 +15,7 @@
  **/
 /**
  * @file 3dCurvatureViewer.cpp
- * @ingroup surfaceTools
+ * @ingroup Visualisation
  * @author Jérémy Levallois (\c jeremy.levallois@liris.cnrs.fr )
  * Laboratoire d'InfoRmatique en Image et Systèmes d'information - LIRIS (CNRS, UMR 5205), INSA-Lyon, France
  * LAboratoire de MAthématiques - LAMA (CNRS, UMR 5127), Université de Savoie, France
@@ -28,6 +28,7 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 #include <iostream>
+#include <sstream>
 #include "DGtal/base/Common.h"
 #include <cstring>
 
@@ -55,25 +56,22 @@
 #include "DGtal/geometry/surfaces/estimation/IntegralInvariantCovarianceEstimator.h"
 
 // Drawing
-#include "DGtal/io/boards/Board3D.h"
+#include "DGtal/io/viewers/PolyscopeViewer.h"
 #include "DGtal/io/colormaps/GradientColorMap.h"
-
-#ifdef WITH_VISU3D_QGLVIEWER
-#include "DGtal/io/viewers/Viewer3D.h"
-#endif
 
 using namespace DGtal;
 using namespace functors;
 
 /**
- @page Doc3DCurvatureViewer 3DCurvatureViewer
+ @page Doc3dCurvatureViewer 3dCurvatureViewer
+ 
 
  @brief  Computes and visualizes mean or gaussian curvature of binary shapes.
-
+ @ingroup visualizationtools
+ 
   Vol file viewer, with curvature (mean or Gaussian, see parameters) information on surface.
-  Blue color means lowest curvature
-  Yellow color means highest curvature
-  Red means the in-between
+  Curvature values are displayed using a colormap (Viridis by default).
+  The colormap and scale can be changed in the Polyscope interface (press W).
 
   Uses IntegralInvariantCurvatureEstimation
   @see related article:
@@ -93,11 +91,11 @@ using namespace functors;
  @code
 
  Positionals:
-   1 TEXT:FILE REQUIRED                  vol file (.vol, .longvol .p3d, .pgm3d and if WITH_ITK is selected: dicom, dcm, mha, mhd). For longvol, dicom, dcm, mha or mhd formats, the input values are linearly scaled between 0 and 255.
+   1 TEXT:FILE REQUIRED                  vol file (.vol, .longvol .p3d, .pgm3d and if DGTAL_WITH_ITK is selected: dicom, dcm, mha, mhd). For longvol, dicom, dcm, mha or mhd formats, the input values are linearly scaled between 0 and 255.
 
  Options:
    -h,--help                             Print this help message and exit
-   -i,--input TEXT:FILE REQUIRED         vol file (.vol, .longvol .p3d, .pgm3d and if WITH_ITK is selected: dicom, dcm, mha, mhd). For longvol, dicom, dcm, mha or mhd formats, the input values are linearly scaled between 0 and 255.
+   -i,--input TEXT:FILE REQUIRED         vol file (.vol, .longvol .p3d, .pgm3d and if DGTAL_WITH_ITK is selected: dicom, dcm, mha, mhd). For longvol, dicom, dcm, mha or mhd formats, the input values are linearly scaled between 0 and 255.
    -r,--radius FLOAT REQUIRED            Kernel radius for IntegralInvariant
    -t,--threshold UINT=8                 Min size of SCell boundary of an object
    -l,--minImageThreshold INT=0          set the minimal image threshold to define the image object (object defined by the voxel with intensity belonging to ]minImageThreshold, maxImageThreshold ] ).
@@ -106,9 +104,9 @@ using namespace functors;
                                          type of output : mean, gaussian, k1, k2, prindir1, prindir2 or normal(default mean)
    -o,--exportOBJ TEXT                   Export the scene to specified OBJ/MTL filename (extensions added).
    -d,--exportDAT TEXT                   Export resulting curvature (for mean, gaussian, k1 or k2 mode) in a simple data file each line representing a surfel.
-   --exportOnly                          Used to only export the result without the 3d Visualisation (usefull for scripts).
-   -s,--imageScale FLOAT x 3             scaleX, scaleY, scaleZ: re sample the source image according with a grid of size 1.0/scale (usefull to compute curvature on image defined on anisotropic grid). Set by default to 1.0 for the three axis.
-   -n,--normalization BOOLEAN            When exporting to OBJ, performs a normalization so that the geometry fits in [-1/2,1/2]^3
+   --exportOnly                          Used to only export the result without the 3d Visualisation (useful for scripts).
+   -s,--imageScale FLOAT x 3             scaleX, scaleY, scaleZ: re sample the source image according with a grid of size 1.0/scale (useful to compute curvature on image defined on anisotropic grid). Set by default to 1.0 for the three axis.
+
    
  @endcode
 
@@ -127,7 +125,7 @@ using namespace functors;
 
  Now we compare the different curvature values from the two shapes:
  @code
-   3dCurvatureViewer -i $DGtal/examples/samples/lobster.vol -r 10 -l 40 -u 255 -m mean
+   3dCurvatureViewer  $DGtal/examples/samples/lobster.vol -r 10 -l 40 -u 255 -m mean
  @endcode
 
  You should obtain such a visualisation:
@@ -136,7 +134,7 @@ using namespace functors;
 
  @see
  @ref 3dCurvatureViewer.cpp,
- @ref Doc3DCurvatureViewerNoise
+ @ref Doc3dCurvatureViewerNoise
  */
 
 const Color  AXIS_COLOR_RED( 200, 20, 20, 255 );
@@ -144,6 +142,16 @@ const Color  AXIS_COLOR_GREEN( 20, 200, 20, 255 );
 const Color  AXIS_COLOR_BLUE( 20, 20, 200, 255 );
 const double AXIS_LINESIZE = 0.05;
 ///////////////////////////////////////////////////////////////////////////////
+
+// used to enable/disable the polyscope UI
+bool show_ui = false;
+void myCallback() {
+    ImGuiIO& io = ImGui::GetIO();
+    if (ImGui::IsKeyPressed(ImGuiKey_W)) {
+        show_ui = !show_ui;
+        polyscope::options::buildGui = show_ui;
+    }
+}
 
 /**
  * Missing parameter error message.
@@ -168,35 +176,31 @@ int main( int argc, char** argv )
   int minImageThreshold {0};
   int maxImageThreshold {255};
   std::string mode {"mean"};
-  std::string export_obj_filename;
   std::string export_dat_filename;
   bool exportOnly {false};
   std::vector< double> vectScale;
-  bool normalization {false};
   
-  app.description("Visualisation of 3d curvature from .vol file using curvature from Integral Invarian\nBasic usage:\n \t3dCurvatureViewerNoise -i file.vol --radius 5 --mode mean  \n Below are the different available modes: \n\t - \"mean\" for the mean curvature \n \t - \"mean\" for the mean curvature\n\t - \"gaussian\" for the Gaussian curvature\n\t - \"k1\" for the first principal curvature\n\t - \"k2\" for the second principal curvature\n\t - \"prindir1\" for the first principal curvature direction\n\t - \"prindir2\" for the second principal curvature direction\n\t - \"normal\" for the normal vector");
+  
+  app.description("Visualisation of 3d curvature from .vol file using curvature from Integral Invariant\nBasic usage:\n \t3dCurvatureViewer file.vol --radius 5 --mode mean  \n Below are the different available modes: \n\t - \"mean\" for the mean curvature \n \t - \"mean\" for the mean curvature\n\t - \"gaussian\" for the Gaussian curvature\n\t - \"k1\" for the first principal curvature\n\t - \"k2\" for the second principal curvature\n\t - \"prindir1\" for the first principal curvature direction\n\t - \"prindir2\" for the second principal curvature direction\n\t - \"normal\" for the normal vector\n Example: 3dCurvatureViewer --radius 20 --mode mean ${DGtal}/examples/samples/lobster.vol -l 110 ");
 
    
    
-   app.add_option("-i,--input,1", inputFileName, "vol file (.vol, .longvol .p3d, .pgm3d and if WITH_ITK is selected: dicom, dcm, mha, mhd). For longvol, dicom, dcm, mha or mhd formats, the input values are linearly scaled between 0 and 255." )
+   app.add_option("-i,--input,1", inputFileName, "vol file (.vol, .longvol .p3d, .pgm3d and if DGTAL_WITH_ITK is selected: dicom, dcm, mha, mhd). For longvol, dicom, dcm, mha or mhd formats, the input values are linearly scaled between 0 and 255." )
    ->required()
    ->check(CLI::ExistingFile);
    
    app.add_option("--radius,-r", re_convolution_kernel, "Kernel radius for IntegralInvariant" )
      ->required();
-   app.add_option("--threshold,-t", threshold, "Min size of SCell boundary of an object", true);
-   app.add_option("--minImageThreshold,-l",minImageThreshold,  "set the minimal image threshold to define the image object (object defined by the voxel with intensity belonging to ]minImageThreshold, maxImageThreshold ] ).", true);
-   app.add_option("--maxImageThreshold,-u",maxImageThreshold, "set the maximal image threshold to define the image object (object defined by the voxel with intensity belonging to ]minImageThreshold, maxImageThreshold] ).", true);
-   app.add_option("--mode,-m", mode, "type of output : mean, gaussian, k1, k2, prindir1, prindir2 or normal(default mean)", true)
+   app.add_option("--threshold,-t", threshold, "Min size of SCell boundary of an object");
+   app.add_option("--minImageThreshold,-l",minImageThreshold,  "set the minimal image threshold to define the image object (object defined by the voxel with intensity belonging to ]minImageThreshold, maxImageThreshold ] ).");
+   app.add_option("--maxImageThreshold,-u",maxImageThreshold, "set the maximal image threshold to define the image object (object defined by the voxel with intensity belonging to ]minImageThreshold, maxImageThreshold] ).");
+   app.add_option("--mode,-m", mode, "type of output : mean, gaussian, k1, k2, prindir1, prindir2 or normal(default mean)")
     -> check(CLI::IsMember({"mean","gaussian", "k1", "k2", "prindir1","prindir2", "normal" }));
-   app.add_option("--exportOBJ,-o", export_obj_filename, "Export the scene to specified OBJ/MTL filename (extensions added).");
    app.add_option("--exportDAT,-d",export_dat_filename, "Export resulting curvature (for mean, gaussian, k1 or k2 mode) in a simple data file each line representing a surfel."  );
-   app.add_flag("--exportOnly", exportOnly, "Used to only export the result without the 3d Visualisation (usefull for scripts).");
+   app.add_flag("--exportOnly", exportOnly, "Used to only export the result without the 3d Visualisation (useful for scripts).");
    
-   app.add_option("--imageScale,-s", vectScale,  "scaleX, scaleY, scaleZ: re sample the source image according with a grid of size 1.0/scale (usefull to compute curvature on image defined on anisotropic grid). Set by default to 1.0 for the three axis.")
+   app.add_option("--imageScale,-s", vectScale,  "scaleX, scaleY, scaleZ: re sample the source image according with a grid of size 1.0/scale (useful to compute curvature on image defined on anisotropic grid). Set by default to 1.0 for the three axis.")
     ->expected(3);
-  
-   app.add_option("--normalization,-n",normalization, "When exporting to OBJ, performs a normalization so that the geometry fits in [-1/2,1/2]^3") ;
    
    app.get_formatter()->column_width(40);
    CLI11_PARSE(app, argc, argv);
@@ -205,44 +209,23 @@ int main( int argc, char** argv )
   bool neededArgsGiven=true;
 
   
-  #ifndef WITH_VISU3D_QGLVIEWER
-    bool enable_visu = false;
-  #else
-    bool enable_visu = !exportOnly; ///<! Default QGLViewer viewer. Disabled if exportOnly is set.
-  #endif
-    bool enable_obj = export_obj_filename != ""; ///<! Export to a .obj file.
+    bool enable_visu = !exportOnly; ///<! Default PolyscopeViewer viewer. Disabled if exportOnly is set.
     bool enable_dat = export_dat_filename != ""; ///<! Export to a .dat file.
 
-    if( !enable_visu && !enable_obj && !enable_dat )
+    if( !enable_visu && !enable_dat )
       {
-  #ifndef WITH_VISU3D_QGLVIEWER
-        trace.error() << "You should specify what you want to export with --export and/or --exportDat." << std::endl;
-  #else
         trace.error() << "You should specify what you want to export with --export and/or --exportDat, or remove --exportOnly." << std::endl;
-  #endif
         neededArgsGiven = false;
       }
 
   
   double h = 1.0;
-  if( enable_obj )
-     {
-       if( export_obj_filename.find(".obj") == std::string::npos )
-         {
-           std::ostringstream oss;
-           oss << export_obj_filename << ".obj" << std::endl;
-           export_obj_filename = oss.str();
-         }
-     }
-  
-
   std::vector<  double > aGridSizeReSample;
   if( vectScale.size() == 3)
      {
        aGridSizeReSample.push_back(1.0/vectScale.at(0));
        aGridSizeReSample.push_back(1.0/vectScale.at(1));
        aGridSizeReSample.push_back(1.0/vectScale.at(2));
-
      }
    else
      {
@@ -324,24 +307,18 @@ int main( int argc, char** argv )
       trace.info()<<std::endl;
       exit(2);
     }
-
-#ifdef WITH_VISU3D_QGLVIEWER
-  QApplication application( argc, argv );
-  typedef Viewer3D<Z3i::Space, Z3i::KSpace> Viewer;
-#endif
-  typedef Board3D<Z3i::Space, Z3i::KSpace> Board;
-
-#ifdef WITH_VISU3D_QGLVIEWER
+  std::stringstream s;
+  s << "3dCurvatureViewer - DGtalTools: ";
+  std::string name = inputFileName.substr(inputFileName.find_last_of("/")+1,inputFileName.size()) ;
+  s << " " <<  name <<  " (W key to display settings)" ;
+  polyscope::options::programName = s.str();
+  polyscope::options::buildGui=false;
+  polyscope::options::groundPlaneMode = polyscope::GroundPlaneMode::None;
+  
+  typedef PolyscopeViewer<Z3i::Space, Z3i::KSpace> Viewer;
   Viewer viewer( K );
-#endif
-  Board board( K );
-
-#ifdef WITH_VISU3D_QGLVIEWER
-  if( enable_visu )
-    {
-      viewer.show();
-    }
-#endif
+  viewer.allowReuseList = true;
+  polyscope::state::userCallback = myCallback;
 
   for( unsigned int i = 0; i<vectConnectedSCell.size(); ++i )
     {
@@ -458,38 +435,11 @@ int main( int argc, char** argv )
             }
           trace.info() << "Max value= "<<max<<"  min value= "<<min<<std::endl;
           ASSERT( min <= max );
-          typedef GradientColorMap< Quantity > Gradient;
-          Gradient cmap_grad( min, (max==min)? max+1: max );
-          cmap_grad.addColor( Color( 50, 50, 255 ) );
-          cmap_grad.addColor( Color( 255, 0, 0 ) );
-          cmap_grad.addColor( Color( 255, 255, 10 ) );
-
-#ifdef WITH_VISU3D_QGLVIEWER
-          if( enable_visu )
-            {
-              viewer << SetMode3D((*abegin2).className(), "Basic" );
-            }
-#endif
-          if( enable_obj )
-            {
-              board << SetMode3D((K.unsigns(*abegin2)).className(), "Basic" );
-            }
-
-
           for ( unsigned int i = 0; i < results.size(); ++i )
             {
-#ifdef WITH_VISU3D_QGLVIEWER
               if( enable_visu )
                 {
-                  viewer << CustomColors3D( Color::Black, cmap_grad( results[ i ] ));
-                  viewer << *abegin2;
-                }
-#endif
-
-              if( enable_obj )
-                {
-                  board << CustomColors3D( Color::Black, cmap_grad( results[ i ] ));
-                  board      << K.unsigns(*abegin2);
+                  viewer << WithQuantity(*abegin2, "curvature", results[i]);
                 }
 
               if( enable_dat )
@@ -557,19 +507,6 @@ int main( int argc, char** argv )
 
 
           ///Visualizaton / export
-
-#ifdef WITH_VISU3D_QGLVIEWER
-          if( enable_visu )
-            {
-              viewer << SetMode3D(K.uCell( K.sKCoords(*abegin2) ).className(), "Basic" );
-            }
-#endif
-
-          if( enable_obj )
-            {
-              board << SetMode3D(K.uCell( K.sKCoords(*abegin2) ).className(), "Basic" );
-            }
-
           for ( unsigned int i = 0; i < results.size(); ++i )
             {
               DGtal::Dimension kDim = K.sOrthDir( *abegin2 );
@@ -581,20 +518,10 @@ int main( int argc, char** argv )
 
               Cell unsignedSurfel = K.uCell( K.sKCoords(*abegin2) );
 
-#ifdef WITH_VISU3D_QGLVIEWER
               if( enable_visu )
                 {
-                  viewer << CustomColors3D( DGtal::Color(255,255,255,255),
-                                            DGtal::Color(255,255,255,255))
+                  viewer << DGtal::Color(255,255,255,255)
                          << unsignedSurfel;
-                }
-#endif
-
-              if( enable_obj )
-                {
-                  board << CustomColors3D( DGtal::Color(255,255,255,255),
-                                           DGtal::Color(255,255,255,255))
-                        << unsignedSurfel;
                 }
 
               if( enable_dat )
@@ -607,24 +534,22 @@ int main( int argc, char** argv )
 
               RealPoint center = embedder( outer );
 
-#ifdef WITH_VISU3D_QGLVIEWER
               if( enable_visu )
                 {
                   if( mode.compare("prindir1") == 0 )
                     {
-                      viewer.setLineColor( AXIS_COLOR_BLUE );
+                      viewer.drawColor( AXIS_COLOR_BLUE );
                     }
                   else if( mode.compare("prindir2") == 0 )
                     {
-                      viewer.setLineColor( AXIS_COLOR_RED );
+                      viewer.drawColor( AXIS_COLOR_RED );
                     }
                   else if( mode.compare("normal") == 0 )
                     {
-                      viewer.setLineColor( AXIS_COLOR_GREEN );
+                      viewer.drawColor( AXIS_COLOR_GREEN );
                     }
 
-
-                  viewer.addLine (
+                  viewer.drawLine(
                                   RealPoint(
                                             center[0] -  0.5 * results[i][0],
                                             center[1] -  0.5 * results[i][1],
@@ -634,36 +559,7 @@ int main( int argc, char** argv )
                                             center[0] +  0.5 * results[i][0],
                                             center[1] +  0.5 * results[i][1],
                                             center[2] +  0.5 * results[i][2]
-                                            ),
-                                  AXIS_LINESIZE );
-                }
-#endif
-
-              if( enable_obj )
-                {
-                  if( mode.compare("prindir1") == 0 )
-                    {
-                      board.setFillColor( AXIS_COLOR_BLUE );
-                    }
-                  else if( mode.compare("prindir2") == 0 )
-                    {
-                      board.setFillColor( AXIS_COLOR_RED );
-                    }
-                  else if( mode.compare("normal") == 0 )
-                    {
-                      board.setFillColor( AXIS_COLOR_GREEN );
-                    }
-
-                  board.addCylinder (
-                                     RealPoint(
-                                               center[0] -  0.5 * results[i][0],
-                                               center[1] -  0.5 * results[i][1],
-                                               center[2] -  0.5 * results[i][2]),
-                                     RealPoint(
-                                               center[0] +  0.5 * results[i][0],
-                                               center[1] +  0.5 * results[i][1],
-                                               center[2] +  0.5 * results[i][2]),
-                                     0.2 );
+                                            ));
                 }
 
               ++abegin2;
@@ -672,29 +568,14 @@ int main( int argc, char** argv )
       trace.endBlock();
     }
 
-#ifdef WITH_VISU3D_QGLVIEWER
   if( enable_visu )
     {
-      viewer << Viewer3D<>::updateDisplay;
-    }
-#endif
-  if( enable_obj )
-    {
-      trace.info()<< "Exporting object: " << export_obj_filename << " ...";
-      board.saveOBJ(export_obj_filename,normalization);
-      trace.info() << "[done]" << std::endl;
+      viewer.show();
     }
   if( enable_dat )
     {
       outDat.close();
     }
-
-#ifdef WITH_VISU3D_QGLVIEWER
-  if( enable_visu )
-    {
-      return application.exec();
-    }
-#endif
 
   return 0;
 }

@@ -15,7 +15,7 @@
  **/
 /**
  * @file curvatureBC.cpp
- * @ingroup estimators
+ * @ingroup Estimators
  * @author Tristan Roussillon (\c tristan.roussillon@liris.cnrs.fr ) 
  * Laboratoire d'InfoRmatique en Image et Systèmes d'information - LIRIS (CNRS, UMR 5205), CNRS,
  * France
@@ -59,12 +59,18 @@ using namespace DGtal;
  @page curvatureBC curvatureBC
  
  @brief Estimatates curvature using a binomial convolver.
-
+ @ingroup estimatortools
+ 
  @b Usage: curvatureBC [options] --input  \<fileName\> 
 
 
  @b Allowed @b options @b are : 
  @code
+ 
+ Positionals:
+ 1 TEXT:FILE REQUIRED                  Input FreemanChain file name
+ 
+ Options:
   -h,--help                             Print this help message and exit
   -i,--input TEXT:FILE REQUIRED         Input FreemanChain file name
   --GridStep FLOAT=1                    Grid step
@@ -74,12 +80,12 @@ using namespace DGtal;
  
 We consider as input shape the freeman chain of the DGtal/examples/sample directory. The contour can be displayed with @ref displayContours : 
  @code
-$  displayContours -i $DGtal/examples/samples/contourS.fc -o contourS.png  --drawPointOfIndex 0
+$  displayContours  $DGtal/examples/samples/contourS.fc contourS.png  --drawPointOfIndex 0
  @endcode
 
 The curvature can be computed as follows:
 @code 
-$ curvatureBC -i $DGtal/examples/samples/contourS.fc  > curvatureBC.dat
+$ curvatureBC $DGtal/examples/samples/contourS.fc  > curvatureBC.dat
 $ gnuplot 
 gnuplot> plot 'curvatureBC.dat' w lines title "curvature with Binomial Convolution estimator"
 @endcode
@@ -109,8 +115,8 @@ int main( int argc, char** argv )
   double h {1.0};
 
   app.description("Estimates curvature using length of most centered segment computers.\n Typical use example:\n \t curvatureMCMS [options] --input  <fileName>\n");
-  app.add_option("-i,--input",fileName,"Input FreemanChain file name")->required()->check(CLI::ExistingFile);
-  app.add_option("--GridStep", h, "Grid step",true);
+  app.add_option("-i,--input,1",fileName,"Input FreemanChain file name")->required()->check(CLI::ExistingFile);
+  app.add_option("--GridStep", h, "Grid step");
   
   app.get_formatter()->column_width(40);
   CLI11_PARSE(app, argc, argv);
@@ -155,7 +161,7 @@ int main( int argc, char** argv )
       unsigned int j = 0;
       for ( ConstIteratorOnPoints it = vectPts.begin(), it_end = vectPts.end();
       it != it_end; ++it, ++j ) {
-  std::cout << j << std::setprecision( 15 )
+        std::cout << j << std::setprecision( 15 )
        << " " << curvatures[ j ] << std::endl;
       }
 

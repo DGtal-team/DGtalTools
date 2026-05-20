@@ -47,7 +47,7 @@ using namespace DGtal;
 /**
  @page vol2heightfield vol2heightfield
  @brief  Converts volumetric  file into a projected 2D image given from a normal direction N and from a starting point P.
-
+ @ingroup convertertools
  The 3D volume is scanned in this normal direction N starting from P with a step 1. If the intensity of the 3d point is inside the given thresholds its 2D gray values are set to the current scan number.
 
 
@@ -58,12 +58,14 @@ using namespace DGtal;
 @code
 
 Positionals:
-  1 TEXT:FILE REQUIRED                  vol file (.vol, .longvol .p3d, .pgm3d and if WITH_ITK is selected: dicom, dcm, mha, mhd). For longvol, dicom, dcm, mha or mhd formats, the input values are linearly scaled between 0 and 255.
+  1 TEXT:FILE REQUIRED                  vol file (.vol, .longvol .p3d, .pgm3d and if DGTAL_WITH_ITK is selected: dicom, dcm, mha, mhd). For longvol, dicom, dcm, mha or mhd formats, the input values are linearly scaled between 0 and 255.
+  2 TEXT=result.pgm                     resulting image filename (in pgm or other).
 
+ 
 Options:
   -h,--help                             Print this help message and exit
-  -i,--input TEXT:FILE REQUIRED         vol file (.vol, .longvol .p3d, .pgm3d and if WITH_ITK is selected: dicom, dcm, mha, mhd). For longvol, dicom, dcm, mha or mhd formats, the input values are linearly scaled between 0 and 255.
-  -o,--output TEXT                      sequence of discrete point file (.sdp)
+  -i,--input TEXT:FILE REQUIRED         vol file (.vol, .longvol .p3d, .pgm3d and if DGTAL_WITH_ITK is selected: dicom, dcm, mha, mhd). For longvol, dicom, dcm, mha or mhd formats, the input values are linearly scaled between 0 and 255.
+  -o,--output TEXT                      resulting image filename (in pgm or other)
   -m,--thresholdMin INT=128             threshold min (excluded) to define binary shape.
   -M,--thresholdMax INT=255             threshold max (included) to define binary shape.
   --rescaleInputMin INT=0               min value used to rescale the input intensity (to avoid basic cast into 8  bits image).
@@ -83,7 +85,7 @@ Options:
 
 @b Example:
 @code 
-$ vol2heightfield -i ${DGtal}/examples/samples/lobster.vol -m 60 -M 500  --nx 0 --ny 0.7 --nz -1 -x 150 -y 0 -z 150 --width 300 --height 300 --heightFieldMaxScan 350  -o resultingHeightMap.pgm 
+$ vol2heightfield ${DGtal}/examples/samples/lobster.vol resultingHeightMap.pgm -m 60 -M 500  --nx 0 --ny 0.7 --nz -1 -x 150 -y 0 -z 150 --width 300 --height 300 --heightFieldMaxScan 350  resultingHeightMap.pgm
 @endcode
 
 You should obtain such a resulting image:
@@ -104,7 +106,7 @@ int main( int argc, char** argv )
 // parse command line using CLI ----------------------------------------------
    CLI::App app;
    std::string inputFileName;
-   std::string outputFileName {"result.raw"};
+   std::string outputFileName {"result.pgm"};
    int thresholdMin {128};
    int thresholdMax {255};
    DGtal::int64_t rescaleInputMin {0};
@@ -122,23 +124,23 @@ int main( int argc, char** argv )
    bool bgLastDepth = false;
    
    app.description("Convert volumetric  file into a projected 2D image given from a normal direction N and from a starting point P. The 3D volume is scanned in this normal direction N starting from P with a step 1. If the intensity of the 3d point is inside the given thresholds its 2D gray values are set to the current scan number.\n  Example:\n vol2heightfield -i ${DGtal}/examples/samples/lobster.vol -m 60 -M 500  --nx 0 --ny 0.7 --nz -1 -x 150 -y 0 -z 150 --width 300 --height 300 --heightFieldMaxScan 350  -o resultingHeightMap.pgm");
-   app.add_option("-i,--input,1", inputFileName, "vol file (.vol, .longvol .p3d, .pgm3d and if WITH_ITK is selected: dicom, dcm, mha, mhd). For longvol, dicom, dcm, mha or mhd formats, the input values are linearly scaled between 0 and 255." )
+   app.add_option("-i,--input,1", inputFileName, "vol file (.vol, .longvol .p3d, .pgm3d and if DGTAL_WITH_ITK is selected: dicom, dcm, mha, mhd). For longvol, dicom, dcm, mha or mhd formats, the input values are linearly scaled between 0 and 255." )
     ->required()
     ->check(CLI::ExistingFile);
-  app.add_option("-o,--output", outputFileName, "sequence of discrete point file (.sdp)");
-  app.add_option("--thresholdMin,-m", thresholdMin, "threshold min (excluded) to define binary shape.", true);
-  app.add_option("--thresholdMax,-M", thresholdMax, "threshold max (included) to define binary shape.", true);
-  app.add_option("--rescaleInputMin", rescaleInputMin, "min value used to rescale the input intensity (to avoid basic cast into 8  bits image).", true);
-  app.add_option("--rescaleInputMax", rescaleInputMax, "max value used to rescale the input intensity (to avoid basic cast into 8  bits image).", true);
+  app.add_option("-o,--output,2", outputFileName, "resulting image filename (in pgm or other).");
+  app.add_option("--thresholdMin,-m", thresholdMin, "threshold min (excluded) to define binary shape.");
+  app.add_option("--thresholdMax,-M", thresholdMax, "threshold max (included) to define binary shape.");
+  app.add_option("--rescaleInputMin", rescaleInputMin, "min value used to rescale the input intensity (to avoid basic cast into 8  bits image).");
+  app.add_option("--rescaleInputMax", rescaleInputMax, "max value used to rescale the input intensity (to avoid basic cast into 8  bits image).");
  
-  app.add_option("--nx",nx, "set the x component of the projection direction.", true);
-  app.add_option("--ny",ny, "set the y component of the projection direction.", true);
-  app.add_option("--nz",nz, "set the z component of the projection direction.", true);
-  app.add_option("--centerX,-x", centerX, "choose x center of the projected image.", true);
-  app.add_option("--centerY,-y", centerY, "choose y center of the projected image.", true);
-  app.add_option("--centerZ,-z", centerZ, "choose z center of the projected image.", true);
-  app.add_option("--width,-w", widthImageScan, "set the width of the resulting height Field image.", true);
-  app.add_option("--height", heightImageScan, "set the height of the resulting height Field image.", true);
+  app.add_option("--nx",nx, "set the x component of the projection direction.");
+  app.add_option("--ny",ny, "set the y component of the projection direction.");
+  app.add_option("--nz",nz, "set the z component of the projection direction.");
+  app.add_option("--centerX,-x", centerX, "choose x center of the projected image.");
+  app.add_option("--centerY,-y", centerY, "choose y center of the projected image.");
+  app.add_option("--centerZ,-z", centerZ, "choose z center of the projected image.");
+  app.add_option("--width,-w", widthImageScan, "set the width of the resulting height Field image.");
+  app.add_option("--height", heightImageScan, "set the height of the resulting height Field image.");
   app.add_option("--heightFieldMaxScan",maxScan, "set the maximal scan deep.");
   app.add_flag("--setBackgroundLastDepth", bgLastDepth,"change the default background (black with the last filled intensity).");
   
@@ -208,7 +210,3 @@ int main( int argc, char** argv )
   trace.info() << " [done] " << std::endl ;   
   return EXIT_SUCCESS;
 }
-
-
-
-

@@ -15,7 +15,7 @@
  **/
 /**
  * @file curvatureScaleSpace.cpp
- * @ingroup estimators
+ * @ingroup Estimators
  *
  * @author Bertrand Kerautret (\c kerautre@loria.fr )
  * LORIA (CNRS, UMR 7503), University of Nancy, France
@@ -64,9 +64,11 @@ using namespace DGtal;
 
 /**
  @page curvatureScaleSpaceBCC curvatureScaleSpaceBCC
+
  
  @brief Generate the Curvature Scale Space image using a binomial convolver based estimator.
-
+ @ingroup estimatortools
+ 
 The x axis is associated to the contour point and the y axis to the scale. The colors represent the curvature values included between the cutoff values (set to 10 by default).
 
  @b Usage:  curvatureScaleSpaceBCC --input <filename>  --output <filename> 
@@ -90,7 +92,7 @@ The x axis is associated to the contour point and the y axis to the scale. The c
 
  @b Example: 
  @code
-$ curvatureScaleSpaceBCC -i ${DGtal}/examples/samples/contourS.fc --gridStepInit 0.001 --gridStepIncrement  0.0005 --gridStepFinal 0.1 -o cssResu.ppm
+$ curvatureScaleSpaceBCC ${DGtal}/examples/samples/contourS.fc --gridStepInit 0.001 --gridStepIncrement  0.0005 --gridStepFinal 0.1 -o cssResu.ppm
  @endcode
 
 
@@ -136,13 +138,13 @@ int main( int argc, char** argv )
   double h_final {1.0};
   double curvatureCutOff {10};
 
-  app.description("Generate the Curvature Scale Space image using a binomial convolver based estimator.\n Typical use example:\n \t curvatureScaleSpaceBCC --input <filename>  --output <filename>\n");
+  app.description("Generate the Curvature Scale Space image using a binomial convolver based estimator.\n Typical use example:\n \t curvatureScaleSpaceBCC <input filename>  <output filename>\n");
   app.add_option("-i,--input,1",fileName,"Input FreemanChain file name")->required()->check(CLI::ExistingFile);
   app.add_option("-o,--output,2",outputFileName,"Set the output name")->required();  
-  app.add_option("--gridStepInit", h_initial, "Grid step initial", true);
-  app.add_option("--gridStepIncrement", h_increment, "Grid step increment ",true);
-  app.add_option("--gridStepFinal", h_final, "Grid step final", true);
-  app.add_option("--curvatureCutOff,-c", curvatureCutOff, "set the curvature limits to better display", true);
+  app.add_option("--gridStepInit", h_initial, "Grid step initial");
+  app.add_option("--gridStepIncrement", h_increment, "Grid step increment ");
+  app.add_option("--gridStepFinal", h_final, "Grid step final");
+  app.add_option("--curvatureCutOff,-c", curvatureCutOff, "set the curvature limits to better display");
 
   app.get_formatter()->column_width(40);
     CLI11_PARSE(app, argc, argv);

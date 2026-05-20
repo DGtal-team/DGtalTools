@@ -18,7 +18,7 @@
  * @file volFillInterior.cpp
  * @author David Coeurjolly (\c david.coeurjolly@liris.cnrs.fr )
  * Laboratoire d'InfoRmatique en Image et Systèmes d'information - LIRIS (CNRS, UMR 5205), CNRS, France
- *
+ * @ingroup Volumetric 
  * @date 2018/09/01
  *
  *
@@ -27,30 +27,34 @@
 
 
 /**
+
  @page volFillInterior volFillInterior
- 
  @brief  Fills the interior of a voxel shape. The process can be sketched as follows: First the volume is filled in a
  breath-first approach from the point (0,0,0) (supposed to be exterior) using 6-adjacency. Then the complement is returned.
- 
- @b Usage:  volFillInterior --input \<volFileName\> -o \<volOutputFileName\> (vol, longvol, p3d format)
+  @ingroup volumetrictools
+ @b Usage:  volFillInterior  \<volFileName\>  \<volOutputFileName\> (vol, longvol, p3d format)
  
  
  
  @b Allowed @b options @b are :
  @code
  Positionals:
-   1 TEXT:FILE REQUIRED                  Input vol file.
+ 1 TEXT:FILE REQUIRED                  Input vol file.
+ 2 TEXT=result.vol                     Output filename.
+ 3 UINT                                Set the filling value other than the default value of 128.
 
  Options:
    -h,--help                             Print this help message and exit
    -i,--input TEXT:FILE REQUIRED         Input vol file.
    -o,--output TEXT=result.vol           Output filename.
+   -v,--fillValue UINT                   Set the filling value other than the default value of 128.
+
  @endcode
  
  @b Example:
  
  @code
- $ volFlip -i ${DGtal}/examples/samples/lobster.vol -o filled.vol
+ $ volFillInterior -i ${DGtal}/examples/samples/lobster.vol -o filled.vol
  @endcode
  
  @see
@@ -87,25 +91,29 @@ void missingParam ( const std::string &param )
 
 int main(int argc, char**argv)
 {
+  typedef ImageContainerBySTLVector<Z3i::Domain, unsigned char>  MyImageC;
+  
   // parse command line using CLI ----------------------------------------------
   CLI::App app;
   std::string inputFileName;
   std::string outputFileName {"result.vol"};
+  MyImageC::Value fillValue = 128;
 
-  app.description("Fill the interior of a voxel set by filling the exterior using the 6-adjacency.\nThe exterior is the set of voxels with value zero and the interior voxels have value 128\n Basic usage:\n\tvolFillInterior --input <volFileName> --o <volOutputFileName> ");
+  app.description("Fill the interior of a voxel set by filling the exterior using the 6-adjacency.\nThe exterior is the set of voxels with value zero and the interior voxels have value 128\n Basic usage:\n\tvolFillInterior <volFileName> <volOutputFileName> ");
   
   app.add_option("-i,--input,1", inputFileName, "Input vol file." )
   ->required()
   ->check(CLI::ExistingFile);
-  app.add_option("-o,--output",outputFileName, "Output filename.", true);
-  
+  app.add_option("-o,--output,2",outputFileName, "Output filename.");
+  app.add_option("-v,--fillValue,3", fillValue, "Set the filling value other than the default value of 128.");
+
   app.get_formatter()->column_width(40);
   CLI11_PARSE(app, argc, argv);
   // END parse command line using CLI ----------------------------------------------
 
   
   trace.beginBlock("Loading");
-  typedef ImageContainerBySTLVector<Z3i::Domain, unsigned char>  MyImageC;
+
   MyImageC  image = VolReader< MyImageC >::importVol ( inputFileName );
   trace.info() << image << std::endl;
   trace.endBlock();
@@ -142,7 +150,7 @@ int main(int argc, char**argv)
   trace.beginBlock("Complement");
   for(auto &p :  image.domain())
     if ((image(p) == 0) && (!imageFlag(p)))
-      image.setValue(p,128);
+      image.setValue(p, fillValue);
   trace.endBlock();
   
   trace.beginBlock("Saving");

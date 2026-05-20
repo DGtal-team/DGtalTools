@@ -17,7 +17,7 @@
  * @file volIntensityScale.cpp
  * @author Bertrand Kerautret (\c kerautre@loria.fr )
  * LORIA (CNRS, UMR 7503), University of Nancy, France
- *
+ * @ingroup Volumetric 
  * @date 2015/01/12
  *
  * 
@@ -43,10 +43,10 @@ using namespace Z3i;
 
 
 /**
- @page volIntensityScale volIntensityScale
- 
- @brief Applies a linear rescaling of the image intensity from an input intensity interval [InMin, InMax] into an output interval [OutMin, OutMax].
 
+ @page volIntensityScale volIntensityScale
+ @brief Applies a linear rescaling of the image intensity from an input intensity interval [InMin, InMax] into an output interval [OutMin, OutMax].
+ @ingroup volumetrictools
  @b Usage: 	  ./volumetric/volIntensityScale [OPTIONS] 1 (image files can be independently in vol, pgm3D, p3d format)
 
 
@@ -72,7 +72,7 @@ using namespace Z3i;
  In this example, we select all intensities included in [0,100] and scale them into [0, 255]: 
 
  @code
-  $ volIntensityScale -i  ${DGtal}/examples/samples/lobster.vol  --inMin 0 --inMax 100 -o lobster0-100.vol 
+  $ volIntensityScale  ${DGtal}/examples/samples/lobster.vol  --inMin 0 --inMax 100  lobster0-100.vol
 
  @endcode
 
@@ -110,17 +110,17 @@ int main(int argc, char**argv)
   int outMax {255};
   
   
-  app.description("Apply a linear rescaling of the image intensity from an input intensity interval [InMin, InMax] into an output interval [OutMin, OutMax].\n Basic usage:\n volIntensityScale --input <volFileName> --output <volOutputFileName>  (both files can be independently in vol, pgm3D, p3d format)\n Example: \n volIntensityScale -i  ${DGtal}/examples/samples/lobster.vol  --inMin 0 --inMax 100 -o lobster0-100.vol");
+  app.description("Apply a linear rescaling of the image intensity from an input intensity interval [InMin, InMax] into an output interval [OutMin, OutMax].\n Basic usage:\n volIntensityScale --input <volFileName> --output <volOutputFileName>  (both files can be independently in vol, pgm3D, p3d format)\n Example: \n volIntensityScale ${DGtal}/examples/samples/lobster.vol  --inMin 0 --inMax 100 lobster0-100.vol");
   
   app.add_option("-i,--input,1", inputFileName, "Input vol file." )
   ->required()
   ->check(CLI::ExistingFile);
   
-  app.add_option("-o,--output",outputFileName, "volumetric output file (.vol, .pgm, .pgm3d, .longvol) ", true);
-  app.add_option("-m,--inMin", inMin,  "the min value of the input image.", true);
-  app.add_option("-M,--inMax", inMax,  "the max value of the input image.", true);
-  app.add_option("--outMin", outMin,  "the min value of the output image.", true);
-  app.add_option("--outMax", outMax,  "the max value of the output image.", true);
+  app.add_option("-o,--output,2",outputFileName, "volumetric output file (.vol, .pgm, .pgm3d, .longvol) ");
+  app.add_option("-m,--inMin", inMin,  "the min value of the input image.");
+  app.add_option("-M,--inMax", inMax,  "the max value of the input image.");
+  app.add_option("--outMin", outMin,  "the min value of the output image.");
+  app.add_option("--outMax", outMax,  "the max value of the output image.");
   
   app.get_formatter()->column_width(40);
   CLI11_PARSE(app, argc, argv);

@@ -15,13 +15,12 @@
  **/
 /**
  * @file heightfield2vol.cpp
- * @ingroup converters
+ *  @ingroup Converters
  * @author Bertrand Kerautret (\c kerautre@loria.fr )
  * LORIA (CNRS, UMR 7503), University of Nancy, France
  *
  * @date 2015/03/18
  *
- * 
  *
  * This file is part of the DGtalTools.
  */
@@ -48,6 +47,8 @@ using namespace DGtal;
 /**
  @page heightfield2vol heightfield2vol
  @brief  Converts a 2D heightfield image into a volumetric file.
+ @ingroup convertertools
+
 
 @b Usage: heightfield2vol [OPTIONS] 1 [2]
 
@@ -70,7 +71,7 @@ Options:
 
 @b Example:
 @code
-  $ heightfield2vol -i ${DGtal}/examples/samples/church.pgm -o volResu.vol -s 0.3 -z 50  
+  $ heightfield2vol ${DGtal}/examples/samples/church.pgm volResu.vol -s 0.3 -z 50
 
 @endcode
 You will obtain such image:
@@ -134,10 +135,11 @@ int main( int argc, char** argv )
    unsigned int  maxZ {255};
  
 
-   app.description("Convert a 2D heightfield image into a volumetric file.\n Example: \n heightfield2vol -i ${DGtal}/examples/samples/church.pgm -o volResu.vol -s 0.3 -z 50  \n");
+   app.description("Convert a 2D heightfield image into a volumetric file.\n Example: \n heightfield2vol ${DGtal}/examples/samples/church.pgm volResu.vol -s 0.3 -z 50  \n");
    app.add_option("-i,--input,1", inputFileName, "input heightfield file (2D image).")
+     ->check(CLI::ExistingFile)
      ->required();
-   app.add_option("-o,--output,2", outputFileName,"output volumetric file.", true);
+   app.add_option("-o,--output,2", outputFileName,"output volumetric file.");
    app.add_option("-s,--scale", scale, "set the scale factor on height values (default 1.0)");
    app.add_option("-z,--volZ", maxZ, "set the Z max value of domain.");
    app.add_option("-f,--foregroundValue", foregroundValue, "specify the foreground value of the resulting voxel.");

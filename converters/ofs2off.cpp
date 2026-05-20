@@ -15,7 +15,7 @@
  **/
 /**
  * @file visuDistanceTransform.cpp
- * @ingroup surfaceTools
+ * @ingroup Converters
  * @author Bertrand Kerautret (\c kerautre@loria.fr )
  * LORIA (CNRS, UMR 7503), University of Nancy, France
  *
@@ -44,7 +44,8 @@ using namespace DGtal;
 /**
  @page ofs2off ofs2off
  @brief  Convert OFS file into OFF mesh format.
-
+ @ingroup convertertools
+   
 @b Usage: ofs2off [input] [output]
 
 @b Allowed @b options @b are:
@@ -52,6 +53,7 @@ using namespace DGtal;
 @code
 Positionals:
   1 TEXT:FILE REQUIRED                  ofs file (.ofs).
+  2 TEXT:FILE                           ofs file (.ofs).
 
 Options:
   -h,--help                             Print this help message and exit
@@ -61,7 +63,7 @@ Options:
 
 @b Example:
 @code
-  $ ofs2off -i input.ofs -o output.off 
+  $ ofs2off input.ofs output.off 
 @endcode
 
 @see ofs2off.cpp

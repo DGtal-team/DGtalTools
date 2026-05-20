@@ -18,7 +18,7 @@
  * @file HDF52vol.cpp
  * @author Martial Tola (\c martial.tola@liris.cnrs.fr )
  * Laboratoire d'InfoRmatique en Image et Systèmes d'information - LIRIS (CNRS, UMR 5205), CNRS, France
- *
+ * @ingroup Converters
  * @date 2013/09/11
  *
  *
@@ -43,6 +43,9 @@ using namespace Z3i;
 
 /**
  @page HDF52vol HDF52vol
+ @ingroup convertertools
+
+
  @brief Converts a 3D 8-bit HDF5 file to vol.
 
 @b Usage: HDF52vol [input] [output]
@@ -95,7 +98,7 @@ int main(int argc, char**argv)
    app.add_option("-i,--input,1", inputFileName, "Input HDF5 file." )
     ->required()
     ->check(CLI::ExistingFile);
-   app.add_option("-o,--output,2", outputFileName, "Output vol filename.", true );
+   app.add_option("-o,--output,2", outputFileName, "Output vol filename." );
 
    app.get_formatter()->column_width(40);
    CLI11_PARSE(app, argc, argv);

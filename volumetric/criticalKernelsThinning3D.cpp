@@ -8,6 +8,7 @@
  * @file criticalKernelsThinning3D.cpp
  * @author Pablo Hernandez-Cerdan (\c pablo.hernandez.cerdan@outlook.com )
  * Institute of Fundamental Sciences, Massey University, New Zealand
+ * @ingroup Volumetric
  *
  * @date 2017/11/04
  *
@@ -17,9 +18,10 @@
  */
 
 /**
- @page criticalKernelsThinning3D criticalKernelsThinning3D
 
+ @page criticalKernelsThinning3D criticalKernelsThinning3D
  @brief Applies an criticalKernels thinning algorithm of a 3d image file (vol,longvol,pgm3d...) with 3D viewer.
+ @ingroup volumetrictools
 
  @b Usage: criticalKernelsThinning3D [options] --input <3dImageFileName>  {vol,longvol,pgm3d...}
 
@@ -54,8 +56,9 @@
    -o,--exportImage TEXT                 Export the resulting set of points to a image compatible with GenericWriter.
    -e,--exportSDP TEXT                   Export the resulting set of points in a simple (sequence of discrete point (sdp)).
    -t,--visualize                        Visualize result in viewer
-
-
+   -k,--keepInputDomain                  Keep the resulting image domain equal to the input image (instead using the resulting bouding box set).
+   -O,--exportOBJ TEXT                   Export the resulting set of points in an OBJ file.
+   -I,--exportInputOBJ TEXT              Export the input set of points in an OBJ file.
 
  @endcode
 
@@ -76,9 +79,10 @@
 #include <chrono>
 #include <unordered_map>
 
-#include <DGtal/io/viewers/Viewer3D.h>
+#include <DGtal/io/viewers/PolyscopeViewer.h>
 #include <DGtal/base/Common.h>
 #include <DGtal/helpers/StdDefs.h>
+#include <DGtal/io/Color.h>
 #include <DGtal/io/readers/GenericReader.h>
 #include <DGtal/io/writers/GenericWriter.h>
 #include "DGtal/images/imagesSetsUtils/SetFromImage.h"
@@ -87,7 +91,6 @@
 #include "DGtal/images/imagesSetsUtils/ImageFromSet.h"
 
 #include <DGtal/topology/SurfelAdjacency.h>
-#include <DGtal/io/boards/Board2D.h>
 #include <DGtal/topology/CubicalComplex.h>
 #include <DGtal/topology/CubicalComplexFunctions.h>
 
@@ -118,34 +121,36 @@ int main(int argc, char* const argv[]){
   string foreground {"black"};
   string outputFilenameImg;
   string outputFilenameSDP;
-
+  
   int thresholdMin {0};
   int thresholdMax {255};
   int persistence {0};
   bool profile {false};
   bool verbose  {false};
-  bool visualize {false};
+  bool visualize {true};
+  bool useInputImgToExp {false};
   
   app.description("Compute the thinning of a volume using the CriticalKernels framework\nBasic usage: criticalKernelsThinning3D --input <volFileName> --skel <ulti,end, 1isthmus, isthmus> --select [ -f <white,black> -m <minlevel> -M <maxlevel> -v ] [--persistence <value> ] --persistence <value> ] \n options for --skel {ulti end 1isthmus isthmus} \n options for --select = {dmax random first} \n Example: \n criticalKernelsThinning3D --input ${DGtal}/examples/samples/Al.100.vol --select dmax --skel 1isthmus --persistence 1 --visualize --verbose --exportImage ./Al100_dmax_1isthmus_p1.vol \n");
   app.add_option("-i,--input,1", inputFileName, "Input vol file." )
   ->required()
   ->check(CLI::ExistingFile);
 
-  app.add_option("--skel,-s", sk_string,"Type of skeletonization. Options: 1isthmus, isthmus, end, ulti.", true )
+  app.add_option("--skel,-s", sk_string,"Type of skeletonization. Options: 1isthmus, isthmus, end, ulti." )
    -> check(CLI::IsMember({"ulti", "end","isthmus", "1isthmus"}));
-  app.add_option("--select,-c", select_string, "Select the ordering for skeletonization. Options: dmax, random, first", true)
+  app.add_option("--select,-c", select_string, "Select the ordering for skeletonization. Options: dmax, random, first")
    -> check(CLI::IsMember({"random", "dmax", "first"}));
-  app.add_option("--foreground,-f",foreground, "Foreground color in binary image", true )
+  app.add_option("--foreground,-f",foreground, "Foreground color in binary image" )
    -> check(CLI::IsMember({"white", "black"}));
-  app.add_option("--thresholdMin,-m", thresholdMin, "Threshold min (excluded) to define binary shape", true );
-  app.add_option("--thresholdMax,-M", thresholdMax, "Threshold max (included) to define binary shape", true );
-  app.add_option("--persistence,-p",persistence,"Persistence value, implies use of persistence algorithm if p>=1", true )
+  app.add_option("--thresholdMin,-m", thresholdMin, "Threshold min (excluded) to define binary shape" );
+  app.add_option("--thresholdMax,-M", thresholdMax, "Threshold max (included) to define binary shape" );
+  app.add_option("--persistence,-p",persistence,"Persistence value, implies use of persistence algorithm if p>=1" )
   ->check(CLI::PositiveNumber);
   app.add_flag("--profile", profile, "Profile algorithm");
   app.add_flag("--verbose,-v",verbose, "Verbose output");
   app.add_option("--exportImage,-o",outputFilenameImg, "Export the resulting set of points to a image compatible with GenericWriter.");
   app.add_option("--exportSDP,-e",outputFilenameSDP, "Export the resulting set of points in a simple (sequence of discrete point (sdp))." );
   app.add_flag("--visualize,-t", visualize, "Visualize result in viewer");
+  app.add_flag("--useInputImgToExp,-k", useInputImgToExp, "Use input image type to export result (allowing to keep same domain (and same image spacing when using ITK)).");
     
   app.get_formatter()->column_width(40);
   CLI11_PARSE(app, argc, argv);
@@ -161,7 +166,14 @@ int main(int argc, char* const argv[]){
   }
   trace.beginBlock("Reading input");
   using Domain = Z3i::Domain ;
+
+#ifdef DGTAL_WITH_ITK
+  using Image = ImageSelector < Z3i::Domain, unsigned char, ITKIMAGEDATA_CONTAINER_I>::Type ;
+#else
   using Image = ImageSelector < Z3i::Domain, unsigned char>::Type ;
+#endif
+
+  
   Image image = GenericReader<Image>::import(inputFileName);
   trace.endBlock();
 
@@ -268,28 +280,30 @@ int main(int argc, char* const argv[]){
       std::cout << "outputFilename" << outputFilenameImg << std::endl;
 
     unsigned int foreground_value = 255;
-    auto thin_image = ImageFromSet<Image>::create(thin_set, foreground_value);
-    thin_image >> outputFilenameImg;
-   }
+    if (useInputImgToExp){
+      for(auto p: image.domain()){image.setValue(p, 0);}
+      ImageFromSet<Image>::append(image, thin_set, foreground_value);
+      image >> outputFilenameImg;
+    }else{
+      auto thin_image = ImageFromSet<Image>::create(thin_set, foreground_value, false, useInputImgToExp);
+      thin_image >> outputFilenameImg;
+    }
+  }
 
   if(visualize)
   {
-    int argc(1);
-    char** argv(nullptr);
-    QApplication app(argc, argv);
-    Viewer3D<> viewer;
-    viewer.setWindowTitle("criticalKernelsThinning3D");
-    viewer.show();
+    polyscope::options::programName = "DGtalTools: criticalKernelsThinning3D";
+    polyscope::view::setNavigateStyle(polyscope::NavigateStyle::Free);
+    PolyscopeViewer<> viewer( ks );
 
-    viewer.setFillColor(Color(255, 255, 255, 255));
+    viewer.drawColor(Color(255, 255, 255, 255));
     viewer << thin_set;
 
     // All kspace voxels
-    viewer.setFillColor(Color(40, 200, 55, 10));
+    viewer.drawColor(Color(40, 200, 55, 10));
     viewer << all_set;
 
-    viewer << Viewer3D<>::updateDisplay;
-
-    app.exec();
+    viewer.show();
   }
+  
 }

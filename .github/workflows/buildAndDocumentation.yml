@@ -1,0 +1,169 @@
+name: CI (linux/macOS/windows)
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+env:
+  # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
+  BUILD_TYPE:   Release
+  CONFIG_GLOBAL: 
+  CONFIG_LINUX:  -DWITH_MAGICK=true -DWITH_GMP=true -DDGTAL_WITH_FFTW3=true -DWARNING_AS_ERROR=ON -DDGTAL_WITH_HDF5=true  -DDGTAL_WITH_CAIRO=true  -DDGTAL_WITH_EIGEN=true -DDGTAL_ENABLE_FLOATING_POINT_EXCEPTIONS=true 
+  CONFIG_MAC:    -DDGTAL_WITH_EIGEN=true -DWITH_GMP=tue
+  CONFIG_WINDOWS: -DDGTAL_WITH_OPENMP=true  -DDGTAL_WITH_POLYSCOPE_VIEWER=OFF 
+
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: true
+      matrix:
+        os: [ubuntu-latest, macOS-latest,windows-latest]
+
+    steps:
+
+     - uses: actions/checkout@v2
+       with:
+          fetch-depth: 10
+          
+     - name: Install linux deps
+       if: matrix.os == 'ubuntu-latest'
+       run: | 
+           sudo apt-get update
+           sudo apt-get install zsh  libboost-dev libeigen3-dev ninja-build libhdf5-serial-dev libboost-dev libcairo2-dev libgmp-dev libgraphicsmagick++1-dev libfftw3-dev xorg-dev  libglu1-mesa-dev freeglut3-dev mesa-common-dev
+
+     - name: Get white list tools
+       run : |
+         echo "::set-output name=WHITE_LIST_TOOLS::$(cat ${{runner.workspace}}/DGtalTools/cmake/whiteListBuildTools.txt | tr -d '\n' ; ${{runner.workspace}}/DGtalTools/cmake/create_whitelist.sh ${{runner.workspace}}/DGtalTools)"
+       id: whitelisttools
+
+
+     - name: Install macOS deps
+       if: matrix.os == 'macOS-latest'
+       run: brew install boost ninja eigen gmp
+
+     - name: Install conan
+       if: matrix.os == 'windows-latest'
+       id: conan
+       uses: turtlebrowser/get-conan@main
+       with:
+         version: 2.4.0
+
+     - name: Create conan default profile
+       if: matrix.os == 'windows-latest'
+       run: |
+           conan profile detect --force
+
+     - uses: actions/cache@v4
+       if: matrix.os == 'windows-latest'
+       with:
+         path: ~/.conan2
+         key: ${{ runner.os }}-conan2-Release
+
+
+     - name: Create Build Environment
+       run: cmake -E make_directory ${{runner.workspace}}/build
+
+
+     
+     - name: DGtalBuild (linux)
+       if: matrix.os == 'ubuntu-latest'
+       shell: bash
+       working-directory: ${{runner.workspace}}/build
+       run: |
+           git clone --depth 1 https://github.com/DGtal-team/DGtal.git
+           cd DGtal
+           mkdir buildDGtal
+           cd buildDGtal
+           echo  cmake .. $CONFIG_LINUX -DBUILD_EXAMPLES=false -DBUILD_TESTING=false  -G Ninja
+           cmake .. $CONFIG_LINUX -DBUILD_EXAMPLES=false -DBUILD_TESTING=false  -G Ninja
+           ninja
+
+     - name: DGtalBuild (macOS)
+       if: matrix.os == 'macOS-latest'
+       shell: bash
+       working-directory: ${{runner.workspace}}/build
+       run: |
+           git clone --depth 1 https://github.com/DGtal-team/DGtal.git
+           cd DGtal
+           mkdir buildDGtal
+           cd buildDGtal
+           echo  cmake .. $CONFIG_MAC -DBUILD_EXAMPLES=false -DBUILD_TESTING=false  -G Ninja
+           cmake .. $CONFIG_MAC -DBUILD_EXAMPLES=false -DBUILD_TESTING=false  -G Ninja
+           ninja
+     - name: DGtalBuild (windows)
+       if: matrix.os == 'windows-latest'
+       shell: bash
+       working-directory: ${{runner.workspace}}/build
+       run: |
+           git clone --depth 1 https://github.com/DGtal-team/DGtal.git
+           cd DGtal
+           conan install . --build=missing -s:a compiler.cppstd=20
+           mkdir buildDGtal
+           cd buildDGtal
+           echo  cmake .. -DCMAKE_POLICY_DEFAULT_CMP0091=NEW  -DCMAKE_BUILD_TYPE=$BUILD_TYPE $CONFIG_WINDOWS -DCMAKE_TOOLCHAIN_FILE="conan_toolchain.cmake" -DBUILD_EXAMPLES=false -DBUILD_TESTING=false -DDGTAL_WITH_POLYSCOPE_VIEWER=true
+           cmake .. -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_BUILD_TYPE=$BUILD_TYPE $CONFIG_WINDOWS -DCMAKE_TOOLCHAIN_FILE="conan_toolchain.cmake" -DBUILD_EXAMPLES=false -DBUILD_TESTING=false -DDGTAL_WITH_POLYSCOPE_VIEWER=true
+           cmake --build . --config Release --parallel 3
+     - name: Configure CMake (linux)
+       if: matrix.os == 'ubuntu-latest'
+       shell: bash
+       working-directory: ${{runner.workspace}}/build
+       run: cmake $GITHUB_WORKSPACE  -DDGtal_DIR=${{runner.workspace}}/build/DGtal/buildDGtal -DCMAKE_BUILD_TYPE=$BUILD_TYPE $CONFIG_GLOBAL $CONFIG_LINUX -DDGTALTOOLS_RANDOMIZED_BUILD_THRESHOLD=25  -DDGTALTOOLS_RANDOMIZED_BUILD_WHITELIST="${{ steps.whitelisttools.outputs.WHITE_LIST_TOOLS }}"  -G Ninja
+
+     - name: Configure CMake (macOS)
+       if: matrix.os == 'macOS-latest'
+       shell: bash
+       working-directory: ${{runner.workspace}}/build
+       run: cmake $GITHUB_WORKSPACE  -DDGtal_DIR=${{runner.workspace}}/build/DGtal/buildDGtal -DCMAKE_BUILD_TYPE=$BUILD_TYPE $CONFIG_GLOBAL -DDGTALTOOLS_RANDOMIZED_BUILD_THRESHOLD=25  -DDGTALTOOLS_RANDOMIZED_BUILD_WHITELIST="${{ steps.whitelisttools.outputs.WHITE_LIST_TOOLS }}" $CONFIG_MAC -G Ninja
+
+     - name: Configure CMake (windows)
+       if: matrix.os == 'windows-latest'
+       shell: bash
+       working-directory: "${{runner.workspace}}/build"
+       run: |
+           conan install $GITHUB_WORKSPACE --build=missing  -s:a compiler.cppstd=20
+           cmake $GITHUB_WORKSPACE -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_MODULE_PATH="D:/a/DGtalTools/build/DGtal/buildDGtal" -DDGtal_DIR="D:/a/DGtalTools/build/DGtal/buildDGtal" -DCMAKE_TOOLCHAIN_FILE="conan_toolchain.cmake" -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DDGTAL_RANDOMIZED_TESTING_WHITELIST="${{ steps.whitelist.outputs.WHITELIST }}"
+
+     - name: Build
+       working-directory: ${{runner.workspace}}/build
+       shell: bash
+       # Execute the build.  You can specify a specific target with "--target <NAME>"
+       run: cmake --build . --config $BUILD_TYPE  
+
+
+
+
+
+ # Documentation (build, check and deploy)
+  Documentation:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up
+      run: |
+         sudo apt-get update
+         sudo apt-get install libboost-dev graphviz texlive doxygen   libeigen3-dev ninja-build libhdf5-serial-dev libboost-dev libcairo2-dev libgmp-dev libgraphicsmagick++1-dev libfftw3-dev xorg-dev  libglu1-mesa-dev freeglut3-dev
+
+    - name: DGtalBuild (linux)
+      shell: bash
+      working-directory: ${{runner.workspace}}
+      run: |
+         git clone --depth 1 https://github.com/DGtal-team/DGtal.git
+         cd DGtal
+         mkdir buildDGtal
+         cd buildDGtal
+         echo  cmake .. $CONFIG_LINUX -DBUILD_EXAMPLES=false -DBUILD_TESTING=false  -G Ninja
+         cmake .. $CONFIG_LINUX -DBUILD_EXAMPLES=false -DBUILD_TESTING=false  -G Ninja
+         ninja
+
+    - name: Building pages
+      working-directory: ${{runner.workspace}}/DGtalTools
+      run: |
+         mkdir build
+         cd build
+         cmake ..   -DDGtal_DIR=${{runner.workspace}}/DGtal/buildDGtal
+         make doc > buildDoc.log

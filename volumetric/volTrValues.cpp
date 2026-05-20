@@ -16,7 +16,7 @@
  **/
 /**
  * @file volTrValues.cpp
- * @ingroup volumetric/
+ * @ingroup Volumetric
  * @author Bertrand Kerautret (\c kerautre@loria.fr )
  * LORIA (CNRS, UMR 7503), University of Nancy, France
  *
@@ -43,10 +43,11 @@ using namespace Z3i;
 
  
 /**
- @page volTrValues volTrValues
- 
- @brief  Applies basic vol image transform from the input values to output values.
 
+ @page volTrValues volTrValues
+ @brief  Applies basic vol image transform from the input values to output values.
+ @ingroup volumetrictools
+ 
  @b Usage:  	 volTrValues --input <volFileName> --o <volOutputFileName> -s 1 99 -r 100 200  
 
 => all voxels of values 1 (resp. 99) will be 100 (resp. 200) in the resulting image.   
@@ -79,8 +80,8 @@ using namespace Z3i;
  instance if you want to transform all intensities starting from 0 to 50 into interval 200 250 you can do as follows:
 
  @code
- $ volTrValues -i $DGtal/examples/samples/lobster.vol -s {0..50} -r {200..250} -o lobsterTr.vol
- $ 3dImageViewer -i  lobsterTr.vol
+ $ volTrValues  $DGtal/examples/samples/lobster.vol lobsterTr.vol -s {0..50} -r {200..250}  
+ $ 3dImageViewer lobsterTr.vol
  @endcode
 
  By using  @ref Doc3dImageViewer ou should obtain such a result:
@@ -109,7 +110,7 @@ int main(int argc, char**argv)
   ->required()
   ->check(CLI::ExistingFile);
   
-  app.add_option("--output,-o,2",outputFileName, "Output filename.", true);
+  app.add_option("--output,-o,2",outputFileName, "Output filename.");
   app.add_option("--inputVals,-s", inputVals, "specify the values which will be transformed with the output values (given with --outputVals).") ->required();
   app.add_option("--outputVals,-r", outputVals, "specify the values which will be transformed with the output values (given with --outputVals).") ->required();
   

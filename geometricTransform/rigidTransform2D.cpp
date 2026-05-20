@@ -70,7 +70,7 @@ Options:
 @b Example
 @code
 # transform lena.pgm
-./rigidTransform2D -i lena.pgm -o lena_transf.pgm -m backward -a 0.5 --ox 0.5 --oy 0.3 --tx 0.1 --ty 0.1
+./rigidTransform2D  lena.pgm lena_transf.pgm -m backward -a 0.5 --ox 0.5 --oy 0.3 --tx 0.1 --ty 0.1
 
 **/
 
@@ -91,11 +91,11 @@ int main(int argc, char**argv)
   app.add_option("-i,--input,1",filename,"Input file.")->required()->check(CLI::ExistingFile);
   app.add_option("-o,--output,2",outputFileName,"Output file.")->required();
   app.add_option("-m,--model",model,"Transformation model: backward, forward.")->required();
-  app.add_option("-a,--angle",angle,"Rotation angle in radians (default 0)",true);
-  app.add_option("--ox",ox,"X coordinate of origin (default 0)",true);
-  app.add_option("--oy",oy,"Y coordinate of origin (default 0)",true);
-  app.add_option("--tx",tx,"X component of translation vector (default 0)",true);
-  app.add_option("--ty",ty,"Y component of translation vector (default 0)",true);
+  app.add_option("-a,--angle",angle,"Rotation angle in radians (default 0)");
+  app.add_option("--ox",ox,"X coordinate of origin (default 0)");
+  app.add_option("--oy",oy,"Y coordinate of origin (default 0)");
+  app.add_option("--tx",tx,"X component of translation vector (default 0)");
+  app.add_option("--ty",ty,"Y component of translation vector (default 0)");
   
   app.get_formatter()->column_width(40);
   CLI11_PARSE(app, argc, argv);

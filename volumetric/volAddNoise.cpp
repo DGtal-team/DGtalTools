@@ -15,7 +15,7 @@
  **/
 /**
  * @file volAddNoise
- * @ingroup converters
+ * @ingroup Volumetric
  * @author David Coeurjolly (\c david.coeurjolly@liris.cnrs.fr)
  *
  * @date 2015/03/24
@@ -45,10 +45,11 @@ using namespace DGtal;
 
 
 /**
+
  @page volAddNoise volAddNoise
  @brief  Adds Kanungo noise to a binary object with 0 values as background
  points and values >0 for the foreground ones.
-
+ @ingroup volumetrictools
  @b Usage:  volumetric/volAddNoise [OPTIONS] 1 [2]
 
  @b Allowed @b options @b are:
@@ -71,11 +72,11 @@ using namespace DGtal;
 
  @b Example:
  @code
- $ volAddNoise -i $DGtal/examples/samples/Al.100.vol -o AlNoisy0.4.vol  -n 0.4
+ $ volAddNoise  $DGtal/examples/samples/Al.100.vol  AlNoisy0.4.vol  -n 0.4
  # Converting in sdp to display:
- $ vol2sdp -i AlNoisy0.4.vol -o AlNoisy0.4.sdp
+ $ vol2sdp  AlNoisy0.4.vol AlNoisy0.4.sdp
  # displaying sequence of points:
- $ 3dSDPViewer -i tmp.sdp
+ $ 3dSDPViewer AlNoisy0.4.sdp
  @endcode
 
  You should obtain such a visualization:
@@ -115,9 +116,9 @@ int main( int argc, char ** argv )
   app.add_option("-i,--input,1", inputFileName, "input image file name (any 3D image format accepted by DGtal::GenericReader)" )
   ->required()
   ->check(CLI::ExistingFile);
-  app.add_option("-o,--output,2", outputFileName, "output image file name (any 3D image format accepted by DGtal::GenericWriter)", true);
+  app.add_option("-o,--output,2", outputFileName, "output image file name (any 3D image format accepted by DGtal::GenericWriter)");
   
-  app.add_option("--noise,-n", noise, "Kanungo noise level in ]0,1[ (default 0.5)\n", true);
+  app.add_option("--noise,-n", noise, "Kanungo noise level in ]0,1[ (default 0.5)\n");
   app.add_flag("--max,-m", MaxFlag, "Extract only the largest 6-connected component.");
     
   app.get_formatter()->column_width(40);

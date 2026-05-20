@@ -15,7 +15,7 @@
  **/
 /**
  * @file freeman2sdp.cpp
- * @ingroup Tools
+ * @ingroup Converters
  * @author Bertrand Kerautret (\c kerautre@loria.fr) and Jacques-Olivier Lachaud 
  * LORIA (CNRS, UMR 7503), University of Nancy, France 
  * (backport from ImaGene)
@@ -52,6 +52,7 @@ using namespace DGtal;
 
 /**
    @page freeman2sdp freeman2sdp
+   @ingroup convertertools
    @brief Transform freeman chain into a Sequence of Discrete Points. Result is given to std output.
 
    @b Usage: freeman2sdp [input] > output.sdp
@@ -108,7 +109,7 @@ int main( int argc, char** argv )
   bool oneline {false};
   bool info {false};
   
-  app.description("Transform freeman chain into a Sequence of Discrete Points. Result is given to std output.\n Example:\n freeman2sdp -i ${DGtal}/tests/samples/contourS.fc > contourS.sdp \n");
+  app.description("Transform freeman chain into a Sequence of Discrete Points. Result is given to std output.\n Example:\n freeman2sdp ${DGtal}/tests/samples/contourS.fc > contourS.sdp \n");
   app.add_option("-i,--input,1", inputFileName, "Input freeman chain file name." )
     ->required()
     ->check(CLI::ExistingFile);
