@@ -5,6 +5,7 @@
 cmake_minimum_required (VERSION 3.20)
 PROJECT(DGtalTools)
 
+cmake_minimum_required (VERSION 3.11)
 cmake_policy(SET CMP0057 NEW) # the new interpretation of IN_LIST is by default not set (at least until  3.21.1).
 
 LIST(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
