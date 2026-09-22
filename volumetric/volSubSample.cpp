@@ -43,65 +43,65 @@ using namespace Z3i;
 
 
 /**
-
+ 
  @page volSubSample volSubSample
  
  @brief Brutally sub samples a vol file (division by 2 in each direction).
  @ingroup volumetrictools
-
+ 
  @b Usage: 	./volumetric/volSubSample [OPTIONS] 1 [2]
-
-
- @b Allowed @b options @b are : 
+ 
+ 
+ @b Allowed @b options @b are :
  @code
  Positionals:
-   1 TEXT:FILE REQUIRED                  Input vol file.
-   2 TEXT=result.vol                     Output filename.
-
+ 1 TEXT:FILE REQUIRED                  Input vol file.
+ 2 TEXT=result.vol                     Output filename.
+ 
  Options:
-   -h,--help                             Print this help message and exit
-   -i,--input TEXT:FILE REQUIRED         Input vol file.
-   -o,--output TEXT=result.vol           Output filename.
-   -f,--function TEXT:{mean,none,max,min,mean}=mean
-                                         Function used to the down-sampling: {none,max, min, mean}
-
+ -h,--help                             Print this help message and exit
+ -i,--input TEXT:FILE REQUIRED         Input vol file.
+ -o,--output TEXT=result.vol           Output filename.
+ -f,--function TEXT:{mean,none,max,min,mean}=mean
+ Function used to the down-sampling: {none,max, min, mean}
+ 
  Positionals:
-   1 TEXT:FILE REQUIRED                  Input vol file.
-   2 TEXT=result.vol                     Output filename.
-
+ 1 TEXT:FILE REQUIRED                  Input vol file.
+ 2 TEXT=result.vol                     Output filename.
+ 
  Options:
-   -h,--help                             Print this help message and exit
-   -i,--input TEXT:FILE REQUIRED         Input vol file.
-   -o,--output TEXT=result.vol           Output filename.
-   -f,--function TEXT:{mean,none,max,min,mean}=mean
-                                         Function used to the down-sampling: {none,max, min, mean}
-
+ -h,--help                             Print this help message and exit
+ -i,--input TEXT:FILE REQUIRED         Input vol file.
+ -o,--output TEXT=result.vol           Output filename.
+ -f,--function TEXT:{mean,none,max,min,mean}=mean
+ Function used to the down-sampling: {none,max, min, mean}
+ 
  @endcode
-
- @b Example: 
-You can apply several sub sampling:
+ 
+ @b Example:
+ You can apply several sub sampling:
  @code
  $ volSubSample $DGtal/examples/samples/lobster.vol lobster2.vol -f mean
  $ volSubSample lobster2.vol lobster4.vol -f mean
  $ volSubSample lobster4.vol lobster8.vol -f mean
  @endcode
-
-You can  display the result by extracting the surface using \ref 3dVolMarchingCubes:
-
-@code 
-$ 3dVolMarchingCubes $DGtal/examples/samples/lobster.vol lobster.off -t 30
-$ 3dVolMarchingCubes lobster2.vol -t 30 lobster2.off
-$ 3dVolMarchingCubes lobster4.vol -t 30 lobster4.off
-$ 3dVolMarchingCubes lobster8.vol -t 30 lobster8.off
-$ meshViewer lobster.off lobster2.off  lobster4.off  lobster8.off -n
-@endcode
-
+ 
+ You can  display the result by extracting the surface using \ref 3dVolMarchingCubes:
+ 
+ @code
+ $ 3dVolMarchingCubes $DGtal/examples/samples/lobster.vol lobster.off -t 30
+ $ 3dVolMarchingCubes lobster2.vol -t 30 lobster2.off
+ $ 3dVolMarchingCubes lobster4.vol -t 30 lobster4.off
+ $ 3dVolMarchingCubes lobster8.vol -t 30 lobster8.off
+ $ meshViewer lobster.off lobster2.off  lobster4.off  lobster8.off -n
+ @endcode
+ 
  You should obtain such a result:
  @image html  resVolSubSample.png "Resulting visualization."
  
  @see
  @ref volSubSample.cpp
-
+ 
  */
 
 
@@ -128,8 +128,8 @@ Val maxVal(Image const& image, Point const& p, Domain const& domain)
       ++it)
     if ( domain.isInside(*it) &&  image( *it) > v) v=image(*it);
   
-  return v;    
-} 
+  return v;
+}
 template<typename Val, typename Image, typename Point, typename Domain>
 Val minVal(Image const& image, Point const& p, Domain const& domain)
 {
@@ -140,8 +140,8 @@ Val minVal(Image const& image, Point const& p, Domain const& domain)
       ++it)
     if (  domain.isInside(*it)&&  image( *it) < v) v=image(*it);
   
-  return v;    
-} 
+  return v;
+}
 template<typename Val, typename Image, typename Point, typename Domain>
 Val meanVal(Image const& image, Point const& p, Domain const& domain)
 {
@@ -152,12 +152,12 @@ Val meanVal(Image const& image, Point const& p, Domain const& domain)
       it != itend;
       ++it)
     if ( domain.isInside(*it) )
-      {
-	nb++;
-	v+=image(*it);
-      }
+    {
+      nb++;
+      v+=image(*it);
+    }
   return static_cast<unsigned char>( v/nb );
-} 
+}
 
 
 int main(int argc, char**argv)
@@ -171,28 +171,29 @@ int main(int argc, char**argv)
   std::string function {"mean"};
   
   app.description("Brutally sub sample a vol file (division by 2 in each direction).\n Basic usage: \n \tvolSubSample  <volFileName>  <volOutputFileName> ");
-
+  
   
   app.add_option("-i,--input,1", inputFileName, "Input vol file." )
   ->required()
   ->check(CLI::ExistingFile);
   app.add_option("-o,--output,2", outputFileName, "Output filename.");
   app.add_option("-f,--function", function, "Function used to the down-sampling: {none,max, min, mean}")
-   -> check(CLI::IsMember({"mean", "none", "max", "min", "mean"}));
+  -> check(CLI::IsMember({"mean", "none", "max", "min", "mean"}));
   
   app.get_formatter()->column_width(40);
   CLI11_PARSE(app, argc, argv);
   // END parse command line using CLI ----------------------------------------------
-
+  
   
   trace.beginBlock("Loading file");
   typedef ImageContainerBySTLVector<Z3i::Domain, unsigned char>  MyImageC;
-
+  
   MyImageC  imageC = VolReader< MyImageC >::importVol ( inputFileName );
-  MyImageC  outputImage( Z3i::Domain( imageC.domain().lowerBound(),
-                                      (imageC.domain().upperBound()-imageC.domain().lowerBound())/Vector().diagonal(2)));
-
+  MyImageC  outputImage( Z3i::Domain( imageC.domain().lowerBound() / 2, imageC.domain().upperBound() / 2));
+  trace.info()<<"Input vol: "<<imageC<<std::endl;
+  trace.info()<<"Output vol: "<<outputImage<<std::endl;
   trace.endBlock();
+  
   Point subvector = Vector().diagonal(2);
   Point p;
   unsigned char val;
@@ -202,40 +203,40 @@ int main(int argc, char**argv)
   //Fast Copy
   if (function == "none")
     for(MyImageC::Domain::ConstIterator it = outputImage.domain().begin(),
-	  itend = outputImage.domain().end(); it != itend; ++it)
-      {
-	p = (*it) * 2;
-	outputImage.setValue( *it , imageC( p ));
-      }
+        itend = outputImage.domain().end(); it != itend; ++it)
+    {
+      p = (*it) * 2;
+      outputImage.setValue( *it , imageC( p ));
+    }
   else
     if (function == "max")
       for(MyImageC::Domain::ConstIterator it = outputImage.domain().begin(),
-	    itend = outputImage.domain().end(); it != itend; ++it)
-	{
-	  val = maxVal<unsigned char, MyImageC, Point>(imageC, *it, imageC.domain());
-	  outputImage.setValue( *it , val );
-	}
+          itend = outputImage.domain().end(); it != itend; ++it)
+      {
+        val = maxVal<unsigned char, MyImageC, Point>(imageC, *it, imageC.domain());
+        outputImage.setValue( *it , val );
+      }
     else
       if (function == "min")
-	for(MyImageC::Domain::ConstIterator it = outputImage.domain().begin(),
-	      itend = outputImage.domain().end(); it != itend; ++it)
-	  {
-	    val = minVal<unsigned char, MyImageC, Point>(imageC, *it, imageC.domain());
-	    outputImage.setValue( *it , val);
-	  }  
+        for(MyImageC::Domain::ConstIterator it = outputImage.domain().begin(),
+            itend = outputImage.domain().end(); it != itend; ++it)
+        {
+          val = minVal<unsigned char, MyImageC, Point>(imageC, *it, imageC.domain());
+          outputImage.setValue( *it , val);
+        }
       else
-	
-      if (function == "mean")
-	for(MyImageC::Domain::ConstIterator it = outputImage.domain().begin(),
-	      itend = outputImage.domain().end(); it != itend; ++it)
-	  {
-	    val = meanVal<unsigned char, MyImageC, Point>(imageC, *it, imageC.domain());
-	    outputImage.setValue( *it , val );
-	  }
-      else
-	trace.error() << "Bad function !"<<std::endl;
-
-
+        
+        if (function == "mean")
+          for(MyImageC::Domain::ConstIterator it = outputImage.domain().begin(),
+              itend = outputImage.domain().end(); it != itend; ++it)
+          {
+            val = meanVal<unsigned char, MyImageC, Point>(imageC, *it, imageC.domain());
+            outputImage.setValue( *it , val );
+          }
+        else
+          trace.error() << "Bad function !"<<std::endl;
+  
+  
   trace.endBlock();
   
   trace.beginBlock("Exporting...");
