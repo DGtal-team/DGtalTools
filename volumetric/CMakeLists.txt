@@ -16,6 +16,7 @@ SET(DGTAL_TOOLS_SRC
   volFillInterior
   volInfo
   volMask
+  volEuclideanDT
 )
 
 
