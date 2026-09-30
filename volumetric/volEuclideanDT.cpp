@@ -98,10 +98,14 @@ int main(int argc, char**argv)
   std::string inputFileName;
   app.add_option("-i,--input,1", inputFileName, "Input vol file." )->required()->check(CLI::ExistingFile);
   std::string outputFileName;
-  app.add_option("-o,--output,2", outputFileName, "Output filename.",true);
+  app.add_option("-o,--output,2", outputFileName, "Output filename.")->required();
   
   std::string mode="edt";
-  app.add_option("-m,--mode", mode, "Export mode for the distance: {edt (remappred distances to the [0:255] range),sedt (exact square of distances as longvol),voronoi (Voronoi map using hash value per cell), rdma (centre of maximal balls)} (default:edt)", true)-> check(CLI::IsMember({"edt", "sedt", "voronoi", "rdma"}));
+  app.add_option("-m,--mode", mode, "Export mode for the distance: {edt (remappred distances to the [0:255] range),sedt (exact square of distances as longvol),voronoi (Voronoi map using hash value per cell), rdma (centre of maximal balls)} (default:edt)")-> check(CLI::IsMember({"edt", "sedt", "voronoi", "rdma"}));
+  
+  std::string exportRDMA="";
+  app.add_option("-c,--export-rdma", exportRDMA, "Filename for an ASCII RDMA export (assuming RDMA mode as been set).");
+
   
   app.get_formatter()->column_width(40);
   CLI11_PARSE(app, argc, argv);
@@ -112,9 +116,6 @@ int main(int argc, char**argv)
   Image image = VolReader< Image >::importVol ( inputFileName );
   trace.info()<<image<<std::endl;
   trace.endBlock();
-  
-  
-  
   
   trace.beginBlock("DT");
   typedef functors::SimpleThresholdForegroundPredicate<Image> Predicate;
@@ -148,7 +149,7 @@ int main(int argc, char**argv)
       ImageContainerBySTLVector<Z3i::Domain, uint64_t>   output(image.domain());
       for(auto &voxel: image.domain())
       {
-        auto val = l2Metric.rawDistance(voxel, dt.getVoronoiVector(voxel));
+        auto val = l2Metric.rawDistance(voxel, dt.getVoronoiSite(voxel));
         output.setValue(voxel, val);
       }
       size_t lastindex = outputFileName.find_last_of(".");
@@ -162,7 +163,7 @@ int main(int argc, char**argv)
         Image output(image.domain());
         for(auto &voxel: image.domain())
         {
-          auto site = dt.getVoronoiVector(voxel);
+          auto site = dt.getVoronoiSite(voxel);
           unsigned char v=0;
           if (site == voxel)
             v = 0;
@@ -179,7 +180,7 @@ int main(int argc, char**argv)
           ImageLong rawDT(image.domain());
           for(auto &voxel: image.domain())
           {
-            auto val = l2Metric.rawDistance(voxel, dt.getVoronoiVector(voxel));
+            auto val = l2Metric.rawDistance(voxel, dt.getVoronoiSite(voxel));
             rawDT.setValue(voxel, val);
           }
           PowerMap<ImageLong, Z3i::L2PowerMetric> powermap(rawDT.domain(), rawDT, l2PowerMetric);
@@ -198,6 +199,20 @@ int main(int argc, char**argv)
               ma.push_back( std::pair<Point,double>(voxel ,std::sqrt(rdma(voxel))) );
           }
           VolWriter<Image>::exportVol(outputFileName, out);
+          
+          
+          if (exportRDMA!="")
+          {
+            std::ofstream outfile;
+            outfile.open(exportRDMA.c_str());
+            for(auto &rdma: ma)
+            {
+              auto p = rdma.first;
+              auto radius = rdma.second;
+              outfile<<p[0]<<" "<<p[1]<<" "<<p[2]<<" "<<radius<<std::endl;
+            }
+            outfile.close();
+          }
         }
   return 0;
 }
