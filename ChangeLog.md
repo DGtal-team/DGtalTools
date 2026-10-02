@@ -8,6 +8,8 @@
 
 - *volumetric*
   - volSubSample: domains are shown before performing the subsampling and bugfix for the lowerbound (David Coeurjolly [481](https://github.com/DGtal-team/DGtalTools/pull/481)
+  - 3dVolMarchingCubes: cleaning up old boost includes (David Coeurjolly []())
+
 
 # DGtalTools 2.1
 
