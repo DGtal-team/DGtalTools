@@ -39,7 +39,15 @@ jobs:
        run : |
          echo "::set-output name=WHITE_LIST_TOOLS::$(cat ${{runner.workspace}}/DGtalTools/cmake/whiteListBuildTools.txt | tr -d '\n' ; ${{runner.workspace}}/DGtalTools/cmake/create_whitelist.sh ${{runner.workspace}}/DGtalTools)"
        id: whitelisttools
-
+       
+    - name: Add compiler version to Conan settings
+      run: |
+        conan config home
+        conan_home=$(conan config home)
+        cat > "$conan_home/settings_user.yml" <<'EOF'
+      compiler:
+        gcc:
+          version: ["15"]
 
      - name: Install macOS deps
        if: matrix.os == 'macOS-latest'
