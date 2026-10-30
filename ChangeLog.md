@@ -8,6 +8,9 @@
 
 - *volumetric*
   - volSubSample: domains are shown before performing the subsampling and bugfix for the lowerbound (David Coeurjolly [481](https://github.com/DGtal-team/DGtalTools/pull/481)
+  
+- *visualisation*
+  - meshViewer: new options to display scalar values on mesh faces   (--scalar, --scalarRange, --scalarColumns) using polyscope colormap. (Bertrand Kerautret [482](https://github.com/DGtal-team/DGtalTools/pull/482)) 
 
 # DGtalTools 2.1
 

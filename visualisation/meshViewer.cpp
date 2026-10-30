@@ -78,6 +78,12 @@ using namespace DGtal;
  -l,--fixLightToScene                  Fix light source to scence instead to camera
  -n,--invertNormal                     invert face normal vectors.
  -v,--drawVertex                       draw the vertex of the mesh
+ --faceScalar TEXT:FILE ... input file(s) containing scalar values associated to mesh faces.
+                            Each line format: <FaceID> <scalar_value>
+ --scalarRange FLOAT x 2    the range of values to display the scalar values
+ --scalarColIndex UINT x 2  set the column indices [colFaceID colScalar] to read FaceID and
+                            scalar values in the input file (default: 0 1). Example:
+                            --scalarColIndex 2 5 (FaceID at column 2, scalar at column 5)
 
  @endcode
 
@@ -111,8 +117,6 @@ void myCallback() {
         show_ui = !show_ui;
         polyscope::options::buildGui = show_ui;
     }
-
-  
 }
 
 
@@ -150,8 +154,12 @@ int main(int argc, char **argv)
   std::string snapshotFile;
   std::string filenameSDP;
   double ballRadius{0.5};
+  std::vector<double> scalarRange;
   bool invertNormal{false};
   bool drawVertex{false};
+  std::vector<std::string> inputScalarFileNames;
+  std::vector<unsigned int> scalFaceIndex {0, 1};
+
 
   // parse command line using CLI ----------------------------------------------
   CLI::App app;
@@ -178,7 +186,11 @@ int main(int argc, char **argv)
   app.add_option("--displaySDP,-s", filenameSDP, "add the display of a set of discrete points as ball of radius 0.5.");
   app.add_flag("--invertNormal,-n", invertNormal, "invert face normal vectors.");
   app.add_flag("--drawVertex,-v", drawVertex, "draw the vertex of the mesh");
-
+  app.add_option("--faceScalar", inputScalarFileNames, "input file(s) containing scalar values associated to mesh faces. Each line format: <FaceID> <scalar_value>")
+    ->check(CLI::ExistingFile);
+    auto scalRangeOpt =  app.add_option("--scalarRange", scalarRange, "the range of values to display the scalar values")
+    ->expected(2);
+  app.add_option("--scalarColIndex", scalFaceIndex, "set the column indices [colFaceID colScalar] to read FaceID and scalar values in the input file (default: 0 1). Example: --scalarColIndex 2 5  (FaceID at column 2, scalar at column 5)")->expected(2);
   app.get_formatter()->column_width(40);
   CLI11_PARSE(app, argc, argv);
   // END parse command line using CLI ----------------------------------------------
@@ -205,6 +217,8 @@ int main(int argc, char **argv)
     sdpColorA = customColorSDP[3];
   }
 
+  bool scalarMode = inputScalarFileNames.size() == inputFileNames.size();
+  typedef PointVector<2, double> FaceIDScalar;
 
   stringstream s;
   s << "meshViewer - DGtalTools: ";
@@ -338,9 +352,23 @@ int main(int argc, char **argv)
     {
       meshColorALine = customColorMesh[i * 8 + 7];
     }
-
-    viewer << Color(meshColorR, meshColorG, meshColorB, meshColorA);
-    viewer << vectMesh[i];
+    if (!scalarMode)
+    {
+      viewer << Color(meshColorR, meshColorG, meshColorB, meshColorA);
+      viewer << vectMesh[i];
+    }
+    else
+    {
+      auto setFaceScalar = PointListReader<FaceIDScalar>::getPointsFromFile(inputScalarFileNames[i], scalFaceIndex);
+      std::sort(setFaceScalar.begin(), setFaceScalar.end(), [](const FaceIDScalar& a, const FaceIDScalar& b) {
+         return a[0] < b[0];
+      });
+      std::vector<double> vectScalar;
+      for (unsigned int i = 0; i < setFaceScalar.size(); i++){
+          vectScalar.push_back(setFaceScalar[i][1]);
+       }
+       viewer << WithQuantity(vectMesh[i], "scalar", vectScalar);
+    }
   }
 
   if (drawVertex)
@@ -381,8 +409,36 @@ int main(int argc, char **argv)
   stringstream ss;
   ss << "# faces: " << std::fixed << nbFaces << "    #vertex: " << nbVertex;
   trace.info() << "[display ready]" << std::endl;
-  polyscope::state::userCallback = myCallback;
-
+  bool done = false;
+    
+  polyscope::state::userCallback = [&]() {
+    if (!done)
+    {
+      done = true;
+      for (unsigned int i = 0; i < vectMesh.size(); i++)
+      {
+        auto* mesh = polyscope::getSurfaceMesh("Mesh_"+std::to_string(i+1));
+        if (mesh)
+        {
+          auto* q = mesh->getQuantity("scalar");
+          if (q)
+          {
+            q->setEnabled(true);
+            if ( scalRangeOpt->count() > 0 )
+            {
+              auto* sq = dynamic_cast<polyscope::SurfaceFaceScalarQuantity*>(q);
+              if (sq) sq->setMapRange({scalarRange[0], scalarRange[1]});
+            }
+          }
+        }
+      }
+    }
+    
+    myCallback();
+  };
+    
+   
+    
   viewer.show();
   return 0;
 }
