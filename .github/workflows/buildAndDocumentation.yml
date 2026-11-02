@@ -40,11 +40,19 @@ jobs:
        run : |
          echo "::set-output name=WHITE_LIST_TOOLS::$(cat ${{runner.workspace}}/DGtalTools/cmake/whiteListBuildTools.txt | tr -d '\n' ; ${{runner.workspace}}/DGtalTools/cmake/create_whitelist.sh ${{runner.workspace}}/DGtalTools)"
        id: whitelisttools
-
-
+       
      - name: Install macOS deps
        if: matrix.os == 'macOS-latest'
        run: brew install boost ninja eigen gmp
+
+     - name: Install CMake
+       if: matrix.os == 'windows-latest'
+       uses: lukka/get-cmake@latest
+       with:
+          cmakeVersion: 3.31.8
+     - name: Check CMake version
+       if: matrix.os == 'windows-latest'
+       run: cmake --version
 
      - name: Install conan
        if: matrix.os == 'windows-latest'
@@ -57,6 +65,23 @@ jobs:
        if: matrix.os == 'windows-latest'
        run: |
            conan profile detect --force
+     - name: Check Windows compiler
+       if: matrix.os == 'windows-latest'
+       shell: bash
+       run: |
+         cat ~/.conan2/profiles/default
+         which gcc || true
+         which g++ || true
+         which mingw32-make || true
+         which nmake || true
+     - name: Add compiler version to Conan settings
+       if: matrix.os == 'windows-latest'
+       shell: pwsh
+       run: |
+           $conanHome = (conan config home).Trim()
+           $content = "compiler:`n  gcc:`n    version: [`"15`"]"
+           Set-Content -Path (Join-Path $conanHome "settings_user.yml") -Value $content
+          
 
      - uses: actions/cache@v4
        if: matrix.os == 'windows-latest'
@@ -95,6 +120,7 @@ jobs:
            echo  cmake .. $CONFIG_MAC -DBUILD_EXAMPLES=false -DBUILD_TESTING=false  -G Ninja
            cmake .. $CONFIG_MAC -DBUILD_EXAMPLES=false -DBUILD_TESTING=false  -G Ninja
            ninja
+
      - name: DGtalBuild (windows)
        if: matrix.os == 'windows-latest'
        shell: bash
@@ -105,9 +131,14 @@ jobs:
            conan install . --build=missing -s:a compiler.cppstd=20
            mkdir buildDGtal
            cd buildDGtal
-           echo  cmake .. -DCMAKE_POLICY_DEFAULT_CMP0091=NEW  -DCMAKE_BUILD_TYPE=$BUILD_TYPE $CONFIG_WINDOWS -DCMAKE_TOOLCHAIN_FILE="conan_toolchain.cmake" -DBUILD_EXAMPLES=false -DBUILD_TESTING=false -DDGTAL_WITH_POLYSCOPE_VIEWER=true
-           cmake .. -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_BUILD_TYPE=$BUILD_TYPE $CONFIG_WINDOWS -DCMAKE_TOOLCHAIN_FILE="conan_toolchain.cmake" -DBUILD_EXAMPLES=false -DBUILD_TESTING=false -DDGTAL_WITH_POLYSCOPE_VIEWER=true
-           cmake --build . --config Release --parallel 3
+           cmake .. -G "MinGW Makefiles" \
+              -DCMAKE_BUILD_TYPE=$BUILD_TYPE $CONFIG_WINDOWS \
+              -DCMAKE_TOOLCHAIN_FILE=../conan_toolchain.cmake \
+              -DCMAKE_C_COMPILER=C:/mingw64/bin/gcc.exe \
+              -DCMAKE_CXX_COMPILER=C:/mingw64/bin/g++.exe \
+              -DCMAKE_MAKE_PROGRAM=C:/mingw64/bin/mingw32-make.exe \
+              -DBUILD_EXAMPLES=false -DBUILD_TESTING=false
+            cmake --build . --parallel 3
      - name: Configure CMake (linux)
        if: matrix.os == 'ubuntu-latest'
        shell: bash
@@ -126,7 +157,19 @@ jobs:
        working-directory: "${{runner.workspace}}/build"
        run: |
            conan install $GITHUB_WORKSPACE --build=missing  -s:a compiler.cppstd=20
-           cmake $GITHUB_WORKSPACE -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_MODULE_PATH="D:/a/DGtalTools/build/DGtal/buildDGtal" -DDGtal_DIR="D:/a/DGtalTools/build/DGtal/buildDGtal" -DCMAKE_TOOLCHAIN_FILE="conan_toolchain.cmake" -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DDGTAL_RANDOMIZED_TESTING_WHITELIST="${{ steps.whitelist.outputs.WHITELIST }}"
+           cmake $GITHUB_WORKSPACE -G "MinGW Makefiles" \
+              -DCMAKE_BUILD_TYPE=$BUILD_TYPE $CONFIG_WINDOWS \
+              -DCMAKE_TOOLCHAIN_FILE=../conan_toolchain.cmake \
+              -DCMAKE_C_COMPILER=C:/mingw64/bin/gcc.exe \
+              -DCMAKE_CXX_COMPILER=C:/mingw64/bin/g++.exe \
+              -DCMAKE_MAKE_PROGRAM=C:/mingw64/bin/mingw32-make.exe \
+              -DBUILD_EXAMPLES=false -DBUILD_TESTING=false  \
+              -DCMAKE_POLICY_DEFAULT_CMP0091=NEW \
+              -DCMAKE_MODULE_PATH="D:/a/DGtalTools/build/DGtal/buildDGtal" \
+              -DDGtal_DIR="D:/a/DGtalTools/build/DGtal/buildDGtal" \
+              -DCMAKE_TOOLCHAIN_FILE="conan_toolchain.cmake" \
+              -DCMAKE_BUILD_TYPE=$BUILD_TYPE \
+              -DGTALTOOLS_RANDOMIZED_BUILD_WHITELIST="${{ steps.whitelist.outputs.WHITE_LIST_TOOLS }}"
 
      - name: Build
        working-directory: ${{runner.workspace}}/build
@@ -142,7 +185,7 @@ jobs:
   Documentation:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
 
     - name: Set up
       run: |
