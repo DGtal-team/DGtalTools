@@ -1,11 +1,12 @@
 # DGtalTools 2.2 (beta)
 
 - *global*
-  - Following the new display introduced from polyscope viewer, the illustrations of tools in the documentations was obsolete. It also add some fix when reproducing examples. Some links were also broken from the new organization. (Bertrand Kerautret [476](https://github.com/DGtal-team/DGtalTools/pull/476)) 
-  
+  - Following the new display introduced from polyscope viewer, the illustrations of tools in the documentations was obsolete. It also add some fix when reproducing examples. Some links were also broken from the new organization. (Bertrand Kerautret [476](https://github.com/DGtal-team/DGtalTools/pull/476))   
   - Default branch set to main instead old master.
    (Bertrand Kerautret [477](https://github.com/DGtal-team/DGtalTools/pull/477)) 
-
+  - Add Docker image for the tools including link to DockerHub image.
+   (Bertrand Kerautret [485](https://github.com/DGtal-team/DGtalTools/pull/485)) 
+   
 - *volumetric*
   - volSubSample: domains are shown before performing the subsampling and bugfix for the lowerbound (David Coeurjolly [481](https://github.com/DGtal-team/DGtalTools/pull/481)
   - 3dVolMarchingCubes: cleaning up old boost includes (David Coeurjolly [483](https://github.com/DGtal-team/DGtalTools/pull/483))
