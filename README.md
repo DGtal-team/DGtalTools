@@ -77,6 +77,36 @@ How to build the tools
   - DGtal must be installed in your system. Concerning DGtal dependencies, all the dependencies used to compile your DGtal library must be present to build the DGtalTools.
   
   
+Docker
+======
+A Dockerfile is included in the repository to allow users to build a
+Docker image with DGtalTools installed. The image is based on the
+DGtal Docker image and includes the DGtalTools library and its
+dependencies.
+
+To build the Docker image, Docker should be installed in the system (see [Docker installation](https://docs.docker.com/engine/install/)). Download the *Dockerfile* inside the [DGtalTools repository](https://github.com/DGtal-team/DGtalTools) and, in the directory containing the *Dockerfile*, execute:
+
+```docker build -t dgtaltools:latest .```
+
+Alternatively, users who do not wish to build the image themselves can
+directly download the prebuilt image from Docker Hub:
+
+```docker pull ker69/dgtaltools:latest```
+
+To run an interactive terminal inside the Docker container and access local data:
+
+```
+docker run -it --rm \
+    -v $(pwd)/samples:/data \
+    dgtaltools:latest bash
+```
+
+
+For example, to run a tools:
+
+```
+vol2obj /data/lobster.vol -m 50 -M 200 res.obj
+```
 
 
 Galleries
