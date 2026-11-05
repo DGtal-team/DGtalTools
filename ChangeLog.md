@@ -12,6 +12,10 @@
   - 3dVolMarchingCubes: cleaning up old boost includes (David Coeurjolly [483](https://github.com/DGtal-team/DGtalTools/pull/483))
 
 
+- *visualisation*
+  - 3dImageViewer: minor update, removing the default display message.
+   (Bertrand Kerautret [485](https://github.com/DGtal-team/DGtalTools/pull/485)) 
+
 # DGtalTools 2.1
 
 - *build*
