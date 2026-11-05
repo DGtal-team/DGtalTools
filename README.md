@@ -81,7 +81,7 @@ Docker
 ======
 A Dockerfile is included in the repository to allow users to build a
 Docker image with DGtalTools installed. The image is based on the
-DGtal Docker image and includes the DGtalTools library and its
+DGtal Docker image and includes the DGtalTools project and its
 dependencies.
 
 To build the Docker image, Docker should be installed in the system (see [Docker installation](https://docs.docker.com/engine/install/)). Download the *Dockerfile* inside the [DGtalTools repository](https://github.com/DGtal-team/DGtalTools) and, in the directory containing the *Dockerfile*, execute:
@@ -107,6 +107,15 @@ For example, to run a tools:
 ```
 vol2obj /data/lobster.vol -m 50 -M 200 res.obj
 ```
+
+
+If you want to use the tools in other image simply do in your Dockerfile:
+
+```
+FROM docker.io/ker69/dgtaltools:latest
+```
+
+
 
 
 Galleries
